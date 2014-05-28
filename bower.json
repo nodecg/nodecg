@@ -1,0 +1,23 @@
+{
+  "name": "nodecg",
+  "version": "0.0.1",
+  "homepage": "https://github.com/MattMcNam/nodecg",
+  "authors": [
+    "Matthew McNamara <matt@mattmcn.com>",
+    "Alex Van Camp <email@alexvan.camp>"
+  ],
+  "description": "Live, controllable graphics system rendered in a browser",
+  "dependencies": {
+    "masonry": "3.1.5",
+    "imagesloaded": "3.1.5"
+  },
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

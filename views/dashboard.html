@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>NodeCG dashboard</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+    <!-- Bootstrap theme CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+
+    <!-- Font Awesome CSS -->
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/dashboard.css" rel="stylesheet">
+
+    <!-- Custom styles for each widget -->
+    <style type="text/css">
+        <% for (var i=0; i < resources.length; i++) { %>
+            <% if (resources[i].type === 'css') { %>
+                <%- resources[i].text %>
+            <% } %>
+        <% } %>
+    </style>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">NodeCG dashboard</a>
+        </div>
+    </div>
+</div>
+
+<!-- Spacer -->
+<p></p>
+
+<div class="container">
+    <div class="starter-template">
+        <!-- Load widget(s) from each package -->
+        <% for (var i=0; i < panels.length; i++) { %>
+            <%- panels[i] %>
+        <% } %>
+    </div>
+</div><!-- /.container -->
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/components/masonry/dist/masonry.pkgd.min.js"></script>
+<script src="/components/imagesloaded/imagesloaded.pkgd.min.js"></script>
+<script>
+    function sendMessage(socket, commandstring, meta) {
+        socket.emit('send', {message: commandstring, content: meta });
+    }
+
+    window.onload = function() {
+        var $container = $('body > div.container');
+        // initialize
+        $container.imagesLoaded(function () {
+            $container.masonry({
+                columnWidth: 264,
+                itemSelector: '.panel'
+            })
+        });
+
+        var messages = [];
+        var hostname = '<%- config.host %>';
+        var port = <%- config.port %>;
+        var socket = io.connect('http://' + hostname + ':' + port);
+
+        <% for (var i=0; i < resources.length; i++) { %>
+        <% if (resources[i].type === 'js') { %>
+            <%- resources[i].text %>
+                <% } %>
+        <% } %>
+
+        /* jQuery for Bootstrap input "spinners" */
+        $('.spinner .btn:first-of-type').on('click', function() {
+            input = $(this).parent().parent().find('input')
+            input.val( parseInt(input.val(), 10) + 1);
+        });
+        $('.spinner .btn:last-of-type').on('click', function() {
+            input = $(this).parent().parent().find('input')
+            input.val( parseInt(input.val(), 10) - 1);
+        });
+    }
+</script>
+</body>
+</html>
