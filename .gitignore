@@ -1,4 +1,6 @@
 bower_components/
 node_modules/
+packages/
+!packages/.empty_directory
 .DS_Store
 .idea/
