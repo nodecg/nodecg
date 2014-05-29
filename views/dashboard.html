@@ -78,7 +78,7 @@
         // initialize
         $container.imagesLoaded(function () {
             $container.masonry({
-                columnWidth: 264,
+                columnWidth: 128 + 8, //.panel-span-1 width = 128, +8 for 4px pad on each side
                 itemSelector: '.panel'
             })
         });
