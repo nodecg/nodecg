@@ -19,8 +19,8 @@ config.login.steamApiKey = 'XXXXX';
  * Currently uses 64 bit Steam IDs
  */
 config.login.allowedIds = [
-	'11111111111111111',
-	'22222222222222222'
+  '11111111111111111',
+  '22222222222222222'
 ];
 
 /** 
