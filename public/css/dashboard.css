@@ -2,7 +2,7 @@ body {
   padding-top: 50px;
 }
 textarea {
-  resize: vertical;
+  max-width: 100%;
 }
 .dashboard-panels {
   padding: 40px 15px;
