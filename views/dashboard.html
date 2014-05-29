@@ -69,31 +69,42 @@
 <script src="/components/masonry/dist/masonry.pkgd.min.js"></script>
 <script src="/components/imagesloaded/imagesloaded.pkgd.min.js"></script>
 <script>
-    function sendMessage(socket, commandstring, meta) {
-        socket.emit('send', {message: commandstring, content: meta });
+  function sendMessage(socket, commandstring, meta) {
+    socket.emit('send', {message: commandstring, content: meta });
+  }
+
+  window.onload = function() {
+    var $container = $('body > div.container');
+    // initialize
+    $container.imagesLoaded(function () {
+      applyMasonry($container);
+    });
+
+    // re-apply the masonry onClick, useful for checkboxes that toggle controls
+    $container.click(function () {
+      applyMasonry($container);
+    });
+
+    // TODO: have masonry re-apply when a textarea is resized
+
+    function applyMasonry(selector) {
+      selector.masonry({
+        columnWidth: 128 + 8, //.panel-span-1 width = 128, +8 for 4px pad on each side
+        itemSelector: '.panel'
+      })
     }
 
-    window.onload = function() {
-        var $container = $('body > div.container');
-        // initialize
-        $container.imagesLoaded(function () {
-            $container.masonry({
-                columnWidth: 128 + 8, //.panel-span-1 width = 128, +8 for 4px pad on each side
-                itemSelector: '.panel'
-            })
-        });
+    var messages = [];
+    var hostname = '<%- config.host %>';
+    var port = <%- config.port %>;
+    var socket = io.connect('http://' + hostname + ':' + port);
 
-        var messages = [];
-        var hostname = '<%- config.host %>';
-        var port = <%- config.port %>;
-        var socket = io.connect('http://' + hostname + ':' + port);
-
-        <% for (var i=0; i < resources.length; i++) { %>
-        <% if (resources[i].type === 'js') { %>
-            <%- resources[i].text %>
-                <% } %>
-        <% } %>
-    }
+    <% for (var i=0; i < resources.length; i++) { %>
+      <% if (resources[i].type === 'js') { %>
+        <%- resources[i].text %>
+      <% } %>
+    <% } %>
+  }
 </script>
 </body>
 </html>
