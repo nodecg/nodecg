@@ -60,6 +60,8 @@
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="/components/jquery/dist/jquery.min.js"></script>
 <script src="/components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/components/bootstrap/js/tooltip.js"></script>
+<script src="/components/bootstrap/js/popover.js"></script>
 <script src="/components/masonry/dist/masonry.pkgd.min.js"></script>
 <script src="/components/imagesloaded/imagesloaded.pkgd.min.js"></script>
 
@@ -89,6 +91,18 @@
         itemSelector: '.panel'
       })
     }
+
+    // Proof of concept code to add informational "popover" tooltips to the header of each panel
+    $('.panel-heading').each(function( index ) {
+      pkgName = $(this).parent().attr("id")
+
+      $(this).popover({
+        title: pkgName,
+        html: true,
+        content: "<a target=\"_blank\" href=\"" + window.location.origin + "/view/" + pkgName + "\">" +
+          window.location.origin + "/view/" + pkgName + "</a>"
+      });
+    });
 
     var messages = [];
     var hostname = '<%- config.host %>';
