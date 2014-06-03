@@ -10,7 +10,7 @@ A nodecg-samples repository will be created soon to demonstrate how this works i
 ### Installation
 Install [node.js & npm](http://nodejs.org/), then install [bower](http://bower.io/), then run the following:
 ```
-git clone https://github.com/MattMcNam/nodecg.git  
+git clone https://github.com/nodecg/nodecg.git  
 cd nodecg  
 npm install  
 bower install  
