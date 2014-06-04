@@ -92,9 +92,9 @@ function readAdminResources() {
 }
 
 var viewSetupScript =
-    'var __overlayHostname = "http://' + config.host + ':' + config.port + '";\r\n' +
-    'var __overlaySocket = io.connect(__overlayHostname);\r\n' +
-    'var dashSocket = __overlaySocket;';
+    '<script src="/socket.io/socket.io.js"></script>\r\n' +
+    '<script>__ncg__packagename__ = PACKAGENAME;</script>' +
+    '<script src="/nodecg.js"></script>';
 
 app.all('*', function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -123,7 +123,7 @@ app.get('/view/:view_name*', function(req, res) {
   }
 
   if (resName.endsWith('html') || resName.endsWith('ejs')) {
-    res.render(fileLocation, {setupScript: viewSetupScript});
+    res.render(fileLocation, {setupScript: viewSetupScript.replace('PACKAGENAME', viewName)});
   } else {
     res.sendfile(fileLocation);
   }
@@ -133,6 +133,10 @@ app.get('/dashboard', ensureAuthenticated, function(req, res) {
   var resources = readAdminResources();
 
   res.render('views/dashboard.html', {resources: resources.resources, panels: resources.panels, config: config});
+});
+
+app.get('/nodecg.js', function(req, res) {
+  res.render('views/js/nodecg.js', {host: config.host, port: config.port, })
 });
 
 /**
