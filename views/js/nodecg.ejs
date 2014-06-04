@@ -1,15 +1,15 @@
 function NodeCG() {
-  this.host = <%- host %>;
+  this.host = '<%- host %>';
   this.port = <%- port %>;
 
   this._socket = io.connect('http://' + this.host + ':' + this.port + '/');
 
   this.sendMessage = function(messageName, data) {
-    this._socket.emit('ncg-' + __ncg__packagename__, {name: messageName, data: data});
+    this._socket.emit('ncg-' + window.__ncg__packagename__, {name: messageName, data: data});
   };
 
   this.listenFor = function(messageName, handler) {
-    this._socket.on('ncg-' + __ncg__packagename__, function(data) {
+    this._socket.on('ncg-' + window.__ncg__packagename__, function(data) {
       if (data.name === messageName) {
         handler(data.data);
       }

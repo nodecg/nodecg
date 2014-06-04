@@ -90,14 +90,30 @@
       })
     }
 
-    var messages = [];
-    var hostname = '<%- config.host %>';
-    var port = <%- config.port %>;
-    var socket = io.connect('http://' + hostname + ':' + port);
+    function NodeCG(packageName) {
+      this.host = '<%- config.host %>';
+      this.port = <%- config.port %>;
+
+      this._socket = io.connect('http://' + this.host + ':' + this.port + '/');
+
+      this.sendMessage = function(messageName, data) {
+        this._socket.emit('ncg-' + packageName, {name: messageName, data: data});
+      };
+
+      this.listenFor = function(messageName, handler) {
+        this._socket.on('ncg-' + packageName, function(data) {
+          if (data.name === messageName) {
+            handler(data.data);
+          }
+        });
+      };
+    }
 
     <% for (var i=0; i < resources.length; i++) { %>
       <% if (resources[i].type === 'js') { %>
-        <%- resources[i].text %>
+        (function (nodecg) {
+          <%- resources[i].text %>
+        })(new NodeCG('<%- resources[i].packageName %>'));
       <% } %>
     <% } %>
   }

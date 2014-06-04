@@ -79,9 +79,9 @@ function readAdminResources() {
 
       var data = fs.readFileSync('packages/' + packageName + '/admin/' + adminContentFilename, {encoding: 'utf8'});
       if (adminContentFilename.endsWith('.js')) {
-        adminResources.push({type: 'js', text: data});
+        adminResources.push({packageName: packageName, type: 'js', text: data});
       } else if (adminContentFilename.endsWith('.css')) {
-        adminResources.push({type: 'css', text: data});
+        adminResources.push({packageName: packageName, type: 'css', text: data});
       } else if (adminContentFilename.endsWith('.html') || adminContentFilename.endsWith('.ejs')) {
         adminPanels.push(data);
       }
@@ -93,7 +93,7 @@ function readAdminResources() {
 
 var viewSetupScript =
     '<script src="/socket.io/socket.io.js"></script>\r\n' +
-    '<script>__ncg__packagename__ = PACKAGENAME;</script>' +
+    '<script>window.__ncg__packagename__ = \'PACKAGENAME\';</script>' +
     '<script src="/nodecg.js"></script>';
 
 app.all('*', function(req, res, next) {
@@ -136,7 +136,7 @@ app.get('/dashboard', ensureAuthenticated, function(req, res) {
 });
 
 app.get('/nodecg.js', function(req, res) {
-  res.render('views/js/nodecg.js', {host: config.host, port: config.port, })
+  res.render('views/js/nodecg.ejs', {host: config.host, port: config.port})
 });
 
 /**
