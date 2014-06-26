@@ -2,17 +2,36 @@ function NodeCG() {
   this.host = '<%- host %>';
   this.port = <%- port %>;
 
-  this._socket = io.connect('http://' + this.host + ':' + this.port + '/');
+  _socket = io.connect('http://' + this.host + ':' + this.port + '/');
+  
+  _handlers = [];
+  
+  _socket.on('connect', function() {
+    _socket.on('message', function(data) {
+      if (data.packageName !== window.__ncg__packagename__)
+        return;
+      
+      for (var i = 0; i < _handlers.length; i++) {
+        var _handler = _handlers[i];
+        if (data.messageName === _handler.messageName) {
+          _handler.func(data.content);
+        }
+      }
+    });
+  });
 
   this.sendMessage = function(messageName, data) {
-    this._socket.emit('ncg-' + window.__ncg__packagename__, {name: messageName, data: data});
+    this._socket.json.send({
+      packageName: window.__ncg__packagename__,
+      messageName: messageName,
+      content: data
+    });
   };
 
   this.listenFor = function(messageName, handler) {
-    this._socket.on('ncg-' + window.__ncg__packagename__, function(data) {
-      if (data.name === messageName) {
-        handler(data.data);
-      }
+    _handlers.push({
+      messageName: messageName,
+      func: handler
     });
   };
 }

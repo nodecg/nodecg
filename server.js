@@ -174,9 +174,8 @@ function ensureAuthenticated(req, res, next) {
 }
 
 io.sockets.on('connection', function (socket) {
-  socket.emit('message', { message: 'welcome' });
-  socket.on('send', function (data) {
-    io.sockets.emit('message', data);
+  socket.on('message', function (data) {
+    io.sockets.json.send(data);
   });
 });
 

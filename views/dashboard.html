@@ -97,13 +97,17 @@
       this._socket = io.connect('http://' + this.host + ':' + this.port + '/');
 
       this.sendMessage = function(messageName, data) {
-        this._socket.emit('ncg-' + packageName, {name: messageName, data: data});
+        this._socket.json.send({
+          packageName: packageName,
+          messageName: messageName,
+          content: data
+        });
       };
 
       this.listenFor = function(messageName, handler) {
-        this._socket.on('ncg-' + packageName, function(data) {
-          if (data.name === messageName) {
-            handler(data.data);
+        this._socket.on('message', function(data) {
+          if (data.packageName === packageName && data.messageName === messageName) {
+            handler(data.content);
           }
         });
       };
