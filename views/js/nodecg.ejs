@@ -2,17 +2,19 @@ function NodeCG() {
   this.host = '<%- host %>';
   this.port = <%- port %>;
 
-  _socket = io.connect('http://' + this.host + ':' + this.port + '/');
+  this._socket = io.connect('http://' + this.host + ':' + this.port + '/');
   
-  _handlers = [];
+  this._handlers = [];
   
-  _socket.on('connect', function() {
-    _socket.on('message', function(data) {
+  var self = this;
+  
+  this._socket.on('connect', function() {
+    self._socket.on('message', function(data) {
       if (data.packageName !== window.__ncg__packagename__)
         return;
       
-      for (var i = 0; i < _handlers.length; i++) {
-        var _handler = _handlers[i];
+      for (var i = 0; i < self._handlers.length; i++) {
+        var _handler = self._handlers[i];
         if (data.messageName === _handler.messageName) {
           _handler.func(data.content);
         }
@@ -21,7 +23,7 @@ function NodeCG() {
   });
 
   this.sendMessage = function(messageName, data) {
-    this._socket.json.send({
+    self._socket.json.send({
       packageName: window.__ncg__packagename__,
       messageName: messageName,
       content: data
@@ -29,7 +31,7 @@ function NodeCG() {
   };
 
   this.listenFor = function(messageName, handler) {
-    _handlers.push({
+    self._handlers.push({
       messageName: messageName,
       func: handler
     });

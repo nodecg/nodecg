@@ -95,20 +95,37 @@
       this.port = <%- config.port %>;
 
       this._socket = io.connect('http://' + this.host + ':' + this.port + '/');
-
+      
+      this._handlers = [];
+      
+      var self = this;
+      
+      this._socket.on('connect', function() {
+        self._socket.on('message', function(data) {
+          if (data.packageName !== packageName)
+            return;
+          
+          for (var i = 0; i < self._handlers.length; i++) {
+            var _handler = self._handlers[i];
+            if (data.messageName === _handler.messageName) {
+              _handler.func(data.content);
+            }
+          }
+        });
+      });
+      
       this.sendMessage = function(messageName, data) {
-        this._socket.json.send({
+        self._socket.json.send({
           packageName: packageName,
           messageName: messageName,
           content: data
         });
       };
-
+      
       this.listenFor = function(messageName, handler) {
-        this._socket.on('message', function(data) {
-          if (data.packageName === packageName && data.messageName === messageName) {
-            handler(data.content);
-          }
+        self._handlers.push({
+          messageName: messageName,
+          func: handler
         });
       };
     }
