@@ -90,14 +90,51 @@
       })
     }
 
-    var messages = [];
-    var hostname = '<%- config.host %>';
-    var port = <%- config.port %>;
-    var socket = io.connect('http://' + hostname + ':' + port);
+    function NodeCG(packageName) {
+      this.host = '<%- config.host %>';
+      this.port = <%- config.port %>;
+
+      this._socket = io.connect('http://' + this.host + ':' + this.port + '/');
+      
+      this._handlers = [];
+      
+      var self = this;
+      
+      this._socket.on('connect', function() {
+        self._socket.on('message', function(data) {
+          if (data.packageName !== packageName)
+            return;
+          
+          for (var i = 0; i < self._handlers.length; i++) {
+            var _handler = self._handlers[i];
+            if (data.messageName === _handler.messageName) {
+              _handler.func(data.content);
+            }
+          }
+        });
+      });
+      
+      this.sendMessage = function(messageName, data) {
+        self._socket.json.send({
+          packageName: packageName,
+          messageName: messageName,
+          content: data
+        });
+      };
+      
+      this.listenFor = function(messageName, handler) {
+        self._handlers.push({
+          messageName: messageName,
+          func: handler
+        });
+      };
+    }
 
     <% for (var i=0; i < resources.length; i++) { %>
       <% if (resources[i].type === 'js') { %>
-        <%- resources[i].text %>
+        (function (nodecg) {
+          <%- resources[i].text %>
+        })(new NodeCG('<%- resources[i].packageName %>'));
       <% } %>
     <% } %>
   }
