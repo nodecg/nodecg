@@ -92,13 +92,18 @@
       })
     }
 
-	// Proof of concept code to add informational "popover" tooltips to the header of each panel
-    $('.panel-heading').each(function( index ) {
-      pkgName = $(this).parent().attr("id");
+    // Proof of concept code to add informational "popover" tooltips to the header of each panel
+    $('.panel-heading').append(
+      '<button type="button" class="btn btn-xs btn-info panel-info">Info</button>'
+    );
+    $('.panel-info').each(function( index ) {
+      pkgName = $(this).closest('.panel').attr("id");
 
       $(this).popover({
         title: pkgName,
         html: true,
+        placement: "bottom",
+        parent: $(this).closest('.panel-heading'),
         content: "<a target=\"_blank\" href=\"" + window.location.origin + "/view/" + pkgName + "\">" +
           window.location.origin + "/view/" + pkgName + "</a>"
       });

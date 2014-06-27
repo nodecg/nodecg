@@ -10,8 +10,15 @@ textarea {
 .panel-title {
   display: inline-block;
 }
+.panel-info {
+  width: auto!important;
+  float: right;
+  margin-right: 4px;
+  font-size: 0.8em;
+}
 .fa {
   float: right;
+  font-size: 20px;
 }
 .panel-span-1 {
   width: 128px;
@@ -36,4 +43,12 @@ textarea {
 }
 .panel-span-8 {
   width: 1024px;
+}
+.popover {
+  left: 0px!important; /* bootstrap really wants to add a left value for whatever reason */
+  margin-left: 8px!important;
+  margin-right: 8px!important;
+}
+.popover-content {
+  overflow-wrap: break-word;
 }
