@@ -34,28 +34,12 @@ textarea {
   float: right;
   font-size: 20px;
 }
-.panel-span-1 {
-  width: 128px;
-}
-.panel-span-2 {
-  width: 256px;
-}
-.panel-span-3 {
-  width: 384px;
-}
-.panel-span-4 {
-  width: 512px;
-}
-.panel-span-5 {
-  width: 640px;
-}
-.panel-span-6 {
-  width: 768px;
-}
-.panel-span-7 {
-  width: 896px;
-}
-.panel-span-8 {
-  width: 1024px;
-}
 
+.generate-panel-spans(8);
+
+.generate-panel-spans(@n, @i: 1) when (@i =< @n) {
+  .panel-span-@{i} {
+    width: (@i * 128px);
+  }
+  .generate-panel-spans(@n, (@i + 1));
+}
