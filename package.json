@@ -1,6 +1,7 @@
 {
   "name": "nodecg",
   "description": "Live, controllable graphics system rendered in a browser",
+  "main": "server.js",
   "version": "0.0.1",
   "author": "Matthew McNamara <matt@mattmcn.com>",
   "contributors": [
