@@ -19,7 +19,7 @@ textarea {
 }
 .panel-heading .popover .arrow {
   left: auto;
-  right: 33px;
+  right: 28px;
 }
 .panel-heading .popover-content {
   overflow-wrap: break-word;
@@ -28,7 +28,11 @@ textarea {
   width: auto!important;
   float: right;
   margin-right: 4px;
-  font-size: 0.8em;
+}
+.panel-info .fa {
+  font-size: 16px;
+  margin-top: 1px;
+  margin-bottom: -1px;
 }
 .fa {
   float: right;
