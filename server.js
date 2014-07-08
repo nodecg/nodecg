@@ -129,6 +129,10 @@ app.get('/view/:view_name*', function(req, res) {
   }
 });
 
+app.get('/', function(req, res) {
+  res.redirect('/dashboard');
+});
+
 app.get('/dashboard', ensureAuthenticated, function(req, res) {
   var resources = readAdminResources();
 
