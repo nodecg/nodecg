@@ -1,6 +1,15 @@
+# Node / Bower
 bower_components/
 node_modules/
+
+# Local packages
 packages/
 !packages/.empty_directory
+
+# OS specific
 .DS_Store
+
+# JetBrains IDEs (IntelliJ/WebStorm)
 .idea/
+*.iml
+
