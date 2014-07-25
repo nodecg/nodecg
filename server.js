@@ -65,8 +65,8 @@ function readAdminResources() {
   for (var i = 0; i < packageDir.length; i++) {
     var packageName = packageDir[i];
 
-    // Skip if not a directory
-    if (!fs.statSync('packages/' + packageName).isDirectory()) {
+    // Skip if admin directory doesn't exist
+    if (!fs.existsSync('packages/' + packageName + '/admin/')) {
       continue;
     }
 
