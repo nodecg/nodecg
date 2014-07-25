@@ -23,7 +23,7 @@ node server.js
 - You can configure NodeCG by editing config.js
 
 ### License
-NodeCG is provided under the MIT license, which is available to read in LICENSE.md
+NodeCG is provided under the MIT license, which is available to read in the LICENSE file
 
 ### Credits
 [Alex "Lange" Van Camp](http://alexvancamp.com), lead programmer & designer of [toth-overlay](https://github.com/Langeh/toth-overlay), contributor to NodeCG  
