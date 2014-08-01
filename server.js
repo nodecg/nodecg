@@ -9,7 +9,9 @@ var express = require('express'),
     fs = require('fs'),
     passport = require('passport'),
     SteamStrategy = require('passport-steam').Strategy,
-    config = require('./config');
+    config = require('./config'),
+    chokidar = require('chokidar'),
+    pkgs = readPackageManifests();
 
 require('string.prototype.endswith');
 
@@ -55,41 +57,77 @@ passport.use(new SteamStrategy({
   }
 ));
 
-function readAdminResources() {
-  // Array of strings containing the panel's <div>
-  var adminPanels = [];
-  // Arrays of Objects with 'type' == 'css' or 'js', and 'text' == the CSS or JS code
-  var adminResources = [];
+/**
+ * Chokidar setup
+ * Watches the "packages" folder for changes
+ */
+var watcher = chokidar.watch('packages/', {ignored: /[\/\\]\./, persistent: true});
+// Is the below line a memory leak?
+// In theory garbage collection will take care of all the now-orphaned objects on the next cycle, right?
+watcher.on('all', function(path) {
+  console.log("[NODECG] Change detected in packages dir, reloading all packages");
+  pkgs = readPackageManifests()
+  console.log("[NODECG] All packages reloaded.");
+});
 
+function readPackageManifests() {
+  var packages = [];
   var packageDir = fs.readdirSync('packages/');
-  for (var i = 0; i < packageDir.length; i++) {
-    var packageName = packageDir[i];
 
-    // Skip if admin directory doesn't exist
-    if (!fs.existsSync('packages/' + packageName + '/admin/')) {
-      continue;
+  packageDir.forEach(function(dir) {
+    var packageName = dir;
+
+    // Skip if nodecg.json doesn't exist
+    var manifestPath = 'packages/' + packageName + '/nodecg.json';
+    if (!fs.existsSync(manifestPath)) {
+      return;
     }
 
-    var adminDir = fs.readdirSync('packages/' + packageName + '/admin/');
-    for (var j = 0; j < adminDir.length; j++) {
-      var adminContentFilename = adminDir[j];
-      if (!fs.statSync('packages/' + packageName + '/admin/' + adminContentFilename).isFile()) {
-        // Skip directories
-        continue;
-      }
+    // Parse the JSON into a new package object
+    var pkg = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    pkg.dir = 'packages/' + pkg.name;
+    pkg.admin = {}; // for some reason it wants me to initialize these
+    pkg.view = {};
+    pkg.admin.dir = pkg.dir + '/admin';
+    pkg.view.url = 'http://' + config.host + ':' + config.port + '/view/' + pkg.name;
 
-      var data = fs.readFileSync('packages/' + packageName + '/admin/' + adminContentFilename, {encoding: 'utf8'});
-      if (adminContentFilename.endsWith('.js')) {
-        adminResources.push({packageName: packageName, type: 'js', text: data});
-      } else if (adminContentFilename.endsWith('.css')) {
-        adminResources.push({packageName: packageName, type: 'css', text: data});
-      } else if (adminContentFilename.endsWith('.html') || adminContentFilename.endsWith('.ejs')) {
-        adminPanels.push(data);
-      }
+    // I don't like this panel implementation, but don't know how to make it better - Lange
+    // Read all HTML/CSS/JS files in the package's "admin" dir into memory
+    // They will then get passed to dashboard.html at the time of 'GET' and be templated into the final rendered page
+    readAdminResources(pkg);
+
+    packages.push(pkg);
+  });
+
+  return packages;
+}
+
+function readAdminResources(pkg) {
+  // Why do I have to require this here? Can't I require it globally? - Lange
+  require('string.prototype.endswith');
+
+  // Array of strings containing the panel's <div>
+  pkg.admin.panels = [];
+  // Arrays of Objects with 'type' == 'css' or 'js', and 'text' == the CSS or JS code
+  pkg.admin.resources = [];
+
+  var adminDir = fs.readdirSync(pkg.admin.dir); // returns just the filenames of each file in the folder, not full path
+
+  adminDir.forEach(function(file) {
+    if (!fs.statSync(pkg.admin.dir + "/" + file).isFile()) {
+      // Skip directories
+      return;
     }
-  }
 
-  return {panels: adminPanels, resources: adminResources};
+    var data = fs.readFileSync(pkg.admin.dir + "/" + file, {encoding: 'utf8'});
+    if (file.endsWith('.js')) {
+      pkg.admin.resources.push({type: 'js', text: data});
+    } else if (file.endsWith('.css')) {
+      pkg.admin.resources.push({type: 'css', text: data});
+    } else if (file.endsWith('.html') || file.endsWith('.ejs')) {
+      pkg.admin.panels.push(data);
+    }
+  });
 }
 
 var viewSetupScript =
@@ -135,9 +173,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/dashboard', ensureAuthenticated, function(req, res) {
-  var resources = readAdminResources();
-
-  res.render('views/dashboard.html', {resources: resources.resources, panels: resources.panels, config: config});
+  res.render('views/dashboard.html', {pkgs: pkgs, config: config});
 });
 
 app.get('/nodecg.js', function(req, res) {
