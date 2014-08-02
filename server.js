@@ -9,11 +9,10 @@ var express = require('express'),
     fs = require('fs'),
     passport = require('passport'),
     SteamStrategy = require('passport-steam').Strategy,
-    config = require('./config'),
     chokidar = require('chokidar'),
+    config = require('./config'),
+    ncgPkg = require('./classes/ncg_pkg'),
     pkgs = readPackageManifests();
-
-require('string.prototype.endswith');
 
 /**
  * Express app setup
@@ -64,6 +63,7 @@ passport.use(new SteamStrategy({
 var watcher = chokidar.watch('packages/', {ignored: /[\/\\]\./, persistent: true});
 // Is the below line a memory leak?
 // In theory garbage collection will take care of all the now-orphaned objects on the next cycle, right?
+// At some point, maybe this should become a per-instance part of the ncgPkg class
 watcher.on('all', function(path) {
   console.log("[NODECG] Change detected in packages dir, reloading all packages");
   pkgs = readPackageManifests()
@@ -78,56 +78,18 @@ function readPackageManifests() {
     var packageName = dir;
 
     // Skip if nodecg.json doesn't exist
-    var manifestPath = 'packages/' + packageName + '/nodecg.json';
-    if (!fs.existsSync(manifestPath)) {
+    var pkgPath = 'packages/' + packageName + '/';
+    if (!fs.existsSync(pkgPath + "nodecg.json")) {
       return;
     }
 
-    // Parse the JSON into a new package object
-    var pkg = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    pkg.dir = 'packages/' + pkg.name;
-    pkg.admin = {}; // for some reason it wants me to initialize these
-    pkg.view = {};
-    pkg.admin.dir = pkg.dir + '/admin';
-    pkg.view.url = 'http://' + config.host + ':' + config.port + '/view/' + pkg.name;
-
-    // I don't like this panel implementation, but don't know how to make it better - Lange
-    // Read all HTML/CSS/JS files in the package's "admin" dir into memory
-    // They will then get passed to dashboard.html at the time of 'GET' and be templated into the final rendered page
-    readAdminResources(pkg);
+    console.log("[NODECG] Loading " + pkgPath);
+    var pkg = new ncgPkg(pkgPath);
 
     packages.push(pkg);
   });
 
   return packages;
-}
-
-function readAdminResources(pkg) {
-  // Why do I have to require this here? Can't I require it globally? - Lange
-  require('string.prototype.endswith');
-
-  // Array of strings containing the panel's <div>
-  pkg.admin.panels = [];
-  // Arrays of Objects with 'type' == 'css' or 'js', and 'text' == the CSS or JS code
-  pkg.admin.resources = [];
-
-  var adminDir = fs.readdirSync(pkg.admin.dir); // returns just the filenames of each file in the folder, not full path
-
-  adminDir.forEach(function(file) {
-    if (!fs.statSync(pkg.admin.dir + "/" + file).isFile()) {
-      // Skip directories
-      return;
-    }
-
-    var data = fs.readFileSync(pkg.admin.dir + "/" + file, {encoding: 'utf8'});
-    if (file.endsWith('.js')) {
-      pkg.admin.resources.push({type: 'js', text: data});
-    } else if (file.endsWith('.css')) {
-      pkg.admin.resources.push({type: 'css', text: data});
-    } else if (file.endsWith('.html') || file.endsWith('.ejs')) {
-      pkg.admin.panels.push(data);
-    }
-  });
 }
 
 var viewSetupScript =
