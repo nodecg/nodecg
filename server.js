@@ -60,14 +60,13 @@ passport.use(new SteamStrategy({
  * Chokidar setup
  * Watches the "packages" folder for changes
  */
-var watcher = chokidar.watch('packages/', {ignored: /[\/\\]\./, persistent: true});
+var watcher = chokidar.watch('packages/', {ignored: /[\/\\]\./, persistent: true, ignoreInitial: true});
 // Is the below line a memory leak?
 // In theory garbage collection will take care of all the now-orphaned objects on the next cycle, right?
 // At some point, maybe this should become a per-instance part of the NcgPkg class
-// The current implementation runs way too often and will be very heavy once people start having dozens of pkgs
 watcher.on('all', function(path) {
   console.log("[NODECG] Change detected in packages dir, reloading all packages");
-  pkgs = readPackageManifests();
+  pkgs = parsePackages();
   console.log("[NODECG] All packages reloaded.");
 });
 
