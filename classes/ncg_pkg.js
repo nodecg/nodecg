@@ -15,7 +15,7 @@ function ncgPkg(dir) {
   // Read all HTML/CSS/JS files in the package's "admin" dir into memory
   // They will then get passed to dashboard.html at the time of 'GET' and be templated into the final rendered page
   this.admin = {};
-  this.admin.dir = this.dir + '/admin';
+  this.admin.dir = this.dir + 'admin/';
   this.readAdminResources();
 
   this.view = {};
@@ -41,6 +41,9 @@ ncgPkg.prototype.readManifest = function() {
 };
 
 ncgPkg.prototype.readAdminResources = function() {
+  // Needed because the scope of "this" changes in the adminDir.forEach loop
+  var self = this;
+
   // Array of strings containing the panel's <div>
   this.admin.panels = [];
   // Arrays of Objects with 'type' == 'css' or 'js', and 'text' == the CSS or JS code
@@ -49,18 +52,18 @@ ncgPkg.prototype.readAdminResources = function() {
   var adminDir = fs.readdirSync(this.admin.dir); // returns just the filenames of each file in the folder, not full path
 
   adminDir.forEach(function(file) {
-    if (!fs.statSync(this.dir + "/" + file).isFile()) {
+    if (!fs.statSync(self.admin.dir + file).isFile()) {
       // Skip directories
       return;
     }
 
-    var data = fs.readFileSync(this.admin.dir + "/" + file, {encoding: 'utf8'});
+    var data = fs.readFileSync(self.admin.dir + file, {encoding: 'utf8'});
     if (file.endsWith('.js')) {
-      this.admin.resources.push({type: 'js', text: data});
+      self.admin.resources.push({type: 'js', text: data});
     } else if (file.endsWith('.css')) {
-      this.admin.resources.push({type: 'css', text: data});
+      self.admin.resources.push({type: 'css', text: data});
     } else if (file.endsWith('.html') || file.endsWith('.ejs')) {
-      this.admin.panels.push(data);
+      self.admin.panels.push(data);
     }
   });
 };
