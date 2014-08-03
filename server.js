@@ -67,7 +67,7 @@ var watcher = chokidar.watch('packages/', {ignored: /[\/\\]\./, persistent: true
 // The current implementation runs way too often and will be very heavy once people start having dozens of pkgs
 watcher.on('all', function(path) {
   console.log("[NODECG] Change detected in packages dir, reloading all packages");
-  pkgs = readPackageManifests()
+  pkgs = readPackageManifests();
   console.log("[NODECG] All packages reloaded.");
 });
 
