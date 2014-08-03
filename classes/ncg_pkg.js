@@ -4,11 +4,12 @@ var assert = require('assert'),
 
 require('string.prototype.endswith');
 
-function ncgPkg(dir) {
+function NcgPkg(dir) {
   this.dir = dir;
   this.manifestPath = this.dir + "nodecg.json";
 
-  // Read metadata from the manifest
+  // Read metadata from the nodecg.json manifest file
+  // This is the bulk of the package's attributes
   this.readManifest();
 
   // I don't like this panel implementation, but don't know how to make it better - Lange
@@ -22,7 +23,7 @@ function ncgPkg(dir) {
   this.view.url = 'http://' + config.host + ':' + config.port + '/view/' + this.name;
 }
 
-ncgPkg.prototype.readManifest = function() {
+NcgPkg.prototype.readManifest = function() {
   // Error if nodecg.json doesn't exist
   assert.ok(fs.existsSync(this.manifestPath),
       "argument 'manifestPath' must point to an existing nodecg.json file, " + this.manifestPath + " was supplied");
@@ -30,7 +31,7 @@ ncgPkg.prototype.readManifest = function() {
   // Parse the JSON from nodecg.json
   var manifest = JSON.parse(fs.readFileSync(this.manifestPath, 'utf8'));
 
-  // Copy the JSON we use into a the new ncgPkg object
+  // Copy the JSON we use into the new ncgPkg object
   this.name = manifest.name;
   this.version = manifest.version;
   this.description = manifest.description;
@@ -40,7 +41,7 @@ ncgPkg.prototype.readManifest = function() {
   this.license = manifest.license;
 };
 
-ncgPkg.prototype.readAdminResources = function() {
+NcgPkg.prototype.readAdminResources = function() {
   // Needed because the scope of "this" changes in the adminDir.forEach loop
   var self = this;
 
@@ -68,4 +69,4 @@ ncgPkg.prototype.readAdminResources = function() {
   });
 };
 
-module.exports = ncgPkg;
+module.exports = NcgPkg;

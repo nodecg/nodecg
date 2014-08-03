@@ -11,8 +11,8 @@ var express = require('express'),
     SteamStrategy = require('passport-steam').Strategy,
     chokidar = require('chokidar'),
     config = require('./config'),
-    ncgPkg = require('./classes/ncg_pkg'),
-    pkgs = readPackageManifests();
+    NcgPkg = require('./classes/ncg_pkg'),
+    pkgs = parsePackages();
 
 /**
  * Express app setup
@@ -63,14 +63,15 @@ passport.use(new SteamStrategy({
 var watcher = chokidar.watch('packages/', {ignored: /[\/\\]\./, persistent: true});
 // Is the below line a memory leak?
 // In theory garbage collection will take care of all the now-orphaned objects on the next cycle, right?
-// At some point, maybe this should become a per-instance part of the ncgPkg class
+// At some point, maybe this should become a per-instance part of the NcgPkg class
+// The current implementation runs way too often and will be very heavy once people start having dozens of pkgs
 watcher.on('all', function(path) {
   console.log("[NODECG] Change detected in packages dir, reloading all packages");
   pkgs = readPackageManifests()
   console.log("[NODECG] All packages reloaded.");
 });
 
-function readPackageManifests() {
+function parsePackages() {
   var packages = [];
   var packageDir = fs.readdirSync('packages/');
 
@@ -84,7 +85,7 @@ function readPackageManifests() {
     }
 
     console.log("[NODECG] Loading " + pkgPath);
-    var pkg = new ncgPkg(pkgPath);
+    var pkg = new NcgPkg(pkgPath);
 
     packages.push(pkg);
   });
