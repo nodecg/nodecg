@@ -19,24 +19,28 @@ textarea {
 }
 .panel-heading .popover .arrow {
   left: auto;
-  right: 28px;
+  right: 31px;
 }
 .panel-heading .popover-content {
   overflow-wrap: break-word;
 }
+.panel-icon {
+  width: 20px;
+  text-align: center;
+}
 .panel-info {
   width: auto!important;
+  height: 21px!important;
   float: right;
   margin-right: 4px;
 }
 .panel-info .fa {
   font-size: 16px;
-  margin-top: 1px;
-  margin-bottom: -1px;
+  margin-top: -1px;
 }
 .fa {
   float: right;
-  font-size: 20px;
+  font-size: 21px;
 }
 .panel-span-1 {
   width: 128px;
