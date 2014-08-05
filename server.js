@@ -9,7 +9,7 @@ var express = require('express'),
     fs = require('fs'),
     passport = require('passport'),
     SteamStrategy = require('passport-steam').Strategy,
-    chokidar = require('chokidar'),
+    gaze = require('gaze'),
     config = require('./config'),
     NcgPkg = require('./classes/ncg_pkg'),
     pkgs = parsePackages();
@@ -57,17 +57,17 @@ passport.use(new SteamStrategy({
 ));
 
 /**
- * Chokidar setup
+ * Gaze setup
  * Watches the "packages" folder for changes
  */
-var watcher = chokidar.watch('packages/', {ignored: /[\/\\]\./, persistent: true, ignoreInitial: true});
-// Is the below line a memory leak?
-// In theory garbage collection will take care of all the now-orphaned objects on the next cycle, right?
-// At some point, maybe this should become a per-instance part of the NcgPkg class
-watcher.on('all', function(path) {
-  console.log("[NODECG] Change detected in packages dir, reloading all packages");
-  pkgs = parsePackages();
-  console.log("[NODECG] All packages reloaded.");
+gaze('packages/**', function(err, watcher) {
+  // On changed/added/deleted
+  this.on('all', function(event, filepath) {
+    console.log("[NODECG] Change detected in packages dir: " + filepath + " " + event);
+    console.log("[NODECG] Reloading all packages");
+    pkgs = parsePackages();
+    console.log("[NODECG] All packages reloaded.");
+  });
 });
 
 function parsePackages() {
