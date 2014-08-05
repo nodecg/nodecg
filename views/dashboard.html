@@ -17,11 +17,13 @@
 
     <!-- Custom styles for each widget -->
     <style type="text/css">
-        <% for (var i=0; i < resources.length; i++) { %>
-            <% if (resources[i].type === 'css') { %>
-                <%- resources[i].text %>
-            <% } %>
-        <% } %>
+        <% pkgs.forEach(function(pkg) { %>
+            <% pkg.admin.resources.forEach(function(resource) { %>
+                <% if (resource.type === 'css') { %>
+                    <%- resource.text %>
+                <% } %>
+            <% }); %>
+        <% }); %>
     </style>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -45,10 +47,12 @@
 
 <div class="container">
     <div class="dashboard-panels">
-        <!-- Load widget(s) from each package -->
-        <% for (var i=0; i < panels.length; i++) { %>
-            <%- panels[i] %>
-        <% } %>
+        <!-- Load panel from each package -->
+        <% pkgs.forEach(function(pkg) { %>
+            <% pkg.admin.panels.forEach(function(panel) { %>
+                <%- panel %>
+            <% }); %>
+        <% }); %>
     </div>
 </div><!-- /.container -->
 
@@ -147,13 +151,15 @@
       };
     }
 
-    <% for (var i=0; i < resources.length; i++) { %>
-      <% if (resources[i].type === 'js') { %>
-        (function (nodecg) {
-          <%- resources[i].text %>
-        })(new NodeCG('<%- resources[i].packageName %>'));
-      <% } %>
-    <% } %>
+    <% pkgs.forEach(function(pkg) { %>
+      <% pkg.admin.resources.forEach(function(resource) { %>
+        <% if (resource.type === 'js') { %>
+          (function (nodecg) {
+            <%- resource.text %>
+          })(new NodeCG('<%- pkg.name %>'));
+        <% } %>
+      <% }); %>
+    <% }); %>
   }
 </script>
 </body>

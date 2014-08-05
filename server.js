@@ -9,9 +9,10 @@ var express = require('express'),
     fs = require('fs'),
     passport = require('passport'),
     SteamStrategy = require('passport-steam').Strategy,
-    config = require('./config');
-
-require('string.prototype.endswith');
+    gaze = require('gaze'),
+    config = require('./config'),
+    NcgPkg = require('./classes/ncg_pkg'),
+    pkgs = parsePackages();
 
 /**
  * Express app setup
@@ -55,41 +56,40 @@ passport.use(new SteamStrategy({
   }
 ));
 
-function readAdminResources() {
-  // Array of strings containing the panel's <div>
-  var adminPanels = [];
-  // Arrays of Objects with 'type' == 'css' or 'js', and 'text' == the CSS or JS code
-  var adminResources = [];
+/**
+ * Gaze setup
+ * Watches the "packages" folder for changes
+ */
+gaze('packages/**', function(err, watcher) {
+  // On changed/added/deleted
+  this.on('all', function(event, filepath) {
+    console.log("[NODECG] Change detected in packages dir: " + filepath + " " + event);
+    console.log("[NODECG] Reloading all packages");
+    pkgs = parsePackages();
+    console.log("[NODECG] All packages reloaded.");
+  });
+});
 
+function parsePackages() {
+  var packages = [];
   var packageDir = fs.readdirSync('packages/');
-  for (var i = 0; i < packageDir.length; i++) {
-    var packageName = packageDir[i];
 
-    // Skip if admin directory doesn't exist
-    if (!fs.existsSync('packages/' + packageName + '/admin/')) {
-      continue;
+  packageDir.forEach(function(dir) {
+    var packageName = dir;
+
+    // Skip if nodecg.json doesn't exist
+    var pkgPath = 'packages/' + packageName + '/';
+    if (!fs.existsSync(pkgPath + "nodecg.json")) {
+      return;
     }
 
-    var adminDir = fs.readdirSync('packages/' + packageName + '/admin/');
-    for (var j = 0; j < adminDir.length; j++) {
-      var adminContentFilename = adminDir[j];
-      if (!fs.statSync('packages/' + packageName + '/admin/' + adminContentFilename).isFile()) {
-        // Skip directories
-        continue;
-      }
+    console.log("[NODECG] Loading " + pkgPath);
+    var pkg = new NcgPkg(pkgPath);
 
-      var data = fs.readFileSync('packages/' + packageName + '/admin/' + adminContentFilename, {encoding: 'utf8'});
-      if (adminContentFilename.endsWith('.js')) {
-        adminResources.push({packageName: packageName, type: 'js', text: data});
-      } else if (adminContentFilename.endsWith('.css')) {
-        adminResources.push({packageName: packageName, type: 'css', text: data});
-      } else if (adminContentFilename.endsWith('.html') || adminContentFilename.endsWith('.ejs')) {
-        adminPanels.push(data);
-      }
-    }
-  }
+    packages.push(pkg);
+  });
 
-  return {panels: adminPanels, resources: adminResources};
+  return packages;
 }
 
 var viewSetupScript =
@@ -135,9 +135,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/dashboard', ensureAuthenticated, function(req, res) {
-  var resources = readAdminResources();
-
-  res.render('views/dashboard.html', {resources: resources.resources, panels: resources.panels, config: config});
+  res.render('views/dashboard.html', {pkgs: pkgs, config: config});
 });
 
 app.get('/nodecg.js', function(req, res) {
