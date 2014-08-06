@@ -57,9 +57,6 @@
 </div><!-- /.container -->
 
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
 <script src="/components/jquery/dist/jquery.min.js"></script>
 <script src="/components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="/components/bootstrap/js/tooltip.js"></script>
@@ -68,6 +65,7 @@
 <script src="/components/imagesloaded/imagesloaded.pkgd.min.js"></script>
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="/js/obsApi.js"></script>
 <script>
   function sendMessage(socket, commandstring, meta) {
     socket.emit('send', {message: commandstring, content: meta });
@@ -85,7 +83,7 @@
       applyMasonry($container);
     });
 
-     // TODO: have masonry re-apply when a textarea is resized
+    // TODO: have masonry re-apply when a textarea is resized
 
     function applyMasonry(selector) {
       selector.masonry({
@@ -116,11 +114,13 @@
       this.port = <%- config.port %>;
 
       this._socket = io.connect('http://' + this.host + ':' + this.port + '/');
-      
+
       this._handlers = [];
-      
+
+      this.obs = new OBSRemote();
+
       var self = this;
-      
+
       this._socket.on('connect', function() {
         self._socket.on('message', function(data) {
           if (data.packageName !== packageName)
@@ -134,7 +134,7 @@
           }
         });
       });
-      
+
       this.sendMessage = function(messageName, data) {
         self._socket.json.send({
           packageName: packageName,
@@ -142,7 +142,7 @@
           content: data
         });
       };
-      
+
       this.listenFor = function(messageName, handler) {
         self._handlers.push({
           messageName: messageName,

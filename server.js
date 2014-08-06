@@ -94,6 +94,7 @@ function parsePackages() {
 
 var viewSetupScript =
     '<script src="/socket.io/socket.io.js"></script>\r\n' +
+    '<script src="/js/obsApi.js"></script>script>/r/n' +
     '<script>window.__ncg__packagename__ = \'PACKAGENAME\';</script>' +
     '<script src="/nodecg.js"></script>';
 
