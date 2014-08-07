@@ -45,7 +45,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new SteamStrategy({
     returnURL: config.login.steamReturnURL,
     realm: config.login.steamReturnURL,
-    apiKey: config.login.apiKey
+    apiKey: config.login.steamApiKey
   },
   function(identifier, profile, done) {
     process.nextTick(function() {
