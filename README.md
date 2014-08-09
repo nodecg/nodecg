@@ -22,8 +22,16 @@ node server.js
 - For each package you install, you can see it's graphic at `http://localhost:9090/view/{package-name}/`  
 - You can configure NodeCG by editing config.js
 
+### Contributing
+1. Fork it ( http://github.com/[my-github-username]/nodecg/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
+
 ### License
-NodeCG is provided under the MIT license, which is available to read in the LICENSE file
+NodeCG is provided under the MIT license, which is available to read in the [LICENSE][] file.
+[license]: LICENSE
 
 ### Credits
 [Alex "Lange" Van Camp](http://alexvancamp.com), lead programmer & designer of [toth-overlay](https://github.com/Langeh/toth-overlay), contributor to NodeCG  
