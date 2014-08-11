@@ -7,13 +7,13 @@
     <title>NodeCG dashboard</title>
 
     <!-- Bootstrap YETI theme CSS -->
-    <link href="css/bootstrap.yeti.min.css" rel="stylesheet">
+    <link href="/css/bootstrap.yeti.min.css" rel="stylesheet">
 
     <!-- Font Awesome CSS -->
     <link href="/components/fontawesome/css/font-awesome.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="css/dashboard.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
 
     <!-- Custom styles for each widget -->
     <style type="text/css">
@@ -154,9 +154,13 @@
     <% pkgs.forEach(function(pkg) { %>
       <% pkg.admin.resources.forEach(function(resource) { %>
         <% if (resource.type === 'js') { %>
-          (function (nodecg) {
-            <%- resource.text %>
-          })(new NodeCG('<%- pkg.name %>'));
+          try {
+            (function (nodecg) {
+              <%- resource.text %>
+            })(new NodeCG('<%- pkg.name %>'));
+          } catch (err) {
+            console.error("[NODECG] Panel for package <%- pkg.name %> threw this error: "+ err.message);
+          }
         <% } %>
       <% }); %>
     <% }); %>
