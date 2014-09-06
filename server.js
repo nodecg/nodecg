@@ -14,7 +14,7 @@ app.use('/components', express.static(__dirname + '/bower_components'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('views', './');
-app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'jade')
 
 app.all('*', function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');

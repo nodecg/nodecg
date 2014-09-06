@@ -18,11 +18,11 @@
   "dependencies": {
     "body-parser": "^1.2.2",
     "cookie-parser": "^1.1.0",
-    "ejs": "~1.0.0",
     "express": "^4.3.1",
     "express-session": "^1.2.1",
     "file": "~0.2.2",
     "gaze": "~0.6.4",
+    "jade": "^1.6.0",
     "nedb": "^0.11.1",
     "passport": "~0.2.0",
     "passport-steam": "~0.1.3",
