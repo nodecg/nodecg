@@ -17,8 +17,8 @@
 
     <!-- Custom styles for each widget -->
     <style type="text/css">
-        <% pkgs.forEach(function(pkg) { %>
-            <% pkg.admin.resources.forEach(function(resource) { %>
+        <% bundles.forEach(function(bndl) { %>
+            <% bndl.admin.resources.forEach(function(resource) { %>
                 <% if (resource.type === 'css') { %>
                     <%- resource.text %>
                 <% } %>
@@ -48,8 +48,8 @@
 <div class="container">
     <div class="dashboard-panels">
         <!-- Load panel from each package -->
-        <% pkgs.forEach(function(pkg) { %>
-            <% pkg.admin.panels.forEach(function(panel) { %>
+        <% bundles.forEach(function(bndl) { %>
+            <% bndl.admin.panels.forEach(function(panel) { %>
                 <%- panel %>
             <% }); %>
         <% }); %>
@@ -99,19 +99,19 @@
       '<button type="button" class="btn btn-xs btn-info panel-info"><i class="fa fa-info"></i></button>'
     );
     $('.panel-info').each(function( index ) {
-      pkgName = $(this).closest('.panel').attr("id");
+      bndlName = $(this).closest('.panel').attr("id");
 
       $(this).popover({
-        title: pkgName,
+        title: bndlName,
         html: true,
         placement: "bottom",
         parent: $(this).closest('.panel-heading'),
-        content: "<a target=\"_blank\" href=\"" + window.location.origin + "/view/" + pkgName + "\">" +
-          window.location.origin + "/view/" + pkgName + "</a>"
+        content: "<a target=\"_blank\" href=\"" + window.location.origin + "/view/" + bndlName + "\">" +
+          window.location.origin + "/view/" + bndlName + "</a>"
       });
     });
 
-    function NodeCG(packageName) {
+    function NodeCG(bundleName) {
       this.host = '<%- config.host %>';
       this.port = <%- config.port %>;
 
@@ -123,7 +123,7 @@
       
       this._socket.on('connect', function() {
         self._socket.on('message', function(data) {
-          if (data.packageName !== packageName)
+          if (data.bundleName !== bundleName)
             return;
           
           for (var i = 0; i < self._handlers.length; i++) {
@@ -137,7 +137,7 @@
       
       this.sendMessage = function(messageName, data) {
         self._socket.json.send({
-          packageName: packageName,
+          bundleName: bundleName,
           messageName: messageName,
           content: data
         });
@@ -151,15 +151,15 @@
       };
     }
 
-    <% pkgs.forEach(function(pkg) { %>
-      <% pkg.admin.resources.forEach(function(resource) { %>
+    <% bundles.forEach(function(bndl) { %>
+      <% bndl.admin.resources.forEach(function(resource) { %>
         <% if (resource.type === 'js') { %>
           try {
             (function (nodecg) {
               <%- resource.text %>
-            })(new NodeCG('<%- pkg.name %>'));
+            })(new NodeCG('<%- bndl.name %>'));
           } catch (err) {
-            console.error("[NODECG] Panel for package <%- pkg.name %> threw this error: "+ err.message);
+            console.error("[NODECG] Panel for bundle <%- bndl.name %> threw this error: "+ err.message);
           }
         <% } %>
       <% }); %>

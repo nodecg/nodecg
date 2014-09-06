@@ -2,9 +2,13 @@
 bower_components/
 node_modules/
 
-# Local packages
-packages/
-!packages/.empty_directory
+# Local bundles
+bundles/
+!bundles/.empty_directory
+
+# Datastores
+db/
+!db/.empty_directory
 
 # OS specific
 .DS_Store
@@ -12,4 +16,3 @@ packages/
 # JetBrains IDEs (IntelliJ/WebStorm)
 .idea/
 *.iml
-
