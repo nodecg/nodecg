@@ -1,0 +1,76 @@
+mixin ie(condition)
+    | <!--[!{condition}]>
+    block
+    | <![endif]-->
+
+doctype html
+html(lang="en")
+    head
+        meta(http-equiv="X-UA-Compatible", content="IE=edge; charset=UTF-8")
+        meta(name="viewport", content="width=device-width", initial-scale=1)
+
+        title NodeCG dashboard
+
+        //Bootstrap YETI theme CSS
+        link(rel='stylesheet', href='/css/bootstrap.yeti.min.css')
+
+        //Font Awesome CSS
+        link(rel='stylesheet', href='/components/fontawesome/css/font-awesome.min.css')
+
+        //Custom styles for this template
+        link(rel='stylesheet', href='/css/dashboard.css')
+
+        //Bundle CSS, re-write this and consider using mixins/includes/partials?
+        each bndl in bundles
+            each resource in bndl.admin.resources
+                if resource.type === 'css'
+                    style(type='text/css')= resource.text
+
+        //HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries
+        +ie('if lt IE 9')
+            script(src='/components/html5shiv/dist/html5shiv.min.js')
+            script(src='/components/respond/dest/respond.min.js')
+
+    body
+        div(class='navbar navbar-inverse navbar-fixed-top', role='navigation')
+            div.container
+                div.navbar-header
+                    a(class='navbar-brand', href='#') NodeCG dashboard
+
+        //Spacer
+        p
+
+        //Bundle panels, re-write this and consider using mixins/includes/partials?
+        div.container
+            div.dashboard-panels
+                //Load panel from each package
+                each bndl in bundles
+                    each panel in bndl.admin.panels
+                        !=panel
+
+        //Core JavaScript
+        //==================================================
+        //Placed at the end of the document so the pages load faster
+        script(src='/components/jquery/dist/jquery.min.js')
+        script(src='/components/bootstrap/dist/js/bootstrap.min.js')
+        script(src='/components/bootstrap/js/tooltip.js')
+        script(src='/components/bootstrap/js/popover.js')
+        script(src='/components/masonry/dist/masonry.pkgd.min.js')
+        script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
+
+        script(src='/socket.io/socket.io.js')
+
+        include ./includes/dash-script.jade
+        include ../includes/nodecg.jade
+
+        each bndl in bundles
+            each resource in bndl.admin.resources
+                if resource.type === 'js'
+                    script(type='text/javascript').
+                        try {
+                            (function (nodecg) {
+                                !{ resource.text }
+                            })(new NodeCG('#{ bndl.name }'));
+                        } catch (err) {
+                            console.error("[NODECG] Panel for bundle #{ bndl.name } threw this error: "+ err.message);
+                        }
