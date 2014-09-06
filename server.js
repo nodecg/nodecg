@@ -1,6 +1,7 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
     app = express(),
+    fs = require('fs'),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server),
     config = require('./config');
@@ -32,6 +33,19 @@ app.use(dashboard);
 
 var bundleViews = require('./lib/bundle_views');
 app.use(bundleViews);
+
+//load and mount express apps from bundles, if they have any
+var bundlesDir = fs.readdirSync('bundles/');
+bundlesDir.forEach(function(bndlName) {
+    // Skip if index.js doesn't exist
+    var bndlPath = 'bundles/' + bndlName + '/';
+    if (!fs.existsSync(bndlPath + "index.js")) {
+        return;
+    }
+
+    console.log('[lib/bundle/index.js] ' + bndlName + ' has an index.js, mounting...');
+    app.use(require('./' + bndlPath + "index.js"));
+});
 
 io.sockets.on('connection', function (socket) {
   socket.on('message', function (data) {
