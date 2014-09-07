@@ -5,6 +5,7 @@ node_modules/
 # Local bundles
 bundles/
 !bundles/.empty_directory
+!lib/bundles
 
 # Datastores
 db/
