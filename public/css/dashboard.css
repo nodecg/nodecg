@@ -42,6 +42,38 @@ textarea {
   float: right;
   font-size: 21px;
 }
+.ncg-btn-group {
+  /* add .no-padding to .ncg-btn-group to opt-out of vertical padding */
+}
+.ncg-btn-group .btn-group.btn-group-justified {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  /* add .no-padding to .btn-group .btn-group-justified to opt-out of horizontal padding */
+}
+.ncg-btn-group .btn-group.btn-group-justified:first-child {
+  padding-top: 0;
+}
+.ncg-btn-group .btn-group.btn-group-justified:last-child {
+  padding-bottom: 0;
+}
+.ncg-btn-group .btn-group.btn-group-justified .btn-group {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+.ncg-btn-group .btn-group.btn-group-justified .btn-group:first-child {
+  padding-left: 0;
+}
+.ncg-btn-group .btn-group.btn-group-justified .btn-group:last-child {
+  padding-right: 0;
+}
+.ncg-btn-group .btn-group.btn-group-justified.no-padding .btn-group {
+  padding-left: 0;
+  padding-right: 0;
+}
+.ncg-btn-group.no-padding .btn-group.btn-group-justified {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 .panel-span-1 {
   width: 128px;
 }

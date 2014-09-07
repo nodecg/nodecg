@@ -1,15 +1,19 @@
 body {
   padding-top: 50px;
 }
+
 textarea {
   max-width: 100%;
 }
+
 .dashboard-panels {
   padding: 40px 15px;
 }
+
 .panel-title {
   display: inline-block;
 }
+
 .panel-heading {
   .popover {
     left: auto!important; right: 0px; /* bootstrap really wants to add a left value for whatever reason */
@@ -24,10 +28,12 @@ textarea {
     overflow-wrap: break-word;
   }
 }
+
 .panel-icon {
   width: 20px;
   text-align: center;
 }
+
 .panel-info {
   width: auto!important;
   height: 21px!important;
@@ -39,9 +45,54 @@ textarea {
     margin-top: -1px; // this is me being nitpicky but the icon is just a little bit too low in the button otherwise
   }
 }
+
 .fa {
   float: right;
   font-size: 21px;
+}
+
+.ncg-btn-group {
+  .btn-group.btn-group-justified {
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    .btn-group {
+      padding-left: 2px;
+      padding-right: 2px;
+
+      &:first-child {
+        padding-left: 0;
+      }
+
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+
+    /* add .no-padding to .btn-group .btn-group-justified to opt-out of horizontal padding */
+    &.no-padding {
+      .btn-group {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  }
+
+  /* add .no-padding to .ncg-btn-group to opt-out of vertical padding */
+  &.no-padding {
+    .btn-group.btn-group-justified {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
 }
 
 .generate-panel-spans(8);
