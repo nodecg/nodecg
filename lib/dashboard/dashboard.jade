@@ -20,11 +20,12 @@ html(lang="en")
         //Custom styles for this template
         link(rel='stylesheet', href='/css/dashboard.css')
 
-        //Bundle CSS, re-write this and consider using mixins/includes/partials?
+        //Bundle CSS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
         each bndl in bundles
-            each resource in bndl.admin.resources
-                if resource.type === 'css'
-                    style(type='text/css')= resource.text
+            // only add the tag if there is a style, empty tags can cause long timeout delays
+            if bndl.admin.styles
+                each style in bndl.admin.styles
+                    style(type='text/css')= style
 
         //HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries
         +ie('if lt IE 9')
@@ -43,10 +44,10 @@ html(lang="en")
         //Bundle panels, re-write this and consider using mixins/includes/partials?
         div.container
             div.dashboard-panels
-                //Load panel from each package
                 each bndl in bundles
-                    each panel in bndl.admin.panels
-                        !=panel
+                    each markup in bndl.admin.markups
+                        !=markup
+
 
         //Core JavaScript
         //==================================================
@@ -58,19 +59,14 @@ html(lang="en")
         script(src='/components/masonry/dist/masonry.pkgd.min.js')
         script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
 
-        script(src='/socket.io/socket.io.js')
+        script(src='/nodecg-api.js')
 
         include ./includes/dash-script.jade
-        include ../includes/nodecg.jade
 
+        //Bundle JS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
         each bndl in bundles
-            each resource in bndl.admin.resources
-                if resource.type === 'js'
+            // only add the tag if there is a script, empty tags can cause long timeout delays
+            if bndl.admin.scripts
+                each script in bndl.admin.scripts
                     script(type='text/javascript').
-                        try {
-                            (function (nodecg) {
-                                !{ resource.text }
-                            })(new NodeCG('#{ bndl.name }'));
-                        } catch (err) {
-                            console.error("[NODECG] Panel for bundle #{ bndl.name } threw this error: "+ err.message);
-                        }
+                      !{ script }

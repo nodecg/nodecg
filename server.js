@@ -14,7 +14,10 @@ app.use('/components', express.static(__dirname + '/bower_components'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('views', './');
-app.set('view engine', 'jade')
+
+app.engine('jade', require('jade').__express);
+app.engine('html', require('ejs').renderFile);
+app.engine('ejs', require('ejs').renderFile);
 
 app.all('*', function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -43,8 +46,8 @@ bundlesDir.forEach(function(bndlName) {
         return;
     }
 
-    console.log('[lib/bundle/index.js] ' + bndlName + ' has an index.js, mounting...');
     app.use(require('./' + bndlPath + "index.js"));
+    console.log('[lib/bundle/index.js] ' + bndlName + ' has an index.js, mounted');
 });
 
 io.sockets.on('connection', function (socket) {
