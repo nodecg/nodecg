@@ -59,6 +59,7 @@ html(lang="en")
         script(src='/components/masonry/dist/masonry.pkgd.min.js')
         script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
 
+        script(src='/socket.io/socket.io.js')
         script(src='/nodecg-api.js')
 
         include ./includes/dash-script.jade
@@ -69,4 +70,11 @@ html(lang="en")
             if bndl.admin.scripts
                 each script in bndl.admin.scripts
                     script(type='text/javascript').
-                      !{ script }
+                        try {
+                            (function (nodecg) {
+                                !{ script }
+                            })(new NodeCG('#{ bndl.name }'));
+                        } catch (err) {
+                            console.error("[NODECG] Panel for bundle #{ bndl.name } threw error: "+ err.message);
+                        }
+
