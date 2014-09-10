@@ -18,13 +18,13 @@ html(lang="en")
         link(rel='stylesheet', href='/components/fontawesome/css/font-awesome.min.css')
 
         //Custom styles for this template
-        link(rel='stylesheet', href='/css/dashboard.css')
+        link(rel='stylesheet', href='/dashboard/dashboard.css')
 
         //Bundle CSS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
         each bndl in bundles
             // only add the tag if there is a style, empty tags can cause long timeout delays
-            if bndl.admin.styles
-                each style in bndl.admin.styles
+            if bndl.admin.css
+                each style in bndl.admin.css
                     style(type='text/css')= style
 
         //HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries
@@ -45,7 +45,7 @@ html(lang="en")
         div.container
             div.dashboard-panels
                 each bndl in bundles
-                    each markup in bndl.admin.markups
+                    each markup in bndl.admin.html
                         !=markup
 
 
@@ -62,13 +62,13 @@ html(lang="en")
         script(src='/socket.io/socket.io.js')
         script(src='/nodecg-api.js')
 
-        include ./includes/dash-script.jade
+        include ../includes/dash-script
 
         //Bundle JS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
         each bndl in bundles
             // only add the tag if there is a script, empty tags can cause long timeout delays
-            if bndl.admin.scripts
-                each script in bndl.admin.scripts
+            if bndl.admin.js
+                each script in bndl.admin.js
                     script(type='text/javascript').
                         try {
                             (function (nodecg) {

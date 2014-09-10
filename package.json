@@ -20,6 +20,7 @@
     "cookie-parser": "^1.1.0",
     "ejs": "^1.0.0",
     "express": "^4.3.1",
+    "express-less": "0.0.4",
     "express-session": "^1.2.1",
     "file": "~0.2.2",
     "gaze": "~0.6.4",

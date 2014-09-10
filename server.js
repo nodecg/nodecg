@@ -13,7 +13,6 @@ app.use(express.static(__dirname + '/public'));
 app.use('/components', express.static(__dirname + '/bower_components'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.set('views', './');
 
 app.engine('jade', require('jade').__express);
 app.engine('html', require('ejs').renderFile);
