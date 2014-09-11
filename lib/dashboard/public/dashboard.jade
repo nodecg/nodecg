@@ -25,7 +25,8 @@ html(lang="en")
             // only add the tag if there is a style, empty tags can cause long timeout delays
             if bndl.admin.css
                 each style in bndl.admin.css
-                    style(type='text/css')= style
+                    style(type='text/css').
+                        !{ style }
 
         //HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries
         +ie('if lt IE 9')
