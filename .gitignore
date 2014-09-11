@@ -3,13 +3,12 @@ bower_components/
 node_modules/
 
 # Local bundles
-bundles/
-!bundles/.empty_directory
-!lib/bundles
+/bundles/
+!/bundles/.empty_directory
 
 # Datastores
-db/
-!db/.empty_directory
+/db/
+!/db/.empty_directory
 
 # OS specific
 .DS_Store
