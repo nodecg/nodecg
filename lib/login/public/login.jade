@@ -1,0 +1,33 @@
+mixin ie(condition)
+    | <!--[!{condition}]>
+    block
+    | <![endif]-->
+doctype html
+html(lang="en")
+    head
+        meta(http-equiv="X-UA-Compatible", content="IE=edge; charset=UTF-8")
+        meta(name="viewport", content="width=device-width", initial-scale=1)
+
+        title NodeCG dashboard
+
+        //Bootstrap YETI theme CSS
+        link(rel='stylesheet', href='/css/bootstrap.yeti.min.css')
+
+        //Custom styles for this template
+        link(rel='stylesheet', href='/login/login.css')
+
+        //HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries
+        +ie('if lt IE 9')
+            script(src='/components/html5shiv/dist/html5shiv.min.js')
+            script(src='/components/respond/dest/respond.min.js')
+
+    body
+        div.container
+            form(class='form-signin', role='form')
+                h2.form-signin-heading Please sign in
+                if user !== undefined && user.allowed
+                    div(class='alert alert-danger')
+                        strong Access denied!
+                        Your account is not in the whitelist
+                a(href='/login/steam')
+                    div(class='btn btn-lg btn-success') Sign in via Steam
