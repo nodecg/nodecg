@@ -1,6 +1,6 @@
 #What does an index.js file do in a bundle?
 It lets you extend the core of NodeCG, adding nearly any additional functionality that your bundle may need.
-An index.js file `must export an express app`, like this:
+An index.js file _must export an express app_, like this:
 
 ````javascript
 var express = require('express'),
