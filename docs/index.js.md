@@ -1,4 +1,4 @@
-#What does an index.js file do in a bundle?
+###What does an index.js file do in a bundle?
 It lets you extend the core of NodeCG, adding nearly any additional functionality that your bundle may need.
 An index.js file __must export an express app__, like this:
 
@@ -12,7 +12,7 @@ app.get('/view/mybundle/customroute', function(req, res) {
 });
 ````
 
-#What if my bundle relies on a npm package that NodeCG doesn't have?
+###What if my bundle relies on a npm package that NodeCG doesn't have?
 You can use [squirrel](https://github.com/DamonOehlman/squirrel) to lazy-install and lazy-load any npm package that your bundle(s) need:
 ````javascript
 var express = require('express'),

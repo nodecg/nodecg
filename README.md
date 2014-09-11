@@ -41,6 +41,6 @@ NodeCG is provided under the MIT license, which is available to read in the [LIC
 [license]: LICENSE
 
 ### Credits
-[Alex "Lange" Van Camp](http://alexvancamp.com), lead programmer & designer of [toth-overlay](https://github.com/Langeh/toth-overlay), contributor to NodeCG
-[Matt "Bluee" McNamara](http://mattmcn.com/), contributor to NodeCG
-[Atmo](https://github.com/atmosfar), original dashboard concept and code
+[Alex "Lange" Van Camp](http://alexvancamp.com), lead programmer & designer of [toth-overlay](https://github.com/Langeh/toth-overlay), contributor to NodeCG  
+[Matt "Bluee" McNamara](http://mattmcn.com/), contributor to NodeCG  
+[Atmo](https://github.com/atmosfar), original dashboard concept and code  
