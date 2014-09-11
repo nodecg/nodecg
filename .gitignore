@@ -3,12 +3,10 @@ bower_components/
 node_modules/
 
 # Local bundles
-/bundles/
-!/bundles/.empty_directory
+/bundles/**
 
 # Datastores
-/db/
-!/db/.empty_directory
+/db/**
 
 # OS specific
 .DS_Store
@@ -16,3 +14,6 @@ node_modules/
 # JetBrains IDEs (IntelliJ/WebStorm)
 .idea/
 *.iml
+
+# Don't ignore .empty_directory files
+!.empty_directory
