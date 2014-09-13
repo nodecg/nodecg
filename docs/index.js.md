@@ -4,11 +4,10 @@ An index.js file __must export an express app__, like this:
 
 ````javascript
 var express = require('express'),
-    app = module.exports = express(),
-    config = require('../../config.js');
+    app = module.exports = express();
 
 app.get('/view/mybundle/customroute', function(req, res) {
-  res.render(__dirname + 'somefile.jade', {host: config.host, port: config.port});
+  res.render(__dirname + 'somefile.jade', {name: "Some test data!", age: 23});
 });
 ````
 
@@ -17,7 +16,6 @@ You can use [squirrel](https://github.com/DamonOehlman/squirrel) to lazy-install
 ````javascript
 var express = require('express'),
     app = module.exports = express(),
-    config = require('../../config.js'),
     squirrel = require('squirrel');
 
 squirrel('jsdom', function(err, jsdom) {
