@@ -3,7 +3,7 @@ var express = require('express'),
     app = express(),
     fs = require('fs'),
     server = require('http').createServer(app),
-    io = require('socket.io').listen(server),
+    io = module.exports = require('socket.io').listen(server), //export our socket.io instance so modules may use it by requiring this file
     config = require('./config');
 
 /**
