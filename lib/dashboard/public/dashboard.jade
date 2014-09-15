@@ -22,7 +22,7 @@ html(lang="en")
 
         //Bundle CSS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
         each bndl in bundles
-            // only add the tag if there is a style, empty tags can cause long timeout delays
+            //- only add the tag if there is a style, empty tags can cause long timeout delays
             if bndl.admin.css
                 each style in bndl.admin.css
                     style(type='text/css').
@@ -67,7 +67,7 @@ html(lang="en")
 
         //Bundle JS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
         each bndl in bundles
-            // only add the tag if there is a script, empty tags can cause long timeout delays
+            //- only add the tag if there is a script, empty tags can cause long timeout delays
             if bndl.admin.js
                 each script in bndl.admin.js
                     script(type='text/javascript').
