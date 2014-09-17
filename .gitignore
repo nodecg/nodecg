@@ -8,6 +8,9 @@ node_modules/
 # Datastores
 /db/**
 
+# Logs
+/logs/**
+
 # OS specific
 .DS_Store
 
