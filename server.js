@@ -49,6 +49,8 @@ bundlesDir.forEach(function(bndlName) {
     console.log('[lib/bundle/index.js] ' + bndlName + ' has an index.js, mounted');
 });
 
+io.set('log level', 1); // reduce logging
+
 io.sockets.on('connection', function (socket) {
   socket.on('message', function (data) {
     io.sockets.json.send(data);
