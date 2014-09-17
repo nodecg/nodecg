@@ -16,6 +16,8 @@ npm install
 node server.js
 ```
 
+Alternatively, if you have [forever](https://github.com/nodejitsu/forever) installed you may run `run_nodecg.sh`
+
 ### Usage
 - Open `http://localhost:9090/dashboard` to see the admin dashboard
 - For each bundle you install, you can see its graphic at `http://localhost:9090/view/{bundle-name}/`
