@@ -10,11 +10,12 @@
   "dependencies": {
     "masonry": "~3.1.5",
     "imagesloaded": "~3.1.5",
-    "bootstrap": "~3.1.1",
+    "bootstrap": "~3.2.0",
     "jquery": "~1.11.0",
     "fontawesome": "~4.1.0",
     "html5shiv": "~3.7.2",
-    "respond": "~1.4.2"
+    "respond": "~1.4.2",
+    "eonasdan-bootstrap-datetimepicker": "~3.1.3"
   },
   "license": "MIT",
   "private": true,
