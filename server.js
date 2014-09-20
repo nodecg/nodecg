@@ -4,7 +4,7 @@ var express = require('express'),
     fs = require('fs'),
     server = require('http').createServer(app),
     io = module.exports = require('socket.io').listen(server), //export our socket.io instance so modules may use it by requiring this file
-    config = require('./config');
+    config = require('./lib/config');
 
 /**
  * Express app setup

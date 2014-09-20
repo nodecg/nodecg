@@ -21,7 +21,7 @@ Alternatively, if you have [forever](https://github.com/nodejitsu/forever) insta
 ### Usage
 - Open `http://localhost:9090/dashboard` to see the admin dashboard
 - For each bundle you install, you can see its graphic at `http://localhost:9090/view/{bundle-name}/`
-- You can configure NodeCG by editing config.js
+- You can configure NodeCG by creating a [config.json](docs/config.json.md) file.
 
 ### Making bundles
 - Each bundle has its own folder in /bundles/
