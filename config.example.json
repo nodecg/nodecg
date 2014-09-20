@@ -1,0 +1,17 @@
+{
+    "host": "example.com",
+    "port": 1234,
+
+    // Steam powered log in, get API key from http://steamcommunity.com/dev/apikey
+    "login": {
+        "enabled": true,
+        "sessionSecret": "supersecret",
+        "steamApiKey": "YYYYY",
+
+        //Only allow certain people to log in. Currently uses 64 bit Steam IDs.
+        "allowedIds": [
+            "33333333333333333",
+            "44444444444444444"
+        ]
+    }
+}
