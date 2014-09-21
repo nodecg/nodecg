@@ -18,11 +18,11 @@ app.engine('jade', require('jade').__express);
 app.engine('html', require('ejs').renderFile);
 app.engine('ejs', require('ejs').renderFile);
 
-app.all('*', function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
+app.all('*', function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
 });
 
 if (config.login.enabled) {
@@ -38,7 +38,7 @@ app.use(bundleViews);
 
 //load and mount express apps from bundles, if they have any
 var bundlesDir = fs.readdirSync('bundles/');
-bundlesDir.forEach(function(bndlName) {
+bundlesDir.forEach(function (bndlName) {
     // Skip if index.js doesn't exist
     var bndlPath = 'bundles/' + bndlName + '/';
     if (!fs.existsSync(bndlPath + "index.js")) {
@@ -52,9 +52,9 @@ bundlesDir.forEach(function(bndlName) {
 io.set('log level', 1); // reduce logging
 
 io.sockets.on('connection', function (socket) {
-  socket.on('message', function (data) {
-    io.sockets.json.send(data);
-  });
+    socket.on('message', function (data) {
+        io.sockets.json.send(data);
+    });
 });
 
 server.listen(config.port);
