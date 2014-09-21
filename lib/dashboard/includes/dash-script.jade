@@ -5,13 +5,32 @@ script(type='text/javascript').
     
     window.onload = function () {
         var $container = $('body > div.container');
-        
-        // initialize
+        var observer;
+
         $container.imagesLoaded(function () {
+            //Apply initial masonry
             applyMasonry($container);
+
+            //Create a MutationObserver which will watch for changes to the DOM and re-apply masonry
+            MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+            observer = new MutationObserver(function(mutations, observer) {
+                applyMasonry($container);
+                console.log('Change detected: re-applying masonry');
+            });
+
+            // define what element should be observed by the observer
+            // and what types of mutations trigger the callback
+            observer.observe(document, {
+                subtree: true,
+                attributes: false, // causes an infinite loop, as masonry itself triggers the MutationObserver if this is true
+                childList: true,
+                characterData: true,
+                attributeOldValue: false,
+                characterDataOldValue: false
+            });
         });
         
-        // re-apply the masonry onClick, useful for checkboxes that toggle controls
+        // re-apply masonry onClick, useful for checkboxes that toggle controls
         $container.click(function () {
             applyMasonry($container);
         });
@@ -39,37 +58,4 @@ script(type='text/javascript').
                     window.location.origin + "/view/" + pkgName + "</a>"
             });
         });
-        
-       /*function NodeCG(packageName) {
-            this.host = '#{ config.host }';
-            this.port = '#{ config.port }';
-            this._socket = io.connect('http://' + this.host + ':' + this.port + '/');
-            this._handlers = [];
-            var self = this;
-            this._socket.on('connect', function() {
-                self._socket.on('message', function(data) {
-                    if (data.packageName !== packageName)
-                        return;
-                    for (var i = 0; i < self._handlers.length; i++) {
-                        var _handler = self._handlers[i];
-                        if (data.messageName === _handler.messageName) {
-                            _handler.func(data.content);
-                        }
-                    }
-                });
-            });
-            this.sendMessage = function(messageName, data) {
-                self._socket.json.send({
-                packageName: packageName,
-                messageName: messageName,
-                content: data
-                });
-            };
-            this.listenFor = function(messageName, handler) {
-                self._handlers.push({
-                messageName: messageName,
-                func: handler
-                });
-            };
-        }*/
     }
