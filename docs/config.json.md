@@ -7,7 +7,7 @@
 
     - `enabled` Boolean. Whether or not to enable login.
     
-    - `sessionSecret` String. Secrey key used for login sessions.
+    - `sessionSecret` String. Secret key used for login sessions.
     
     - `steamApiKey` String. Steam API key used to process logins. **Required** if `login.enabled` is set to `true`.
 
