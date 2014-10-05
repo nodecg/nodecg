@@ -20,7 +20,7 @@
 {
   "name": "toth-alert",
   "version": "0.0.1",
-  "nodecgDependency": "^0.0.1"
+  "nodecgDependency": "^0.0.1",
   "description": "Simple pop-in informational display",
   "homepage": "http://tipofthehats.org/",
   "authors": [
