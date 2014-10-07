@@ -14,6 +14,7 @@
     "type": "git",
     "url": "https://github.com/nodecg/nodecg.git"
   },
+  "bugs": "https://github.com/nodecg/nodecg/issues",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.2.2",
