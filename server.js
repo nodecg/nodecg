@@ -38,7 +38,7 @@ app.use(dashboard);
 var bundleViews = require('./lib/bundle_views');
 app.use(bundleViews);
 
-// Mount the NodeCG extension entrypoint fron each bundle, if any
+// Mount the NodeCG extension entrypoint from each bundle, if any
 bundles.on('allLoaded', function(allbundles) {
     allbundles.forEach(function(bundle) {
         if (!bundle.extension)
