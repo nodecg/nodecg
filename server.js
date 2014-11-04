@@ -54,7 +54,7 @@ bundles.on('allLoaded', function(allbundles) {
                 console.log('[lib/bundles/parser.js] Successfully mounted', bundle.name, 'as an extension');
             }
         } else {
-            console.error('[lib/bundles/parser.js] Couldn\'t load bundle.main', bundle.extension.path, 'for', bundle.name, 'Skipping.');
+            console.error('[lib/bundles/parser.js] Couldn\'t load extension', bundle.extension.path, 'for', bundle.name, 'Skipping.');
         }
     });
 });
