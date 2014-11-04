@@ -15,11 +15,11 @@
 
 - `license` String. The license used by your package (i.e., MIT, GPLv3).
 
-- `extension` (optional) Object. Describes the NodeCG extension entry point, if any.
+- `extension` (optional) Object. Describes the [NodeCG extension](docs/extensions.md) entry point, if any.
 
     - `express` Boolean. Whether or not the extension exports an express app.
 
-    - `path` String. The file path to the [main script file](https://www.npmjs.org/doc/files/package.json.html#main). This will be read by `require`.
+    - `path` String. The file path to the main extension file. This will be read by `require`.
 
 ##Example
 ```json
