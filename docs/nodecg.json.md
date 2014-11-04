@@ -15,7 +15,7 @@
 
 - `license` String. The license used by your package (i.e., MIT, GPLv3).
 
-- `main` (optional) Object. Describes the NodeCG extension entry point, if any.
+- `extension` (optional) Object. Describes the NodeCG extension entry point, if any.
 
     - `express` Boolean. Whether or not the extension exports an express app.
 
@@ -39,7 +39,7 @@
     "720p"
   ],
   "license": "MIT",
-  "main": {
+  "extension": {
     "express": false,
     "path": "index.js"
   }

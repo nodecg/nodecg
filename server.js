@@ -41,12 +41,12 @@ app.use(bundleViews);
 // Mount the NodeCG extension entrypoint fron each bundle, if any
 bundles.on('allLoaded', function(allbundles) {
     allbundles.forEach(function(bundle) {
-        if (!bundle.main)
+        if (!bundle.extension)
             return;
 
-        var mainPath = path.join(__dirname, bundle.dir, bundle.main.path);
+        var mainPath = path.join(__dirname, bundle.dir, bundle.extension.path);
         if (fs.existsSync(mainPath)) {
-            if (bundle.main.express) {
+            if (bundle.extension.express) {
                 app.use(require(mainPath));
                 console.log('[lib/bundles/parser.js] Successfully mounted', bundle.name, 'as an express app');
             } else {
@@ -54,7 +54,7 @@ bundles.on('allLoaded', function(allbundles) {
                 console.log('[lib/bundles/parser.js] Successfully mounted', bundle.name, 'as an extension');
             }
         } else {
-            console.error('[lib/bundles/parser.js] Couldn\'t load bundle.main', bundle.main.path, 'for', bundle.name, 'Skipping.');
+            console.error('[lib/bundles/parser.js] Couldn\'t load bundle.main', bundle.extension.path, 'for', bundle.name, 'Skipping.');
         }
     });
 });
