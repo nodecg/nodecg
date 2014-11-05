@@ -1,4 +1,4 @@
-#Schema
+##Schema
 - `host` String. The hostname of the machine running this instance of NodeCG.
 
 - `port` Integer. The port number you'd like this instance to listen to.

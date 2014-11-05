@@ -1,4 +1,4 @@
-#Schema
+##Schema
 - `name` String. The name of your package, must be unique. No two packages with identical names may be installed at the same time.
 
 - `version` [Semver](http://www.jakobm.com/semver-in-nodejs-and-npm) string. The version of your package.
