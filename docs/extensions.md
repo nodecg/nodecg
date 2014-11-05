@@ -4,7 +4,7 @@ Extensions let you extend the core of NodeCG, adding nearly any additional funct
 Extensions can export any module, but don't __have__ to export anything if they do not need to.
 
 ###How do I load my bundle's extension?
-Your bundle's [nodecg.json](docs/nodecg.json.md) must have the `extension` property.
+Your bundle's [nodecg.json](nodecg.json.md) must have the `extension` property.
 
 ###What if my extension needs to define a route?
 If an extension exports an express app, it will automatically be mounted.
