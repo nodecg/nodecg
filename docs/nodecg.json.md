@@ -15,7 +15,7 @@
 
 - `license` String. The license used by your package (i.e., MIT, GPLv3).
 
-- `extension` (optional) Object. Describes the [NodeCG extension](docs/extensions.md) entry point, if any.
+- `extension` (optional) Object. Describes the [NodeCG extension](extensions.md) entry point, if any.
 
     - `express` Boolean. Whether or not the extension exports an express app.
 
