@@ -19,7 +19,7 @@
 
     - `express` Boolean. Whether or not the extension exports an express app.
 
-    - `path` String. The file path to the main extension file. This will be read by `require`.
+    - `path` String. The file path to the main extension file. This will be mounted by `require`.
 
 ##Example
 ```json
