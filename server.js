@@ -4,7 +4,9 @@ var express = require('express'),
     fs = require('fs'),
     server = require('http').createServer(app),
     io = module.exports = require('socket.io').listen(server), //export our socket.io instance so modules may use it by requiring this file
-    config = require('./lib/config');
+    config = require('./lib/config'),
+    bundles = require('./lib/bundles'),
+    path = require('path');
 
 /**
  * Express app setup
@@ -36,17 +38,25 @@ app.use(dashboard);
 var bundleViews = require('./lib/bundle_views');
 app.use(bundleViews);
 
-//load and mount express apps from bundles, if they have any
-var bundlesDir = fs.readdirSync('bundles/');
-bundlesDir.forEach(function (bndlName) {
-    // Skip if index.js doesn't exist
-    var bndlPath = 'bundles/' + bndlName + '/';
-    if (!fs.existsSync(bndlPath + "index.js")) {
-        return;
-    }
+// Mount the NodeCG extension entrypoint from each bundle, if any
+bundles.on('allLoaded', function(allbundles) {
+    allbundles.forEach(function(bundle) {
+        if (!bundle.extension)
+            return;
 
-    app.use(require('./' + bndlPath + "index.js"));
-    console.log('[lib/bundle/index.js] ' + bndlName + ' has an index.js, mounted');
+        var mainPath = path.join(__dirname, bundle.dir, bundle.extension.path);
+        if (fs.existsSync(mainPath)) {
+            if (bundle.extension.express) {
+                app.use(require(mainPath));
+                console.log('[lib/bundles/parser.js] Successfully mounted', bundle.name, 'as an express app');
+            } else {
+                require(mainPath);
+                console.log('[lib/bundles/parser.js] Successfully mounted', bundle.name, 'as an extension');
+            }
+        } else {
+            console.error('[lib/bundles/parser.js] Couldn\'t load extension', bundle.extension.path, 'for', bundle.name, 'Skipping.');
+        }
+    });
 });
 
 io.set('log level', 1); // reduce logging

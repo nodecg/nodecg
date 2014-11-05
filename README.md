@@ -27,7 +27,7 @@ Alternatively, if you have [forever](https://github.com/nodejitsu/forever) insta
 - Each bundle has its own folder in /bundles/
 - Each bundle should be its own git repository
 - A [nodecg.json](docs/nodecg.json.md) file is required in the root directory of your bundle
-- You may make an [index.js](docs/index.js.md) file in the root of your bundle to extend NodeCG.
+- Your bundle may run code on the server via an [extension](docs/extensions.md).
 - A bundle may have multiple panels and multiple views, though most will only have one of each
 
 ### Contributing
