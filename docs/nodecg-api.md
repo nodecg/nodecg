@@ -20,9 +20,10 @@ document.addEventListener("ncgReady", function() {
 This is to ensure the scripts NodeCG depends on are loaded and configured before the view attempts to use the API.
 
 ##Sending a message
-Messages have a name, and an optional object containing any additional information you require.
+Messages have a name, an optional object containing any additional information you require, and an optional callback.
+Callbacks are not automatically invoked. They must be explicitly called by some piece of extension code [(Example)](extensions.md#invoking-a-callback-supplied-by-nodecgsendmessage).
 ```javascript
-nodecg.sendMessage(String messageName[, Object customData]);
+nodecg.sendMessage(String messageName[, Object customData, Function callback]);
 ```
 
 ##Listening for messages
