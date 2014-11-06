@@ -68,4 +68,4 @@ io.sockets.on('connection', function (socket) {
 });
 
 server.listen(config.port);
-console.log("Listening on port " + config.port);
+console.log("[server.js] NodeCG running on " + config.host + ":" + config.port);
