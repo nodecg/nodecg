@@ -69,7 +69,7 @@ if (config.login.enabled) {
 }
 
 log.trace("[server.js] Starting dashboard lib");
-var dashboard = require('./lib/dashboard');
+var dashboard = require('./lib/dashboard')(log);
 app.use(dashboard);
 
 log.trace("[server.js] Starting bundle views lib");
@@ -89,13 +89,13 @@ bundles.on('allLoaded', function(allbundles) {
         if (fs.existsSync(mainPath)) {
             if (bundle.extension.express) {
                 app.use(require(mainPath));
-                log.info('[server.js] Mounted %s extension as an express app', bundle.name);
+                log.info("[server.js] Mounted %s extension as an express app", bundle.name);
             } else {
                 require(mainPath);
-                log.info('[server.js] Mounted %s extension as a generic extension', bundle.name);
+                log.info("[server.js] Mounted %s extension as a generic extension", bundle.name);
             }
         } else {
-            log.error('[server.js] Couldn\'t load extension %s for %s. Skipping', bundle.extension.path, bundle.name);
+            log.error("[server.js] Couldn't load extension %s for %s. Skipping", bundle.extension.path, bundle.name);
         }
     });
 });
@@ -110,6 +110,6 @@ io.sockets.on('connection', function (socket) {
     });
 });
 
-log.trace("[server.js] Attempting to liston on port %s", config.port);
+log.trace("[server.js] Attempting to listen on port %s", config.port);
 server.listen(config.port);
 log.info("[server.js] NodeCG running on %s:%s", config.host, config.port);
