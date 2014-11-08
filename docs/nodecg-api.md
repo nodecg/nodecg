@@ -23,7 +23,7 @@ This is to ensure the scripts NodeCG depends on are loaded and configured before
 Messages have a name, an optional object containing any additional information you require, and an optional callback.
 Callbacks are not automatically invoked. They must be explicitly called by some piece of extension code [(Example)](extensions.md#invoking-a-callback-supplied-by-nodecgsendmessage).
 ```javascript
-nodecg.sendMessage(String messageName[, Object customData, Function callback]);
+nodecg.sendMessage(String messageName[, Object customData, function callback]);
 ```
 
 ##Listening for messages
