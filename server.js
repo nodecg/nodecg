@@ -1,46 +1,15 @@
+'use strict';
+
 var express = require('express'),
     bodyParser = require('body-parser'),
     app = express(),
     fs = require('fs'),
-    winston = require('winston'),
     server = require('http').createServer(app),
     io = module.exports = require('socket.io').listen(server), //export our socket.io instance so modules may use it by requiring this file
     config = require('./lib/config'),
+    log = require('./lib/logger'),
     bundles = require('./lib/bundles'),
     path = require('path');
-
-/**
- * Winston logger setup
- */
-var log = (function() {
-    var transports = [];
-    if (config.logging.console.enabled) {
-        transports.push(new (winston.transports.Console)({
-            prettyPrint: true,
-            level: config.logging.console.level
-        }));
-    }
-
-    if (config.logging.file.enabled) {
-        transports.push(new (winston.transports.File)({
-            json: false,
-            prettyPrint: true,
-            filename: config.logging.file.path,
-            level: config.logging.file.level
-        }));
-    }
-
-    return new (winston.Logger)({
-        transports: transports,
-        levels: {
-            trace: 0,
-            debug: 1,
-            info: 2,
-            error: 3
-        }
-    });
-})();
-log.trace("[server.js] Logger started");
 
 /**
  * Express app setup
@@ -69,7 +38,7 @@ if (config.login.enabled) {
 }
 
 log.trace("[server.js] Starting dashboard lib");
-var dashboard = require('./lib/dashboard')(log);
+var dashboard = require('./lib/dashboard');
 app.use(dashboard);
 
 log.trace("[server.js] Starting bundle views lib");
@@ -103,7 +72,9 @@ bundles.on('allLoaded', function(allbundles) {
 io.set('log level', 1); // reduce logging
 
 io.sockets.on('connection', function (socket) {
-    log.trace("[server.js] New socket connection: ID %s with IP %s", socket.id, socket.manager.handshaken[socket.id].address.address);
+    log.trace("[server.js] New socket connection: ID %s with IP %s", socket.id,
+        socket.manager.handshaken[socket.id].address.address); // wot tha fuck pete
+
     socket.on('message', function (data) {
         log.debug("[server.js] Socket %s sent a message:", socket.id, data);
         io.sockets.json.send(data);
