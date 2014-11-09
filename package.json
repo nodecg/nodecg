@@ -38,7 +38,8 @@
     "semver": "^3.0.1",
     "socket.io": "^0.9.17",
     "squirrel": "^0.2.2",
-    "string.prototype.endswith": "^0.2.0"
+    "string.prototype.endswith": "^0.2.0",
+    "winston": "^0.8.3"
   },
   "scripts": {
     "postinstall": "./node_modules/.bin/bower install"
