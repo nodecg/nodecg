@@ -57,11 +57,19 @@ bundles.on('allLoaded', function(allbundles) {
         var mainPath = path.join(__dirname, bundle.dir, bundle.extension.path);
         if (fs.existsSync(mainPath)) {
             if (bundle.extension.express) {
-                app.use(require(mainPath));
-                log.info("[server.js] Mounted %s extension as an express app", bundle.name);
+                try {
+                    app.use(require(mainPath));
+                    log.info("[server.js] Mounted %s extension as an express app", bundle.name);
+                } catch (err) {
+                    log.error(err.message);
+                }
             } else {
-                require(mainPath);
-                log.info("[server.js] Mounted %s extension as a generic extension", bundle.name);
+                try {
+                    require(mainPath);
+                    log.info("[server.js] Mounted %s extension as a generic extension", bundle.name);
+                } catch (err) {
+                    log.error(err.message);
+                }
             }
         } else {
             log.error("[server.js] Couldn't load extension %s for %s. Skipping", bundle.extension.path, bundle.name);
