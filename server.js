@@ -61,14 +61,16 @@ bundles.on('allLoaded', function(allbundles) {
                     app.use(require(mainPath));
                     log.info("[server.js] Mounted %s extension as an express app", bundle.name);
                 } catch (err) {
-                    log.error(err.message);
+                    var msg = err.message;
+                    log.error("[server.js] Failed to mount %s extension:", bundle.name, msg);
                 }
             } else {
                 try {
                     require(mainPath);
                     log.info("[server.js] Mounted %s extension as a generic extension", bundle.name);
                 } catch (err) {
-                    log.error(err.message);
+                    var msg = err.message;
+                    log.error("[server.js] Failed to mount %s extension:", bundle.name, msg);
                 }
             }
         } else {
