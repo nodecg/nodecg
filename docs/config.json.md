@@ -19,7 +19,7 @@
 
         - `enabled` Boolean. Whether or not console logging is enabled.
 
-        - `level` String. Lowest importance of messages which should be logged.
+        - `level` String. Lowest importance of messages which should be logged. Must be `"trace"`, `"debug"`, `"info"` or `"error"`
 
     - `file` Object. Contains properties for file logging.
 
@@ -27,7 +27,7 @@
 
         - `path` String. File path and name to use for log file.
 
-        - `level` String. Lowest importance of messages which should be logged.
+        - `level` String. Lowest importance of messages which should be logged. Must be `"trace"`, `"debug"`, `"info"` or `"error"`
 
 ##Example
 ```json
