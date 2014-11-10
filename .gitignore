@@ -2,9 +2,17 @@
 bower_components/
 node_modules/
 
-# Local packages
-packages/
-!packages/.empty_directory
+# Local bundles
+/bundles/**
+
+# Datastores
+/db/**
+
+# Logs
+/logs/**
+
+# User config
+/config.json
 
 # OS specific
 .DS_Store
@@ -13,3 +21,5 @@ packages/
 .idea/
 *.iml
 
+# Don't ignore .empty_directory files
+!.empty_directory

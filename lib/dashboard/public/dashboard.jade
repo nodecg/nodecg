@@ -1,0 +1,79 @@
+doctype html
+html(lang="en")
+    head
+        meta(http-equiv="X-UA-Compatible", content="IE=edge; charset=UTF-8")
+        meta(name="viewport", content="width=device-width", initial-scale=1)
+
+        title NodeCG dashboard
+
+        //Bootstrap main CSS & Yeti override
+        link(rel='stylesheet', href='/components/bootstrap/dist/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/components/bsw-yeti/css/bootstrap.min.css')
+
+        //Bower component CSS
+        link(rel='stylesheet', href='/components/fontawesome/css/font-awesome.min.css')
+        link(rel='stylesheet', href='/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
+        link(rel='stylesheet', href='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.css')
+        link(rel='stylesheet', href='/components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css')
+
+        //Custom styles for this template
+        link(rel='stylesheet', href='/dashboard/dashboard.css')
+
+        //Bundle CSS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
+        each bndl in bundles
+            //- only add the tag if there is a style, empty tags can cause long timeout delays
+            if bndl.admin.css
+                each style in bndl.admin.css
+                    style(type='text/css').
+                        !{ style }
+
+    body
+        div(class='navbar navbar-inverse navbar-fixed-top', role='navigation')
+            div.container
+                div.navbar-header
+                    a(class='navbar-brand', href='#') NodeCG dashboard
+
+        //Spacer
+        p
+
+        //Bundle panels, re-write this and consider using mixins/includes/partials?
+        div.container
+            div.dashboard-panels
+                each bndl in bundles
+                    each markup in bndl.admin.html
+                        !=markup
+
+
+        //Core JavaScript
+        //==================================================
+        //Placed at the end of the document so the pages load faster
+        script(src='/components/jquery/dist/jquery.min.js')
+        script(src='/components/bootstrap/dist/js/bootstrap.min.js')
+        script(src='/components/bootstrap/js/tooltip.js')
+        script(src='/components/bootstrap/js/popover.js')
+        script(src='/components/masonry/dist/masonry.pkgd.min.js')
+        script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
+        script(src='/components/moment/min/moment.min.js')
+        script(src='/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js')
+        script(src='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js')
+        script(src='/components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js')
+
+        script(src='/socket.io/socket.io.js')
+        script(src='/nodecg-api.js')
+
+        script(src='/dashboard/dashboard.js')
+
+        //Bundle JS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
+        each bndl in bundles
+            //- only add the tag if there is a script, empty tags can cause long timeout delays
+            if bndl.admin.js
+                each script in bndl.admin.js
+                    script(type='text/javascript').
+                        try {
+                            (function (nodecg) {
+                                !{ script }
+                            })(new NodeCG('#{ bndl.name }'));
+                        } catch (err) {
+                            console.error("[NODECG] Panel for bundle #{ bndl.name } threw error: "+ err.message);
+                        }
+
