@@ -9,9 +9,25 @@
 
     - `sessionSecret` String. Secret key used for login sessions.
 
-    - `steamApiKey` String. Steam API key used to process logins. **Required** if `login.enabled` is set to `true`.
+    - `steam` Object. Contains steam login configuration properties.
 
-    - `allowedIds` Array of strings. Which 64bit SteamIDs will be allowed to login.
+        - `enabled` Boolean. Whether or not to enable steam login.
+
+        - `apiKey` String. [Steam API key](http://steamcommunity.com/dev/apikey) used to process logins. **Required** if `login.steam.enabled` is set to `true`.
+
+        - `allowedIds` Array of strings. Which 64bit SteamIDs will be allowed to login.
+
+    - `twitch` Object. Contains twitch login configuration properties.
+
+        - `enabled` Boolean. Whether or not to enable twitch login.
+
+        - `clientID` String. [Twitch app client ID](http://www.twitch.tv/kraken/oauth2/clients/new) **Required** if `login.twitch.enabled` is set to `true`.
+
+        - `clientSecret` String. [Twitch app client secret](http://www.twitch.tv/kraken/oauth2/clients/new) **Required** if `login.twitch.enabled` is set to `true`.
+
+        - `scope` Array of strings. What [permissions](https://github.com/justintv/Twitch-API/blob/master/authentication.md#scope) your Twitch app needs.
+
+        - `allowedIds` Array of strings. Which Twitch IDs will be allowed to login.
 
 - `logging` Object. Contains other configuration properties.
 
