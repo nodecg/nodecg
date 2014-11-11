@@ -53,11 +53,24 @@
     "login": {
         "enabled": true,
         "sessionSecret": "supersecret",
-        "steamApiKey": "YYYYY",
-        "allowedIds": [
-            "33333333333333333",
-            "44444444444444444"
-        ]
+        "steam": {
+            "enabled": true,
+            "apiKey": "YYYYY",
+            "allowedIds": [
+                "11111111111111111",
+                "22222222222222222"
+            ]
+        },
+        "twitch": {
+            "enabled": true,
+            "clientID": "your_app_id",
+            "clientSecret": "your_app_key",
+            "scope": "user_read",
+            "allowedIds": [
+                "333333333",
+                "444444444"
+            ]
+        }
     },
     "logging": {
         "console": {
