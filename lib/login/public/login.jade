@@ -21,5 +21,9 @@ html(lang="en")
                     div(class='alert alert-danger')
                         strong Access denied!
                         Your account is not in the whitelist
-                a(href='/login/steam')
-                    div(class='btn btn-lg btn-success') Sign in via Steam
+                if config.login.steam.enabled
+                    a(href='/login/steam')
+                        img(src='/login/signin_steam.png')
+                if config.login.twitch.enabled
+                    a(href='/login/twitch')
+                        img(src='/login/signin_twitch.png')
