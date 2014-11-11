@@ -66,9 +66,8 @@
             "clientID": "your_app_id",
             "clientSecret": "your_app_key",
             "scope": "user_read",
-            "allowedIds": [
-                "333333333",
-                "444444444"
+            "allowedUsernames": [
+                "some_username"
             ]
         }
     },
