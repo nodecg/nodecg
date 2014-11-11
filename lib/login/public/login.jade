@@ -17,10 +17,11 @@ html(lang="en")
         div.container
             form(class='form-signin', role='form')
                 h2.form-signin-heading Please sign in
-                if user !== undefined && user.allowed
+                if user !== undefined && !user.allowed
                     div(class='alert alert-danger')
                         strong Access denied!
-                        Your account is not in the whitelist
+                        br
+                        | Your account is not in the whitelist
                 if config.login.steam.enabled
                     a(href='/login/steam')
                         img(src='/login/signin_steam.png')
