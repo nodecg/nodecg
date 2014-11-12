@@ -33,6 +33,7 @@
     "nedb": "^0.11.1",
     "passport": "~0.2.0",
     "passport-steam": "~0.1.3",
+    "passport-twitch": "^1.0.1",
     "q": "^1.0.1",
     "request": "^2.44.0",
     "semver": "^3.0.1",
