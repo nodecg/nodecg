@@ -5,15 +5,13 @@ var express = require('express'),
     app = express(),
     fs = require('fs'),
     server = require('http').createServer(app),
-    io = module.exports = require('socket.io').listen(server), //export our socket.io instance so modules may use it by requiring this file
+    io = require('socket.io').listen(server),
     config = require('./lib/config'),
     log = require('./lib/logger'),
     bundles = require('./lib/bundles'),
-    path = require('path');
+    path = require('path'),
+    ExtensionApi = require('./lib/extension_api');
 
-/**
- * Express app setup
- */
 log.trace("[server.js] Setting up Express");
 app.use(express.static(__dirname + '/public'));
 app.use('/components', express.static(__dirname + '/bower_components'));
@@ -48,33 +46,28 @@ app.use(bundleViews);
 // Mount the NodeCG extension entrypoint from each bundle, if any
 bundles.on('allLoaded', function(allbundles) {
     log.trace("[server.js] Starting extension mounting");
+
     allbundles.forEach(function(bundle) {
         if (!bundle.extension)
             return;
 
         log.debug("[server.js] Bundle %s has extension", bundle.name, bundle.extension);
 
-        var mainPath = path.join(__dirname, bundle.dir, bundle.extension.path);
-        if (fs.existsSync(mainPath)) {
-            if (bundle.extension.express) {
-                try {
-                    app.use(require(mainPath));
+        var extPath = path.join(__dirname, bundle.dir, bundle.extension.path);
+        if (fs.existsSync(extPath)) {
+            try {
+                if (bundle.extension.express) {
+                    app.use(require(extPath)(new ExtensionApi(bundle.name, io)));
                     log.info("[server.js] Mounted %s extension as an express app", bundle.name);
-                } catch (err) {
-                    var msg = err.message;
-                    log.error("[server.js] Failed to mount %s extension:", bundle.name, msg);
-                }
-            } else {
-                try {
-                    require(mainPath);
+                } else {
+                    require(extPath)(new ExtensionApi(bundle.name, io));
                     log.info("[server.js] Mounted %s extension as a generic extension", bundle.name);
-                } catch (err) {
-                    var msg = err.message;
-                    log.error("[server.js] Failed to mount %s extension:", bundle.name, msg);
                 }
+            } catch (err) {
+                log.error("[server.js] Failed to mount %s extension:", bundle.name, err.stack);
             }
         } else {
-            log.error("[server.js] Couldn't load extension %s for %s. Skipping", bundle.extension.path, bundle.name);
+            log.error("[server.js] Specified entry point %s for %s does not exist. Skipped.", bundle.extension.path, bundle.name);
         }
     });
 });
