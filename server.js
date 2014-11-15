@@ -5,7 +5,7 @@ var express = require('express'),
     app = express(),
     fs = require('fs'),
     server = require('http').createServer(app),
-    io = module.exports = require('socket.io').listen(server),
+    io = module.exports.io = require('socket.io').listen(server),
     config = require('./lib/config'),
     log = require('./lib/logger'),
     bundles = require('./lib/bundles'),
@@ -44,6 +44,7 @@ log.trace("[server.js] Starting bundle views lib");
 var bundleViews = require('./lib/bundle_views');
 app.use(bundleViews);
 
+var extensions = module.exports.extensions = {};
 // Mount the NodeCG extension entrypoint from each bundle, if any
 bundles.on('allLoaded', function(allbundles) {
     log.trace("[server.js] Starting extension mounting");
@@ -57,13 +58,14 @@ bundles.on('allLoaded', function(allbundles) {
         var extPath = path.join(__dirname, bundle.dir, bundle.extension.path);
         if (fs.existsSync(extPath)) {
             try {
+                var extension = require(extPath)(new ExtensionApi(bundle.name, io));
                 if (bundle.extension.express) {
-                    app.use(require(extPath)(new ExtensionApi(bundle.name, io)));
+                    app.use(extension);
                     log.info("[server.js] Mounted %s extension as an express app", bundle.name);
                 } else {
-                    require(extPath)(new ExtensionApi(bundle.name, io));
                     log.info("[server.js] Mounted %s extension as a generic extension", bundle.name);
                 }
+                extensions[bundle.name] = extension;
             } catch (err) {
                 log.error("[server.js] Failed to mount %s extension:", bundle.name, err.stack);
             }
