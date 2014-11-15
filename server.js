@@ -49,31 +49,69 @@ var extensions = module.exports.extensions = {};
 bundles.on('allLoaded', function(allbundles) {
     log.trace("[server.js] Starting extension mounting");
 
-    allbundles.forEach(function(bundle) {
-        if (!bundle.extension)
-            return;
-
-        log.debug("[server.js] Bundle %s has extension", bundle.name, bundle.extension);
-
-        var extPath = path.join(__dirname, bundle.dir, bundle.extension.path);
-        if (fs.existsSync(extPath)) {
-            try {
-                var extension = require(extPath)(new ExtensionApi(bundle.name, io));
-                if (bundle.extension.express) {
-                    app.use(extension);
-                    log.info("[server.js] Mounted %s extension as an express app", bundle.name);
-                } else {
-                    log.info("[server.js] Mounted %s extension as a generic extension", bundle.name);
-                }
-                extensions[bundle.name] = extension;
-            } catch (err) {
-                log.error("[server.js] Failed to mount %s extension:", bundle.name, err.stack);
+    while(allbundles.length > 0) {
+        var startLen = allbundles.length;
+        for (var i = 0; i < startLen; i++) {
+            if (!allbundles[i].extension) {
+                allbundles.splice(i, 1);
+                break;
             }
-        } else {
-            log.error("[server.js] Specified entry point %s for %s does not exist. Skipped.", bundle.extension.path, bundle.name);
+
+            if (!allbundles[i].bundleDependencies) {
+                log.info("[server.js] Bundle %s has extension with no dependencies", allbundles[i].name);
+                loadExtension(allbundles[i]);
+                allbundles.splice(i, 1);
+                break;
+            }
+
+            if (bundleDepsSatisfied(allbundles[i])) {
+                log.info("[server.js] Bundle %s has extension with satisfied dependencies", allbundles[i].name);
+                loadExtension(allbundles[i]);
+                allbundles.splice(i, 1);
+                break;
+            }
         }
-    });
+
+        var endLen = allbundles.length;
+        if (startLen === endLen) {
+            log.warn("[server.js] %d bundle(s) could not be loaded, as their dependencies were not satisfied", endLen);
+            break;
+        }
+    }
 });
+
+function loadExtension(bundle) {
+    var extPath = path.join(__dirname, bundle.dir, bundle.extension.path);
+    if (fs.existsSync(extPath)) {
+        try {
+            var extension = require(extPath)(new ExtensionApi(bundle.name, io));
+            if (bundle.extension.express) {
+                app.use(extension);
+                log.info("[server.js] Mounted %s extension as an express app", bundle.name);
+            } else {
+                log.info("[server.js] Mounted %s extension as a generic extension", bundle.name);
+            }
+            extensions[bundle.name] = extension;
+        } catch (err) {
+            log.error("[server.js] Failed to mount %s extension:", bundle.name, err.stack);
+        }
+    } else {
+        log.error("[server.js] Specified entry point %s for %s does not exist. Skipped.", bundle.extension.path, bundle.name);
+    }
+}
+
+function bundleDepsSatisfied(bundle) {
+    var deps = bundle.bundleDependencies;
+
+    for (var extName in extensions) {
+        var index = deps.indexOf(extName);
+        if (index > -1) {
+            deps.splice(index, 1);
+        }
+    }
+
+    return deps.length === 0;
+}
 
 io.set('log level', 1); // reduce logging
 
