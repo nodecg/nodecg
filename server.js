@@ -58,14 +58,14 @@ bundles.on('allLoaded', function(allbundles) {
             }
 
             if (!allbundles[i].bundleDependencies) {
-                log.info("[server.js] Bundle %s has extension with no dependencies", allbundles[i].name);
+                log.debug("[server.js] Bundle %s has extension with no dependencies", allbundles[i].name);
                 loadExtension(allbundles[i]);
                 allbundles.splice(i, 1);
                 break;
             }
 
             if (bundleDepsSatisfied(allbundles[i])) {
-                log.info("[server.js] Bundle %s has extension with satisfied dependencies", allbundles[i].name);
+                log.debug("[server.js] Bundle %s has extension with satisfied dependencies", allbundles[i].name);
                 loadExtension(allbundles[i]);
                 allbundles.splice(i, 1);
                 break;
