@@ -10,6 +10,7 @@ var express = require('express'),
     log = require('./lib/logger'),
     bundles = require('./lib/bundles'),
     path = require('path'),
+    syncedVariables = require('./lib/synced_variables'), //require'd here just to initialize the event listeners
     ExtensionApi = require('./lib/extension_api');
 
 log.trace("[server.js] Setting up Express");
