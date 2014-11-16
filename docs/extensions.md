@@ -5,6 +5,7 @@ Extensions can export any module, but don't __have__ to export anything if they 
 
 ##Extension template
 ```javascript
+// nodecg/bundles/my-bundle/index.js
 var nodecg = {};
 
 function MyClass(extensionApi) {
@@ -43,7 +44,7 @@ module.exports = function(extensionApi) { return new MyClass(extensionApi) };
 Your bundle's [nodecg.json](nodecg.json.md) must have the `extension` property.
 
 ###How can I access another bundle's extension?
-First, you _must_ declare that bundle as a `bundleDependency` in your [nodecg.json](nodecg.json.md)
+First, you _must_ declare that bundle as a `bundleDependency` in your [nodecg.json](nodecg.json.md).
 Then, you may access that bundle's extension via `nodecg.extensions[bundle-name]`.
 
 ###How can I define a custom route for my bundle?
