@@ -84,7 +84,7 @@ it triggers callbacks specified by every instance of that variable. This effecti
 allowing data to always be in sync and for bundles to react to changes in that data.
 
 ###Declaring a synced variable
-NOTE: As of this writing, it is not possible for one piece of code to listen to two variables of the same name, even if they belong to two different bundles.
+NOTE: As of this writing, it is not possible for a given scope to listen to two variables of the same name, even if they belong to two different bundles.
 This is because variables are accessed via `nodecg.variables[variable-name]`, with no respect to the bundle name. This may change in the future.
 
 ```javascript
@@ -98,7 +98,7 @@ nodecg.declareSyncedVar({
 
 ###Accessing a synced variable
 Most operations that need to access the value of a synced variable are best done from that variable's `setter`.
-However, in some cases it may be necessary to access the value directly.
+However, in some cases it may be necessary to access the value directly. A synced variable may only be accessed after it has been declared in the current scope.
 ```javascript
 var value = nodecg.variables.myVar; // value = 123
 ```
