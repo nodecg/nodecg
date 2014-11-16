@@ -84,10 +84,13 @@ it triggers callbacks specified by every instance of that variable. This effecti
 allowing data to always be in sync and for bundles to react to changes in that data.
 
 ###Declaring a synced variable
+NOTE: As of this writing, it is not possible for one piece of code to listen to two variables of the same name, even if they belong to two different bundles.
+This is because variables are accessed via `nodecg.variables[variable-name]`, with no respect to the bundle name. This may change in the future.
+
 ```javascript
 nodecg.declareSyncedVar({
   variableName: 'myVar',
-  bundleName: 'my-bundle', //optional, defaults to the name of the current bundle
+  bundleName: 'my-bundle', //optional, defaults to the name of the current bundle. can be used to listen to another bundle's variable
   initialVal: 123, //optional, specifies an initial val to set the variable to if it doesn't yet exist
   setter: function(newVal) {} // callback fired whenever the value of this variable changes
 })
