@@ -42,6 +42,10 @@ Callbacks are not automatically invoked. They must be explicitly called by some 
 ```javascript
 nodecg.sendMessage(String messageName[, Object customData, function callback]);
 ```
+You can also send a message to another bundle.
+```javascript
+nodecg.sendMessageToBundle(String messageName, String bundleName[, Object customData, function callback]);
+```
 
 ###Invoking a callback supplied by nodecg.sendMessage
 Bundles may need to supply a callback to their [sendMessage](nodecg-api.md#sending-a-message) operations.
