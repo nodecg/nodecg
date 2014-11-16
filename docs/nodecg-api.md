@@ -84,6 +84,8 @@ it triggers callbacks specified by every instance of that variable. This effecti
 allowing data to always be in sync and for bundles to react to changes in that data.
 
 ###Declaring a synced variable
+If the variable has already been declared, this will not overwrite the existing var. To access a var in a given scope, it _must_ first be declared.
+
 NOTE: As of this writing, it is not possible for a given scope to listen to two variables of the same name, even if they belong to two different bundles.
 This is because variables are accessed via `nodecg.variables[variable-name]`, with no respect to the bundle name. This may change in the future.
 
