@@ -4,7 +4,10 @@ Generally, an admin panel will send a message when a button is pressed, and the 
 An example is given below, and further examples can be found in the [samples repository](https://github.com/nodecg/nodecg-samples).
 
 ##Accessing the API
-In dashboard panels, all of your .js files will have access to a `nodecg` object.  
+###From the dashboard
+In dashboard panels, all of your .js files will have access to a `nodecg` object, without the need for any extra code.
+
+###From a view
 In views, you must include `<script src="/viewsetup.js"></script>` at the bottom of your body tag, and you must wrap your Javascript as below:
 ```javascript
 $(document).on('ncgReady', function() {
@@ -19,21 +22,28 @@ document.addEventListener("ncgReady", function() {
 ```
 This is to ensure the scripts NodeCG depends on are loaded and configured before the view attempts to use the API.
 
-##Sending a message
+###From an extension
+If your extension meets the NodeCG extension specification, it will have access to a `nodecg` object, without the need for any extra code.
+
+
+##Messages
+NodeCG allows for events to be fired/heard from not only the server, but any and all clients.
+
+###Sending a message
 Messages have a name, an optional object containing any additional information you require, and an optional callback.
 Callbacks are not automatically invoked. They must be explicitly called by some piece of extension code [(Example)](extensions.md#invoking-a-callback-supplied-by-nodecgsendmessage).
 ```javascript
 nodecg.sendMessage(String messageName[, Object customData, function callback]);
 ```
 
-##Listening for messages
+###Listening for messages
 When a message is received, it fires a function which you define.  
 Note that you can also listen to messages from other bundles, with an optional parameter.
 ```javascript
 nodecg.listenFor(String messageName[, String bundleName], function messageHandler(data));
 ```
 
-##Examples
+###Examples
 To send a message within your bundle, the following calls are valid
 ```javascript
 nodecg.sendMessage('startAnimation', {duration: 10});
@@ -44,7 +54,7 @@ You *can not* send a message to another bundle directly, it must listen for your
 To listen for a message in your own bundle
 ```javascript
 nodecg.listenFor('startAnimation', startMyAnimation);
-function startMyAnimation(data) { 
+function startMyAnimation(data) {
   console.log("animation duration: " + data.duration);
   ...
 }
@@ -55,4 +65,26 @@ nodecg.listenFor('hideAnimation', function() { ... });
 To listen to messages in another bundle, for example, a shared helper bundle
 ```javascript
 nodecg.listenFor('sharedMessage', 'another-bundle', myHandler);
+```
+
+##Synced Variables
+Synced variables are data that is replicated on the server and across all clients. Any time a synced variable changes,
+it triggers callbacks specified by every instance of that variable. This effectively provides full-stack data binding for bundles,
+allowing data to always be in sync and for bundles to react to changes in that data.
+
+###Declaring a synced variable
+```javascript
+nodecg.declareSyncedVar({
+  variableName: 'myVar',
+  bundleName: 'my-bundle', //optional, defaults to the name of the current bundle
+  initialVal: 123, //optional, specifies an initial val to set the variable to if it doesn't yet exist
+  setter: function(newVal) {} // callback fired whenever the value of this variable changes
+})
+```
+
+###Accessing a synced variable
+Most operations that need to access the value of a synced variable are best done from that variable's `setter`.
+However, in some cases it may be necessary to access the value directly.
+```javascript
+var value = nodecg.variables.myVar; // value = 123
 ```
