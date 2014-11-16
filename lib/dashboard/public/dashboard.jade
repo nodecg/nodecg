@@ -73,7 +73,7 @@ html(lang="en")
                         try {
                             (function (nodecg) {
                                 !{ script }
-                            })(new NodeCG('#{ bndl.name }'));
+                            })(new NodeCG('#{ bndl.name }', !{JSON.stringify(config)}));
                         } catch (err) {
                             console.error("[NODECG] Panel for bundle #{ bndl.name } threw error: "+ err.message);
                         }
