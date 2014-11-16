@@ -1,7 +1,7 @@
 #Creating NodeCG Extensions
 An extension is any bundle code that runs on the server (the NodeJS environment) and not on the client (the browser).
 Extensions let you extend the core of NodeCG, adding nearly any additional functionality that your bundle may need.
-Extensions can export any module, but don't __have__ to export anything if they do not need to.
+Extensions MUST export a function that accepts a single argument, that argument being an instance of the NodeCG API.
 
 ##Extension template
 ```javascript
