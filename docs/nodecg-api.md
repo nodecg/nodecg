@@ -29,6 +29,13 @@ If your extension meets the NodeCG extension specification, it will have access 
 ##Messages
 NodeCG allows for events to be fired/heard from not only the server, but any and all clients.
 
+###Listening for messages
+When a message is received, it fires a function which you define.
+Note that you can also listen to messages from other bundles, with an optional parameter.
+```javascript
+nodecg.listenFor(String messageName[, String bundleName], function messageHandler(data));
+```
+
 ###Sending a message
 Messages have a name, an optional object containing any additional information you require, and an optional callback.
 Callbacks are not automatically invoked. They must be explicitly called by some piece of extension code [(Example)](extensions.md#invoking-a-callback-supplied-by-nodecgsendmessage).
@@ -36,12 +43,16 @@ Callbacks are not automatically invoked. They must be explicitly called by some 
 nodecg.sendMessage(String messageName[, Object customData, function callback]);
 ```
 
-###Listening for messages
-When a message is received, it fires a function which you define.  
-Note that you can also listen to messages from other bundles, with an optional parameter.
-```javascript
-nodecg.listenFor(String messageName[, String bundleName], function messageHandler(data));
-```
+###Invoking a callback supplied by nodecg.sendMessage
+Bundles may need to supply a callback to their [sendMessage](nodecg-api.md#sending-a-message) operations.
+For these callbacks to work, there must be code in place to invoke them.
+````javascript
+var myData = { name: 'Geoff' };
+
+nodecg.listenFor('myMessage', function(data, callback) {
+    callback(myData);
+);
+````
 
 ###Examples
 To send a message within your bundle, the following calls are valid
