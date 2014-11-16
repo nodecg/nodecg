@@ -84,9 +84,10 @@ it triggers callbacks specified by every instance of that variable. This effecti
 allowing data to always be in sync and for bundles to react to changes in that data.
 
 ###Declaring a synced variable
-If the variable has already been declared, this will not overwrite the existing var. To access a var in a given scope, it _must_ first be declared.
+If the variable has already been declared, this will not overwrite the existing var.
+To access a var from a given NodeCG API instance, it _must_ first be declared by that instance, even if another instance has already declared it.
 
-NOTE: As of this writing, it is not possible for a given scope to listen to two variables of the same name, even if they belong to two different bundles.
+NOTE: As of this writing, it is not possible for a NodeCG API instance to listen to two variables of the same name, even if they belong to two different bundles.
 This is because variables are accessed via `nodecg.variables[variable-name]`, with no respect to the bundle name. This may change in the future.
 
 ```javascript
@@ -100,7 +101,8 @@ nodecg.declareSyncedVar({
 
 ###Accessing a synced variable
 Most operations that need to access the value of a synced variable are best done from that variable's `setter`.
-However, in some cases it may be necessary to access the value directly. A synced variable may only be accessed after it has been declared in the current scope.
+However, in some cases it may be necessary to access the value directly.
+A synced variable may only be accessed after it has been declared by the given instance of the NodeCG API.
 ```javascript
 var value = nodecg.variables.myVar; // value = 123
 ```
