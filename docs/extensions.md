@@ -1,42 +1,29 @@
 #Creating NodeCG Extensions
 An extension is any bundle code that runs on the server (the NodeJS environment) and not on the client (the browser).
 Extensions let you extend the core of NodeCG, adding nearly any additional functionality that your bundle may need.
-Extensions MUST export a function that accepts a single argument, that argument being an instance of the NodeCG API.
+Extensions are _always_ singletons. They are `require`d once by the core of NodeCG, then cached.
+To access the NodeCG API, your extension _must_ export a function that accepts a single argument, that argument being an instance of the NodeCG API.
 
 ##Extension template
 ```javascript
 // nodecg/bundles/my-bundle/index.js
-var nodecg = {};
-
-function MyClass(extensionApi) {
-    // Uncomment the block below if you want your class to be a singleton
-    /*  if (MyClass.prototype._singletonInstance) {
-            return MyClass.prototype._singletonInstance;
-        }
-        MyClass.prototype._singletonInstance = this;
-    */
-
-    nodecg = extensionApi;
-    var self = this;
-
+// 'nodecg` is injected by the core of NodeCG
+module.exports = function(nodecg) {
     // Declare a synced var
     nodecg.declareSyncedVar({ variableName: 'myVar', initialVal: 123 });
 
     // Listen for a message
     nodecg.listenFor('myMessage', myCallback);
-}
+};
 
 function myCallback(data, callback) {
     console.log(data);
 
     // If the client supplied a callback, uncomment this to invoke it
     /*  var response = 'acknowledged';
-        callback(response);
-    */
+     callback(response);
+     */
 }
-
-// 'extensionApi` is injected by the core of NodeCG
-module.exports = function(extensionApi) { return new MyClass(extensionApi) };
 ```
 
 ##FAQ
