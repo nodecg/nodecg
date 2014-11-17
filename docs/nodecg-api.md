@@ -1,6 +1,6 @@
 #Using NodeCG's Javascript API
-Dashboard panels, views, and extensions have access to a Javascript API, allowing them to send messages to each other.  
-Generally, an admin panel will send a message when a button is pressed, and the view will 'listen' for that message.  
+Dashboard panels, views, and extensions have access to a Javascript API, allowing them to send messages to each other.
+Generally, an admin panel will send a message when a button is pressed, and the view will 'listen' for that message.
 An example is given below, and further examples can be found in the [samples repository](https://github.com/nodecg/nodecg-samples).
 
 ##Accessing the API
