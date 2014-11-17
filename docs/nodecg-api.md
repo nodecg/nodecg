@@ -110,3 +110,19 @@ A synced variable may only be accessed after it has been declared by the given i
 ```javascript
 var value = nodecg.variables.myVar; // value = 123
 ```
+
+## Utility functions
+The NodeCG API offers a number of utility functions.
+
+###Config
+The NodeCG config can be read via `nodecg.config`.
+This property is read-only, and has sentitive information such as API keys filtered out.
+
+###util.authCheck
+Checks if a user is logged in, may only be used in express routes.
+```javascript
+// only logged in users may access this route
+app.get('/secreturl', nodecg.util.authCheck, function(req, res) {
+    res.send('congrats, you're logged in');
+});
+```
