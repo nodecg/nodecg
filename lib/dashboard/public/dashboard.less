@@ -1,9 +1,34 @@
+@panel-unit-width: 128px;
+@panel-gutter-width: 16px;
+
 body {
   padding-top: 50px;
 }
 
 textarea {
   max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  // we can fit 4 panel widths and 4+2 gutters (+2 because masonry is weird)
+  .container {
+    @num: 4;
+    width: (@num * @panel-unit-width) + (@num + 2) * @panel-gutter-width; // 608px
+  }
+}
+@media (min-width: 992px) {
+  // we can fit 6 panel widths and 6+2 gutters (+2 because masonry is weird)
+  .container {
+    @num: 6;
+    width: (@num * @panel-unit-width) + (@num + 2) * @panel-gutter-width; // 896px
+  }
+}
+@media (min-width: 1200px) {
+  // we can fit 8 panel widths and 8+2 gutters (+2 because masonry is weird)
+  .container {
+    @num: 8;
+    width: (@num * @panel-unit-width) + (@num + 2) * @panel-gutter-width; // 1184px
+  }
 }
 
 .dashboard-panels {
@@ -105,10 +130,9 @@ textarea {
 }
 
 .generate-panel-spans(8);
-
 .generate-panel-spans(@n, @i: 1) when (@i =< @n) {
   .panel-span-@{i} {
-    width: (@i * 128px);
+    width: (@i * @panel-unit-width) + (@i - 1) * @panel-gutter-width;
   }
   .generate-panel-spans(@n, (@i + 1));
 }
