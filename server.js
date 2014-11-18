@@ -1,17 +1,21 @@
 'use strict';
 
-var express = require('express'),
-    bodyParser = require('body-parser'),
-    app = express(),
-    fs = require('fs'),
-    server = require('http').createServer(app),
-    io = module.exports.io = require('socket.io').listen(server),
-    config = require('./lib/config').config,
-    log = require('./lib/logger'),
-    bundles = require('./lib/bundles'),
-    path = require('path'),
-    syncedVariables = require('./lib/synced_variables'), //require'd here just to initialize the event listeners
-    ExtensionApi = require('./lib/extension_api');
+var express = require('express');
+var bodyParser = require('body-parser');
+var app = express();
+var fs = require('fs');
+var server = require('http').createServer(app);
+var io = module.exports.io = require('socket.io').listen(server);
+var config = require('./lib/config').config;
+var log = require('./lib/logger');
+var bundles = require('./lib/bundles');
+var path = require('path');
+var syncedVariables = require('./lib/synced_variables'); //require'd here just to initialize the event listeners
+var ExtensionApi = require('./lib/extension_api');
+
+// For testing purposes, server.js needs to emit an event when it has loaded all extensions
+var EventEmitter = require('events').EventEmitter;
+var emitter = module.exports.emitter = new EventEmitter();
 
 log.trace("[server.js] Setting up Express");
 app.use(express.static(__dirname + '/public'));
@@ -78,6 +82,9 @@ bundles.on('allLoaded', function(allbundles) {
             break;
         }
     }
+
+    emitter.emit('extensionsLoaded');
+    log.trace("[server.js] Completed extension mounting");
 });
 
 function loadExtension(bundle) {

@@ -47,5 +47,9 @@
   },
   "engines": {
     "node": ">= 0.10.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.0.1",
+    "zombie": "^2.2.1"
   }
 }
