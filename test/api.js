@@ -33,7 +33,6 @@ describe("api", function() {
         serverApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
         clientApi.declareSyncedVar({ variableName: 'testVar', initialVal: 456,
             setter: function(newVal) {
-                console.log('hit setter', clientApi.variables);
                 assert.equal(serverApi.variables.testVar, 123);
                 assert.equal(clientApi.variables.testVar, 123);
                 done();
