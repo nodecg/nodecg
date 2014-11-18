@@ -32,6 +32,12 @@ html(lang="en")
             div.container
                 div.navbar-header
                     a(class='navbar-brand', href='#') NodeCG dashboard
+                if config.login.enabled
+                    .collapse.navbar-collapse
+                        ul.nav.navbar-nav.navbar-right
+                            li
+                                a(href="/logout" title="Sign out")
+                                    i.fa.fa-sign-out
 
         //Spacer
         p
