@@ -21,6 +21,8 @@
 
     - `path` String. The file path to the main extension file. This will be mounted by `require`.
 
+- `bundleDependencies` (optional) Array. Names of the bundles your bundle depends on, if any.
+
 ##Example
 ```json
 {
@@ -42,6 +44,10 @@
   "extension": {
     "express": false,
     "path": "index.js"
-  }
+  },
+  "bundleDependencies": [
+    "some-bundle",
+    "another-bundle"
+  ]
 }
 ```

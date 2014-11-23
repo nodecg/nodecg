@@ -1,1 +1,2 @@
-forever start -l forever.log -o ./logs/nodecg.log -e ./logs/nodecg_err.log --uid "nodecg" server.js
+#!/bin/sh
+forever start --uid "nodecg" server.js
