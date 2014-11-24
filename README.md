@@ -2,6 +2,8 @@
 NodeCG is a live graphics system, designed to be used during live stream events.
 It is based on the overlay system used during the [Tip of the Hats 2014](https://www.youtube.com/playlist?list=PLJUPqfTTJdNnxdK5YlAo3y2jQj188jl0_) event.
 
+[![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
+
 NodeCG provides a basic bundle system for graphics, as well as an admin dashboard for controlling the bundles.
 
 A _bundle_ contains HTML, Javascript, CSS, and any other resources required to produce a certain graphic animation and also contains an admin panel for controlling the animation.
