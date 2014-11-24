@@ -1,1 +1,0 @@
-forever start --uid "nodecg" server.js
