@@ -100,7 +100,9 @@ describe("api", function() {
             serverApi.config.host = 'the_test_failed';
             assert.notEqual(clientApi.config.host, 'the_test_failed');
         });
-    })
+    });
+
+    after(function() {
+        server.shutdown();
+    });
 });
-
-

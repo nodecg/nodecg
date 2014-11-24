@@ -127,6 +127,10 @@ io.sockets.on('connection', function (socket) {
     });
 });
 
+exports.shutdown = function() {
+    server.close();
+};
+
 log.trace("[server.js] Attempting to listen on port %s", config.port);
 server.listen(config.port);
 log.info("[server.js] NodeCG running on %s:%s", config.host, config.port);
