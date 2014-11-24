@@ -23,15 +23,23 @@ describe("api", function() {
     var clientApi = {};
     before(function(done) {
         var self = this;
+
+        // Wait until page is loaded
+        function pageLoaded(window) {
+            return (typeof window.NodeCG !== "undefined");
+        }
+
         this.timeout(10000);
         this.browser = new Browser();
         this.browser
             .visit(DASHBOARD_URL)
             .then(function() {
-                var evalStr = util.format('new NodeCG("%s", %s)', BUNDLE_NAME, JSON.stringify(filteredConfig));
-                clientApi = self.browser.window.clientApi = self.browser.evaluate(evalStr);
-            })
-            .then(done, done);
+                self.browser.wait(pageLoaded, function () {
+                    var evalStr = util.format('window.clientApi = new NodeCG("%s", %s)', BUNDLE_NAME, JSON.stringify(filteredConfig));
+                    clientApi = self.browser.evaluate(evalStr);
+                    done();
+                });
+            });
     });
 
     it("should allow client -> server messaging with callbacks", function(done) {
