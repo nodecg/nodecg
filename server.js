@@ -13,10 +13,6 @@ var path = require('path');
 var syncedVariables = require('./lib/synced_variables'); //require'd here just to initialize the event listeners
 var ExtensionApi = require('./lib/extension_api');
 
-// For testing purposes, server.js needs to emit an event when it has loaded all extensions
-var EventEmitter = require('events').EventEmitter;
-var emitter = module.exports.emitter = new EventEmitter();
-
 log.trace("[server.js] Setting up Express");
 app.use(express.static(__dirname + '/public'));
 app.use('/components', express.static(__dirname + '/bower_components'));
@@ -83,7 +79,6 @@ bundles.on('allLoaded', function(allbundles) {
         }
     }
 
-    emitter.emit('extensionsLoaded');
     log.trace("[server.js] Completed extension mounting");
 });
 

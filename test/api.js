@@ -5,39 +5,33 @@ var Browser = require("zombie");
 // Start up the server
 var server = require(process.cwd() + '/server.js');
 
+// Modules needed to set up test environment
+var util = require('util');
+var config = require(process.cwd() + '/lib/config').config;
+var filteredConfig = require(process.cwd() + '/lib/config').filteredConfig;
+var ExtensionApi = require(process.cwd() + '/lib/extension_api');
+
 var BUNDLE_NAME = 'test-bundle';
+var DASHBOARD_URL = util.format("http://%s:%d/", config.host, config.port);
 
 describe("api", function() {
     var serverApi = {};
-    before(function(done) {
-        this.timeout(10000);
-        server.emitter.on('extensionsLoaded', function(){
-            serverApi = server.extensions[BUNDLE_NAME];
-            done();
-        });
+    before(function() {
+        serverApi = new ExtensionApi(BUNDLE_NAME, server.io);
     });
 
     var clientApi = {};
     before(function(done) {
         var self = this;
+        this.timeout(10000);
         this.browser = new Browser();
         this.browser
-            .visit("http://localhost:9090/")
+            .visit(DASHBOARD_URL)
             .then(function() {
-                clientApi = self.browser.window.testBundleApiInstance;
+                var evalStr = util.format('new NodeCG("%s", %s)', BUNDLE_NAME, JSON.stringify(filteredConfig));
+                clientApi = self.browser.window.clientApi = self.browser.evaluate(evalStr);
             })
             .then(done, done);
-    });
-
-    it("should not let multiple declarations of synced variables overwrite one another", function(done) {
-        serverApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
-        clientApi.declareSyncedVar({ variableName: 'testVar', initialVal: 456,
-            setter: function(newVal) {
-                assert.equal(serverApi.variables.testVar, 123);
-                assert.equal(clientApi.variables.testVar, 123);
-                done();
-            }
-        });
     });
 
     it("should allow client -> server messaging with callbacks", function(done) {
@@ -54,6 +48,17 @@ describe("api", function() {
             done();
         });
         serverApi.sendMessage('serverToClient');
+    });
+
+    it("should not let multiple declarations of synced variables overwrite one another", function(done) {
+        serverApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
+        clientApi.declareSyncedVar({ variableName: 'testVar', initialVal: 789,
+            setter: function(newVal) {
+                assert.equal(serverApi.variables.testVar, 123);
+                assert.equal(clientApi.variables.testVar, 123);
+                done();
+            }
+        });
     });
 
     describe("server api config property", function() {
