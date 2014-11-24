@@ -49,6 +49,15 @@
   "engines": {
     "node": ">= 0.10.0"
   },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "bower.json",
+    "lib/",
+    "logs/.empty_directory",
+    "public/",
+    "server.js"
+  ],
   "devDependencies": {
     "mocha": "^2.0.1",
     "zombie": "^2.2.1"
