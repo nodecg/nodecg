@@ -1,6 +1,6 @@
 // Modules used to run tests
 var assert = require('assert');
-var Browser = require("zombie");
+var Browser = require('zombie');
 
 // Start up the server
 var server = require(process.cwd() + '/server.js');
@@ -37,7 +37,10 @@ describe("api", function() {
                 self.browser.wait(pageLoaded, function () {
                     var evalStr = util.format('window.clientApi = new NodeCG("%s", %s)', BUNDLE_NAME, JSON.stringify(filteredConfig));
                     clientApi = self.browser.evaluate(evalStr);
-                    done();
+
+                    self.browser.wait(function(w) {
+                        return w.clientApi._socket.socket.connected;
+                    }, done);
                 });
             });
     });
