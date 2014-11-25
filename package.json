@@ -43,8 +43,8 @@
     "winston": "^0.8.3"
   },
   "scripts": {
-    "postinstall": "./node_modules/.bin/bower install",
-    "test": "./node_modules/.bin/mocha"
+    "postinstall": "bower install",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
   },
   "engines": {
     "node": ">= 0.10.0"
@@ -59,7 +59,10 @@
     "server.js"
   ],
   "devDependencies": {
+    "coveralls": "^2.11.2",
+    "istanbul": "^0.3.2",
     "mocha": "^2.0.1",
+    "mocha-lcov-reporter": "0.0.1",
     "zombie": "^2.2.1"
   }
 }
