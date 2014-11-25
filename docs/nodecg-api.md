@@ -111,6 +111,13 @@ A synced variable may only be accessed after it has been declared by the given i
 var value = nodecg.variables.myVar; // value = 123
 ```
 
+###Caveats
+Currently, syncedVars do not handle objects or arrays well.
+
+For example, `nodecg.variables.myArray.push('data')` will break the variable, as it replaces `nodecg.variables.myArray` with a new array object.
+Likewise, setting a property such as `nodecg.variables.myObject.a = 'data'` will not propogate throughout the stack and will not trigger the appropriate `setter` functions.
+We realize how silly of a limitation this is, and are brainstorming how to best rectify it. We are currently examining the proposed [`Object.observe`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe) property as a future solution.
+
 ## Utility functions
 The NodeCG API offers a number of utility functions.
 
@@ -123,6 +130,6 @@ Checks if a user is logged in, may only be used in express routes.
 ```javascript
 // only logged in users may access this route
 app.get('/secreturl', nodecg.util.authCheck, function(req, res) {
-    res.send('congrats, you're logged in');
+    res.send("congrats, you're logged in");
 });
 ```

@@ -1,6 +1,7 @@
 # NodeCG
-NodeCG is a live graphics system, designed to be used during live stream events.
-It is based on the overlay system used during the [Tip of the Hats 2014](https://www.youtube.com/watch?v=x9PzBHgN29U) event.
+NodeCG is a live graphics system, designed to be used in live broadcasts.
+It is primarily aimed at [Twitch](http://twitch.tv) broadcasters using [Open Broadcaster Software](https://obsproject.com/), but is usable in any environment that can render HTML.
+NodeCG is based on the overlay system developed for the [Tip of the Hats 2014](https://www.youtube.com/watch?v=x9PzBHgN29U) charity event.
 
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
 [![Coverage Status](https://img.shields.io/coveralls/nodecg/nodecg.svg)](https://coveralls.io/r/nodecg/nodecg)
@@ -19,7 +20,7 @@ npm install
 node server.js
 ```
 
-Alternatively, if you have [forever](https://github.com/nodejitsu/forever) installed you may run `run_nodecg.sh`
+To run NodeCG in production, [pm2](https://github.com/Unitech/pm2) is recommended.
 
 ### Usage
 - Open `http://localhost:9090/dashboard` to see the admin dashboard

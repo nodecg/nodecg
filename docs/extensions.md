@@ -7,7 +7,7 @@ To access the NodeCG API, your extension _must_ export a function that accepts a
 ##Extension template
 ```javascript
 // nodecg/bundles/my-bundle/index.js
-// 'nodecg` is injected by the core of NodeCG
+// 'nodecg' is injected by the core of NodeCG
 module.exports = function(nodecg) {
     // Declare a synced var
     nodecg.declareSyncedVar({ variableName: 'myVar', initialVal: 123 });
@@ -20,9 +20,7 @@ function myCallback(data, callback) {
     console.log(data);
 
     // If the client supplied a callback, uncomment this to invoke it
-    /*  var response = 'acknowledged';
-     callback(response);
-     */
+    // callback('acknowledged');
 }
 ```
 
@@ -38,25 +36,31 @@ Then, you may access that bundle's extension via `nodecg.extensions[bundle-name]
 If an extension exports an express app, it will automatically be mounted.
 Below is an example of an extension exporting an express app:
 
-````javascript
+```javascript
 var express = require('express'),
-    app = module.exports = express();
+    app = express();
 
-app.get('/mybundle/customroute', function(req, res) {
-  res.render(__dirname + 'somefile.jade', {name: "Some test data!", age: 23});
-});
+module.exports = function(nodecg) {
+    app.get('/mybundle/customroute', function(req, res) {
+      res.render(__dirname + 'somefile.jade', {name: "Some test data!", age: 23});
+    });
+
+    return app;
+};
 ````
 
 ###What if my bundle's extension relies on a npm package that NodeCG doesn't have?
 You can use [squirrel](https://github.com/DamonOehlman/squirrel) to lazy-install and lazy-load any npm package that your bundle(s) need:
-````javascript
+```javascript
 var express = require('express'),
     app = module.exports = express(),
     squirrel = require('squirrel');
 
-squirrel('jsdom', function(err, jsdom) {
-  app.get('/mybundle/customroute', function(req, res) {
-    //do something that requires jsdom
-  });
-});
-````
+module.exports = function(nodecg) {
+    squirrel('jsdom', function(err, jsdom) {
+        app.get('/mybundle/customroute', function(req, res) {
+            //do something that requires jsdom
+        });
+    });
+}
+```
