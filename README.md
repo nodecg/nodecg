@@ -16,7 +16,7 @@ Install [node.js & npm](http://nodejs.org/), then install [bower](http://bower.i
 ```
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
-npm install
+npm install --production
 node server.js
 ```
 
