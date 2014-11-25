@@ -1,6 +1,6 @@
 # NodeCG
 NodeCG is a live graphics system, designed to be used during live stream events.
-It is based on the overlay system used during the [Tip of the Hats 2014](https://www.youtube.com/playlist?list=PLJUPqfTTJdNnxdK5YlAo3y2jQj188jl0_) event.
+It is based on the overlay system used during the [Tip of the Hats 2014](https://www.youtube.com/watch?v=x9PzBHgN29U) event.
 
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
 [![Coverage Status](https://img.shields.io/coveralls/nodecg/nodecg.svg)](https://coveralls.io/r/nodecg/nodecg)
