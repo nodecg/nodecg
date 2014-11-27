@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 var app = express();
 var fs = require('fs');
 var server = require('http').createServer(app);
-var io = module.exports.io = require('socket.io').listen(server);
+var io = module.exports.io = require('socket.io')(server);
 var config = require('./lib/config').config;
 var log = require('./lib/logger');
 var bundles = require('./lib/bundles');
@@ -119,11 +119,11 @@ io.set('log level', 1); // reduce logging
 
 io.sockets.on('connection', function (socket) {
     log.trace("[server.js] New socket connection: ID %s with IP %s", socket.id,
-        socket.manager.handshaken[socket.id].address.address); // wot tha fuck pete
+        socket.handshake.address);
 
     socket.on('message', function (data) {
         log.debug("[server.js] Socket %s sent a message:", socket.id, data);
-        io.sockets.json.send(data);
+        io.emit('message', data);
     });
 });
 

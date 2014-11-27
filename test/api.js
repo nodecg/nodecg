@@ -29,7 +29,7 @@ describe("api", function() {
             return (typeof window.NodeCG !== "undefined");
         }
 
-        this.timeout(10000);
+        this.timeout(15000);
         this.browser = new Browser();
         this.browser
             .visit(DASHBOARD_URL)
@@ -68,8 +68,7 @@ describe("api", function() {
                 assert.equal(serverApi.variables.testVar, 123);
                 assert.equal(clientApi.variables.testVar, 123);
                 done();
-            }
-        });
+            }});
     });
 
     describe("server api config property", function() {
