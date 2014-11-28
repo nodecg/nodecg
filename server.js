@@ -4,7 +4,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 var fs = require('fs');
-var server = require('http').createServer(app);
+var server = require('http').Server(app);
 var io = module.exports.io = require('socket.io')(server);
 var config = require('./lib/config').config;
 var log = require('./lib/logger');
@@ -46,7 +46,7 @@ app.use(bundleViews);
 
 var extensions = module.exports.extensions = {};
 // Mount the NodeCG extension entrypoint from each bundle, if any
-bundles.on('allLoaded', function(allbundles) {
+bundles.on('allLoaded', function allLoaded(allbundles) {
     log.trace("[server.js] Starting extension mounting");
 
     while(allbundles.length > 0) {
@@ -115,13 +115,11 @@ function bundleDepsSatisfied(bundle) {
     return deps.length === 0;
 }
 
-io.set('log level', 1); // reduce logging
-
-io.sockets.on('connection', function (socket) {
+io.on('connection', function onConnection(socket) {
     log.trace("[server.js] New socket connection: ID %s with IP %s", socket.id,
         socket.handshake.address);
 
-    socket.on('message', function (data) {
+    socket.on('message', function onMessage(data) {
         log.debug("[server.js] Socket %s sent a message:", socket.id, data);
         io.emit('message', data);
     });

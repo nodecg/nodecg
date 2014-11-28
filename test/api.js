@@ -39,7 +39,7 @@ describe("api", function() {
                     clientApi = self.browser.evaluate(evalStr);
 
                     self.browser.wait(function(w) {
-                        return w.clientApi._socket.socket.connected;
+                        return w.clientApi._socket.connected;
                     }, done);
                 });
             });
