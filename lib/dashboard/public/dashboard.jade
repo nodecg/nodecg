@@ -6,20 +6,20 @@ html(lang="en")
 
         title NodeCG dashboard
 
-        //Bootstrap main CSS & Yeti override
+        //- Bootstrap main CSS & Yeti override
         link(rel='stylesheet', href='/components/bootstrap/dist/css/bootstrap.min.css')
         link(rel='stylesheet', href='/components/bsw-yeti/css/bootstrap.min.css')
 
-        //Bower component CSS
+        //- Bower component CSS
         link(rel='stylesheet', href='/components/fontawesome/css/font-awesome.min.css')
         link(rel='stylesheet', href='/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
         link(rel='stylesheet', href='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.css')
         link(rel='stylesheet', href='/components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css')
 
-        //Custom styles for this template
+        //- Custom styles for this template
         link(rel='stylesheet', href='/dashboard/dashboard.css')
 
-        //Bundle CSS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
+        //- Bundle CSS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
         each bndl in bundles
             //- only add the tag if there is a style, empty tags can cause long timeout delays
             if bndl.admin.css
@@ -39,10 +39,10 @@ html(lang="en")
                                 a(href="/logout" title="Sign out")
                                     i.fa.fa-sign-out
 
-        //Spacer
+        //- Spacer
         p
 
-        //Bundle panels, re-write this and consider using mixins/includes/partials?
+        //- Bundle panels, re-write this and consider using mixins/includes/partials?
         div.container
             div.dashboard-panels
                 each bndl in bundles
@@ -50,9 +50,7 @@ html(lang="en")
                         !=markup
 
 
-        //Core JavaScript
-        //==================================================
-        //Placed at the end of the document so the pages load faster
+        //- Core JavaScript
         script(src='/components/jquery/dist/jquery.min.js')
         script(src='/components/bootstrap/dist/js/bootstrap.min.js')
         script(src='/components/bootstrap/js/tooltip.js')
@@ -70,7 +68,7 @@ html(lang="en")
 
         script(src='/dashboard/dashboard.js')
 
-        //Bundle JS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
+        //- Bundle JS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
         each bndl in bundles
             //- only add the tag if there is a script, empty tags can cause long timeout delays
             if bndl.admin.js
