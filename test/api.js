@@ -39,7 +39,11 @@ describe("api", function() {
                     clientApi = self.browser.evaluate(evalStr);
 
                     self.browser.wait(function(w) {
-                        return w.clientApi._socket.connected;
+                        var socket = w.clientApi._socket;
+                        //if (socket.connected === false) return false;
+                        //if (socket.io.engine.readyState !== 'open') return false;
+                        if (socket.io.engine.upgrading || socket.io.engine.upgrade) return false;
+                        return true;
                     }, done);
                 });
             });
