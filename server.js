@@ -44,7 +44,9 @@ log.trace("[server.js] Starting bundle views lib");
 var bundleViews = require('./lib/bundle_views');
 app.use(bundleViews);
 
+// All extensions are loaded once then cached
 var extensions = module.exports.extensions = {};
+
 // Mount the NodeCG extension entrypoint from each bundle, if any
 bundles.on('allLoaded', function(allbundles) {
     log.trace("[server.js] Starting extension mounting");
@@ -74,6 +76,10 @@ bundles.on('allLoaded', function(allbundles) {
 
         var endLen = allbundles.length;
         if (startLen === endLen) {
+            allbundles.forEach(function(bundle) {
+               log.warn("[server.js] Extension for bundle %s could not be mounted, as it had unsatisfied dependencies:",
+                   bundle.name, bundle.bundleDependencies.join(', '));
+            });
             log.warn("[server.js] %d bundle(s) could not be loaded, as their dependencies were not satisfied", endLen);
             break;
         }
