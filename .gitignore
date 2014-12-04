@@ -11,8 +11,8 @@ node_modules/
 # Logs
 /logs/**
 
-# User config
-/config.json
+# Configs
+/cfg
 
 # OS specific
 .DS_Store
@@ -20,6 +20,9 @@ node_modules/
 # JetBrains IDEs (IntelliJ/WebStorm)
 .idea/
 *.iml
+
+# Code coverage results
+/coverage
 
 # Don't ignore .empty_directory files
 !.empty_directory
