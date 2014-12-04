@@ -77,8 +77,9 @@ bundles.on('allLoaded', function(allbundles) {
         var endLen = allbundles.length;
         if (startLen === endLen) {
             allbundles.forEach(function(bundle) {
-               log.warn("[server.js] Extension for bundle %s could not be mounted, as it had unsatisfied dependencies:",
+                log.warn("[server.js] Extension for bundle %s could not be mounted, as it had unsatisfied dependencies:",
                    bundle.name, bundle.bundleDependencies.join(', '));
+                bundles.remove(bundle.name);
             });
             log.warn("[server.js] %d bundle(s) could not be loaded, as their dependencies were not satisfied", endLen);
             break;
