@@ -2,49 +2,56 @@
 var assert = require('assert');
 var Browser = require('zombie');
 
-// Start up the server
-var server = require(process.cwd() + '/server.js');
-
 // Modules needed to set up test environment
 var util = require('util');
+var path = require('path');
+var fs = require('fs');
 var config = require(process.cwd() + '/lib/config').config;
-var filteredConfig = require(process.cwd() + '/lib/config').filteredConfig;
-var ExtensionApi = require(process.cwd() + '/lib/extension_api');
+var wrench = require('wrench');
 
 var BUNDLE_NAME = 'test-bundle';
 var DASHBOARD_URL = util.format("http://%s:%d/", config.host, config.port);
+var BUNDLE_DIR = path.resolve(process.cwd(), 'bundles', BUNDLE_NAME);
 
-describe("api", function() {
-    var serverApi = {};
-    before(function() {
-        serverApi = new ExtensionApi(BUNDLE_NAME, server.io);
+var server = null;
+var serverApi = null;
+var clientApi = null;
+
+before(function(done) {
+    var self = this;
+    this.timeout(10000);
+
+    /** Set up test bundle **/
+    wrench.copyDirSyncRecursive(__dirname + '/' + BUNDLE_NAME, BUNDLE_DIR, {
+        forceDelete: true
     });
 
-    var clientApi = {};
-    before(function(done) {
-        var self = this;
+    // Start up the server
+    server = require(process.cwd() + '/server.js');
 
+    server.emitter.on('extensionsLoaded', function extensionsLoaded() {
+        /** Server API setup **/
+        serverApi = server.extensions[BUNDLE_NAME];
+
+        /** Client API setup **/
         // Wait until page is loaded
         function pageLoaded(window) {
-            return (typeof window.NodeCG !== "undefined");
+            return (typeof window.clientApi !== "undefined");
         }
 
-        this.timeout(10000);
-        this.browser = new Browser();
-        this.browser
+        self.browser = new Browser();
+        self.browser
             .visit(DASHBOARD_URL)
             .then(function() {
                 self.browser.wait(pageLoaded, function () {
-                    var evalStr = util.format('window.clientApi = new NodeCG("%s", %s)', BUNDLE_NAME, JSON.stringify(filteredConfig));
-                    clientApi = self.browser.evaluate(evalStr);
-
-                    self.browser.wait(function(w) {
-                        return w.clientApi._socket.socket.connected;
-                    }, done);
+                    clientApi = self.browser.window.clientApi;
+                    done();
                 });
             });
     });
+});
 
+describe("socket api", function() {
     it("should allow client -> server messaging with callbacks", function(done) {
         serverApi.listenFor('clientToServer', function (data, cb) {
             cb();
@@ -71,38 +78,54 @@ describe("api", function() {
             }
         });
     });
+});
 
-    describe("server api config property", function() {
-        it("should exist and have length", function() {
+describe("server api", function() {
+    describe("nodecg config", function() {
+        it("exists and has length", function() {
             assert.ok(Object.keys(serverApi.config).length);
         });
 
-        it("should not reveal sensitive information", function() {
+        it("doesn't reveal sensitive information", function() {
             assert.equal(typeof(serverApi.config.login.sessionSecret), 'undefined');
         });
 
-        it("should not be writable", function() {
+        it("isn't writable", function() {
             serverApi.config.host = 'the_test_failed';
             assert.notEqual(serverApi.config.host, 'the_test_failed');
         });
     });
 
-    describe("client api config property", function() {
-        it("should exist and have length", function() {
+    describe.skip("bundle config", function() {
+        it("exists and has length", function() {
+            assert.ok(Object.keys(serverApi.bundleConfig).length);
+        });
+    })
+});
+
+describe("client api", function() {
+    describe("nodecg config", function() {
+        it("exists and has length", function() {
             assert.ok(Object.keys(clientApi.config).length);
         });
 
-        it("should not reveal sensitive information", function() {
+        it("doesn't reveal sensitive information", function() {
             assert.equal(typeof(clientApi.config.login.sessionSecret), 'undefined');
         });
 
-        it("should not be writable", function() {
+        it("isn't writable", function() {
             serverApi.config.host = 'the_test_failed';
             assert.notEqual(clientApi.config.host, 'the_test_failed');
         });
     });
+});
 
-    after(function() {
-        server.shutdown();
-    });
+after(function() {
+    server.shutdown();
+
+    try {
+        wrench.rmdirSyncRecursive(BUNDLE_DIR);
+    } catch (e) {
+        console.warn("Couldn't remove test-bundle dir from bundles folder");
+    }
 });

@@ -10,6 +10,7 @@ var config = require('./lib/config').config;
 var log = require('./lib/logger');
 var bundles = require('./lib/bundles');
 var path = require('path');
+var emitter = exports.emitter = new (require('events').EventEmitter);
 var syncedVariables = require('./lib/synced_variables'); //require'd here just to initialize the event listeners
 var ExtensionApi = require('./lib/extension_api');
 
@@ -86,6 +87,7 @@ bundles.on('allLoaded', function(allbundles) {
         }
     }
 
+    emitter.emit('extensionsLoaded');
     log.trace("[server.js] Completed extension mounting");
 });
 
@@ -93,7 +95,7 @@ function loadExtension(bundle) {
     var extPath = path.join(__dirname, bundle.dir, bundle.extension.path);
     if (fs.existsSync(extPath)) {
         try {
-            var extension = require(extPath)(new ExtensionApi(bundle.name, io));
+            var extension = require(extPath)(new ExtensionApi(bundle, io));
             if (bundle.extension.express) {
                 app.use(extension);
                 log.info("[server.js] Mounted %s extension as an express app", bundle.name);

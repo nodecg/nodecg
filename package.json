@@ -64,6 +64,7 @@
     "istanbul": "^0.3.2",
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
+    "wrench": "^1.5.8",
     "zombie": "^2.2.1"
   }
 }
