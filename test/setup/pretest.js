@@ -17,4 +17,4 @@ if (!fs.existsSync(CFG_DIR)) {
 wrench.copyDirSyncRecursive(TEST_BUNDLE_SRC_PATH, BUNDLE_DIR, {
     forceDelete: true
 });
-fs.writeFileSync(BUNDLE_CFG_PATH, JSON.stringify({ test: "data" }));
+fs.writeFileSync(BUNDLE_CFG_PATH, JSON.stringify({ test: "the_test_string" }));

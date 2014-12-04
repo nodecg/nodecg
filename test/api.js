@@ -12,6 +12,8 @@ var DASHBOARD_URL = util.format("http://%s:%d/", config.host, config.port);
 var VIEW_URL = DASHBOARD_URL + 'view/' + BUNDLE_NAME;
 
 var server = null;
+var dashboardBrowser = null;
+var viewBrowser = null;
 var extensionApi = null;
 var dashboardApi = null;
 var viewApi = null;
@@ -39,12 +41,12 @@ before(function(done) {
             return (typeof window.dashboardApi !== "undefined");
         }
 
-        self.dashboardBrowser = new Browser();
-        self.dashboardBrowser
+        dashboardBrowser = new Browser();
+        dashboardBrowser
             .visit(DASHBOARD_URL)
             .then(function() {
-                self.dashboardBrowser.wait(dashboardApiLoaded, function () {
-                    dashboardApi = self.dashboardBrowser.window.dashboardApi;
+                dashboardBrowser.wait(dashboardApiLoaded, function () {
+                    dashboardApi = dashboardBrowser.window.dashboardApi;
                     dashboardDone = true;
                     checkDone();
                 });
@@ -59,26 +61,18 @@ before(function(done) {
 
         // Zombie doesn't set referers itself when requesting assets on a page
         // For this reason, there is a workaround in lib/bundle_views
-        self.viewBrowser = new Browser();
-        self.viewBrowser
+        viewBrowser = new Browser();
+        viewBrowser
             .visit(VIEW_URL)
             .then(function() {
-                self.viewBrowser.wait(viewApiLoaded, function () {
-                    viewApi = self.viewBrowser.window.viewApi;
+                viewBrowser.wait(viewApiLoaded, function () {
+                    viewApi = viewBrowser.window.viewApi;
                     viewDone = true;
                     checkDone();
                 });
             });
     });
 });
-
-/*before(function(done) {
-    /** View API setup **/
-    /*var self = this;
-    this.timeout(10000);
-
-    /
-});*/
 
 describe("socket api", function() {
     it("facilitates client -> server messaging with acknowledgements", function(done) {
@@ -177,6 +171,12 @@ describe("view api", function() {
             assert.ok(Object.keys(viewApi.bundleConfig).length);
         });
     })
+});
+
+describe("dashboard", function() {
+    it("renders panel Jade with bundleConfig", function() {
+        dashboardBrowser.assert.text('#test-bundle .js-test', 'the_test_string');
+    });
 });
 
 after(function() {
