@@ -22,8 +22,8 @@ html(lang="en")
         //Bundle CSS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
         each bndl in bundles
             //- only add the tag if there is a style, empty tags can cause long timeout delays
-            if bndl.admin.css
-                each style in bndl.admin.css
+            if bndl.dashboard.css
+                each style in bndl.dashboard.css
                     style(type='text/css').
                         !{ style }
 
@@ -46,7 +46,7 @@ html(lang="en")
         div.container
             div.dashboard-panels
                 each bndl in bundles
-                    each markup in bndl.admin.html
+                    each markup in bndl.dashboard.html
                         !=markup
 
 
@@ -73,8 +73,8 @@ html(lang="en")
         //Bundle JS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
         each bndl in bundles
             //- only add the tag if there is a script, empty tags can cause long timeout delays
-            if bndl.admin.js
-                each script in bndl.admin.js
+            if bndl.dashboard.js
+                each script in bndl.dashboard.js
                     script(type='text/javascript').
                         try {
                             (function (nodecg) {
