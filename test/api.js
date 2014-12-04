@@ -5,137 +5,180 @@ var Browser = require('zombie');
 // Modules needed to set up test environment
 var util = require('util');
 var path = require('path');
-var fs = require('fs');
 var config = require(process.cwd() + '/lib/config').config;
-var wrench = require('wrench');
 
 var BUNDLE_NAME = 'test-bundle';
 var DASHBOARD_URL = util.format("http://%s:%d/", config.host, config.port);
-var BUNDLE_DIR = path.resolve(process.cwd(), 'bundles', BUNDLE_NAME);
-var CFG_PATH = path.resolve(process.cwd(), 'cfg', BUNDLE_NAME + '.json');
+var VIEW_URL = DASHBOARD_URL + 'view/' + BUNDLE_NAME;
 
 var server = null;
-var serverApi = null;
-var clientApi = null;
+var extensionApi = null;
+var dashboardApi = null;
+var viewApi = null;
 
 before(function(done) {
     var self = this;
-    this.timeout(10000);
+    this.timeout(20000);
 
-    /** Set up test bundle **/
-    wrench.copyDirSyncRecursive(__dirname + '/' + BUNDLE_NAME, BUNDLE_DIR, {
-        forceDelete: true
-    });
-    fs.writeFileSync(CFG_PATH, JSON.stringify({ test: "data" }));
+    var dashboardDone = false;
+    var viewDone = false;
+    function checkDone() {
+        if (dashboardDone && viewDone) done();
+    }
 
     // Start up the server
     server = require(process.cwd() + '/server.js');
 
     server.emitter.on('extensionsLoaded', function extensionsLoaded() {
-        /** Server API setup **/
-        serverApi = server.extensions[BUNDLE_NAME];
+        /** Extension API setup **/
+        extensionApi = server.extensions[BUNDLE_NAME];
 
-        /** Client API setup **/
-        // Wait until page is loaded
-        function pageLoaded(window) {
-            return (typeof window.clientApi !== "undefined");
+        /** Dashboard API setup **/
+        // Wait until dashboard API is loaded
+        function dashboardApiLoaded(window) {
+            return (typeof window.dashboardApi !== "undefined");
         }
 
-        self.browser = new Browser();
-        self.browser
+        self.dashboardBrowser = new Browser();
+        self.dashboardBrowser
             .visit(DASHBOARD_URL)
             .then(function() {
-                self.browser.wait(pageLoaded, function () {
-                    clientApi = self.browser.window.clientApi;
-                    done();
+                self.dashboardBrowser.wait(dashboardApiLoaded, function () {
+                    dashboardApi = self.dashboardBrowser.window.dashboardApi;
+                    dashboardDone = true;
+                    checkDone();
+                });
+            });
+
+        /** View API setup **/
+        // Wait until view API is loaded
+        function viewApiLoaded(window) {
+            //return (typeof window.NodeCG !== "undefined");
+            return (typeof window.viewApi !== "undefined");
+        }
+
+        // Zombie doesn't set referers itself when requesting assets on a page
+        // For this reason, there is a workaround in lib/bundle_views
+        self.viewBrowser = new Browser();
+        self.viewBrowser
+            .visit(VIEW_URL)
+            .then(function() {
+                self.viewBrowser.wait(viewApiLoaded, function () {
+                    viewApi = self.viewBrowser.window.viewApi;
+                    viewDone = true;
+                    checkDone();
                 });
             });
     });
 });
 
+/*before(function(done) {
+    /** View API setup **/
+    /*var self = this;
+    this.timeout(10000);
+
+    /
+});*/
+
 describe("socket api", function() {
     it("facilitates client -> server messaging with acknowledgements", function(done) {
-        serverApi.listenFor('clientToServer', function (data, cb) {
+        extensionApi.listenFor('clientToServer', function (data, cb) {
             cb();
         });
-        clientApi.sendMessage('clientToServer', function () {
+        dashboardApi.sendMessage('clientToServer', function () {
             done();
         });
     });
 
     it("facilitates server -> client messaging", function(done) {
-        clientApi.listenFor('serverToClient', function () {
+        dashboardApi.listenFor('serverToClient', function () {
             done();
         });
-        serverApi.sendMessage('serverToClient');
+        extensionApi.sendMessage('serverToClient');
     });
 
     it("doesn't let multiple declarations of a synced variable overwrite itself", function(done) {
-        serverApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
-        clientApi.declareSyncedVar({ variableName: 'testVar', initialVal: 456,
+        extensionApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
+        dashboardApi.declareSyncedVar({ variableName: 'testVar', initialVal: 456,
             setter: function(newVal) {
                 assert.equal(newVal, 123);
-                assert.equal(serverApi.variables.testVar, 123);
-                assert.equal(clientApi.variables.testVar, 123);
+                assert.equal(extensionApi.variables.testVar, 123);
+                assert.equal(dashboardApi.variables.testVar, 123);
                 done();
             }
         });
     });
 });
 
-describe("server api", function() {
+describe("extension api", function() {
     describe("nodecg config", function() {
         it("exists and has length", function() {
-            assert.ok(Object.keys(serverApi.config).length);
+            assert.ok(Object.keys(extensionApi.config).length);
         });
 
         it("doesn't reveal sensitive information", function() {
-            assert.equal(typeof(serverApi.config.login.sessionSecret), 'undefined');
+            assert.equal(typeof(extensionApi.config.login.sessionSecret), 'undefined');
         });
 
         it("isn't writable", function() {
-            serverApi.config.host = 'the_test_failed';
-            assert.notEqual(serverApi.config.host, 'the_test_failed');
+            extensionApi.config.host = 'the_test_failed';
+            assert.notEqual(extensionApi.config.host, 'the_test_failed');
         });
     });
 
     describe("bundle config", function() {
         it("exists and has length", function() {
-            assert.ok(Object.keys(serverApi.bundleConfig).length);
+            assert.ok(Object.keys(extensionApi.bundleConfig).length);
         });
     })
 });
 
-describe("client api", function() {
+describe("dashboard api", function() {
     describe("nodecg config", function() {
         it("exists and has length", function() {
-            assert.ok(Object.keys(clientApi.config).length);
+            assert.ok(Object.keys(dashboardApi.config).length);
         });
 
         it("doesn't reveal sensitive information", function() {
-            assert.equal(typeof(clientApi.config.login.sessionSecret), 'undefined');
+            assert.equal(typeof(dashboardApi.config.login.sessionSecret), 'undefined');
         });
 
         it("isn't writable", function() {
-            serverApi.config.host = 'the_test_failed';
-            assert.notEqual(clientApi.config.host, 'the_test_failed');
+            extensionApi.config.host = 'the_test_failed';
+            assert.notEqual(dashboardApi.config.host, 'the_test_failed');
         });
     });
 
     describe("bundle config", function() {
         it("exists and has length", function() {
-            assert.ok(Object.keys(clientApi.bundleConfig).length);
+            assert.ok(Object.keys(dashboardApi.bundleConfig).length);
+        });
+    })
+});
+
+describe("view api", function() {
+    describe("nodecg config", function() {
+        it("exists and has length", function() {
+            assert.ok(Object.keys(viewApi.config).length);
+        });
+
+        it("doesn't reveal sensitive information", function() {
+            assert.equal(typeof(viewApi.config.login.sessionSecret), 'undefined');
+        });
+
+        it("isn't writable", function() {
+            extensionApi.config.host = 'the_test_failed';
+            assert.notEqual(viewApi.config.host, 'the_test_failed');
+        });
+    });
+
+    describe("bundle config", function() {
+        it("exists and has length", function() {
+            assert.ok(Object.keys(viewApi.bundleConfig).length);
         });
     })
 });
 
 after(function() {
     server.shutdown();
-
-    try {
-        fs.unlinkSync(CFG_PATH);
-        wrench.rmdirSyncRecursive(BUNDLE_DIR);
-    } catch (e) {
-        console.warn("Couldn't clean up test bundle files");
-    }
 });

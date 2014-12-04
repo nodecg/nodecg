@@ -73,10 +73,6 @@ html(lang="en")
             //- only add the tag if there is a script, empty tags can cause long timeout delays
             if bndl.dashboard.js
                 each script in bndl.dashboard.js
-                    //- bundleConfig needs to be SOMETHING, otherwise the NodeCG constructor will error
-                    unless bndl.config
-                        - bndl.config = {}
-
                     script(type='text/javascript').
                         try {
                             (function (nodecg) {
