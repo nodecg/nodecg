@@ -10,7 +10,7 @@ var server = null;
 var dashboardBrowser = null;
 
 before(function(done) {
-    this.timeout(10000);
+    this.timeout(15000);
 
     // Start up the server
     server = require(process.cwd() + '/server.js');

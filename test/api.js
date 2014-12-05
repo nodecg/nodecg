@@ -16,7 +16,7 @@ var dashboardApi = null;
 var viewApi = null;
 
 before(function(done) {
-    this.timeout(10000);
+    this.timeout(15000);
 
     var dashboardDone = false;
     var viewDone = false;
