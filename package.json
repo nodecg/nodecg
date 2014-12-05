@@ -62,6 +62,7 @@
     "server.js"
   ],
   "devDependencies": {
+    "chai": "^1.10.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.2",
     "mocha": "^2.0.1",

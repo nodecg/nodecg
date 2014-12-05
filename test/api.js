@@ -1,15 +1,12 @@
+'use strict';
+
 // Modules used to run tests
-var assert = require('assert');
+var chai = require('chai');
+var should = chai.should();
+var expect = chai.expect;
 var Browser = require('zombie');
 
-// Modules needed to set up test environment
-var util = require('util');
-var path = require('path');
-var config = require(process.cwd() + '/lib/config').config;
-
-var BUNDLE_NAME = 'test-bundle';
-var DASHBOARD_URL = util.format("http://%s:%d/", config.host, config.port);
-var VIEW_URL = DASHBOARD_URL + 'view/' + BUNDLE_NAME;
+var C = require('./setup/test-constants');
 
 var server = null;
 var dashboardBrowser = null;
@@ -19,8 +16,7 @@ var dashboardApi = null;
 var viewApi = null;
 
 before(function(done) {
-    var self = this;
-    this.timeout(20000);
+    this.timeout(10000);
 
     var dashboardDone = false;
     var viewDone = false;
@@ -33,7 +29,7 @@ before(function(done) {
 
     server.emitter.on('extensionsLoaded', function extensionsLoaded() {
         /** Extension API setup **/
-        extensionApi = server.extensions[BUNDLE_NAME];
+        extensionApi = server.extensions[C.BUNDLE_NAME];
 
         /** Dashboard API setup **/
         // Wait until dashboard API is loaded
@@ -43,7 +39,7 @@ before(function(done) {
 
         dashboardBrowser = new Browser();
         dashboardBrowser
-            .visit(DASHBOARD_URL)
+            .visit(C.DASHBOARD_URL)
             .then(function() {
                 dashboardBrowser.wait(dashboardApiLoaded, function () {
                     dashboardApi = dashboardBrowser.window.dashboardApi;
@@ -55,7 +51,6 @@ before(function(done) {
         /** View API setup **/
         // Wait until view API is loaded
         function viewApiLoaded(window) {
-            //return (typeof window.NodeCG !== "undefined");
             return (typeof window.viewApi !== "undefined");
         }
 
@@ -63,7 +58,7 @@ before(function(done) {
         // For this reason, there is a workaround in lib/bundle_views
         viewBrowser = new Browser();
         viewBrowser
-            .visit(VIEW_URL)
+            .visit(C.VIEW_URL)
             .then(function() {
                 viewBrowser.wait(viewApiLoaded, function () {
                     viewApi = viewBrowser.window.viewApi;
@@ -95,9 +90,9 @@ describe("socket api", function() {
         extensionApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
         dashboardApi.declareSyncedVar({ variableName: 'testVar', initialVal: 456,
             setter: function(newVal) {
-                assert.equal(newVal, 123);
-                assert.equal(extensionApi.variables.testVar, 123);
-                assert.equal(dashboardApi.variables.testVar, 123);
+                newVal.should.equal(123);
+                extensionApi.variables.testVar.should.equal(123);
+                dashboardApi.variables.testVar.should.equal(123);
                 done();
             }
         });
@@ -107,22 +102,23 @@ describe("socket api", function() {
 describe("extension api", function() {
     describe("nodecg config", function() {
         it("exists and has length", function() {
-            assert.ok(Object.keys(extensionApi.config).length);
+            expect(extensionApi.config).to.not.be.empty;
         });
 
         it("doesn't reveal sensitive information", function() {
-            assert.equal(typeof(extensionApi.config.login.sessionSecret), 'undefined');
+            expect(extensionApi.config.login).to.not.have.property('sessionSecret');
         });
 
         it("isn't writable", function() {
-            extensionApi.config.host = 'the_test_failed';
-            assert.notEqual(extensionApi.config.host, 'the_test_failed');
+            expect(function() {
+                extensionApi.config.host = 'the_test_failed';
+            }).to.throw(TypeError);
         });
     });
 
     describe("bundle config", function() {
         it("exists and has length", function() {
-            assert.ok(Object.keys(extensionApi.bundleConfig).length);
+            expect(extensionApi.bundleConfig).to.not.be.empty();
         });
     })
 });
@@ -130,22 +126,23 @@ describe("extension api", function() {
 describe("dashboard api", function() {
     describe("nodecg config", function() {
         it("exists and has length", function() {
-            assert.ok(Object.keys(dashboardApi.config).length);
+            expect(dashboardApi.config).to.not.be.empty;
         });
 
         it("doesn't reveal sensitive information", function() {
-            assert.equal(typeof(dashboardApi.config.login.sessionSecret), 'undefined');
+            expect(dashboardApi.config.login).to.not.have.property('sessionSecret');
         });
 
         it("isn't writable", function() {
-            extensionApi.config.host = 'the_test_failed';
-            assert.notEqual(dashboardApi.config.host, 'the_test_failed');
+            expect(function() {
+                dashboardApi.config.host = 'the_test_failed';
+            }).to.throw(TypeError);
         });
     });
 
     describe("bundle config", function() {
         it("exists and has length", function() {
-            assert.ok(Object.keys(dashboardApi.bundleConfig).length);
+            expect(dashboardApi.bundleConfig).to.not.be.empty();
         });
     })
 });
@@ -153,32 +150,29 @@ describe("dashboard api", function() {
 describe("view api", function() {
     describe("nodecg config", function() {
         it("exists and has length", function() {
-            assert.ok(Object.keys(viewApi.config).length);
+            expect(viewApi.config).to.not.be.empty;
         });
 
         it("doesn't reveal sensitive information", function() {
-            assert.equal(typeof(viewApi.config.login.sessionSecret), 'undefined');
+            expect(viewApi.config.login).to.not.have.property('sessionSecret');
         });
 
         it("isn't writable", function() {
-            extensionApi.config.host = 'the_test_failed';
-            assert.notEqual(viewApi.config.host, 'the_test_failed');
+            expect(function() {
+                viewApi.config.host = 'the_test_failed';
+            }).to.throw(TypeError);
         });
     });
 
     describe("bundle config", function() {
         it("exists and has length", function() {
-            assert.ok(Object.keys(viewApi.bundleConfig).length);
+            expect(viewApi.bundleConfig).to.not.be.empty();
         });
     })
 });
 
-describe("dashboard", function() {
-    it("renders panel Jade with bundleConfig", function() {
-        dashboardBrowser.assert.text('#test-bundle .js-test', 'the_test_string');
-    });
-});
-
 after(function() {
-    server.shutdown();
+    try{
+        server.shutdown();
+    } catch(e) {}
 });
