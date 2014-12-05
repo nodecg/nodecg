@@ -1,3 +1,5 @@
+
+
 doctype html
 html(lang="en")
     head
@@ -46,8 +48,8 @@ html(lang="en")
         div.container
             div.dashboard-panels
                 each bndl in bundles
-                    each markup in bndl.dashboard.html
-                        !=markup
+                    +panels(bndl)
+
 
 
         //- Core JavaScript
