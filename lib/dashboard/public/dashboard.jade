@@ -1,5 +1,30 @@
+mixin panels(bundle)
+    each panel in bundle.dashboard.panels
+        div(id=bundle.name + '_' + panel.name, class='panel panel-default panel-span-#{ panel.width } #{ bundle.name } #{ panel.id }')
+            .panel-heading
+                h3.panel-title=panel.title
+                i(class="fa panel-icon #{ panel.faIcon }")
+                +panelInfoBtn(panel)
+            //- The body was rendered from Jade into HTML in an earlier step of bundle parsing
+            //- This is inefficient, as it means we are doing two rendering passes for each bundle:
+            //- Once to render the body, once to render the rest of the panel (container + header).
+            //- However, I see no other way to do it as Jade is a compiled language and does not
+            //- support dynamic includes.
+            .panel-body!=panel.body
 
+//- TODO: Make panel info better. Show things like resolution, authors, etc. Lots more info
+mixin panelInfoBtn(panel)
+    button.btn.btn-xs.btn-info.panel-info(type="button",
+    data-toggle="popover",
+    title=panel.title,
+    data-html="true",
+    data-container="body"
+    data-placement="bottom",
+    data-content="<a target='_blank' href='#{ panel.viewUrl }'>#{ panel.viewUrl }</a>")
+        i.fa.fa-info
 
+mixin panelInfoContent(panel)
+    a(target="_blank" href=panel.viewUrl)= panel.viewUrl
 doctype html
 html(lang="en")
     head
@@ -22,10 +47,10 @@ html(lang="en")
         link(rel='stylesheet', href='/dashboard/dashboard.css')
 
         //- Bundle CSS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
-        each bndl in bundles
+        each bundle in bundles
             //- only add the tag if there is a style, empty tags can cause long timeout delays
-            if bndl.dashboard.css
-                each style in bndl.dashboard.css
+            if bundle.dashboard.css
+                each style in bundle.dashboard.css
                     style(type='text/css').
                         !{ style }
 
@@ -47,10 +72,8 @@ html(lang="en")
         //- Bundle panels, re-write this and consider using mixins/includes/partials?
         div.container
             div.dashboard-panels
-                each bndl in bundles
-                    +panels(bndl)
-
-
+                each bundle in bundles
+                    +panels(bundle)
 
         //- Core JavaScript
         script(src='/components/jquery/dist/jquery.min.js')
@@ -71,16 +94,16 @@ html(lang="en")
         script(src='/dashboard/dashboard.js')
 
         //- Bundle JS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
-        each bndl in bundles
+        each bundle in bundles
             //- only add the tag if there is a script, empty tags can cause long timeout delays
-            if bndl.dashboard.js
-                each script in bndl.dashboard.js
-                    script(type='text/javascript').
+            if bundle.dashboard.js
+                each script in bundle.dashboard.js
+                    script(type='text/javascript').npm
                         try {
                             (function (nodecg) {
+                                var $bundle = $('.#{ bundle.name }');
                                 !{ script }
-                            })(new NodeCG('#{ bndl.name }', !{JSON.stringify(bndl.config)}, !{JSON.stringify(ncgConfig)}));
+                            })(new NodeCG('#{ bundle.name }', !{JSON.stringify(bundle.config)}, !{JSON.stringify(ncgConfig)}));
                         } catch (err) {
-                            console.error("[NODECG] Panel for bundle #{ bndl.name } threw error: "+ err.message);
+                            console.error("[NODECG] Panel for bundle #{ bundle.name } threw error: "+ err.message);
                         }
-
