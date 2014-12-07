@@ -1,3 +1,30 @@
+mixin panels(bundle)
+    each panel in bundle.dashboard.panels
+        div(class='#{ bundle.name } #{ panel.name } panel panel-default panel-span-#{ panel.width }')
+            .panel-heading
+                h3.panel-title=panel.title
+                i(class="fa panel-icon #{ panel.faIcon }")
+                +panelInfoBtn(panel)
+            //- The body was rendered from Jade into HTML in an earlier step of bundle parsing
+            //- This is inefficient, as it means we are doing two rendering passes for each bundle:
+            //- Once to render the body, once to render the rest of the panel (container + header).
+            //- However, I see no other way to do it as Jade is a compiled language and does not
+            //- support dynamic includes.
+            .panel-body!=panel.body
+
+//- TODO: Make panel info better. Show things like resolution, authors, etc. Lots more info
+mixin panelInfoBtn(panel)
+    button.btn.btn-xs.btn-info.panel-info(type="button",
+    data-toggle="popover",
+    title=panel.title,
+    data-html="true",
+    data-container="body"
+    data-placement="bottom",
+    data-content="<a target='_blank' href='#{ panel.viewUrl }'>#{ panel.viewUrl }</a>")
+        i.fa.fa-info
+
+mixin panelInfoContent(panel)
+    a(target="_blank" href=panel.viewUrl)= panel.viewUrl
 doctype html
 html(lang="en")
     head
@@ -6,24 +33,24 @@ html(lang="en")
 
         title NodeCG dashboard
 
-        //Bootstrap main CSS & Yeti override
+        //- Bootstrap main CSS & Yeti override
         link(rel='stylesheet', href='/components/bootstrap/dist/css/bootstrap.min.css')
         link(rel='stylesheet', href='/components/bsw-yeti/css/bootstrap.min.css')
 
-        //Bower component CSS
+        //- Bower component CSS
         link(rel='stylesheet', href='/components/fontawesome/css/font-awesome.min.css')
         link(rel='stylesheet', href='/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
         link(rel='stylesheet', href='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.css')
         link(rel='stylesheet', href='/components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css')
 
-        //Custom styles for this template
+        //- Custom styles for this template
         link(rel='stylesheet', href='/dashboard/dashboard.css')
 
-        //Bundle CSS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
-        each bndl in bundles
+        //- Bundle CSS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
+        each bundle in bundles
             //- only add the tag if there is a style, empty tags can cause long timeout delays
-            if bndl.admin.css
-                each style in bndl.admin.css
+            if bundle.dashboard.css
+                each style in bundle.dashboard.css
                     style(type='text/css').
                         !{ style }
 
@@ -32,27 +59,23 @@ html(lang="en")
             div.container
                 div.navbar-header
                     a(class='navbar-brand', href='#') NodeCG dashboard
-                if config.login.enabled
+                if ncgConfig.login.enabled
                     .collapse.navbar-collapse
                         ul.nav.navbar-nav.navbar-right
                             li
                                 a(href="/logout" title="Sign out")
                                     i.fa.fa-sign-out
 
-        //Spacer
+        //- Spacer
         p
 
-        //Bundle panels, re-write this and consider using mixins/includes/partials?
+        //- Bundle panels, re-write this and consider using mixins/includes/partials?
         div.container
             div.dashboard-panels
-                each bndl in bundles
-                    each markup in bndl.admin.html
-                        !=markup
+                each bundle in bundles
+                    +panels(bundle)
 
-
-        //Core JavaScript
-        //==================================================
-        //Placed at the end of the document so the pages load faster
+        //- Core JavaScript
         script(src='/components/jquery/dist/jquery.min.js')
         script(src='/components/bootstrap/dist/js/bootstrap.min.js')
         script(src='/components/bootstrap/js/tooltip.js')
@@ -70,17 +93,17 @@ html(lang="en")
 
         script(src='/dashboard/dashboard.js')
 
-        //Bundle JS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
-        each bndl in bundles
+        //- Bundle JS, re-write this and consider using mixins/includes/partials? or maybe just link to them lol???
+        each bundle in bundles
             //- only add the tag if there is a script, empty tags can cause long timeout delays
-            if bndl.admin.js
-                each script in bndl.admin.js
+            if bundle.dashboard.js
+                each script in bundle.dashboard.js
                     script(type='text/javascript').
                         try {
                             (function (nodecg) {
+                                var $bundle = $('.#{ bundle.name }');
                                 !{ script }
-                            })(new NodeCG('#{ bndl.name }', !{JSON.stringify(config)}));
+                            })(new NodeCG('#{ bundle.name }', !{JSON.stringify(bundle.config)}, !{JSON.stringify(ncgConfig)}));
                         } catch (err) {
-                            console.error("[NODECG] Panel for bundle #{ bndl.name } threw error: "+ err.message);
+                            console.error("[NODECG] Panel for bundle #{ bundle.name } threw error: "+ err.message);
                         }
-

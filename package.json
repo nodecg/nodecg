@@ -44,7 +44,9 @@
   },
   "scripts": {
     "postinstall": "bower install",
+    "pretest": "node test/setup/pretest",
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
+    "posttest": "node test/setup/posttest",
     "coveralls": "cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
   },
   "engines": {
@@ -60,10 +62,12 @@
     "server.js"
   ],
   "devDependencies": {
+    "chai": "^1.10.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.2",
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
+    "wrench": "^1.5.8",
     "zombie": "^2.2.1"
   }
 }

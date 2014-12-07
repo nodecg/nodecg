@@ -10,6 +10,7 @@ var config = require('./lib/config').config;
 var log = require('./lib/logger');
 var bundles = require('./lib/bundles');
 var path = require('path');
+var emitter = exports.emitter = new (require('events').EventEmitter);
 var syncedVariables = require('./lib/synced_variables'); //require'd here just to initialize the event listeners
 var ExtensionApi = require('./lib/extension_api');
 
@@ -44,7 +45,9 @@ log.trace("[server.js] Starting bundle views lib");
 var bundleViews = require('./lib/bundle_views');
 app.use(bundleViews);
 
+// All extensions are loaded once then cached
 var extensions = module.exports.extensions = {};
+
 // Mount the NodeCG extension entrypoint from each bundle, if any
 bundles.on('allLoaded', function(allbundles) {
     log.trace("[server.js] Starting extension mounting");
@@ -74,19 +77,30 @@ bundles.on('allLoaded', function(allbundles) {
 
         var endLen = allbundles.length;
         if (startLen === endLen) {
+            allbundles.forEach(function(bundle) {
+                var unsatisfiedDeps = [];
+                bundle.bundleDependencies.forEach(function(dep) {
+                    if (extensions.hasOwnProperty(dep)) return;
+                    unsatisfiedDeps.push(dep);
+                });
+                log.warn("[server.js] Extension for bundle %s could not be mounted, as it had unsatisfied dependencies:",
+                   bundle.name, unsatisfiedDeps.join(', '));
+                bundles.remove(bundle.name);
+            });
             log.warn("[server.js] %d bundle(s) could not be loaded, as their dependencies were not satisfied", endLen);
             break;
         }
     }
 
+    emitter.emit('extensionsLoaded');
     log.trace("[server.js] Completed extension mounting");
 });
 
 function loadExtension(bundle) {
-    var extPath = path.join(__dirname, bundle.dir, bundle.extension.path);
+    var extPath = path.join(bundle.dir, bundle.extension.path);
     if (fs.existsSync(extPath)) {
         try {
-            var extension = require(extPath)(new ExtensionApi(bundle.name, io));
+            var extension = require(extPath)(new ExtensionApi(bundle, io));
             if (bundle.extension.express) {
                 app.use(extension);
                 log.info("[server.js] Mounted %s extension as an express app", bundle.name);

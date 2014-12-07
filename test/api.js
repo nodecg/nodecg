@@ -1,108 +1,178 @@
+'use strict';
+
 // Modules used to run tests
-var assert = require('assert');
+var chai = require('chai');
+var should = chai.should();
+var expect = chai.expect;
 var Browser = require('zombie');
 
-// Start up the server
-var server = require(process.cwd() + '/server.js');
+var C = require('./setup/test-constants');
 
-// Modules needed to set up test environment
-var util = require('util');
-var config = require(process.cwd() + '/lib/config').config;
-var filteredConfig = require(process.cwd() + '/lib/config').filteredConfig;
-var ExtensionApi = require(process.cwd() + '/lib/extension_api');
+var server = null;
+var dashboardBrowser = null;
+var viewBrowser = null;
+var extensionApi = null;
+var dashboardApi = null;
+var viewApi = null;
 
-var BUNDLE_NAME = 'test-bundle';
-var DASHBOARD_URL = util.format("http://%s:%d/", config.host, config.port);
+before(function(done) {
+    this.timeout(15000);
 
-describe("api", function() {
-    var serverApi = {};
-    before(function() {
-        serverApi = new ExtensionApi(BUNDLE_NAME, server.io);
-    });
+    var dashboardDone = false;
+    var viewDone = false;
+    function checkDone() {
+        if (dashboardDone && viewDone) done();
+    }
 
-    var clientApi = {};
-    before(function(done) {
-        var self = this;
+    // Start up the server
+    server = require(process.cwd() + '/server.js');
 
-        // Wait until page is loaded
-        function pageLoaded(window) {
-            return (typeof window.NodeCG !== "undefined");
+    server.emitter.on('extensionsLoaded', function extensionsLoaded() {
+        /** Extension API setup **/
+        extensionApi = server.extensions[C.BUNDLE_NAME];
+
+        /** Dashboard API setup **/
+        // Wait until dashboard API is loaded
+        function dashboardApiLoaded(window) {
+            return (typeof window.dashboardApi !== "undefined");
         }
 
-        this.timeout(10000);
-        this.browser = new Browser();
-        this.browser
-            .visit(DASHBOARD_URL)
+        dashboardBrowser = new Browser();
+        dashboardBrowser
+            .visit(C.DASHBOARD_URL)
             .then(function() {
-                self.browser.wait(pageLoaded, function () {
-                    var evalStr = util.format('window.clientApi = new NodeCG("%s", %s)', BUNDLE_NAME, JSON.stringify(filteredConfig));
-                    clientApi = self.browser.evaluate(evalStr);
+                dashboardBrowser.wait(dashboardApiLoaded, function () {
+                    dashboardApi = dashboardBrowser.window.dashboardApi;
+                    dashboardDone = true;
+                    checkDone();
+                });
+            });
 
-                    self.browser.wait(function(w) {
-                        return w.clientApi._socket.socket.connected;
-                    }, done);
+        /** View API setup **/
+        // Wait until view API is loaded
+        function viewApiLoaded(window) {
+            return (typeof window.viewApi !== "undefined");
+        }
+
+        // Zombie doesn't set referers itself when requesting assets on a page
+        // For this reason, there is a workaround in lib/bundle_views
+        viewBrowser = new Browser();
+        viewBrowser
+            .visit(C.VIEW_URL)
+            .then(function() {
+                viewBrowser.wait(viewApiLoaded, function () {
+                    viewApi = viewBrowser.window.viewApi;
+                    viewDone = true;
+                    checkDone();
                 });
             });
     });
+});
 
-    it("should allow client -> server messaging with callbacks", function(done) {
-        serverApi.listenFor('clientToServer', function (data, cb) {
+describe("socket api", function() {
+    it("facilitates client -> server messaging with acknowledgements", function(done) {
+        extensionApi.listenFor('clientToServer', function (data, cb) {
             cb();
         });
-        clientApi.sendMessage('clientToServer', function () {
+        dashboardApi.sendMessage('clientToServer', function () {
             done();
         });
     });
 
-    it("should allow server -> client messaging without callbacks", function(done) {
-        clientApi.listenFor('serverToClient', function () {
+    it("facilitates server -> client messaging", function(done) {
+        dashboardApi.listenFor('serverToClient', function () {
             done();
         });
-        serverApi.sendMessage('serverToClient');
+        extensionApi.sendMessage('serverToClient');
     });
 
-    it("should not let multiple declarations of synced variables overwrite one another", function(done) {
-        serverApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
-        clientApi.declareSyncedVar({ variableName: 'testVar', initialVal: 789,
+    it("doesn't let multiple declarations of a synced variable overwrite itself", function(done) {
+        extensionApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
+        dashboardApi.declareSyncedVar({ variableName: 'testVar', initialVal: 456,
             setter: function(newVal) {
-                assert.equal(serverApi.variables.testVar, 123);
-                assert.equal(clientApi.variables.testVar, 123);
+                newVal.should.equal(123);
+                extensionApi.variables.testVar.should.equal(123);
+                dashboardApi.variables.testVar.should.equal(123);
                 done();
             }
         });
     });
+});
 
-    describe("server api config property", function() {
-        it("should exist and have length", function() {
-            assert.ok(Object.keys(serverApi.config).length);
+describe("extension api", function() {
+    describe("nodecg config", function() {
+        it("exists and has length", function() {
+            expect(extensionApi.config).to.not.be.empty;
         });
 
-        it("should not reveal sensitive information", function() {
-            assert.equal(typeof(serverApi.config.login.sessionSecret), 'undefined');
+        it("doesn't reveal sensitive information", function() {
+            expect(extensionApi.config.login).to.not.have.property('sessionSecret');
         });
 
-        it("should not be writable", function() {
-            serverApi.config.host = 'the_test_failed';
-            assert.notEqual(serverApi.config.host, 'the_test_failed');
-        });
-    });
-
-    describe("client api config property", function() {
-        it("should exist and have length", function() {
-            assert.ok(Object.keys(clientApi.config).length);
-        });
-
-        it("should not reveal sensitive information", function() {
-            assert.equal(typeof(clientApi.config.login.sessionSecret), 'undefined');
-        });
-
-        it("should not be writable", function() {
-            serverApi.config.host = 'the_test_failed';
-            assert.notEqual(clientApi.config.host, 'the_test_failed');
+        it("isn't writable", function() {
+            expect(function() {
+                extensionApi.config.host = 'the_test_failed';
+            }).to.throw(TypeError);
         });
     });
 
-    after(function() {
+    describe("bundle config", function() {
+        it("exists and has length", function() {
+            expect(extensionApi.bundleConfig).to.not.be.empty();
+        });
+    })
+});
+
+describe("dashboard api", function() {
+    describe("nodecg config", function() {
+        it("exists and has length", function() {
+            expect(dashboardApi.config).to.not.be.empty;
+        });
+
+        it("doesn't reveal sensitive information", function() {
+            expect(dashboardApi.config.login).to.not.have.property('sessionSecret');
+        });
+
+        it("isn't writable", function() {
+            expect(function() {
+                dashboardApi.config.host = 'the_test_failed';
+            }).to.throw(TypeError);
+        });
+    });
+
+    describe("bundle config", function() {
+        it("exists and has length", function() {
+            expect(dashboardApi.bundleConfig).to.not.be.empty();
+        });
+    })
+});
+
+describe("view api", function() {
+    describe("nodecg config", function() {
+        it("exists and has length", function() {
+            expect(viewApi.config).to.not.be.empty;
+        });
+
+        it("doesn't reveal sensitive information", function() {
+            expect(viewApi.config.login).to.not.have.property('sessionSecret');
+        });
+
+        it("isn't writable", function() {
+            expect(function() {
+                viewApi.config.host = 'the_test_failed';
+            }).to.throw(TypeError);
+        });
+    });
+
+    describe("bundle config", function() {
+        it("exists and has length", function() {
+            expect(viewApi.bundleConfig).to.not.be.empty();
+        });
+    })
+});
+
+after(function() {
+    try{
         server.shutdown();
-    });
+    } catch(e) {}
 });
