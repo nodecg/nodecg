@@ -1,6 +1,6 @@
 mixin panels(bundle)
     each panel in bundle.dashboard.panels
-        div(id=bundle.name + '_' + panel.name, class='panel panel-default panel-span-#{ panel.width } #{ bundle.name } #{ panel.id }')
+        div(class='#{ bundle.name } #{ panel.name } panel panel-default panel-span-#{ panel.width }')
             .panel-heading
                 h3.panel-title=panel.title
                 i(class="fa panel-icon #{ panel.faIcon }")
@@ -98,7 +98,7 @@ html(lang="en")
             //- only add the tag if there is a script, empty tags can cause long timeout delays
             if bundle.dashboard.js
                 each script in bundle.dashboard.js
-                    script(type='text/javascript').npm
+                    script(type='text/javascript').
                         try {
                             (function (nodecg) {
                                 var $bundle = $('.#{ bundle.name }');

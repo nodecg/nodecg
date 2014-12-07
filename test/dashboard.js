@@ -24,21 +24,21 @@ before(function(done) {
 describe("dashboard", function() {
     describe("html panels", function() {
         it("show up on the dashboard", function() {
-            dashboardBrowser.assert.element('#test-bundle_html');
+            dashboardBrowser.assert.element('.test-bundle.html');
         });
     });
 
     describe("jade panels", function() {
         it("show up on the dashboard", function() {
-            dashboardBrowser.assert.element('#test-bundle_jade');
+            dashboardBrowser.assert.element('.test-bundle.jade');
         });
 
         it("have access to bundleConfig", function() {
-            dashboardBrowser.assert.text('#test-bundle_jade .js-bundleConfig', 'the_test_string');
+            dashboardBrowser.assert.text('.test-bundle.jade .js-bundleConfig', 'the_test_string');
         });
 
         it("have access to ncgConfig", function() {
-            dashboardBrowser.assert.text('#test-bundle_jade .js-ncgConfig', config.host);
+            dashboardBrowser.assert.text('.test-bundle.jade .js-ncgConfig', config.host);
         });
     });
 });
