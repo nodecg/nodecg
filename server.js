@@ -147,5 +147,11 @@ exports.shutdown = function() {
 };
 
 log.trace("[server.js] Attempting to listen on port %s", config.port);
+server.on('error', function(e) {
+   if (e.code === 'EADDRINUSE') {
+       log.error("[server.js] Port %d in use, is NodeCG already running? NodeCG will now exit.", config.port);
+       process.exit(1);
+   }
+});
 server.listen(config.port);
 log.info("[server.js] NodeCG running on %s:%s", config.host, config.port);
