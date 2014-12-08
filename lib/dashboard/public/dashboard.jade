@@ -23,8 +23,6 @@ mixin panelInfoBtn(panel)
     data-content="<a target='_blank' href='#{ panel.viewUrl }'>#{ panel.viewUrl }</a>")
         i.fa.fa-info
 
-mixin panelInfoContent(panel)
-    a(target="_blank" href=panel.viewUrl)= panel.viewUrl
 doctype html
 html(lang="en")
     head
@@ -69,7 +67,7 @@ html(lang="en")
         //- Spacer
         p
 
-        //- Bundle panels, re-write this and consider using mixins/includes/partials?
+        //- Bundle panels
         div.container
             div.dashboard-panels
                 each bundle in bundles
