@@ -102,7 +102,7 @@ html(lang="en")
                     script(type='text/javascript').
                         try {
                             (function (nodecg) {
-                                var $bundle = $('.#{ bundle.name }');
+                                var $bundle = $('.dashboard-panels .#{ bundle.name }');
                                 !{ script }
                             })(new NodeCG('#{ bundle.name }', !{JSON.stringify(bundle.config)}, !{JSON.stringify(ncgConfig)}));
                         } catch (err) {
