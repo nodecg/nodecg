@@ -109,6 +109,7 @@ function loadExtension(bundle) {
             }
             extensions[bundle.name] = extension;
         } catch (err) {
+            bundles.remove(bundle.name);
             log.error("[server.js] Failed to mount %s extension:", bundle.name, err.stack);
         }
     } else {
