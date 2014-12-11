@@ -106,5 +106,5 @@ html(lang="en")
                                 !{ script }
                             })(new NodeCG('#{ bundle.name }', !{JSON.stringify(bundle.config)}, !{JSON.stringify(ncgConfig)}));
                         } catch (err) {
-                            console.error("[NODECG] Panel for bundle #{ bundle.name } threw error: "+ err.message);
+                            console.error("[NODECG] Panel for bundle #{ bundle.name } threw error:", err.stack);
                         }
