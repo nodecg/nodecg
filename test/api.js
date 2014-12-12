@@ -98,17 +98,24 @@ describe("socket api", function() {
         });
     });
 
-    it("supports legacy 'variableName' when declaring synced variables", function(done) {
-        extensionApi.declareSyncedVar({ variableName: 'oldVar', initialValue: 123 });
-        done();
+    it("supports legacy 'variableName' when declaring synced variables", function() {
+        extensionApi.declareSyncedVar({ variableName: 'oldVar', initialVal: 123 });
+
+        extensionApi.variables.oldVar.should.equal(123);
     });
 
-    it("throws an error when no name is given to a synced variable", function (done) {
-        try {
+    it("supports 'initialVal' and 'initialValue' when declaring synced variables", function() {
+        extensionApi.declareSyncedVar({ variableName: 'initialVal', initialVal: 123 });
+        extensionApi.declareSyncedVar({ variableName: 'initialValue', initialValue: 456 });
+
+        extensionApi.variables.initialVal.should.equal(123);
+        extensionApi.variables.initialValue.should.equal(456);
+    });
+
+    it("throws an error when no name is given to a synced variable", function () {
+        expect(function() {
             extensionApi.declareSyncedVar({ initialValue: 123 });
-        } catch (e) {
-            done();
-        }
+        }).to.throw(Error);
     });
 });
 
