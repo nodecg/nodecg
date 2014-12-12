@@ -12,7 +12,7 @@ A _bundle_ contains HTML, Javascript, CSS, and any other resources required to p
 See [nodecg-samples](http://github.com/nodecg/nodecg-samples/) for some examples of how these bundles are structured.
 
 ### Installation
-Install [node.js & npm](http://nodejs.org/), then install [bower](http://bower.io/), then run the following:
+Install [node.js & npm](http://nodejs.org/), then run the following:
 ```
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
