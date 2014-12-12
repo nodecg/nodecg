@@ -87,8 +87,8 @@ describe("socket api", function() {
     });
 
     it("doesn't let multiple declarations of a synced variable overwrite itself", function(done) {
-        extensionApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
-        dashboardApi.declareSyncedVar({ variableName: 'testVar', initialVal: 456,
+        extensionApi.declareSyncedVar({ name: 'testVar', initialVal: 123 });
+        dashboardApi.declareSyncedVar({ name: 'testVar', initialVal: 456,
             setter: function(newVal) {
                 newVal.should.equal(123);
                 extensionApi.variables.testVar.should.equal(123);
@@ -96,6 +96,26 @@ describe("socket api", function() {
                 done();
             }
         });
+    });
+
+    it("supports legacy 'variableName' when declaring synced variables", function() {
+        extensionApi.declareSyncedVar({ variableName: 'oldVar', initialVal: 123 });
+
+        extensionApi.variables.oldVar.should.equal(123);
+    });
+
+    it("supports 'initialVal' and 'initialValue' when declaring synced variables", function() {
+        extensionApi.declareSyncedVar({ variableName: 'initialVal', initialVal: 123 });
+        extensionApi.declareSyncedVar({ variableName: 'initialValue', initialValue: 456 });
+
+        extensionApi.variables.initialVal.should.equal(123);
+        extensionApi.variables.initialValue.should.equal(456);
+    });
+
+    it("throws an error when no name is given to a synced variable", function () {
+        expect(function() {
+            extensionApi.declareSyncedVar({ initialValue: 123 });
+        }).to.throw(Error);
     });
 });
 
@@ -120,7 +140,7 @@ describe("extension api", function() {
         it("exists and has length", function() {
             expect(extensionApi.bundleConfig).to.not.be.empty();
         });
-    })
+    });
 });
 
 describe("dashboard api", function() {
@@ -144,7 +164,7 @@ describe("dashboard api", function() {
         it("exists and has length", function() {
             expect(dashboardApi.bundleConfig).to.not.be.empty();
         });
-    })
+    });
 });
 
 describe("view api", function() {
@@ -168,7 +188,7 @@ describe("view api", function() {
         it("exists and has length", function() {
             expect(viewApi.bundleConfig).to.not.be.empty();
         });
-    })
+    });
 });
 
 after(function() {
