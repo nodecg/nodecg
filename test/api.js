@@ -87,8 +87,8 @@ describe("socket api", function() {
     });
 
     it("doesn't let multiple declarations of a synced variable overwrite itself", function(done) {
-        extensionApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
-        dashboardApi.declareSyncedVar({ variableName: 'testVar', initialVal: 456,
+        extensionApi.declareSyncedVar({ name: 'testVar', initialVal: 123 });
+        dashboardApi.declareSyncedVar({ name: 'testVar', initialVal: 456,
             setter: function(newVal) {
                 newVal.should.equal(123);
                 extensionApi.variables.testVar.should.equal(123);
@@ -96,6 +96,19 @@ describe("socket api", function() {
                 done();
             }
         });
+    });
+
+    it("supports legacy 'variableName' when declaring synced variables", function(done) {
+        extensionApi.declareSyncedVar({ variableName: 'oldVar', initialValue: 123 });
+        done();
+    });
+
+    it("throws an error when no name is given to a synced variable", function (done) {
+        try {
+            extensionApi.declareSyncedVar({ initialValue: 123 });
+        } catch (e) {
+            done();
+        }
     });
 });
 
@@ -120,7 +133,7 @@ describe("extension api", function() {
         it("exists and has length", function() {
             expect(extensionApi.bundleConfig).to.not.be.empty();
         });
-    })
+    });
 });
 
 describe("dashboard api", function() {
@@ -144,7 +157,7 @@ describe("dashboard api", function() {
         it("exists and has length", function() {
             expect(dashboardApi.bundleConfig).to.not.be.empty();
         });
-    })
+    });
 });
 
 describe("view api", function() {
@@ -168,7 +181,7 @@ describe("view api", function() {
         it("exists and has length", function() {
             expect(viewApi.bundleConfig).to.not.be.empty();
         });
-    })
+    });
 });
 
 after(function() {
