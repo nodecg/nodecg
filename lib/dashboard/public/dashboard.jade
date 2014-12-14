@@ -86,7 +86,12 @@ html(lang="en")
         script(src='/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js')
         script(src='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js')
         script(src='/components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js')
-        script(src='/components/obs-remote/src/obs-remote.js')
+
+        //- Firefox doesn't support native WebCrypto yet >:(
+        script(src='/components/cryptojslib/components/core-min.js')
+        script(src='/components/cryptojslib/components/sha256-min.js')
+        script(src='/components/cryptojslib/components/enc-base64-min.js')
+        script(src='/components/obs-remote/dist/obs-remote.min.js')
 
         //- Twitch JS SDK isn't on bower ¯\_(ツ)_/¯
         script(src='/dashboard/twitch.min.js')
