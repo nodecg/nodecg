@@ -29,6 +29,7 @@
     "file": "~0.2.2",
     "gaze": "~0.5.1",
     "jade": "^1.6.0",
+    "lcov-filter": "0.0.1",
     "less": "^1.7.5",
     "nedb": "^0.11.1",
     "passport": "~0.2.0",
@@ -47,7 +48,7 @@
     "pretest": "node test/setup/pretest",
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
     "posttest": "node test/setup/posttest",
-    "coveralls": "cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
+    "coveralls": "node node_modules/lcov-filter/index.js ./coverage/lcov.info test bundles | coveralls && rm -rf ./coverage"
   },
   "engines": {
     "node": ">= 0.10.0"
