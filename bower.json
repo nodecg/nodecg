@@ -18,8 +18,8 @@
     "bootstrap-tagsinput": "~0.4.2",
     "seiyria-bootstrap-slider": "~4.0.8",
     "typeahead.js": "~0.10.5",
-    "obs-remote": "nodecg/obs-remote-js#latest",
-    "cryptojslib": "~3.1.2"
+    "cryptojslib": "~3.1.2",
+    "obs-remote": "^1.0.0"
   },
   "license": "MIT",
   "private": true,
