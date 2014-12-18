@@ -88,6 +88,12 @@ html(lang="en")
         script(src='/components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js')
         script(src='/components/typeahead.js/dist/typeahead.jquery.min.js')
 
+        //- Firefox doesn't support native WebCrypto yet >:(
+        script(src='/components/cryptojslib/components/core-min.js')
+        script(src='/components/cryptojslib/components/sha256-min.js')
+        script(src='/components/cryptojslib/components/enc-base64-min.js')
+        script(src='/components/obs-remote/dist/obs-remote.min.js')
+
         //- Twitch JS SDK isn't on bower ¯\_(ツ)_/¯
         script(src='/dashboard/twitch.min.js')
         script(src='/socket.io/socket.io.js')
