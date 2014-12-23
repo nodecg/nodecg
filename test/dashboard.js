@@ -5,15 +5,12 @@ var Browser = require('zombie');
 var config = require(process.cwd() + '/lib/config').config;
 
 var C = require('./setup/test-constants');
+var e = require('./setup/test-environment');
 
-var server = null;
 var dashboardBrowser = null;
 
 before(function(done) {
     this.timeout(15000);
-
-    // Start up the server
-    server = require(process.cwd() + '/server.js');
 
     dashboardBrowser = new Browser();
     dashboardBrowser
@@ -41,10 +38,4 @@ describe("dashboard", function() {
             dashboardBrowser.assert.text('.test-bundle.jade .js-ncgConfig', config.host);
         });
     });
-});
-
-after(function() {
-    try{
-       server.shutdown();
-    } catch(e) {}
 });

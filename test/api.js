@@ -7,8 +7,8 @@ var expect = chai.expect;
 var Browser = require('zombie');
 
 var C = require('./setup/test-constants');
+var e = require('./setup/test-environment');
 
-var server = null;
 var dashboardBrowser = null;
 var viewBrowser = null;
 var extensionApi = null;
@@ -24,12 +24,9 @@ before(function(done) {
         if (dashboardDone && viewDone) done();
     }
 
-    // Start up the server
-    server = require(process.cwd() + '/server.js');
-
-    server.emitter.on('extensionsLoaded', function extensionsLoaded() {
+    e.server.emitter.on('extensionsLoaded', function extensionsLoaded() {
         /** Extension API setup **/
-        extensionApi = server.extensions[C.BUNDLE_NAME];
+        extensionApi = e.server.extensions[C.BUNDLE_NAME];
 
         /** Dashboard API setup **/
         // Wait until dashboard API is loaded
@@ -189,10 +186,4 @@ describe("view api", function() {
             expect(viewApi.bundleConfig).to.not.be.empty();
         });
     });
-});
-
-after(function() {
-    try{
-        server.shutdown();
-    } catch(e) {}
 });
