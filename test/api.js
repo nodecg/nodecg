@@ -7,29 +7,26 @@ var expect = chai.expect;
 var Browser = require('zombie');
 
 var C = require('./setup/test-constants');
+var e = require('./setup/test-environment');
 
-var server = null;
 var dashboardBrowser = null;
 var viewBrowser = null;
 var extensionApi = null;
 var dashboardApi = null;
 var viewApi = null;
 
-before(function(done) {
-    this.timeout(15000);
+describe("nodecg api", function() {
+    before(function(done) {
+        this.timeout(15000);
 
-    var dashboardDone = false;
-    var viewDone = false;
-    function checkDone() {
-        if (dashboardDone && viewDone) done();
-    }
+        var dashboardDone = false;
+        var viewDone = false;
+        function checkDone() {
+            if (dashboardDone && viewDone) done();
+        }
 
-    // Start up the server
-    server = require(process.cwd() + '/server.js');
-
-    server.emitter.on('extensionsLoaded', function extensionsLoaded() {
         /** Extension API setup **/
-        extensionApi = server.extensions[C.BUNDLE_NAME];
+        extensionApi = e.server.extensions[C.BUNDLE_NAME];
 
         /** Dashboard API setup **/
         // Wait until dashboard API is loaded
@@ -67,132 +64,126 @@ before(function(done) {
                 });
             });
     });
-});
 
-describe("socket api", function() {
-    it("facilitates client -> server messaging with acknowledgements", function(done) {
-        extensionApi.listenFor('clientToServer', function (data, cb) {
-            cb();
-        });
-        dashboardApi.sendMessage('clientToServer', function () {
-            done();
-        });
-    });
-
-    it("facilitates server -> client messaging", function(done) {
-        dashboardApi.listenFor('serverToClient', function () {
-            done();
-        });
-        extensionApi.sendMessage('serverToClient');
-    });
-
-    it("doesn't let multiple declarations of a synced variable overwrite itself", function(done) {
-        extensionApi.declareSyncedVar({ name: 'testVar', initialVal: 123 });
-        dashboardApi.declareSyncedVar({ name: 'testVar', initialVal: 456,
-            setter: function(newVal) {
-                newVal.should.equal(123);
-                extensionApi.variables.testVar.should.equal(123);
-                dashboardApi.variables.testVar.should.equal(123);
+    describe("socket api", function() {
+        it("facilitates client -> server messaging with acknowledgements", function(done) {
+            extensionApi.listenFor('clientToServer', function (data, cb) {
+                cb();
+            });
+            dashboardApi.sendMessage('clientToServer', function () {
                 done();
-            }
-        });
-    });
-
-    it("supports legacy 'variableName' when declaring synced variables", function() {
-        extensionApi.declareSyncedVar({ variableName: 'oldVar', initialVal: 123 });
-
-        extensionApi.variables.oldVar.should.equal(123);
-    });
-
-    it("supports 'initialVal' and 'initialValue' when declaring synced variables", function() {
-        extensionApi.declareSyncedVar({ variableName: 'initialVal', initialVal: 123 });
-        extensionApi.declareSyncedVar({ variableName: 'initialValue', initialValue: 456 });
-
-        extensionApi.variables.initialVal.should.equal(123);
-        extensionApi.variables.initialValue.should.equal(456);
-    });
-
-    it("throws an error when no name is given to a synced variable", function () {
-        expect(function() {
-            extensionApi.declareSyncedVar({ initialValue: 123 });
-        }).to.throw(Error);
-    });
-});
-
-describe("extension api", function() {
-    describe("nodecg config", function() {
-        it("exists and has length", function() {
-            expect(extensionApi.config).to.not.be.empty;
+            });
         });
 
-        it("doesn't reveal sensitive information", function() {
-            expect(extensionApi.config.login).to.not.have.property('sessionSecret');
+        it("facilitates server -> client messaging", function(done) {
+            dashboardApi.listenFor('serverToClient', function () {
+                done();
+            });
+            extensionApi.sendMessage('serverToClient');
         });
 
-        it("isn't writable", function() {
+        it("doesn't let multiple declarations of a synced variable overwrite itself", function(done) {
+            extensionApi.declareSyncedVar({ name: 'testVar', initialVal: 123 });
+            dashboardApi.declareSyncedVar({ name: 'testVar', initialVal: 456,
+                setter: function(newVal) {
+                    newVal.should.equal(123);
+                    extensionApi.variables.testVar.should.equal(123);
+                    dashboardApi.variables.testVar.should.equal(123);
+                    done();
+                }
+            });
+        });
+
+        it("supports legacy 'variableName' when declaring synced variables", function() {
+            extensionApi.declareSyncedVar({ variableName: 'oldVar', initialVal: 123 });
+
+            extensionApi.variables.oldVar.should.equal(123);
+        });
+
+        it("supports 'initialVal' and 'initialValue' when declaring synced variables", function() {
+            extensionApi.declareSyncedVar({ variableName: 'initialVal', initialVal: 123 });
+            extensionApi.declareSyncedVar({ variableName: 'initialValue', initialValue: 456 });
+
+            extensionApi.variables.initialVal.should.equal(123);
+            extensionApi.variables.initialValue.should.equal(456);
+        });
+
+        it("throws an error when no name is given to a synced variable", function () {
             expect(function() {
-                extensionApi.config.host = 'the_test_failed';
-            }).to.throw(TypeError);
+                extensionApi.declareSyncedVar({ initialValue: 123 });
+            }).to.throw(Error);
         });
     });
 
-    describe("bundle config", function() {
-        it("exists and has length", function() {
-            expect(extensionApi.bundleConfig).to.not.be.empty();
-        });
-    });
-});
+    describe("extension api", function() {
+        describe("nodecg config", function() {
+            it("exists and has length", function() {
+                expect(extensionApi.config).to.not.be.empty;
+            });
 
-describe("dashboard api", function() {
-    describe("nodecg config", function() {
-        it("exists and has length", function() {
-            expect(dashboardApi.config).to.not.be.empty;
-        });
+            it("doesn't reveal sensitive information", function() {
+                expect(extensionApi.config.login).to.not.have.property('sessionSecret');
+            });
 
-        it("doesn't reveal sensitive information", function() {
-            expect(dashboardApi.config.login).to.not.have.property('sessionSecret');
-        });
-
-        it("isn't writable", function() {
-            expect(function() {
-                dashboardApi.config.host = 'the_test_failed';
-            }).to.throw(TypeError);
-        });
-    });
-
-    describe("bundle config", function() {
-        it("exists and has length", function() {
-            expect(dashboardApi.bundleConfig).to.not.be.empty();
-        });
-    });
-});
-
-describe("view api", function() {
-    describe("nodecg config", function() {
-        it("exists and has length", function() {
-            expect(viewApi.config).to.not.be.empty;
+            it("isn't writable", function() {
+                expect(function() {
+                    extensionApi.config.host = 'the_test_failed';
+                }).to.throw(TypeError);
+            });
         });
 
-        it("doesn't reveal sensitive information", function() {
-            expect(viewApi.config.login).to.not.have.property('sessionSecret');
-        });
-
-        it("isn't writable", function() {
-            expect(function() {
-                viewApi.config.host = 'the_test_failed';
-            }).to.throw(TypeError);
+        describe("bundle config", function() {
+            it("exists and has length", function() {
+                expect(extensionApi.bundleConfig).to.not.be.empty();
+            });
         });
     });
 
-    describe("bundle config", function() {
-        it("exists and has length", function() {
-            expect(viewApi.bundleConfig).to.not.be.empty();
+    describe("dashboard api", function() {
+        describe("nodecg config", function() {
+            it("exists and has length", function() {
+                expect(dashboardApi.config).to.not.be.empty;
+            });
+
+            it("doesn't reveal sensitive information", function() {
+                expect(dashboardApi.config.login).to.not.have.property('sessionSecret');
+            });
+
+            it("isn't writable", function() {
+                expect(function() {
+                    dashboardApi.config.host = 'the_test_failed';
+                }).to.throw(TypeError);
+            });
+        });
+
+        describe("bundle config", function() {
+            it("exists and has length", function() {
+                expect(dashboardApi.bundleConfig).to.not.be.empty();
+            });
         });
     });
-});
 
-after(function() {
-    try{
-        server.shutdown();
-    } catch(e) {}
+    describe("view api", function() {
+        describe("nodecg config", function() {
+            it("exists and has length", function() {
+                expect(viewApi.config).to.not.be.empty;
+            });
+
+            it("doesn't reveal sensitive information", function() {
+                expect(viewApi.config.login).to.not.have.property('sessionSecret');
+            });
+
+            it("isn't writable", function() {
+                expect(function() {
+                    viewApi.config.host = 'the_test_failed';
+                }).to.throw(TypeError);
+            });
+        });
+
+        describe("bundle config", function() {
+            it("exists and has length", function() {
+                expect(viewApi.bundleConfig).to.not.be.empty();
+            });
+        });
+    });
 });

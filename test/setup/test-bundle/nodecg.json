@@ -12,5 +12,8 @@
   "extension": {
     "express": false,
     "path": "extension.js"
+  },
+  "dependencies": {
+    "commander": "latest"
   }
 }
