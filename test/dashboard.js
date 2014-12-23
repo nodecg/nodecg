@@ -9,16 +9,16 @@ var e = require('./setup/test-environment');
 
 var dashboardBrowser = null;
 
-before(function(done) {
-    this.timeout(15000);
-
-    dashboardBrowser = new Browser();
-    dashboardBrowser
-        .visit(C.DASHBOARD_URL)
-        .then(done, done);
-});
-
 describe("dashboard", function() {
+    before(function(done) {
+        this.timeout(15000);
+
+        dashboardBrowser = new Browser();
+        dashboardBrowser
+            .visit(C.DASHBOARD_URL)
+            .then(done, done);
+    });
+
     describe("html panels", function() {
         it("show up on the dashboard", function() {
             dashboardBrowser.assert.element('.test-bundle.html');
