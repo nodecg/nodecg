@@ -24,46 +24,44 @@ before(function(done) {
         if (dashboardDone && viewDone) done();
     }
 
-    e.server.emitter.on('extensionsLoaded', function extensionsLoaded() {
-        /** Extension API setup **/
-        extensionApi = e.server.extensions[C.BUNDLE_NAME];
+    /** Extension API setup **/
+    extensionApi = e.server.extensions[C.BUNDLE_NAME];
 
-        /** Dashboard API setup **/
-        // Wait until dashboard API is loaded
-        function dashboardApiLoaded(window) {
-            return (typeof window.dashboardApi !== "undefined");
-        }
+    /** Dashboard API setup **/
+    // Wait until dashboard API is loaded
+    function dashboardApiLoaded(window) {
+        return (typeof window.dashboardApi !== "undefined");
+    }
 
-        dashboardBrowser = new Browser();
-        dashboardBrowser
-            .visit(C.DASHBOARD_URL)
-            .then(function() {
-                dashboardBrowser.wait(dashboardApiLoaded, function () {
-                    dashboardApi = dashboardBrowser.window.dashboardApi;
-                    dashboardDone = true;
-                    checkDone();
-                });
+    dashboardBrowser = new Browser();
+    dashboardBrowser
+        .visit(C.DASHBOARD_URL)
+        .then(function() {
+            dashboardBrowser.wait(dashboardApiLoaded, function () {
+                dashboardApi = dashboardBrowser.window.dashboardApi;
+                dashboardDone = true;
+                checkDone();
             });
+        });
 
-        /** View API setup **/
-        // Wait until view API is loaded
-        function viewApiLoaded(window) {
-            return (typeof window.viewApi !== "undefined");
-        }
+    /** View API setup **/
+    // Wait until view API is loaded
+    function viewApiLoaded(window) {
+        return (typeof window.viewApi !== "undefined");
+    }
 
-        // Zombie doesn't set referers itself when requesting assets on a page
-        // For this reason, there is a workaround in lib/bundle_views
-        viewBrowser = new Browser();
-        viewBrowser
-            .visit(C.VIEW_URL)
-            .then(function() {
-                viewBrowser.wait(viewApiLoaded, function () {
-                    viewApi = viewBrowser.window.viewApi;
-                    viewDone = true;
-                    checkDone();
-                });
+    // Zombie doesn't set referers itself when requesting assets on a page
+    // For this reason, there is a workaround in lib/bundle_views
+    viewBrowser = new Browser();
+    viewBrowser
+        .visit(C.VIEW_URL)
+        .then(function() {
+            viewBrowser.wait(viewApiLoaded, function () {
+                viewApi = viewBrowser.window.viewApi;
+                viewDone = true;
+                checkDone();
             });
-    });
+        });
 });
 
 describe("socket api", function() {
