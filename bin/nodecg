@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+'use strict';
+
+var Liftoff = require('liftoff');
+var argv = require('minimist')(process.argv.slice(2));
+
+var NodeCG = new Liftoff({
+    name: 'nodecg',
+    configName: 'cfg/nodecg',
+    extensions: {
+        '.json': null
+    }
+}).on('require', function (name, module) {
+        console.log('Loading external module:', name);
+    }).on('requireFail', function (name, err) {
+        console.log('Unable to load:', name, err);
+    });
+
+NodeCG.launch({
+    cwd: argv.cwd,
+    configPath: argv.hackerfile,
+    require: argv.require,
+    completion: argv.completion,
+    verbose: argv.verbose
+}, invoke);
+
+function invoke (env) {
+    if (argv.verbose) {
+        console.log('LIFTOFF SETTINGS:', this);
+        console.log('CLI OPTIONS:', argv);
+        console.log('CWD:', env.cwd);
+        console.log('LOCAL MODULES PRELOADED:', env.require);
+        console.log('SEARCHING FOR:', env.configNameRegex);
+        console.log('FOUND CONFIG AT:',  env.configPath);
+        console.log('CONFIG BASE DIR:', env.configBase);
+        console.log('YOUR LOCAL MODULE IS LOCATED:', env.modulePath);
+        console.log('LOCAL PACKAGE.JSON:', env.modulePackage);
+        console.log('CLI PACKAGE.JSON', require('../package'));
+    }
+
+    // nodecg.json is optional, so launch NodeCG regardless of if the config file was found
+    process.chdir(env.configBase);
+    process.chdir('..'); // nodecg.json is located in 'cfg' folder, we must go up one
+    require(process.cwd());
+}
