@@ -33,7 +33,6 @@
     "request": "^2.44.0",
     "semver": "^3.0.1",
     "socket.io": "^0.9.17",
-    "squirrel": "^1.0.0",
     "string.prototype.endswith": "^0.2.0",
     "winston": "^0.8.3"
   },
