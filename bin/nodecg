@@ -3,6 +3,9 @@
 
 var Liftoff = require('liftoff');
 var argv = require('minimist')(process.argv.slice(2));
+var npm = require('npm');
+var fs = require('fs.extra');
+var file = require('file');
 
 var NodeCG = new Liftoff({
     name: 'nodecg',
@@ -38,8 +41,71 @@ function invoke (env) {
         console.log('CLI PACKAGE.JSON', require('../package'));
     }
 
-    // nodecg.json is optional, so launch NodeCG regardless of if the config file was found
-    process.chdir(env.configBase);
-    process.chdir('..'); // nodecg.json is located in 'cfg' folder, we must go up one
-    require(process.cwd());
+    if (env.configBase) {
+        // config was found
+        process.chdir(env.configBase);
+        process.chdir('..'); // nodecg.json is located in 'cfg' folder, we must go up one
+    } else {
+        // no config, assume the current dir is the intended destination
+    }
+
+    // switch on the first freestanding argument (i.e., 'install', 'init'. Not '--verbose', or '--cwd ./blah/'
+    switch (argv._[0]) {
+        case 'install':
+            var version = 'latest' || argv._[1];
+
+            // check if nodecg is already installed
+            var pjsonPath = process.cwd() + '/package.json';
+            if (fs.existsSync(pjsonPath)) {
+                var pjson = require(pjsonPath);
+                if (pjson.name.toLowerCase() === 'nodecg') {
+                    console.log('NodeCG is already installed in this directory');
+                    process.exit(0);
+                }
+            }
+
+            npm.load({}, function (er) {
+                if (er) {
+                    console.error('Error loading npm:', er.stack);
+                    process.exit(1);
+                }
+
+                // astoundingly stupid hack to make NPM not spam the console
+                console.log('Installing nodecg@' + version);
+                npm.commands.install(['nodecg@' + version], function (er, data) {
+                    if (er) {
+                        console.error('Error downloading/installing NodeCG:', er.stack);
+                        process.exit(1);
+                    } else {
+                        // npm automatically installs nodecg to node_modules/nodecg
+                        // we must move it into the current directory
+                        console.log('\nCopying files. This will take a while...');
+                        fs.copyRecursive('./node_modules/nodecg', '.', function (er) {
+                            if (er) {
+                                console.error('Error moving nodecg after npm install:', er.stack);
+                                process.exit(1);
+                            }
+
+                            fs.rmrf('./node_modules/nodecg', function (err) {
+                                if (err) {
+                                    console.error('Error cleaning up after npm install:', er.stack);
+                                    process.exit(1);
+                                }
+
+                                console.log('NodeCG installed to', process.cwd());
+                                process.exit(0);
+                            });
+                        });
+                    }
+                });
+            });
+            break;
+        default:
+            if (fs.existsSync('package.json')) {
+                require(process.cwd());
+            } else {
+                console.error('Nothing to run in this directory');
+            }
+            break;
+    }
 }
