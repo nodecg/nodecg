@@ -5,7 +5,9 @@ var Liftoff = require('liftoff');
 var argv = require('minimist')(process.argv.slice(2));
 var npm = require('npm');
 var fs = require('fs.extra');
-var file = require('file');
+var path = require('path');
+var inquirer = require("inquirer");
+require('string.prototype.endswith');
 
 var NodeCG = new Liftoff({
     name: 'nodecg',
@@ -51,7 +53,7 @@ function invoke (env) {
 
     // switch on the first freestanding argument (i.e., 'install', 'init'. Not '--verbose', or '--cwd ./blah/'
     switch (argv._[0]) {
-        case 'install':
+        case 'init':
             var version = 'latest' || argv._[1];
 
             // check if nodecg is already installed
@@ -98,6 +100,45 @@ function invoke (env) {
                         });
                     }
                 });
+            });
+            break;
+        case 'configure':
+        case 'config':
+        case 'cfg':
+            break;
+        case 'bundle':
+            var questions = [
+                {
+                    name: 'name',
+                    message: 'Bundle name:',
+                    validate: function(answer) {
+                        return answer ? true : false;
+                    }
+                },
+                {
+                    name: 'description',
+                    message: 'Description:'
+                },
+                {
+                    name: 'authors',
+                    message: 'Author:',
+                    filter: function(answer) {
+                        return new Array(answer);
+                    }
+                },
+                {
+                    name: 'homepage',
+                    message: 'Homepage:'
+                },
+                {
+                    name: 'license',
+                    message: 'License:'
+                }
+            ];
+            inquirer.prompt(questions, function(answers) {
+                var dir = path.resolve(process.cwd(), 'bundles', answers.name);
+                fs.mkdirpSync(dir);
+                fs.writeFileSync(path.join(dir, 'nodecg.json'), JSON.stringify(answers, null, 4));
             });
             break;
         default:
