@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 
-var Liftoff = require('liftoff');
 var argv = require('minimist')(process.argv.slice(2));
-var npm = require('npm');
 var fs = require('fs.extra');
-var path = require('path');
 var inquirer = require("inquirer");
+var Liftoff = require('liftoff');
+var npm = require('npm');
+var os = require('os');
+var path = require('path');
 require('string.prototype.endswith');
 
 var NodeCG = new Liftoff({
@@ -54,7 +55,7 @@ function invoke (env) {
     // switch on the first freestanding argument (i.e., 'install', 'init'. Not '--verbose', or '--cwd ./blah/'
     switch (argv._[0]) {
         case 'init':
-            var version = 'latest' || argv._[1];
+            var version = argv._[1] || 'latest';
 
             // check if nodecg is already installed
             var pjsonPath = process.cwd() + '/package.json';
@@ -65,6 +66,9 @@ function invoke (env) {
                     process.exit(0);
                 }
             }
+
+            // Use npm to install to node_modules, then copy out
+            fs.mkdirpSync('node_modules');
 
             npm.load({}, function (er) {
                 if (er) {
@@ -81,7 +85,7 @@ function invoke (env) {
                     } else {
                         // npm automatically installs nodecg to node_modules/nodecg
                         // we must move it into the current directory
-                        console.log('\nCopying files. This will take a while...');
+                        console.log(os.EOL + 'Copying files. This will take a while...');
                         fs.copyRecursive('./node_modules/nodecg', '.', function (er) {
                             if (er) {
                                 console.error('Error moving nodecg after npm install:', er.stack);
@@ -94,7 +98,7 @@ function invoke (env) {
                                     process.exit(1);
                                 }
 
-                                console.log('NodeCG installed to', process.cwd());
+                                console.log('NodeCG (%s) installed to', version, process.cwd());
                                 process.exit(0);
                             });
                         });
@@ -142,7 +146,9 @@ function invoke (env) {
             });
             break;
         default:
-            if (fs.existsSync('package.json')) {
+            if (fs.existsSync(path.join('.', 'package.json'))) {
+                var pjson = require(process.cwd() + '/package.json');
+                console.log('Running local NodeCG ('+ pjson.version +')');
                 require(process.cwd());
             } else {
                 console.error('Nothing to run in this directory');
