@@ -10,7 +10,7 @@ var config = require('./lib/config').config;
 var log = require('./lib/logger');
 var bundles = require('./lib/bundles');
 var path = require('path');
-var emitter = exports.emitter = new (require('events').EventEmitter);
+var emitter = exports.emitter = new (require('events').EventEmitter)();
 var syncedVariables = require('./lib/synced_variables'); //require'd here just to initialize the event listeners
 var ExtensionApi = require('./lib/extension_api');
 
@@ -147,11 +147,17 @@ exports.shutdown = function() {
 };
 
 log.trace("[server.js] Attempting to listen on port %s", config.port);
-server.on('error', function(e) {
-   if (e.code === 'EADDRINUSE') {
-       log.error("[server.js] Port %d in use, is NodeCG already running? NodeCG will now exit.", config.port);
-       process.exit(1);
-   }
+server.on('error', function(err) {
+    switch (err.code) {
+        case 'EADDRINUSE':
+            log.error("[server.js] Port %d in use, is NodeCG already running? NodeCG will now exit.", config.port);
+            process.exit(1);
+            break;
+        default:
+            log.error("Unhandled error!", err);
+            break;
+    }
 });
+
 server.listen(config.port);
 log.info("[server.js] NodeCG running on %s:%s", config.host, config.port);
