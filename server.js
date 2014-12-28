@@ -7,7 +7,7 @@ var fs = require('fs');
 var server = require('http').createServer(app);
 var io = module.exports.io = require('socket.io').listen(server);
 var config = require('./lib/config').config;
-var log = require('./lib/logger');
+var log = require('./lib/logger')('nodecg/server');
 var bundles = require('./lib/bundles');
 var path = require('path');
 var emitter = exports.emitter = new (require('events').EventEmitter)();
@@ -50,7 +50,7 @@ var extensions = module.exports.extensions = {};
 
 // Mount the NodeCG extension entrypoint from each bundle, if any
 bundles.on('allLoaded', function(allbundles) {
-    log.trace("[server.js] Starting extension mounting");
+    log.trace("Starting extension mounting");
 
     while(allbundles.length > 0) {
         var startLen = allbundles.length;
@@ -61,14 +61,14 @@ bundles.on('allLoaded', function(allbundles) {
             }
 
             if (!allbundles[i].bundleDependencies) {
-                log.debug("[server.js] Bundle %s has extension with no dependencies", allbundles[i].name);
+                log.debug("Bundle %s has extension with no dependencies", allbundles[i].name);
                 loadExtension(allbundles[i]);
                 allbundles.splice(i, 1);
                 break;
             }
 
             if (bundleDepsSatisfied(allbundles[i])) {
-                log.debug("[server.js] Bundle %s has extension with satisfied dependencies", allbundles[i].name);
+                log.debug("Bundle %s has extension with satisfied dependencies", allbundles[i].name);
                 loadExtension(allbundles[i]);
                 allbundles.splice(i, 1);
                 break;
@@ -83,17 +83,17 @@ bundles.on('allLoaded', function(allbundles) {
                     if (extensions.hasOwnProperty(dep)) return;
                     unsatisfiedDeps.push(dep);
                 });
-                log.warn("[server.js] Extension for bundle %s could not be mounted, as it had unsatisfied dependencies:",
+                log.warn("Extension for bundle %s could not be mounted, as it had unsatisfied dependencies:",
                    bundle.name, unsatisfiedDeps.join(', '));
                 bundles.remove(bundle.name);
             });
-            log.warn("[server.js] %d bundle(s) could not be loaded, as their dependencies were not satisfied", endLen);
+            log.warn("%d bundle(s) could not be loaded, as their dependencies were not satisfied", endLen);
             break;
         }
     }
 
     emitter.emit('extensionsLoaded');
-    log.trace("[server.js] Completed extension mounting");
+    log.trace("Completed extension mounting");
 });
 
 function loadExtension(bundle) {
@@ -103,17 +103,17 @@ function loadExtension(bundle) {
             var extension = require(extPath)(new ExtensionApi(bundle, io));
             if (bundle.extension.express) {
                 app.use(extension);
-                log.info("[server.js] Mounted %s extension as an express app", bundle.name);
+                log.info("Mounted %s extension as an express app", bundle.name);
             } else {
-                log.info("[server.js] Mounted %s extension as a generic extension", bundle.name);
+                log.info("Mounted %s extension as a generic extension", bundle.name);
             }
             extensions[bundle.name] = extension;
         } catch (err) {
             bundles.remove(bundle.name);
-            log.error("[server.js] Failed to mount %s extension:", bundle.name, err.stack);
+            log.error("Failed to mount %s extension:", bundle.name, err.stack);
         }
     } else {
-        log.error("[server.js] Specified entry point %s for %s does not exist. Skipped.", bundle.extension.path, bundle.name);
+        log.error("Specified entry point %s for %s does not exist. Skipped.", bundle.extension.path, bundle.name);
     }
 }
 
@@ -133,11 +133,11 @@ function bundleDepsSatisfied(bundle) {
 io.set('log level', 1); // reduce logging
 
 io.sockets.on('connection', function (socket) {
-    log.trace("[server.js] New socket connection: ID %s with IP %s", socket.id,
+    log.trace("New socket connection: ID %s with IP %s", socket.id,
         socket.manager.handshaken[socket.id].address.address); // wot tha fuck pete
 
     socket.on('message', function (data) {
-        log.debug("[server.js] Socket %s sent a message:", socket.id, data);
+        log.debug("Socket %s sent a message:", socket.id, data);
         io.sockets.json.send(data);
     });
 });
@@ -146,7 +146,7 @@ exports.shutdown = function() {
     server.close();
 };
 
-log.trace("[server.js] Attempting to listen on port %s", config.port);
+log.trace("Attempting to listen on port %s", config.port);
 server.on('error', function(err) {
     switch (err.code) {
         case 'EADDRINUSE':
@@ -160,4 +160,4 @@ server.on('error', function(err) {
 });
 
 server.listen(config.port);
-log.info("[server.js] NodeCG running on %s:%s", config.host, config.port);
+log.info("NodeCG running on %s:%s", config.host, config.port);
