@@ -2,7 +2,7 @@
 
 // Modules used to run tests
 var Browser = require('zombie');
-var config = require(process.cwd() + '/lib/config').config;
+var config = require(process.cwd() + '/lib/config').getConfig();
 
 var C = require('./setup/test-constants');
 var e = require('./setup/test-environment');
