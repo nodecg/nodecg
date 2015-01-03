@@ -2,6 +2,7 @@
   "name": "nodecg",
   "description": "Live, controllable graphics system rendered in a browser",
   "main": "index.js",
+  "preferGlobal": true,
   "bin": {
     "nodecg": "./bin/nodecg"
   },
