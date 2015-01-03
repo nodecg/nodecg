@@ -1,7 +1,7 @@
 {
   "name": "nodecg",
   "description": "Live, controllable graphics system rendered in a browser",
-  "main": "server.js",
+  "main": "index.js",
   "bin": {
     "nodecg": "./bin/nodecg"
   },
@@ -44,6 +44,7 @@
     "winston": "^0.8.3"
   },
   "scripts": {
+    "start": "node index.js",
     "postinstall": "bower install",
     "pretest": "node test/setup/pretest",
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
