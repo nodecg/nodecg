@@ -145,7 +145,7 @@ function invoke (env) {
                 fs.writeFileSync(path.join(dir, 'nodecg.json'), JSON.stringify(answers, null, 4));
             });
             break;
-        default:
+        case 'start':
             if (fs.existsSync(path.join('.', 'package.json'))) {
                 var pjson = require(process.cwd() + '/package.json');
                 console.log('Running local NodeCG ('+ pjson.version +')');
@@ -153,6 +153,13 @@ function invoke (env) {
             } else {
                 console.error('Nothing to run in this directory');
             }
+            break;
+        default:
+            console.log(
+                'Usage: nodecg [command] [options]', os.EOL,
+                os.EOL,
+                'where [command] is one of:', os.EOL,
+                '    bundle, init, start');
             break;
     }
 }
