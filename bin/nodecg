@@ -151,7 +151,10 @@ function invoke (env) {
                 console.log('Running local NodeCG ('+ pjson.version +')');
                 require(process.cwd());
             } else {
-                console.error('Nothing to run in this directory');
+                console.log('Running global NodeCG');
+                var server = require('nodecg/lib/server');
+                server.init(process.cwd());
+                server.start();
             }
             break;
         default:
