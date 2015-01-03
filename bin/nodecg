@@ -109,6 +109,10 @@ function invoke (env) {
         case 'configure':
         case 'config':
         case 'cfg':
+            if (fs.existsSync(path.join(process.cwd(), 'cfg/nodecg.json'))) {
+                console.warn('cfg/nodecg.json already exists, exiting');
+                process.exit(0);
+            }
             var questions = [
                 {
                     name: 'host',
