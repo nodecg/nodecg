@@ -26,7 +26,7 @@ describe("nodecg api", function() {
         }
 
         /** Extension API setup **/
-        extensionApi = e.server.extensions[C.BUNDLE_NAME];
+        extensionApi = e.server.getExtensions()[C.BUNDLE_NAME];
 
         /** Dashboard API setup **/
         // Wait until dashboard API is loaded
