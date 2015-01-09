@@ -15,6 +15,8 @@ var BUNDLE_NAME = 'test-bundle';
 var DASHBOARD_URL = util.format("http://%s:%d/", config.host, config.port);
 
 describe("api", function() {
+    var browser = new Browser();
+
     var serverApi = {};
     before(function() {
         serverApi = new ExtensionApi(BUNDLE_NAME, server.io);
@@ -30,15 +32,14 @@ describe("api", function() {
         }
 
         this.timeout(15000);
-        this.browser = new Browser();
-        this.browser
+        browser
             .visit(DASHBOARD_URL)
             .then(function() {
-                self.browser.wait(pageLoaded, function () {
+                browser.wait(pageLoaded, function () {
                     var evalStr = util.format('window.clientApi = new NodeCG("%s", %s)', BUNDLE_NAME, JSON.stringify(filteredConfig));
-                    clientApi = self.browser.evaluate(evalStr);
+                    clientApi = browser.evaluate(evalStr);
 
-                    self.browser.wait(function(w) {
+                    browser.wait(function(w) {
                         var socket = w.clientApi._socket;
                         //if (socket.connected === false) return false;
                         //if (socket.io.engine.readyState !== 'open') return false;
@@ -67,12 +68,16 @@ describe("api", function() {
 
     it("should not let multiple declarations of synced variables overwrite one another", function(done) {
         serverApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
-        clientApi.declareSyncedVar({ variableName: 'testVar', initialVal: 789,
-            setter: function(newVal) {
-                assert.equal(serverApi.variables.testVar, 123);
-                assert.equal(clientApi.variables.testVar, 123);
-                done();
-            }});
+
+        // Let Zombie process socket.io events
+        browser.wait({duration:100}, function() {
+            clientApi.declareSyncedVar({ variableName: 'testVar', initialVal: 789,
+                setter: function(newVal) {
+                    assert.equal(serverApi.variables.testVar, 123);
+                    assert.equal(clientApi.variables.testVar, 123);
+                    done();
+                }});
+        });
     });
 
     describe("server api config property", function() {
