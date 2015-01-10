@@ -1,0 +1,19 @@
+{
+  "name": "test-bundle",
+  "version": "0.0.1",
+  "nodecgDependency": "~0.4.0",
+  "homepage": "http://github.com/nodecg",
+  "authors": [
+    "Alex Van Camp <email@alexvan.camp>",
+    "Matt McNamara"
+  ],
+  "description": "A test bundle",
+  "license": "MIT",
+  "extension": {
+    "express": false,
+    "path": "extension.js"
+  },
+  "dependencies": {
+    "commander": "latest"
+  }
+}

@@ -1,116 +1,193 @@
+'use strict';
+
 // Modules used to run tests
-var assert = require('assert');
+var chai = require('chai');
+var should = chai.should();
+var expect = chai.expect;
 var Browser = require('zombie');
 
-// Start up the server
-var server = require(process.cwd() + '/server.js');
+var C = require('./setup/test-constants');
+var e = require('./setup/test-environment');
 
-// Modules needed to set up test environment
-var util = require('util');
-var config = require(process.cwd() + '/lib/config').config;
-var filteredConfig = require(process.cwd() + '/lib/config').filteredConfig;
-var ExtensionApi = require(process.cwd() + '/lib/extension_api');
+var dashboardBrowser = null;
+var viewBrowser = null;
+var extensionApi = null;
+var dashboardApi = null;
+var viewApi = null;
 
-var BUNDLE_NAME = 'test-bundle';
-var DASHBOARD_URL = util.format("http://%s:%d/", config.host, config.port);
-
-describe("api", function() {
-    var browser = new Browser();
-
-    var serverApi = {};
-    before(function() {
-        serverApi = new ExtensionApi(BUNDLE_NAME, server.io);
-    });
-
-    var clientApi = {};
+describe("nodecg api", function() {
     before(function(done) {
-        var self = this;
+        this.timeout(15000);
 
-        // Wait until page is loaded
-        function pageLoaded(window) {
-            return (typeof window.NodeCG !== "undefined");
+        var dashboardDone = false;
+        var viewDone = false;
+        function checkDone() {
+            if (dashboardDone && viewDone) done();
         }
 
-        this.timeout(15000);
-        browser
-            .visit(DASHBOARD_URL)
-            .then(function() {
-                browser.wait(pageLoaded, function () {
-                    var evalStr = util.format('window.clientApi = new NodeCG("%s", %s)', BUNDLE_NAME, JSON.stringify(filteredConfig));
-                    clientApi = browser.evaluate(evalStr);
+        /** Extension API setup **/
+        extensionApi = e.server.getExtensions()[C.BUNDLE_NAME];
 
-                    browser.wait(function(w) {
-                        var socket = w.clientApi._socket;
-                        //if (socket.connected === false) return false;
-                        //if (socket.io.engine.readyState !== 'open') return false;
-                        if (socket.io.engine.upgrading || socket.io.engine.upgrade) return false;
-                        return true;
-                    }, done);
+        /** Dashboard API setup **/
+        // Wait until dashboard API is loaded
+        function dashboardApiLoaded(window) {
+            return (typeof window.dashboardApi !== "undefined");
+        }
+
+        dashboardBrowser = new Browser();
+        dashboardBrowser
+            .visit(C.DASHBOARD_URL)
+            .then(function() {
+                dashboardBrowser.wait(dashboardApiLoaded, function () {
+                    dashboardApi = dashboardBrowser.window.dashboardApi;
+                    dashboardDone = true;
+                    checkDone();
+                });
+            });
+
+        /** View API setup **/
+        // Wait until view API is loaded
+        function viewApiLoaded(window) {
+            return (typeof window.viewApi !== "undefined");
+        }
+
+        // Zombie doesn't set referers itself when requesting assets on a page
+        // For this reason, there is a workaround in lib/bundle_views
+        viewBrowser = new Browser();
+        viewBrowser
+            .visit(C.VIEW_URL)
+            .then(function() {
+                viewBrowser.wait(viewApiLoaded, function () {
+                    viewApi = viewBrowser.window.viewApi;
+                    viewDone = true;
+                    checkDone();
                 });
             });
     });
 
-    it("should allow client -> server messaging with callbacks", function(done) {
-        serverApi.listenFor('clientToServer', function (data, cb) {
-            cb();
-        });
-        clientApi.sendMessage('clientToServer', function () {
-            done();
-        });
-    });
-
-    it("should allow server -> client messaging without callbacks", function(done) {
-        clientApi.listenFor('serverToClient', function () {
-            done();
-        });
-        serverApi.sendMessage('serverToClient');
-    });
-
-    it("should not let multiple declarations of synced variables overwrite one another", function(done) {
-        serverApi.declareSyncedVar({ variableName: 'testVar', initialVal: 123 });
-
-        // Let Zombie process socket.io events
-        browser.wait({duration:100}, function() {
-            clientApi.declareSyncedVar({ variableName: 'testVar', initialVal: 789,
-                setter: function(newVal) {
-                    assert.equal(serverApi.variables.testVar, 123);
-                    assert.equal(clientApi.variables.testVar, 123);
-                    done();
-                }});
-        });
-    });
-
-    describe("server api config property", function() {
-        it("should exist and have length", function() {
-            assert.ok(Object.keys(serverApi.config).length);
+    describe("socket api", function() {
+        it("facilitates client -> server messaging with acknowledgements", function(done) {
+            extensionApi.listenFor('clientToServer', function (data, cb) {
+                cb();
+            });
+            dashboardApi.sendMessage('clientToServer', function () {
+                done();
+            });
         });
 
-        it("should not reveal sensitive information", function() {
-            assert.equal(typeof(serverApi.config.login.sessionSecret), 'undefined');
+        it("facilitates server -> client messaging", function(done) {
+            dashboardApi.listenFor('serverToClient', function () {
+                done();
+            });
+            extensionApi.sendMessage('serverToClient');
         });
 
-        it("should not be writable", function() {
-            serverApi.config.host = 'the_test_failed';
-            assert.notEqual(serverApi.config.host, 'the_test_failed');
-        });
-    });
+        it("doesn't let multiple declarations of a synced variable overwrite itself", function(done) {
+            extensionApi.declareSyncedVar({ name: 'testVar', initialVal: 123 });
 
-    describe("client api config property", function() {
-        it("should exist and have length", function() {
-            assert.ok(Object.keys(clientApi.config).length);
+            // Give Zombie a chance to process socket.io events
+            dashboardBrowser.wait({duration: 100}, function() {
+                dashboardApi.declareSyncedVar({ name: 'testVar', initialVal: 456,
+                    setter: function(newVal) {
+                        newVal.should.equal(123);
+                        extensionApi.variables.testVar.should.equal(123);
+                        dashboardApi.variables.testVar.should.equal(123);
+                        done();
+                    }
+                });
+            });
         });
 
-        it("should not reveal sensitive information", function() {
-            assert.equal(typeof(clientApi.config.login.sessionSecret), 'undefined');
+        it("supports legacy 'variableName' when declaring synced variables", function() {
+            extensionApi.declareSyncedVar({ variableName: 'oldVar', initialVal: 123 });
+
+            extensionApi.variables.oldVar.should.equal(123);
         });
 
-        it("should not be writable", function() {
-            serverApi.config.host = 'the_test_failed';
-            assert.notEqual(clientApi.config.host, 'the_test_failed');
+        it("supports 'initialVal' and 'initialValue' when declaring synced variables", function() {
+            extensionApi.declareSyncedVar({ variableName: 'initialVal', initialVal: 123 });
+            extensionApi.declareSyncedVar({ variableName: 'initialValue', initialValue: 456 });
+
+            extensionApi.variables.initialVal.should.equal(123);
+            extensionApi.variables.initialValue.should.equal(456);
+        });
+
+        it("throws an error when no name is given to a synced variable", function () {
+            expect(function() {
+                extensionApi.declareSyncedVar({ initialValue: 123 });
+            }).to.throw(Error);
         });
     });
 
-    after(function() {
-        server.shutdown();
+    describe("extension api", function() {
+        describe("nodecg config", function() {
+            it("exists and has length", function() {
+                expect(extensionApi.config).to.not.be.empty;
+            });
+
+            it("doesn't reveal sensitive information", function() {
+                expect(extensionApi.config.login).to.not.have.property('sessionSecret');
+            });
+
+            it("isn't writable", function() {
+                expect(function() {
+                    extensionApi.config.host = 'the_test_failed';
+                }).to.throw(TypeError);
+            });
+        });
+
+        describe("bundle config", function() {
+            it("exists and has length", function() {
+                expect(extensionApi.bundleConfig).to.not.be.empty();
+            });
+        });
+    });
+
+    describe("dashboard api", function() {
+        describe("nodecg config", function() {
+            it("exists and has length", function() {
+                expect(dashboardApi.config).to.not.be.empty;
+            });
+
+            it("doesn't reveal sensitive information", function() {
+                expect(dashboardApi.config.login).to.not.have.property('sessionSecret');
+            });
+
+            it("isn't writable", function() {
+                expect(function() {
+                    dashboardApi.config.host = 'the_test_failed';
+                }).to.throw(TypeError);
+            });
+        });
+
+        describe("bundle config", function() {
+            it("exists and has length", function() {
+                expect(dashboardApi.bundleConfig).to.not.be.empty();
+            });
+        });
+    });
+
+    describe("view api", function() {
+        describe("nodecg config", function() {
+            it("exists and has length", function() {
+                expect(viewApi.config).to.not.be.empty;
+            });
+
+            it("doesn't reveal sensitive information", function() {
+                expect(viewApi.config.login).to.not.have.property('sessionSecret');
+            });
+
+            it("isn't writable", function() {
+                expect(function() {
+                    viewApi.config.host = 'the_test_failed';
+                }).to.throw(TypeError);
+            });
+        });
+
+        describe("bundle config", function() {
+            it("exists and has length", function() {
+                expect(viewApi.bundleConfig).to.not.be.empty();
+            });
+        });
     });
 });

@@ -1,15 +1,12 @@
 {
   "name": "nodecg",
   "description": "Live, controllable graphics system rendered in a browser",
-  "main": "server.js",
-  "version": "0.2.1",
-  "author": "Matthew McNamara <matt@mattmcn.com>",
-  "contributors": [
-    {
-      "name": "Alex Van Camp",
-      "email": "email@alexvan.camp"
-    }
-  ],
+  "main": "index.js",
+  "preferGlobal": true,
+  "bin": {
+    "nodecg": "./bin/nodecg"
+  },
+  "version": "0.4.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/nodecg/nodecg.git"
@@ -27,10 +24,16 @@
     "express-session": "^1.2.1",
     "extend": "^1.3.0",
     "file": "~0.2.2",
+    "fs.extra": "^1.2.1",
     "gaze": "~0.5.1",
+    "inquirer": "^0.8.0",
     "jade": "^1.6.0",
     "less": "^1.7.5",
+    "liftoff": "^1.0.3",
+    "minimist": "^1.1.0",
     "nedb": "^0.11.1",
+    "npm": "^2.1.14",
+    "obs-remote": "^1.0.0",
     "passport": "~0.2.0",
     "passport-steam": "~0.1.3",
     "passport-twitch": "^1.0.1",
@@ -38,13 +41,16 @@
     "request": "^2.44.0",
     "semver": "^3.0.1",
     "socket.io": "^1.2.1",
-    "squirrel": "^1.0.0",
     "string.prototype.endswith": "^0.2.0",
     "winston": "^0.8.3"
   },
   "scripts": {
+    "start": "node index.js",
     "postinstall": "bower install",
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
+    "pretest": "node test/setup/pretest",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
+    "posttest": "node test/setup/posttest",
+    "coveralls": "node node_modules/lcov-filter/index.js ./coverage/lcov.info test bundles | coveralls && rm -rf ./coverage"
   },
   "engines": {
     "node": ">= 0.10.0"
@@ -53,16 +59,20 @@
     "LICENSE",
     "README.md",
     "bower.json",
+    "bin/",
     "lib/",
     "logs/.empty_directory",
     "public/",
     "server.js"
   ],
   "devDependencies": {
+    "chai": "^1.10.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.2",
+    "lcov-filter": "0.0.1",
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
+    "wrench": "^1.5.8",
     "zombie": "^2.4.0"
   }
 }

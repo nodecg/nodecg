@@ -12,7 +12,7 @@ A _bundle_ contains HTML, Javascript, CSS, and any other resources required to p
 See [nodecg-samples](http://github.com/nodecg/nodecg-samples/) for some examples of how these bundles are structured.
 
 ### Installation
-Install [node.js & npm](http://nodejs.org/), then install [bower](http://bower.io/), then run the following:
+Install [node.js & npm](http://nodejs.org/), then run the following:
 ```
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
@@ -25,15 +25,10 @@ To run NodeCG in production, [pm2](https://github.com/Unitech/pm2) is recommende
 ### Usage
 - Open `http://localhost:9090/dashboard` to see the admin dashboard
 - For each bundle you install, you can see its graphic at `http://localhost:9090/view/{bundle-name}/`
-- You can configure NodeCG by creating a [config.json](docs/config.json.md) file.
+- You can configure NodeCG by creating a [cfg/nodecg.json](https://github.com/nodecg/nodecg/wiki/NodeCG-config) file.
 
-### Making bundles
-- Each bundle has its own folder in /bundles/
-- Each bundle should be its own git repository
-- A [nodecg.json](docs/nodecg.json.md) file is required in the root directory of your bundle
-- Your bundle may run code on the server via an [extension](docs/extensions.md)
-- All bundle code (both client and server) has access to the [NodeCG API](docs/nodecg-api.md)
-- A bundle may have multiple panels and multiple views, though most will only have one of each
+### Full Documentation
+Full docs can be found in the [wiki](https://github.com/nodecg/nodecg/wiki).
 
 ### Contributing
 1. Fork it ( http://github.com/nodecg/nodecg/fork )
