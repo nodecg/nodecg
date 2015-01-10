@@ -84,13 +84,17 @@ describe("nodecg api", function() {
 
         it("doesn't let multiple declarations of a synced variable overwrite itself", function(done) {
             extensionApi.declareSyncedVar({ name: 'testVar', initialVal: 123 });
-            dashboardApi.declareSyncedVar({ name: 'testVar', initialVal: 456,
-                setter: function(newVal) {
-                    newVal.should.equal(123);
-                    extensionApi.variables.testVar.should.equal(123);
-                    dashboardApi.variables.testVar.should.equal(123);
-                    done();
-                }
+
+            // Give Zombie a chance to process socket.io events
+            dashboardBrowser.wait({duration: 100}, function() {
+                dashboardApi.declareSyncedVar({ name: 'testVar', initialVal: 456,
+                    setter: function(newVal) {
+                        newVal.should.equal(123);
+                        extensionApi.variables.testVar.should.equal(123);
+                        dashboardApi.variables.testVar.should.equal(123);
+                        done();
+                    }
+                });
             });
         });
 
@@ -118,7 +122,7 @@ describe("nodecg api", function() {
     describe("extension api", function() {
         describe("nodecg config", function() {
             it("exists and has length", function() {
-                expect(extensionApi.config).to.not.be.empty;
+                expect(extensionApi.config).to.not.be.empty();
             });
 
             it("doesn't reveal sensitive information", function() {
@@ -142,7 +146,7 @@ describe("nodecg api", function() {
     describe("dashboard api", function() {
         describe("nodecg config", function() {
             it("exists and has length", function() {
-                expect(dashboardApi.config).to.not.be.empty;
+                expect(dashboardApi.config).to.not.be.empty();
             });
 
             it("doesn't reveal sensitive information", function() {
@@ -166,7 +170,7 @@ describe("nodecg api", function() {
     describe("view api", function() {
         describe("nodecg config", function() {
             it("exists and has length", function() {
-                expect(viewApi.config).to.not.be.empty;
+                expect(viewApi.config).to.not.be.empty();
             });
 
             it("doesn't reveal sensitive information", function() {
