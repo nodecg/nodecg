@@ -40,7 +40,7 @@
     "q": "^1.0.1",
     "request": "^2.44.0",
     "semver": "^3.0.1",
-    "socket.io": "^0.9.17",
+    "socket.io": "^1.2.1",
     "string.prototype.endswith": "^0.2.0",
     "winston": "^0.8.3"
   },
@@ -73,6 +73,6 @@
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
     "wrench": "^1.5.8",
-    "zombie": "^2.2.1"
+    "zombie": "^2.4.0"
   }
 }
