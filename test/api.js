@@ -122,7 +122,7 @@ describe("nodecg api", function() {
     describe("extension api", function() {
         describe("nodecg config", function() {
             it("exists and has length", function() {
-                expect(extensionApi.config).to.not.be.empty;
+                expect(extensionApi.config).to.not.be.empty();
             });
 
             it("doesn't reveal sensitive information", function() {
@@ -146,7 +146,7 @@ describe("nodecg api", function() {
     describe("dashboard api", function() {
         describe("nodecg config", function() {
             it("exists and has length", function() {
-                expect(dashboardApi.config).to.not.be.empty;
+                expect(dashboardApi.config).to.not.be.empty();
             });
 
             it("doesn't reveal sensitive information", function() {
@@ -170,7 +170,7 @@ describe("nodecg api", function() {
     describe("view api", function() {
         describe("nodecg config", function() {
             it("exists and has length", function() {
-                expect(viewApi.config).to.not.be.empty;
+                expect(viewApi.config).to.not.be.empty();
             });
 
             it("doesn't reveal sensitive information", function() {
