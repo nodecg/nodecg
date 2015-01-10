@@ -54,6 +54,10 @@ html(lang="en")
                     style(type='text/css').
                         !{ style }
 
+        //- Make the NodeCG config available to all code
+        script(type='text/javascript').
+            window.ncgConfig = !{ JSON.stringify(ncgConfig) };
+
     body
         div(class='navbar navbar-inverse navbar-fixed-top', role='navigation')
             div.container
@@ -65,6 +69,10 @@ html(lang="en")
                             li
                                 a(href="/logout" title="Sign out")
                                     i.fa.fa-sign-out
+
+        //- Alert container element for socket disconnects/errors/reconnects
+        .container
+            #socketStatus
 
         //- Spacer
         p
@@ -96,7 +104,11 @@ html(lang="en")
 
         //- Twitch JS SDK isn't on bower ¯\_(ツ)_/¯
         script(src='/dashboard/twitch.min.js')
+
+        //- Load socket.io and immediately create a socket that all dashboard code will use
         script(src='/socket.io/socket.io.js')
+        script(type='text/javascript').
+            window.socket = io.connect('http://#{ ncgConfig.host }:#{ ncgConfig.port }/');
         script(src='/nodecg-api.js')
 
         script(src='/dashboard/dashboard.js')
@@ -111,7 +123,7 @@ html(lang="en")
                             (function (nodecg) {
                                 var $bundle = $('.dashboard-panels .#{ bundle.name }');
                                 !{ script }
-                            })(new NodeCG('#{ bundle.name }', !{JSON.stringify(bundle.config)}, !{JSON.stringify(ncgConfig)}));
+                            })(new NodeCG('#{ bundle.name }', !{JSON.stringify(bundle.config)}, !{JSON.stringify(ncgConfig)}, window.socket));
                         } catch (err) {
                             console.error("[NODECG] Panel for bundle #{ bundle.name } threw error:", err.stack);
                         }

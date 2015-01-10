@@ -1,6 +1,9 @@
 'use strict';
 
-var config = require(process.cwd() + '/lib/config').config;
+var server = require(process.cwd() + '/lib/server');
+server.init(process.cwd());
+
+var config = require(process.cwd() + '/lib/config').getConfig();
 var path = require('path');
 var util = require('util');
 
