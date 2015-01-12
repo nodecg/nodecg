@@ -8,6 +8,6 @@ before(function(done) {
 
 after(function() {
     try{
-        e.server.shutdown();
+        e.server.stop();
     } catch(e) {}
 });
