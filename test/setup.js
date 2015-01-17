@@ -4,6 +4,7 @@ var e = require('./setup/test-environment');
 
 before(function(done) {
     e.server.on('extensionsLoaded', done);
+    e.server.start();
 });
 
 after(function() {
