@@ -1,4 +1,5 @@
-# NodeCG
+[![NodeCG Logo](http://i.imgur.com/aNJNQis.png)](http://github.com/nodecg/nodecg)
+
 NodeCG is a live graphics system, designed to be used in live broadcasts.
 It is primarily aimed at [Twitch](http://twitch.tv) broadcasters using [Open Broadcaster Software](https://obsproject.com/), but is usable in any environment that can render HTML.
 NodeCG is based on the overlay system developed for the [Tip of the Hats 2014](https://www.youtube.com/watch?v=x9PzBHgN29U) charity event.
@@ -6,7 +7,7 @@ NodeCG is based on the overlay system developed for the [Tip of the Hats 2014](h
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
 [![Coverage Status](https://img.shields.io/coveralls/nodecg/nodecg.svg)](https://coveralls.io/r/nodecg/nodecg)
 
-NodeCG provides a basic bundle system for graphics, as well as an admin dashboard for controlling the bundles.
+NodeCG provides a basic bundle system for graphics, as well as an control dashboard for controlling the bundles.
 
 A _bundle_ contains HTML, Javascript, CSS, and any other resources required to produce a certain graphic animation and also contains an admin panel for controlling the animation.
 See [nodecg-samples](http://github.com/nodecg/nodecg-samples/) for some examples of how these bundles are structured.

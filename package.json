@@ -1,15 +1,8 @@
 {
   "name": "nodecg",
   "description": "Live, controllable graphics system rendered in a browser",
-  "main": "server.js",
-  "version": "0.3.0",
-  "author": "Matthew McNamara <matt@mattmcn.com>",
-  "contributors": [
-    {
-      "name": "Alex Van Camp",
-      "email": "email@alexvan.camp"
-    }
-  ],
+  "main": "index.js",
+  "version": "0.4.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/nodecg/nodecg.git"
@@ -19,31 +12,28 @@
   "dependencies": {
     "body-parser": "^1.2.2",
     "bower": "^1.3.10",
-    "connect-busboy": "0.0.2",
     "cookie-parser": "^1.1.0",
-    "ejs": "^1.0.0",
+    "ejs": "^2.1.4",
     "express": "^4.3.1",
-    "express-less": "0.0.4",
+    "express-less": "0.0.6",
     "express-session": "^1.2.1",
-    "extend": "^1.3.0",
-    "file": "~0.2.2",
-    "gaze": "~0.5.1",
+    "extend": "^2.0.0",
+    "file": "^0.2.2",
+    "fs.extra": "^1.3.2",
+    "gaze": "^0.6.4",
     "jade": "^1.6.0",
-    "less": "^1.7.5",
-    "nedb": "^0.11.1",
     "obs-remote": "^1.0.0",
-    "passport": "~0.2.0",
-    "passport-steam": "~0.1.3",
+    "passport": "^0.2.0",
+    "passport-steam": "^0.1.3",
     "passport-twitch": "^1.0.1",
     "q": "^1.0.1",
-    "request": "^2.44.0",
-    "semver": "^3.0.1",
-    "socket.io": "^0.9.17",
-    "squirrel": "^1.0.0",
+    "semver": "^4.2.0",
+    "socket.io": "^1.2.1",
     "string.prototype.endswith": "^0.2.0",
     "winston": "^0.8.3"
   },
   "scripts": {
+    "start": "node index.js",
     "postinstall": "bower install",
     "pretest": "node test/setup/pretest",
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
@@ -57,6 +47,7 @@
     "LICENSE",
     "README.md",
     "bower.json",
+    "bin/",
     "lib/",
     "logs/.empty_directory",
     "public/",
@@ -70,6 +61,6 @@
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
     "wrench": "^1.5.8",
-    "zombie": "^2.2.1"
+    "zombie": "^2.4.0"
   }
 }

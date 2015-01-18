@@ -2,26 +2,23 @@
 
 // Modules used to run tests
 var Browser = require('zombie');
-var config = require(process.cwd() + '/lib/config').config;
+var config = require(process.cwd() + '/lib/config').getConfig();
 
 var C = require('./setup/test-constants');
+var e = require('./setup/test-environment');
 
-var server = null;
 var dashboardBrowser = null;
 
-before(function(done) {
-    this.timeout(15000);
-
-    // Start up the server
-    server = require(process.cwd() + '/server.js');
-
-    dashboardBrowser = new Browser();
-    dashboardBrowser
-        .visit(C.DASHBOARD_URL)
-        .then(done, done);
-});
-
 describe("dashboard", function() {
+    before(function(done) {
+        this.timeout(10000);
+
+        dashboardBrowser = new Browser();
+        dashboardBrowser
+            .visit(C.DASHBOARD_URL)
+            .then(done, done);
+    });
+
     describe("html panels", function() {
         it("show up on the dashboard", function() {
             dashboardBrowser.assert.element('.test-bundle.html');
@@ -41,10 +38,4 @@ describe("dashboard", function() {
             dashboardBrowser.assert.text('.test-bundle.jade .js-ncgConfig', config.host);
         });
     });
-});
-
-after(function() {
-    try{
-       server.shutdown();
-    } catch(e) {}
 });
