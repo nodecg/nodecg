@@ -3,6 +3,7 @@ var e = require('./setup/test-environment');
 // Global before and after
 
 before(function(done) {
+    this.timeout(15000);
     e.server.on('extensionsLoaded', done);
     e.server.start();
 });

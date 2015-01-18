@@ -11,7 +11,7 @@ var dashboardBrowser = null;
 
 describe("dashboard", function() {
     before(function(done) {
-        this.timeout(15000);
+        this.timeout(10000);
 
         dashboardBrowser = new Browser();
         dashboardBrowser

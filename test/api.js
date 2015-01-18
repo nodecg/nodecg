@@ -17,7 +17,7 @@ var viewApi = null;
 
 describe("nodecg api", function() {
     before(function(done) {
-        this.timeout(15000);
+        this.timeout(10000);
 
         var dashboardDone = false;
         var viewDone = false;
