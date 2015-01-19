@@ -13,7 +13,10 @@ A _bundle_ contains HTML, Javascript, CSS, and any other resources required to p
 See [nodecg-samples](http://github.com/nodecg/nodecg-samples/) for some examples of how these bundles are structured.
 
 ### Installation
-Install [node.js & npm](http://nodejs.org/), then run the following:
+First, install [node.js & npm](http://nodejs.org/).  
+Next, you'll need to install [Python 2.7](https://www.python.org/) on Windows. Mac OS X and Linux should have this already.  
+Finally, install [Visual Studio Express](http://go.microsoft.com/?linkid=9816758) on Windows, Xcode on OS X, and `build-essential` (or equivalent) on Linux.  
+Now run the following commands:
 ```
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
