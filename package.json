@@ -2,7 +2,7 @@
   "name": "nodecg",
   "description": "Live, controllable graphics system rendered in a browser",
   "main": "index.js",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/nodecg/nodecg.git"
@@ -44,14 +44,12 @@
     "node": ">= 0.10.0"
   },
   "files": [
+    "AUTHORS",
     "LICENSE",
     "README.md",
     "bower.json",
-    "bin/",
-    "lib/",
-    "logs/.empty_directory",
-    "public/",
-    "server.js"
+    "index.js",
+    "lib/"
   ],
   "devDependencies": {
     "chai": "^1.10.0",
