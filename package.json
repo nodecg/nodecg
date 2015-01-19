@@ -36,7 +36,7 @@
     "start": "node index.js",
     "postinstall": "bower install",
     "pretest": "node test/setup/pretest",
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec",
     "posttest": "node test/setup/posttest",
     "coveralls": "node node_modules/lcov-filter/index.js ./coverage/lcov.info test bundles | coveralls && rm -rf ./coverage"
   },
