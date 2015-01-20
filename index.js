@@ -10,5 +10,4 @@ server.on('stopped', function() {
     process.exit(0);
 });
 
-server.init(__dirname);
 server.start();

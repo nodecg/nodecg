@@ -1,16 +1,15 @@
 'use strict';
 
-var server = require(process.cwd() + '/lib/server');
-server.init(process.cwd());
-
-var config = require(process.cwd() + '/lib/config').getConfig();
 var path = require('path');
 var util = require('util');
 
+var rootDir = path.resolve(__dirname, '../..');
+var config = require(path.join(rootDir, '/lib/config')).getConfig();
+
 var bundleName        = 'test-bundle';
-var testBundleSrcPath = path.resolve(process.cwd(), 'test/setup/', bundleName);
-var bundleDir         = path.resolve(process.cwd(), 'bundles', bundleName);
-var cfgDir            = path.resolve(process.cwd(), 'cfg');
+var testBundleSrcPath = path.resolve(rootDir, 'test/setup/', bundleName);
+var bundleDir         = path.resolve(rootDir, 'bundles', bundleName);
+var cfgDir            = path.resolve(rootDir, 'cfg');
 var bundleCfgPath     = path.resolve(cfgDir, bundleName + '.json');
 var dashboardUrl      = util.format("http://%s:%d/", config.host, config.port);
 var viewUrl           = dashboardUrl + 'view/' + bundleName;
