@@ -1,15 +1,31 @@
-language: node_js
-node_js:
-  - '0.10'
-  - '0.11'
+env:
+  - NODE_VERSION=0.10
+  - NODE_VERSION=0.11
+# - NODE_VERSION=iojs
+# not testing on iojs until dependencies support it
 
 sudo: false
+
+os:
+  - osx
+  - linux
+
+install:
+  - test $TRAVIS_OS_NAME = "osx" && brew install nvm && source $(brew --prefix nvm)/nvm.sh || test $TRAVIS_OS_NAME = "linux"
+  - nvm install $NODE_VERSION
+  - node --version
+  - npm --version
+  - npm install
+
+script:
+  - npm test
 
 after_success: npm run coveralls
 
 matrix:
   allow_failures:
-    - node_js: '0.11'
+    - os: osx
+    - env: "NODE_VERSION=0.11"
   fast_finish: true
 
 notifications:
