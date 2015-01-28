@@ -69,6 +69,7 @@
 
 
   "globals"       : {
-    "nodecg"    : true
+    "nodecg"      : true,
+    "$bundle"     : true
   }
 }
