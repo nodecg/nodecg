@@ -13,21 +13,21 @@ textarea {
   // we can fit 4 panel widths and 4+2 gutters (+2 because masonry is weird)
   .container {
     @num: 4;
-    width: (@num * @panel-unit-width) + (@num + 2) * @panel-gutter-width; // 608px
+    width: (@num * @panel-unit-width) + (@num + 2) * @panel-gutter-width + 30; // 638px
   }
 }
 @media (min-width: 992px) {
   // we can fit 6 panel widths and 6+2 gutters (+2 because masonry is weird)
   .container {
     @num: 6;
-    width: (@num * @panel-unit-width) + (@num + 2) * @panel-gutter-width; // 896px
+    width: (@num * @panel-unit-width) + (@num + 2) * @panel-gutter-width + 30; // 926px
   }
 }
 @media (min-width: 1200px) {
   // we can fit 8 panel widths and 8+2 gutters (+2 because masonry is weird)
   .container {
     @num: 8;
-    width: (@num * @panel-unit-width) + (@num + 2) * @panel-gutter-width; // 1184px
+    width: (@num * @panel-unit-width) + (@num + 2) * @panel-gutter-width + 30; // 1214px
   }
 }
 
@@ -102,7 +102,7 @@ textarea {
       }
     }
 
-    /* add .no-padding to .btn-group .btn-group-justified to opt-out of horizontal padding */
+    // add .no-padding to .btn-group .btn-group-justified to opt-out of horizontal padding
     &.no-padding {
       .btn-group {
         padding-left: 0;
@@ -111,7 +111,7 @@ textarea {
     }
   }
 
-  /* add .no-padding to .ncg-btn-group to opt-out of vertical padding */
+  // add .no-padding to .ncg-btn-group to opt-out of vertical padding
   &.no-padding {
     .btn-group.btn-group-justified {
       padding-top: 0;
