@@ -22,7 +22,7 @@ Now run the following commands:
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
 npm install --production
-node server.js
+node index.js
 ```
 
 To run NodeCG in production, [pm2](https://github.com/Unitech/pm2) is recommended.
