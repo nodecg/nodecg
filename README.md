@@ -5,6 +5,7 @@ It is primarily aimed at [Twitch](http://twitch.tv) broadcasters using [Open Bro
 NodeCG is based on the overlay system developed for the [Tip of the Hats 2014](https://www.youtube.com/watch?v=x9PzBHgN29U) charity event.
 
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/nwbo16kjvkekeb32?svg=true)](https://ci.appveyor.com/project/mattmcnam/nodecg)
 [![Coverage Status](https://img.shields.io/coveralls/nodecg/nodecg.svg)](https://coveralls.io/r/nodecg/nodecg)
 
 NodeCG provides a basic bundle system for graphics, as well as an control dashboard for controlling the bundles.
