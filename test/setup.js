@@ -4,7 +4,7 @@ var e = require('./setup/test-environment');
 
 before(function(done) {
     this.timeout(15000);
-    e.server.on('extensionsLoaded', done);
+    e.server.on('started', done);
     e.server.start();
 });
 
