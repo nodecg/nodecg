@@ -108,7 +108,7 @@ html(lang="en")
         //- Load socket.io and immediately create a socket that all dashboard code will use
         script(src='/socket.io/socket.io.js')
         script(type='text/javascript').
-            window.socket = io.connect('http://#{ ncgConfig.host }:#{ ncgConfig.port }/');
+            window.socket = io.connect('//#{ ncgConfig.host }:#{ ncgConfig.port }/');
         script(src='/nodecg-api.js')
 
         script(src='/dashboard/dashboard.js')
