@@ -5,13 +5,13 @@ init:
 # Test against these versions of Node.js.
 environment:
   matrix:
-    - node_version: "0.10"
-    # - node_version: "0.11"
+    - nodejs_version: "0.10"
+    - nodejs_version: "0.11"
 
 # Allow failing jobs for bleeding-edge Node.js versions.
 matrix:
   allow_failures:
-    - nodejs_version: "0.11"
+    #- nodejs_version: "0.11"
 
 # Install scripts. (runs after repo cloning)
 install:
@@ -32,3 +32,12 @@ build: off
 
 # Set build version format here instead of in the admin panel.
 version: "{build}"
+
+# Slack alerts for failures
+notifications:
+  - provider: Slack
+    auth_token:
+      secure: nwMVzoe5QgwKrCU1WpPVg645UjOZ4g8xdTan41DSVd0I2M6wcYoCwavNa2umEoyh
+    channel: github
+    on_build_success: false
+    on_build_failure: true
