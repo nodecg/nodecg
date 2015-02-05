@@ -9,9 +9,10 @@ environment:
     - nodejs_version: "0.11"
 
 # Allow failing jobs for bleeding-edge Node.js versions.
-#matrix:
-#  allow_failures:
-#    - nodejs_version: "0.11"
+matrix:
+  fast_finish: true
+  allow_failures:
+    - nodejs_version: "0.11"
 
 # Install scripts. (runs after repo cloning)
 install:
