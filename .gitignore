@@ -24,5 +24,9 @@ node_modules/
 # Code coverage results
 /coverage
 
+# Test folders
+/bundles2
+/bundles_off
+
 # Don't ignore .empty_directory files
 !.empty_directory
