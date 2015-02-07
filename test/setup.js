@@ -10,6 +10,14 @@ var C = require('./setup/test-constants');
 before(function(done) {
     this.timeout(15000);
 
+    if (C.CONFIG.login.enabled) {
+        throw new Error('Login security is enabled! Please disable login security in cfg/nodecg.json before running tests');
+    }
+
+    if (C.CONFIG.ssl.enabled) {
+        throw new Error('SSL is enabled! Please disable SSL in cfg/nodecg.json before running tests');
+    }
+
     e.server.on('started', function() {
         var dashboardDone = false;
         var viewDone = false;
