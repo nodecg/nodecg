@@ -1,8 +1,8 @@
 env:
   - NODE_VERSION=0.10
   - NODE_VERSION=0.11
-# - NODE_VERSION=iojs
-# not testing on iojs until dependencies support it
+  - NODE_VERSION=0.12
+  - NODE_VERSION=iojs
 
 sudo: false
 
@@ -24,8 +24,9 @@ after_success: npm run coveralls
 
 matrix:
   allow_failures:
-    - os: osx
     - env: "NODE_VERSION=0.11"
+    - env: "NODE_VERSION=0.12"
+    - env: "NODE_VERSION=iojs"
   fast_finish: true
 
 notifications:
