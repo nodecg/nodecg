@@ -11,7 +11,7 @@ var testBundleSrcPath = path.resolve(rootDir, 'test/setup/', bundleName);
 var bundleDir         = path.resolve(rootDir, 'bundles', bundleName);
 var cfgDir            = path.resolve(rootDir, 'cfg');
 var bundleCfgPath     = path.resolve(cfgDir, bundleName + '.json');
-var dashboardUrl      = util.format("http://%s:%d/", config.host, config.port);
+var dashboardUrl      = util.format('http://%s:%d/', config.host, config.port);
 var viewUrl           = dashboardUrl + 'view/' + bundleName;
 
 module.exports = {
@@ -21,7 +21,8 @@ module.exports = {
     CFG_DIR: cfgDir,
     BUNDLE_CFG_PATH: bundleCfgPath,
     DASHBOARD_URL: dashboardUrl,
-    VIEW_URL: viewUrl
+    VIEW_URL: viewUrl,
+    CONFIG: config
 };
 
 
