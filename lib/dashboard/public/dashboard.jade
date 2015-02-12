@@ -117,13 +117,12 @@ html(lang="en")
         each bundle in bundles
             //- only add the tag if there is a script, empty tags can cause long timeout delays
             if bundle.dashboard.js
-                each script in bundle.dashboard.js
-                    script(type='text/javascript').
-                        try {
-                            (function (nodecg) {
-                                var $bundle = $('.dashboard-panels .#{ bundle.name }');
-                                !{ script }
-                            })(new NodeCG('#{ bundle.name }', !{JSON.stringify(bundle.config)}, !{JSON.stringify(ncgConfig)}, window.socket));
-                        } catch (err) {
-                            console.error("[NODECG] Panel for bundle #{ bundle.name } threw error:", err.stack);
-                        }
+                script(type='text/javascript').
+                    try {
+                        (function (nodecg) {
+                            var $bundle = $('.dashboard-panels .#{ bundle.name }');
+                            !{ bundle.dashboard.js.join('') }
+                        })(new NodeCG('#{ bundle.name }', !{JSON.stringify(bundle.config)}, !{JSON.stringify(ncgConfig)}, window.socket));
+                    } catch (err) {
+                        console.error("[NODECG] Panel for bundle #{ bundle.name } threw error:", err.stack);
+                    }
