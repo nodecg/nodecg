@@ -4,9 +4,29 @@ NodeCG is a live graphics system, designed to be used in broadcasts.
 It is primarily aimed at [Twitch](http://twitch.tv) broadcasters using [Open Broadcaster Software](https://obsproject.com/), but is usable in any environment that can render HTML.
 NodeCG is based on the overlay system developed for the [Tip of the Hats 2014](https://www.youtube.com/watch?v=x9PzBHgN29U) charity event.
 
-[![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/nwbo16kjvkekeb32?svg=true)](https://ci.appveyor.com/project/mattmcnam/nodecg)
-[![Coverage Status](https://img.shields.io/coveralls/nodecg/nodecg.svg)](https://coveralls.io/r/nodecg/nodecg)
+<table>
+  <thead>
+    <tr>
+      <th>Linux</th>
+      <th>OS X</th>
+      <th>Windows</th>
+      <th>Test Coverage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="2" align="center">
+        <a href="https://travis-ci.org/nodecg/nodecg"><img src="https://travis-ci.org/nodecg/nodecg.svg"></a>
+      </td>
+      <td align="center">
+        <a href="https://ci.appveyor.com/project/timbranyen/nodecg"><img src="https://ci.appveyor.com/api/projects/status/nwbo16kjvkekeb32?svg=true"></a>
+      </td>
+      <td align="center">
+        <a href="https://coveralls.io/r/nodecg/nodecg"><img src="https://img.shields.io/coveralls/nodecg/nodecg.svg"></a>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 NodeCG provides a basic bundle system for graphics, as well as a dashboard for controlling the bundles.
 
