@@ -1,6 +1,6 @@
 'use strict';
 
-/** Set up test bundle **/
+// Set up test bundle
 var fs = require('fs');
 var wrench = require('wrench');
 var C = require('./test-constants');

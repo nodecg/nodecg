@@ -5,13 +5,16 @@ init:
 # Test against these versions of Node.js.
 environment:
   matrix:
-    - node_version: "0.10"
-    # - node_version: "0.11"
+    - nodejs_version: "0.10"
+#    - nodejs_version: "0.12"
+#    - nodejs_version: "iojs"
 
 # Allow failing jobs for bleeding-edge Node.js versions.
 matrix:
+  fast_finish: true
   allow_failures:
-    - nodejs_version: "0.11"
+    - nodejs_version: "0.12"
+    - nodejs_version: "iojs"
 
 # Install scripts. (runs after repo cloning)
 install:
@@ -32,3 +35,16 @@ build: off
 
 # Set build version format here instead of in the admin panel.
 version: "{build}"
+
+# Slack alerts for failures
+notifications:
+  - provider: Webhook
+    url: https://webhooks.gitter.im/e/8714f1ce7377232521c6
+    on_build_success: false
+    on_build_failure: true
+  - provider: Slack
+    auth_token:
+      secure: nwMVzoe5QgwKrCU1WpPVg645UjOZ4g8xdTan41DSVd0I2M6wcYoCwavNa2umEoyh
+    channel: github
+    on_build_success: false
+    on_build_failure: true
