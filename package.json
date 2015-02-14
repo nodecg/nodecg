@@ -2,7 +2,7 @@
   "name": "nodecg",
   "description": "Live, controllable graphics system rendered in a browser",
   "main": "index.js",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/nodecg/nodecg.git"
