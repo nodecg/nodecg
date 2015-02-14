@@ -38,7 +38,7 @@ version: "{build}"
 
 # Slack alerts for failures
 notifications:
-  - provider: Gitter
+  - provider: Webhook
     url: https://webhooks.gitter.im/e/8714f1ce7377232521c6
     on_build_success: false
     on_build_failure: true
