@@ -1,8 +1,7 @@
 env:
   - NODE_VERSION=0.10
-  - NODE_VERSION=0.11
-  - NODE_VERSION=0.12
-  - NODE_VERSION=iojs
+#  - NODE_VERSION=0.12
+#  - NODE_VERSION=iojs
 
 sudo: false
 
@@ -24,12 +23,17 @@ after_success: npm run coveralls
 
 matrix:
   allow_failures:
-    - env: "NODE_VERSION=0.11"
     - env: "NODE_VERSION=0.12"
     - env: "NODE_VERSION=iojs"
   fast_finish: true
 
 notifications:
   email: false
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/8c1769bff63cbd033bf7
+    on_success: always
+    on_failure: always
+    on_start: false
   slack:
     secure: R+TkavWRhREwc9shV6JYJ+YrrMdpaSB5iYlVVhtO4XjSJPtbsgFvg8aelELIfwUY/Lsl6dmUD8bhv1GxN4Bdui7igrGEzXqh+ziJSnPET0Apxyc2HFYzM3phQYwsESyFXGfx9PiegLQ6fcozZ75rio17YhPjT8//9jb5I9hue9g=
