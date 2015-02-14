@@ -28,6 +28,9 @@ NodeCG is based on the overlay system developed for the [Tip of the Hats 2014](h
   </tbody>
 </table>
 
+Have questions about NodeCG, or just want to say 'hi'? Join our Gitter!  
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/gitterHQ/gitter)
+
 NodeCG provides a basic bundle system for graphics, as well as a dashboard for controlling the bundles.
 
 A _bundle_ contains HTML, Javascript, CSS, and any other resources required to produce a certain graphic animation and also contains an admin panel for controlling the animation.
