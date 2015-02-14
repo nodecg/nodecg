@@ -19,7 +19,7 @@ NodeCG is based on the overlay system developed for the [Tip of the Hats 2014](h
         <a href="https://travis-ci.org/nodecg/nodecg"><img src="https://travis-ci.org/nodecg/nodecg.svg"></a>
       </td>
       <td align="center">
-        <a href="https://ci.appveyor.com/project/timbranyen/nodecg"><img src="https://ci.appveyor.com/api/projects/status/nwbo16kjvkekeb32?svg=true"></a>
+        <a href="https://ci.appveyor.com/project/mattmcnam/nodecg"><img src="https://ci.appveyor.com/api/projects/status/nwbo16kjvkekeb32?svg=true"></a>
       </td>
       <td align="center">
         <a href="https://coveralls.io/r/nodecg/nodecg"><img src="https://img.shields.io/coveralls/nodecg/nodecg.svg"></a>
