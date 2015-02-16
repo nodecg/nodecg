@@ -1,8 +1,8 @@
 {
   "name": "nodecg",
-  "description": "Live, controllable graphics system rendered in a browser",
+  "description": "Dynamic broadcast graphics rendered in a browser",
   "main": "index.js",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "repository": {
     "type": "git",
     "url": "https://github.com/nodecg/nodecg.git"
@@ -12,6 +12,7 @@
   "dependencies": {
     "body-parser": "^1.2.2",
     "bower": "^1.3.10",
+    "chokidar": "^1.0.0-rc3",
     "connect-nedb-session": "0.0.3",
     "cookie-parser": "^1.1.0",
     "deasync": "0.0.8",
@@ -23,7 +24,6 @@
     "extend": "^2.0.0",
     "file": "^0.2.2",
     "fs.extra": "^1.3.2",
-    "gaze": "^0.6.4",
     "jade": "^1.6.0",
     "nedb": "^1.1.1",
     "obs-remote": "^1.0.0",
