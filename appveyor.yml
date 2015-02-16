@@ -6,8 +6,8 @@ init:
 environment:
   matrix:
     - nodejs_version: "0.10"
-#    - nodejs_version: "0.12"
-#    - nodejs_version: "iojs"
+    - nodejs_version: "0.12"
+    - nodejs_version: "iojs"
 
 # Allow failing jobs for bleeding-edge Node.js versions.
 matrix:
