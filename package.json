@@ -12,6 +12,7 @@
   "dependencies": {
     "body-parser": "^1.2.2",
     "bower": "^1.3.10",
+    "cheerio": "^0.18.0",
     "chokidar": "^1.0.0-rc3",
     "connect-nedb-session": "0.0.3",
     "cookie-parser": "^1.1.0",
