@@ -6,13 +6,14 @@ var util = require('util');
 var rootDir = path.resolve(__dirname, '../..');
 var config = require(path.join(rootDir, '/lib/config')).getConfig();
 
-var bundleName        = 'test-bundle';
-var testBundleSrcPath = path.resolve(rootDir, 'test/setup/', bundleName);
-var bundleDir         = path.resolve(rootDir, 'bundles', bundleName);
-var cfgDir            = path.resolve(rootDir, 'cfg');
-var bundleCfgPath     = path.resolve(cfgDir, bundleName + '.json');
-var dashboardUrl      = util.format('http://%s:%d/', config.host, config.port);
-var viewUrl           = dashboardUrl + 'view/' + bundleName;
+var bundleName          = 'test-bundle';
+var testBundleSrcPath   = path.resolve(rootDir, 'test/setup/', bundleName);
+var bundleDir           = path.resolve(rootDir, 'bundles', bundleName);
+var cfgDir              = path.resolve(rootDir, 'cfg');
+var bundleCfgPath       = path.resolve(cfgDir, bundleName + '.json');
+var dashboardUrl        = util.format('http://%s:%d/', config.host, config.port);
+var dashboardBundleUrl  = dashboardUrl + 'dashboard/' + bundleName;
+var viewUrl             = dashboardUrl + 'view/' + bundleName;
 
 module.exports = {
     BUNDLE_NAME: bundleName,
@@ -21,8 +22,7 @@ module.exports = {
     CFG_DIR: cfgDir,
     BUNDLE_CFG_PATH: bundleCfgPath,
     DASHBOARD_URL: dashboardUrl,
+    DASHBOARD_BUNDLE_URL: dashboardBundleUrl,
     VIEW_URL: viewUrl,
     CONFIG: config
 };
-
-
