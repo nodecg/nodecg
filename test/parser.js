@@ -14,3 +14,10 @@ describe('per-bundle npm packages', function() {
         expect(fs.existsSync(dir)).to.be.true();
     });
 });
+
+describe('per-bundle bower packages', function() {
+    it('get installed', function () {
+        var dir = path.join(C.BUNDLE_DIR, 'bower_components/webcomponentsjs');
+        expect(fs.existsSync(dir)).to.be.true();
+    });
+});
