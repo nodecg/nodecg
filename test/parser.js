@@ -3,6 +3,7 @@
 // Modules used to run tests
 var chai = require('chai');
 var expect = chai.expect;
+var request = require('request');
 
 var path = require('path');
 var fs = require('fs');
@@ -22,14 +23,14 @@ describe('per-bundle bower packages', function() {
     });
 
     it('are accessible via /dashboard', function() {
-        e.request(C.DASHBOARD_BUNDLE_URL + '/components/webcomponentsjs/webcomponents.js', function (error, response, body) {
+        request(C.DASHBOARD_BUNDLE_URL + '/components/webcomponentsjs/webcomponents.js', function (error, response, body) {
             expect(error).to.be.null();
             expect(response.statusCode).to.equal(200);
         })
     })
 
     it('are accessible via /view', function() {
-        e.request(C.VIEW_URL + '/components/webcomponentsjs/webcomponents.js', function (error, response, body) {
+        request(C.VIEW_URL + '/components/webcomponentsjs/webcomponents.js', function (error, response, body) {
             expect(error).to.be.null();
             expect(response.statusCode).to.equal(200);
         })
