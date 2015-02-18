@@ -1,7 +1,7 @@
 {
   "name": "test-bundle",
   "version": "0.0.1",
-  "nodecgDependency": "~0.4.0",
+  "nodecgDependency": "~0.5.0",
   "homepage": "http://github.com/nodecg",
   "authors": [
     "Alex Van Camp <email@alexvan.camp>",
@@ -12,8 +12,5 @@
   "extension": {
     "express": false,
     "path": "extension.js"
-  },
-  "dependencies": {
-    "commander": "^2.6.0"
   }
 }

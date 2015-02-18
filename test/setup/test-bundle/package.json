@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "commander": "^2.6.0"
+  }
+}
