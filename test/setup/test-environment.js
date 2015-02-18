@@ -1,6 +1,7 @@
 'use strict';
 
 var path = require('path');
+var request = require('request');
 var server = require(path.resolve(__dirname, '../../lib/server'));
 
 module.exports = {
@@ -13,5 +14,6 @@ module.exports = {
     browsers: {
         view: {},
         dashboard: {}
-    }
+    },
+    request: request
 };

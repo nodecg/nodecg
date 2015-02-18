@@ -20,4 +20,18 @@ describe('per-bundle bower packages', function() {
         var dir = path.join(C.BUNDLE_DIR, 'bower_components/webcomponentsjs');
         expect(fs.existsSync(dir)).to.be.true();
     });
+
+    it('are accessible via /dashboard', function() {
+        e.request(C.DASHBOARD_BUNDLE_URL + '/components/webcomponentsjs/webcomponents.js', function (error, response, body) {
+            expect(error).to.be.null();
+            expect(response.statusCode).to.equal(200);
+        })
+    })
+
+    it('are accessible via /view', function() {
+        e.request(C.VIEW_URL + '/components/webcomponentsjs/webcomponents.js', function (error, response, body) {
+            expect(error).to.be.null();
+            expect(response.statusCode).to.equal(200);
+        })
+    })
 });
