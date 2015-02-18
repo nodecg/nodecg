@@ -13,7 +13,6 @@ environment:
 matrix:
   fast_finish: true
   allow_failures:
-    - nodejs_version: "0.12"
     - nodejs_version: "iojs"
 
 # Install scripts. (runs after repo cloning)
