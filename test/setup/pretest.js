@@ -7,7 +7,6 @@ var C = require('./test-constants');
 
 // Create the cfg dir if it does not exist
 if (!fs.existsSync(C.CFG_DIR)) {
-    console.log(C.CFG_DIR);
     fs.mkdirSync(C.CFG_DIR);
 }
 

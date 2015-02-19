@@ -4,8 +4,10 @@
 var chai = require('chai');
 var should = chai.should();
 var expect = chai.expect;
+var request = require('request');
 
 var e = require('./setup/test-environment');
+var C = require('./setup/test-constants');
 
 describe('extension api', function() {
     before(function(done) {
@@ -26,6 +28,14 @@ describe('extension api', function() {
     it('can send messages', function(done) {
         e.apis.dashboard.listenFor('serverToClient', done);
         e.apis.extension.sendMessage('serverToClient');
+    });
+
+    it('can mount express middleware', function(done) {
+        request(C.DASHBOARD_URL + 'test-bundle/test-route', function (error, response, body) {
+            expect(error).to.be.null();
+            expect(response.statusCode).to.equal(200);
+            done();
+        });
     });
 
     describe('nodecg config', function() {
