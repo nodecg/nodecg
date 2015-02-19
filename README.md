@@ -56,7 +56,7 @@ To run NodeCG in production, [pm2](https://github.com/Unitech/pm2) is recommende
 - You can configure NodeCG by creating a [cfg/nodecg.json](https://github.com/nodecg/nodecg/wiki/NodeCG-config) file.
 
 ### Full Documentation
-Full docs can be found in the [wiki](https://github.com/nodecg/nodecg/wiki).
+Full docs can be found at [nodecg.com](http://nodecg.com/)
 
 ### Contributing
 1. Fork it ( http://github.com/nodecg/nodecg/fork )
