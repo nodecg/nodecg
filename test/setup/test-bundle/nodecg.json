@@ -10,7 +10,6 @@
   "description": "A test bundle",
   "license": "MIT",
   "extension": {
-    "express": false,
     "path": "extension.js"
   }
 }

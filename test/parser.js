@@ -22,17 +22,19 @@ describe('per-bundle bower packages', function() {
         expect(fs.existsSync(dir)).to.be.true();
     });
 
-    it('are accessible via /dashboard', function() {
+    it('are accessible via /dashboard', function(done) {
         request(C.DASHBOARD_BUNDLE_URL + '/components/webcomponentsjs/webcomponents.js', function (error, response, body) {
             expect(error).to.be.null();
             expect(response.statusCode).to.equal(200);
-        })
-    })
+            done();
+        });
+    });
 
-    it('are accessible via /view', function() {
+    it('are accessible via /view', function(done) {
         request(C.VIEW_URL + '/components/webcomponentsjs/webcomponents.js', function (error, response, body) {
             expect(error).to.be.null();
             expect(response.statusCode).to.equal(200);
-        })
-    })
+            done();
+        });
+    });
 });
