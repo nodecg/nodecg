@@ -2,7 +2,7 @@
   "name": "nodecg",
   "description": "Dynamic broadcast graphics rendered in a browser",
   "main": "index.js",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/nodecg/nodecg.git"
@@ -16,7 +16,6 @@
     "chokidar": "^1.0.0-rc3",
     "connect-nedb-session": "0.0.3",
     "cookie-parser": "^1.1.0",
-    "deasync": "0.0.10",
     "ejs": "^2.1.4",
     "express": "^4.3.1",
     "express-favicon": "^1.0.1",
