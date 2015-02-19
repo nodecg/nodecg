@@ -53,7 +53,7 @@ To run NodeCG in production, [pm2](https://github.com/Unitech/pm2) is recommende
 ### Usage
 - Open `http://localhost:9090/dashboard` to see the admin dashboard
 - For each bundle you install, you can see its graphic at `http://localhost:9090/view/{bundle-name}/`
-- You can configure NodeCG by creating a [cfg/nodecg.json](https://github.com/nodecg/nodecg/wiki/NodeCG-config) file.
+- You can configure NodeCG by creating a [cfg/nodecg.json](http://nodecg.com/starter/configuration.html) file.
 
 ### Full Documentation
 Full docs can be found at [nodecg.com](http://nodecg.com/)
