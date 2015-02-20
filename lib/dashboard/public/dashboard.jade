@@ -1,6 +1,7 @@
 mixin panels(bundle)
     each panel in bundle.dashboard.panels
-        div(class='#{ bundle.name } #{ panel.name } panel panel-default panel-span-#{ panel.width }')
+        div(class='#{ bundle.name } #{ panel.name } panel panel-default panel-span-#{ panel.width }',
+        data-panel=panel.name)
             .panel-heading
                 h3.panel-title=panel.title
                 i(class="fa panel-icon #{ panel.faIcon }")
