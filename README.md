@@ -65,10 +65,15 @@ Full docs can be found at [nodecg.com](http://nodecg.com/)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
-**Before creating your pull request:**  
-1. Ensure your code matches our existing style using our provided [EditorConfig](http://editorconfig.org/) options  
-2. Ensure the existing tests pass, or are updated appropriately, with `npm test`  
+**Before creating your pull request:**
+
+1. Ensure your code matches our existing style using our provided [EditorConfig](http://editorconfig.org/) options
+2. Ensure the existing tests pass, or are updated appropriately, with `npm test`
 3. For new features, you should add new tests
+
+Check which branch you should PR to. NodeCG is still in an unstable state, so we follow these [semver](http://semver.org/) guidelines:
+- Bug fixes and new features go to the next 'patch' branch (`0.current.x`)
+- Breaking changes go to the next 'minor' branch (`0.next.0`)
 
 ### License
 NodeCG is provided under the MIT license, which is available to read in the [LICENSE][] file.
