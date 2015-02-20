@@ -65,6 +65,11 @@ Full docs can be found at [nodecg.com](http://nodecg.com/)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
+**Before creating your pull request:**  
+1. Ensure your code matches our existing style using our provided [EditorConfig](http://editorconfig.org/) options  
+2. Ensure the existing tests pass, or are updated appropriately, with `npm test`  
+3. For new features, you should add new tests
+
 ### License
 NodeCG is provided under the MIT license, which is available to read in the [LICENSE][] file.
 [license]: LICENSE
