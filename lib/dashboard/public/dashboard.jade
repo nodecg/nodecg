@@ -1,6 +1,7 @@
 mixin panels(bundle)
     each panel in bundle.dashboard.panels
-        div(class='#{ bundle.name } #{ panel.name } panel panel-default panel-span-#{ panel.width }')
+        div(class='#{ bundle.name } #{ panel.name } panel panel-default panel-span-#{ panel.width }',
+        data-panel=panel.name)
             .panel-heading
                 h3.panel-title=panel.title
                 i(class="fa panel-icon #{ panel.faIcon }")
@@ -88,7 +89,8 @@ html(lang="en")
         script(src='/components/bootstrap/dist/js/bootstrap.min.js')
         script(src='/components/bootstrap/js/tooltip.js')
         script(src='/components/bootstrap/js/popover.js')
-        script(src='/components/masonry/dist/masonry.pkgd.min.js')
+        script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
+        script(src='/components/packery/dist/packery.pkgd.min.js')
         script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
         script(src='/components/moment/min/moment.min.js')
         script(src='/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js')
@@ -111,6 +113,7 @@ html(lang="en")
             window.socket = io.connect('//#{ ncgConfig.host }:#{ ncgConfig.port }/');
         script(src='/nodecg-api.js')
 
+        script(src='/dashboard/panels.dashboard.js')
         script(src='/dashboard/dashboard.js')
 
         //- Bundle javascript
