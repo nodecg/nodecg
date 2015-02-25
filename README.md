@@ -1,4 +1,4 @@
-[![NodeCG Logo](http://i.imgur.com/8PjMIL4.png)](http://github.com/nodecg/nodecg)
+[![NodeCG Logo](http://i.imgur.com/8PjMIL4.png)](http://nodecg.com/)
 
 NodeCG is a live graphics system, designed to be used in broadcasts.
 It is primarily aimed at [Twitch](http://twitch.tv) broadcasters using [Open Broadcaster Software](https://obsproject.com/), but is usable in any environment that can render HTML.
