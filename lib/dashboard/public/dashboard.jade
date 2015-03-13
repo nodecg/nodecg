@@ -76,12 +76,6 @@ html(lang="en")
         //- Spacer
         p
 
-        //- Bundle panels
-        div.container
-            div.dashboard-panels
-                each bundle in bundles
-                    +panels(bundle)
-
         //- Core JavaScript
         script(src='/components/jquery/dist/jquery.min.js')
         script(src='/components/bootstrap/dist/js/bootstrap.min.js')
@@ -109,6 +103,14 @@ html(lang="en")
         script(src='/nodecg-api.js')
 
         script(src='/dashboard/dashboard.js')
+
+        //- Bundle panels
+            We load these after all JS is loaded to ensure that any scripts declared inline are loaded after
+            all the core JS is loaded.
+        div.container
+            div.dashboard-panels
+                each bundle in bundles
+                    +panels(bundle)
 
         //- Bundle javascript
         each bundle in bundles
