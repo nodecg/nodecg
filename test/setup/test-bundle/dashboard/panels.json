@@ -12,5 +12,13 @@
     "width": 2,
     "file": "jade.jade",
     "faIcon": "fa-meh-o"
+  },
+  {
+    "name": "web-component",
+    "title": "Web Component Panel",
+    "width": 2,
+    "webComponent": "test-web-component-panel",
+    "file": "elements/test-web-component-panel.html",
+    "faIcon": "fa-meh-o"
   }
 ]
