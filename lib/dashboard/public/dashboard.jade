@@ -8,7 +8,7 @@ mixin panels(bundle)
             if panel.webComponent
                 // web component support
                 .panel-body
-                    #{panel.webComponent}(bundleConfig=JSON.stringify(bundle))
+                    #{panel.webComponent}(bundlename=bundle.name, bundleConfig=JSON.stringify(bundle.config))
             else
                 //- The body was rendered from Jade into HTML in an earlier step of bundle parsing
                 //- This is inefficient, as it means we are doing two rendering passes for each bundle:
