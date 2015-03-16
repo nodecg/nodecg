@@ -5,7 +5,7 @@
     <script src="/nodecg-api.js"></script>
 
     <template>
-        <p>name: {{nodecg.bundlename}}</p>
+        <p>name: {{nodecg.bundleName}}</p>
         <p>test: {{nodecg.bundleConfig.test}}</p>
         <p>host: {{nodecg.config.host}}</p>
     </template>
@@ -14,8 +14,6 @@
         Polymer({
             ready: function() {
                 this.nodecg = new NodeCG(this.bundlename, JSON.parse(this.bundleConfig), window.ncgConfig, window.socket);
-
-                console.log(this.nodecg);
             }
         });
   </script>
