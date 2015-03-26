@@ -23,7 +23,7 @@ after_success: npm run coveralls
 
 matrix:
   allow_failures:
-    - env: "NODE_VERSION=iojs"
+    - os: osx
   fast_finish: true
 
 notifications:
