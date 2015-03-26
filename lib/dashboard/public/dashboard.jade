@@ -37,7 +37,6 @@ html(lang="en")
 
         //- Bower component CSS
         link(rel='stylesheet', href='/components/fontawesome/css/font-awesome.min.css')
-        link(rel='stylesheet', href='/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
         link(rel='stylesheet', href='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.css')
         link(rel='stylesheet', href='/components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css')
 
@@ -77,12 +76,6 @@ html(lang="en")
         //- Spacer
         p
 
-        //- Bundle panels
-        div.container
-            div.dashboard-panels
-                each bundle in bundles
-                    +panels(bundle)
-
         //- Core JavaScript
         script(src='/components/jquery/dist/jquery.min.js')
         script(src='/components/bootstrap/dist/js/bootstrap.min.js')
@@ -90,8 +83,6 @@ html(lang="en")
         script(src='/components/bootstrap/js/popover.js')
         script(src='/components/masonry/dist/masonry.pkgd.min.js')
         script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
-        script(src='/components/moment/min/moment.min.js')
-        script(src='/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js')
         script(src='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js')
         script(src='/components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js')
         script(src='/components/typeahead.js/dist/typeahead.jquery.min.js')
@@ -108,10 +99,18 @@ html(lang="en")
         //- Load socket.io and immediately create a socket that all dashboard code will use
         script(src='/socket.io/socket.io.js')
         script(type='text/javascript').
-            window.socket = io.connect('//#{ ncgConfig.host }:#{ ncgConfig.port }/');
+            window.socket = io.connect('//#{ ncgConfig.baseURL }/');
         script(src='/nodecg-api.js')
 
         script(src='/dashboard/dashboard.js')
+
+        //- Bundle panels
+            We load these after all JS is loaded to ensure that any scripts declared inline are loaded after
+            all the core JS is loaded.
+        div.container
+            div.dashboard-panels
+                each bundle in bundles
+                    +panels(bundle)
 
         //- Bundle javascript
         each bundle in bundles
