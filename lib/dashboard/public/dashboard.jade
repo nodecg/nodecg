@@ -5,12 +5,17 @@ mixin panels(bundle)
                 h3.panel-title=panel.title
                 i(class="fa panel-icon #{ panel.faIcon }")
                 +panelInfoBtn(panel)
-            //- The body was rendered from Jade into HTML in an earlier step of bundle parsing
-            //- This is inefficient, as it means we are doing two rendering passes for each bundle:
-            //- Once to render the body, once to render the rest of the panel (container + header).
-            //- However, I see no other way to do it as Jade is a compiled language and does not
-            //- support dynamic includes.
-            .panel-body!=panel.body
+            if panel.webComponent
+                // web component support
+                .panel-body
+                    #{panel.webComponent}(bundlename=bundle.name, bundleConfig=JSON.stringify(bundle.config))
+            else
+                //- The body was rendered from Jade into HTML in an earlier step of bundle parsing
+                //- This is inefficient, as it means we are doing two rendering passes for each bundle:
+                //- Once to render the body, once to render the rest of the panel (container + header).
+                //- However, I see no other way to do it as Jade is a compiled language and does not
+                //- support dynamic includes.
+                .panel-body!=panel.body
 
 //- TODO: Make panel info better. Show things like resolution, authors, etc. Lots more info
 mixin panelInfoBtn(panel)
@@ -43,10 +48,15 @@ html(lang="en")
         //- Custom styles for this template
         link(rel='stylesheet', href='/dashboard/dashboard.css')
 
+        script(src='/components/webcomponentsjs/webcomponents.js')
+
         //- Bundle CSS, perhaps these can just be linked to directly?
             The javascript needs to be cached because of the way we're injecting, but we're not doing
             anything special to the CSS, at least not yet.
         each bundle in bundles
+            each panel in bundle.dashboard.panels
+                if panel.webComponent
+                    link(rel='import', href='/dashboard/' + bundle.name + '/' + panel.file)
             //- only add the tag if there is a style, empty tags can cause long timeout delays
             if bundle.dashboard.css
                 each style in bundle.dashboard.css

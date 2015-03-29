@@ -1,0 +1,20 @@
+<link rel="import" href="../components/polymer/polymer.html">
+
+<polymer-element name="test-web-component-panel" attributes="bundlename bundleConfig">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/nodecg-api.js"></script>
+
+    <template>
+        <p>name: {{nodecg.bundleName}}</p>
+        <p>test: {{nodecg.bundleConfig.test}}</p>
+        <p>host: {{nodecg.config.host}}</p>
+    </template>
+
+    <script>
+        Polymer({
+            ready: function() {
+                this.nodecg = new NodeCG(this.bundlename, JSON.parse(this.bundleConfig), window.ncgConfig, window.socket);
+            }
+        });
+  </script>
+</polymer-element>
