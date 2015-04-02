@@ -27,6 +27,8 @@
     "httpolyglot": "^0.1.1",
     "jade": "^1.6.0",
     "nedb": "^1.1.1",
+    "nested-observe": "^1.2.1",
+    "object-path": "^0.9.1",
     "obs-remote": "^1.0.0",
     "passport": "^0.2.0",
     "passport-steam": "^0.1.3",
@@ -47,7 +49,7 @@
     "coveralls": "node node_modules/lcov-filter/index.js ./coverage/lcov.info test bundles | coveralls && rm -rf ./coverage"
   },
   "engines": {
-    "node": ">= 0.10.0"
+    "node": ">= 0.11.13"
   },
   "files": [
     "AUTHORS",
