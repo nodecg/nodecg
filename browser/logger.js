@@ -1,7 +1,8 @@
 'use strict';
 
 // TODO: See if this can be shimmed down more
-var logLevel = require('../lib/config').getConfig().logLevel;
+//var logLevel = require('../lib/config').getConfig().logLevel;
+var logLevel = 'info';
 
 var LOG_LEVELS = {
     trace: 0,
