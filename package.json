@@ -71,16 +71,5 @@
     "mocha-lcov-reporter": "0.0.1",
     "wrench": "^1.5.8",
     "zombie": "^2.4.0"
-  },
-  "browserify": {
-    "transform": [
-      "brfs"
-    ]
-  },
-  "browser": {
-    "./lib/logger.js": "./browser/lib/shim/logger.js",
-    "./lib/replicator.js": false,
-    "./lib/util.js": false,
-    "./lib/server/index.js": false
   }
 }
