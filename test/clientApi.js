@@ -10,7 +10,7 @@ var e = require('./setup/test-environment');
 describe('client api', function() {
     before(function(done) {
         // Drop all synced variables
-        e.server._resetSyncedVariables();
+        e.server._resetReplicants();
 
         // Wait a bit for all clients to react
         setTimeout(done, 1750);
@@ -65,54 +65,29 @@ describe('client api', function() {
         });
     });
 
-    describe('synced variables', function() {
-        it('doesn\'t let multiple declarations of a synced variable overwrite itself', function(done) {
-            e.apis.dashboard.declareSyncedVar({ name: 'testVar', initialVal: 123 });
+    describe('replicants', function() {
+        it('only apply defaultValue when first declared', function(done) {
+            e.apis.extension.Replicant('test', { defaultValue: 'foo' });
+            var rep = e.apis.dashboard.Replicant('test', { defaultValue: 'bar' });
 
             // Give Zombie a chance to process socket.io events
             e.browsers.dashboard.wait({duration: 100}, function() {
-                e.apis.extension.declareSyncedVar({ name: 'testVar', initialVal: 456,
-                    setter: function(newVal) {
-                        newVal.should.equal(123);
-                        e.apis.dashboard.variables.testVar.should.equal(123);
-                        done();
-                    }
-                });
-            });
-        });
-
-        it('supports single retrieval via readSyncedVar', function(done) {
-            e.apis.dashboard.readSyncedVar('testVar', function(val) {
-                expect(val).to.equal(123);
+                expect(rep.value).to.equal('foo');
                 done();
             });
         });
 
-        it('supports legacy "variableName" when declaring synced variables', function(done) {
-            e.apis.dashboard.declareSyncedVar({ variableName: 'oldVar', initialVal: 123 });
-
-            // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 100}, function() {
-                expect(e.apis.dashboard.variables.oldVar).to.equal(123);
-                done();
-            });
-        });
-
-        it('supports "initialVal" and "initialValue" when declaring synced variables', function(done) {
-            e.apis.dashboard.declareSyncedVar({ variableName: 'initialVal', initialVal: 123 });
-            e.apis.dashboard.declareSyncedVar({ variableName: 'initialValue', initialVal: 456 });
-
-            e.browsers.dashboard.wait({duration: 100}, function() {
-                expect(e.apis.dashboard.variables.initialVal).to.equal(123);
-                expect(e.apis.dashboard.variables.initialValue).to.equal(456);
+        it('can be read once without subscription, via readReplicant', function(done) {
+            e.apis.dashboard.readReplicant('test', function(replicant) {
+                expect(replicant.value).to.equal('foo');
                 done();
             });
         });
 
         it('throws an error when no name is given to a synced variable', function () {
             expect(function() {
-                e.apis.dashboard.declareSyncedVar({ initialValue: 123 });
-            }).to.throw(/Attempted to declare an unnamed variable/);
+                e.apis.dashboard.Replicant();
+            }).to.throw(/Must supply a name when instantiating a Replicant/);
         });
     });
 });

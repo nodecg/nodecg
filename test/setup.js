@@ -40,6 +40,9 @@ before(function(done) {
             .then(function() {
                 e.browsers.dashboard.wait(dashboardApiLoaded, function () {
                     e.apis.dashboard = e.browsers.dashboard.window.dashboardApi;
+                    if (typeof e.apis.dashboard === 'undefined') {
+                        throw new Error('Dashboard API is undefined!');
+                    }
                     dashboardDone = true;
                     checkDone();
                 });

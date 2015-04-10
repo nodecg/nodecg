@@ -121,7 +121,9 @@ html(lang="en")
                         (function (nodecg) {
                             var $bundle = $('.dashboard-panels .#{ bundle.name }');
                             !{ bundle.dashboard.js.join('') }
-                        })(new NodeCG('#{ bundle.name }', !{JSON.stringify(bundle.config)}, !{JSON.stringify(ncgConfig)}, window.socket));
+                        //- TODO: make this not waste a fuckton of RAM
+                        //- The entire bundle object is being stringified, meaning all the raw CSS, JS, and HTML for it
+                        })(new NodeCG(!{JSON.stringify(bundle)}, window.socket));
                     } catch (err) {
                         console.error("[NODECG] Panel for bundle #{ bundle.name } threw error:", err.stack);
                     }

@@ -71,6 +71,6 @@
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
     "wrench": "^1.5.8",
-    "zombie": "^2.4.0"
+    "zombie": "^3.1.1"
   }
 }
