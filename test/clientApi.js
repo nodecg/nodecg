@@ -89,5 +89,46 @@ describe('client api', function() {
                 e.apis.dashboard.Replicant();
             }).to.throw(/Must supply a name when instantiating a Replicant/);
         });
+
+        it.skip('can be assigned via the ".value" property', function (done) {
+            var rep = e.apis.dashboard.Replicant('assignmentTest');
+
+            // Give Zombie a chance to process socket.io events
+            e.browsers.dashboard.wait({duration: 100}, function() {
+                rep.value = 'assignmentOK';
+
+                // Give Zombie a chance to process socket.io events
+                e.browsers.dashboard.wait({duration: 100}, function() {
+                    e.apis.dashboard.readReplicant('assignmentTest', function(replicant) {
+                        expect(replicant.value).to.equal('assignmentOK');
+                        done();
+                    });
+                });
+            });
+        });
+
+        it.skip('reacts to changes in nested properties of objects', function(done) {
+            var rep = e.apis.dashboard.Replicant('objTest', {
+                defaultValue: {
+                    a: {
+                        b: {
+                            c: 'c'
+                        }
+                    }
+                }
+            });
+
+            // Give Zombie a chance to process socket.io events
+            setTimeout(function() {
+                rep.value.a.b.c = 'nestedChangeOK';
+
+                e.browsers.dashboard.wait({duration: 100}, function() {
+                    e.apis.dashboard.readReplicant('objTest', function(replicant) {
+                        expect(replicant.value.a.b.c).to.equal('nestedChangeOK');
+                        done();
+                    });
+                });
+            }, 100);
+        });
     });
 });

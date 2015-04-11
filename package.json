@@ -19,6 +19,7 @@
     "chokidar": "^1.0.0",
     "connect-nedb-session": "0.0.3",
     "cookie-parser": "^1.1.0",
+    "deep-equal": "^1.0.0",
     "ejs": "^2.1.4",
     "express": "^4.12.3",
     "express-favicon": "^1.0.1",
