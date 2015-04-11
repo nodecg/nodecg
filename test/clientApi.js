@@ -90,7 +90,7 @@ describe('client api', function() {
             }).to.throw(/Must supply a name when instantiating a Replicant/);
         });
 
-        it.skip('can be assigned via the ".value" property', function (done) {
+        it('can be assigned via the ".value" property', function (done) {
             var rep = e.apis.dashboard.Replicant('assignmentTest');
 
             // Give Zombie a chance to process socket.io events
@@ -119,7 +119,7 @@ describe('client api', function() {
             });
 
             // Give Zombie a chance to process socket.io events
-            setTimeout(function() {
+            e.browsers.dashboard.wait({duration: 100}, function() {
                 rep.value.a.b.c = 'nestedChangeOK';
 
                 e.browsers.dashboard.wait({duration: 100}, function() {
@@ -128,7 +128,7 @@ describe('client api', function() {
                         done();
                     });
                 });
-            }, 100);
+            });
         });
     });
 });
