@@ -23,6 +23,11 @@ describe('extension api', function() {
             cb();
         });
         e.apis.dashboard.sendMessage('clientToServer', done);
+
+        // Give Zombie a chance to process socket.io events
+        // What the actual fuck why is this only SOMETIMES necessary??????
+        // I'm so mad what the heck
+        e.browsers.dashboard.wait({duration: 100});
     });
 
     it('can send messages', function(done) {
