@@ -93,8 +93,8 @@ describe('extension api', function() {
             expect(rep.value).to.equal('assignmentOK');
         });
 
-        it.skip('reacts to changes in nested properties of objects', function() {
-            var rep = e.apis.dashboard.Replicant('objTest', {
+        it('reacts to changes in nested properties of objects', function(done) {
+            var rep = e.apis.extension.Replicant('objTest', {
                 defaultValue: {
                     a: {
                         b: {
@@ -103,8 +103,16 @@ describe('extension api', function() {
                     }
                 }
             });
+
             rep.value.a.b.c = 'nestedChangeOK';
-            expect(rep.value.a.b.c).to.equal('nestedChangeOK');
+
+            rep.on('change', function(oldVal, newVal, change) {
+                expect(change.type).to.equal('update');
+                expect(change.path).to.equal('a.b.c');
+                expect(change.oldValue).to.equal('c');
+                expect(change.newValue).to.equal('nestedChangeOK');
+                done();
+            });
         });
     });
 
