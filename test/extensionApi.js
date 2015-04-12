@@ -72,11 +72,8 @@ describe('extension api', function() {
             });
         });
 
-        it('can be read once without subscription, via readReplicant', function(done) {
-            e.apis.extension.readReplicant('test', function(replicant) {
-                expect(replicant.value).to.equal('foo');
-                done();
-            });
+        it('can be read once without subscription, via readReplicant', function() {
+             expect(e.apis.extension.readReplicant('test').value).to.equal('foo');
         });
 
         it('throws an error when no name is given to a synced variable', function () {
