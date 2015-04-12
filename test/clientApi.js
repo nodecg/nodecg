@@ -9,7 +9,7 @@ var e = require('./setup/test-environment');
 
 describe('client api', function() {
     before(function(done) {
-        // Drop all synced variables
+        // Drop all replicants
         e.server._resetReplicants();
 
         // Wait a bit for all clients to react
