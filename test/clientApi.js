@@ -107,6 +107,8 @@ describe('client api', function() {
             });
         });
 
+        // Skipping this test for now because for some reason changes to the value object
+        // aren't triggering the Nested.observe callback.
         it.skip('reacts to changes in nested properties of objects', function(done) {
             var rep = e.apis.dashboard.Replicant('objTest', {
                 defaultValue: {
@@ -118,14 +120,27 @@ describe('client api', function() {
                 }
             });
 
-            // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 100}, function() {
-                rep.value.a.b.c = 'nestedChangeOK';
+            rep.on('change', function(oldVal, newVal, change) {
+                expect(change.type).to.equal('update');
+                expect(change.path).to.equal('a.b.c');
+                expect(change.oldValue).to.equal('c');
+                expect(change.newValue).to.equal('nestedChangeOK');
+                done();
+            });
 
+            // This is FUCKING stupid.
+            // Wait for Socket.IO to join the bundle's room
+            e.browsers.dashboard.wait({duration: 100}, function() {
+
+                // Wait for the "declareReplicant" message to be sent
                 e.browsers.dashboard.wait({duration: 100}, function() {
-                    e.apis.dashboard.readReplicant('objTest', function(replicant) {
-                        expect(replicant.value.a.b.c).to.equal('nestedChangeOK');
-                        done();
+                    rep.value.a.b.c = 'nestedChangeOK';
+
+                    // Wait for the change to get emitted
+                    e.browsers.dashboard.wait({duration: 100}, function() {
+
+                        // Wait for the change to get received
+                        e.browsers.dashboard.wait({duration: 100});
                     });
                 });
             });
