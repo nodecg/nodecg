@@ -168,16 +168,32 @@ describe('client api', function() {
             });
         });
 
-        it('don\'t persist when "persistent" is set to "false"', function() {
+        it('don\'t persist when "persistent" is set to "false"', function(done) {
             // Remove the file if it exists for some reason
             try {
                 fs.unlinkSync('./db/replicants/test-bundle.clientTransience');
             } catch(e) {}
 
-            var rep = e.apis.extension.Replicant('clientTransience', { persistent: false });
-            rep.value = 'o no';
-            var exists = fs.existsSync('./db/replicants/test-bundle.clientTransience');
-            expect(exists).to.be.false;
+            e.apis.dashboard.Replicant('clientTransience', { defaultValue: 'o no', persistent: false });
+            e.browsers.dashboard.wait({duration: 10}, function() {
+                var exists = fs.existsSync('./db/replicants/test-bundle.clientTransience');
+                expect(exists).to.be.false;
+                done();
+            });
+        });
+
+        it.skip('redeclare after reconnecting to Socket.IO', function(done) {
+            this.timeout(30000);
+            var rep = e.apis.dashboard.Replicant('clientRedeclare', { defaultValue: 'foo', persistent: false });
+            e.browsers.dashboard.wait({duration: 10}, function() {});
+            rep.once('declared', function() {
+                e.server.once('stopped', function() {
+                    rep.once('declared', done);
+                    e.server.once('started', function() {});
+                    e.server.start();
+                });
+                e.server.stop();
+            });
         });
     });
 });

@@ -18,7 +18,7 @@ before(function(done) {
         throw new Error('SSL is enabled! Please disable SSL in cfg/nodecg.json before running tests');
     }
 
-    e.server.on('started', function() {
+    e.server.once('started', function() {
         var dashboardDone = false;
         var viewDone = false;
         function checkDone() {
