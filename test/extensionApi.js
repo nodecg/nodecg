@@ -5,6 +5,7 @@ var chai = require('chai');
 var should = chai.should();
 var expect = chai.expect;
 var request = require('request');
+var fs = require('fs');
 
 var e = require('./setup/test-environment');
 var C = require('./setup/test-constants');
@@ -62,18 +63,20 @@ describe('extension api', function() {
             e.apis.dashboard.Replicant('extensionTest', { defaultValue: 'foo', persistent: false });
 
             // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 10}, function() {
+            e.browsers.dashboard.wait({duration: 10}, function() {});
+
+            setTimeout(function() {
                 var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
                 expect(rep.value).to.equal('foo');
                 done();
-            });
+            }, 50);
         });
 
         it('can be read once without subscription, via readReplicant', function() {
              expect(e.apis.extension.readReplicant('extensionTest').value).to.equal('foo');
         });
 
-        it('throws an error when no name is given to a synced variable', function () {
+        it('throw an error when no name is given to a synced variable', function () {
             expect(function() {
                 e.apis.extension.Replicant();
             }).to.throw(/Must supply a name when instantiating a Replicant/);
@@ -85,7 +88,7 @@ describe('extension api', function() {
             expect(rep.value).to.equal('assignmentOK');
         });
 
-        it('reacts to changes in nested properties of objects', function(done) {
+        it('react to changes in nested properties of objects', function(done) {
             var rep = e.apis.extension.Replicant('extensionObjTest', {
                 persistent: false,
                 defaultValue: {
@@ -106,6 +109,46 @@ describe('extension api', function() {
                 expect(change.newValue).to.equal('nestedChangeOK');
                 done();
             });
+        });
+
+        it('load persisted values when they exist', function() {
+            // Make sure the persisted value exists
+            fs.writeFileSync('./db/replicants/test-bundle.extensionPersistence', 'it work good!');
+
+            var rep = e.apis.extension.Replicant('extensionPersistence');
+            expect(rep.value).to.equal('it work good!');
+        });
+
+        it('persist assignment to disk', function(done) {
+            var rep = e.apis.extension.Replicant('extensionPersistence');
+            rep.value = { nested: 'hey we assigned!' };
+            setTimeout(function() {
+                var persistedValue = fs.readFileSync('./db/replicants/test-bundle.extensionPersistence', 'utf-8');
+                expect(persistedValue).to.equal('{"nested":"hey we assigned!"}');
+                done();
+            }, 10);
+        });
+
+        it('persist changes to disk', function(done) {
+            var rep = e.apis.extension.Replicant('extensionPersistence');
+            rep.value.nested = 'hey we changed!';
+            setTimeout(function() {
+                var persistedValue = fs.readFileSync('./db/replicants/test-bundle.extensionPersistence', 'utf-8');
+                expect(persistedValue).to.equal('{"nested":"hey we changed!"}');
+                done();
+            }, 10);
+        });
+
+        it('don\'t persist when "persistent" is set to "false"', function() {
+            // Remove the file if it exists for some reason
+            try {
+                fs.unlinkSync('./db/replicants/test-bundle.extensionTransience');
+            } catch(e) {}
+
+            var rep = e.apis.extension.Replicant('extensionTransience', { persistent: false });
+            rep.value = 'o no';
+            var exists = fs.existsSync('./db/replicants/test-bundle.extensionTransience');
+            expect(exists).to.be.false;
         });
     });
 

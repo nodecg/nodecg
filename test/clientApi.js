@@ -4,6 +4,7 @@
 var chai = require('chai');
 var should = chai.should();
 var expect = chai.expect;
+var fs = require('fs');
 
 var e = require('./setup/test-environment');
 
@@ -63,10 +64,12 @@ describe('client api', function() {
             var rep = e.apis.dashboard.Replicant('clientTest', { defaultValue: 'bar' });
 
             // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 100}, function() {
+            e.browsers.dashboard.wait({duration: 10}, function() {});
+
+            setTimeout(function() {
                 expect(rep.value).to.equal('foo');
                 done();
-            });
+            }, 50);
         });
 
         it('can be read once without subscription, via readReplicant', function(done) {
@@ -130,6 +133,51 @@ describe('client api', function() {
                     e.browsers.dashboard.wait({duration: 10}, function() {});
                 });
             });
+        });
+
+        it('load persisted values when they exist', function(done) {
+            // Make sure the persisted value exists
+            fs.writeFileSync('./db/replicants/test-bundle.clientPersistence', 'it work good!');
+
+            var rep = e.apis.dashboard.Replicant('clientPersistence');
+            e.browsers.dashboard.wait({duration: 10}, function() {
+                expect(rep.value).to.equal('it work good!');
+                done();
+            });
+        });
+
+        it('persist assignment to disk', function(done) {
+            var rep = e.apis.dashboard.Replicant('clientPersistence');
+            rep.value = { nested: 'hey we assigned!' };
+            e.browsers.dashboard.wait({duration: 10}, function() {
+                var persistedValue = fs.readFileSync('./db/replicants/test-bundle.clientPersistence', 'utf-8');
+                expect(persistedValue).to.equal('{"nested":"hey we assigned!"}');
+                done();
+            });
+        });
+
+        // Skipping this test for now because for some reason changes to the value object
+        // aren't triggering the Nested.observe callback.
+        it.skip('persist changes to disk', function(done) {
+            var rep = e.apis.dashboard.Replicant('clientPersistence');
+            rep.value.nested = 'hey we changed!';
+            e.browsers.dashboard.wait({duration: 10}, function() {
+                var persistedValue = fs.readFileSync('./db/replicants/test-bundle.clientPersistence', 'utf-8');
+                expect(persistedValue).to.equal('{"nested":"hey we changed!"}');
+                done();
+            });
+        });
+
+        it('don\'t persist when "persistent" is set to "false"', function() {
+            // Remove the file if it exists for some reason
+            try {
+                fs.unlinkSync('./db/replicants/test-bundle.clientTransience');
+            } catch(e) {}
+
+            var rep = e.apis.extension.Replicant('clientTransience', { persistent: false });
+            rep.value = 'o no';
+            var exists = fs.existsSync('./db/replicants/test-bundle.clientTransience');
+            expect(exists).to.be.false;
         });
     });
 });
