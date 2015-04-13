@@ -10,14 +10,6 @@ var e = require('./setup/test-environment');
 var C = require('./setup/test-constants');
 
 describe('extension api', function() {
-    before(function(done) {
-        // Drop all replicants
-        e.server._resetReplicants();
-
-        // Wait a bit for all clients to react
-        setTimeout(done, 1750);
-    });
-
     it('can receive messages and fire acknowledgements', function(done) {
         e.apis.extension.listenFor('clientToServer', function (data, cb) {
             cb();
@@ -67,18 +59,18 @@ describe('extension api', function() {
 
     describe('replicants', function() {
         it('only apply defaultValue when first declared', function(done) {
-            e.apis.dashboard.Replicant('test', { defaultValue: 'foo' });
+            e.apis.dashboard.Replicant('extensionTest', { defaultValue: 'foo', persistent: false });
 
             // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 100}, function() {
-                var rep = e.apis.extension.Replicant('test', { defaultValue: 'bar' });
+            e.browsers.dashboard.wait({duration: 10}, function() {
+                var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
                 expect(rep.value).to.equal('foo');
                 done();
             });
         });
 
         it('can be read once without subscription, via readReplicant', function() {
-             expect(e.apis.extension.readReplicant('test').value).to.equal('foo');
+             expect(e.apis.extension.readReplicant('extensionTest').value).to.equal('foo');
         });
 
         it('throws an error when no name is given to a synced variable', function () {
@@ -88,13 +80,14 @@ describe('extension api', function() {
         });
 
         it('can be assigned via the ".value" property', function () {
-            var rep = e.apis.extension.Replicant('assignmentTest');
+            var rep = e.apis.extension.Replicant('extensionAssignmentTest', { persistent: false });
             rep.value = 'assignmentOK';
             expect(rep.value).to.equal('assignmentOK');
         });
 
         it('reacts to changes in nested properties of objects', function(done) {
-            var rep = e.apis.extension.Replicant('objTest', {
+            var rep = e.apis.extension.Replicant('extensionObjTest', {
+                persistent: false,
                 defaultValue: {
                     a: {
                         b: {

@@ -8,14 +8,6 @@ var expect = chai.expect;
 var e = require('./setup/test-environment');
 
 describe('client api', function() {
-    before(function(done) {
-        // Drop all replicants
-        e.server._resetReplicants();
-
-        // Wait a bit for all clients to react
-        setTimeout(done, 1750);
-    });
-
     describe('dashboard api', function() {
         // Check for basic connectivity. The rest of the test are run from the dashboard as well.
         it('can receive messages', function(done) {
@@ -67,8 +59,8 @@ describe('client api', function() {
 
     describe('replicants', function() {
         it('only apply defaultValue when first declared', function(done) {
-            e.apis.extension.Replicant('test', { defaultValue: 'foo' });
-            var rep = e.apis.dashboard.Replicant('test', { defaultValue: 'bar' });
+            e.apis.extension.Replicant('clientTest', { defaultValue: 'foo', persistent: false });
+            var rep = e.apis.dashboard.Replicant('clientTest', { defaultValue: 'bar' });
 
             // Give Zombie a chance to process socket.io events
             e.browsers.dashboard.wait({duration: 100}, function() {
@@ -78,7 +70,7 @@ describe('client api', function() {
         });
 
         it('can be read once without subscription, via readReplicant', function(done) {
-            e.apis.dashboard.readReplicant('test', function(replicant) {
+            e.apis.dashboard.readReplicant('clientTest', function(replicant) {
                 expect(replicant.value).to.equal('foo');
                 done();
             });
@@ -91,26 +83,28 @@ describe('client api', function() {
         });
 
         it('can be assigned via the ".value" property', function (done) {
-            var rep = e.apis.dashboard.Replicant('assignmentTest');
+            var rep = e.apis.dashboard.Replicant('clientAssignmentTest', { persistent: false });
+            rep.on('assignmentAccepted', function(data) {
+                expect(data.value).to.equal('assignmentOK');
+                expect(data.revision).to.equal(1);
+                done();
+            });
+            rep.value = 'assignmentOK';
 
-            // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 100}, function() {
-                rep.value = 'assignmentOK';
-
-                // Give Zombie a chance to process socket.io events
-                e.browsers.dashboard.wait({duration: 100}, function() {
-                    e.apis.dashboard.readReplicant('assignmentTest', function(replicant) {
-                        expect(replicant.value).to.equal('assignmentOK');
-                        done();
-                    });
-                });
+            // Give Zombie a chance to process socket.io events.
+            // I don't know why I have to micromanage the event loop like this.
+            // This is dumb.
+            // I am mad.
+            e.browsers.dashboard.wait({duration: 10}, function() {
+                e.browsers.dashboard.wait({duration: 10}, function() {});
             });
         });
 
         // Skipping this test for now because for some reason changes to the value object
         // aren't triggering the Nested.observe callback.
         it.skip('reacts to changes in nested properties of objects', function(done) {
-            var rep = e.apis.dashboard.Replicant('objTest', {
+            var rep = e.apis.dashboard.Replicant('clientObjTest', {
+                persistent: false,
                 defaultValue: {
                     a: {
                         b: {
@@ -129,19 +123,11 @@ describe('client api', function() {
             });
 
             // This is FUCKING stupid.
-            // Wait for Socket.IO to join the bundle's room
-            e.browsers.dashboard.wait({duration: 100}, function() {
+            e.browsers.dashboard.wait({duration: 10}, function() {
+                rep.value.a.b.c = 'nestedChangeOK';
 
-                // Wait for the "declareReplicant" message to be sent
-                e.browsers.dashboard.wait({duration: 100}, function() {
-                    rep.value.a.b.c = 'nestedChangeOK';
-
-                    // Wait for the change to get emitted
-                    e.browsers.dashboard.wait({duration: 100}, function() {
-
-                        // Wait for the change to get received
-                        e.browsers.dashboard.wait({duration: 100});
-                    });
+                e.browsers.dashboard.wait({duration: 10}, function() {
+                    e.browsers.dashboard.wait({duration: 10}, function() {});
                 });
             });
         });
