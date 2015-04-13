@@ -99,9 +99,6 @@ describe('extension api', function() {
                     }
                 }
             });
-
-            rep.value.a.b.c = 'nestedChangeOK';
-
             rep.on('change', function(oldVal, newVal, change) {
                 expect(change.type).to.equal('update');
                 expect(change.path).to.equal('a.b.c');
@@ -109,6 +106,23 @@ describe('extension api', function() {
                 expect(change.newValue).to.equal('nestedChangeOK');
                 done();
             });
+            rep.value.a.b.c = 'nestedChangeOK';
+        });
+
+        it.only('react to changes in arrays', function(done) {
+            var rep = e.apis.extension.Replicant('extensionArrTest', {
+                persistent: false,
+                defaultValue: []
+            });
+            rep.on('change', function(oldVal, newVal, change) {
+                expect(change.type).to.equal('splice');
+                expect(change.removed).to.deep.equal([]);
+                expect(change.removedCount).to.equal(0);
+                expect(change.added).to.deep.equal(['arrPushOK']);
+                expect(change.addedCount).to.equal(1);
+                done();
+            });
+            rep.value.push('arrPushOK');
         });
 
         it('load persisted values when they exist', function() {
@@ -149,6 +163,19 @@ describe('extension api', function() {
             rep.value = 'o no';
             var exists = fs.existsSync('./db/replicants/test-bundle.extensionTransience');
             expect(exists).to.be.false;
+        });
+
+        it('gets a fullUpdate when there is a revision mismatch', function(done) {
+            var rep = e.apis.extension.Replicant('extensionRevision', {
+                defaultValue: {
+                    foo: 'bar'
+                },
+                persistent: false });
+            rep.on('fullUpdate', function() {
+                done();
+            });
+            rep.revision = -10;
+            rep.value.foo = 'baz';
         });
     });
 
