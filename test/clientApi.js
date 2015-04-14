@@ -117,7 +117,7 @@ describe('client api', function() {
                 }
             });
 
-            rep.on('change', function(oldVal, newVal, change) {
+            rep.on('change', function(newVal, change) {
                 expect(change.type).to.equal('update');
                 expect(change.path).to.equal('a.b.c');
                 expect(change.oldValue).to.equal('c');

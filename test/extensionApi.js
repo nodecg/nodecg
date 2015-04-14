@@ -99,7 +99,7 @@ describe('extension api', function() {
                     }
                 }
             });
-            rep.on('change', function(oldVal, newVal, change) {
+            rep.on('change', function(newVal, change) {
                 expect(change.type).to.equal('update');
                 expect(change.path).to.equal('a.b.c');
                 expect(change.oldValue).to.equal('c');
@@ -109,12 +109,13 @@ describe('extension api', function() {
             rep.value.a.b.c = 'nestedChangeOK';
         });
 
-        it.only('react to changes in arrays', function(done) {
+        it('react to changes in arrays', function(done) {
             var rep = e.apis.extension.Replicant('extensionArrTest', {
                 persistent: false,
-                defaultValue: []
+                defaultValue: ['starting']
             });
-            rep.on('change', function(oldVal, newVal, change) {
+            rep.on('change', function(newVal, change) {
+                expect(newVal).to.deep.equal(['starting', 'arrPushOK']);
                 expect(change.type).to.equal('splice');
                 expect(change.removed).to.deep.equal([]);
                 expect(change.removedCount).to.equal(0);
