@@ -18,7 +18,7 @@ before(function(done) {
         throw new Error('SSL is enabled! Please disable SSL in cfg/nodecg.json before running tests');
     }
 
-    e.server.on('started', function() {
+    e.server.once('started', function() {
         var dashboardDone = false;
         var viewDone = false;
         function checkDone() {
@@ -40,6 +40,9 @@ before(function(done) {
             .then(function() {
                 e.browsers.dashboard.wait(dashboardApiLoaded, function () {
                     e.apis.dashboard = e.browsers.dashboard.window.dashboardApi;
+                    if (typeof e.apis.dashboard === 'undefined') {
+                        throw new Error('Dashboard API is undefined!');
+                    }
                     dashboardDone = true;
                     checkDone();
                 });
