@@ -73,7 +73,7 @@ describe('extension api', function() {
         });
 
         it('can be read once without subscription, via readReplicant', function() {
-             expect(e.apis.extension.readReplicant('extensionTest').value).to.equal('foo');
+             expect(e.apis.extension.readReplicant('extensionTest')).to.equal('foo');
         });
 
         it('throw an error when no name is given to a synced variable', function () {

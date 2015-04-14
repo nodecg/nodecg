@@ -73,8 +73,8 @@ describe('client api', function() {
         });
 
         it('can be read once without subscription, via readReplicant', function(done) {
-            e.apis.dashboard.readReplicant('clientTest', function(replicant) {
-                expect(replicant.value).to.equal('foo');
+            e.apis.dashboard.readReplicant('clientTest', function(value) {
+                expect(value).to.equal('foo');
                 done();
             });
         });
