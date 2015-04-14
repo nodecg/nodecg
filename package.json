@@ -45,6 +45,7 @@
     "semver": "^4.3.3",
     "socket.io": "^1.2.1",
     "string.prototype.endswith": "^0.2.0",
+    "uuid": "^2.0.1",
     "winston": "^1.0.0"
   },
   "scripts": {
