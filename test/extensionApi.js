@@ -99,11 +99,14 @@ describe('extension api', function() {
                     }
                 }
             });
-            rep.on('change', function(newVal, change) {
-                expect(change.type).to.equal('update');
-                expect(change.path).to.equal('a.b.c');
-                expect(change.oldValue).to.equal('c');
-                expect(change.newValue).to.equal('nestedChangeOK');
+            rep.on('change', function(oldVal, newVal, changes) {
+                expect(oldVal).to.deep.equal({a: {b: {c: 'c'}}});
+                expect(newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
+                expect(changes).to.have.length(1);
+                expect(changes[0].type).to.equal('update');
+                expect(changes[0].path).to.equal('a.b.c');
+                expect(changes[0].oldValue).to.equal('c');
+                expect(changes[0].newValue).to.equal('nestedChangeOK');
                 done();
             });
             rep.value.a.b.c = 'nestedChangeOK';
@@ -114,13 +117,15 @@ describe('extension api', function() {
                 persistent: false,
                 defaultValue: ['starting']
             });
-            rep.on('change', function(newVal, change) {
+            rep.on('change', function(oldVal, newVal, changes) {
+                expect(oldVal).to.deep.equal(['starting']);
                 expect(newVal).to.deep.equal(['starting', 'arrPushOK']);
-                expect(change.type).to.equal('splice');
-                expect(change.removed).to.deep.equal([]);
-                expect(change.removedCount).to.equal(0);
-                expect(change.added).to.deep.equal(['arrPushOK']);
-                expect(change.addedCount).to.equal(1);
+                expect(changes).to.have.length(1);
+                expect(changes[0].type).to.equal('splice');
+                expect(changes[0].removed).to.deep.equal([]);
+                expect(changes[0].removedCount).to.equal(0);
+                expect(changes[0].added).to.deep.equal(['arrPushOK']);
+                expect(changes[0].addedCount).to.equal(1);
                 done();
             });
             rep.value.push('arrPushOK');
