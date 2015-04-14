@@ -116,14 +116,14 @@ html(lang="en")
         each bundle in bundles
             //- only add the tag if there is a script, empty tags can cause long timeout delays
             if bundle.dashboard.js
+                - var bundleNoAssets = JSON.parse(JSON.stringify(bundle));
+                - delete bundleNoAssets.dashboard;
                 script(type='text/javascript').
                     try {
                         (function (nodecg) {
                             var $bundle = $('.dashboard-panels .#{ bundle.name }');
                             !{ bundle.dashboard.js.join('') }
-                        //- TODO: make this not waste a fuckton of RAM
-                        //- The entire bundle object is being stringified, meaning all the raw CSS, JS, and HTML for it
-                        })(new NodeCG(!{JSON.stringify(bundle)}, window.socket));
+                        })(new NodeCG(!{ JSON.stringify(bundleNoAssets) }, window.socket));
                     } catch (err) {
                         console.error("[NODECG] Panel for bundle #{ bundle.name } threw error:", err.stack);
                     }
