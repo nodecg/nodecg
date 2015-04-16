@@ -49,6 +49,8 @@
     "winston": "^1.0.0"
   },
   "scripts": {
+    "build-css": "lessc ./lib/dashboard/src/dashboard.less > ./lib/dashboard/public/dashboard.css",
+    "build": "npm run build-css",
     "start": "node index.js",
     "postinstall": "bower install",
     "pretest": "node test/setup/pretest",

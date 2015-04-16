@@ -1,0 +1,141 @@
+body {
+  padding-top: 50px;
+}
+textarea {
+  max-width: 100%;
+}
+@media (min-width: 768px) {
+  .container {
+    width: 638px;
+  }
+}
+@media (min-width: 992px) {
+  .container {
+    width: 926px;
+  }
+}
+@media (min-width: 1200px) {
+  .container {
+    width: 1214px;
+  }
+}
+.dashboard-panels {
+  padding: 0 16px 32px 16px;
+}
+.panel-title {
+  display: inline-block;
+}
+.panel-heading .fa {
+  float: right;
+  font-size: 21px;
+}
+.panel-heading .popover {
+  left: auto!important;
+  right: 0;
+  /* bootstrap really wants to add a left value for whatever reason */
+  margin-left: 8px!important;
+  margin-right: 8px!important;
+}
+.panel-heading .popover .arrow {
+  left: auto;
+  right: 31px;
+}
+.panel-heading .popover-content {
+  overflow-wrap: break-word;
+}
+.panel-icon {
+  width: 20px;
+  text-align: center;
+}
+.panel-info {
+  width: auto!important;
+  height: 21px!important;
+  float: right;
+  margin-right: 4px;
+}
+.panel-info .fa {
+  font-size: 16px;
+  margin-top: -1px;
+}
+.ncg-btn-group .btn-group.btn-group-justified {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+.ncg-btn-group .btn-group.btn-group-justified:first-child {
+  padding-top: 0;
+}
+.ncg-btn-group .btn-group.btn-group-justified:last-child {
+  padding-bottom: 0;
+}
+.ncg-btn-group .btn-group.btn-group-justified .btn-group {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+.ncg-btn-group .btn-group.btn-group-justified .btn-group:first-child {
+  padding-left: 0;
+}
+.ncg-btn-group .btn-group.btn-group-justified .btn-group:last-child {
+  padding-right: 0;
+}
+.ncg-btn-group .btn-group.btn-group-justified.no-padding .btn-group {
+  padding-left: 0;
+  padding-right: 0;
+}
+.ncg-btn-group.no-padding .btn-group.btn-group-justified {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.ncg-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #959595;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+.panel-span-1 {
+  width: 128px;
+}
+.panel-span-2 {
+  width: 272px;
+}
+.panel-span-3 {
+  width: 416px;
+}
+.panel-span-4 {
+  width: 560px;
+}
+.panel-span-5 {
+  width: 704px;
+}
+.panel-span-6 {
+  width: 848px;
+}
+.panel-span-7 {
+  width: 992px;
+}
+.panel-span-8 {
+  width: 1136px;
+}
+.btn-file {
+  position: relative;
+  overflow: hidden;
+}
+.btn-file input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  outline: none;
+  background: white;
+  cursor: inherit;
+  display: block;
+}
+#socketStatus .alert {
+  margin-bottom: 6px;
+}
