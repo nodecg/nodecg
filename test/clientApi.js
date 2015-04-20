@@ -8,6 +8,8 @@ var fs = require('fs');
 var e = require('./setup/test-environment');
 
 describe('client api', function() {
+    this.timeout(10000);
+
     describe('dashboard api', function() {
         // Check for basic connectivity. The rest of the test are run from the dashboard as well.
         it('can receive messages', function(done) {

@@ -11,6 +11,8 @@ var C = require('./setup/test-constants');
 
 describe('extension api', function() {
     it('can receive messages and fire acknowledgements', function(done) {
+        this.timeout(10000);
+
         e.apis.extension.listenFor('clientToServer', done);
 
         e.browser.client
@@ -25,6 +27,8 @@ describe('extension api', function() {
     });
 
     it('can send messages', function(done) {
+        this.timeout(10000);
+
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
             .executeAsync(function(done) {
@@ -71,6 +75,8 @@ describe('extension api', function() {
 
     describe('replicants', function() {
         it('only apply defaultValue when first declared', function(done) {
+            this.timeout(10000);
+
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {

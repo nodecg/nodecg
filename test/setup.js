@@ -34,6 +34,7 @@ before(function(done) {
             key: process.env.SAUCE_ACCESS_KEY
         })
             .init()
+            .timeoutsAsyncScript(10000)
             .newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
             .getCurrentTabId(function(err, tabId) {
                 if (err) {
@@ -42,6 +43,19 @@ before(function(done) {
 
                 e.browser.tabs.dashboard = tabId;
             })
+            .executeAsync(function(done) {
+                var checkForApi;
+                checkForApi = setInterval(function(done) {
+                    if (typeof window.dashboardApi !== 'undefined') {
+                        clearInterval(checkForApi);
+                        done();
+                    }
+                }, 50);
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+            })
             .newWindow(C.VIEW_URL, 'NodeCG test bundle view', '')
             .getCurrentTabId(function(err, tabId) {
                 if (err) {
@@ -49,6 +63,19 @@ before(function(done) {
                 }
 
                 e.browser.tabs.view = tabId;
+            })
+            .executeAsync(function(done) {
+                var checkForApi;
+                checkForApi = setInterval(function(done) {
+                    if (typeof window.viewApi !== 'undefined') {
+                        clearInterval(checkForApi);
+                        done();
+                    }
+                }, 50);
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
             })
             .timeoutsAsyncScript(5000)
             .call(done);

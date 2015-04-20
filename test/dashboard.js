@@ -8,6 +8,8 @@ var expect = chai.expect;
 var e = require('./setup/test-environment');
 
 describe('dashboard', function() {
+    this.timeout(10000);
+
     describe('html panels', function() {
         it('show up on the dashboard', function(done) {
             e.browser.client
