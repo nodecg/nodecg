@@ -22,9 +22,6 @@ before(function(done) {
         /** Extension API setup **/
         e.apis.extension = e.server.getExtensions()[C.BUNDLE_NAME];
 
-        var dashboardReady = false;
-        var viewReady = false;
-
         e.browser.client = webdriverio.remote({
             desiredCapabilities: {
                 tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
@@ -58,8 +55,6 @@ before(function(done) {
 });
 
 after(function() {
-    try{
-        e.server.stop();
-        e.browser.client.end();
-    } catch(e) {}
+    e.server.stop();
+    e.browser.client.end();
 });

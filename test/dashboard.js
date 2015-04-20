@@ -13,6 +13,10 @@ describe('dashboard', function() {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .isExisting('.test-bundle.html', function(err, isExisting) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(isExisting).to.be.true;
                 })
                 .call(done);
@@ -24,6 +28,10 @@ describe('dashboard', function() {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .isExisting('.test-bundle.jade', function(err, isExisting) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(isExisting).to.be.true;
                 })
                 .call(done);
@@ -33,6 +41,10 @@ describe('dashboard', function() {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .getText('.test-bundle.jade .js-bundleConfig', function(err, text) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(text).to.equal('the_test_string');
                 })
                 .call(done);
@@ -42,6 +54,10 @@ describe('dashboard', function() {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .getText('.test-bundle.jade .js-bundleName', function(err, text) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(text).to.equal('test-bundle');
                 })
                 .call(done);
@@ -51,6 +67,10 @@ describe('dashboard', function() {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .getText('.test-bundle.jade .js-ncgConfig', function(err, text) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(text).to.equal(config.host);
                 })
                 .call(done);

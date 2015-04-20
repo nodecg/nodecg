@@ -149,19 +149,28 @@ describe('extension api', function() {
 
         it('load persisted values when they exist', function() {
             // Make sure the persisted value exists
-            fs.writeFileSync('./db/replicants/test-bundle.extensionPersistence', 'it work good!');
+            fs.writeFile('./db/replicants/test-bundle.extensionPersistence', 'it work good!', function(err) {
+                if (err) {
+                    throw err;
+                }
 
-            var rep = e.apis.extension.Replicant('extensionPersistence');
-            expect(rep.value).to.equal('it work good!');
+                var rep = e.apis.extension.Replicant('extensionPersistence');
+                expect(rep.value).to.equal('it work good!');
+            });
         });
 
         it('persist assignment to disk', function(done) {
             var rep = e.apis.extension.Replicant('extensionPersistence');
             rep.value = { nested: 'hey we assigned!' };
             setTimeout(function() {
-                var persistedValue = fs.readFileSync('./db/replicants/test-bundle.extensionPersistence', 'utf-8');
-                expect(persistedValue).to.equal('{"nested":"hey we assigned!"}');
-                done();
+                fs.readFile('./db/replicants/test-bundle.extensionPersistence', 'utf-8', function(err, data) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(data).to.equal('{"nested":"hey we assigned!"}');
+                    done();
+                });
             }, 10);
         });
 
@@ -169,22 +178,34 @@ describe('extension api', function() {
             var rep = e.apis.extension.Replicant('extensionPersistence');
             rep.value.nested = 'hey we changed!';
             setTimeout(function() {
-                var persistedValue = fs.readFileSync('./db/replicants/test-bundle.extensionPersistence', 'utf-8');
-                expect(persistedValue).to.equal('{"nested":"hey we changed!"}');
-                done();
+                fs.readFile('./db/replicants/test-bundle.extensionPersistence', 'utf-8', function(err, data) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(data).to.equal('{"nested":"hey we changed!"}');
+                    done();
+                });
             }, 10);
         });
 
         it('don\'t persist when "persistent" is set to "false"', function() {
             // Remove the file if it exists for some reason
-            try {
-                fs.unlinkSync('./db/replicants/test-bundle.extensionTransience');
-            } catch(e) {}
+            fs.unlink('./db/replicants/test-bundle.extensionTransience', function(err) {
+                if (err && err.code !== 'ENOENT') {
+                    throw err;
+                }
 
-            var rep = e.apis.extension.Replicant('extensionTransience', { persistent: false });
-            rep.value = 'o no';
-            var exists = fs.existsSync('./db/replicants/test-bundle.extensionTransience');
-            expect(exists).to.be.false;
+                var rep = e.apis.extension.Replicant('extensionTransience', { persistent: false });
+                rep.value = 'o no';
+                fs.readFile('./db/replicants/test-bundle.extensionTransience', function(err) {
+                    expect(function() {
+                        if (err) {
+                            throw err;
+                        }
+                    }).to.throw(/ENOENT/);
+                });
+            });
         });
 
         it('gets a fullUpdate when there is a revision mismatch', function(done) {

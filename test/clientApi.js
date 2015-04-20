@@ -244,7 +244,7 @@ describe('client api', function() {
                             oldVal: oldVal,
                             newVal: newVal,
                             changes: changes
-                        })
+                        });
                     });
                 }, function(err, data) {
                     if (err) {
@@ -264,24 +264,28 @@ describe('client api', function() {
 
         it('load persisted values when they exist', function(done) {
             // Make sure the persisted value exists
-            fs.writeFileSync('./db/replicants/test-bundle.clientPersistence', 'it work good!');
+            fs.writeFile('./db/replicants/test-bundle.clientPersistence', 'it work good!', function(err) {
+                if (err) {
+                    throw err;
+                }
 
-            e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
-                .executeAsync(function(done) {
-                    var rep = window.dashboardApi.Replicant('clientPersistence');
+                e.browser.client
+                    .switchTab(e.browser.tabs.dashboard)
+                    .executeAsync(function(done) {
+                        var rep = window.dashboardApi.Replicant('clientPersistence');
 
-                    rep.on('declared', function() {
-                        done(rep.value);
-                    });
-                }, function(err, replicantValue) {
-                    if (err) {
-                        throw err;
-                    }
+                        rep.on('declared', function() {
+                            done(rep.value);
+                        });
+                    }, function(err, replicantValue) {
+                        if (err) {
+                            throw err;
+                        }
 
-                    expect(replicantValue).to.equal('it work good!');
-                })
-                .call(done);
+                        expect(replicantValue).to.equal('it work good!');
+                    })
+                    .call(done);
+            });
         });
 
         it('persist assignment to disk', function(done) {
@@ -299,10 +303,15 @@ describe('client api', function() {
                         throw err;
                     }
 
-                    var persistedValue = fs.readFileSync('./db/replicants/test-bundle.clientPersistence', 'utf-8');
-                    expect(persistedValue).to.equal('{"nested":"hey we assigned!"}');
-                })
-                .call(done);
+                    fs.readFile('./db/replicants/test-bundle.clientPersistence', 'utf-8', function(err, data) {
+                        if (err) {
+                            throw err;
+                        }
+
+                        expect(data).to.equal('{"nested":"hey we assigned!"}');
+                        done();
+                    });
+                });
         });
 
         // Skipping this test for now because for some reason changes to the value object
@@ -322,35 +331,46 @@ describe('client api', function() {
                         throw err;
                     }
 
-                    var persistedValue = fs.readFileSync('./db/replicants/test-bundle.clientPersistence', 'utf-8');
-                    expect(persistedValue).to.equal('{"nested":"hey we changed!"}');
-                })
-                .call(done);
+                    fs.readFile('./db/replicants/test-bundle.clientPersistence', 'utf-8', function(err, data) {
+                        if (err) {
+                            throw err;
+                        }
+
+                        expect(data).to.equal('{"nested":"hey we changed!"}');
+                        done();
+                    });
+                });
         });
 
         it('don\'t persist when "persistent" is set to "false"', function(done) {
-            // Remove the file if it exists for some reason
-            try {
-                fs.unlinkSync('./db/replicants/test-bundle.clientTransience');
-            } catch(e) {}
+            fs.unlink('./db/replicants/test-bundle.clientTransience', function(err) {
+                if (err && err.code !== 'ENOENT') {
+                    throw err;
+                }
 
-            e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
-                .executeAsync(function(done) {
-                    window.dashboardApi.Replicant('clientTransience', { defaultValue: 'o no', persistent: false });
+                e.browser.client
+                    .switchTab(e.browser.tabs.dashboard)
+                    .executeAsync(function(done) {
+                        var rep = window.dashboardApi.Replicant('clientTransience', { defaultValue: 'o no', persistent: false });
 
-                    rep.on('declared', function() {
-                        done();
-                    });
-                }, function(err) {
-                    if (err) {
-                        throw err;
-                    }
+                        rep.on('declared', function() {
+                            done();
+                        });
+                    }, function(err) {
+                        if (err) {
+                            throw err;
+                        }
 
-                    var exists = fs.existsSync('./db/replicants/test-bundle.clientTransience');
-                    expect(exists).to.be.false;
-                })
-                .call(done);
+                        fs.readFile('./db/replicants/test-bundle.clientTransience', function(err) {
+                            expect(function() {
+                                if (err) {
+                                    throw err;
+                                }
+                            }).to.throw(/ENOENT/);
+                        });
+                    })
+                    .call(done);
+            });
         });
 
         it('redeclare after reconnecting to Socket.IO', function(done) {
@@ -375,7 +395,7 @@ describe('client api', function() {
                             .executeAsync(function(done) {
                                 window.clientRedeclare.once('declared', function() {
                                     done();
-                                })
+                                });
                             }, function(err) {
                                 if (err) {
                                     throw err;
@@ -383,7 +403,6 @@ describe('client api', function() {
                             })
                             .call(done);
 
-                        e.server.once('started', function() {});
                         e.server.start();
                     });
 
