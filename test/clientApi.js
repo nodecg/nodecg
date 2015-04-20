@@ -204,7 +204,7 @@ describe('client api', function() {
 
         // Skipping this test for now because for some reason changes to the value object
         // aren't triggering the Nested.observe callback.
-        it.skip('reacts to changes in nested properties of objects', function(done) {
+        it('reacts to changes in nested properties of objects', function(done) {
             e.browsers.dashboard
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientObjTest', {
@@ -284,7 +284,7 @@ describe('client api', function() {
 
         // Skipping this test for now because for some reason changes to the value object
         // aren't triggering the Nested.observe callback.
-        it.skip('persist changes to disk', function(done) {
+        it('persist changes to disk', function(done) {
             e.browsers.dashboard
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
@@ -328,18 +328,41 @@ describe('client api', function() {
                 });
         });
 
-        it.skip('redeclare after reconnecting to Socket.IO', function(done) {
+        it('redeclare after reconnecting to Socket.IO', function(done) {
             this.timeout(30000);
-            var rep = window.dashboardApi.Replicant('clientRedeclare', { defaultValue: 'foo', persistent: false });
-            e.browsers.dashboard.wait({duration: 10}, function() {});
-            rep.once('declared', function() {
-                e.server.once('stopped', function() {
-                    rep.once('declared', done);
-                    e.server.once('started', function() {});
-                    e.server.start();
+
+            e.browsers.dashboard
+                .executeAsync(function(done) {
+                    window.clientRedeclare = window.dashboardApi.Replicant('clientRedeclare', { defaultValue: 'foo', persistent: false });
+
+                    window.clientRedeclare.once('declared', function() {
+                        done();
+                    });
+                }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    e.server.once('stopped', function() {
+                        e.browsers.dashboard
+                            .executeAsync(function(done) {
+                                window.clientRedeclare.once('declared', function() {
+                                    done();
+                                })
+                            }, function(err) {
+                                if (err) {
+                                    throw err;
+                                }
+
+                                done();
+                            });
+
+                        e.server.once('started', function() {});
+                        e.server.start();
+                    });
+
+                    e.server.stop();
                 });
-                e.server.stop();
-            });
         });
     });
 });
