@@ -10,10 +10,12 @@ var e = require('./setup/test-environment');
 describe('client api', function() {
     describe('dashboard api', function() {
         // Check for basic connectivity. The rest of the test are run from the dashboard as well.
-        it.skip('can receive messages', function(done) {
+        it('can receive messages', function(done) {
             e.browsers.dashboard.executeAsync(function(done) {
                 window.dashboardApi.listenFor('serverToDashboard', done);
-            }, done);
+            }, function() {
+                done();
+            });
             e.apis.extension.sendMessage('serverToDashboard');
         });
 
@@ -28,10 +30,12 @@ describe('client api', function() {
     describe('view api', function() {
         // The view and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
-        it.skip('can receive messages', function(done) {
+        it('can receive messages', function(done) {
             e.browsers.view.executeAsync(function(done) {
                 window.viewApi.listenFor('serverToView', done);
-            }, done);
+            }, function() {
+                done();
+            });
             e.apis.extension.sendMessage('serverToView');
         });
 
@@ -99,7 +103,7 @@ describe('client api', function() {
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientTest', { defaultValue: 'bar' });
 
-                    rep.on('change', function() {
+                    rep.on('declared', function() {
                         done(rep.value);
                     });
                 }, function(err, replicantValue) {
