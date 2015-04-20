@@ -10,17 +10,17 @@ var e = require('./setup/test-environment');
 describe('client api', function() {
     describe('dashboard api', function() {
         // Check for basic connectivity. The rest of the test are run from the dashboard as well.
-        it('can receive messages', function(done) {
+        it.skip('can receive messages', function(done) {
             e.browsers.dashboard.executeAsync(function(done) {
-                window.dashboardApi.listenFor('dashboardToServer', done);
+                window.dashboardApi.listenFor('serverToDashboard', done);
             }, done);
-            e.apis.extension.sendMessage('dashboardToServer');
+            e.apis.extension.sendMessage('serverToDashboard');
         });
 
         it('can send messages', function(done) {
-            e.apis.extension.listenFor('serverToDashboard', done);
+            e.apis.extension.listenFor('dashboardToServer', done);
             e.browsers.dashboard.execute(function() {
-                window.dashboardApi.sendMessage('serverToDashboard');
+                window.dashboardApi.sendMessage('dashboardToServer');
             });
         });
     });
@@ -28,17 +28,17 @@ describe('client api', function() {
     describe('view api', function() {
         // The view and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
-        it('can receive messages', function(done) {
+        it.skip('can receive messages', function(done) {
             e.browsers.view.executeAsync(function(done) {
-                window.viewApi.listenFor('viewToServer', done);
+                window.viewApi.listenFor('serverToView', done);
             }, done);
-            e.apis.extension.sendMessage('viewToServer');
+            e.apis.extension.sendMessage('serverToView');
         });
 
         it('can send messages', function(done) {
-            e.apis.extension.listenFor('serverToView', done);
+            e.apis.extension.listenFor('viewToServer', done);
             e.browsers.view.execute(function() {
-                window.viewApi.sendMessage('serverToView');
+                window.viewApi.sendMessage('viewToServer');
             });
         });
     });
