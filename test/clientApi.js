@@ -197,7 +197,7 @@ describe('client api', function() {
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
 
-                    rep.on('change', function() {
+                    rep.on('declared', function() {
                         done(rep.value);
                     });
                 }, function(err, replicantValue) {

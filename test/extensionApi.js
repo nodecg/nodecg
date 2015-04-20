@@ -11,8 +11,8 @@ var C = require('./setup/test-constants');
 
 describe('extension api', function() {
     it('can receive messages and fire acknowledgements', function(done) {
-        e.apis.extension.listenFor('clientToServer', function (data, cb) {
-            cb();
+        e.apis.extension.listenFor('clientToServer', function() {
+            done();
         });
         e.browsers.dashboard.execute(function() {
             window.dashboardApi.sendMessage('clientToServer');
@@ -22,7 +22,9 @@ describe('extension api', function() {
     it('can send messages', function(done) {
         e.browsers.dashboard.executeAsync(function(done) {
             window.dashboardApi.listenFor('serverToClient', done);
-        }, done);
+        }, function() {
+            done();
+        });
         e.apis.extension.sendMessage('serverToClient');
     });
 
