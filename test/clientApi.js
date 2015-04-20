@@ -217,7 +217,7 @@ describe('client api', function() {
                     }
 
                     expect(data.value).to.equal('assignmentOK');
-                    expect(data.revision).to.equal(1
+                    expect(data.revision).to.equal(1);
                 })
                 .call(done);
         });
