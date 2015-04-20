@@ -51,6 +51,7 @@ before(function(done) {
 
                 e.browser.tabs.view = tabId;
             })
+            .timeoutsAsyncScript(5000)
             .call(done);
     });
     e.server.start();
