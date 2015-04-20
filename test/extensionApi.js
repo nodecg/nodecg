@@ -16,13 +16,21 @@ describe('extension api', function() {
         });
         e.browsers.dashboard.execute(function() {
             window.dashboardApi.sendMessage('clientToServer');
+        }, function(err) {
+            if (err) {
+                throw err;
+            }
         });
     });
 
     it('can send messages', function(done) {
         e.browsers.dashboard.executeAsync(function(done) {
             window.dashboardApi.listenFor('serverToClient', done);
-        }, function() {
+        }, function(err) {
+            if (err) {
+                throw err;
+            }
+
             done();
         });
         e.apis.extension.sendMessage('serverToClient');
@@ -67,7 +75,11 @@ describe('extension api', function() {
                     rep.on('declared', function() {
                         done();
                     });
-                }, function() {
+                }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+
                     var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
                     expect(rep.value).to.equal('foo');
                     done();

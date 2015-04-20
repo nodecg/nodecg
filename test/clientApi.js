@@ -13,7 +13,11 @@ describe('client api', function() {
         it('can receive messages', function(done) {
             e.browsers.dashboard.executeAsync(function(done) {
                 window.dashboardApi.listenFor('serverToDashboard', done);
-            }, function() {
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+
                 done();
             });
             e.apis.extension.sendMessage('serverToDashboard');
@@ -23,6 +27,10 @@ describe('client api', function() {
             e.apis.extension.listenFor('dashboardToServer', done);
             e.browsers.dashboard.execute(function() {
                 window.dashboardApi.sendMessage('dashboardToServer');
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
             });
         });
     });
@@ -33,7 +41,11 @@ describe('client api', function() {
         it('can receive messages', function(done) {
             e.browsers.view.executeAsync(function(done) {
                 window.viewApi.listenFor('serverToView', done);
-            }, function() {
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+
                 done();
             });
             e.apis.extension.sendMessage('serverToView');
@@ -43,6 +55,10 @@ describe('client api', function() {
             e.apis.extension.listenFor('viewToServer', done);
             e.browsers.view.execute(function() {
                 window.viewApi.sendMessage('viewToServer');
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
             });
         });
     });
@@ -53,6 +69,10 @@ describe('client api', function() {
                 .execute(function() {
                     return window.dashboardApi.config;
                 }, function(err, config) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(config).to.not.be.empty();
                 })
                 .call(done);
@@ -63,6 +83,10 @@ describe('client api', function() {
                 .execute(function() {
                     return window.dashboardApi.config;
                 }, function(err, config) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(config.login).to.not.have.property('sessionSecret');
                 })
                 .call(done);
@@ -78,6 +102,10 @@ describe('client api', function() {
                         done(e instanceof TypeError);
                     }
                 }, function(err, isTypeError) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(isTypeError).to.be.true;
                     done();
                 });
@@ -90,6 +118,10 @@ describe('client api', function() {
                 .execute(function() {
                     return window.dashboardApi.bundleConfig;
                 }, function(err, bundleConfig) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(bundleConfig).to.not.be.empty();
                 })
                 .call(done);
@@ -107,6 +139,10 @@ describe('client api', function() {
                         done(rep.value);
                     });
                 }, function(err, replicantValue) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(replicantValue).to.equal('foo');
                     done();
                 });
@@ -119,6 +155,10 @@ describe('client api', function() {
                         done(value);
                     });
                 }, function(err, replicantValue) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(replicantValue).to.equal('foo');
                     done();
                 });
@@ -134,6 +174,10 @@ describe('client api', function() {
                         done(e.message);
                     }
                 }, function(err, errorMessage) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(errorMessage).to.equal('Must supply a name when instantiating a Replicant');
                     done();
                 });
@@ -148,6 +192,10 @@ describe('client api', function() {
                     });
                     rep.value = 'assignmentOK';
                 }, function(err, data) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(data.value).to.equal('assignmentOK');
                     expect(data.revision).to.equal(1);
                     done();
@@ -178,6 +226,10 @@ describe('client api', function() {
                         })
                     });
                 }, function(err, data) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(data.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
                     expect(data.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
                     expect(data.changes).to.have.length(1);
@@ -201,6 +253,10 @@ describe('client api', function() {
                         done(rep.value);
                     });
                 }, function(err, replicantValue) {
+                    if (err) {
+                        throw err;
+                    }
+
                     expect(replicantValue).to.equal('it work good!');
                     done();
                 });
@@ -216,6 +272,10 @@ describe('client api', function() {
                         done();
                     });
                 }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+
                     var persistedValue = fs.readFileSync('./db/replicants/test-bundle.clientPersistence', 'utf-8');
                     expect(persistedValue).to.equal('{"nested":"hey we assigned!"}');
                     done();
@@ -234,6 +294,10 @@ describe('client api', function() {
                         done();
                     });
                 }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+
                     var persistedValue = fs.readFileSync('./db/replicants/test-bundle.clientPersistence', 'utf-8');
                     expect(persistedValue).to.equal('{"nested":"hey we changed!"}');
                     done();
@@ -254,6 +318,10 @@ describe('client api', function() {
                         done();
                     });
                 }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+
                     var exists = fs.existsSync('./db/replicants/test-bundle.clientTransience');
                     expect(exists).to.be.false;
                     done();
