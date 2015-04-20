@@ -76,6 +76,7 @@
     "lcov-filter": "0.0.1",
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
+    "webdriverio": "^2.4.5",
     "wrench": "^1.5.8",
     "zombie": "^3.1.1"
   }
