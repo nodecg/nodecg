@@ -22,6 +22,9 @@ before(function(done) {
         /** Extension API setup **/
         e.apis.extension = e.server.getExtensions()[C.BUNDLE_NAME];
 
+        var dashboardReady = false;
+        var viewReady = false;
+
         e.browsers.dashboard = webdriverio.remote({
             desiredCapabilities: {
                 tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
@@ -32,7 +35,14 @@ before(function(done) {
             key: process.env.SAUCE_ACCESS_KEY
         })
             .init()
-            .url(C.DASHBOARD_URL);
+            .url(C.DASHBOARD_URL)
+            .call(function() {
+                dashboardReady = true;
+
+                if (dashboardReady && viewReady) {
+                    done();
+                }
+            });
 
         // Zombie doesn't set referers itself when requesting assets on a page
         // For this reason, there is a workaround in lib/bundle_views
@@ -46,9 +56,14 @@ before(function(done) {
             key: process.env.SAUCE_ACCESS_KEY
         })
             .init()
-            .url(C.VIEW_URL);
+            .url(C.VIEW_URL)
+            .call(function() {
+                viewReady = true;
 
-        done();
+                if (dashboardReady && viewReady) {
+                    done();
+                }
+            });
     });
     e.server.start();
 });
