@@ -14,16 +14,15 @@ describe('extension api', function() {
         e.apis.extension.listenFor('clientToServer', function (data, cb) {
             cb();
         });
-        e.apis.dashboard.sendMessage('clientToServer', done);
-
-        // Give Zombie a chance to process socket.io events
-        // What the actual fuck why is this only SOMETIMES necessary??????
-        // I'm so mad what the heck
-        e.browsers.dashboard.wait({duration: 100});
+        e.browsers.dashboard.execute(function() {
+            window.dashboardApi.sendMessage('clientToServer');
+        });
     });
 
     it('can send messages', function(done) {
-        e.apis.dashboard.listenFor('serverToClient', done);
+        e.browsers.dashboard.executeAsync(function(done) {
+            window.dashboardApi.listenFor('serverToClient', done);
+        }, done);
         e.apis.extension.sendMessage('serverToClient');
     });
 
@@ -59,16 +58,18 @@ describe('extension api', function() {
 
     describe('replicants', function() {
         it('only apply defaultValue when first declared', function(done) {
-            e.apis.dashboard.Replicant('extensionTest', { defaultValue: 'foo', persistent: false });
+            e.browsers.dashboard
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('extensionTest', { defaultValue: 'foo', persistent: false });
 
-            // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 10}, function() {});
-
-            setTimeout(function() {
-                var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
-                expect(rep.value).to.equal('foo');
-                done();
-            }, 50);
+                    rep.on('declared', function() {
+                        done();
+                    });
+                }, function() {
+                    var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
+                    expect(rep.value).to.equal('foo');
+                    done();
+                });
         });
 
         it('can be read once without subscription, via readReplicant', function() {
