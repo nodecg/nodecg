@@ -30,9 +30,8 @@ before(function(done) {
             port: 80,
             user: process.env.SAUCE_USERNAME,
             key: process.env.SAUCE_ACCESS_KEY
-        }).init();
-
-        e.browsers.dashboard
+        })
+            .init()
             .url(C.DASHBOARD_URL);
 
         // Zombie doesn't set referers itself when requesting assets on a page
@@ -45,9 +44,8 @@ before(function(done) {
             port: 80,
             user: process.env.SAUCE_USERNAME,
             key: process.env.SAUCE_ACCESS_KEY
-        }).init();
-
-        e.browsers.view
+        })
+            .init();
             .url(C.VIEW_URL);
 
         done();

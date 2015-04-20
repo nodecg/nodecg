@@ -12,13 +12,17 @@ describe('client api', function() {
     describe('dashboard api', function() {
         // Check for basic connectivity. The rest of the test are run from the dashboard as well.
         it('can receive messages', function(done) {
-            e.apis.dashboard.listenFor('dashboardToServer', done);
+            e.browsers.dashboard.executeAsync(function(done) {
+                window.dashboardApi.listenFor('dashboardToServer', done);
+            }, done);
             e.apis.extension.sendMessage('dashboardToServer');
         });
 
         it('can send messages', function(done) {
             e.apis.extension.listenFor('serverToDashboard', done);
-            e.apis.dashboard.sendMessage('serverToDashboard');
+            e.browsers.dashboard.execute(function() {
+                window.dashboardApi.sendMessage('serverToDashboard');
+            });
         });
     });
 
@@ -26,35 +30,64 @@ describe('client api', function() {
         // The view and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
         it('can receive messages', function(done) {
-            e.apis.view.listenFor('viewToServer', done);
+            e.browsers.view.executeAsync(function(done) {
+                window.viewApi.listenFor('viewToServer', done);
+            }, done);
             e.apis.extension.sendMessage('viewToServer');
         });
 
         it('can send messages', function(done) {
             e.apis.extension.listenFor('serverToView', done);
-            e.apis.view.sendMessage('serverToView');
+            e.browsers.view.execute(function() {
+                window.viewApi.sendMessage('serverToView');
+            });
         });
     });
 
     describe('nodecg config', function() {
-        it('exists and has length', function() {
-            expect(e.apis.dashboard.config).to.not.be.empty();
+        it('exists and has length', function(done) {
+            e.browsers.dashboard.execute(function() {
+                return window.dashboardApi.config;
+            }, function(err, config) {
+                expect(config).to.not.be.empty();
+                done();
+            });
         });
 
-        it('doesn\'t reveal sensitive information', function() {
-            expect(e.apis.dashboard.config.login).to.not.have.property('sessionSecret');
+        it('doesn\'t reveal sensitive information', function(done) {
+            e.browsers.dashboard.execute(function() {
+                return window.dashboardApi.config;
+            }, function(err, config) {
+                expect(config.login).to.not.have.property('sessionSecret');
+                done();
+            });
         });
 
         it('isn\'t writable', function() {
-            expect(function() {
-                e.apis.dashboard.config.host = 'the_test_failed';
-            }).to.throw(TypeError);
+            e.browsers.dashboard.executeAsync(function(done) {
+                try {
+                    e.apis.dashboard.config.host = 'the_test_failed';
+                }
+                catch (e) {
+                    done(e);
+                }
+                window.dashboardApi.listenFor('dashboardToServer', done);
+            }, function(err, e) {
+                expect(function() {
+                    throw e;
+                }).to.throw(TypeError);
+            });
         });
     });
 
     describe('bundle config', function() {
-        it('exists and has length', function() {
-            expect(e.apis.dashboard.bundleConfig).to.not.be.empty();
+        it('exists and has length', function(done) {
+            e.browsers.dashboard.execute(function() {
+                return window.dashboardApi.bundleConfig;
+            }, function(err, bundleConfig) {
+                expect(bundleConfig).to.not.be.empty();
+                done();
+            });
         });
     });
 
