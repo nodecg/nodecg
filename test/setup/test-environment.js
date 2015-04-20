@@ -8,8 +8,8 @@ module.exports = {
     apis: {
         extension: {}
     },
-    browsers: {
-        view: {},
-        dashboard: {}
+    browser: {
+        client: {},
+        tabs: {}
     }
 };

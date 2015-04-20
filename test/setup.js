@@ -25,7 +25,7 @@ before(function(done) {
         var dashboardReady = false;
         var viewReady = false;
 
-        e.browsers.dashboard = webdriverio.remote({
+        e.browser.client = webdriverio.remote({
             desiredCapabilities: {
                 tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
             },
@@ -35,35 +35,23 @@ before(function(done) {
             key: process.env.SAUCE_ACCESS_KEY
         })
             .init()
-            .url(C.DASHBOARD_URL)
-            .call(function() {
-                dashboardReady = true;
-
-                if (dashboardReady && viewReady) {
-                    done();
+            .newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
+            .getCurrentTabId(function(err, tabId) {
+                if (err) {
+                    throw err;
                 }
-            });
 
-        // Zombie doesn't set referers itself when requesting assets on a page
-        // For this reason, there is a workaround in lib/bundle_views
-        e.browsers.view = webdriverio.remote({
-            desiredCapabilities: {
-                tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
-            },
-            host: 'ondemand.saucelabs.com',
-            port: 80,
-            user: process.env.SAUCE_USERNAME,
-            key: process.env.SAUCE_ACCESS_KEY
-        })
-            .init()
-            .url(C.VIEW_URL)
-            .call(function() {
-                viewReady = true;
-
-                if (dashboardReady && viewReady) {
-                    done();
+                e.browser.tabs.dashboard = tabId;
+            })
+            .newWindow(C.VIEW_URL, 'NodeCG test bundle view', '')
+            .getCurrentTabId(function(err, tabId) {
+                if (err) {
+                    throw err;
                 }
-            });
+
+                e.browser.tabs.view = tabId;
+            })
+            .call(done);
     });
     e.server.start();
 });
@@ -71,7 +59,6 @@ before(function(done) {
 after(function() {
     try{
         e.server.stop();
-        e.browsers.dashboard.end();
-        e.browsers.view.end();
+        e.browser.client.end();
     } catch(e) {}
 });

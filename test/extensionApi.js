@@ -11,28 +11,29 @@ var C = require('./setup/test-constants');
 
 describe('extension api', function() {
     it('can receive messages and fire acknowledgements', function(done) {
-        e.apis.extension.listenFor('clientToServer', function() {
-            done();
-        });
-        e.browsers.dashboard.execute(function() {
-            window.dashboardApi.sendMessage('clientToServer');
-        }, function(err) {
-            if (err) {
-                throw err;
-            }
-        });
+        e.apis.extension.listenFor('clientToServer', done);
+
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard).execute(function() {
+                window.dashboardApi.sendMessage('clientToServer');
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+            });
     });
 
     it('can send messages', function(done) {
-        e.browsers.dashboard.executeAsync(function(done) {
-            window.dashboardApi.listenFor('serverToClient', done);
-        }, function(err) {
-            if (err) {
-                throw err;
-            }
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard).executeAsync(function(done) {
+                window.dashboardApi.listenFor('serverToClient', done);
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+            })
+            .call(done);
 
-            done();
-        });
         e.apis.extension.sendMessage('serverToClient');
     });
 
@@ -68,7 +69,8 @@ describe('extension api', function() {
 
     describe('replicants', function() {
         it('only apply defaultValue when first declared', function(done) {
-            e.browsers.dashboard
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('extensionTest', { defaultValue: 'foo', persistent: false });
 
@@ -82,8 +84,8 @@ describe('extension api', function() {
 
                     var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
                     expect(rep.value).to.equal('foo');
-                    done();
-                });
+                })
+                .call(done);
         });
 
         it('can be read once without subscription, via readReplicant', function() {

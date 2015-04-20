@@ -10,7 +10,8 @@ var e = require('./setup/test-environment');
 describe('dashboard', function() {
     describe('html panels', function() {
         it('show up on the dashboard', function(done) {
-            e.browsers.dashboard
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
                 .isExisting('.test-bundle.html', function(err, isExisting) {
                     expect(isExisting).to.be.true;
                 })
@@ -20,7 +21,8 @@ describe('dashboard', function() {
 
     describe('jade panels', function() {
         it('show up on the dashboard', function(done) {
-            e.browsers.dashboard
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
                 .isExisting('.test-bundle.jade', function(err, isExisting) {
                     expect(isExisting).to.be.true;
                 })
@@ -28,7 +30,8 @@ describe('dashboard', function() {
         });
 
         it('have access to bundleConfig', function(done) {
-            e.browsers.dashboard
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
                 .getText('.test-bundle.jade .js-bundleConfig', function(err, text) {
                     expect(text).to.equal('the_test_string');
                 })
@@ -36,7 +39,8 @@ describe('dashboard', function() {
         });
 
         it('have access to bundleName', function(done) {
-            e.browsers.dashboard
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
                 .getText('.test-bundle.jade .js-bundleName', function(err, text) {
                     expect(text).to.equal('test-bundle');
                 })
@@ -44,7 +48,8 @@ describe('dashboard', function() {
         });
 
         it('have access to ncgConfig', function(done) {
-            e.browsers.dashboard
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
                 .getText('.test-bundle.jade .js-ncgConfig', function(err, text) {
                     expect(text).to.equal(config.host);
                 })
