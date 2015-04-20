@@ -25,7 +25,7 @@ before(function(done) {
         e.browser.client = webdriverio.remote({
             desiredCapabilities: {
                 browserName: 'chrome',
-                version: 'b',
+                version: 'beta',
                 tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
             },
             host: 'ondemand.saucelabs.com',
