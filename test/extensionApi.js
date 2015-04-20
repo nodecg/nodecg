@@ -16,8 +16,7 @@ describe('extension api', function() {
         e.apis.extension.listenFor('clientToServer', done);
 
         e.browser.client
-            .switchTab(e.browser.tabs.dashboard)
-            .execute(function() {
+            .switchTab(e.browser.tabs.dashboard).execute(function() {
                 window.dashboardApi.sendMessage('clientToServer');
             }, function(err) {
                 if (err) {
@@ -30,15 +29,14 @@ describe('extension api', function() {
         this.timeout(10000);
 
         e.browser.client
-            .switchTab(e.browser.tabs.dashboard)
-            .executeAsync(function(done) {
+            .switchTab(e.browser.tabs.dashboard).executeAsync(function(done) {
                 window.dashboardApi.listenFor('serverToClient', done);
             }, function(err) {
                 if (err) {
                     throw err;
                 }
-                done();
-            });
+            })
+            .call(done);
 
         e.apis.extension.sendMessage('serverToClient');
     });
@@ -92,8 +90,8 @@ describe('extension api', function() {
 
                     var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
                     expect(rep.value).to.equal('foo');
-                    done();
-                });
+                })
+                .call(done);
         });
 
         it('can be read once without subscription, via readReplicant', function() {
