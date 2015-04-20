@@ -19,7 +19,7 @@ describe('dashboard', function() {
     });
 
     describe('jade panels', function() {
-        it('show up on the dashboard', function() {
+        it('show up on the dashboard', function(done) {
             e.browsers.dashboard
                 .isExisting('.test-bundle.jade', function(err, isExisting) {
                     expect(isExisting).to.be.true;
@@ -27,7 +27,7 @@ describe('dashboard', function() {
                 .call(done);
         });
 
-        it('have access to bundleConfig', function() {
+        it('have access to bundleConfig', function(done) {
             e.browsers.dashboard
                 .getText('.test-bundle.jade .js-bundleConfig', function(err, text) {
                     expect(text).to.equal('the_test_string');
@@ -35,7 +35,7 @@ describe('dashboard', function() {
                 .call(done);
         });
 
-        it('have access to bundleName', function() {
+        it('have access to bundleName', function(done) {
             e.browsers.dashboard
                 .getText('.test-bundle.jade .js-bundleName', function(err, text) {
                     expect(text).to.equal('test-bundle');
@@ -43,7 +43,7 @@ describe('dashboard', function() {
                 .call(done);
         });
 
-        it('have access to ncgConfig', function() {
+        it('have access to ncgConfig', function(done) {
             e.browsers.dashboard
                 .getText('.test-bundle.jade .js-ncgConfig', function(err, text) {
                     expect(text).to.equal(config.host);

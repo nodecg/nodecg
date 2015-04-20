@@ -45,48 +45,53 @@ describe('client api', function() {
 
     describe('nodecg config', function() {
         it('exists and has length', function(done) {
-            e.browsers.dashboard.execute(function() {
-                return window.dashboardApi.config;
-            }, function(err, config) {
-                expect(config).to.not.be.empty();
-                done();
-            });
+            e.browsers.dashboard
+                .execute(function() {
+                    return window.dashboardApi.config;
+                }, function(err, config) {
+                    expect(config).to.not.be.empty();
+                })
+                .call(done);
         });
 
         it('doesn\'t reveal sensitive information', function(done) {
-            e.browsers.dashboard.execute(function() {
-                return window.dashboardApi.config;
-            }, function(err, config) {
-                expect(config.login).to.not.have.property('sessionSecret');
-                done();
-            });
+            e.browsers.dashboard
+                .execute(function() {
+                    return window.dashboardApi.config;
+                }, function(err, config) {
+                    expect(config.login).to.not.have.property('sessionSecret');
+                })
+                .call(done);
         });
 
-        it('isn\'t writable', function() {
-            e.browsers.dashboard.executeAsync(function(done) {
-                try {
-                    e.apis.dashboard.config.host = 'the_test_failed';
-                }
-                catch (e) {
-                    done(e);
-                }
-                window.dashboardApi.listenFor('dashboardToServer', done);
-            }, function(err, e) {
-                expect(function() {
-                    throw e;
-                }).to.throw(TypeError);
-            });
+        it('isn\'t writable', function(done) {
+            e.browsers.dashboard
+                .executeAsync(function(done) {
+                    try {
+                        e.apis.dashboard.config.host = 'the_test_failed';
+                    }
+                    catch (e) {
+                        done(e);
+                    }
+                    window.dashboardApi.listenFor('dashboardToServer', done);
+                }, function(err, e) {
+                    expect(function() {
+                        throw e;
+                    }).to.throw(TypeError);
+                })
+                .call(done);
         });
     });
 
     describe('bundle config', function() {
         it('exists and has length', function(done) {
-            e.browsers.dashboard.execute(function() {
-                return window.dashboardApi.bundleConfig;
-            }, function(err, bundleConfig) {
-                expect(bundleConfig).to.not.be.empty();
-                done();
-            });
+            e.browsers.dashboard
+                .execute(function() {
+                    return window.dashboardApi.bundleConfig;
+                }, function(err, bundleConfig) {
+                    expect(bundleConfig).to.not.be.empty();
+                })
+                .call(done);
         });
     });
 
