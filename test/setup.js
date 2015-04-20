@@ -45,7 +45,7 @@ before(function(done) {
             user: process.env.SAUCE_USERNAME,
             key: process.env.SAUCE_ACCESS_KEY
         })
-            .init();
+            .init()
             .url(C.VIEW_URL);
 
         done();

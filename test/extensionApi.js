@@ -2,7 +2,6 @@
 
 // Modules used to run tests
 var chai = require('chai');
-var should = chai.should();
 var expect = chai.expect;
 var request = require('request');
 var fs = require('fs');
