@@ -37,8 +37,8 @@ describe('extension api', function() {
                 if (err) {
                     throw err;
                 }
-                done();
-            });
+            })
+            .call(done);
 
         e.apis.extension.sendMessage('serverToClient');
     });
@@ -92,8 +92,8 @@ describe('extension api', function() {
 
                     var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
                     expect(rep.value).to.equal('foo');
-                    done();
-                });
+                })
+                .call(done);
         });
 
         it('can be read once without subscription, via readReplicant', function() {

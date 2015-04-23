@@ -109,20 +109,15 @@ describe('client api', function() {
         it('isn\'t writable', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .executeAsync(function(done) {
-                    try {
-                        window.dashboardApi.config.host = 'the_test_failed';
-                    }
-                    catch (e) {
-                        done(e);
-                    }
+                .execute(function() {
+                    return window.dashboardApi.config;
                 }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
                     expect(function() {
-                        throw ret.value;
+                        ret.value.host = 'the_test_failed';
                     }).to.throw(TypeError);
                 })
                 .call(done);
@@ -171,10 +166,8 @@ describe('client api', function() {
         it('can be read once without subscription, via readReplicant', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .executeAsync(function(done) {
-                    window.dashboardApi.readReplicant('clientTest', function(value) {
-                        done(value);
-                    });
+                .execute(function() {
+                    return window.dashboardApi.readReplicant('clientTest');
                 }, function(err, ret) {
                     if (err) {
                         throw err;
@@ -193,16 +186,14 @@ describe('client api', function() {
                         window.dashboardApi.Replicant();
                     }
                     catch (e) {
-                        done(e);
+                        done(e.message);
                     }
                 }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(function() {
-                        throw ret.value;
-                    }).to.throw(/Must supply a name when instantiating a Replicant/);
+                    expect(ret.value).to.equal('Must supply a name when instantiating a Replicant');
                 })
                 .call(done);
         });
@@ -282,12 +273,12 @@ describe('client api', function() {
                         rep.on('declared', function() {
                             done(rep.value);
                         });
-                    }, function(err, replicantValue) {
+                    }, function(err, ret) {
                         if (err) {
                             throw err;
                         }
 
-                        expect(replicantValue).to.equal('it work good!');
+                        expect(ret.value).to.equal('it work good!');
                     })
                     .call(done);
             });
