@@ -165,7 +165,9 @@ describe('client api', function() {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
-                    window.dashboardApi.readReplicant('clientTest', done);
+                    window.dashboardApi.readReplicant('clientTest', function(done, value) {
+                        done(value);
+                    }.bind(this, done));
                 }, function(err, ret) {
                     if (err) {
                         throw err;
@@ -235,11 +237,13 @@ describe('client api', function() {
 
                     rep.on('declared', function() {
                         rep.on('change', function(oldVal, newVal, changes) {
-                            done({
-                                oldVal: oldVal,
-                                newVal: newVal,
-                                changes: changes
-                            });
+                            if (oldVal && newVal && changes) {
+                                done({
+                                    oldVal: oldVal,
+                                    newVal: newVal,
+                                    changes: changes
+                                });
+                            }
                         });
 
                         rep.value.a.b.c = 'nestedChangeOK';
