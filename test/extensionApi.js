@@ -30,7 +30,7 @@ describe('extension api', function() {
     });
 
     it('can send messages', function(done) {
-        this.timeout(30000);
+        this.timeout(10000);
 
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
@@ -52,7 +52,6 @@ describe('extension api', function() {
 
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
-            .timeoutsAsyncScript(30000)
             .executeAsync(function(done) {
                 var checkMessageReceived;
 
@@ -63,7 +62,6 @@ describe('extension api', function() {
                     }
                 }, 50);
             })
-            .timeoutsAsyncScript(5000)
             .call(done);
     });
 

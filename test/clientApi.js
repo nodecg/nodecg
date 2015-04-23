@@ -13,8 +13,6 @@ describe('client api', function() {
     describe('dashboard api', function() {
         // Check for basic connectivity. The rest of the test are run from the dashboard as well.
         it('can receive messages', function(done) {
-            this.timeout(30000);
-
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
@@ -35,7 +33,6 @@ describe('client api', function() {
 
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .timeoutsAsyncScript(30000)
                 .executeAsync(function(done) {
                     var checkMessageReceived;
 
@@ -46,7 +43,6 @@ describe('client api', function() {
                         }
                     }, 50);
                 })
-                .timeoutsAsyncScript(5000)
                 .call(done);
         });
 
@@ -69,8 +65,6 @@ describe('client api', function() {
         // The view and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
         it('can receive messages', function(done) {
-            this.timeout(30000);
-
             e.browser.client
                 .switchTab(e.browser.tabs.view)
                 .execute(function() {
@@ -91,7 +85,6 @@ describe('client api', function() {
 
             e.browser.client
                 .switchTab(e.browser.tabs.view)
-                .timeoutsAsyncScript(30000)
                 .executeAsync(function(done) {
                     var checkMessageReceived;
 
@@ -102,7 +95,6 @@ describe('client api', function() {
                         }
                     }, 50);
                 })
-                .timeoutsAsyncScript(5000)
                 .call(done);
         });
 
