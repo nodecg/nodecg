@@ -116,9 +116,7 @@ describe('client api', function() {
                         throw err;
                     }
 
-                    expect(function() {
-                        ret.value.host = 'the_test_failed';
-                    }).to.throw(TypeError);
+                    expect(Object.isFrozen(ret.value)).to.be.true;
                 })
                 .call(done);
         });
@@ -235,12 +233,16 @@ describe('client api', function() {
                         }
                     });
 
-                    rep.on('change', function(oldVal, newVal, changes) {
-                        done({
-                            oldVal: oldVal,
-                            newVal: newVal,
-                            changes: changes
+                    rep.on('declared', function() {
+                        rep.on('change', function(oldVal, newVal, changes) {
+                            done({
+                                oldVal: oldVal,
+                                newVal: newVal,
+                                changes: changes
+                            });
                         });
+
+                        rep.value.a.b.c = 'nestedChangeOK';
                     });
                 }, function(err, ret) {
                     if (err) {
@@ -310,8 +312,6 @@ describe('client api', function() {
                 });
         });
 
-        // Skipping this test for now because for some reason changes to the value object
-        // aren't triggering the Nested.observe callback.
         it('persist changes to disk', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
@@ -369,7 +369,8 @@ describe('client api', function() {
             });
         });
 
-        it('redeclare after reconnecting to Socket.IO', function(done) {
+        // need a better way to test this
+        it.skip('redeclare after reconnecting to Socket.IO', function(done) {
             this.timeout(30000);
 
             e.browser.client
