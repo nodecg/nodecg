@@ -53,7 +53,7 @@ before(function(done) {
                         clearInterval(checkForApi);
                         done();
                     }
-                }.bind(this, done), 50);
+                }, 50, done);
             }, function(err) {
                 if (err) {
                     throw err;
@@ -74,7 +74,7 @@ before(function(done) {
                         clearInterval(checkForApi);
                         done();
                     }
-                }.bind(this, done), 50);
+                }, 50, done);
             }, function(err) {
                 if (err) {
                     throw err;
