@@ -11,19 +11,20 @@ var C = require('./setup/test-constants');
 
 describe('extension api', function() {
     it('can receive messages and fire acknowledgements', function(done) {
-        this.timeout(10000);
-
-        e.apis.extension.listenFor('clientToServer', done);
+        e.apis.extension.listenFor('clientToServer', function(cb) {
+            cb();
+        });
 
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
-            .execute(function() {
-                window.dashboardApi.sendMessage('clientToServer');
+            .executeAsync(function() {
+                window.dashboardApi.sendMessage('clientToServer', done);
             }, function(err) {
                 if (err) {
                     throw err;
                 }
-            });
+            })
+            .call(done);
     });
 
     it('can send messages', function(done) {
@@ -32,7 +33,7 @@ describe('extension api', function() {
             .execute(function() {
                 window.serverToClientReceived = false;
 
-                window.viewApi.listenFor('serverToClient', function() {
+                window.dashboardApi.listenFor('serverToClient', function() {
                     window.serverToClientReceived = true;
                 });
             }, function(err) {
