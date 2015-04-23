@@ -26,7 +26,7 @@ before(function(done) {
             desiredCapabilities: {
                 name: "Travis build " + process.env.TRAVIS_JOB_NUMBER,
                 build: process.env.TRAVIS_BUILD_NUMBER,
-                tags: [process.env.TRAVIS_BRANCH, process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE, process.env.TRAVIS_PULL_REQUEST, process.env.TRAVIS_TAG]
+                tags: [process.env.TRAVIS_BRANCH, process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE, process.env.TRAVIS_PULL_REQUEST, process.env.TRAVIS_TAG],
                 browserName: 'chrome',
                 version: 'beta',
                 tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
