@@ -15,16 +15,33 @@ describe('client api', function() {
         it('can receive messages', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .executeAsync(function(done) {
-                    window.dashboardApi.listenFor('serverToDashboard', done);
+                .execute(function() {
+                    window.serverToDashboardReceived = false;
+
+                    window.dashboardApi.listenFor('serverToDashboard', function() {
+                        window.serverToDashboardReceived = true;
+                    });
                 }, function(err) {
                     if (err) {
                         throw err;
                     }
-                })
-                .call(done);
+                });
 
             e.apis.extension.sendMessage('serverToDashboard');
+
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    var checkMessageReceived;
+
+                    checkMessageReceived = setInterval(function() {
+                        if (window.serverToDashboardReceived) {
+                            clearInterval(checkMessageReceived);
+                            done();
+                        }
+                    }, 50);
+                })
+                .call(done);
         });
 
         it('can send messages', function(done) {
@@ -48,16 +65,33 @@ describe('client api', function() {
         it('can receive messages', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.view)
-                .executeAsync(function(done) {
-                    window.viewApi.listenFor('serverToView', done);
+                .execute(function() {
+                    window.serverToViewReceived = false;
+
+                    window.viewApi.listenFor('serverToView', function() {
+                        window.serverToViewReceived = true;
+                    });
                 }, function(err) {
                     if (err) {
                         throw err;
                     }
-                })
-                .call(done);
+                });
 
             e.apis.extension.sendMessage('serverToView');
+
+            e.browser.client
+                .switchTab(e.browser.tabs.view)
+                .executeAsync(function(done) {
+                    var checkMessageReceived;
+
+                    checkMessageReceived = setInterval(function() {
+                        if (window.serverToViewReceived) {
+                            clearInterval(checkMessageReceived);
+                            done();
+                        }
+                    }, 50);
+                })
+                .call(done);
         });
 
         it('can send messages', function(done) {
@@ -164,10 +198,8 @@ describe('client api', function() {
         it('can be read once without subscription, via readReplicant', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .execute(function() {
-                    window.dashboardApi.readReplicant('clientTest', function(done, value) {
-                        done(value);
-                    }.bind(this, done));
+                .executeAsync(function(done) {
+                    window.dashboardApi.readReplicant('clientTest', done);
                 }, function(err, ret) {
                     if (err) {
                         throw err;
@@ -252,8 +284,6 @@ describe('client api', function() {
                     if (err) {
                         throw err;
                     }
-
-                    console.log(ret.value);
 
                     expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
                     expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});

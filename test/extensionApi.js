@@ -27,20 +27,35 @@ describe('extension api', function() {
     });
 
     it('can send messages', function(done) {
-        this.timeout(10000);
-
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
-            .executeAsync(function(done) {
-                window.dashboardApi.listenFor('serverToClient', done);
+            .execute(function() {
+                window.serverToClientReceived = false;
+
+                window.viewApi.listenFor('serverToClient', function() {
+                    window.serverToClientReceived = true;
+                });
             }, function(err) {
                 if (err) {
                     throw err;
                 }
-            })
-            .call(done);
+            });
 
         e.apis.extension.sendMessage('serverToClient');
+
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard)
+            .executeAsync(function(done) {
+                var checkMessageReceived;
+
+                checkMessageReceived = setInterval(function() {
+                    if (window.serverToClientReceived) {
+                        clearInterval(checkMessageReceived);
+                        done();
+                    }
+                }, 50);
+            })
+            .call(done);
     });
 
     it('can mount express middleware', function(done) {
