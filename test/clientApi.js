@@ -27,7 +27,7 @@ describe('client api', function() {
                     }
                 });
 
-            setInterval(function() {
+            var sendMessage = setInterval(function() {
                 e.apis.extension.sendMessage('serverToDashboard');
             }, 500);
 
@@ -42,6 +42,8 @@ describe('client api', function() {
                             done();
                         }
                     }, 50);
+                }, function() {
+                    clearInterval(sendMessage);
                 })
                 .call(done);
         });
@@ -79,7 +81,7 @@ describe('client api', function() {
                     }
                 });
 
-            setInterval(function() {
+            var sendMessage = setInterval(function() {
                 e.apis.extension.sendMessage('serverToView');
             }, 500);
 
@@ -94,6 +96,8 @@ describe('client api', function() {
                             done();
                         }
                     }, 50);
+                }, function() {
+                    clearInterval(sendMessage);
                 })
                 .call(done);
         });

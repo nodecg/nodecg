@@ -46,7 +46,7 @@ describe('extension api', function() {
                 }
             });
 
-        setInterval(function() {
+        var sendMessage = setInterval(function() {
             e.apis.extension.sendMessage('serverToView');
         }, 500);
 
@@ -61,6 +61,8 @@ describe('extension api', function() {
                         done();
                     }
                 }, 50);
+            }, function() {
+                clearInterval(sendMessage);
             })
             .call(done);
     });
