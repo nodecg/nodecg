@@ -21,9 +21,8 @@ describe('client api', function() {
                     if (err) {
                         throw err;
                     }
-
-                    done();
-                });
+                })
+                .call(done);
 
             e.apis.extension.sendMessage('serverToDashboard');
         });
@@ -55,9 +54,8 @@ describe('client api', function() {
                     if (err) {
                         throw err;
                     }
-
-                    done();
-                });
+                })
+                .call(done);
 
             e.apis.extension.sendMessage('serverToView');
         });
@@ -83,14 +81,14 @@ describe('client api', function() {
                 .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
                     return window.dashboardApi.config;
-                }, function(err, config) {
+                }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(config).to.not.be.empty();
-                    done();
-                });
+                    expect(ret.value).to.not.be.empty();
+                })
+                .call(done);
         });
 
         it('doesn\'t reveal sensitive information', function(done) {
@@ -98,14 +96,14 @@ describe('client api', function() {
                 .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
                     return window.dashboardApi.config;
-                }, function(err, config) {
+                }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(config.login).to.not.have.property('sessionSecret');
-                    done();
-                });
+                    expect(ret.value.login).to.not.have.property('sessionSecret');
+                })
+                .call(done);
         });
 
         it('isn\'t writable', function(done) {
@@ -116,16 +114,18 @@ describe('client api', function() {
                         window.dashboardApi.config.host = 'the_test_failed';
                     }
                     catch (e) {
-                        done(e instanceof TypeError);
+                        done(e);
                     }
-                }, function(err, isTypeError) {
+                }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(isTypeError).to.be.true;
-                    done();
-                });
+                    expect(function() {
+                        throw ret.value;
+                    }).to.throw(TypeError);
+                })
+                .call(done);
         });
     });
 
@@ -135,14 +135,14 @@ describe('client api', function() {
                 .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
                     return window.dashboardApi.bundleConfig;
-                }, function(err, bundleConfig) {
+                }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(bundleConfig).to.not.be.empty();
-                    done();
-                });
+                    expect(ret.value).to.not.be.empty();
+                })
+                .call(done);
         });
     });
 
@@ -158,14 +158,14 @@ describe('client api', function() {
                     rep.on('declared', function() {
                         done(rep.value);
                     });
-                }, function(err, replicantValue) {
+                }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(replicantValue).to.equal('foo');
-                    done();
-                });
+                    expect(ret.value).to.equal('foo');
+                })
+                .call(done);
         });
 
         it('can be read once without subscription, via readReplicant', function(done) {
@@ -175,14 +175,14 @@ describe('client api', function() {
                     window.dashboardApi.readReplicant('clientTest', function(value) {
                         done(value);
                     });
-                }, function(err, replicantValue) {
+                }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(replicantValue).to.equal('foo');
-                    done();
-                });
+                    expect(ret.value).to.equal('foo');
+                })
+                .call(done);
         });
 
         it('throws an error when no name is given to a synced variable', function(done) {
@@ -193,16 +193,18 @@ describe('client api', function() {
                         window.dashboardApi.Replicant();
                     }
                     catch (e) {
-                        done(e.message);
+                        done(e);
                     }
-                }, function(err, errorMessage) {
+                }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(errorMessage).to.equal('Must supply a name when instantiating a Replicant');
-                    done();
-                });
+                    expect(function() {
+                        throw ret.value;
+                    }).to.throw(/Must supply a name when instantiating a Replicant/);
+                })
+                .call(done);
         });
 
         it('can be assigned via the ".value" property', function (done) {
@@ -214,15 +216,15 @@ describe('client api', function() {
                         done(data);
                     });
                     rep.value = 'assignmentOK';
-                }, function(err, data) {
+                }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(data.value).to.equal('assignmentOK');
-                    expect(data.revision).to.equal(1);
-                    done();
-                });
+                    expect(ret.value.value).to.equal('assignmentOK');
+                    expect(ret.value.revision).to.equal(1);
+                })
+                .call(done);
         });
 
         // Skipping this test for now because for some reason changes to the value object
@@ -249,20 +251,20 @@ describe('client api', function() {
                             changes: changes
                         });
                     });
-                }, function(err, data) {
+                }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(data.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
-                    expect(data.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
-                    expect(data.changes).to.have.length(1);
-                    expect(data.changes[0].type).to.equal('update');
-                    expect(data.changes[0].path).to.equal('a.b.c');
-                    expect(data.changes[0].oldValue).to.equal('c');
-                    expect(data.changes[0].newValue).to.equal('nestedChangeOK');
-                    done();
-                });
+                    expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
+                    expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
+                    expect(ret.value.changes).to.have.length(1);
+                    expect(ret.value.changes[0].type).to.equal('update');
+                    expect(ret.value.changes[0].path).to.equal('a.b.c');
+                    expect(ret.value.changes[0].oldValue).to.equal('c');
+                    expect(ret.value.changes[0].newValue).to.equal('nestedChangeOK');
+                })
+                .call(done);
         });
 
         it('load persisted values when they exist', function(done) {
@@ -286,8 +288,8 @@ describe('client api', function() {
                         }
 
                         expect(replicantValue).to.equal('it work good!');
-                        done();
-                    });
+                    })
+                    .call(done);
             });
         });
 
@@ -371,8 +373,8 @@ describe('client api', function() {
                                 }
                             }).to.throw(/ENOENT/);
                         });
-                        done();
-                    });
+                    })
+                    .call(done);
             });
         });
 
@@ -403,8 +405,8 @@ describe('client api', function() {
                                 if (err) {
                                     throw err;
                                 }
-                                done();
-                            });
+                            })
+                            .call(done);
 
                         e.server.start();
                     });
