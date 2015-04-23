@@ -21,8 +21,9 @@ describe('client api', function() {
                     if (err) {
                         throw err;
                     }
-                })
-                .call(done);
+
+                    done();
+                });
 
             e.apis.extension.sendMessage('serverToDashboard');
         });
@@ -38,8 +39,7 @@ describe('client api', function() {
                     if (err) {
                         throw err;
                     }
-                })
-                .call(done);
+                });
         });
     });
 
@@ -55,8 +55,9 @@ describe('client api', function() {
                     if (err) {
                         throw err;
                     }
-                })
-                .call(done);
+
+                    done();
+                });
 
             e.apis.extension.sendMessage('serverToView');
         });
@@ -88,8 +89,8 @@ describe('client api', function() {
                     }
 
                     expect(config).to.not.be.empty();
-                })
-                .call(done);
+                    done();
+                });
         });
 
         it('doesn\'t reveal sensitive information', function(done) {
@@ -103,8 +104,8 @@ describe('client api', function() {
                     }
 
                     expect(config.login).to.not.have.property('sessionSecret');
-                })
-                .call(done);
+                    done();
+                });
         });
 
         it('isn\'t writable', function(done) {
@@ -123,8 +124,8 @@ describe('client api', function() {
                     }
 
                     expect(isTypeError).to.be.true;
-                })
-                .call(done);
+                    done();
+                });
         });
     });
 
@@ -140,8 +141,8 @@ describe('client api', function() {
                     }
 
                     expect(bundleConfig).to.not.be.empty();
-                })
-                .call(done);
+                    done();
+                });
         });
     });
 
@@ -163,8 +164,8 @@ describe('client api', function() {
                     }
 
                     expect(replicantValue).to.equal('foo');
-                })
-                .call(done);
+                    done();
+                });
         });
 
         it('can be read once without subscription, via readReplicant', function(done) {
@@ -180,8 +181,8 @@ describe('client api', function() {
                     }
 
                     expect(replicantValue).to.equal('foo');
-                })
-                .call(done);
+                    done();
+                });
         });
 
         it('throws an error when no name is given to a synced variable', function(done) {
@@ -200,8 +201,8 @@ describe('client api', function() {
                     }
 
                     expect(errorMessage).to.equal('Must supply a name when instantiating a Replicant');
-                })
-                .call(done);
+                    done();
+                });
         });
 
         it('can be assigned via the ".value" property', function (done) {
@@ -220,8 +221,8 @@ describe('client api', function() {
 
                     expect(data.value).to.equal('assignmentOK');
                     expect(data.revision).to.equal(1);
-                })
-                .call(done);
+                    done();
+                });
         });
 
         // Skipping this test for now because for some reason changes to the value object
@@ -260,8 +261,8 @@ describe('client api', function() {
                     expect(data.changes[0].path).to.equal('a.b.c');
                     expect(data.changes[0].oldValue).to.equal('c');
                     expect(data.changes[0].newValue).to.equal('nestedChangeOK');
-                })
-                .call(done);
+                    done();
+                });
         });
 
         it('load persisted values when they exist', function(done) {
@@ -285,8 +286,8 @@ describe('client api', function() {
                         }
 
                         expect(replicantValue).to.equal('it work good!');
-                    })
-                    .call(done);
+                        done();
+                    });
             });
         });
 
@@ -370,8 +371,8 @@ describe('client api', function() {
                                 }
                             }).to.throw(/ENOENT/);
                         });
-                    })
-                    .call(done);
+                        done();
+                    });
             });
         });
 
@@ -402,8 +403,8 @@ describe('client api', function() {
                                 if (err) {
                                     throw err;
                                 }
-                            })
-                            .call(done);
+                                done();
+                            });
 
                         e.server.start();
                     });
