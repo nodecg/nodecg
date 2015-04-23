@@ -110,13 +110,13 @@ describe('client api', function() {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
-                    return window.dashboardApi.config;
+                    return Object.isFrozen(window.dashboardApi.config);
                 }, function(err, ret) {
                     if (err) {
                         throw err;
                     }
 
-                    expect(Object.isFrozen(ret.value)).to.be.true;
+                    expect(ret.value).to.be.true;
                 })
                 .call(done);
         });
@@ -165,7 +165,7 @@ describe('client api', function() {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
-                    return window.dashboardApi.readReplicant('clientTest');
+                    window.dashboardApi.readReplicant('clientTest', done);
                 }, function(err, ret) {
                     if (err) {
                         throw err;
@@ -248,6 +248,8 @@ describe('client api', function() {
                     if (err) {
                         throw err;
                     }
+
+                    console.log(ret.value);
 
                     expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
                     expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
