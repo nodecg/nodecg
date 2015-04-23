@@ -77,9 +77,7 @@ describe('extension api', function() {
         });
 
         it('isn\'t writable', function() {
-            expect(function() {
-                e.apis.extension.config.host = 'the_test_failed';
-            }).to.throw(TypeError);
+            expect(Object.isFrozen(e.apis.extension.config)).to.be.true;
         });
     });
 
