@@ -11,14 +11,16 @@ var C = require('./setup/test-constants');
 
 describe('extension api', function() {
     it('can receive messages and fire acknowledgements', function(done) {
-        e.apis.extension.listenFor('clientToServer', function(cb) {
+        this.timeout(10000);
+
+        e.apis.extension.listenFor('clientToServer', function(data, cb) {
             cb();
         });
 
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
             .executeAsync(function(done) {
-                window.dashboardApi.sendMessage('clientToServer', done);
+                window.dashboardApi.sendMessage('clientToServer', null, done);
             }, function(err) {
                 if (err) {
                     throw err;
@@ -28,6 +30,8 @@ describe('extension api', function() {
     });
 
     it('can send messages', function(done) {
+        this.timeout(10000);
+
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
             .execute(function() {
