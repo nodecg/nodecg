@@ -1,6 +1,6 @@
 'use strict';
 
-var Browser = require('zombie');
+var webdriverio = require('webdriverio');
 
 var e = require('./setup/test-environment');
 var C = require('./setup/test-constants');
@@ -19,59 +19,91 @@ before(function(done) {
     }
 
     e.server.once('started', function() {
-        var dashboardDone = false;
-        var viewDone = false;
-        function checkDone() {
-            if (dashboardDone && viewDone) done();
-        }
-
         /** Extension API setup **/
         e.apis.extension = e.server.getExtensions()[C.BUNDLE_NAME];
 
-        /** Dashboard API setup **/
-        // Wait until dashboard API is loaded
-        function dashboardApiLoaded(window) {
-            return (typeof window.dashboardApi !== 'undefined');
+        var desiredCapabilities = {
+            name: "Travis job " + process.env.TRAVIS_JOB_NUMBER,
+            build: process.env.TRAVIS_BUILD_NUMBER,
+            tags: [process.env.TRAVIS_BRANCH, process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE],
+            browserName: 'chrome',
+            version: 'beta',
+            tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+        };
+
+        if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
+            desiredCapabilities.tags.push(process.env.TRAVIS_PULL_REQUEST);
         }
 
-        e.browsers.dashboard = new Browser();
-        e.browsers.dashboard
-            .visit(C.DASHBOARD_URL)
-            .then(function() {
-                e.browsers.dashboard.wait(dashboardApiLoaded, function () {
-                    e.apis.dashboard = e.browsers.dashboard.window.dashboardApi;
-                    if (typeof e.apis.dashboard === 'undefined') {
-                        throw new Error('Dashboard API is undefined!');
+        if (process.env.TRAVIS_TAG) {
+            desiredCapabilities.tags.push(process.env.TRAVIS_TAG);
+        }
+
+        if (process.env.TRAVIS_OS_NAME === 'linux') {
+            desiredCapabilities.platform = 'Linux';
+        }
+        else if (process.env.TRAVIS_OS_NAME === 'osx') {
+            desiredCapabilities.platform = 'OS X 10.10';
+        }
+
+        e.browser.client = webdriverio.remote({
+            desiredCapabilities: desiredCapabilities,
+            host: 'ondemand.saucelabs.com',
+            port: 80,
+            user: process.env.SAUCE_USERNAME,
+            key: process.env.SAUCE_ACCESS_KEY
+        })
+            .init()
+            .timeoutsAsyncScript(10000)
+            .newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
+            .getCurrentTabId(function(err, tabId) {
+                if (err) {
+                    throw err;
+                }
+
+                e.browser.tabs.dashboard = tabId;
+            })
+            .executeAsync(function(done) {
+                var checkForApi;
+                checkForApi = setInterval(function(done) {
+                    if (typeof window.dashboardApi !== 'undefined') {
+                        clearInterval(checkForApi);
+                        done();
                     }
-                    dashboardDone = true;
-                    checkDone();
-                });
-            });
+                }, 50, done);
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+            })
+            .newWindow(C.VIEW_URL, 'NodeCG test bundle view', '')
+            .getCurrentTabId(function(err, tabId) {
+                if (err) {
+                    throw err;
+                }
 
-        /** View API setup **/
-        // Wait until view API is loaded
-        function viewApiLoaded(window) {
-            return (typeof window.viewApi !== 'undefined');
-        }
-
-        // Zombie doesn't set referers itself when requesting assets on a page
-        // For this reason, there is a workaround in lib/bundle_views
-        e.browsers.view = new Browser();
-        e.browsers.view
-            .visit(C.VIEW_URL)
-            .then(function() {
-                e.browsers.view.wait(viewApiLoaded, function () {
-                    e.apis.view = e.browsers.view.window.viewApi;
-                    viewDone = true;
-                    checkDone();
-                });
-            });
+                e.browser.tabs.view = tabId;
+            })
+            .executeAsync(function(done) {
+                var checkForApi;
+                checkForApi = setInterval(function(done) {
+                    if (typeof window.viewApi !== 'undefined') {
+                        clearInterval(checkForApi);
+                        done();
+                    }
+                }, 50, done);
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+            })
+            .timeoutsAsyncScript(5000)
+            .call(done);
     });
     e.server.start();
 });
 
 after(function() {
-    try{
-        e.server.stop();
-    } catch(e) {}
+    e.server.stop();
+    e.browser.client.end();
 });

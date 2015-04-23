@@ -2,7 +2,6 @@
 
 // Modules used to run tests
 var chai = require('chai');
-var should = chai.should();
 var expect = chai.expect;
 var request = require('request');
 var fs = require('fs');
@@ -12,20 +11,60 @@ var C = require('./setup/test-constants');
 
 describe('extension api', function() {
     it('can receive messages and fire acknowledgements', function(done) {
-        e.apis.extension.listenFor('clientToServer', function (data, cb) {
+        this.timeout(10000);
+
+        e.apis.extension.listenFor('clientToServer', function(data, cb) {
             cb();
         });
-        e.apis.dashboard.sendMessage('clientToServer', done);
 
-        // Give Zombie a chance to process socket.io events
-        // What the actual fuck why is this only SOMETIMES necessary??????
-        // I'm so mad what the heck
-        e.browsers.dashboard.wait({duration: 100});
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard)
+            .executeAsync(function(done) {
+                window.dashboardApi.sendMessage('clientToServer', null, done);
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+            })
+            .call(done);
     });
 
     it('can send messages', function(done) {
-        e.apis.dashboard.listenFor('serverToClient', done);
-        e.apis.extension.sendMessage('serverToClient');
+        this.timeout(10000);
+
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard)
+            .execute(function() {
+                window.serverToClientReceived = false;
+
+                window.dashboardApi.listenFor('serverToClient', function() {
+                    window.serverToClientReceived = true;
+                });
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+            });
+
+        var sendMessage = setInterval(function() {
+            e.apis.extension.sendMessage('serverToClient');
+        }, 500);
+
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard)
+            .executeAsync(function(done) {
+                var checkMessageReceived;
+
+                checkMessageReceived = setInterval(function() {
+                    if (window.serverToClientReceived) {
+                        clearInterval(checkMessageReceived);
+                        done();
+                    }
+                }, 50);
+            }, function() {
+                clearInterval(sendMessage);
+            })
+            .call(done);
     });
 
     it('can mount express middleware', function(done) {
@@ -46,9 +85,7 @@ describe('extension api', function() {
         });
 
         it('isn\'t writable', function() {
-            expect(function() {
-                e.apis.extension.config.host = 'the_test_failed';
-            }).to.throw(TypeError);
+            expect(Object.isFrozen(e.apis.extension.config)).to.be.true;
         });
     });
 
@@ -60,16 +97,25 @@ describe('extension api', function() {
 
     describe('replicants', function() {
         it('only apply defaultValue when first declared', function(done) {
-            e.apis.dashboard.Replicant('extensionTest', { defaultValue: 'foo', persistent: false });
+            this.timeout(10000);
 
-            // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 10}, function() {});
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('extensionTest', { defaultValue: 'foo', persistent: false });
 
-            setTimeout(function() {
-                var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
-                expect(rep.value).to.equal('foo');
-                done();
-            }, 50);
+                    rep.on('declared', function() {
+                        done();
+                    });
+                }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
+                    expect(rep.value).to.equal('foo');
+                })
+                .call(done);
         });
 
         it('can be read once without subscription, via readReplicant', function() {
@@ -133,19 +179,28 @@ describe('extension api', function() {
 
         it('load persisted values when they exist', function() {
             // Make sure the persisted value exists
-            fs.writeFileSync('./db/replicants/test-bundle.extensionPersistence', 'it work good!');
+            fs.writeFile('./db/replicants/test-bundle.extensionPersistence', 'it work good!', function(err) {
+                if (err) {
+                    throw err;
+                }
 
-            var rep = e.apis.extension.Replicant('extensionPersistence');
-            expect(rep.value).to.equal('it work good!');
+                var rep = e.apis.extension.Replicant('extensionPersistence');
+                expect(rep.value).to.equal('it work good!');
+            });
         });
 
         it('persist assignment to disk', function(done) {
             var rep = e.apis.extension.Replicant('extensionPersistence');
             rep.value = { nested: 'hey we assigned!' };
             setTimeout(function() {
-                var persistedValue = fs.readFileSync('./db/replicants/test-bundle.extensionPersistence', 'utf-8');
-                expect(persistedValue).to.equal('{"nested":"hey we assigned!"}');
-                done();
+                fs.readFile('./db/replicants/test-bundle.extensionPersistence', 'utf-8', function(err, data) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(data).to.equal('{"nested":"hey we assigned!"}');
+                    done();
+                });
             }, 10);
         });
 
@@ -153,22 +208,34 @@ describe('extension api', function() {
             var rep = e.apis.extension.Replicant('extensionPersistence');
             rep.value.nested = 'hey we changed!';
             setTimeout(function() {
-                var persistedValue = fs.readFileSync('./db/replicants/test-bundle.extensionPersistence', 'utf-8');
-                expect(persistedValue).to.equal('{"nested":"hey we changed!"}');
-                done();
+                fs.readFile('./db/replicants/test-bundle.extensionPersistence', 'utf-8', function(err, data) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(data).to.equal('{"nested":"hey we changed!"}');
+                    done();
+                });
             }, 10);
         });
 
         it('don\'t persist when "persistent" is set to "false"', function() {
             // Remove the file if it exists for some reason
-            try {
-                fs.unlinkSync('./db/replicants/test-bundle.extensionTransience');
-            } catch(e) {}
+            fs.unlink('./db/replicants/test-bundle.extensionTransience', function(err) {
+                if (err && err.code !== 'ENOENT') {
+                    throw err;
+                }
 
-            var rep = e.apis.extension.Replicant('extensionTransience', { persistent: false });
-            rep.value = 'o no';
-            var exists = fs.existsSync('./db/replicants/test-bundle.extensionTransience');
-            expect(exists).to.be.false;
+                var rep = e.apis.extension.Replicant('extensionTransience', { persistent: false });
+                rep.value = 'o no';
+                fs.readFile('./db/replicants/test-bundle.extensionTransience', function(err) {
+                    expect(function() {
+                        if (err) {
+                            throw err;
+                        }
+                    }).to.throw(/ENOENT/);
+                });
+            });
         });
 
         it('gets a fullUpdate when there is a revision mismatch', function(done) {

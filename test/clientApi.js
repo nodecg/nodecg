@@ -2,23 +2,64 @@
 
 // Modules used to run tests
 var chai = require('chai');
-var should = chai.should();
 var expect = chai.expect;
 var fs = require('fs');
 
 var e = require('./setup/test-environment');
 
 describe('client api', function() {
+    this.timeout(10000);
+
     describe('dashboard api', function() {
         // Check for basic connectivity. The rest of the test are run from the dashboard as well.
         it('can receive messages', function(done) {
-            e.apis.dashboard.listenFor('dashboardToServer', done);
-            e.apis.extension.sendMessage('dashboardToServer');
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .execute(function() {
+                    window.serverToDashboardReceived = false;
+
+                    window.dashboardApi.listenFor('serverToDashboard', function() {
+                        window.serverToDashboardReceived = true;
+                    });
+                }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+                });
+
+            var sendMessage = setInterval(function() {
+                e.apis.extension.sendMessage('serverToDashboard');
+            }, 500);
+
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    var checkMessageReceived;
+
+                    checkMessageReceived = setInterval(function() {
+                        if (window.serverToDashboardReceived) {
+                            clearInterval(checkMessageReceived);
+                            done();
+                        }
+                    }, 50);
+                }, function() {
+                    clearInterval(sendMessage);
+                })
+                .call(done);
         });
 
         it('can send messages', function(done) {
-            e.apis.extension.listenFor('serverToDashboard', done);
-            e.apis.dashboard.sendMessage('serverToDashboard');
+            e.apis.extension.listenFor('dashboardToServer', done);
+
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .execute(function() {
+                    window.dashboardApi.sendMessage('dashboardToServer');
+                }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+                });
         });
     });
 
@@ -26,177 +67,388 @@ describe('client api', function() {
         // The view and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
         it('can receive messages', function(done) {
-            e.apis.view.listenFor('viewToServer', done);
-            e.apis.extension.sendMessage('viewToServer');
+            e.browser.client
+                .switchTab(e.browser.tabs.view)
+                .execute(function() {
+                    window.serverToViewReceived = false;
+
+                    window.viewApi.listenFor('serverToView', function() {
+                        window.serverToViewReceived = true;
+                    });
+                }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+                });
+
+            var sendMessage = setInterval(function() {
+                e.apis.extension.sendMessage('serverToView');
+            }, 500);
+
+            e.browser.client
+                .switchTab(e.browser.tabs.view)
+                .executeAsync(function(done) {
+                    var checkMessageReceived;
+
+                    checkMessageReceived = setInterval(function() {
+                        if (window.serverToViewReceived) {
+                            clearInterval(checkMessageReceived);
+                            done();
+                        }
+                    }, 50);
+                }, function() {
+                    clearInterval(sendMessage);
+                })
+                .call(done);
         });
 
         it('can send messages', function(done) {
-            e.apis.extension.listenFor('serverToView', done);
-            e.apis.view.sendMessage('serverToView');
+            e.apis.extension.listenFor('viewToServer', done);
+
+            e.browser.client
+                .switchTab(e.browser.tabs.view)
+                .execute(function() {
+                    window.viewApi.sendMessage('viewToServer');
+                }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+                });
         });
     });
 
     describe('nodecg config', function() {
-        it('exists and has length', function() {
-            expect(e.apis.dashboard.config).to.not.be.empty();
+        it('exists and has length', function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .execute(function() {
+                    return window.dashboardApi.config;
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(ret.value).to.not.be.empty();
+                })
+                .call(done);
         });
 
-        it('doesn\'t reveal sensitive information', function() {
-            expect(e.apis.dashboard.config.login).to.not.have.property('sessionSecret');
+        it('doesn\'t reveal sensitive information', function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .execute(function() {
+                    return window.dashboardApi.config;
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(ret.value.login).to.not.have.property('sessionSecret');
+                })
+                .call(done);
         });
 
-        it('isn\'t writable', function() {
-            expect(function() {
-                e.apis.dashboard.config.host = 'the_test_failed';
-            }).to.throw(TypeError);
+        it('isn\'t writable', function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .execute(function() {
+                    return Object.isFrozen(window.dashboardApi.config);
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(ret.value).to.be.true;
+                })
+                .call(done);
         });
     });
 
     describe('bundle config', function() {
-        it('exists and has length', function() {
-            expect(e.apis.dashboard.bundleConfig).to.not.be.empty();
+        it('exists and has length', function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .execute(function() {
+                    return window.dashboardApi.bundleConfig;
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(ret.value).to.not.be.empty();
+                })
+                .call(done);
         });
     });
 
     describe('replicants', function() {
         it('only apply defaultValue when first declared', function(done) {
             e.apis.extension.Replicant('clientTest', { defaultValue: 'foo', persistent: false });
-            var rep = e.apis.dashboard.Replicant('clientTest', { defaultValue: 'bar' });
 
-            // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 10}, function() {});
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientTest', { defaultValue: 'bar' });
 
-            setTimeout(function() {
-                expect(rep.value).to.equal('foo');
-                done();
-            }, 50);
+                    rep.on('declared', function() {
+                        done(rep.value);
+                    });
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(ret.value).to.equal('foo');
+                })
+                .call(done);
         });
 
         it('can be read once without subscription, via readReplicant', function(done) {
-            e.apis.dashboard.readReplicant('clientTest', function(value) {
-                expect(value).to.equal('foo');
-                done();
-            });
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    window.dashboardApi.readReplicant('clientTest', done);
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(ret.value).to.equal('foo');
+                })
+                .call(done);
         });
 
-        it('throws an error when no name is given to a synced variable', function () {
-            expect(function() {
-                e.apis.dashboard.Replicant();
-            }).to.throw(/Must supply a name when instantiating a Replicant/);
+        it('throws an error when no name is given to a synced variable', function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    try {
+                        window.dashboardApi.Replicant();
+                    }
+                    catch (e) {
+                        done(e.message);
+                    }
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(ret.value).to.equal('Must supply a name when instantiating a Replicant');
+                })
+                .call(done);
         });
 
         it('can be assigned via the ".value" property', function (done) {
-            var rep = e.apis.dashboard.Replicant('clientAssignmentTest', { persistent: false });
-            rep.on('assignmentAccepted', function(data) {
-                expect(data.value).to.equal('assignmentOK');
-                expect(data.revision).to.equal(1);
-                done();
-            });
-            rep.value = 'assignmentOK';
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientAssignmentTest', { persistent: false });
+                    rep.on('assignmentAccepted', function(data) {
+                        done(data);
+                    });
+                    rep.value = 'assignmentOK';
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
 
-            // Give Zombie a chance to process socket.io events.
-            // I don't know why I have to micromanage the event loop like this.
-            // This is dumb.
-            // I am mad.
-            e.browsers.dashboard.wait({duration: 10}, function() {
-                e.browsers.dashboard.wait({duration: 10}, function() {});
-            });
+                    expect(ret.value.value).to.equal('assignmentOK');
+                    expect(ret.value.revision).to.equal(1);
+                })
+                .call(done);
         });
 
         // Skipping this test for now because for some reason changes to the value object
         // aren't triggering the Nested.observe callback.
-        it.skip('reacts to changes in nested properties of objects', function(done) {
-            var rep = e.apis.dashboard.Replicant('clientObjTest', {
-                persistent: false,
-                defaultValue: {
-                    a: {
-                        b: {
-                            c: 'c'
+        it('reacts to changes in nested properties of objects', function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientObjTest', {
+                        persistent: false,
+                        defaultValue: {
+                            a: {
+                                b: {
+                                    c: 'c'
+                                }
+                            }
                         }
+                    });
+
+                    rep.on('declared', function() {
+                        rep.on('change', function(oldVal, newVal, changes) {
+                            if (oldVal && newVal && changes) {
+                                done({
+                                    oldVal: oldVal,
+                                    newVal: newVal,
+                                    changes: changes
+                                });
+                            }
+                        });
+
+                        rep.value.a.b.c = 'nestedChangeOK';
+                    });
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
                     }
-                }
-            });
 
-            rep.on('change', function(oldVal, newVal, changes) {
-                expect(oldVal).to.deep.equal({a: {b: {c: 'c'}}});
-                expect(newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
-                expect(changes).to.have.length(1);
-                expect(changes[0].type).to.equal('update');
-                expect(changes[0].path).to.equal('a.b.c');
-                expect(changes[0].oldValue).to.equal('c');
-                expect(changes[0].newValue).to.equal('nestedChangeOK');
-                done();
-            });
-
-            // This is FUCKING stupid.
-            e.browsers.dashboard.wait({duration: 10}, function() {
-                rep.value.a.b.c = 'nestedChangeOK';
-
-                e.browsers.dashboard.wait({duration: 10}, function() {
-                    e.browsers.dashboard.wait({duration: 10}, function() {});
-                });
-            });
+                    expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
+                    expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
+                    expect(ret.value.changes).to.have.length(1);
+                    expect(ret.value.changes[0].type).to.equal('update');
+                    expect(ret.value.changes[0].path).to.equal('a.b.c');
+                    expect(ret.value.changes[0].oldValue).to.equal('c');
+                    expect(ret.value.changes[0].newValue).to.equal('nestedChangeOK');
+                })
+                .call(done);
         });
 
         it('load persisted values when they exist', function(done) {
             // Make sure the persisted value exists
-            fs.writeFileSync('./db/replicants/test-bundle.clientPersistence', 'it work good!');
+            fs.writeFile('./db/replicants/test-bundle.clientPersistence', 'it work good!', function(err) {
+                if (err) {
+                    throw err;
+                }
 
-            var rep = e.apis.dashboard.Replicant('clientPersistence');
-            e.browsers.dashboard.wait({duration: 10}, function() {
-                expect(rep.value).to.equal('it work good!');
-                done();
+                e.browser.client
+                    .switchTab(e.browser.tabs.dashboard)
+                    .executeAsync(function(done) {
+                        var rep = window.dashboardApi.Replicant('clientPersistence');
+
+                        rep.on('declared', function() {
+                            done(rep.value);
+                        });
+                    }, function(err, ret) {
+                        if (err) {
+                            throw err;
+                        }
+
+                        expect(ret.value).to.equal('it work good!');
+                    })
+                    .call(done);
             });
         });
 
         it('persist assignment to disk', function(done) {
-            var rep = e.apis.dashboard.Replicant('clientPersistence');
-            rep.value = { nested: 'hey we assigned!' };
-            e.browsers.dashboard.wait({duration: 10}, function() {
-                var persistedValue = fs.readFileSync('./db/replicants/test-bundle.clientPersistence', 'utf-8');
-                expect(persistedValue).to.equal('{"nested":"hey we assigned!"}');
-                done();
-            });
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientPersistence');
+                    rep.value = { nested: 'hey we assigned!' };
+
+                    rep.on('change', function() {
+                        done();
+                    });
+                }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    fs.readFile('./db/replicants/test-bundle.clientPersistence', 'utf-8', function(err, data) {
+                        if (err) {
+                            throw err;
+                        }
+
+                        expect(data).to.equal('{"nested":"hey we assigned!"}');
+                        done();
+                    });
+                });
         });
 
-        // Skipping this test for now because for some reason changes to the value object
-        // aren't triggering the Nested.observe callback.
-        it.skip('persist changes to disk', function(done) {
-            var rep = e.apis.dashboard.Replicant('clientPersistence');
-            rep.value.nested = 'hey we changed!';
-            e.browsers.dashboard.wait({duration: 10}, function() {
-                var persistedValue = fs.readFileSync('./db/replicants/test-bundle.clientPersistence', 'utf-8');
-                expect(persistedValue).to.equal('{"nested":"hey we changed!"}');
-                done();
-            });
+        it('persist changes to disk', function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientPersistence');
+                    rep.value.nested = 'hey we changed!';
+
+                    rep.on('change', function() {
+                        done();
+                    });
+                }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    fs.readFile('./db/replicants/test-bundle.clientPersistence', 'utf-8', function(err, data) {
+                        if (err) {
+                            throw err;
+                        }
+
+                        expect(data).to.equal('{"nested":"hey we changed!"}');
+                        done();
+                    });
+                });
         });
 
         it('don\'t persist when "persistent" is set to "false"', function(done) {
-            // Remove the file if it exists for some reason
-            try {
-                fs.unlinkSync('./db/replicants/test-bundle.clientTransience');
-            } catch(e) {}
+            fs.unlink('./db/replicants/test-bundle.clientTransience', function(err) {
+                if (err && err.code !== 'ENOENT') {
+                    throw err;
+                }
 
-            e.apis.dashboard.Replicant('clientTransience', { defaultValue: 'o no', persistent: false });
-            e.browsers.dashboard.wait({duration: 10}, function() {
-                var exists = fs.existsSync('./db/replicants/test-bundle.clientTransience');
-                expect(exists).to.be.false;
-                done();
+                e.browser.client
+                    .switchTab(e.browser.tabs.dashboard)
+                    .executeAsync(function(done) {
+                        var rep = window.dashboardApi.Replicant('clientTransience', { defaultValue: 'o no', persistent: false });
+
+                        rep.on('declared', function() {
+                            done();
+                        });
+                    }, function(err) {
+                        if (err) {
+                            throw err;
+                        }
+
+                        fs.readFile('./db/replicants/test-bundle.clientTransience', function(err) {
+                            expect(function() {
+                                if (err) {
+                                    throw err;
+                                }
+                            }).to.throw(/ENOENT/);
+                        });
+                    })
+                    .call(done);
             });
         });
 
+        // need a better way to test this
         it.skip('redeclare after reconnecting to Socket.IO', function(done) {
             this.timeout(30000);
-            var rep = e.apis.dashboard.Replicant('clientRedeclare', { defaultValue: 'foo', persistent: false });
-            e.browsers.dashboard.wait({duration: 10}, function() {});
-            rep.once('declared', function() {
-                e.server.once('stopped', function() {
-                    rep.once('declared', done);
-                    e.server.once('started', function() {});
-                    e.server.start();
+
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    window.clientRedeclare = window.dashboardApi.Replicant('clientRedeclare', { defaultValue: 'foo', persistent: false });
+
+                    window.clientRedeclare.once('declared', function() {
+                        done();
+                    });
+                }, function(err) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    e.server.once('stopped', function() {
+                        e.browser.client
+                            .switchTab(e.browser.tabs.dashboard)
+                            .executeAsync(function(done) {
+                                window.clientRedeclare.once('declared', function() {
+                                    done();
+                                });
+                            }, function(err) {
+                                if (err) {
+                                    throw err;
+                                }
+                            })
+                            .call(done);
+
+                        e.server.start();
+                    });
+
+                    e.server.stop();
                 });
-                e.server.stop();
-            });
         });
     });
 });
