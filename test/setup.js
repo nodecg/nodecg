@@ -22,15 +22,32 @@ before(function(done) {
         /** Extension API setup **/
         e.apis.extension = e.server.getExtensions()[C.BUNDLE_NAME];
 
+        var desiredCapabilities = {
+            name: "Travis job " + process.env.TRAVIS_JOB_NUMBER,
+            build: process.env.TRAVIS_BUILD_NUMBER,
+            tags: [process.env.TRAVIS_BRANCH, process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE],
+            browserName: 'chrome',
+            version: 'beta',
+            tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+        };
+
+        if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
+            desiredCapabilities.tags.push(process.env.TRAVIS_PULL_REQUEST);
+        }
+
+        if (process.env.TRAVIS_TAG) {
+            desiredCapabilities.tags.push(process.env.TRAVIS_TAG);
+        }
+
+        if (process.env.TRAVIS_OS_NAME === 'linux') {
+            desiredCapabilities.platform = 'Linux';
+        }
+        else if (process.env.TRAVIS_OS_NAME === 'osx') {
+            desiredCapabilities.platform = 'OS X 10.10';
+        }
+
         e.browser.client = webdriverio.remote({
-            desiredCapabilities: {
-                name: "Travis job " + process.env.TRAVIS_JOB_NUMBER,
-                build: process.env.TRAVIS_BUILD_NUMBER,
-                tags: [process.env.TRAVIS_BRANCH, process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE, process.env.TRAVIS_PULL_REQUEST, process.env.TRAVIS_TAG],
-                browserName: 'chrome',
-                version: 'beta',
-                tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
-            },
+            desiredCapabilities: desiredCapabilities,
             host: 'ondemand.saucelabs.com',
             port: 80,
             user: process.env.SAUCE_USERNAME,
