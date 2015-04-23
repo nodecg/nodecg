@@ -47,7 +47,7 @@ describe('extension api', function() {
             });
 
         var sendMessage = setInterval(function() {
-            e.apis.extension.sendMessage('serverToView');
+            e.apis.extension.sendMessage('serverToClient');
         }, 500);
 
         e.browser.client
