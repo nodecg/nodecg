@@ -17,7 +17,7 @@ describe('extension api', function() {
 
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
-            .executeAsync(function() {
+            .executeAsync(function(done) {
                 window.dashboardApi.sendMessage('clientToServer', done);
             }, function(err) {
                 if (err) {
