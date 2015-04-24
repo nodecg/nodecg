@@ -258,21 +258,13 @@ describe('client api', function() {
                 .call(done);
         });
 
-        // Skipping this test for now because for some reason changes to the value object
-        // aren't triggering the Nested.observe callback.
         it('reacts to changes in nested properties of objects', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientObjTest', {
                         persistent: false,
-                        defaultValue: {
-                            a: {
-                                b: {
-                                    c: 'c'
-                                }
-                            }
-                        }
+                        defaultValue: {a: {b: {c: 'c'}}}
                     });
 
                     rep.on('declared', function() {
@@ -300,6 +292,45 @@ describe('client api', function() {
                     expect(ret.value.changes[0].path).to.equal('a.b.c');
                     expect(ret.value.changes[0].oldValue).to.equal('c');
                     expect(ret.value.changes[0].newValue).to.equal('nestedChangeOK');
+                })
+                .call(done);
+        });
+
+        it('react to changes in arrays', function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientArrTest', {
+                        persistent: false,
+                        defaultValue: ['starting']
+                    });
+
+                    rep.on('declared', function() {
+                        rep.on('change', function(oldVal, newVal, changes) {
+                            if (oldVal && newVal && changes) {
+                                done({
+                                    oldVal: oldVal,
+                                    newVal: newVal,
+                                    changes: changes
+                                });
+                            }
+                        });
+
+                        rep.value.push('arrPushOK');
+                    });
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(ret.value.oldVal).to.deep.equal(['starting']);
+                    expect(ret.value.newVal).to.deep.equal(['starting', 'arrPushOK']);
+                    expect(ret.value.changes).to.have.length(1);
+                    expect(ret.value.changes[0].type).to.equal('splice');
+                    expect(ret.value.changes[0].removed).to.deep.equal([]);
+                    expect(ret.value.changes[0].removedCount).to.equal(0);
+                    expect(ret.value.changes[0].added).to.deep.equal(['arrPushOK']);
+                    expect(ret.value.changes[0].addedCount).to.equal(1);
                 })
                 .call(done);
         });

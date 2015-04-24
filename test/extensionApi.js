@@ -137,13 +137,7 @@ describe('extension api', function() {
         it('react to changes in nested properties of objects', function(done) {
             var rep = e.apis.extension.Replicant('extensionObjTest', {
                 persistent: false,
-                defaultValue: {
-                    a: {
-                        b: {
-                            c: 'c'
-                        }
-                    }
-                }
+                defaultValue: {a: {b: {c: 'c'}}}
             });
             rep.on('change', function(oldVal, newVal, changes) {
                 expect(oldVal).to.deep.equal({a: {b: {c: 'c'}}});
