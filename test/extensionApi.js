@@ -171,7 +171,7 @@ describe('extension api', function() {
             rep.value.push('arrPushOK');
         });
 
-        it('load persisted values when they exist', function() {
+        it('load persisted values when they exist', function(done) {
             // Make sure the persisted value exists
             fs.writeFile('./db/replicants/test-bundle.extensionPersistence', 'it work good!', function(err) {
                 if (err) {
@@ -180,6 +180,7 @@ describe('extension api', function() {
 
                 var rep = e.apis.extension.Replicant('extensionPersistence');
                 expect(rep.value).to.equal('it work good!');
+                done();
             });
         });
 
@@ -213,7 +214,7 @@ describe('extension api', function() {
             }, 10);
         });
 
-        it('don\'t persist when "persistent" is set to "false"', function() {
+        it('don\'t persist when "persistent" is set to "false"', function(done) {
             // Remove the file if it exists for some reason
             fs.unlink('./db/replicants/test-bundle.extensionTransience', function(err) {
                 if (err && err.code !== 'ENOENT') {
@@ -228,6 +229,7 @@ describe('extension api', function() {
                             throw err;
                         }
                     }).to.throw(/ENOENT/);
+                    done();
                 });
             });
         });
