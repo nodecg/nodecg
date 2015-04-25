@@ -173,7 +173,7 @@ describe('extension api', function() {
 
         it('load persisted values when they exist', function(done) {
             // Make sure the persisted value exists
-            fs.writeFile('./db/replicants/test-bundle.extensionPersistence', 'it work good!', function(err) {
+            fs.writeFile('./db/replicants/test-bundle/extensionPersistence.rep', 'it work good!', function(err) {
                 if (err) {
                     throw err;
                 }
@@ -188,7 +188,7 @@ describe('extension api', function() {
             var rep = e.apis.extension.Replicant('extensionPersistence');
             rep.value = { nested: 'hey we assigned!' };
             setTimeout(function() {
-                fs.readFile('./db/replicants/test-bundle.extensionPersistence', 'utf-8', function(err, data) {
+                fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', function(err, data) {
                     if (err) {
                         throw err;
                     }
@@ -203,7 +203,7 @@ describe('extension api', function() {
             var rep = e.apis.extension.Replicant('extensionPersistence');
             rep.value.nested = 'hey we changed!';
             setTimeout(function() {
-                fs.readFile('./db/replicants/test-bundle.extensionPersistence', 'utf-8', function(err, data) {
+                fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', function(err, data) {
                     if (err) {
                         throw err;
                     }
@@ -216,14 +216,14 @@ describe('extension api', function() {
 
         it('don\'t persist when "persistent" is set to "false"', function(done) {
             // Remove the file if it exists for some reason
-            fs.unlink('./db/replicants/test-bundle.extensionTransience', function(err) {
+            fs.unlink('./db/replicants/test-bundle/extensionTransience.rep', function(err) {
                 if (err && err.code !== 'ENOENT') {
                     throw err;
                 }
 
                 var rep = e.apis.extension.Replicant('extensionTransience', { persistent: false });
                 rep.value = 'o no';
-                fs.readFile('./db/replicants/test-bundle.extensionTransience', function(err) {
+                fs.readFile('./db/replicants/test-bundle/extensionTransience.rep', function(err) {
                     expect(function() {
                         if (err) {
                             throw err;

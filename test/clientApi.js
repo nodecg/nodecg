@@ -337,7 +337,7 @@ describe('client api', function() {
 
         it('load persisted values when they exist', function(done) {
             // Make sure the persisted value exists
-            fs.writeFile('./db/replicants/test-bundle.clientPersistence', 'it work good!', function(err) {
+            fs.writeFile('./db/replicants/test-bundle/clientPersistence.rep', 'it work good!', function(err) {
                 if (err) {
                     throw err;
                 }
@@ -376,7 +376,7 @@ describe('client api', function() {
                         throw err;
                     }
 
-                    fs.readFile('./db/replicants/test-bundle.clientPersistence', 'utf-8', function(err, data) {
+                    fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
                         if (err) {
                             throw err;
                         }
@@ -402,7 +402,7 @@ describe('client api', function() {
                         throw err;
                     }
 
-                    fs.readFile('./db/replicants/test-bundle.clientPersistence', 'utf-8', function(err, data) {
+                    fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
                         if (err) {
                             throw err;
                         }
@@ -414,7 +414,7 @@ describe('client api', function() {
         });
 
         it('don\'t persist when "persistent" is set to "false"', function(done) {
-            fs.unlink('./db/replicants/test-bundle.clientTransience', function(err) {
+            fs.unlink('./db/replicants/test-bundle/clientTransience.rep', function(err) {
                 if (err && err.code !== 'ENOENT') {
                     throw err;
                 }
@@ -432,7 +432,7 @@ describe('client api', function() {
                             throw err;
                         }
 
-                        fs.readFile('./db/replicants/test-bundle.clientTransience', function(err) {
+                        fs.readFile('./db/replicants/test-bundle/clientTransience.rep', function(err) {
                             expect(function() {
                                 if (err) {
                                     throw err;
