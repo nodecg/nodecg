@@ -11,10 +11,15 @@ describe('client api', function() {
     this.timeout(10000);
 
     describe('dashboard api', function() {
+        before(function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .call(done);
+        });
+
         // Check for basic connectivity. The rest of the test are run from the dashboard as well.
         it('can receive messages', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
                     window.serverToDashboardReceived = false;
 
@@ -22,9 +27,7 @@ describe('client api', function() {
                         window.serverToDashboardReceived = true;
                     });
                 }, function(err) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
                 });
 
             var sendMessage = setInterval(function() {
@@ -32,7 +35,6 @@ describe('client api', function() {
             }, 500);
 
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     var checkMessageReceived;
 
@@ -52,23 +54,25 @@ describe('client api', function() {
             e.apis.extension.listenFor('dashboardToServer', done);
 
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
                     window.dashboardApi.sendMessage('dashboardToServer');
                 }, function(err) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
                 });
         });
     });
 
     describe('view api', function() {
+        before(function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.view)
+                .call(done);
+        });
+
         // The view and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
         it('can receive messages', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.view)
                 .execute(function() {
                     window.serverToViewReceived = false;
 
@@ -76,9 +80,7 @@ describe('client api', function() {
                         window.serverToViewReceived = true;
                     });
                 }, function(err) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
                 });
 
             var sendMessage = setInterval(function() {
@@ -86,7 +88,6 @@ describe('client api', function() {
             }, 500);
 
             e.browser.client
-                .switchTab(e.browser.tabs.view)
                 .executeAsync(function(done) {
                     var checkMessageReceived;
 
@@ -106,27 +107,27 @@ describe('client api', function() {
             e.apis.extension.listenFor('viewToServer', done);
 
             e.browser.client
-                .switchTab(e.browser.tabs.view)
                 .execute(function() {
                     window.viewApi.sendMessage('viewToServer');
                 }, function(err) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
                 });
         });
     });
 
     describe('nodecg config', function() {
-        it('exists and has length', function(done) {
+        before(function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
+                .call(done);
+        });
+
+        it('exists and has length', function(done) {
+            e.browser.client
                 .execute(function() {
                     return window.dashboardApi.config;
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     expect(ret.value).to.not.be.empty();
                 })
@@ -135,13 +136,10 @@ describe('client api', function() {
 
         it('doesn\'t reveal sensitive information', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
                     return window.dashboardApi.config;
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     expect(ret.value.login).to.not.have.property('sessionSecret');
                 })
@@ -150,13 +148,10 @@ describe('client api', function() {
 
         it('isn\'t writable', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .execute(function() {
                     return Object.isFrozen(window.dashboardApi.config);
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     expect(ret.value).to.be.true;
                 })
@@ -165,15 +160,18 @@ describe('client api', function() {
     });
 
     describe('bundle config', function() {
-        it('exists and has length', function(done) {
+        before(function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
+                .call(done);
+        });
+
+        it('exists and has length', function(done) {
+            e.browser.client
                 .execute(function() {
                     return window.dashboardApi.bundleConfig;
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     expect(ret.value).to.not.be.empty();
                 })
@@ -182,11 +180,16 @@ describe('client api', function() {
     });
 
     describe('replicants', function() {
+        before(function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .call(done);
+        });
+
         it('only apply defaultValue when first declared', function(done) {
             e.apis.extension.Replicant('clientTest', { defaultValue: 'foo', persistent: false });
 
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientTest', { defaultValue: 'bar' });
 
@@ -194,9 +197,7 @@ describe('client api', function() {
                         done(rep.value);
                     });
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     expect(ret.value).to.equal('foo');
                 })
@@ -205,13 +206,10 @@ describe('client api', function() {
 
         it('can be read once without subscription, via readReplicant', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     window.dashboardApi.readReplicant('clientTest', done);
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     expect(ret.value).to.equal('foo');
                 })
@@ -220,7 +218,6 @@ describe('client api', function() {
 
         it('throws an error when no name is given to a synced variable', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     try {
                         window.dashboardApi.Replicant();
@@ -229,9 +226,7 @@ describe('client api', function() {
                         done(e.message);
                     }
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     expect(ret.value).to.equal('Must supply a name when instantiating a Replicant');
                 })
@@ -240,7 +235,6 @@ describe('client api', function() {
 
         it('can be assigned via the ".value" property', function (done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientAssignmentTest', { persistent: false });
                     rep.on('assignmentAccepted', function(data) {
@@ -248,9 +242,7 @@ describe('client api', function() {
                     });
                     rep.value = 'assignmentOK';
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     expect(ret.value.value).to.equal('assignmentOK');
                     expect(ret.value.revision).to.equal(1);
@@ -260,7 +252,6 @@ describe('client api', function() {
 
         it('reacts to changes in nested properties of objects', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientObjTest', {
                         persistent: false,
@@ -281,9 +272,7 @@ describe('client api', function() {
                         rep.value.a.b.c = 'nestedChangeOK';
                     });
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
                     expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
@@ -298,7 +287,6 @@ describe('client api', function() {
 
         it('react to changes in arrays', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientArrTest', {
                         persistent: false,
@@ -319,9 +307,7 @@ describe('client api', function() {
                         rep.value.push('arrPushOK');
                     });
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     expect(ret.value.oldVal).to.deep.equal(['starting']);
                     expect(ret.value.newVal).to.deep.equal(['starting', 'arrPushOK']);
@@ -343,7 +329,6 @@ describe('client api', function() {
                 }
 
                 e.browser.client
-                    .switchTab(e.browser.tabs.dashboard)
                     .executeAsync(function(done) {
                         var rep = window.dashboardApi.Replicant('clientPersistence');
 
@@ -363,7 +348,6 @@ describe('client api', function() {
 
         it('persist assignment to disk', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
                     rep.value = { nested: 'hey we assigned!' };
@@ -372,9 +356,7 @@ describe('client api', function() {
                         done();
                     });
                 }, function(err) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
                         if (err) {
@@ -389,7 +371,6 @@ describe('client api', function() {
 
         it('persist changes to disk', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
                     rep.value.nested = 'hey we changed!';
@@ -398,9 +379,7 @@ describe('client api', function() {
                         done();
                     });
                 }, function(err) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
                         if (err) {
@@ -420,7 +399,6 @@ describe('client api', function() {
                 }
 
                 e.browser.client
-                    .switchTab(e.browser.tabs.dashboard)
                     .executeAsync(function(done) {
                         var rep = window.dashboardApi.Replicant('clientTransience', { defaultValue: 'o no', persistent: false });
 
@@ -449,7 +427,6 @@ describe('client api', function() {
             this.timeout(30000);
 
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     window.clientRedeclare = window.dashboardApi.Replicant('clientRedeclare', { defaultValue: 'foo', persistent: false });
 
@@ -457,13 +434,10 @@ describe('client api', function() {
                         done();
                     });
                 }, function(err) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
 
                     e.server.once('stopped', function() {
                         e.browser.client
-                            .switchTab(e.browser.tabs.dashboard)
                             .executeAsync(function(done) {
                                 window.clientRedeclare.once('declared', function() {
                                     done();
@@ -480,6 +454,23 @@ describe('client api', function() {
 
                     e.server.stop();
                 });
+        });
+
+        it('can be programmatically accessed via nodecg.declaredReplicants', function(done) {
+            e.browser.client
+                .execute(function() {
+                    window.dashboardApi.Replicant('clientProgrammatic', {
+                        defaultValue: 'foo',
+                        persistent: false
+                    });
+
+                    return window.dashboardApi.declaredReplicants['test-bundle'].clientProgrammatic.value;
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value).to.equal('foo');
+                })
+                .call(done);
         });
     });
 });

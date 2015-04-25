@@ -246,6 +246,14 @@ describe('extension api', function() {
             rep.revision = -10;
             rep.value.foo = 'baz';
         });
+
+        it('can be programmatically accessed via nodecg.declaredReplicants', function() {
+            e.apis.extension.Replicant('extensionProgrammatic', {
+                defaultValue: 'foo',
+                persistent: false
+            });
+            expect(e.apis.extension.declaredReplicants['test-bundle'].extensionProgrammatic.value).to.equal('foo');
+        });
     });
 
 });
