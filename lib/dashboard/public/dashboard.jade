@@ -78,6 +78,7 @@ html(lang="en")
 
         //- Core JavaScript
         script(src='/components/jquery/dist/jquery.min.js')
+        script(src='/components/jquery-cookie/jquery.cookie.js')
         script(src='/components/bootstrap/dist/js/bootstrap.min.js')
         script(src='/components/bootstrap/js/tooltip.js')
         script(src='/components/bootstrap/js/popover.js')
@@ -99,9 +100,10 @@ html(lang="en")
         //- Load socket.io and immediately create a socket that all dashboard code will use
         script(src='/socket.io/socket.io.js')
         script(type='text/javascript').
-            window.socket = io.connect('//#{ ncgConfig.baseURL }/');
+            window.socket = io.connect('//#{ ncgConfig.baseURL }/', {
+                query: 'token=' + $.cookie('socketToken')
+            });
         script(src='/nodecg-api.js')
-
         script(src='/dashboard/dashboard.js')
 
         //- Bundle panels

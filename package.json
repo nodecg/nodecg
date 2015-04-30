@@ -44,9 +44,11 @@
     "request": "^2.51.0",
     "semver": "^4.3.3",
     "socket.io": "^1.2.1",
+    "socketio-jwt": "^4.0.0",
     "string.prototype.endswith": "^0.2.0",
     "uuid": "^2.0.1",
-    "winston": "^1.0.0"
+    "winston": "^1.0.0",
+    "xtend": "^4.0.0"
   },
   "scripts": {
     "build-css": "lessc ./lib/dashboard/src/dashboard.less > ./lib/dashboard/public/dashboard.css",
