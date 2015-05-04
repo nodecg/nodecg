@@ -244,7 +244,7 @@ describe('client api', function() {
                 }, function(err, ret) {
                     if (err) throw err;
 
-                    expect(ret.value.value).to.equal('assignmentOK');
+                    expect(ret.value.newValue).to.equal('assignmentOK');
                     expect(ret.value.revision).to.equal(1);
                 })
                 .call(done);
