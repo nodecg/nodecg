@@ -20,6 +20,7 @@ mixin panelInfoBtn(panel)
     data-html="true",
     data-container="body"
     data-placement="bottom",
+    data-rawurl=panel.viewUrl,
     data-content="<a target='_blank' href='#{ panel.viewUrl }'>#{ panel.viewUrl }</a>")
         i.fa.fa-info
 
@@ -58,16 +59,24 @@ html(lang="en")
             window.ncgConfig = !{ JSON.stringify(ncgConfig) };
 
     body
-        div(class='navbar navbar-inverse navbar-fixed-top', role='navigation')
+        div(class='navbar navbar-inverse navbar-fixed-top' role='navigation')
             div.container
                 div.navbar-header
-                    a(class='navbar-brand', href='#') NodeCG dashboard
-                if ncgConfig.login.enabled
-                    .collapse.navbar-collapse
-                        ul.nav.navbar-nav.navbar-right
+                    a(class='navbar-brand' href='#')
+                        img(src="/dashboard/img/navbar-logo.png" alt="NodeCG dashboard" title="NodeCG dashboard")
+                .collapse.navbar-collapse
+                    ul.nav.navbar-nav
+                        if ncgConfig.login.enabled
+                            li
+                                a(href="#" title="View key" data-toggle="modal" data-target="#viewKey")
+                                    i.fa.fa-key
+                                    |  View Key
+                    ul.nav.navbar-nav.navbar-right
+                        if ncgConfig.login.enabled
                             li
                                 a(href="/logout" title="Sign out")
                                     i.fa.fa-sign-out
+
 
         //- Alert container element for socket disconnects/errors/reconnects
         .container
@@ -76,8 +85,13 @@ html(lang="en")
         //- Spacer
         p
 
+        //- Add "view key" modal if config is enabled
+        if ncgConfig.login.enabled
+            include ./includes/view_key_modal.jade
+
         //- Core JavaScript
         script(src='/components/jquery/dist/jquery.min.js')
+        script(src='/components/jquery-cookie/jquery.cookie.js')
         script(src='/components/bootstrap/dist/js/bootstrap.min.js')
         script(src='/components/bootstrap/js/tooltip.js')
         script(src='/components/bootstrap/js/popover.js')
@@ -86,6 +100,10 @@ html(lang="en")
         script(src='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js')
         script(src='/components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js')
         script(src='/components/typeahead.js/dist/typeahead.jquery.min.js')
+
+        if ncgConfig.login.enabled
+            script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
+            script(src='/dashboard/key.js')
 
         //- Firefox doesn't support native WebCrypto yet >:(
         script(src='/components/cryptojslib/components/core-min.js')
@@ -98,10 +116,15 @@ html(lang="en")
 
         //- Load socket.io and immediately create a socket that all dashboard code will use
         script(src='/socket.io/socket.io.js')
-        script(type='text/javascript').
-            window.socket = io.connect('//#{ ncgConfig.baseURL }/');
+        if ncgConfig.login.enabled
+            script(type='text/javascript').
+                window.socket = io.connect('//#{ ncgConfig.baseURL }/', {
+                    query: 'token=' + $.cookie('socketToken')
+                });
+        else
+            script(type='text/javascript').
+                window.socket = io.connect('//#{ ncgConfig.baseURL }/');
         script(src='/nodecg-api.js')
-
         script(src='/dashboard/dashboard.js')
 
         //- Bundle panels

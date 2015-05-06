@@ -46,7 +46,8 @@
     "socket.io": "^1.2.1",
     "string.prototype.endswith": "^0.2.0",
     "uuid": "^2.0.1",
-    "winston": "^1.0.0"
+    "winston": "^1.0.0",
+    "xtend": "^4.0.0"
   },
   "scripts": {
     "build-css": "lessc ./lib/dashboard/src/dashboard.less > ./lib/dashboard/public/dashboard.css",
@@ -77,7 +78,6 @@
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
     "webdriverio": "^2.4.5",
-    "wrench": "^1.5.8",
-    "zombie": "^3.1.1"
+    "wrench": "^1.5.8"
   }
 }

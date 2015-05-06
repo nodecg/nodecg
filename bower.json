@@ -18,7 +18,9 @@
     "seiyria-bootstrap-slider": "~4.0.8",
     "typeahead.js": "~0.10.5",
     "cryptojslib": "~3.1.2",
-    "obs-remote": "^1.0.0"
+    "obs-remote": "^1.0.0",
+    "jquery-cookie": "~1.4.1",
+    "zeroclipboard": "~2.2.0"
   },
   "license": "MIT",
   "private": true,
