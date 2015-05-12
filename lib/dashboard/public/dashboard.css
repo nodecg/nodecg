@@ -152,3 +152,7 @@ textarea {
 .navbar-brand {
   padding: 8px 15px;
 }
+.navbar-inverse .navbar-collapse,
+.navbar-inverse .navbar-form {
+  border-color: #00bebe;
+}
