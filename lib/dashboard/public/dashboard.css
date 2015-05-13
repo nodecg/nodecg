@@ -1,14 +1,51 @@
+#utils {
+  background-color: #e0e0e0;
+  height: 100%;
+  padding: 16px;
+}
+#panels {
+  background-color: #f5f5f5;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding: 32px;
+}
+nodecg-dashboard-panel {
+  width: 230px;
+}
 nodecg-dashboard-panel.width-1 {
-  width: 240px;
+  width: 230px;
 }
 nodecg-dashboard-panel.width-2 {
   width: 480px;
 }
 nodecg-dashboard-panel.width-3 {
-  width: 720px;
+  width: 730px;
 }
 nodecg-dashboard-panel.width-4 {
-  width: 960px;
+  width: 980px;
+}
+.logo {
+  vertical-align: middle;
+}
+.text-warning {
+  color: #c53929;
+}
+.panel-heading {
+  background-color: #616161;
+  color: #f5f5f5;
+  opacity: 100%;
+  padding: 10px 15px;
+}
+.panel-heading.green {
+  background-color: #0b8043;
+}
+.panel-heading > core-icon {
+  opacity: 70%;
+}
+.panel-body {
+  color: #616161;
+  padding: 15px;
 }
 .navbar {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
