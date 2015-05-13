@@ -16,9 +16,13 @@ html(lang="en")
         link(rel='import', href='/components/paper-header-panel/paper-header-panel.html')
         link(rel='import', href='/components/paper-toolbar/paper-toolbar.html')
 
+        link(rel='import', href='/dashboard/elements/nodecg-dashboard-panel.html')
+
         each bundle in bundles
             each panel in bundle.dashboard.panels
                 link(rel='import', href='/dashboard/' + bundle.name + '/' + panel.file)
+
+        link(rel='stylesheet', href='/dashboard/dashboard.css')
 
         style(is='custom-style').
             * {
@@ -29,8 +33,20 @@ html(lang="en")
             paper-toolbar
                 span.flex: img(src="/dashboard/img/navbar-logo.png" alt="NodeCG dashboard" title="NodeCG dashboard")
                 if ncgConfig.login.enabled
-                    paper-icon-button(icon='communication:vpn-key', alt='View Key')
                     paper-icon-button(icon='exit-to-app', alt='Sign Out')
             paper-drawer-panel
                 div(drawer)
-                div(main)
+                    if ncgConfig.login.enabled
+                        paper-icon-button(icon='communication:vpn-key', alt='View Key')
+                #panels(main)
+                    each bundle in bundles
+                        each panel in bundle.dashboard.panels
+                            nodecg-dashboard-panel(class='width-' + panel.width)
+                                #{panel.element}
+        script(src='/components/packery/dist/packery.pkgd.min.js')
+        script.
+            var panels = document.querySelector('#panels');
+            var pckry = new Packery(panels, {
+                itemSelector: 'nodecg-dashboard-panel',
+                gutter: 10
+            });
