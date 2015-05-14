@@ -1,0 +1,27 @@
+<link rel="import" href="/components/polymer/polymer.html">
+
+<dom-module id="nodecg-test-view">
+    <style>
+    </style>
+    <template>
+        <p>This is a test view!</p>
+        <p id="bundleConfig">{{nodecg.bundleConfig.test}}</p>
+        <p id="bundleName">{{nodecg.bundleName}}</p>
+        <p id="ncgConfig">{{nodecg.config.host}}</p>
+    </template>
+</dom-module>
+
+<script src="/nodecg-api.js"></script>
+
+<script>
+    Polymer({
+        is: "nodecg-test-view",
+        properties: {
+            bundle: Object
+        },
+        ready: function() {
+            this.nodecg = new NodeCG(this.bundle, window.socket);
+            window.viewApi = this.nodecg;
+        }
+    });
+</script>
