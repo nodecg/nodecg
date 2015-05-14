@@ -23,6 +23,9 @@ html(lang="en")
         script(src='/socket.io/socket.io.js')
         script(src='/nodecg-socket.js')
 
-    body(style='width: ' + width + 'px; height: ' + height + 'px;')
-        each view in views
-            #{view.element}(bundle=JSON.stringify(view.bundle))
+        script(src='/display/display.js')
+
+    body
+        .container(style='width: ' + width + 'px; height: ' + height + 'px;')
+            each view in views
+                #{view.element}.view(bundle=JSON.stringify(view.bundle))
