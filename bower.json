@@ -21,7 +21,7 @@
     "jquery-cookie": "~1.4.1",
     "zeroclipboard": "~2.2.0",
     "polymer": "Polymer/polymer#^1.0.0",
-    "webcomponentsjs": "~0.6.1",
+    "webcomponentsjs": "^0.7",
     "packery": "~1.4.1",
     "cookies-js": "~1.2.1",
     "paper-elements": "PolymerElements/paper-elements#~0.9.0",
