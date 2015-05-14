@@ -6,6 +6,9 @@ html(lang="en")
         //- Web Component support
         script(src='/components/webcomponentsjs/webcomponents-lite.min.js')
 
+        //- Polymer
+        link(rel='import', href='/components/polymer/polymer.html')
+
         //- import display views
         each view in views
             link(rel='import', href='/display/' + view.bundle.name + '/' + view.file)
