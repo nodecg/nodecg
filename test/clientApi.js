@@ -62,29 +62,29 @@ describe('client api', function() {
         });
     });
 
-    describe('view api', function() {
+    describe('display api', function() {
         before(function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.view)
+                .switchTab(e.browser.tabs.display)
                 .call(done);
         });
 
-        // The view and dashboard APIs use the same file
+        // The display and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
         it('can receive messages', function(done) {
             e.browser.client
                 .execute(function() {
-                    window.serverToViewReceived = false;
+                    window.serverToDisplayReceived = false;
 
-                    window.viewApi.listenFor('serverToView', function() {
-                        window.serverToViewReceived = true;
+                    window.displayApi.listenFor('serverToDisplay', function() {
+                        window.serverToDisplayReceived = true;
                     });
                 }, function(err) {
                     if (err) throw err;
                 });
 
             var sendMessage = setInterval(function() {
-                e.apis.extension.sendMessage('serverToView');
+                e.apis.extension.sendMessage('serverToDisplay');
             }, 500);
 
             e.browser.client
@@ -92,7 +92,7 @@ describe('client api', function() {
                     var checkMessageReceived;
 
                     checkMessageReceived = setInterval(function() {
-                        if (window.serverToViewReceived) {
+                        if (window.serverToDisplayReceived) {
                             clearInterval(checkMessageReceived);
                             done();
                         }
@@ -104,11 +104,11 @@ describe('client api', function() {
         });
 
         it('can send messages', function(done) {
-            e.apis.extension.listenFor('viewToServer', done);
+            e.apis.extension.listenFor('displayToServer', done);
 
             e.browser.client
                 .execute(function() {
-                    window.viewApi.sendMessage('viewToServer');
+                    window.displayApi.sendMessage('displayToServer');
                 }, function(err) {
                     if (err) throw err;
                 });

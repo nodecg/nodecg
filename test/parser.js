@@ -30,8 +30,8 @@ describe('per-bundle bower packages', function() {
         });
     });
 
-    it('are accessible via /view', function(done) {
-        request(C.VIEW_URL + '/components/webcomponentsjs/webcomponents.js', function (error, response, body) {
+    it('are accessible via /display', function(done) {
+        request(C.DISPLAY_BUNDLE_URL + '/components/webcomponentsjs/webcomponents.js', function (error, response, body) {
             expect(error).to.be.null();
             expect(response.statusCode).to.equal(200);
             done();
