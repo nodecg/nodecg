@@ -245,7 +245,7 @@ function Replicant(name, bundle, opts, nodecg) {
     nodecg.socket.on('replicantChanged', function (data) {
         if (data.name !== name || data.bundle !== bundle) return;
         else if (data.revision !== (self.revision + 1)) {
-            log.debug('[%s] Replicant "%s" not at head revision (ours %s, theirs %s), fetching latest...',
+            log.replicants('[%s] Replicant "%s" not at head revision (ours %s, theirs %s), fetching latest...',
                 bundle, name, self.revision, data.revision);
             fullUpdate();
             return;
