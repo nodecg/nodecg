@@ -2,10 +2,6 @@
   {
     "name": "test",
     "file": "nodecg-test-view.html",
-    "element": "nodecg-test-view",
-    "optimalDisplayRes": {
-        "width": 1280,
-        "height": 720
-    }
+    "element": "nodecg-test-view"
   }
 ]
