@@ -76,7 +76,7 @@ html(lang="en")
                 #panels(main)
                     each bundle in bundles
                         each panel in bundle.dashboard.panels
-                            nodecg-dashboard-panel(class='width-' + panel.width, name=panel.name)
+                            nodecg-dashboard-panel(class='width-' + panel.width, name=panel.title)
                                 #{panel.element}(bundle=JSON.stringify(bundle))
         paper-toast.paper-font-body1#socket-error(text='Unhandled socket error!')
         paper-toast.paper-font-body1#socket-disconnected(text='Lost connection to NodeCG server!')
