@@ -37,27 +37,22 @@ html(lang="en")
         //- dashboard CSS
         link(rel='stylesheet', href='/dashboard/dashboard.css')
 
-        //- initialize the socket
-        script(src='/components/cookies-js/dist/cookies.min.js')
-        script(src='/socket.io/socket.io.js')
-        if ncgConfig.login.enabled
-            script(type='text/javascript').
-                window.socket = io.connect('//#{ ncgConfig.baseURL }/', {
-                    query: 'token=' + Cookies.get('socketToken')
-                });
-        else
-            script(type='text/javascript').
-                window.socket = io.connect('//#{ ncgConfig.baseURL }/');
-
         //- make the global config available
         script(type='text/javascript').
             window.ncgConfig = !{ JSON.stringify(ncgConfig) };
+
+        //- initialize the socket
+        script(src='/components/cookies-js/dist/cookies.min.js')
+        script(src='/components/cn-jsurl/url.min.js')
+        script(src='/socket.io/socket.io.js')
+        script(src='/nodecg-socket.js')
 
         //- custom styles for Polymer
         style(is='custom-style').
             * {
                 --default-primary-color: #00bebe;
             }
+
     body.fullbleed.vertical.layout
         paper-header-panel.flex
             paper-toolbar
