@@ -15,8 +15,12 @@ html(lang="en")
         link(rel='import', href='/components/iron-icons/iron-icons.html')
         link(rel='import', href='/components/iron-overlay-behavior/iron-overlay-behavior.html')
         link(rel='import', href='/components/paper-button/paper-button.html')
+        link(rel='import', href='/components/paper-checkbox/paper-checkbox.html')
         link(rel='import', href='/components/paper-drawer-panel/paper-drawer-panel.html')
         link(rel='import', href='/components/paper-icon-button/paper-icon-button.html')
+        link(rel='import', href='/components/paper-input/paper-input.html')
+        link(rel='import', href='/components/paper-item/paper-item.html')
+        link(rel='import', href='/components/paper-item/paper-item-body.html')
         link(rel='import', href='/components/paper-header-panel/paper-header-panel.html')
         link(rel='import', href='/components/paper-styles/paper-styles.html')
         link(rel='import', href='/components/paper-styles/paper-styles-classes.html')
@@ -47,6 +51,11 @@ html(lang="en")
         script(src='/socket.io/socket.io.js')
         script(src='/nodecg-socket.js')
 
+        //- other dashboard scripts
+        script(src='/components/packery/dist/packery.pkgd.min.js')
+        script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
+        script(src='/dashboard/dashboard.js')
+
         //- custom styles for Polymer
         style(is='custom-style').
             * {
@@ -67,6 +76,27 @@ html(lang="en")
                         paper-button.paper-font-button#showKey(alt='View Key')
                             iron-icon(icon='communication:vpn-key')
                             | &ensp;View Key
+
+                    h2.paper-font-title Display
+                    h3.paper-font-subhead Resolution
+                    paper-input#displayWidth(auto-validate, type='number', required, error-message='must be valid width', placeholder='width', value=1280)
+                    paper-input#displayHeight(auto-validate, type='number', required, error-message='must be valid width', placeholder='height', value=720)
+                    h3.paper-font-subhead Views
+                    div#displayViews
+                        each bundle in bundles
+                            each view in bundle.display.views
+                                paper-item.displayView
+                                    paper-item-body
+                                        div= view.name
+                                        div(secondary)= bundle.name
+                                    paper-checkbox(checked, value=bundle.name + ':' + view.name)
+                    h3.paper-font-subhead Display
+                    paper-button.paper-font-button#openDisplay(alt='Open Display')
+                        iron-icon(icon='icons:launch')
+                        | &ensp;Open
+                    paper-button.paper-font-button#copyDisplayURL(alt='Copy Display URL')
+                        iron-icon(icon='icons:link')
+                        | &ensp;Copy URL
 
                 #panels(main)
                     each bundle in bundles
@@ -97,12 +127,3 @@ html(lang="en")
                         paper-button.paper-font-button#resetKey(alt='Reset Key')
                             iron-icon(icon='icons:refresh')
                             | &ensp;Reset Key
-
-        //- other dashboard scripts
-        script(src='/components/packery/dist/packery.pkgd.min.js')
-        script(src='/dashboard/dashboard.js')
-
-        //- for secured instances of NodeCG
-        if ncgConfig.login.enabled
-            script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
-            script(src='/dashboard/secure.js')
