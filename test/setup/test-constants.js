@@ -14,7 +14,7 @@ var bundleCfgPath       = path.resolve(cfgDir, bundleName + '.json');
 var baseUrl             = util.format('http://%s', config.baseURL);
 var dashboardUrl        = baseUrl + '/dashboard/';
 var dashboardBundleUrl  = dashboardUrl + bundleName;
-var dashboardUrl        = baseUrl + '/display/';
+var displayUrl          = baseUrl + '/display/';
 var displayBundleUrl    = displayUrl + bundleName;
 
 module.exports = {
