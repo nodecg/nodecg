@@ -10,6 +10,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "webcomponentsjs": "~0.7.0"
+    "webcomponentsjs": "^0.7.0"
   }
 }
