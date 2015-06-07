@@ -9,7 +9,6 @@ NodeCG is based on the overlay system developed for the [Tip of the Hats 2014](h
     <tr>
       <th>Linux</th>
       <th>OS X</th>
-      <th>Windows</th>
       <th>Test Coverage</th>
     </tr>
   </thead>
@@ -19,14 +18,15 @@ NodeCG is based on the overlay system developed for the [Tip of the Hats 2014](h
         <a href="https://travis-ci.org/nodecg/nodecg"><img src="https://travis-ci.org/nodecg/nodecg.svg"></a>
       </td>
       <td align="center">
-        <a href="https://ci.appveyor.com/project/mattmcnam/nodecg"><img src="https://ci.appveyor.com/api/projects/status/nwbo16kjvkekeb32?svg=true"></a>
-      </td>
-      <td align="center">
         <a href="https://coveralls.io/r/nodecg/nodecg"><img src="https://img.shields.io/coveralls/nodecg/nodecg.svg"></a>
       </td>
     </tr>
   </tbody>
 </table>
+
+We currently do not perform automated tests on Windows, as we've yet to develop a good way of running our WebDriver.io
+tests on it. However, a significant portion of our development is done on Windows and it is safe to assume that if the
+Linux/OS X builds are passing that the Windows build is OK.
 
 Have questions about NodeCG, or just want to say 'hi'? Join our Gitter!  
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nodecg/nodecg)
@@ -37,10 +37,8 @@ A _bundle_ contains HTML, Javascript, CSS, and any other resources required to p
 See [nodecg-samples](http://github.com/nodecg/nodecg-samples/) for some examples of how these bundles are structured.
 
 ### Installation
-First, install [node.js & npm](http://nodejs.org/).  
-Next, you'll need to install [Python 2.7](https://www.python.org/) on Windows. Mac OS X and Linux should have this already.  
-Finally, install [Visual Studio Express](http://go.microsoft.com/?linkid=9816758) on Windows, Xcode on OS X, and `build-essential` (or equivalent) on Linux.  
-Now run the following commands:
+Install [node.js & npm](http://nodejs.org/).  
+Then, run the following commands:
 ```
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
@@ -79,7 +77,11 @@ Check which branch you should PR to. NodeCG is still in an unstable state, so we
 NodeCG is provided under the MIT license, which is available to read in the [LICENSE][] file.
 [license]: LICENSE
 
+### Contributors
+* [Matt "Bluee" McNamara](http://mattmcn.com/)  
+* [Alex "Lange" Van Camp](http://alexvancamp.com)  
+* ["tsc"](http://fwdcp.net)  
+
 ### Credits
-[Alex "Lange" Van Camp](http://alexvancamp.com), lead programmer & designer of [toth-overlay](https://github.com/Langeh/toth-overlay), contributor to NodeCG  
-[Matt "Bluee" McNamara](http://mattmcn.com/), contributor to NodeCG  
-[Atmo](https://github.com/atmosfar), original dashboard concept and code  
+* [Atmo](https://github.com/atmosfar), original dashboard concept and code  
+* [Alex "Lange" Van Camp](http://alexvancamp.com), lead programmer & designer of [toth-overlay](https://github.com/TipoftheHats/toth-overlay)  
