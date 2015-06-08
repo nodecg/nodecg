@@ -1,0 +1,38 @@
+<link rel="import" href="/components/polymer/polymer.html">
+
+<link rel="import" href="/components/paper-material/paper-material.html">
+<link rel="import" href="/components/paper-styles/paper-styles.html">
+<link rel="import" href="/components/paper-styles/paper-styles-classes.html">
+
+<dom-module id="nodecg-dashboard-panel">
+    <style>
+        .heading {
+            background-color: var(--google-grey-700);
+            color: var(--google-grey-100);
+            padding: 10px 15px;
+        }
+
+        .body {
+            padding: 15px;
+        }
+    </style>
+    <template>
+        <paper-material>
+            <div class="heading paper-font-title">
+                <span>{{name}}</span>
+            </div>
+            <div class="body">
+                <content></content>
+            </div>
+        </paper-material>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is: "nodecg-dashboard-panel",
+        properties: {
+            name: String
+        }
+    });
+</script>

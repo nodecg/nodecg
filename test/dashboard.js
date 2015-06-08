@@ -10,26 +10,11 @@ var e = require('./setup/test-environment');
 describe('dashboard', function() {
     this.timeout(10000);
 
-    describe('html panels', function() {
+    describe('panels', function() {
         it('show up on the dashboard', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .isExisting('.test-bundle.html', function(err, isExisting) {
-                    if (err) {
-                        throw err;
-                    }
-
-                    expect(isExisting).to.be.true;
-                })
-                .call(done);
-        });
-    });
-
-    describe('jade panels', function() {
-        it('show up on the dashboard', function(done) {
-            e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
-                .isExisting('.test-bundle.jade', function(err, isExisting) {
+                .isExisting('nodecg-test-panel', function(err, isExisting) {
                     if (err) {
                         throw err;
                     }
@@ -42,7 +27,7 @@ describe('dashboard', function() {
         it('have access to bundleConfig', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .getText('.test-bundle.jade .js-bundleConfig', function(err, text) {
+                .getText('nodecg-test-panel /deep/ #bundleConfig', function(err, text) {
                     if (err) {
                         throw err;
                     }
@@ -55,7 +40,7 @@ describe('dashboard', function() {
         it('have access to bundleName', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .getText('.test-bundle.jade .js-bundleName', function(err, text) {
+                .getText('nodecg-test-panel /deep/ #bundleName', function(err, text) {
                     if (err) {
                         throw err;
                     }
@@ -68,7 +53,7 @@ describe('dashboard', function() {
         it('have access to ncgConfig', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .getText('.test-bundle.jade .js-ncgConfig', function(err, text) {
+                .getText('nodecg-test-panel /deep/ #ncgConfig', function(err, text) {
                     if (err) {
                         throw err;
                     }

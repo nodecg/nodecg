@@ -1,0 +1,34 @@
+doctype html
+html(lang="en")
+    head
+        title NodeCG display
+
+        //- Web Component support
+        script(src='/components/webcomponentsjs/webcomponents-lite.min.js')
+
+        //- Polymer
+        link(rel='import', href='/components/polymer/polymer.html')
+
+        //- import display views
+        each view in views
+            link(rel='import', href='/display/' + view.bundle.name + '/' + view.file)
+
+        //- display CSS
+        link(rel='stylesheet', href='/display/display.css')
+
+        //- make the global config available
+        script(type='text/javascript').
+            window.ncgConfig = !{ JSON.stringify(ncgConfig) };
+
+        //- initialize the socket
+        script(src='/components/cookies-js/dist/cookies.min.js')
+        script(src='/components/cn-jsurl/url.min.js')
+        script(src='/socket.io/socket.io.js')
+        script(src='/nodecg-socket.js')
+
+        script(src='/display/display.js')
+
+    body
+        .container(style='width: ' + width + 'px; height: ' + height + 'px;')
+            each view in views
+                #{view.element}.view(bundle=JSON.stringify(view.bundle))

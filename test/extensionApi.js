@@ -68,7 +68,7 @@ describe('extension api', function() {
     });
 
     it('can mount express middleware', function(done) {
-        request(C.DASHBOARD_URL + 'test-bundle/test-route', function (error, response, body) {
+        request(C.BASE_URL + '/test-bundle/test-route', function (error, response, body) {
             expect(error).to.be.null();
             expect(response.statusCode).to.equal(200);
             done();

@@ -88,18 +88,18 @@ before(function(done) {
                     throw err;
                 }
             })
-            .newWindow(C.VIEW_URL, 'NodeCG test bundle view', '')
+            .newWindow(C.DISPLAY_URL, 'NodeCG display', '')
             .getCurrentTabId(function(err, tabId) {
                 if (err) {
                     throw err;
                 }
 
-                e.browser.tabs.view = tabId;
+                e.browser.tabs.display = tabId;
             })
             .executeAsync(function(done) {
                 var checkForApi;
                 checkForApi = setInterval(function(done) {
-                    if (typeof window.viewApi !== 'undefined') {
+                    if (typeof window.displayApi !== 'undefined') {
                         clearInterval(checkForApi);
                         done();
                     }

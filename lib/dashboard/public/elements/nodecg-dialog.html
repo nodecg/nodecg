@@ -1,0 +1,25 @@
+<link rel="import" href="/components/polymer/polymer.html">
+
+<link rel="import" href="/components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="/components/paper-styles/paper-styles.html">
+<link rel="import" href="/components/paper-styles/paper-styles-classes.html">
+
+<dom-module id="nodecg-dialog">
+    <style>
+        :host {
+            background: white;
+        }
+    </style>
+    <template>
+        <content></content>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is: "nodecg-dialog",
+        behaviors: [
+            Polymer.IronOverlayBehavior
+        ]
+    });
+</script>
