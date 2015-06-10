@@ -322,28 +322,21 @@ describe('client api', function() {
         });
 
         it('load persisted values when they exist', function(done) {
-            // Make sure the persisted value exists
-            fs.writeFile('./db/replicants/test-bundle/clientPersistence.rep', 'it work good!', function(err) {
-                if (err) {
-                    throw err;
-                }
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientPersistence');
 
-                e.browser.client
-                    .executeAsync(function(done) {
-                        var rep = window.dashboardApi.Replicant('clientPersistence');
+                    rep.on('declared', function() {
+                        done(rep.value);
+                    });
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
 
-                        rep.on('declared', function() {
-                            done(rep.value);
-                        });
-                    }, function(err, ret) {
-                        if (err) {
-                            throw err;
-                        }
-
-                        expect(ret.value).to.equal('it work good!');
-                    })
-                    .call(done);
-            });
+                    expect(ret.value).to.equal('it work good!');
+                })
+                .call(done);
         });
 
         it('persist assignment to disk', function(done) {

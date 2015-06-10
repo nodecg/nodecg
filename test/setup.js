@@ -1,5 +1,6 @@
 'use strict';
 
+var fs = require('fs.extra');
 var webdriverio = require('webdriverio');
 
 var e = require('./setup/test-environment');
@@ -17,6 +18,11 @@ before(function(done) {
     if (C.CONFIG.ssl.enabled) {
         throw new Error('SSL is enabled! Please disable SSL in cfg/nodecg.json before running tests');
     }
+
+    // clientApi & extensionApi setup
+    fs.mkdirpSync('./db/replicants/test-bundle/');
+    fs.writeFileSync('./db/replicants/test-bundle/clientPersistence.rep', '"it work good!"');
+    fs.writeFileSync('./db/replicants/test-bundle/extensionPersistence.rep', '"it work good!"');
 
     e.server.once('started', function() {
         /** Extension API setup **/

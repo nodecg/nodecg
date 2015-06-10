@@ -172,13 +172,9 @@ describe('extension api', function() {
         });
 
         it('load persisted values when they exist', function(done) {
-            // Make sure the persisted value exists
-            fs.writeFile('./db/replicants/test-bundle/extensionPersistence.rep', 'it work good!', function(err) {
-                if (err) throw err;
-                var rep = e.apis.extension.Replicant('extensionPersistence');
-                expect(rep.value).to.equal('it work good!');
-                done();
-            });
+            var rep = e.apis.extension.Replicant('extensionPersistence');
+            expect(rep.value).to.equal('it work good!');
+            done();
         });
 
         it('persist assignment to disk', function(done) {
