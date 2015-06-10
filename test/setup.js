@@ -8,7 +8,7 @@ var C = require('./setup/test-constants');
 // Global before and after
 
 before(function(done) {
-    this.timeout(30000);
+    this.timeout(0);
 
     if (C.CONFIG.login.enabled) {
         throw new Error('Login security is enabled! Please disable login security in cfg/nodecg.json before running tests');
