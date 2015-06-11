@@ -50,17 +50,18 @@
     "xtend": "^4.0.0"
   },
   "scripts": {
-    "build-css": "lessc ./lib/dashboard/src/dashboard.less > ./lib/dashboard/public/dashboard.css",
-    "build": "npm run build-css",
+    "build-css": "node node_modules/less/bin/lessc lib/dashboard/src/dashboard.less > lib/dashboard/public/dashboard.css",
+    "build-lint": "node node_modules/jshint/bin/jshint index.js lib/*",
+    "build": "npm run build-css && npm run build-lint",
     "start": "node index.js",
     "postinstall": "bower install",
     "pretest": "node test/setup/pretest",
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec",
+    "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec",
     "posttest": "node test/setup/posttest",
-    "coveralls": "node node_modules/lcov-filter/index.js ./coverage/lcov.info test bundles | coveralls && rm -rf ./coverage"
+    "coveralls": "node node_modules/lcov-filter/index.js coverage/lcov.info test bundles | coveralls && rm -rf coverage"
   },
   "engines": {
-    "node": ">= 0.11.13"
+    "node": ">= 0.12.0"
   },
   "files": [
     "AUTHORS",
@@ -74,7 +75,9 @@
     "chai": "^1.10.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.2",
+    "jshint": "^2.8.0",
     "lcov-filter": "0.0.1",
+    "less": "^2.5.1",
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
     "webdriverio": "^2.4.5",
