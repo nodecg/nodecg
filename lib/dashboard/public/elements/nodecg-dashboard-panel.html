@@ -19,7 +19,7 @@
     <template>
         <paper-material>
             <div class="heading paper-font-title">
-                <span>{{name}}</span>
+                <span>{{title}}</span>
             </div>
             <div class="body">
                 <content></content>
@@ -32,7 +32,7 @@
     Polymer({
         is: "nodecg-dashboard-panel",
         properties: {
-            name: String
+            title: String
         }
     });
 </script>

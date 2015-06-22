@@ -30,6 +30,9 @@ html(lang='en')
         //- our custom dialog (until paper-dialog comes back?)
         link(rel='import', href='/dashboard/elements/nodecg-dialog.html')
 
+        //- our custom dashboard panel container
+        link(rel='import', href='/dashboard/elements/nodecg-dashboard-panel.html')
+
         //- dashboard CSS
         link(rel='stylesheet', href='/dashboard/dashboard.css')
 
@@ -100,9 +103,9 @@ html(lang='en')
                 #panels(main)
                     each bundle in bundles
                         each panel in bundle.dashboard.panels
-                            iframe(src='/panels/#{bundle.name}/#{panel.name}', frameborder='0', scrolling='no'
-                                id=bundle.name + '_' + panel.name, class='dashboard-panel width-' + panel.width,
-                                data-bundle=bundle.name, data-panel=panel.name)
+                            nodecg-dashboard-panel(class='dashboard-panel width-' + panel.width, title=panel.title,
+                                id=bundle.name + '_' + panel.name, data-bundle=bundle.name, data-panel=panel.name)
+                                iframe(src='/panel/#{bundle.name}/#{panel.name}', frameborder='0', scrolling='no')
 
         //- Used by packery to establish the width of the columns
         #grid-sizer(class="width-1")
