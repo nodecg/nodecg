@@ -11,19 +11,19 @@
   overflow: auto;
   padding: 32px;
 }
-nodecg-dashboard-panel {
+.dashboard-panel {
   width: 230px;
 }
-nodecg-dashboard-panel.width-1 {
+.dashboard-panel.width-1 {
   width: 230px;
 }
-nodecg-dashboard-panel.width-2 {
+.dashboard-panel.width-2 {
   width: 480px;
 }
-nodecg-dashboard-panel.width-3 {
+.dashboard-panel.width-3 {
   width: 730px;
 }
-nodecg-dashboard-panel.width-4 {
+.dashboard-panel.width-4 {
   width: 980px;
 }
 .logo {

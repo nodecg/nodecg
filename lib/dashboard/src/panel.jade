@@ -42,5 +42,9 @@ html(lang="en")
         //- custom styles for Polymer
         style(is='custom-style').
             * {--default-primary-color: #00bebe;}
+
+        //- change the default margin of the body tag
+        style.
+            body {margin: 5px;}
     body
         nodecg-dashboard-panel(class='width-' + panel.width, name=panel.title) !{panel.html}
