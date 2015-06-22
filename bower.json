@@ -15,7 +15,8 @@
     "cookies-js": "~1.2.1",
     "paper-elements": "PolymerElements/paper-elements#^1.0.0",
     "iron-elements": "PolymerElements/iron-elements#^1.0.0",
-    "cn-jsurl": "~1.0.0"
+    "cn-jsurl": "~1.0.0",
+    "iframe-resizer": "~2.8.10"
   },
   "license": "MIT",
   "private": true,

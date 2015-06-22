@@ -1,8 +1,8 @@
 doctype html
-html(lang="en")
+html(lang='en')
     head
-        meta(http-equiv="X-UA-Compatible", content="IE=edge; charset=UTF-8")
-        meta(name="viewport", content="width=device-width", initial-scale=1)
+        meta(http-equiv='X-UA-Compatible', content='IE=edge; charset=UTF-8')
+        meta(name='viewport', content='width=device-width', initial-scale=1)
 
         title NodeCG Dashboard
 
@@ -27,16 +27,8 @@ html(lang="en")
         link(rel='import', href='/components/paper-toast/paper-toast.html')
         link(rel='import', href='/components/paper-toolbar/paper-toolbar.html')
 
-        //- our custom dashboard panel container
-        link(rel='import', href='/dashboard/elements/nodecg-dashboard-panel.html')
-
         //- our custom dialog (until paper-dialog comes back?)
         link(rel='import', href='/dashboard/elements/nodecg-dialog.html')
-
-        //- import dashboard panels
-        each bundle in bundles
-            each panel in bundle.dashboard.panels
-                link(rel='import', href='/dashboard/' + bundle.name + '/' + panel.file)
 
         //- dashboard CSS
         link(rel='stylesheet', href='/dashboard/dashboard.css')
@@ -44,6 +36,9 @@ html(lang="en")
         //- make the global config available
         script(type='text/javascript').
             window.ncgConfig = !{ JSON.stringify(ncgConfig) };
+
+        //- make the API available
+        script(src='/nodecg-api.js')
 
         //- initialize the socket
         script(src='/components/cookies-js/dist/cookies.min.js')
@@ -54,6 +49,7 @@ html(lang="en")
         //- other dashboard scripts
         script(src='/components/packery/dist/packery.pkgd.min.js')
         script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
+        script(src='/components/iframe-resizer/js/iframeResizer.min.js')
         script(src='/dashboard/dashboard.js')
 
         //- custom styles for Polymer
@@ -65,7 +61,7 @@ html(lang="en")
     body.fullbleed.vertical.layout
         paper-header-panel.flex
             paper-toolbar
-                span.flex: img.logo(src="/dashboard/img/navbar-logo.png" alt="NodeCG dashboard" title="NodeCG dashboard")
+                span.flex: img.logo(src='/dashboard/img/navbar-logo.png' alt='NodeCG dashboard' title='NodeCG dashboard')
                 if ncgConfig.login.enabled
                     paper-icon-button#logout(icon='exit-to-app', alt='Sign Out')
             paper-drawer-panel
@@ -101,8 +97,15 @@ html(lang="en")
                 #panels(main)
                     each bundle in bundles
                         each panel in bundle.dashboard.panels
-                            nodecg-dashboard-panel(class='width-' + panel.width, name=panel.title)
-                                #{panel.element}(bundle=JSON.stringify(bundle))
+                            iframe(src='/panels/#{bundle.name}/#{panel.name}', frameborder='0', scrolling='no'
+                                id=bundle.name + '_' + panel.name, class='width-' + panel.width,
+                                data-bundle=bundle.name, data-panel=panel.name)
+
+                //- Once all the panel iFrames are loaded, this func (from the iframe-resize bower dep)
+                    automagically fixes the height of all the iframes.
+                script(type='text/javascript').
+                    window.iFrameResize();
+
         paper-toast.paper-font-body1#socket-error(text='Unhandled socket error!')
         paper-toast.paper-font-body1#socket-disconnected(text='Lost connection to NodeCG server!')
         paper-toast.paper-font-body1#socket-reconnectattempt(text='Attempting to reconnect to NodeCG server...')

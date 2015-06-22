@@ -1,0 +1,8 @@
+p This is a test panel!
+p(id="bundleConfig")=bundleConfig.test
+p(id="bundleName")=bundleName
+p(id="ncgConfig")=ncgConfig.host
+
+script(type="text/javascript").
+    window.nodecg = new parent.window.NodeCG({name: '!{bundleName}', config: !{JSON.stringify(bundleConfig)}}, parent.window.socket);
+    parent.window.dashboardApi = window.nodecg;
