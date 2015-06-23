@@ -13,7 +13,7 @@ html(lang='en')
         link(rel='import', href='/components/iron-icon/iron-icon.html')
         link(rel='import', href='/components/iron-icons/communication-icons.html')
         link(rel='import', href='/components/iron-icons/iron-icons.html')
-        link(rel='import', href='/components/iron-overlay-behavior/iron-overlay-behavior.html')
+        link(rel='import', href='/components/paper-dialog/paper-dialog.html')
         link(rel='import', href='/components/paper-button/paper-button.html')
         link(rel='import', href='/components/paper-checkbox/paper-checkbox.html')
         link(rel='import', href='/components/paper-drawer-panel/paper-drawer-panel.html')
@@ -26,9 +26,6 @@ html(lang='en')
         link(rel='import', href='/components/paper-styles/paper-styles-classes.html')
         link(rel='import', href='/components/paper-toast/paper-toast.html')
         link(rel='import', href='/components/paper-toolbar/paper-toolbar.html')
-
-        //- our custom dialog (until paper-dialog comes back?)
-        link(rel='import', href='/dashboard/elements/nodecg-dialog.html')
 
         //- our custom dashboard panel container
         link(rel='import', href='/dashboard/elements/nodecg-dashboard-panel.html')
@@ -104,7 +101,7 @@ html(lang='en')
                     each bundle in bundles
                         each panel in bundle.dashboard.panels
                             nodecg-dashboard-panel(class='dashboard-panel width-' + panel.width, title=panel.title,
-                                id=bundle.name + '_' + panel.name, data-bundle=bundle.name, data-panel=panel.name)
+                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
                                 iframe(src='/panel/#{bundle.name}/#{panel.name}', frameborder='0', scrolling='no')
 
         //- Used by packery to establish the width of the columns
@@ -118,19 +115,18 @@ html(lang='en')
 
         //- key overlay
         if ncgConfig.login.enabled
-            nodecg-dialog#keyDialog(with-backdrop)
-                paper-material
-                    .panel-heading.green.paper-font-headline
-                        iron-icon(icon='communication:vpn-key')
-                        | &ensp;NodeCG Key
-                    .panel-body.paper-font-body1
-                        code.paper-font-code1#key
-                        paper-button#copyKey(data-clipboard-target='key')
-                            iron-icon(icon='icons:content-copy')
-                            | &ensp;Copy Key
+            paper-dialog#keyDialog(modal)
+                h2 NodeCG Key
+                code.paper-font-code1#key
+                p.text-warning.paper-font-body1
+                    | Resetting your key will disrupt all current sessions using it.<br/>
+                    | When you reset your key, the dashboard will be refreshed so that a new key can be obtained.
 
-                        h2.paper-font-subhead Reset Key
-                        p.text-warning.paper-font-body1 Resetting your key will disrupt all current sessions using it. When you reset your key, the dashboard will be refreshed so that a new key can be obtained.
-                        paper-button.paper-font-button#resetKey(alt='Reset Key')
-                            iron-icon(icon='icons:refresh')
-                            | &ensp;Reset Key
+                .buttons
+                    paper-button(dialog-dismiss) Close
+                    paper-button#copyKey(data-clipboard-target='key' autofocus)
+                        iron-icon(icon='icons:content-copy')
+                        | &ensp;Copy Key
+                    paper-button#resetKey
+                        iron-icon(icon='icons:refresh')
+                        | &ensp;Reset Key

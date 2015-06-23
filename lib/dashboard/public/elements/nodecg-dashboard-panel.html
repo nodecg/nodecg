@@ -4,12 +4,17 @@
 <link rel="import" href="/components/paper-styles/paper-styles.html">
 <link rel="import" href="/components/paper-styles/paper-styles-classes.html">
 
+<link rel="import" href="nodecg-dashboard-panel-info.html">
+
 <dom-module id="nodecg-dashboard-panel">
     <style>
         .heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             background-color: var(--google-grey-700);
             color: var(--google-grey-100);
-            padding: 10px 15px;
+            padding: 0 15px;
         }
 
         .body {
@@ -20,6 +25,7 @@
         <paper-material>
             <div class="heading paper-font-title">
                 <span>{{title}}</span>
+                <nodecg-dashboard-panel-info id="infoBtn" bundle="{{bundle}}"></nodecg-dashboard-panel-info>
             </div>
             <div class="body">
                 <content></content>
@@ -30,9 +36,20 @@
 
 <script>
     Polymer({
-        is: "nodecg-dashboard-panel",
+        is: 'nodecg-dashboard-panel',
         properties: {
-            title: String
+            title: {
+                type: String,
+                reflectToAttribute: true
+            },
+            bundle: {
+                type: String,
+                reflectToAttribute: true
+            },
+            panel: {
+                type: String,
+                reflectToAttribute: true
+            }
         }
     });
 </script>
