@@ -3,7 +3,6 @@
     "name": "test",
     "title": "Test Panel",
     "width": 2,
-    "file": "nodecg-test-panel.html",
-    "element": "nodecg-test-panel"
+    "file": "panel.jade"
   }
 ]

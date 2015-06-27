@@ -11,20 +11,20 @@
   overflow: auto;
   padding: 32px;
 }
-nodecg-dashboard-panel {
+.dashboard-panel {
   width: 230px;
 }
-nodecg-dashboard-panel.width-1 {
+.dashboard-panel.width-1 {
   width: 230px;
 }
-nodecg-dashboard-panel.width-2 {
-  width: 480px;
+.dashboard-panel.width-2 {
+  width: 470px;
 }
-nodecg-dashboard-panel.width-3 {
-  width: 730px;
+.dashboard-panel.width-3 {
+  width: 710px;
 }
-nodecg-dashboard-panel.width-4 {
-  width: 980px;
+.dashboard-panel.width-4 {
+  width: 950px;
 }
 .logo {
   vertical-align: middle;

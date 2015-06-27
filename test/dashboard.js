@@ -10,11 +10,15 @@ var e = require('./setup/test-environment');
 describe('dashboard', function() {
     this.timeout(10000);
 
-    describe('panels', function() {
+    before(function() {
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard);
+    });
+
+    describe('jade panels', function() {
         it('show up on the dashboard', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
-                .isExisting('nodecg-test-panel', function(err, isExisting) {
+                .isExisting('#test-bundle_test', function(err, isExisting) {
                     if (err) {
                         throw err;
                     }
@@ -26,40 +30,44 @@ describe('dashboard', function() {
 
         it('have access to bundleConfig', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
-                .getText('nodecg-test-panel /deep/ #bundleConfig', function(err, text) {
+                .frame('test-bundle_test')
+                .getText('#bundleConfig', function(err, text) {
+                    console.log('got that bundleConfig', text);
                     if (err) {
                         throw err;
                     }
 
                     expect(text).to.equal('the_test_string');
                 })
+                .frame(null)
                 .call(done);
         });
 
         it('have access to bundleName', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
-                .getText('nodecg-test-panel /deep/ #bundleName', function(err, text) {
+                .frame('test-bundle_test')
+                .getText('#bundleName', function(err, text) {
                     if (err) {
                         throw err;
                     }
 
                     expect(text).to.equal('test-bundle');
                 })
+                .frame(null)
                 .call(done);
         });
 
         it('have access to ncgConfig', function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.dashboard)
-                .getText('nodecg-test-panel /deep/ #ncgConfig', function(err, text) {
+                .frame('test-bundle_test')
+                .getText('#ncgConfig', function(err, text) {
                     if (err) {
                         throw err;
                     }
 
                     expect(text).to.equal(config.host);
                 })
+                .frame(null)
                 .call(done);
         });
     });

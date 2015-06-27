@@ -4,12 +4,17 @@
 <link rel="import" href="/components/paper-styles/paper-styles.html">
 <link rel="import" href="/components/paper-styles/paper-styles-classes.html">
 
+<link rel="import" href="nodecg-dashboard-panel-info.html">
+
 <dom-module id="nodecg-dashboard-panel">
     <style>
         .heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             background-color: var(--google-grey-700);
             color: var(--google-grey-100);
-            padding: 10px 15px;
+            padding: 0 15px;
         }
 
         .body {
@@ -19,7 +24,8 @@
     <template>
         <paper-material>
             <div class="heading paper-font-title">
-                <span>{{name}}</span>
+                <span>{{title}}</span>
+                <nodecg-dashboard-panel-info id="infoBtn" bundle="{{bundle}}"></nodecg-dashboard-panel-info>
             </div>
             <div class="body">
                 <content></content>
@@ -30,9 +36,39 @@
 
 <script>
     Polymer({
-        is: "nodecg-dashboard-panel",
+        is: 'nodecg-dashboard-panel',
         properties: {
-            name: String
+            title: {
+                type: String,
+                reflectToAttribute: true
+            },
+            bundle: {
+                type: String,
+                reflectToAttribute: true
+            },
+            element: {
+                type: String,
+                reflectToAttribute: true
+            }
+        },
+
+        /*
+         * Lifecycle
+         */
+        ready: function() {
+            this.nodecg = new window.NodeCG({name: this.bundle, config: {}}, window.socket);
+        },
+
+        attached: function() {
+            // There should only ever be a single distributed node, the custom element from the panel.
+            var content = this.$$.('content');
+            var distributedNodes = Polymer.dom(content).getDistributedNodes();
+            if (distributedNodes.length > 1) {
+                throw new Error('There should be no more than one element present in the ' +
+                        '<content> tag of a nodecg-dasboard-panel element')
+            } else {
+                distributedNodes[0].nodecg = this.nodecg;
+            }
         }
     });
 </script>

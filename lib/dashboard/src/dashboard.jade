@@ -1,8 +1,8 @@
 doctype html
-html(lang="en")
+html(lang='en')
     head
-        meta(http-equiv="X-UA-Compatible", content="IE=edge; charset=UTF-8")
-        meta(name="viewport", content="width=device-width", initial-scale=1)
+        meta(http-equiv='X-UA-Compatible', content='IE=edge; charset=UTF-8')
+        meta(name='viewport', content='width=device-width', initial-scale=1)
 
         title NodeCG Dashboard
 
@@ -13,7 +13,7 @@ html(lang="en")
         link(rel='import', href='/components/iron-icon/iron-icon.html')
         link(rel='import', href='/components/iron-icons/communication-icons.html')
         link(rel='import', href='/components/iron-icons/iron-icons.html')
-        link(rel='import', href='/components/iron-overlay-behavior/iron-overlay-behavior.html')
+        link(rel='import', href='/components/paper-dialog/paper-dialog.html')
         link(rel='import', href='/components/paper-button/paper-button.html')
         link(rel='import', href='/components/paper-checkbox/paper-checkbox.html')
         link(rel='import', href='/components/paper-drawer-panel/paper-drawer-panel.html')
@@ -30,9 +30,6 @@ html(lang="en")
         //- our custom dashboard panel container
         link(rel='import', href='/dashboard/elements/nodecg-dashboard-panel.html')
 
-        //- our custom dialog (until paper-dialog comes back?)
-        link(rel='import', href='/dashboard/elements/nodecg-dialog.html')
-
         //- import dashboard panels
         each bundle in bundles
             each panel in bundle.dashboard.panels
@@ -45,6 +42,9 @@ html(lang="en")
         script(type='text/javascript').
             window.ncgConfig = !{ JSON.stringify(ncgConfig) };
 
+        //- make the API available
+        script(src='/nodecg-api.js')
+
         //- initialize the socket
         script(src='/components/cookies-js/dist/cookies.min.js')
         script(src='/components/cn-jsurl/url.min.js')
@@ -52,8 +52,11 @@ html(lang="en")
         script(src='/nodecg-socket.js')
 
         //- other dashboard scripts
+        script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
         script(src='/components/packery/dist/packery.pkgd.min.js')
         script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
+        script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
+        script(src='/dashboard/panels.js')
         script(src='/dashboard/dashboard.js')
 
         //- custom styles for Polymer
@@ -65,7 +68,7 @@ html(lang="en")
     body.fullbleed.vertical.layout
         paper-header-panel.flex
             paper-toolbar
-                span.flex: img.logo(src="/dashboard/img/navbar-logo.png" alt="NodeCG dashboard" title="NodeCG dashboard")
+                span.flex: img.logo(src='/dashboard/img/navbar-logo.png' alt='NodeCG dashboard' title='NodeCG dashboard')
                 if ncgConfig.login.enabled
                     paper-icon-button#logout(icon='exit-to-app', alt='Sign Out')
             paper-drawer-panel
@@ -101,8 +104,13 @@ html(lang="en")
                 #panels(main)
                     each bundle in bundles
                         each panel in bundle.dashboard.panels
-                            nodecg-dashboard-panel(class='width-' + panel.width, name=panel.title)
-                                #{panel.element}(bundle=JSON.stringify(bundle))
+                            nodecg-dashboard-panel(class='dashboard-panel width-' + panel.width, title=panel.title,
+                                bundle=bundle.name, element=panel.element)
+                                #{panel.element}
+
+        //- Used by packery to establish the width of the columns
+        #grid-sizer(class="width-1")
+
         paper-toast.paper-font-body1#socket-error(text='Unhandled socket error!')
         paper-toast.paper-font-body1#socket-disconnected(text='Lost connection to NodeCG server!')
         paper-toast.paper-font-body1#socket-reconnectattempt(text='Attempting to reconnect to NodeCG server...')
@@ -111,19 +119,18 @@ html(lang="en")
 
         //- key overlay
         if ncgConfig.login.enabled
-            nodecg-dialog#keyDialog(with-backdrop)
-                paper-material
-                    .panel-heading.green.paper-font-headline
-                        iron-icon(icon='communication:vpn-key')
-                        | &ensp;NodeCG Key
-                    .panel-body.paper-font-body1
-                        code.paper-font-code1#key
-                        paper-button#copyKey(data-clipboard-target='key')
-                            iron-icon(icon='icons:content-copy')
-                            | &ensp;Copy Key
+            paper-dialog#keyDialog(modal)
+                h2 NodeCG Key
+                code.paper-font-code1#key
+                p.text-warning.paper-font-body1
+                    | Resetting your key will disrupt all current sessions using it.<br/>
+                    | When you reset your key, the dashboard will be refreshed so that a new key can be obtained.
 
-                        h2.paper-font-subhead Reset Key
-                        p.text-warning.paper-font-body1 Resetting your key will disrupt all current sessions using it. When you reset your key, the dashboard will be refreshed so that a new key can be obtained.
-                        paper-button.paper-font-button#resetKey(alt='Reset Key')
-                            iron-icon(icon='icons:refresh')
-                            | &ensp;Reset Key
+                .buttons
+                    paper-button(dialog-dismiss) Close
+                    paper-button#copyKey(data-clipboard-target='key' autofocus)
+                        iron-icon(icon='icons:content-copy')
+                        | &ensp;Copy Key
+                    paper-button#resetKey
+                        iron-icon(icon='icons:refresh')
+                        | &ensp;Reset Key
