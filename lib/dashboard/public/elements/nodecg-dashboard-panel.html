@@ -46,9 +46,28 @@
                 type: String,
                 reflectToAttribute: true
             },
-            panel: {
+            element: {
                 type: String,
                 reflectToAttribute: true
+            }
+        },
+
+        /*
+         * Lifecycle
+         */
+        ready: function() {
+            this.nodecg = new window.NodeCG({name: this.bundle, config: {}}, window.socket);
+        },
+
+        attached: function() {
+            // There should only ever be a single distributed node, the custom element from the panel.
+            var content = this.$$.('content');
+            var distributedNodes = Polymer.dom(content).getDistributedNodes();
+            if (distributedNodes.length > 1) {
+                throw new Error('There should be no more than one element present in the ' +
+                        '<content> tag of a nodecg-dasboard-panel element')
+            } else {
+                distributedNodes[0].nodecg = this.nodecg;
             }
         }
     });

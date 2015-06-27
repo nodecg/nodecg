@@ -2,6 +2,10 @@
 bower_components/
 node_modules/
 
+# Temporary dev stuff
+!bower_components/ncg-corner-select/
+!bower_components/ncg-toggle/
+
 # Local bundles
 /bundles/**
 

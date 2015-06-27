@@ -30,6 +30,11 @@ html(lang='en')
         //- our custom dashboard panel container
         link(rel='import', href='/dashboard/elements/nodecg-dashboard-panel.html')
 
+        //- import dashboard panels
+        each bundle in bundles
+            each panel in bundle.dashboard.panels
+                link(rel='import', href='/dashboard/' + bundle.name + '/' + panel.file)
+
         //- dashboard CSS
         link(rel='stylesheet', href='/dashboard/dashboard.css')
 
@@ -50,7 +55,6 @@ html(lang='en')
         script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
         script(src='/components/packery/dist/packery.pkgd.min.js')
         script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
-        script(src='/components/iframe-resizer/js/iframeResizer.min.js')
         script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
         script(src='/dashboard/panels.js')
         script(src='/dashboard/dashboard.js')
@@ -101,8 +105,8 @@ html(lang='en')
                     each bundle in bundles
                         each panel in bundle.dashboard.panels
                             nodecg-dashboard-panel(class='dashboard-panel width-' + panel.width, title=panel.title,
-                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
-                                iframe(src='/panel/#{bundle.name}/#{panel.name}', frameborder='0', scrolling='no')
+                                bundle=bundle.name, element=panel.element)
+                                #{panel.element}
 
         //- Used by packery to establish the width of the columns
         #grid-sizer(class="width-1")
