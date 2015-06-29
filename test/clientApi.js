@@ -2,117 +2,468 @@
 
 // Modules used to run tests
 var chai = require('chai');
-var should = chai.should();
 var expect = chai.expect;
+var fs = require('fs');
 
 var e = require('./setup/test-environment');
 
 describe('client api', function() {
-    before(function(done) {
-        // Drop all synced variables
-        e.server._resetSyncedVariables();
-
-        // Wait a bit for all clients to react
-        setTimeout(done, 1750);
-    });
+    this.timeout(10000);
 
     describe('dashboard api', function() {
+        before(function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .call(done);
+        });
+
         // Check for basic connectivity. The rest of the test are run from the dashboard as well.
         it('can receive messages', function(done) {
-            e.apis.dashboard.listenFor('dashboardToServer', done);
-            e.apis.extension.sendMessage('dashboardToServer');
+            e.browser.client
+                .execute(function() {
+                    window.serverToDashboardReceived = false;
+
+                    window.dashboardApi.listenFor('serverToDashboard', function() {
+                        window.serverToDashboardReceived = true;
+                    });
+                }, function(err) {
+                    if (err) throw err;
+                });
+
+            var sendMessage = setInterval(function() {
+                e.apis.extension.sendMessage('serverToDashboard');
+            }, 500);
+
+            e.browser.client
+                .executeAsync(function(done) {
+                    var checkMessageReceived;
+
+                    checkMessageReceived = setInterval(function() {
+                        if (window.serverToDashboardReceived) {
+                            clearInterval(checkMessageReceived);
+                            done();
+                        }
+                    }, 50);
+                }, function() {
+                    clearInterval(sendMessage);
+                })
+                .call(done);
         });
 
         it('can send messages', function(done) {
-            e.apis.extension.listenFor('serverToDashboard', done);
-            e.apis.dashboard.sendMessage('serverToDashboard');
+            e.apis.extension.listenFor('dashboardToServer', done);
+
+            e.browser.client
+                .execute(function() {
+                    window.dashboardApi.sendMessage('dashboardToServer');
+                }, function(err) {
+                    if (err) throw err;
+                });
         });
     });
 
     describe('view api', function() {
+        before(function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.view)
+                .call(done);
+        });
+
         // The view and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
         it('can receive messages', function(done) {
-            e.apis.view.listenFor('viewToServer', done);
-            e.apis.extension.sendMessage('viewToServer');
+            e.browser.client
+                .execute(function() {
+                    window.serverToViewReceived = false;
+
+                    window.viewApi.listenFor('serverToView', function() {
+                        window.serverToViewReceived = true;
+                    });
+                }, function(err) {
+                    if (err) throw err;
+                });
+
+            var sendMessage = setInterval(function() {
+                e.apis.extension.sendMessage('serverToView');
+            }, 500);
+
+            e.browser.client
+                .executeAsync(function(done) {
+                    var checkMessageReceived;
+
+                    checkMessageReceived = setInterval(function() {
+                        if (window.serverToViewReceived) {
+                            clearInterval(checkMessageReceived);
+                            done();
+                        }
+                    }, 50);
+                }, function() {
+                    clearInterval(sendMessage);
+                })
+                .call(done);
         });
 
         it('can send messages', function(done) {
-            e.apis.extension.listenFor('serverToView', done);
-            e.apis.view.sendMessage('serverToView');
+            e.apis.extension.listenFor('viewToServer', done);
+
+            e.browser.client
+                .execute(function() {
+                    window.viewApi.sendMessage('viewToServer');
+                }, function(err) {
+                    if (err) throw err;
+                });
         });
     });
 
     describe('nodecg config', function() {
-        it('exists and has length', function() {
-            expect(e.apis.dashboard.config).to.not.be.empty();
+        before(function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .call(done);
         });
 
-        it('doesn\'t reveal sensitive information', function() {
-            expect(e.apis.dashboard.config.login).to.not.have.property('sessionSecret');
+        it('exists and has length', function(done) {
+            e.browser.client
+                .execute(function() {
+                    return window.dashboardApi.config;
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value).to.not.be.empty();
+                })
+                .call(done);
         });
 
-        it('isn\'t writable', function() {
-            expect(function() {
-                e.apis.dashboard.config.host = 'the_test_failed';
-            }).to.throw(TypeError);
+        it('doesn\'t reveal sensitive information', function(done) {
+            e.browser.client
+                .execute(function() {
+                    return window.dashboardApi.config;
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value.login).to.not.have.property('sessionSecret');
+                })
+                .call(done);
+        });
+
+        it('isn\'t writable', function(done) {
+            e.browser.client
+                .execute(function() {
+                    return Object.isFrozen(window.dashboardApi.config);
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value).to.be.true;
+                })
+                .call(done);
         });
     });
 
     describe('bundle config', function() {
-        it('exists and has length', function() {
-            expect(e.apis.dashboard.bundleConfig).to.not.be.empty();
+        before(function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .call(done);
+        });
+
+        it('exists and has length', function(done) {
+            e.browser.client
+                .execute(function() {
+                    return window.dashboardApi.bundleConfig;
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value).to.not.be.empty();
+                })
+                .call(done);
         });
     });
 
-    describe('synced variables', function() {
-        it('doesn\'t let multiple declarations of a synced variable overwrite itself', function(done) {
-            e.apis.dashboard.declareSyncedVar({ name: 'testVar', initialVal: 123 });
+    describe('replicants', function() {
+        before(function(done) {
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .call(done);
+        });
 
-            // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 100}, function() {
-                e.apis.extension.declareSyncedVar({ name: 'testVar', initialVal: 456,
-                    setter: function(newVal) {
-                        newVal.should.equal(123);
-                        e.apis.dashboard.variables.testVar.should.equal(123);
-                        done();
+        it('only apply defaultValue when first declared', function(done) {
+            e.apis.extension.Replicant('clientTest', { defaultValue: 'foo', persistent: false });
+
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientTest', { defaultValue: 'bar' });
+
+                    rep.on('declared', function() {
+                        done(rep.value);
+                    });
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value).to.equal('foo');
+                })
+                .call(done);
+        });
+
+        it('can be read once without subscription, via readReplicant', function(done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    window.dashboardApi.readReplicant('clientTest', done);
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value).to.equal('foo');
+                })
+                .call(done);
+        });
+
+        it('throws an error when no name is given to a synced variable', function(done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    try {
+                        window.dashboardApi.Replicant();
                     }
+                    catch (e) {
+                        done(e.message);
+                    }
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value).to.equal('Must supply a name when instantiating a Replicant');
+                })
+                .call(done);
+        });
+
+        it('can be assigned via the ".value" property', function (done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientAssignmentTest', { persistent: false });
+                    rep.on('assignmentAccepted', function(data) {
+                        done(data);
+                    });
+                    rep.value = 'assignmentOK';
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value.newValue).to.equal('assignmentOK');
+                    expect(ret.value.revision).to.equal(1);
+                })
+                .call(done);
+        });
+
+        it('reacts to changes in nested properties of objects', function(done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientObjTest', {
+                        persistent: false,
+                        defaultValue: {a: {b: {c: 'c'}}}
+                    });
+
+                    rep.on('declared', function() {
+                        rep.on('change', function(oldVal, newVal, changes) {
+                            if (oldVal && newVal && changes) {
+                                done({
+                                    oldVal: oldVal,
+                                    newVal: newVal,
+                                    changes: changes
+                                });
+                            }
+                        });
+
+                        rep.value.a.b.c = 'nestedChangeOK';
+                    });
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
+                    expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
+                    expect(ret.value.changes).to.have.length(1);
+                    expect(ret.value.changes[0].type).to.equal('update');
+                    expect(ret.value.changes[0].path).to.equal('a.b.c');
+                    expect(ret.value.changes[0].oldValue).to.equal('c');
+                    expect(ret.value.changes[0].newValue).to.equal('nestedChangeOK');
+                })
+                .call(done);
+        });
+
+        it('react to changes in arrays', function(done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientArrTest', {
+                        persistent: false,
+                        defaultValue: ['starting']
+                    });
+
+                    rep.on('declared', function() {
+                        rep.on('change', function(oldVal, newVal, changes) {
+                            if (oldVal && newVal && changes) {
+                                done({
+                                    oldVal: oldVal,
+                                    newVal: newVal,
+                                    changes: changes
+                                });
+                            }
+                        });
+
+                        rep.value.push('arrPushOK');
+                    });
+                }, function(err, ret) {
+                    if (err) throw err;
+
+                    expect(ret.value.oldVal).to.deep.equal(['starting']);
+                    expect(ret.value.newVal).to.deep.equal(['starting', 'arrPushOK']);
+                    expect(ret.value.changes).to.have.length(1);
+                    expect(ret.value.changes[0].type).to.equal('splice');
+                    expect(ret.value.changes[0].removed).to.deep.equal([]);
+                    expect(ret.value.changes[0].removedCount).to.equal(0);
+                    expect(ret.value.changes[0].added).to.deep.equal(['arrPushOK']);
+                    expect(ret.value.changes[0].addedCount).to.equal(1);
+                })
+                .call(done);
+        });
+
+        it('load persisted values when they exist', function(done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientPersistence');
+
+                    rep.on('declared', function() {
+                        done(rep.value);
+                    });
+                }, function(err, ret) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    expect(ret.value).to.equal('it work good!');
+                })
+                .call(done);
+        });
+
+        it('persist assignment to disk', function(done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientPersistence');
+                    rep.value = { nested: 'hey we assigned!' };
+
+                    rep.on('change', function() {
+                        done();
+                    });
+                }, function(err) {
+                    if (err) throw err;
+
+                    fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
+                        if (err) {
+                            throw err;
+                        }
+
+                        expect(data).to.equal('{"nested":"hey we assigned!"}');
+                        done();
+                    });
                 });
+        });
+
+        it('persist changes to disk', function(done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientPersistence');
+                    rep.value.nested = 'hey we changed!';
+
+                    rep.on('change', function() {
+                        done();
+                    });
+                }, function(err) {
+                    if (err) throw err;
+
+                    fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
+                        if (err) {
+                            throw err;
+                        }
+
+                        expect(data).to.equal('{"nested":"hey we changed!"}');
+                        done();
+                    });
+                });
+        });
+
+        it('don\'t persist when "persistent" is set to "false"', function(done) {
+            fs.unlink('./db/replicants/test-bundle/clientTransience.rep', function(err) {
+                if (err && err.code !== 'ENOENT') {
+                    throw err;
+                }
+
+                e.browser.client
+                    .executeAsync(function(done) {
+                        var rep = window.dashboardApi.Replicant('clientTransience', { defaultValue: 'o no', persistent: false });
+
+                        rep.on('declared', function() {
+                            done();
+                        });
+                    }, function(err) {
+                        if (err) {
+                            throw err;
+                        }
+
+                        fs.readFile('./db/replicants/test-bundle/clientTransience.rep', function(err) {
+                            expect(function() {
+                                if (err) {
+                                    throw err;
+                                }
+                            }).to.throw(/ENOENT/);
+                        });
+                    })
+                    .call(done);
             });
         });
 
-        it('supports single retrieval via readSyncedVar', function(done) {
-            e.apis.dashboard.readSyncedVar('testVar', function(val) {
-                expect(val).to.equal(123);
-                done();
-            });
+        // need a better way to test this
+        it.skip('redeclare after reconnecting to Socket.IO', function(done) {
+            this.timeout(30000);
+
+            e.browser.client
+                .executeAsync(function(done) {
+                    window.clientRedeclare = window.dashboardApi.Replicant('clientRedeclare', { defaultValue: 'foo', persistent: false });
+
+                    window.clientRedeclare.once('declared', function() {
+                        done();
+                    });
+                }, function(err) {
+                    if (err) throw err;
+
+                    e.server.once('stopped', function() {
+                        e.browser.client
+                            .executeAsync(function(done) {
+                                window.clientRedeclare.once('declared', function() {
+                                    done();
+                                });
+                            }, function(err) {
+                                if (err) {
+                                    throw err;
+                                }
+                            })
+                            .call(done);
+
+                        e.server.start();
+                    });
+
+                    e.server.stop();
+                });
         });
 
-        it('supports legacy "variableName" when declaring synced variables', function(done) {
-            e.apis.dashboard.declareSyncedVar({ variableName: 'oldVar', initialVal: 123 });
+        it('can be programmatically accessed via nodecg.declaredReplicants', function(done) {
+            e.browser.client
+                .execute(function() {
+                    window.dashboardApi.Replicant('clientProgrammatic', {
+                        defaultValue: 'foo',
+                        persistent: false
+                    });
 
-            // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 100}, function() {
-                expect(e.apis.dashboard.variables.oldVar).to.equal(123);
-                done();
-            });
-        });
+                    return window.dashboardApi.declaredReplicants['test-bundle'].clientProgrammatic.value;
+                }, function(err, ret) {
+                    if (err) throw err;
 
-        it('supports "initialVal" and "initialValue" when declaring synced variables', function(done) {
-            e.apis.dashboard.declareSyncedVar({ variableName: 'initialVal', initialVal: 123 });
-            e.apis.dashboard.declareSyncedVar({ variableName: 'initialValue', initialVal: 456 });
-
-            e.browsers.dashboard.wait({duration: 100}, function() {
-                expect(e.apis.dashboard.variables.initialVal).to.equal(123);
-                expect(e.apis.dashboard.variables.initialValue).to.equal(456);
-                done();
-            });
-        });
-
-        it('throws an error when no name is given to a synced variable', function () {
-            expect(function() {
-                e.apis.dashboard.declareSyncedVar({ initialValue: 123 });
-            }).to.throw(/Attempted to declare an unnamed variable/);
+                    expect(ret.value).to.equal('foo');
+                })
+                .call(done);
         });
     });
 });

@@ -1,0 +1,54 @@
+style.
+    .collCtrl {
+        display: flex;
+        margin-bottom: 8px;
+    }
+
+    .collCtrl .btn {
+        flex-shrink: 0;
+    }
+
+    .collCtrl .collapsing,
+    .collCtrl .collapse.in {
+        margin-left: 8px;
+        flex-grow: 1;
+        display: flex;
+    }
+
+    .collCtrl .well {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+#viewKey.modal.fade(tabindex="-1" role="dialog" aria-labelledby="viewKeyLabel" aria-hidden="true")
+    .modal-dialog
+        .modal-content
+            .modal-header
+                button.close(type="button" data-dismiss="modal" aria-label="Close")
+                    span(aria-hidden="true") &#215;
+                h4#viewKeyLabel.modal-title Your Key
+            .modal-body
+                p Your key must be kept secret, just like your Twitch stream key! <b>Do not show it on stream!</b>
+
+                .collCtrl
+                    button.js-show.btn.btn-primary.btn-xs(type="button" data-toggle="collapse" data-target="#viewKey-key"
+                        aria-expanded="false" aria-controls="collapseExample")
+                        | Show Key
+                    #viewKey-key.collapse
+                        .well
+                            code
+                        button.js-copy.btn.btn-info.btn-xs
+                            <i class="fa fa-clipboard"></i> Copy
+                .collCtrl
+                    button.js-new.btn.btn-warning.btn-xs(type="button" data-toggle="collapse" data-target="#viewKey-new"
+                    aria-expanded="false" aria-controls="collapseExample")
+                        <i class="fa fa-refresh"></i> New Key
+                    #viewKey-new.collapse
+                        div
+                            p Are you sure? This will invalidate your previous key,
+                                | and you will need to paste the new one into all your view URLs!
+                            p Doing this will refresh the dashboard.
+                        button.js-confirmNew.btn.btn-danger.btn-xs
+                            <i class="fa fa-clipboard"></i> Click to confirm
+            .modal-footer
+                button.btn.btn-xs(type="button" data-dismiss="modal") Close

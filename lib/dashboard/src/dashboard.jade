@@ -1,7 +1,8 @@
 mixin panels(bundle)
     each panel in bundle.dashboard.panels
-        div(class='#{ bundle.name } #{ panel.name } panel panel-default panel-span-#{ panel.width }')
-            .panel-heading
+        div(class='#{ bundle.name } #{ panel.name } panel panel-default panel-span-#{ panel.width }',
+            data-bundle=bundle.name, data-panel=panel.name)
+            .panel-heading.noselect
                 h3.panel-title=panel.title
                 i(class="fa panel-icon #{ panel.faIcon }")
                 +panelInfoBtn(panel)
@@ -20,6 +21,7 @@ mixin panelInfoBtn(panel)
     data-html="true",
     data-container="body"
     data-placement="bottom",
+    data-rawurl=panel.viewUrl,
     data-content="<a target='_blank' href='#{ panel.viewUrl }'>#{ panel.viewUrl }</a>")
         i.fa.fa-info
 
@@ -29,7 +31,7 @@ html(lang="en")
         meta(http-equiv="X-UA-Compatible", content="IE=edge; charset=UTF-8")
         meta(name="viewport", content="width=device-width", initial-scale=1)
 
-        title NodeCG dashboard
+        title NodeCG Dashboard
 
         //- Bootstrap main CSS & Yeti override
         link(rel='stylesheet', href='/components/bootstrap/dist/css/bootstrap.min.css')
@@ -58,16 +60,33 @@ html(lang="en")
             window.ncgConfig = !{ JSON.stringify(ncgConfig) };
 
     body
-        div(class='navbar navbar-inverse navbar-fixed-top', role='navigation')
-            div.container
-                div.navbar-header
-                    a(class='navbar-brand', href='#') NodeCG dashboard
-                if ncgConfig.login.enabled
-                    .collapse.navbar-collapse
-                        ul.nav.navbar-nav.navbar-right
+        .navbar.navbar-inverse.navbar-fixed-top(role='navigation')
+            .container
+                .navbar-header
+                    // Remove this conditional if we ever have nav links that are visible when login is disabled
+                    if ncgConfig.login.enabled
+                        button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#navcollapse")
+                            span.sr-only Toggle navigation
+                            span.icon-bar
+                            span.icon-bar
+                            span.icon-bar
+                    a.navbar-brand(href='#')
+                        img(src="/dashboard/img/navbar-logo.png" alt="NodeCG dashboard" title="NodeCG dashboard")
+
+                #navcollapse.collapse.navbar-collapse
+                    ul.nav.navbar-nav
+                        if ncgConfig.login.enabled
+                            li
+                                a(href="#" title="View key" data-toggle="modal" data-target="#viewKey")
+                                    i.fa.fa-key
+                                    |  View Key
+                    ul.nav.navbar-nav.navbar-right
+                        if ncgConfig.login.enabled
                             li
                                 a(href="/logout" title="Sign out")
                                     i.fa.fa-sign-out
+                                    |  Sign out
+
 
         //- Alert container element for socket disconnects/errors/reconnects
         .container
@@ -76,16 +95,27 @@ html(lang="en")
         //- Spacer
         p
 
+        //- Add "view key" modal if config is enabled
+        if ncgConfig.login.enabled
+            include ./includes/view_key_modal.jade
+
         //- Core JavaScript
         script(src='/components/jquery/dist/jquery.min.js')
+        script(src='/components/jquery-cookie/jquery.cookie.js')
         script(src='/components/bootstrap/dist/js/bootstrap.min.js')
         script(src='/components/bootstrap/js/tooltip.js')
         script(src='/components/bootstrap/js/popover.js')
-        script(src='/components/masonry/dist/masonry.pkgd.min.js')
+        script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
+        script(src='/components/packery/dist/packery.pkgd.min.js')
         script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
         script(src='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js')
         script(src='/components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js')
         script(src='/components/typeahead.js/dist/typeahead.jquery.min.js')
+        link(href="/components/polymer/polymer.html" rel="import")
+
+        if ncgConfig.login.enabled
+            script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
+            script(src='/dashboard/key.js')
 
         //- Firefox doesn't support native WebCrypto yet >:(
         script(src='/components/cryptojslib/components/core-min.js')
@@ -98,10 +128,16 @@ html(lang="en")
 
         //- Load socket.io and immediately create a socket that all dashboard code will use
         script(src='/socket.io/socket.io.js')
-        script(type='text/javascript').
-            window.socket = io.connect('//#{ ncgConfig.baseURL }/');
+        if ncgConfig.login.enabled
+            script(type='text/javascript').
+                window.socket = io.connect('//#{ ncgConfig.baseURL }/', {
+                    query: 'token=' + $.cookie('socketToken')
+                });
+        else
+            script(type='text/javascript').
+                window.socket = io.connect('//#{ ncgConfig.baseURL }/');
         script(src='/nodecg-api.js')
-
+        script(src='/dashboard/panels.js')
         script(src='/dashboard/dashboard.js')
 
         //- Bundle panels
@@ -116,12 +152,14 @@ html(lang="en")
         each bundle in bundles
             //- only add the tag if there is a script, empty tags can cause long timeout delays
             if bundle.dashboard.js
+                - var bundleNoAssets = JSON.parse(JSON.stringify(bundle));
+                - delete bundleNoAssets.dashboard;
                 script(type='text/javascript').
                     try {
                         (function (nodecg) {
                             var $bundle = $('.dashboard-panels .#{ bundle.name }');
                             !{ bundle.dashboard.js.join('') }
-                        })(new NodeCG('#{ bundle.name }', !{JSON.stringify(bundle.config)}, !{JSON.stringify(ncgConfig)}, window.socket));
+                        })(new NodeCG(!{ JSON.stringify(bundleNoAssets) }, window.socket));
                     } catch (err) {
                         console.error("[NODECG] Panel for bundle #{ bundle.name } threw error:", err.stack);
                     }

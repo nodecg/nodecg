@@ -2,32 +2,69 @@
 
 // Modules used to run tests
 var chai = require('chai');
-var should = chai.should();
 var expect = chai.expect;
 var request = require('request');
+var fs = require('fs');
 
 var e = require('./setup/test-environment');
 var C = require('./setup/test-constants');
 
 describe('extension api', function() {
-    before(function(done) {
-        // Drop all synced variables
-        e.server._resetSyncedVariables();
-
-        // Wait a bit for all clients to react
-        setTimeout(done, 1750);
-    });
-
     it('can receive messages and fire acknowledgements', function(done) {
-        e.apis.extension.listenFor('clientToServer', function (data, cb) {
+        this.timeout(10000);
+
+        e.apis.extension.listenFor('clientToServer', function(data, cb) {
             cb();
         });
-        e.apis.dashboard.sendMessage('clientToServer', done);
+
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard)
+            .executeAsync(function(done) {
+                window.dashboardApi.sendMessage('clientToServer', null, done);
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+            })
+            .call(done);
     });
 
     it('can send messages', function(done) {
-        e.apis.dashboard.listenFor('serverToClient', done);
-        e.apis.extension.sendMessage('serverToClient');
+        this.timeout(10000);
+
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard)
+            .execute(function() {
+                window.serverToClientReceived = false;
+
+                window.dashboardApi.listenFor('serverToClient', function() {
+                    window.serverToClientReceived = true;
+                });
+            }, function(err) {
+                if (err) {
+                    throw err;
+                }
+            });
+
+        var sendMessage = setInterval(function() {
+            e.apis.extension.sendMessage('serverToClient');
+        }, 500);
+
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard)
+            .executeAsync(function(done) {
+                var checkMessageReceived;
+
+                checkMessageReceived = setInterval(function() {
+                    if (window.serverToClientReceived) {
+                        clearInterval(checkMessageReceived);
+                        done();
+                    }
+                }, 50);
+            }, function() {
+                clearInterval(sendMessage);
+            })
+            .call(done);
     });
 
     it('can mount express middleware', function(done) {
@@ -48,9 +85,7 @@ describe('extension api', function() {
         });
 
         it('isn\'t writable', function() {
-            expect(function() {
-                e.apis.extension.config.host = 'the_test_failed';
-            }).to.throw(TypeError);
+            expect(Object.isFrozen(e.apis.extension.config)).to.be.true;
         });
     });
 
@@ -60,44 +95,135 @@ describe('extension api', function() {
         });
     });
 
-    describe('synced variables', function() {
-        it('doesn\'t let multiple declarations of a synced variable overwrite itself', function(done) {
-            e.apis.extension.declareSyncedVar({ name: 'testVar', initialVal: 123 });
+    describe('replicants', function() {
+        it('only apply defaultValue when first declared', function(done) {
+            this.timeout(10000);
 
-            // Give Zombie a chance to process socket.io events
-            e.browsers.dashboard.wait({duration: 100}, function() {
-                e.apis.dashboard.declareSyncedVar({ name: 'testVar', initialVal: 456,
-                    setter: function(newVal) {
-                        newVal.should.equal(123);
-                        e.apis.extension.variables.testVar.should.equal(123);
+            e.browser.client
+                .switchTab(e.browser.tabs.dashboard)
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('extensionTest', { defaultValue: 'foo', persistent: false });
+
+                    rep.on('declared', function() {
                         done();
+                    });
+                }, function(err) {
+                    if (err) {
+                        throw err;
                     }
+
+                    var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
+                    expect(rep.value).to.equal('foo');
+                })
+                .call(done);
+        });
+
+        it('can be read once without subscription, via readReplicant', function() {
+             expect(e.apis.extension.readReplicant('extensionTest')).to.equal('foo');
+        });
+
+        it('throw an error when no name is given to a synced variable', function () {
+            expect(function() {
+                e.apis.extension.Replicant();
+            }).to.throw(/Must supply a name when instantiating a Replicant/);
+        });
+
+        it('can be assigned via the ".value" property', function () {
+            var rep = e.apis.extension.Replicant('extensionAssignmentTest', { persistent: false });
+            rep.value = 'assignmentOK';
+            expect(rep.value).to.equal('assignmentOK');
+        });
+
+        it('react to changes in nested properties of objects', function(done) {
+            var rep = e.apis.extension.Replicant('extensionObjTest', {
+                persistent: false,
+                defaultValue: {a: {b: {c: 'c'}}}
+            });
+            rep.on('change', function(oldVal, newVal, changes) {
+                expect(oldVal).to.deep.equal({a: {b: {c: 'c'}}});
+                expect(newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
+                expect(changes).to.have.length(1);
+                expect(changes[0].type).to.equal('update');
+                expect(changes[0].path).to.equal('a.b.c');
+                expect(changes[0].oldValue).to.equal('c');
+                expect(changes[0].newValue).to.equal('nestedChangeOK');
+                done();
+            });
+            rep.value.a.b.c = 'nestedChangeOK';
+        });
+
+        it('react to changes in arrays', function(done) {
+            var rep = e.apis.extension.Replicant('extensionArrTest', {
+                persistent: false,
+                defaultValue: ['starting']
+            });
+            rep.on('change', function(oldVal, newVal, changes) {
+                expect(oldVal).to.deep.equal(['starting']);
+                expect(newVal).to.deep.equal(['starting', 'arrPushOK']);
+                expect(changes).to.have.length(1);
+                expect(changes[0].type).to.equal('splice');
+                expect(changes[0].removed).to.deep.equal([]);
+                expect(changes[0].removedCount).to.equal(0);
+                expect(changes[0].added).to.deep.equal(['arrPushOK']);
+                expect(changes[0].addedCount).to.equal(1);
+                done();
+            });
+            rep.value.push('arrPushOK');
+        });
+
+        it('load persisted values when they exist', function(done) {
+            var rep = e.apis.extension.Replicant('extensionPersistence');
+            expect(rep.value).to.equal('it work good!');
+            done();
+        });
+
+        it('persist assignment to disk', function(done) {
+            var rep = e.apis.extension.Replicant('extensionPersistence');
+            rep.value = { nested: 'hey we assigned!' };
+            setTimeout(function() {
+                fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', function(err, data) {
+                    if (err) throw err;
+                    expect(data).to.equal('{"nested":"hey we assigned!"}');
+                    done();
+                });
+            }, 10);
+        });
+
+        it('persist changes to disk', function(done) {
+            var rep = e.apis.extension.Replicant('extensionPersistence');
+            rep.value.nested = 'hey we changed!';
+            setTimeout(function() {
+                fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', function(err, data) {
+                    if (err) throw err;
+                    expect(data).to.equal('{"nested":"hey we changed!"}');
+                    done();
+                });
+            }, 10);
+        });
+
+        it('don\'t persist when "persistent" is set to "false"', function(done) {
+            // Remove the file if it exists for some reason
+            fs.unlink('./db/replicants/test-bundle/extensionTransience.rep', function(err) {
+                if (err && err.code !== 'ENOENT') throw err;
+                var rep = e.apis.extension.Replicant('extensionTransience', { persistent: false });
+                rep.value = 'o no';
+                fs.readFile('./db/replicants/test-bundle/extensionTransience.rep', function(err) {
+                    expect(function() {
+                        if (err) {
+                            throw err;
+                        }
+                    }).to.throw(/ENOENT/);
+                    done();
                 });
             });
         });
 
-        it('supports single retrieval via readSyncedVar', function() {
-            var val = e.apis.extension.readSyncedVar('testVar');
-            expect(val).to.equal(123);
-        });
-
-        it('supports legacy "variableName" when declaring synced variables', function() {
-            e.apis.extension.declareSyncedVar({ variableName: 'oldVar', initialVal: 123 });
-            expect(e.apis.extension.variables.oldVar).to.equal(123);
-        });
-
-        it('supports "initialVal" and "initialValue" when declaring synced variables', function() {
-            e.apis.extension.declareSyncedVar({ variableName: 'initialVal', initialVal: 123 });
-            e.apis.extension.declareSyncedVar({ variableName: 'initialValue', initialVal: 456 });
-
-            expect(e.apis.extension.variables.initialVal).to.equal(123);
-            expect(e.apis.extension.variables.initialValue).to.equal(456);
-        });
-
-        it('throws an error when no name is given to a synced variable', function () {
-            expect(function() {
-                e.apis.extension.declareSyncedVar({ initialValue: 123 });
-            }).to.throw(Error);
+        it('can be programmatically accessed via nodecg.declaredReplicants', function() {
+            e.apis.extension.Replicant('extensionProgrammatic', {
+                defaultValue: 'foo',
+                persistent: false
+            });
+            expect(e.apis.extension.declaredReplicants['test-bundle'].extensionProgrammatic.value).to.equal('foo');
         });
     });
 

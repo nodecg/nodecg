@@ -8,7 +8,8 @@
   ],
   "description": "Live, controllable graphics system rendered in a browser",
   "dependencies": {
-    "masonry": "~3.1.5",
+    "draggabilly": "~1.2.3",
+    "packery": "~1.4.1",
     "imagesloaded": "~3.1.5",
     "bootstrap": "~3.2.0",
     "bsw-yeti": "~3.2.0",
@@ -18,7 +19,10 @@
     "seiyria-bootstrap-slider": "~4.0.8",
     "typeahead.js": "~0.10.5",
     "cryptojslib": "~3.1.2",
-    "obs-remote": "^1.0.0"
+    "obs-remote": "^1.0.0",
+    "jquery-cookie": "~1.4.1",
+    "zeroclipboard": "~2.2.0",
+    "polymer": "~1.0.2"
   },
   "license": "MIT",
   "private": true,

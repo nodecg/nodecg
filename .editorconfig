@@ -12,6 +12,11 @@ indent_size = 4
 
 charset = utf-8
 
+# NPM forces an indent size of 2 on package.json.
+# If you can't beat em, join em.
+[*.json]
+indent_size = 2
+
 # Don't remove trailing whitespace from Markdown
 [*.md]
 trim_trailing_whitespace = false
