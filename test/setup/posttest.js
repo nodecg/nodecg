@@ -13,7 +13,7 @@ try {
         try {
             fs.unlinkSync(C.BUNDLE_DIR);
         } catch (e) {
-            console.warn("Couldn't clean up test bundle files")
+            console.warn('Couldn\'t clean up test bundle files');
         }
     }
 }
