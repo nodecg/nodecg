@@ -22,7 +22,6 @@ describe('client api', function() {
             e.browser.client
                 .execute(function() {
                     window.serverToDashboardReceived = false;
-
                     window.dashboardApi.listenFor('serverToDashboard', function() {
                         window.serverToDashboardReceived = true;
                     });
@@ -37,7 +36,6 @@ describe('client api', function() {
             e.browser.client
                 .executeAsync(function(done) {
                     var checkMessageReceived;
-
                     checkMessageReceived = setInterval(function() {
                         if (window.serverToDashboardReceived) {
                             clearInterval(checkMessageReceived);
@@ -52,7 +50,6 @@ describe('client api', function() {
 
         it('can send messages', function(done) {
             e.apis.extension.listenFor('dashboardToServer', done);
-
             e.browser.client
                 .execute(function() {
                     window.dashboardApi.sendMessage('dashboardToServer');
@@ -75,7 +72,6 @@ describe('client api', function() {
             e.browser.client
                 .execute(function() {
                     window.serverToViewReceived = false;
-
                     window.viewApi.listenFor('serverToView', function() {
                         window.serverToViewReceived = true;
                     });
@@ -90,7 +86,6 @@ describe('client api', function() {
             e.browser.client
                 .executeAsync(function(done) {
                     var checkMessageReceived;
-
                     checkMessageReceived = setInterval(function() {
                         if (window.serverToViewReceived) {
                             clearInterval(checkMessageReceived);
@@ -105,7 +100,6 @@ describe('client api', function() {
 
         it('can send messages', function(done) {
             e.apis.extension.listenFor('viewToServer', done);
-
             e.browser.client
                 .execute(function() {
                     window.viewApi.sendMessage('viewToServer');
@@ -128,7 +122,6 @@ describe('client api', function() {
                     return window.dashboardApi.config;
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value).to.not.be.empty();
                 })
                 .call(done);
@@ -140,7 +133,6 @@ describe('client api', function() {
                     return window.dashboardApi.config;
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value.login).to.not.have.property('sessionSecret');
                 })
                 .call(done);
@@ -152,7 +144,6 @@ describe('client api', function() {
                     return Object.isFrozen(window.dashboardApi.config);
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value).to.be.true;
                 })
                 .call(done);
@@ -172,7 +163,6 @@ describe('client api', function() {
                     return window.dashboardApi.bundleConfig;
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value).to.not.be.empty();
                 })
                 .call(done);
@@ -192,13 +182,11 @@ describe('client api', function() {
             e.browser.client
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientTest', { defaultValue: 'bar' });
-
                     rep.on('declared', function() {
                         done(rep.value);
                     });
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value).to.equal('foo');
                 })
                 .call(done);
@@ -210,7 +198,6 @@ describe('client api', function() {
                     window.dashboardApi.readReplicant('clientTest', done);
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value).to.equal('foo');
                 })
                 .call(done);
@@ -221,13 +208,11 @@ describe('client api', function() {
                 .executeAsync(function(done) {
                     try {
                         window.dashboardApi.Replicant();
-                    }
-                    catch (e) {
+                    } catch (e) {
                         done(e.message);
                     }
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value).to.equal('Must supply a name when instantiating a Replicant');
                 })
                 .call(done);
@@ -243,7 +228,6 @@ describe('client api', function() {
                     rep.value = 'assignmentOK';
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value.newValue).to.equal('assignmentOK');
                     expect(ret.value.revision).to.equal(1);
                 })
@@ -273,7 +257,6 @@ describe('client api', function() {
                     });
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
                     expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
                     expect(ret.value.changes).to.have.length(1);
@@ -308,7 +291,6 @@ describe('client api', function() {
                     });
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value.oldVal).to.deep.equal(['starting']);
                     expect(ret.value.newVal).to.deep.equal(['starting', 'arrPushOK']);
                     expect(ret.value.changes).to.have.length(1);
@@ -325,15 +307,11 @@ describe('client api', function() {
             e.browser.client
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
-
                     rep.on('declared', function() {
                         done(rep.value);
                     });
                 }, function(err, ret) {
-                    if (err) {
-                        throw err;
-                    }
-
+                    if (err) throw err;
                     expect(ret.value).to.equal('it work good!');
                 })
                 .call(done);
@@ -344,18 +322,13 @@ describe('client api', function() {
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
                     rep.value = { nested: 'hey we assigned!' };
-
                     rep.on('change', function() {
                         done();
                     });
                 }, function(err) {
                     if (err) throw err;
-
                     fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
-                        if (err) {
-                            throw err;
-                        }
-
+                        if (err) throw err;
                         expect(data).to.equal('{"nested":"hey we assigned!"}');
                         done();
                     });
@@ -367,18 +340,13 @@ describe('client api', function() {
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
                     rep.value.nested = 'hey we changed!';
-
                     rep.on('change', function() {
                         done();
                     });
                 }, function(err) {
                     if (err) throw err;
-
                     fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
-                        if (err) {
-                            throw err;
-                        }
-
+                        if (err) throw err;
                         expect(data).to.equal('{"nested":"hey we changed!"}');
                         done();
                     });
@@ -394,20 +362,14 @@ describe('client api', function() {
                 e.browser.client
                     .executeAsync(function(done) {
                         var rep = window.dashboardApi.Replicant('clientTransience', { defaultValue: 'o no', persistent: false });
-
                         rep.on('declared', function() {
                             done();
                         });
                     }, function(err) {
-                        if (err) {
-                            throw err;
-                        }
-
+                        if (err) throw err;
                         fs.readFile('./db/replicants/test-bundle/clientTransience.rep', function(err) {
                             expect(function() {
-                                if (err) {
-                                    throw err;
-                                }
+                                if (err) throw err;
                             }).to.throw(/ENOENT/);
                         });
                     })
@@ -422,13 +384,11 @@ describe('client api', function() {
             e.browser.client
                 .executeAsync(function(done) {
                     window.clientRedeclare = window.dashboardApi.Replicant('clientRedeclare', { defaultValue: 'foo', persistent: false });
-
                     window.clientRedeclare.once('declared', function() {
                         done();
                     });
                 }, function(err) {
                     if (err) throw err;
-
                     e.server.once('stopped', function() {
                         e.browser.client
                             .executeAsync(function(done) {
@@ -436,9 +396,7 @@ describe('client api', function() {
                                     done();
                                 });
                             }, function(err) {
-                                if (err) {
-                                    throw err;
-                                }
+                                if (err) throw err;
                             })
                             .call(done);
 
@@ -460,7 +418,6 @@ describe('client api', function() {
                     return window.dashboardApi.declaredReplicants['test-bundle'].clientProgrammatic.value;
                 }, function(err, ret) {
                     if (err) throw err;
-
                     expect(ret.value).to.equal('foo');
                 })
                 .call(done);

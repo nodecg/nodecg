@@ -75,10 +75,7 @@ before(function(done) {
             .timeoutsAsyncScript(10000)
             .newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
             .getCurrentTabId(function(err, tabId) {
-                if (err) {
-                    throw err;
-                }
-
+                if (err) throw err;
                 e.browser.tabs.dashboard = tabId;
             })
             .executeAsync(function(done) {
@@ -90,16 +87,11 @@ before(function(done) {
                     }
                 }, 50, done);
             }, function(err) {
-                if (err) {
-                    throw err;
-                }
+                if (err) throw err;
             })
             .newWindow(C.VIEW_URL, 'NodeCG test bundle view', '')
             .getCurrentTabId(function(err, tabId) {
-                if (err) {
-                    throw err;
-                }
-
+                if (err) throw err;
                 e.browser.tabs.view = tabId;
             })
             .executeAsync(function(done) {
@@ -111,9 +103,7 @@ before(function(done) {
                     }
                 }, 50, done);
             }, function(err) {
-                if (err) {
-                    throw err;
-                }
+                if (err) throw err;
             })
             .timeoutsAsyncScript(5000)
             .call(done);

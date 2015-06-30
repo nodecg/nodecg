@@ -22,9 +22,7 @@ describe('extension api', function() {
             .executeAsync(function(done) {
                 window.dashboardApi.sendMessage('clientToServer', null, done);
             }, function(err) {
-                if (err) {
-                    throw err;
-                }
+                if (err) throw err;
             })
             .call(done);
     });
@@ -36,14 +34,11 @@ describe('extension api', function() {
             .switchTab(e.browser.tabs.dashboard)
             .execute(function() {
                 window.serverToClientReceived = false;
-
                 window.dashboardApi.listenFor('serverToClient', function() {
                     window.serverToClientReceived = true;
                 });
             }, function(err) {
-                if (err) {
-                    throw err;
-                }
+                if (err) throw err;
             });
 
         var sendMessage = setInterval(function() {
@@ -54,7 +49,6 @@ describe('extension api', function() {
             .switchTab(e.browser.tabs.dashboard)
             .executeAsync(function(done) {
                 var checkMessageReceived;
-
                 checkMessageReceived = setInterval(function() {
                     if (window.serverToClientReceived) {
                         clearInterval(checkMessageReceived);
@@ -103,15 +97,11 @@ describe('extension api', function() {
                 .switchTab(e.browser.tabs.dashboard)
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('extensionTest', { defaultValue: 'foo', persistent: false });
-
                     rep.on('declared', function() {
                         done();
                     });
                 }, function(err) {
-                    if (err) {
-                        throw err;
-                    }
-
+                    if (err) throw err;
                     var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
                     expect(rep.value).to.equal('foo');
                 })
@@ -139,6 +129,7 @@ describe('extension api', function() {
                 persistent: false,
                 defaultValue: {a: {b: {c: 'c'}}}
             });
+
             rep.on('change', function(oldVal, newVal, changes) {
                 expect(oldVal).to.deep.equal({a: {b: {c: 'c'}}});
                 expect(newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
@@ -149,6 +140,7 @@ describe('extension api', function() {
                 expect(changes[0].newValue).to.equal('nestedChangeOK');
                 done();
             });
+
             rep.value.a.b.c = 'nestedChangeOK';
         });
 
@@ -157,6 +149,7 @@ describe('extension api', function() {
                 persistent: false,
                 defaultValue: ['starting']
             });
+
             rep.on('change', function(oldVal, newVal, changes) {
                 expect(oldVal).to.deep.equal(['starting']);
                 expect(newVal).to.deep.equal(['starting', 'arrPushOK']);
@@ -168,6 +161,7 @@ describe('extension api', function() {
                 expect(changes[0].addedCount).to.equal(1);
                 done();
             });
+
             rep.value.push('arrPushOK');
         });
 
@@ -209,9 +203,7 @@ describe('extension api', function() {
                 rep.value = 'o no';
                 fs.readFile('./db/replicants/test-bundle/extensionTransience.rep', function(err) {
                     expect(function() {
-                        if (err) {
-                            throw err;
-                        }
+                        if (err) throw err;
                     }).to.throw(/ENOENT/);
                     done();
                 });
