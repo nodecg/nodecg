@@ -50,9 +50,10 @@
     "xtend": "^4.0.0"
   },
   "scripts": {
+    "build-api": "node bin/browserifyApi.js",
     "build-css": "node node_modules/less/bin/lessc lib/dashboard/src/dashboard.less > lib/dashboard/public/dashboard.css",
     "build-lint": "node node_modules/jshint/bin/jshint index.js lib/*",
-    "build": "npm run build-css && npm run build-lint",
+    "build": "npm run build-css && npm run build-lint && npm run build-api",
     "start": "node index.js",
     "postinstall": "bower install",
     "pretest": "node test/setup/pretest",
@@ -78,6 +79,7 @@
     "jshint": "^2.8.0",
     "lcov-filter": "0.0.1",
     "less": "^2.5.1",
+    "minifyify": "^7.0.2",
     "mocha": "^2.0.1",
     "mocha-lcov-reporter": "0.0.1",
     "webdriverio": "^2.4.5",
