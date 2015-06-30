@@ -2,17 +2,16 @@
 
 var fs = require('fs.extra');
 var webdriverio = require('webdriverio');
-
 var e = require('./setup/test-environment');
 var C = require('./setup/test-constants');
 
 // Global before and after
-
 before(function(done) {
     this.timeout(0);
 
     if (C.CONFIG.login.enabled) {
-        throw new Error('Login security is enabled! Please disable login security in cfg/nodecg.json before running tests');
+        throw new Error('Login security is enabled! '
+            + 'Please disable login security in cfg/nodecg.json before running tests');
     }
 
     if (C.CONFIG.ssl.enabled) {

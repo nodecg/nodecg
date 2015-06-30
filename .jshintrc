@@ -55,7 +55,7 @@
   "dojo"          : false,
   "jasmine"       : false,
   "jquery"        : true,
-  "mocha"         : false,
+  "mocha"         : true,
   "mootools"      : false,
   "node"          : true,
   "nonstandard"   : false,
@@ -67,9 +67,9 @@
   "wsh"           : false,
   "yui"           : false,
 
-
   "globals"       : {
     "nodecg"      : true,
-    "$bundle"     : true
+    "$bundle"     : true,
+    "context"     : true
   }
 }
