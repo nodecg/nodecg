@@ -1,5 +1,7 @@
 'use strict';
 
+process.env.test = true;
+
 var fs = require('fs.extra');
 var webdriverio = require('webdriverio');
 var e = require('./setup/test-environment');

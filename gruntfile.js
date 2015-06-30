@@ -1,5 +1,7 @@
 'use strict';
 
+var istanbul = require('browserify-istanbul');
+
 module.exports = function(grunt) {
     var lessFiles = {
         'lib/dashboard/src/dashboard.less': 'lib/dashboard/public/dashboard.css'
@@ -8,7 +10,7 @@ module.exports = function(grunt) {
     var jshintFiles = ['index.js', 'lib/**/*.js', '!lib/browser/public/*.js'];
     var browserifyFiles = ['lib/api.js'];
 
-    grunt.initConfig({
+    var gruntConfig = {
         less: {
             compile: {
                 files: lessFiles
@@ -21,37 +23,71 @@ module.exports = function(grunt) {
             all: jshintFiles
         },
         browserify: {
-            options: {
-                browserifyOptions: {
-                    debug: true
+            dist: {
+                files: {
+                    './lib/browser/public/browserifiedApi.min.js': browserifyFiles
                 },
-                plugin: [
-                    ['minifyify', {
-                        map: '/nodecg-api.map.json',
-                        output: 'lib/browser/public/browserifiedApi.map.json'
-                    }]
-                ],
-                transform: [
-                    ['aliasify', {
-                        aliases: {
-                            './logger': './lib/browser/logger',
-                            './replicant': './lib/browser/replicant'
-                        },
-                        verbose: false
-                    }],
-                    ['envify', {
-                        _: 'purge',
-                        browser: true
-                    }],
-                    'brfs'
-                ],
-                ignore: [
-                    './lib/server/index.js',
-                    './lib/replicator.js',
-                    './lib/util.js'
-                ]
+                options: {
+                    browserifyOptions: {
+                        debug: true
+                    },
+                    plugin: [
+                        ['minifyify', {
+                            map: '/nodecg-api.map.json',
+                            output: 'lib/browser/public/browserifiedApi.map.json'
+                        }]
+                    ],
+                    transform: [
+                        ['aliasify', {
+                            aliases: {
+                                './logger': './lib/browser/logger',
+                                './replicant': './lib/browser/replicant'
+                            },
+                            verbose: false
+                        }],
+                        ['envify', {
+                            _: 'purge',
+                            browser: true
+                        }],
+                        'brfs'
+                    ],
+                    ignore: [
+                        './lib/server/index.js',
+                        './lib/replicator.js',
+                        './lib/util.js'
+                    ]
+                }
             },
-            './lib/browser/public/browserifiedApi.min.js': browserifyFiles
+            coverage: {
+                files: {
+                    './lib/browser/public/browserifiedTestApi.js': browserifyFiles
+                },
+                options: {
+                    browserifyOptions: {
+                        debug: true
+                    },
+                    transform: [
+                        ['aliasify', {
+                            aliases: {
+                                './logger': './lib/browser/logger',
+                                './replicant': './lib/browser/replicant'
+                            },
+                            verbose: false
+                        }],
+                        ['envify', {
+                            _: 'purge',
+                            browser: true
+                        }],
+                        'brfs',
+                        istanbul
+                    ],
+                    ignore: [
+                        './lib/server/index.js',
+                        './lib/replicator.js',
+                        './lib/util.js'
+                    ]
+                }
+            }
         },
         watch: {
             stylesheets: {
@@ -76,7 +112,9 @@ module.exports = function(grunt) {
                 }
             }
         }
-    });
+    };
+
+    grunt.initConfig(gruntConfig);
 
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-jshint');
