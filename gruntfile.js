@@ -39,6 +39,10 @@ module.exports = function(grunt) {
                         },
                         verbose: false
                     }],
+                    ['envify', {
+                        _: 'purge',
+                        browser: true
+                    }],
                     'brfs'
                 ],
                 ignore: [
