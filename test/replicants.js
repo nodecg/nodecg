@@ -19,7 +19,7 @@ describe('client-side replicants', function() {
 
         e.browser.client
             .executeAsync(function(done) {
-                var rep = window.dashboardApi.Replicant('clientTest', { defaultValue: 'bar' });
+                var rep = window.dashboardApi.Replicant('clientTest', {defaultValue: 'bar'});
                 rep.on('declared', function() {
                     done(rep.value);
                 });
@@ -173,22 +173,6 @@ describe('client-side replicants', function() {
 
                 e.server.stop();
             });
-    });
-
-    it('should be programmatically accessible via nodecg.declaredReplicants', function(done) {
-        e.browser.client
-            .execute(function() {
-                window.dashboardApi.Replicant('clientProgrammatic', {
-                    defaultValue: 'foo',
-                    persistent: false
-                });
-
-                return window.dashboardApi.declaredReplicants['test-bundle'].clientProgrammatic.value;
-            }, function(err, ret) {
-                if (err) throw err;
-                expect(ret.value).to.equal('foo');
-            })
-            .call(done);
     });
 
     context('when "persistent" is set to "true"', function() {
@@ -348,14 +332,6 @@ describe('server-side replicants', function() {
         });
 
         rep.value.push('arrPushOK');
-    });
-
-    it('should be programmatically accessed via nodecg.declaredReplicants', function() {
-        e.apis.extension.Replicant('extensionProgrammatic', {
-            defaultValue: 'foo',
-            persistent: false
-        });
-        expect(e.apis.extension.declaredReplicants['test-bundle'].extensionProgrammatic.value).to.equal('foo');
     });
 
     context('when "persistent" is set to "true"', function() {
