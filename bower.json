@@ -22,7 +22,9 @@
     "obs-remote": "^1.0.0",
     "jquery-cookie": "~1.4.1",
     "zeroclipboard": "~2.2.0",
-    "polymer": "~1.0.2"
+    "polymer": "~1.0.5",
+    "paper-elements": "PolymerElements/paper-elements#~1.0.1",
+    "iron-elements": "PolymerElements/iron-elements#~1.0.1"
   },
   "license": "MIT",
   "private": true,
