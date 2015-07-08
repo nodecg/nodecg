@@ -105,7 +105,7 @@ module.exports = function(grunt) {
                 }
             },
             clientScripts: {
-                files: browserifyFiles,
+                files: ['lib/api.js', 'lib/browser/*.js'],
                 tasks: ['browserify'],
                 options: {
                     debounceDelay: 250
