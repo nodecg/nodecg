@@ -72,7 +72,7 @@ describe('client-side api', function() {
             e.browser.client
                 .execute(function() {
                     window.serverToViewReceived = false;
-                    window.viewApi.listenFor('serverToView', function() {
+                    window.graphicApi.listenFor('serverToView', function() {
                         window.serverToViewReceived = true;
                     });
                 }, function(err) {
@@ -102,7 +102,7 @@ describe('client-side api', function() {
             e.apis.extension.listenFor('viewToServer', done);
             e.browser.client
                 .execute(function() {
-                    window.viewApi.sendMessage('viewToServer');
+                    window.graphicApi.sendMessage('viewToServer');
                 }, function(err) {
                     if (err) throw err;
                 });

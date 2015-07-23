@@ -90,7 +90,7 @@ before(function(done) {
             }, function(err) {
                 if (err) throw err;
             })
-            .newWindow(C.VIEW_URL, 'NodeCG test bundle view', '')
+            .newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '')
             .getCurrentTabId(function(err, tabId) {
                 if (err) throw err;
                 e.browser.tabs.view = tabId;
@@ -98,7 +98,7 @@ before(function(done) {
             .executeAsync(function(done) {
                 var checkForApi;
                 checkForApi = setInterval(function(done) {
-                    if (typeof window.viewApi !== 'undefined') {
+                    if (typeof window.graphicApi !== 'undefined') {
                         clearInterval(checkForApi);
                         done();
                     }

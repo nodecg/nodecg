@@ -1,6 +1,6 @@
 {
   "name": "nodecg",
-  "version": "0.5.3",
+  "version": "0.7.0",
   "homepage": "https://github.com/nodecg/nodecg",
   "authors": [
     "Matthew McNamara <matt@mattmcn.com>",
@@ -11,19 +11,15 @@
     "draggabilly": "~1.2.3",
     "packery": "~1.4.1",
     "imagesloaded": "~3.1.5",
-    "bootstrap": "~3.2.0",
-    "bsw-yeti": "~3.2.0",
-    "jquery": ">=2.1.1",
-    "fontawesome": "~4.2.0",
-    "bootstrap-tagsinput": "~0.4.2",
-    "seiyria-bootstrap-slider": "~4.0.8",
     "cryptojslib": "~3.1.2",
     "obs-remote": "^1.0.0",
-    "jquery-cookie": "~1.4.1",
+    "cookies-js": "~1.2.1",
     "zeroclipboard": "~2.2.0",
-    "polymer": "~1.0.5",
+    "polymer": "~1.0.7",
     "paper-elements": "PolymerElements/paper-elements#~1.0.1",
-    "iron-elements": "PolymerElements/iron-elements#~1.0.1"
+    "iron-elements": "PolymerElements/iron-elements#~1.0.1",
+    "cn-jsurl": "~1.0.0",
+    "iframe-resizer": "~2.8.10"
   },
   "license": "MIT",
   "private": true,

@@ -1,164 +1,112 @@
-mixin panels(bundle)
-    each panel in bundle.dashboard.panels
-        div(class='#{ bundle.name } #{ panel.name } panel panel-default panel-span-#{ panel.width }',
-            data-bundle=bundle.name, data-panel=panel.name)
-            .panel-heading.noselect
-                h3.panel-title=panel.title
-                i(class="fa panel-icon #{ panel.faIcon }")
-                +panelInfoBtn(panel)
-            //- The body was rendered from Jade into HTML in an earlier step of bundle parsing
-            //- This is inefficient, as it means we are doing two rendering passes for each bundle:
-            //- Once to render the body, once to render the rest of the panel (container + header).
-            //- However, I see no other way to do it as Jade is a compiled language and does not
-            //- support dynamic includes.
-            .panel-body!=panel.body
-
-//- TODO: Make panel info better. Show things like resolution, authors, etc. Lots more info
-mixin panelInfoBtn(panel)
-    button.btn.btn-xs.btn-info.panel-info(type="button",
-    data-toggle="popover",
-    title=panel.title,
-    data-html="true",
-    data-container="body"
-    data-placement="bottom",
-    data-rawurl=panel.viewUrl,
-    data-content="<a target='_blank' href='#{ panel.viewUrl }'>#{ panel.viewUrl }</a>")
-        i.fa.fa-info
-
 doctype html
-html(lang="en")
+html(lang='en')
     head
-        meta(http-equiv="X-UA-Compatible", content="IE=edge; charset=UTF-8")
-        meta(name="viewport", content="width=device-width", initial-scale=1)
+        meta(http-equiv='X-UA-Compatible', content='IE=edge; charset=UTF-8')
+        meta(name='viewport', content='width=device-width', initial-scale=1)
 
         title NodeCG Dashboard
 
-        //- Bootstrap main CSS & Yeti override
-        link(rel='stylesheet', href='/components/bootstrap/dist/css/bootstrap.min.css')
-        link(rel='stylesheet', href='/components/bsw-yeti/css/bootstrap.min.css')
+        //- Web Component support
+        script(src='/components/webcomponentsjs/webcomponents-lite.min.js')
 
-        //- Bower component CSS
-        link(rel='stylesheet', href='/components/fontawesome/css/font-awesome.min.css')
-        link(rel='stylesheet', href='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.css')
-        link(rel='stylesheet', href='/components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css')
+        //- import Polymer elements
+        link(rel='import', href='/components/iron-icon/iron-icon.html')
+        link(rel='import', href='/components/iron-icons/communication-icons.html')
+        link(rel='import', href='/components/iron-icons/iron-icons.html')
+        link(rel='import', href='/components/paper-dialog/paper-dialog.html')
+        link(rel='import', href='/components/paper-button/paper-button.html')
+        link(rel='import', href='/components/paper-checkbox/paper-checkbox.html')
+        link(rel='import', href='/components/paper-drawer-panel/paper-drawer-panel.html')
+        link(rel='import', href='/components/paper-icon-button/paper-icon-button.html')
+        link(rel='import', href='/components/paper-input/paper-input.html')
+        link(rel='import', href='/components/paper-item/paper-item.html')
+        link(rel='import', href='/components/paper-item/paper-item-body.html')
+        link(rel='import', href='/components/paper-header-panel/paper-header-panel.html')
+        link(rel='import', href='/components/paper-styles/paper-styles.html')
+        link(rel='import', href='/components/paper-styles/paper-styles-classes.html')
+        link(rel='import', href='/components/paper-toast/paper-toast.html')
+        link(rel='import', href='/components/paper-toolbar/paper-toolbar.html')
 
-        //- Custom styles for this template
+        //- our custom dashboard panel container
+        link(rel='import', href='/dashboard/elements/nodecg-dashboard-panel.html')
+
+        //- dashboard CSS
         link(rel='stylesheet', href='/dashboard/dashboard.css')
 
-        //- Bundle CSS, perhaps these can just be linked to directly?
-            The javascript needs to be cached because of the way we're injecting, but we're not doing
-            anything special to the CSS, at least not yet.
-        each bundle in bundles
-            //- only add the tag if there is a style, empty tags can cause long timeout delays
-            if bundle.dashboard.css
-                each style in bundle.dashboard.css
-                    style(type='text/css').
-                        !{ style }
-
-        //- Make the NodeCG config available to all code
+        //- make the global config available
         script(type='text/javascript').
             window.ncgConfig = !{ JSON.stringify(ncgConfig) };
 
-    body
-        .navbar.navbar-inverse.navbar-fixed-top(role='navigation')
-            .container
-                .navbar-header
-                    // Remove this conditional if we ever have nav links that are visible when login is disabled
-                    if ncgConfig.login.enabled
-                        button.navbar-toggle.collapsed(type="button" data-toggle="collapse" data-target="#navcollapse")
-                            span.sr-only Toggle navigation
-                            span.icon-bar
-                            span.icon-bar
-                            span.icon-bar
-                    a.navbar-brand(href='#')
-                        img(src="/dashboard/img/navbar-logo.png" alt="NodeCG dashboard" title="NodeCG dashboard")
+        //- make the API available
+        script(src='/nodecg-api.js')
 
-                #navcollapse.collapse.navbar-collapse
-                    ul.nav.navbar-nav
-                        if ncgConfig.login.enabled
-                            li
-                                a(href="#" title="View key" data-toggle="modal" data-target="#viewKey")
-                                    i.fa.fa-key
-                                    |  View Key
-                    ul.nav.navbar-nav.navbar-right
-                        if ncgConfig.login.enabled
-                            li
-                                a(href="/logout" title="Sign out")
-                                    i.fa.fa-sign-out
-                                    |  Sign out
+        //- initialize the socket
+        script(src='/components/cookies-js/dist/cookies.min.js')
+        script(src='/components/cn-jsurl/url.min.js')
+        script(src='/socket.io/socket.io.js')
+        script(type='text/javascript').
+            var url = new Url;
+            window.token = url.query.key || Cookies.get('socketToken');
+            if (window.token) {
+                window.socket = io.connect('//' + window.ncgConfig.baseURL + '/', {
+                    query: 'token=' + window.token
+                });
+            }
+            else {
+                window.socket = io.connect('//' + window.ncgConfig.baseURL + '/');
+            }
 
-
-        //- Alert container element for socket disconnects/errors/reconnects
-        .container
-            #socketStatus
-
-        //- Spacer
-        p
-
-        //- Add "view key" modal if config is enabled
-        if ncgConfig.login.enabled
-            include ./includes/view_key_modal.jade
-
-        //- Core JavaScript
-        script(src='/components/jquery/dist/jquery.min.js')
-        script(src='/components/jquery-cookie/jquery.cookie.js')
-        script(src='/components/bootstrap/dist/js/bootstrap.min.js')
-        script(src='/components/bootstrap/js/tooltip.js')
-        script(src='/components/bootstrap/js/popover.js')
+        //- other dashboard scripts
         script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
         script(src='/components/packery/dist/packery.pkgd.min.js')
+        script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
+        script(src='/components/iframe-resizer/js/iframeResizer.min.js')
         script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
-        script(src='/components/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js')
-        script(src='/components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js')
-        link(href="/components/polymer/polymer.html" rel="import")
-
-        if ncgConfig.login.enabled
-            script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
-            script(src='/dashboard/key.js')
-
-        //- Firefox doesn't support native WebCrypto yet >:(
-        script(src='/components/cryptojslib/components/core-min.js')
-        script(src='/components/cryptojslib/components/sha256-min.js')
-        script(src='/components/cryptojslib/components/enc-base64-min.js')
-        script(src='/components/obs-remote/dist/obs-remote.min.js')
-
-        //- Twitch JS SDK isn't on bower ¯\_(ツ)_/¯
-        script(src='/dashboard/twitch.min.js')
-
-        //- Load socket.io and immediately create a socket that all dashboard code will use
-        script(src='/socket.io/socket.io.js')
-        if ncgConfig.login.enabled
-            script(type='text/javascript').
-                window.socket = io.connect('//#{ ncgConfig.baseURL }/', {
-                    query: 'token=' + $.cookie('socketToken')
-                });
-        else
-            script(type='text/javascript').
-                window.socket = io.connect('//#{ ncgConfig.baseURL }/');
-        script(src='/nodecg-api.js')
         script(src='/dashboard/panels.js')
         script(src='/dashboard/dashboard.js')
 
-        //- Bundle panels
-            We load these after all JS is loaded to ensure that any scripts declared inline are loaded after
-            all the core JS is loaded.
-        div.container
-            div.dashboard-panels
-                each bundle in bundles
-                    +panels(bundle)
+        //- custom styles for Polymer
+        style(is='custom-style').
+            * {
+                --default-primary-color: #00bebe;
+            }
 
-        //- Bundle javascript
-        each bundle in bundles
-            //- only add the tag if there is a script, empty tags can cause long timeout delays
-            if bundle.dashboard.js
-                - var bundleNoAssets = JSON.parse(JSON.stringify(bundle));
-                - delete bundleNoAssets.dashboard;
-                script(type='text/javascript').
-                    try {
-                        (function (nodecg) {
-                            var $bundle = $('.dashboard-panels .#{ bundle.name }');
-                            !{ bundle.dashboard.js.join('') }
-                        })(new NodeCG(!{ JSON.stringify(bundleNoAssets) }, window.socket));
-                    } catch (err) {
-                        console.error("[NODECG] Panel for bundle #{ bundle.name } threw error:", err.stack);
-                    }
+    body.fullbleed.vertical.layout
+        paper-header-panel.flex
+            paper-toolbar
+                span.flex: img.logo(src='/dashboard/img/navbar-logo.png' alt='NodeCG dashboard' title='NodeCG dashboard')
+                if ncgConfig.login.enabled
+                    paper-icon-button#logout(icon='exit-to-app', alt='Sign Out')
+            #panels
+                each bundle in bundles
+                    each panel in bundle.dashboard.panels
+                        nodecg-dashboard-panel(class='dashboard-panel width-' + panel.width, title=panel.title,
+                            id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
+                            iframe(src='/panel/#{bundle.name}/#{panel.name}', frameborder='0', scrolling='no')
+
+        //- Used by packery to establish the width of the columns
+        #grid-sizer(class="width-1")
+
+        paper-toast.paper-font-body1#socket-error(text='Unhandled socket error!')
+        paper-toast.paper-font-body1#socket-disconnected(text='Lost connection to NodeCG server!')
+        paper-toast.paper-font-body1#socket-reconnectattempt(text='Attempting to reconnect to NodeCG server...')
+        paper-toast.paper-font-body1#socket-reconnected(text='Reconnected to NodeCG server!')
+        paper-toast.paper-font-body1#socket-reconnectfailed(text='Failed to reconnect to NodeCG server!')
+
+        //- key overlay
+        if ncgConfig.login.enabled
+            paper-dialog#keyDialog(modal)
+                h2 NodeCG Key
+                code.paper-font-code1#key
+                p.text-warning.paper-font-body1
+                    | Resetting your key will disrupt all current sessions using it.<br/>
+                    | When you reset your key, the dashboard will be refreshed so that a new key can be obtained.
+
+                .buttons
+                    paper-button(dialog-dismiss) Close
+                    paper-button#copyKey(data-clipboard-target='key' autofocus)
+                        iron-icon(icon='icons:content-copy')
+                        | &ensp;Copy Key
+                    paper-button#resetKey
+                        iron-icon(icon='icons:refresh')
+                        | &ensp;Reset Key

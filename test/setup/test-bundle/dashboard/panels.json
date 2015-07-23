@@ -1,16 +1,8 @@
 [
   {
-    "name": "html",
-    "title": "HTML Panel",
-    "width": 2,
-    "file": "html.html",
-    "faIcon": "fa-meh-o"
-  },
-  {
-    "name": "jade",
-    "title": "Jade Panel",
-    "width": 2,
-    "file": "jade.jade",
-    "faIcon": "fa-meh-o"
+    "name": "test",
+    "title": "Test Panel",
+    "width": 1,
+    "file": "panel.html"
   }
 ]

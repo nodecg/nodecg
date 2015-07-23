@@ -3,17 +3,15 @@
 var istanbul = require('browserify-istanbul');
 
 module.exports = function(grunt) {
-    var lessFiles = {
-        'lib/dashboard/src/dashboard.less': 'lib/dashboard/public/dashboard.css'
-    };
-
     var jshintFiles = ['index.js', 'lib/**/*.js', '!lib/browser/public/*.js'];
     var browserifyFiles = ['lib/api.js'];
 
     var gruntConfig = {
         less: {
             compile: {
-                files: lessFiles
+                files: {
+                    'lib/dashboard/public/dashboard.css': 'lib/dashboard/src/dashboard.less'
+                }
             }
         },
         jshint: {
@@ -91,7 +89,7 @@ module.exports = function(grunt) {
         },
         watch: {
             stylesheets: {
-                files: lessFiles,
+                files: ['lib/dashboard/src/dashboard.less'],
                 tasks: ['less'],
                 options: {
                     debounceDelay: 250
