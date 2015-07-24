@@ -29,6 +29,7 @@ html(lang='en')
 
         //- our custom dashboard panel container
         link(rel='import', href='/dashboard/elements/nodecg-dashboard-panel.html')
+        link(rel='import', href='/dashboard/elements/ncg-dialog.html')
 
         //- dashboard CSS
         link(rel='stylesheet', href='/dashboard/dashboard.css')
@@ -80,9 +81,16 @@ html(lang='en')
             #panels
                 each bundle in bundles
                     each panel in bundle.dashboard.panels
-                        nodecg-dashboard-panel(class='dashboard-panel width-' + panel.width, title=panel.title,
-                            id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
-                            iframe(src='/panel/#{bundle.name}/#{panel.name}', frameborder='0', scrolling='no')
+                        if panel.modal
+                            ncg-dialog(class='dashboard-panel width-' + panel.width,
+                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name, modal)
+                                iframe(src='/panel/#{bundle.name}/#{panel.name}',
+                                    frameborder='0', scrolling='no', style='width: 100%')
+                        else
+                            nodecg-dashboard-panel(class='dashboard-panel width-' + panel.width, title=panel.title,
+                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
+                                iframe(src='/panel/#{bundle.name}/#{panel.name}',
+                                    frameborder='0', scrolling='no', style='width: 100%')
 
         //- Used by packery to establish the width of the columns
         #grid-sizer(class="width-1")
