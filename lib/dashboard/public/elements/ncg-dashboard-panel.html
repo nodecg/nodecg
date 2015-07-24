@@ -1,12 +1,10 @@
 <link rel="import" href="/components/polymer/polymer.html">
-
 <link rel="import" href="/components/paper-material/paper-material.html">
 <link rel="import" href="/components/paper-styles/paper-styles.html">
 <link rel="import" href="/components/paper-styles/paper-styles-classes.html">
+<link rel="import" href="ncg-dashboard-panel-info.html">
 
-<link rel="import" href="nodecg-dashboard-panel-info.html">
-
-<dom-module id="nodecg-dashboard-panel">
+<dom-module id="ncg-dashboard-panel">
     <style>
         .heading {
             display: flex;
@@ -25,7 +23,7 @@
         <paper-material>
             <div class="heading paper-font-title">
                 <span>{{title}}</span>
-                <nodecg-dashboard-panel-info id="infoBtn" bundle="{{bundle}}"></nodecg-dashboard-panel-info>
+                <ncg-dashboard-panel-info id="infoBtn" bundle="{{bundle}}"></ncg-dashboard-panel-info>
             </div>
             <div class="body">
                 <content></content>
@@ -36,7 +34,7 @@
 
 <script>
     Polymer({
-        is: 'nodecg-dashboard-panel',
+        is: 'ncg-dashboard-panel',
         properties: {
             title: {
                 type: String,
