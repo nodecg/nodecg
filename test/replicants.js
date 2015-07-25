@@ -382,4 +382,28 @@ describe('server-side replicants', function() {
             });
         });
     });
+
+    it('should only apply array splices from the client once', function(done) {
+        this.timeout(7000);
+
+        var serverRep = e.apis.extension.Replicant('clientDoubleApplyTest', {persistent: false, defaultValue: []});
+
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard)
+            .executeAsync(function(done) {
+                var rep = window.dashboardApi.Replicant('clientDoubleApplyTest', {persistent: false});
+
+                rep.on('declared', function() {
+                    rep.on('change', function() {
+                        done();
+                    });
+
+                    rep.value.push('test');
+                });
+            }, function(err) {
+                if (err) throw err;
+                expect(serverRep.value).to.deep.equal(['test']);
+            })
+            .call(done);
+    });
 });

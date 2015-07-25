@@ -13,7 +13,7 @@ describe('dashboard', function() {
         it('should show up on the dashboard', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .isExisting('nodecg-dashboard-panel[bundle="test-bundle"][panel="test"]', function(err, isExisting) {
+                .isExisting('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]', function(err, isExisting) {
                     if (err) throw err;
                     expect(isExisting).to.be.true;
                 })
