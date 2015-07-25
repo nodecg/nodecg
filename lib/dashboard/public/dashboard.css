@@ -17,16 +17,28 @@ body {
   width: 230px;
 }
 .dashboard-panel.width-1 {
-  width: 230px;
+  width: 128 px;
 }
 .dashboard-panel.width-2 {
-  width: 470px;
+  width: 272 px;
 }
 .dashboard-panel.width-3 {
-  width: 710px;
+  width: 416 px;
 }
 .dashboard-panel.width-4 {
-  width: 950px;
+  width: 560 px;
+}
+.dashboard-panel.width-5 {
+  width: 704 px;
+}
+.dashboard-panel.width-6 {
+  width: 848 px;
+}
+.dashboard-panel.width-7 {
+  width: 992 px;
+}
+.dashboard-panel.width-8 {
+  width: 1136 px;
 }
 .logo {
   vertical-align: middle;
