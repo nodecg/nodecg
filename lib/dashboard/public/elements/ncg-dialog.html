@@ -1,6 +1,5 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="/components/polymer/polymer.html">
+<link rel="import" href="/components/paper-dialog/paper-dialog.html">
 
 <dom-module id="ncg-dialog">
     <style>
@@ -16,16 +15,11 @@
         #dialog {
             padding: 20px;
         }
-
-        #close {
-            display: inherit;
-        }
     </style>
 
     <template>
         <paper-dialog id="dialog" modal="{{modal}}">
             <content></content>
-            <paper-button id="close" hidden="{{hideCloseButton}}">Close</paper-button>
         </paper-dialog>
     </template>
 </dom-module>
@@ -35,23 +29,9 @@
         is: 'ncg-dialog',
 
         properties: {
-            hideCloseButton: {
-                type: Boolean,
-                value: false
-            },
             modal: {
                 type: Boolean,
                 value: true
-            }
-        },
-
-        /*
-         * Lifecycle
-         */
-        ready: function() {
-            // If we're in an iframe, append to the top frame
-            if (window !== window.top) {
-                window.top.document.body.appendChild(this);
             }
         },
 
