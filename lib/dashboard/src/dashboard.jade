@@ -90,7 +90,7 @@ html(lang='en')
                     each panel in bundle.dashboard.panels
                         if panel.dialog
                             ncg-dialog(class='dashboard-panel width-' + panel.width,
-                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name, modal)
+                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
                                 iframe(src='/panel/#{bundle.name}/#{panel.name}',
                                     frameborder='0', scrolling='no', style='width: 100%')
 
