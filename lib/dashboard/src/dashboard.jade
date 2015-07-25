@@ -52,8 +52,7 @@ html(lang='en')
                 window.socket = io.connect('//' + window.ncgConfig.baseURL + '/', {
                     query: 'token=' + window.token
                 });
-            }
-            else {
+            } else {
                 window.socket = io.connect('//' + window.ncgConfig.baseURL + '/');
             }
 
@@ -63,7 +62,7 @@ html(lang='en')
         script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
         script(src='/components/iframe-resizer/js/iframeResizer.min.js')
         script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
-        script(src='/dashboard/panels.js')
+        script(src='/dashboard/panel_packery.js')
         script(src='/dashboard/dashboard.js')
 
         //- custom styles for Polymer
@@ -81,14 +80,17 @@ html(lang='en')
             #panels
                 each bundle in bundles
                     each panel in bundle.dashboard.panels
-                        if panel.modal
-                            ncg-dialog(class='dashboard-panel width-' + panel.width,
-                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name, modal)
-                                iframe(src='/panel/#{bundle.name}/#{panel.name}',
-                                    frameborder='0', scrolling='no', style='width: 100%')
-                        else
+                        if !panel.dialog
                             ncg-dashboard-panel(class='dashboard-panel width-' + panel.width, title=panel.title,
                                 id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
+                                iframe(src='/panel/#{bundle.name}/#{panel.name}',
+                                    frameborder='0', scrolling='no', style='width: 100%')
+            #dialogs
+                each bundle in bundles
+                    each panel in bundle.dashboard.panels
+                        if panel.dialog
+                            ncg-dialog(class='dashboard-panel width-' + panel.width,
+                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name, modal)
                                 iframe(src='/panel/#{bundle.name}/#{panel.name}',
                                     frameborder='0', scrolling='no', style='width: 100%')
 
