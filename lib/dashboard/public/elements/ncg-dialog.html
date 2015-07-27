@@ -1,0 +1,38 @@
+<link rel="import" href="/components/polymer/polymer.html">
+<link rel="import" href="/components/paper-dialog/paper-dialog.html">
+
+<dom-module id="ncg-dialog">
+    <style>
+        :host::shadow #dialog > *:first-child {
+            margin-top: 0;
+        }
+
+        :host::shadow #dialog > * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #dialog {
+            padding: 20px;
+        }
+    </style>
+
+    <template>
+        <paper-dialog id="dialog" with-backdrop>
+            <content></content>
+        </paper-dialog>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is: 'ncg-dialog',
+
+        /*
+         * Methods
+         */
+        open: function() {
+            this.$.dialog.open();
+        }
+    });
+</script>

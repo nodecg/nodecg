@@ -50,8 +50,7 @@ before(function(done) {
 
             if (process.env.TRAVIS_OS_NAME === 'linux') {
                 desiredCapabilities.platform = 'Linux';
-            }
-            else if (process.env.TRAVIS_OS_NAME === 'osx') {
+            } else if (process.env.TRAVIS_OS_NAME === 'osx') {
                 desiredCapabilities.platform = 'OS X 10.10';
             }
 

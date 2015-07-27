@@ -21,23 +21,17 @@ body {
 }
 
 .dashboard-panel {
-    width: 230px;
+    width: 128px;
 }
 
-.dashboard-panel.width-1 {
-    width: 230px;
-}
+.generate-panel-widths(8);
 
-.dashboard-panel.width-2 {
-    width: 470px;
-}
+.generate-panel-widths(@num, @i: 1) when (@i =< @num) {
+    .dashboard-panel.width-@{i} {
+        width: (128 * @i + (16 * (@i - 1))) px;
+    }
 
-.dashboard-panel.width-3 {
-    width: 710px;
-}
-
-.dashboard-panel.width-4 {
-    width: 950px;
+    .generate-panel-widths(@num, @i + 1);
 }
 
 .logo {
