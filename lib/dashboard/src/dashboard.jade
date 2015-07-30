@@ -99,6 +99,9 @@ html(lang="en")
         if ncgConfig.login.enabled
             include ./includes/view_key_modal.jade
 
+        //- Polyfills and Shims
+        script(src='/shims/WeakMap.js')
+
         //- Core JavaScript
         script(src='/components/jquery/dist/jquery.min.js')
         script(src='/components/jquery-cookie/jquery.cookie.js')

@@ -7,7 +7,13 @@ module.exports = function(grunt) {
         'lib/dashboard/src/dashboard.less': 'lib/dashboard/public/dashboard.css'
     };
 
-    var jshintFiles = ['index.js', 'lib/**/*.js', '!lib/browser/public/*.js'];
+    var jshintFiles = [
+        'index.js',
+        'lib/**/*.js',
+        '!lib/browser/dist/*.js',
+        '!lib/browser/shims/*.js'
+    ];
+
     var browserifyFiles = ['lib/api.js'];
 
     var gruntConfig = {
@@ -25,7 +31,7 @@ module.exports = function(grunt) {
         browserify: {
             dist: {
                 files: {
-                    './lib/browser/public/browserifiedApi.min.js': browserifyFiles
+                    './lib/browser/dist/browserifiedApi.min.js': browserifyFiles
                 },
                 options: {
                     browserifyOptions: {
@@ -34,7 +40,7 @@ module.exports = function(grunt) {
                     plugin: [
                         ['minifyify', {
                             map: '/nodecg-api.map.json',
-                            output: 'lib/browser/public/browserifiedApi.map.json'
+                            output: 'lib/browser/dist/browserifiedApi.map.json'
                         }]
                     ],
                     transform: [
@@ -60,7 +66,7 @@ module.exports = function(grunt) {
             },
             coverage: {
                 files: {
-                    './lib/browser/public/browserifiedTestApi.js': browserifyFiles
+                    './lib/browser/dist/browserifiedTestApi.js': browserifyFiles
                 },
                 options: {
                     browserifyOptions: {
@@ -105,7 +111,7 @@ module.exports = function(grunt) {
                 }
             },
             clientScripts: {
-                files: ['lib/api.js', 'lib/browser/*.js'],
+                files: ['lib/api.js', 'lib/browser/*.js', '!lib/browser/index.js'],
                 tasks: ['browserify'],
                 options: {
                     debounceDelay: 250
