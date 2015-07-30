@@ -23,7 +23,8 @@
     "zeroclipboard": "~2.2.0",
     "polymer": "~1.0.5",
     "paper-elements": "PolymerElements/paper-elements#~1.0.1",
-    "iron-elements": "PolymerElements/iron-elements#~1.0.1"
+    "iron-elements": "PolymerElements/iron-elements#~1.0.1",
+    "observe-shim": "~0.4.2"
   },
   "license": "MIT",
   "private": true,
