@@ -85,14 +85,14 @@ html(lang='en')
                                 id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
                                 iframe(src='/panel/#{bundle.name}/#{panel.name}',
                                     frameborder='0', scrolling='no', style='width: 100%')
-            #dialogs
-                each bundle in bundles
-                    each panel in bundle.dashboard.panels
-                        if panel.dialog
-                            ncg-dialog(class='dashboard-panel width-' + panel.width, with-backdrop,
-                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
-                                iframe(src='/panel/#{bundle.name}/#{panel.name}',
-                                    frameborder='0', scrolling='no', style='width: 100%')
+        #dialogs
+            each bundle in bundles
+                each panel in bundle.dashboard.panels
+                    if panel.dialog
+                        ncg-dialog(class='dashboard-panel width-' + panel.width, with-backdrop,
+                            id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
+                            iframe(src='/panel/#{bundle.name}/#{panel.name}',
+                                frameborder='0', scrolling='no', style='width: 100%')
 
         //- Used by packery to establish the width of the columns
         #grid-sizer(class="width-1")
