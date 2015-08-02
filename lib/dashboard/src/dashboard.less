@@ -28,7 +28,7 @@ body {
 
 .generate-panel-widths(@num, @i: 1) when (@i =< @num) {
     .dashboard-panel.width-@{i} {
-        width: (128 * @i + (16 * (@i - 1))) px;
+        width: (128px * @i + (16 * (@i - 1)));
     }
 
     .generate-panel-widths(@num, @i + 1);

@@ -14,31 +14,31 @@ body {
   padding: 32px;
 }
 .dashboard-panel {
-  width: 230px;
+  width: 128px;
 }
 .dashboard-panel.width-1 {
-  width: 128 px;
+  width: 128px;
 }
 .dashboard-panel.width-2 {
-  width: 272 px;
+  width: 272px;
 }
 .dashboard-panel.width-3 {
-  width: 416 px;
+  width: 416px;
 }
 .dashboard-panel.width-4 {
-  width: 560 px;
+  width: 560px;
 }
 .dashboard-panel.width-5 {
-  width: 704 px;
+  width: 704px;
 }
 .dashboard-panel.width-6 {
-  width: 848 px;
+  width: 848px;
 }
 .dashboard-panel.width-7 {
-  width: 992 px;
+  width: 992px;
 }
 .dashboard-panel.width-8 {
-  width: 1136 px;
+  width: 1136px;
 }
 .logo {
   vertical-align: middle;
