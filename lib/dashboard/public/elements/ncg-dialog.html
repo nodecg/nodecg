@@ -1,38 +1,71 @@
 <link rel="import" href="/components/polymer/polymer.html">
-<link rel="import" href="/components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/components/neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="/components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="/components/paper-styles/paper-styles.html">
 
 <dom-module id="ncg-dialog">
+    <link rel="import" type="css" href="/components/paper-dialog-behavior/paper-dialog-common.css">
+
     <style>
-        :host::shadow #dialog > *:first-child {
-            margin-top: 0;
+        :host > ::content > iframe {
+            box-sizing: border-box;
         }
 
-        :host::shadow #dialog > * {
-            margin: 0;
-            padding: 0;
+        /*:host::shadow #dialog > *:first-child {
+            margin-top: 0;
         }
 
         #dialog {
             padding: 20px;
-        }
+        }*/
     </style>
 
     <template>
-        <paper-dialog id="dialog" with-backdrop>
-            <content></content>
-        </paper-dialog>
+        <content></content>
     </template>
 </dom-module>
 
 <script>
+
+(function() {
+
     Polymer({
+
         is: 'ncg-dialog',
 
-        /*
-         * Methods
-         */
-        open: function() {
-            this.$.dialog.open();
+        behaviors: [
+            Polymer.PaperDialogBehavior,
+            Polymer.NeonAnimationRunnerBehavior
+        ],
+
+        listeners: {
+            'neon-animation-finish': '_onNeonAnimationFinish'
+        },
+
+        _renderOpened: function() {
+            if (this.withBackdrop) {
+                this.backdropElement.open();
+            }
+            this.playAnimation('entry');
+        },
+
+        _renderClosed: function() {
+            if (this.withBackdrop) {
+                this.backdropElement.close();
+            }
+            this.playAnimation('exit');
+        },
+
+        _onNeonAnimationFinish: function() {
+            if (this.opened) {
+                this._finishRenderOpened();
+            } else {
+                this._finishRenderClosed();
+            }
         }
+
     });
+
+})();
+
 </script>
