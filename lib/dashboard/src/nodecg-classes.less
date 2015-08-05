@@ -1,0 +1,26 @@
+@nodecg-info-color: #645BA6;
+@nodecg-success-color: #5BA664;
+@nodecg-warning-color: #FF7522;
+@nodecg-danger-color: #C9513E;
+@nodecg-configure-color: #A50074;
+
+.nodecgColorClass(@name, @color) {
+    &.nodecg-@{name} {
+        button&,
+        paper-button&,
+        p& {
+            background-color: @color;
+            color: white;
+        }
+
+        span& {
+            color: @color;
+        }
+    }
+}
+
+.nodecgColorClass(info, @nodecg-info-color);
+.nodecgColorClass(success, @nodecg-success-color);
+.nodecgColorClass(warning, @nodecg-warning-color);
+.nodecgColorClass(danger, @nodecg-danger-color);
+.nodecgColorClass(configure, @nodecg-configure-color);

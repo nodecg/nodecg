@@ -10,7 +10,8 @@ module.exports = function(grunt) {
         less: {
             compile: {
                 files: {
-                    'lib/dashboard/public/dashboard.css': 'lib/dashboard/src/dashboard.less'
+                    'lib/dashboard/public/dashboard.css': 'lib/dashboard/src/dashboard.less',
+                    'lib/dashboard/public/nodecg-classes.css': 'lib/dashboard/src/nodecg-classes.less'
                 }
             }
         },
@@ -89,7 +90,10 @@ module.exports = function(grunt) {
         },
         watch: {
             stylesheets: {
-                files: ['lib/dashboard/src/dashboard.less'],
+                files: [
+                    'lib/dashboard/src/dashboard.less',
+                    'lib/dashboard/src/nodecg-classes.less'
+                ],
                 tasks: ['less'],
                 options: {
                     debounceDelay: 250

@@ -1,0 +1,45 @@
+button.nodecg-info,
+paper-button.nodecg-info,
+p.nodecg-info {
+  background-color: #645ba6;
+  color: white;
+}
+span.nodecg-info {
+  color: #645ba6;
+}
+button.nodecg-success,
+paper-button.nodecg-success,
+p.nodecg-success {
+  background-color: #5ba664;
+  color: white;
+}
+span.nodecg-success {
+  color: #5ba664;
+}
+button.nodecg-warning,
+paper-button.nodecg-warning,
+p.nodecg-warning {
+  background-color: #ff7522;
+  color: white;
+}
+span.nodecg-warning {
+  color: #ff7522;
+}
+button.nodecg-danger,
+paper-button.nodecg-danger,
+p.nodecg-danger {
+  background-color: #c9513e;
+  color: white;
+}
+span.nodecg-danger {
+  color: #c9513e;
+}
+button.nodecg-configure,
+paper-button.nodecg-configure,
+p.nodecg-configure {
+  background-color: #a50074;
+  color: white;
+}
+span.nodecg-configure {
+  color: #a50074;
+}
