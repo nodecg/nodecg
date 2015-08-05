@@ -195,7 +195,7 @@ describe('client-side replicants', function() {
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
                     rep.value = { nested: 'hey we assigned!' };
-                    rep.on('change', function() {
+                    rep.on('assignmentAccepted', function() {
                         done();
                     });
                 }, function(err) {
