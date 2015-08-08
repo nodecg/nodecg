@@ -11,7 +11,7 @@ module.exports = function(grunt) {
             compile: {
                 files: {
                     'lib/dashboard/public/dashboard.css': 'lib/dashboard/src/dashboard.less',
-                    'lib/dashboard/public/nodecg-classes.css': 'lib/dashboard/src/nodecg-classes.less'
+                    'lib/dashboard/public/style/nodecg-defaults.css': 'lib/dashboard/src/nodecg-defaults.less'
                 }
             }
         },
@@ -92,7 +92,7 @@ module.exports = function(grunt) {
             stylesheets: {
                 files: [
                     'lib/dashboard/src/dashboard.less',
-                    'lib/dashboard/src/nodecg-classes.less'
+                    'lib/dashboard/src/nodecg-defaults.less'
                 ],
                 tasks: ['less'],
                 options: {

@@ -24,16 +24,30 @@ body {
     width: 128px;
 }
 
-.generate-panel-widths(8);
-
-.generate-panel-widths(@num, @i: 1) when (@i =< @num) {
-    .dashboard-panel.width-@{i} {
-        width: (128px * @i + (16 * (@i - 1)));
-    }
-
-    .generate-panel-widths(@num, @i + 1);
+.dashboard-panel.width-1 {
+    width: 128px;
 }
-
+.dashboard-panel.width-2 {
+    width: 272px;
+}
+.dashboard-panel.width-3 {
+    width: 416px;
+}
+.dashboard-panel.width-4 {
+    width: 560px;
+}
+.dashboard-panel.width-5 {
+    width: 704px;
+}
+.dashboard-panel.width-6 {
+    width: 848px;
+}
+.dashboard-panel.width-7 {
+    width: 992px;
+}
+.dashboard-panel.width-8 {
+    width: 1136px;
+}
 .logo {
     vertical-align: middle;
 }
