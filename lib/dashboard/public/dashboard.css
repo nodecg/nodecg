@@ -42,6 +42,7 @@ body {
 }
 .logo {
   vertical-align: middle;
+  margin-right: 1em;
 }
 .text-warning {
   color: #c53929;

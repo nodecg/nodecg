@@ -74,9 +74,13 @@ html(lang='en')
     body.fullbleed.vertical.layout
         paper-header-panel.flex
             paper-toolbar
-                span.flex: img.logo(src='/dashboard/img/navbar-logo.png' alt='NodeCG dashboard' title='NodeCG dashboard')
+                span.title
+                    img.logo(src='/dashboard/img/navbar-logo.png' alt='NodeCG dashboard' title='NodeCG dashboard')
                 if ncgConfig.login.enabled
-                    paper-icon-button#logout(icon='exit-to-app', alt='Sign Out')
+                    paper-button.paper-font-button#showKey(alt='View Key')
+                        iron-icon(icon='communication:vpn-key')
+                        | &ensp;View Key
+                    paper-icon-button.paper-font-button#logout(icon='exit-to-app', alt='Sign Out')
             #panels
                 each bundle in bundles
                     each panel in bundle.dashboard.panels
