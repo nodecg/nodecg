@@ -72,40 +72,6 @@ describe('client-side replicants', function() {
             .call(done);
     });
 
-    it('should react to changes in nested properties of objects', function(done) {
-        e.browser.client
-            .executeAsync(function(done) {
-                var rep = window.dashboardApi.Replicant('clientObjTest', {
-                    persistent: false,
-                    defaultValue: {a: {b: {c: 'c'}}}
-                });
-
-                rep.on('declared', function() {
-                    rep.on('change', function(oldVal, newVal, changes) {
-                        if (oldVal && newVal && changes) {
-                            done({
-                                oldVal: oldVal,
-                                newVal: newVal,
-                                changes: changes
-                            });
-                        }
-                    });
-
-                    rep.value.a.b.c = 'nestedChangeOK';
-                });
-            }, function(err, ret) {
-                if (err) throw err;
-                expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
-                expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
-                expect(ret.value.changes).to.have.length(1);
-                expect(ret.value.changes[0].type).to.equal('update');
-                expect(ret.value.changes[0].path).to.equal('a.b.c');
-                expect(ret.value.changes[0].oldValue).to.equal('c');
-                expect(ret.value.changes[0].newValue).to.equal('nestedChangeOK');
-            })
-            .call(done);
-    });
-
     it('should react to changes in arrays', function(done) {
         e.browser.client
             .executeAsync(function(done) {
@@ -175,6 +141,73 @@ describe('client-side replicants', function() {
             });
     });
 
+    context('when an object', function() {
+        it('should not cause server-side replicants to lose observation', function(done) {
+            var rep = e.apis.extension.Replicant('clientServerObservation', {
+                defaultValue: {foo: 'foo'},
+                persistent: false
+            });
+
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientServerObservation');
+
+                    rep.on('change', function(oldVal, newVal) {
+                        if (newVal.foo === 'bar') {
+                            done(newVal);
+                        } else {
+                            rep.value.foo = 'bar';
+                        }
+                    });
+                }, function(err, ret) {
+                    if (err) throw err;
+                    expect(ret.value).to.deep.equal({foo: 'bar'});
+
+                    rep.on('change', function(oldVal, newVal) {
+                        if (newVal.foo === 'baz') {
+                            done();
+                        }
+                    });
+
+                    rep.value.foo = 'baz';
+                });
+        });
+
+        it('should react to changes in nested properties', function(done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientObjTest', {
+                        persistent: false,
+                        defaultValue: {a: {b: {c: 'c'}}}
+                    });
+
+                    rep.on('declared', function() {
+                        rep.on('change', function(oldVal, newVal, changes) {
+                            if (oldVal && newVal && changes) {
+                                done({
+                                    oldVal: oldVal,
+                                    newVal: newVal,
+                                    changes: changes
+                                });
+                            }
+                        });
+
+                        rep.value.a.b.c = 'nestedChangeOK';
+                    });
+                }, function(err, ret) {
+                    if (err) throw err;
+                    expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
+                    expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
+                    expect(ret.value.changes).to.have.length(1);
+                    expect(ret.value.changes[0].type).to.equal('update');
+                    expect(ret.value.changes[0].path).to.equal('a.b.c');
+                    expect(ret.value.changes[0].oldValue).to.equal('c');
+                    expect(ret.value.changes[0].newValue).to.equal('nestedChangeOK');
+                })
+                .call(done);
+        });
+    });
+
     context('when "persistent" is set to "true"', function() {
         it('should load persisted values when they exist', function(done) {
             e.browser.client
@@ -195,7 +228,7 @@ describe('client-side replicants', function() {
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
                     rep.value = { nested: 'hey we assigned!' };
-                    rep.on('change', function() {
+                    rep.on('assignmentAccepted', function() {
                         done();
                     });
                 }, function(err) {
