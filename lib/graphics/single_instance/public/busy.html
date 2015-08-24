@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="import" href="/dashboard/style/nodecg-styles.html">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        #container {
+            padding: 8px;
+            background-color: #ff3f4c;
+            color: white;
+            font-size: 16px;
+            position: absolute;
+        }
+
+        #graphicPath {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- TODO: make this prettier -->
+    <div id="container">
+        <p>The graphic located at:</p>
+        <p id="graphicPath"></p>
+        <p>... is currently in use. As soon as the current user closes their instance of it,
+        this page will automatically load the graphic.</p>
+    </div>
+
+    <script>
+        // Copy-pasted from lib/login/public/QueryString.js
+        // I copy-pasted it because the file is only served when login security is enabled,
+        // and singleInstance can be active when login security is not.
+        // Definitely need to make this DRYer.
+        var qs = (function(a) {
+            if (a == "") return {};
+            var b = {};
+            for (var i = 0; i < a.length; ++i)
+            {
+                var p=a[i].split('=', 2);
+                if (p.length == 1)
+                    b[p[0]] = "";
+                else
+                    b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+            }
+            return b;
+        })(window.location.search.substr(1).split('&'));
+
+        document.getElementById('graphicPath').textContent = qs['path'];
+
+        // TODO: show error if qs['path'] is undefined
+
+        // The dashboard will have some kind of killswitch to destroy all instances of a singleInstance graphic.
+        // This includes the active instance *and* all "busy" pages waiting for that graphic to become available.
+        window.socket.on('graphicKill', function(pathToKill) {
+            if (pathToKill === qs['path']) {
+                window.location.href = '/instance/killed.html?path=' + qs['path'];
+            }
+        });
+
+        // Check if the desired graphic is available every 100ms
+        setInterval(_checkAvailability, 1000);
+        _checkAvailability();
+        function _checkAvailability () {
+            window.socket.emit('isGraphicAvailable', qs['path'], function (available) {
+                // If the graphic is available, go to it
+                if (available) {
+                    window.location.href = qs['path'];
+                }
+            });
+        }
+    </script>
+</body>
+</html>
