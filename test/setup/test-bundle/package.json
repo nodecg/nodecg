@@ -12,7 +12,7 @@
   "description": "A test bundle",
   "license": "MIT",
   "nodecg": {
-    "compatabilityRange": "~0.7.0",
+    "compatibleRange": "~0.7.0",
     "dashboardPanels": [
       {
         "name": "test",
