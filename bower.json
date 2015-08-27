@@ -15,7 +15,6 @@
     "obs-remote": "^1.0.0",
     "cookies-js": "~1.2.1",
     "zeroclipboard": "~2.2.0",
-    "polymer": "~1.0.7",
     "paper-elements": "PolymerElements/paper-elements#~1.0.1",
     "iron-elements": "PolymerElements/iron-elements#~1.0.1",
     "cn-jsurl": "~1.0.0",
