@@ -23,7 +23,9 @@ before(function(done) {
     // clientApi & extensionApi setup
     fs.mkdirpSync('./db/replicants/test-bundle/');
     fs.writeFileSync('./db/replicants/test-bundle/clientPersistence.rep', '"it work good!"');
+    fs.writeFileSync('./db/replicants/test-bundle/clientFalseyRead.rep', '0');
     fs.writeFileSync('./db/replicants/test-bundle/extensionPersistence.rep', '"it work good!"');
+    fs.writeFileSync('./db/replicants/test-bundle/extensionFalseyRead.rep', '0');
 
     e.server.once('started', function() {
         /** Extension API setup **/

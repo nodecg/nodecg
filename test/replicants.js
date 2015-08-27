@@ -227,7 +227,7 @@ describe('client-side replicants', function() {
             e.browser.client
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
-                    rep.value = { nested: 'hey we assigned!' };
+                    rep.value = {nested: 'hey we assigned!'};
                     rep.on('assignmentAccepted', function() {
                         done();
                     });
@@ -257,6 +257,38 @@ describe('client-side replicants', function() {
                         done();
                     });
                 });
+        });
+
+        it('should persist falsey values to disk', function(done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientFalseyWrite');
+                    rep.value = 0;
+                    rep.on('assignmentAccepted', function() {
+                        done();
+                    });
+                }, function(err) {
+                    if (err) throw err;
+                    fs.readFile('./db/replicants/test-bundle/clientFalseyWrite.rep', 'utf-8', function(err, data) {
+                        if (err) throw err;
+                        expect(data).to.equal('0');
+                        done();
+                    });
+                });
+        });
+
+        it('should read falsey values from disk', function(done) {
+            e.browser.client
+                .executeAsync(function(done) {
+                    var rep = window.dashboardApi.Replicant('clientFalseyRead');
+                    rep.on('declared', function() {
+                        done(rep.value);
+                    });
+                }, function(err, ret) {
+                    if (err) throw err;
+                    expect(ret.value).to.equal(0);
+                })
+                .call(done);
         });
     });
 
@@ -368,10 +400,9 @@ describe('server-side replicants', function() {
     });
 
     context('when "persistent" is set to "true"', function() {
-        it('should load persisted values when they exist', function(done) {
+        it('should load persisted values when they exist', function() {
             var rep = e.apis.extension.Replicant('extensionPersistence');
             expect(rep.value).to.equal('it work good!');
-            done();
         });
 
         it('should persist assignment to disk', function(done) {
@@ -396,6 +427,23 @@ describe('server-side replicants', function() {
                     done();
                 });
             }, 10);
+        });
+
+        it('should persist falsey values to disk', function(done) {
+            var rep = e.apis.extension.Replicant('extensionFalseyWrite');
+            rep.value = 0;
+            setTimeout(function() {
+                fs.readFile('./db/replicants/test-bundle/extensionFalseyWrite.rep', 'utf-8', function(err, data) {
+                    if (err) throw err;
+                    expect(data).to.equal('0');
+                    done();
+                });
+            }, 10);
+        });
+
+        it('should read falsey values from disk', function() {
+            var rep = e.apis.extension.Replicant('extensionFalseyRead');
+            expect(rep.value).to.equal(0);
         });
     });
 
