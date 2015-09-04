@@ -11,11 +11,10 @@
     <div id="container">
         <p>The graphic located at:</p>
         <p id="graphicPath"></p>
-        <p>... is currently in use. As soon as the current user closes their instance of it,
-        this page will automatically load the graphic.</p>
-
-        <p>If you need to forcibly close the current instance, you can kill it from the "SINGLE INSTANCES" dialog
-        at the top of the dashboard.</p>
+        <p>
+            ... has been killed, so as to make it available for another user.
+            <a id="graphicLink" href="">Click here</a> to automatically reload this graphic once it becomes available.
+        </p>
     </div>
 
     <script>
@@ -38,28 +37,9 @@
         })(window.location.search.substr(1).split('&'));
 
         document.getElementById('graphicPath').textContent = qs['path'];
+        document.getElementById('graphicLink').setAttribute('href',  qs['path']);
 
         // TODO: show error if qs['path'] is undefined
-
-        // The dashboard will have some kind of killswitch to destroy all instances of a singleInstance graphic.
-        // This includes the active instance *and* all "busy" pages waiting for that graphic to become available.
-        window.socket.on('graphicKill', function(pathToKill) {
-            if (pathToKill === qs['path']) {
-                window.location.href = '/instance/killed.html?path=' + qs['path'];
-            }
-        });
-
-        // Check if the desired graphic is available every 100ms
-        setInterval(_checkAvailability, 1000);
-        _checkAvailability();
-        function _checkAvailability () {
-            window.socket.emit('isGraphicAvailable', qs['path'], function (available) {
-                // If the graphic is available, go to it
-                if (available) {
-                    window.location.href = qs['path'];
-                }
-            });
-        }
     </script>
 </body>
 </html>

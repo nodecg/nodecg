@@ -12,6 +12,7 @@ html(lang='en')
         //- import Polymer elements
         link(rel='import', href='/components/iron-icon/iron-icon.html')
         link(rel='import', href='/components/iron-icons/communication-icons.html')
+        link(rel='import', href='/components/iron-icons/image-icons.html')
         link(rel='import', href='/components/iron-icons/iron-icons.html')
         link(rel='import', href='/components/paper-dialog/paper-dialog.html')
         link(rel='import', href='/components/paper-button/paper-button.html')
@@ -27,12 +28,14 @@ html(lang='en')
         link(rel='import', href='/components/paper-toast/paper-toast.html')
         link(rel='import', href='/components/paper-toolbar/paper-toolbar.html')
 
-        //- our custom dashboard panel container
+        //- our custom dashboard elements
         link(rel='import', href='/dashboard/elements/ncg-dashboard-panel.html')
         link(rel='import', href='/dashboard/elements/ncg-dialog.html')
+        link(rel='import', href='/dashboard/elements/ncg-single-instance.html')
 
         //- dashboard CSS
         link(rel='stylesheet', href='/dashboard/dashboard.css')
+        link(rel='import', href='/dashboard/style/nodecg-styles.html')
 
         //- make the global config available
         script(type='text/javascript').
@@ -64,6 +67,7 @@ html(lang='en')
         script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
         script(src='/dashboard/panel_packery.js')
         script(src='/dashboard/dashboard.js')
+        script(src='/dashboard/single_instances.js')
 
         //- custom styles for Polymer
         style(is='custom-style').
@@ -76,6 +80,9 @@ html(lang='en')
             paper-toolbar
                 span.title
                     img.logo(src='/dashboard/img/navbar-logo.png' alt='NodeCG dashboard' title='NodeCG dashboard')
+                paper-button.paper-font-button#showInstances(alt='Single Instances')
+                    iron-icon(icon='image:looks-one')
+                    | &ensp;Single Instances
                 if ncgConfig.login.enabled
                     paper-button.paper-font-button#showKey(alt='View Key')
                         iron-icon(icon='communication:vpn-key')
@@ -124,3 +131,13 @@ html(lang='en')
                     paper-button#resetKey
                         iron-icon(icon='icons:refresh')
                         | &ensp;Reset Key
+
+        //- singleInstance management dialog
+        paper-dialog#singleInstanceDialog(modal)
+            h2 Active Single-Instance Graphics
+            div
+                #instancesList
+                #instancesList-empty
+                    span No single-instance graphics are currently open.
+            .buttons
+                paper-button(dialog-dismiss) Close

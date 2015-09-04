@@ -13,6 +13,15 @@ body {
   overflow: auto;
   padding: 32px;
 }
+#instancesList-empty {
+    text-align: center;
+    border: 4px dashed #B7B7B7;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+}
 .dashboard-panel {
   width: 128px;
 }
