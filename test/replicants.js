@@ -200,7 +200,7 @@ describe('client-side replicants', function() {
                     expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
                     expect(ret.value.changes).to.have.length(1);
                     expect(ret.value.changes[0].type).to.equal('update');
-                    expect(ret.value.changes[0].path).to.equal('a.b.c');
+                    expect(ret.value.changes[0].path).to.deep.equal(['a', 'b', 'c']);
                     expect(ret.value.changes[0].oldValue).to.equal('c');
                     expect(ret.value.changes[0].newValue).to.equal('nestedChangeOK');
                 })
@@ -369,7 +369,7 @@ describe('server-side replicants', function() {
             expect(newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
             expect(changes).to.have.length(1);
             expect(changes[0].type).to.equal('update');
-            expect(changes[0].path).to.equal('a.b.c');
+            expect(changes[0].path).to.deep.equal(['a', 'b', 'c']);
             expect(changes[0].oldValue).to.equal('c');
             expect(changes[0].newValue).to.equal('nestedChangeOK');
             done();
