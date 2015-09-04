@@ -9,6 +9,10 @@ html(lang='en')
         //- Web Component support
         script(src='/components/webcomponentsjs/webcomponents-lite.min.js')
 
+        //- Polyfills and Shims
+        script(src='/components/observe-shim/lib/observe-shim.js')
+        script(src='/shims/WeakMap.js')
+
         //- import Polymer elements
         link(rel='import', href='/components/iron-icon/iron-icon.html')
         link(rel='import', href='/components/iron-icons/communication-icons.html')
