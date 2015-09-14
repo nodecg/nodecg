@@ -17,6 +17,7 @@ env:
 addons:
   sauce_connect: true
 
+after_failure: cat /home/travis/sauce-connect.log
 after_success: npm run coveralls
 
 matrix:
