@@ -242,6 +242,7 @@ describe('client-side replicants', function() {
         });
 
         it('should persist changes to disk', function(done) {
+            var serverRep = e.apis.extension.Replicant('clientPersistence');
             e.browser.client
                 .executeAsync(function(done) {
                     var rep = window.dashboardApi.Replicant('clientPersistence');
@@ -251,10 +252,12 @@ describe('client-side replicants', function() {
                     });
                 }, function(err) {
                     if (err) throw err;
-                    fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
-                        if (err) throw err;
-                        expect(data).to.equal('{"nested":"hey we changed!"}');
-                        done();
+                    serverRep.on('change', function() {
+                        fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
+                            if (err) throw err;
+                            expect(data).to.equal('{"nested":"hey we changed!"}');
+                            done();
+                        });
                     });
                 });
         });
@@ -483,7 +486,9 @@ describe('server-side replicants', function() {
                 });
             }, function(err) {
                 if (err) throw err;
-                expect(serverRep.value).to.deep.equal(['test']);
+                serverRep.on('change', function(oldVal, newVal) {
+                    expect(newVal).to.deep.equal(['test']);
+                });
             })
             .call(done);
     });
