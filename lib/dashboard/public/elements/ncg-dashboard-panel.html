@@ -2,7 +2,7 @@
 <link rel="import" href="/components/paper-material/paper-material.html">
 <link rel="import" href="/components/paper-styles/paper-styles.html">
 <link rel="import" href="/components/paper-styles/paper-styles-classes.html">
-<link rel="import" href="ncg-dashboard-panel-info.html">
+<link rel="import" href="ncg-dashboard-panel-info-dialog.html">
 
 <dom-module id="ncg-dashboard-panel">
     <style>
@@ -16,14 +16,14 @@
         }
 
         .body {
-            padding: 0px;
+            padding: 0;
         }
     </style>
     <template>
         <paper-material>
             <div class="heading paper-font-title">
                 <span>{{title}}</span>
-                <ncg-dashboard-panel-info id="infoBtn" bundle="{{bundle}}"></ncg-dashboard-panel-info>
+                <paper-icon-button id="button" icon="info"></paper-icon-button>
             </div>
             <div class="body">
                 <content></content>
@@ -48,6 +48,16 @@
                 type: String,
                 reflectToAttribute: true
             }
+        },
+
+        ready: function() {
+            var infoDialog = new window.NcgDashboardPanelInfoDialog();
+            infoDialog.bundle = this.bundle;
+            document.body.appendChild(infoDialog);
+
+            this.$.button.addEventListener('click', function() {
+                infoDialog.open();
+            });
         }
     });
 </script>
