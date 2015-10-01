@@ -206,6 +206,62 @@ describe('client-side replicants', function() {
                 })
                 .call(done);
         });
+
+        // This specifically tests the following case:
+        // When the server has a replicant with an array nested inside an object, and that array changes,
+        // the server should detect that change event, emit it to all clients,
+        // and the clients should then digest that change and emit a "change" event.
+        // This test is to address a very specific bug reported by Love Olsson.
+        /* jshint -W106 */
+        it('should react to server-side changes of array properties', function(done) {
+            var serverRep = e.apis.extension.Replicant('s2c_nestedArrTest', {
+                persistent: false,
+                defaultValue: {
+                    arr: []
+                }
+            });
+
+            e.browser.client
+                .executeAsync(function(done) {
+                    window.s2c_nestedArrTest = window.dashboardApi.Replicant('s2c_nestedArrTest');
+                    window.s2c_nestedArrTest.on('declared', function() {
+                        done();
+
+                        window.s2c_nestedArrTest.on('change', function(oldVal, newVal, changes) {
+                            if (oldVal && newVal && changes) {
+                                window.s2c_nestedArrChange = {
+                                    oldVal: oldVal,
+                                    newVal: newVal,
+                                    changes: changes
+                                };
+                            }
+                        });
+                    });
+                })
+                .call(function() {
+                    serverRep.value.arr.push('test');
+                })
+                .executeAsync(function(done) {
+                    var interval = setInterval(function() {
+                        if (window.s2c_nestedArrChange) {
+                            clearInterval(interval);
+                            done(window.s2c_nestedArrChange);
+                        }
+                    }, 50);
+                }, function(err, ret) {
+                    if (err) throw err;
+                    expect(ret.value.oldVal).to.deep.equal({arr: []});
+                    expect(ret.value.newVal).to.deep.equal({arr: ['test']});
+                    expect(ret.value.changes).to.have.length(1);
+                    expect(ret.value.changes[0].type).to.equal('splice');
+                    expect(ret.value.changes[0].path).to.deep.equal(['arr']);
+                    expect(ret.value.changes[0].added).to.deep.equal(['test']);
+                    expect(ret.value.changes[0].addedCount).to.equal(1);
+                    expect(ret.value.changes[0].removedCount).to.equal(0);
+                })
+                .call(done);
+        });
+        /* jshint +W106 */
     });
 
     context('when "persistent" is set to "true"', function() {
@@ -402,6 +458,32 @@ describe('server-side replicants', function() {
         rep.value.push('arrPushOK');
     });
 
+    it('should only apply array splices from the client once', function(done) {
+        this.timeout(7000);
+
+        var serverRep = e.apis.extension.Replicant('clientDoubleApplyTest', {persistent: false, defaultValue: []});
+
+        e.browser.client
+            .switchTab(e.browser.tabs.dashboard)
+            .executeAsync(function(done) {
+                var rep = window.dashboardApi.Replicant('clientDoubleApplyTest', {persistent: false});
+
+                rep.on('declared', function() {
+                    rep.on('change', function() {
+                        done();
+                    });
+
+                    rep.value.push('test');
+                });
+            }, function(err) {
+                if (err) throw err;
+                serverRep.on('change', function(oldVal, newVal) {
+                    expect(newVal).to.deep.equal(['test']);
+                });
+            })
+            .call(done);
+    });
+
     context('when "persistent" is set to "true"', function() {
         it('should load persisted values when they exist', function() {
             var rep = e.apis.extension.Replicant('extensionPersistence');
@@ -465,31 +547,5 @@ describe('server-side replicants', function() {
                 });
             });
         });
-    });
-
-    it('should only apply array splices from the client once', function(done) {
-        this.timeout(7000);
-
-        var serverRep = e.apis.extension.Replicant('clientDoubleApplyTest', {persistent: false, defaultValue: []});
-
-        e.browser.client
-            .switchTab(e.browser.tabs.dashboard)
-            .executeAsync(function(done) {
-                var rep = window.dashboardApi.Replicant('clientDoubleApplyTest', {persistent: false});
-
-                rep.on('declared', function() {
-                    rep.on('change', function() {
-                        done();
-                    });
-
-                    rep.value.push('test');
-                });
-            }, function(err) {
-                if (err) throw err;
-                serverRep.on('change', function(oldVal, newVal) {
-                    expect(newVal).to.deep.equal(['test']);
-                });
-            })
-            .call(done);
     });
 });
