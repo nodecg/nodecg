@@ -39,6 +39,9 @@ before(function(done) {
                 tags: [process.env.TRAVIS_BRANCH, process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE],
                 browserName: 'chrome',
                 version: 'beta',
+                chromeOptions: {
+                    args: ['--disable-popup-blocking']
+                },
                 tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
             };
 
@@ -76,36 +79,32 @@ before(function(done) {
             .init()
             .timeoutsAsyncScript(30000)
             .newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
-            .getCurrentTabId(function(err, tabId) {
-                if (err) throw err;
+            .getCurrentTabId()
+            .then(function(tabId) {
                 e.browser.tabs.dashboard = tabId;
             })
             .executeAsync(function(done) {
                 var checkForApi;
-                checkForApi = setInterval(function(done) {
+                checkForApi = setInterval(function() {
                     if (typeof window.dashboardApi !== 'undefined') {
                         clearInterval(checkForApi);
                         done();
                     }
-                }, 50, done);
-            }, function(err) {
-                if (err) throw err;
+                }, 50);
             })
             .newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '')
-            .getCurrentTabId(function(err, tabId) {
-                if (err) throw err;
-                e.browser.tabs.view = tabId;
+            .getCurrentTabId()
+            .then(function(tabId) {
+                e.browser.tabs.graphic = tabId;
             })
             .executeAsync(function(done) {
                 var checkForApi;
-                checkForApi = setInterval(function(done) {
+                checkForApi = setInterval(function() {
                     if (typeof window.graphicApi !== 'undefined') {
                         clearInterval(checkForApi);
                         done();
                     }
-                }, 50, done);
-            }, function(err) {
-                if (err) throw err;
+                }, 50);
             })
             .timeoutsAsyncScript(5000)
             .call(done);

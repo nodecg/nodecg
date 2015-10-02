@@ -25,8 +25,6 @@ describe('client-side api', function() {
                     window.dashboardApi.listenFor('serverToDashboard', function() {
                         window.serverToDashboardReceived = true;
                     });
-                }, function(err) {
-                    if (err) throw err;
                 });
 
             var sendMessage = setInterval(function() {
@@ -42,10 +40,12 @@ describe('client-side api', function() {
                             done();
                         }
                     }, 50);
-                }, function() {
-                    clearInterval(sendMessage);
                 })
-                .call(done);
+                .then(function() {
+                    clearInterval(sendMessage);
+
+                    done();
+                });
         });
 
         it('should send messages', function(done) {
@@ -53,58 +53,54 @@ describe('client-side api', function() {
             e.browser.client
                 .execute(function() {
                     window.dashboardApi.sendMessage('dashboardToServer');
-                }, function(err) {
-                    if (err) throw err;
                 });
         });
     });
 
-    context('in a view', function() {
+    context('in a graphic', function() {
         before(function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.view)
+                .switchTab(e.browser.tabs.graphic)
                 .call(done);
         });
 
-        // The view and dashboard APIs use the same file
+        // The graphic and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
         it('should receive messages', function(done) {
             e.browser.client
                 .execute(function() {
-                    window.serverToViewReceived = false;
-                    window.graphicApi.listenFor('serverToView', function() {
-                        window.serverToViewReceived = true;
+                    window.serverToGraphicReceived = false;
+                    window.graphicApi.listenFor('serverToGraphic', function() {
+                        window.serverToGraphicReceived = true;
                     });
-                }, function(err) {
-                    if (err) throw err;
                 });
 
             var sendMessage = setInterval(function() {
-                e.apis.extension.sendMessage('serverToView');
+                e.apis.extension.sendMessage('serverToGraphic');
             }, 500);
 
             e.browser.client
                 .executeAsync(function(done) {
                     var checkMessageReceived;
                     checkMessageReceived = setInterval(function() {
-                        if (window.serverToViewReceived) {
+                        if (window.serverToGraphicReceived) {
                             clearInterval(checkMessageReceived);
                             done();
                         }
                     }, 50);
-                }, function() {
-                    clearInterval(sendMessage);
                 })
-                .call(done);
+                .then(function() {
+                    clearInterval(sendMessage);
+
+                    done();
+                });
         });
 
         it('should send messages', function(done) {
-            e.apis.extension.listenFor('viewToServer', done);
+            e.apis.extension.listenFor('graphicToServer', done);
             e.browser.client
                 .execute(function() {
-                    window.graphicApi.sendMessage('viewToServer');
-                }, function(err) {
-                    if (err) throw err;
+                    window.graphicApi.sendMessage('graphicToServer');
                 });
         });
     });
@@ -120,33 +116,36 @@ describe('client-side api', function() {
             e.browser.client
                 .execute(function() {
                     return window.dashboardApi.config;
-                }, function(err, ret) {
-                    if (err) throw err;
-                    expect(ret.value).to.not.be.empty();
                 })
-                .call(done);
+                .then(function(ret) {
+                    expect(ret.value).to.not.be.empty();
+
+                    done();
+                });
         });
 
         it('shouldn\'t reveal sensitive information', function(done) {
             e.browser.client
                 .execute(function() {
                     return window.dashboardApi.config;
-                }, function(err, ret) {
-                    if (err) throw err;
-                    expect(ret.value.login).to.not.have.property('sessionSecret');
                 })
-                .call(done);
+                .then(function(ret) {
+                    expect(ret.value.login).to.not.have.property('sessionSecret');
+
+                    done();
+                });
         });
 
         it('shouldn\'t be writable', function(done) {
             e.browser.client
                 .execute(function() {
                     return Object.isFrozen(window.dashboardApi.config);
-                }, function(err, ret) {
-                    if (err) throw err;
-                    expect(ret.value).to.be.true;
                 })
-                .call(done);
+                .then(function(ret) {
+                    expect(ret.value).to.be.true;
+
+                    done();
+                });
         });
     });
 
@@ -161,11 +160,12 @@ describe('client-side api', function() {
             e.browser.client
                 .execute(function() {
                     return window.dashboardApi.bundleConfig;
-                }, function(err, ret) {
-                    if (err) throw err;
-                    expect(ret.value).to.not.be.empty();
                 })
-                .call(done);
+                .then(function(ret) {
+                    expect(ret.value).to.not.be.empty();
+
+                    done();
+                });
         });
     });
 });
@@ -182,8 +182,6 @@ describe('server-side api', function() {
             .switchTab(e.browser.tabs.dashboard)
             .executeAsync(function(done) {
                 window.dashboardApi.sendMessage('clientToServer', null, done);
-            }, function(err) {
-                if (err) throw err;
             })
             .call(done);
     });
@@ -198,8 +196,6 @@ describe('server-side api', function() {
                 window.dashboardApi.listenFor('serverToClient', function() {
                     window.serverToClientReceived = true;
                 });
-            }, function(err) {
-                if (err) throw err;
             });
 
         var sendMessage = setInterval(function() {
@@ -216,10 +212,12 @@ describe('server-side api', function() {
                         done();
                     }
                 }, 50);
-            }, function() {
-                clearInterval(sendMessage);
             })
-            .call(done);
+            .then(function() {
+                clearInterval(sendMessage);
+
+                done();
+            });
     });
 
     it('should mount express middleware', function(done) {
