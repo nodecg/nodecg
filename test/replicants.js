@@ -59,7 +59,7 @@ describe('client-side replicants', function() {
             });
     });
 
-    it.only('should be assignable via the ".value" property', function (done) {
+    it('should be assignable via the ".value" property', function (done) {
         e.browser.client
             .executeAsync(function(done) {
                 var rep = window.dashboardApi.Replicant('clientAssignmentTest', {persistent: false});
