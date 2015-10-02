@@ -60,30 +60,30 @@ describe('client-side api', function() {
     context('in a graphic', function() {
         before(function(done) {
             e.browser.client
-                .switchTab(e.browser.tabs.view)
+                .switchTab(e.browser.tabs.graphic)
                 .call(done);
         });
 
-        // The view and dashboard APIs use the same file
+        // The graphic and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
         it('should receive messages', function(done) {
             e.browser.client
                 .execute(function() {
-                    window.serverToViewReceived = false;
-                    window.graphicApi.listenFor('serverToView', function() {
-                        window.serverToViewReceived = true;
+                    window.serverToGraphicReceived = false;
+                    window.graphicApi.listenFor('serverToGraphic', function() {
+                        window.serverToGraphicReceived = true;
                     });
                 });
 
             var sendMessage = setInterval(function() {
-                e.apis.extension.sendMessage('serverToView');
+                e.apis.extension.sendMessage('serverToGraphic');
             }, 500);
 
             e.browser.client
                 .executeAsync(function(done) {
                     var checkMessageReceived;
                     checkMessageReceived = setInterval(function() {
-                        if (window.serverToViewReceived) {
+                        if (window.serverToGraphicReceived) {
                             clearInterval(checkMessageReceived);
                             done();
                         }
@@ -97,10 +97,10 @@ describe('client-side api', function() {
         });
 
         it('should send messages', function(done) {
-            e.apis.extension.listenFor('viewToServer', done);
+            e.apis.extension.listenFor('graphicToServer', done);
             e.browser.client
                 .execute(function() {
-                    window.graphicApi.sendMessage('viewToServer');
+                    window.graphicApi.sendMessage('graphicToServer');
                 });
         });
     });

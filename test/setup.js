@@ -76,8 +76,8 @@ before(function(done) {
             .init()
             .timeoutsAsyncScript(30000)
             .newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
-            .getCurrentTabId(function(err, tabId) {
-                if (err) throw err;
+            .getCurrentTabId()
+            .then(function(tabId) {
                 e.browser.tabs.dashboard = tabId;
             })
             .executeAsync(function(done) {
@@ -90,9 +90,9 @@ before(function(done) {
                 }, 50);
             })
             .newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '')
-            .getCurrentTabId(function(err, tabId) {
-                if (err) throw err;
-                e.browser.tabs.view = tabId;
+            .getCurrentTabId()
+            .then(function(tabId) {
+                e.browser.tabs.graphic = tabId;
             })
             .executeAsync(function(done) {
                 var checkForApi;
