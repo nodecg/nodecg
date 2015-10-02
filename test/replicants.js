@@ -23,22 +23,24 @@ describe('client-side replicants', function() {
                 rep.on('declared', function() {
                     done(rep.value);
                 });
-            }, function(err, ret) {
-                if (err) throw err;
-                expect(ret.value).to.equal('foo');
             })
-            .call(done);
+            .then(function(ret) {
+                expect(ret.value).to.equal('foo');
+
+                done();
+            });
     });
 
     it('should be readable without subscription, via readReplicant', function(done) {
         e.browser.client
             .executeAsync(function(done) {
                 window.dashboardApi.readReplicant('clientTest', done);
-            }, function(err, ret) {
-                if (err) throw err;
-                expect(ret.value).to.equal('foo');
             })
-            .call(done);
+            .then(function(ret) {
+                expect(ret.value).to.equal('foo');
+
+                done();
+            });
     });
 
     it('should throw an error when no name is provided', function(done) {
@@ -49,14 +51,15 @@ describe('client-side replicants', function() {
                 } catch (e) {
                     done(e.message);
                 }
-            }, function(err, ret) {
-                if (err) throw err;
-                expect(ret.value).to.equal('Must supply a name when instantiating a Replicant');
             })
-            .call(done);
+            .then(function(ret) {
+                expect(ret.value).to.equal('Must supply a name when instantiating a Replicant');
+
+                done();
+            });
     });
 
-    it('should be assignable via the ".value" property', function (done) {
+    it.only('should be assignable via the ".value" property', function (done) {
         e.browser.client
             .executeAsync(function(done) {
                 var rep = window.dashboardApi.Replicant('clientAssignmentTest', {persistent: false});
@@ -64,12 +67,13 @@ describe('client-side replicants', function() {
                     done(data);
                 });
                 rep.value = 'assignmentOK';
-            }, function(err, ret) {
-                if (err) throw err;
+            })
+            .then(function(ret) {
                 expect(ret.value.newValue).to.equal('assignmentOK');
                 expect(ret.value.revision).to.equal(1);
-            })
-            .call(done);
+
+                done();
+            });
     });
 
     it('should react to changes in arrays', function(done) {
@@ -93,8 +97,8 @@ describe('client-side replicants', function() {
 
                     rep.value.push('arrPushOK');
                 });
-            }, function(err, ret) {
-                if (err) throw err;
+            })
+            .then(function(ret) {
                 expect(ret.value.oldVal).to.deep.equal(['starting']);
                 expect(ret.value.newVal).to.deep.equal(['starting', 'arrPushOK']);
                 expect(ret.value.changes).to.have.length(1);
@@ -103,8 +107,9 @@ describe('client-side replicants', function() {
                 expect(ret.value.changes[0].removedCount).to.equal(0);
                 expect(ret.value.changes[0].added).to.deep.equal(['arrPushOK']);
                 expect(ret.value.changes[0].addedCount).to.equal(1);
-            })
-            .call(done);
+
+                done();
+            });
     });
 
     // need a better way to test this
@@ -121,16 +126,14 @@ describe('client-side replicants', function() {
                 window.clientRedeclare.once('declared', function() {
                     done();
                 });
-            }, function(err) {
-                if (err) throw err;
+            })
+            .then(function() {
                 e.server.once('stopped', function() {
                     e.browser.client
                         .executeAsync(function(done) {
                             window.clientRedeclare.once('declared', function() {
                                 done();
                             });
-                        }, function(err) {
-                            if (err) throw err;
                         })
                         .call(done);
 
@@ -159,8 +162,8 @@ describe('client-side replicants', function() {
                             rep.value.foo = 'bar';
                         }
                     });
-                }, function(err, ret) {
-                    if (err) throw err;
+                })
+                .then(function(ret) {
                     expect(ret.value).to.deep.equal({foo: 'bar'});
 
                     rep.on('change', function(oldVal, newVal) {
@@ -194,8 +197,8 @@ describe('client-side replicants', function() {
 
                         rep.value.a.b.c = 'nestedChangeOK';
                     });
-                }, function(err, ret) {
-                    if (err) throw err;
+                })
+                .then(function(ret) {
                     expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
                     expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
                     expect(ret.value.changes).to.have.length(1);
@@ -203,8 +206,9 @@ describe('client-side replicants', function() {
                     expect(ret.value.changes[0].path).to.deep.equal(['a', 'b', 'c']);
                     expect(ret.value.changes[0].oldValue).to.equal('c');
                     expect(ret.value.changes[0].newValue).to.equal('nestedChangeOK');
-                })
-                .call(done);
+
+                    done();
+                });
         });
 
         // This specifically tests the following case:
@@ -248,8 +252,8 @@ describe('client-side replicants', function() {
                             done(window.s2c_nestedArrChange);
                         }
                     }, 50);
-                }, function(err, ret) {
-                    if (err) throw err;
+                })
+                .then(function(ret) {
                     expect(ret.value.oldVal).to.deep.equal({arr: []});
                     expect(ret.value.newVal).to.deep.equal({arr: ['test']});
                     expect(ret.value.changes).to.have.length(1);
@@ -258,8 +262,9 @@ describe('client-side replicants', function() {
                     expect(ret.value.changes[0].added).to.deep.equal(['test']);
                     expect(ret.value.changes[0].addedCount).to.equal(1);
                     expect(ret.value.changes[0].removedCount).to.equal(0);
-                })
-                .call(done);
+
+                    done();
+                });
         });
         /* jshint +W106 */
     });
@@ -272,11 +277,12 @@ describe('client-side replicants', function() {
                     rep.on('declared', function() {
                         done(rep.value);
                     });
-                }, function(err, ret) {
-                    if (err) throw err;
-                    expect(ret.value).to.equal('it work good!');
                 })
-                .call(done);
+                .then(function(ret) {
+                    expect(ret.value).to.equal('it work good!');
+
+                    done();
+                });
         });
 
         it('should persist assignment to disk', function(done) {
@@ -287,8 +293,8 @@ describe('client-side replicants', function() {
                     rep.on('assignmentAccepted', function() {
                         done();
                     });
-                }, function(err) {
-                    if (err) throw err;
+                })
+                .then(function() {
                     fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
                         if (err) throw err;
                         expect(data).to.equal('{"nested":"hey we assigned!"}');
@@ -306,8 +312,8 @@ describe('client-side replicants', function() {
                     rep.on('change', function() {
                         done();
                     });
-                }, function(err) {
-                    if (err) throw err;
+                })
+                .then(function() {
                     serverRep.on('change', function() {
                         fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
                             if (err) throw err;
@@ -326,8 +332,8 @@ describe('client-side replicants', function() {
                     rep.on('assignmentAccepted', function() {
                         done();
                     });
-                }, function(err) {
-                    if (err) throw err;
+                })
+                .then(function() {
                     fs.readFile('./db/replicants/test-bundle/clientFalseyWrite.rep', 'utf-8', function(err, data) {
                         if (err) throw err;
                         expect(data).to.equal('0');
@@ -343,11 +349,12 @@ describe('client-side replicants', function() {
                     rep.on('declared', function() {
                         done(rep.value);
                     });
-                }, function(err, ret) {
-                    if (err) throw err;
-                    expect(ret.value).to.equal(0);
                 })
-                .call(done);
+                .then(function(ret) {
+                    expect(ret.value).to.equal(0);
+
+                    done();
+                });
         });
     });
 
@@ -368,8 +375,8 @@ describe('client-side replicants', function() {
                         rep.on('declared', function() {
                             done();
                         });
-                    }, function(err) {
-                        if (err) throw err;
+                    })
+                    .then(function() {
                         fs.readFile('./db/replicants/test-bundle/clientTransience.rep', function(err) {
                             expect(function() {
                                 if (err) throw err;
@@ -393,12 +400,13 @@ describe('server-side replicants', function() {
                 rep.on('declared', function() {
                     done();
                 });
-            }, function(err) {
-                if (err) throw err;
+            })
+            .then(function() {
                 var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
                 expect(rep.value).to.equal('foo');
-            })
-            .call(done);
+
+                done();
+            });
     });
 
     it('should be readable without subscription, via readReplicant', function() {
@@ -475,13 +483,14 @@ describe('server-side replicants', function() {
 
                     rep.value.push('test');
                 });
-            }, function(err) {
-                if (err) throw err;
+            })
+            .then(function() {
                 serverRep.on('change', function(oldVal, newVal) {
                     expect(newVal).to.deep.equal(['test']);
+
+                    done();
                 });
-            })
-            .call(done);
+            });
     });
 
     context('when "persistent" is set to "true"', function() {

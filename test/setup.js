@@ -82,14 +82,12 @@ before(function(done) {
             })
             .executeAsync(function(done) {
                 var checkForApi;
-                checkForApi = setInterval(function(done) {
+                checkForApi = setInterval(function() {
                     if (typeof window.dashboardApi !== 'undefined') {
                         clearInterval(checkForApi);
                         done();
                     }
-                }, 50, done);
-            }, function(err) {
-                if (err) throw err;
+                }, 50);
             })
             .newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '')
             .getCurrentTabId(function(err, tabId) {
@@ -98,14 +96,12 @@ before(function(done) {
             })
             .executeAsync(function(done) {
                 var checkForApi;
-                checkForApi = setInterval(function(done) {
+                checkForApi = setInterval(function() {
                     if (typeof window.graphicApi !== 'undefined') {
                         clearInterval(checkForApi);
                         done();
                     }
-                }, 50, done);
-            }, function(err) {
-                if (err) throw err;
+                }, 50);
             })
             .timeoutsAsyncScript(5000)
             .call(done);

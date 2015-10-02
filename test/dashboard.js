@@ -13,11 +13,12 @@ describe('dashboard', function() {
         it('should show up on the dashboard', function(done) {
             e.browser.client
                 .switchTab(e.browser.tabs.dashboard)
-                .isExisting('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]', function(err, isExisting) {
-                    if (err) throw err;
+                .isExisting('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')
+                .then(function(isExisting) {
                     expect(isExisting).to.be.true;
-                })
-                .call(done);
+
+                    done();
+                });
         });
     });
 });
