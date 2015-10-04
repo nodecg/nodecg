@@ -6,13 +6,6 @@ html(lang='en')
 
         title NodeCG Dashboard
 
-        //- Web Component support
-        script(src='/components/webcomponentsjs/webcomponents-lite.min.js')
-
-        //- Polyfills and Shims
-        script(src='/components/observe-shim/lib/observe-shim.js')
-        script(src='/shims/WeakMap.js')
-
         //- import Polymer elements
         link(rel='import', href='/components/iron-icon/iron-icon.html')
         link(rel='import', href='/components/iron-icons/communication-icons.html')
@@ -38,6 +31,13 @@ html(lang='en')
         link(rel='stylesheet', href='/dashboard/dashboard.css')
         link(rel='import', href='/dashboard/style/nodecg-styles.html')
 
+        //- Web Component support
+        script(src='/components/webcomponentsjs/webcomponents-lite.min.js')
+
+        //- Polyfills and Shims
+        script(src='/components/observe-shim/lib/observe-shim.js')
+        script(src='/shims/WeakMap.js')
+
         //- make the global config available
         script(type='text/javascript').
             window.ncgConfig = !{ JSON.stringify(ncgConfig) };
@@ -59,16 +59,6 @@ html(lang='en')
             } else {
                 window.socket = io.connect('//' + window.ncgConfig.baseURL + '/');
             }
-
-        //- other dashboard scripts
-        script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
-        script(src='/components/packery/dist/packery.pkgd.min.js')
-        script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
-        script(src='/components/iframe-resizer/js/iframeResizer.min.js')
-        script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
-        script(src='/dashboard/panel_packery.js')
-        script(src='/dashboard/dashboard.js')
-        script(src='/dashboard/single_instances.js')
 
         //- custom styles for Polymer
         style(is='custom-style').
@@ -142,3 +132,13 @@ html(lang='en')
                     span No single-instance graphics are currently open.
             .buttons
                 paper-button(dialog-dismiss) Close
+
+    //- other dashboard scripts
+    script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
+    script(src='/components/packery/dist/packery.pkgd.min.js')
+    script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
+    script(src='/components/iframe-resizer/js/iframeResizer.min.js')
+    script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
+    script(src='/dashboard/panel_packery.js')
+    script(src='/dashboard/dashboard.js')
+    script(src='/dashboard/single_instances.js')
