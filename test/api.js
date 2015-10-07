@@ -19,19 +19,19 @@ describe('client-side api', function() {
 
         // Check for basic connectivity. The rest of the test are run from the dashboard as well.
         it('should receive messages', function(done) {
+            var sendMessage;
             e.browser.client
                 .execute(function() {
                     window.serverToDashboardReceived = false;
                     window.dashboardApi.listenFor('serverToDashboard', function() {
                         window.serverToDashboardReceived = true;
                     });
-                });
-
-            var sendMessage = setInterval(function() {
-                e.apis.extension.sendMessage('serverToDashboard');
-            }, 500);
-
-            e.browser.client
+                })
+                .then(function() {
+                    sendMessage = setInterval(function() {
+                        e.apis.extension.sendMessage('serverToDashboard');
+                    }, 500);
+                })
                 .executeAsync(function(done) {
                     var checkMessageReceived;
                     checkMessageReceived = setInterval(function() {
@@ -43,7 +43,6 @@ describe('client-side api', function() {
                 })
                 .then(function() {
                     clearInterval(sendMessage);
-
                     done();
                 });
         });
@@ -67,19 +66,19 @@ describe('client-side api', function() {
         // The graphic and dashboard APIs use the same file
         // If dashboard API passes all its tests, we just need to make sure that the socket works
         it('should receive messages', function(done) {
+            var sendMessage;
             e.browser.client
                 .execute(function() {
                     window.serverToGraphicReceived = false;
                     window.graphicApi.listenFor('serverToGraphic', function() {
                         window.serverToGraphicReceived = true;
                     });
-                });
-
-            var sendMessage = setInterval(function() {
-                e.apis.extension.sendMessage('serverToGraphic');
-            }, 500);
-
-            e.browser.client
+                })
+                .then(function() {
+                    sendMessage = setInterval(function() {
+                        e.apis.extension.sendMessage('serverToGraphic');
+                    }, 500);
+                })
                 .executeAsync(function(done) {
                     var checkMessageReceived;
                     checkMessageReceived = setInterval(function() {
@@ -91,7 +90,6 @@ describe('client-side api', function() {
                 })
                 .then(function() {
                     clearInterval(sendMessage);
-
                     done();
                 });
         });
