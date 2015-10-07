@@ -14,8 +14,9 @@ var cfgDir              = path.resolve(rootDir, 'cfg');
 var bundleCfgPath       = path.resolve(cfgDir, bundleName + '.json');
 var dashboardUrl        = util.format('http://%s/', config.baseURL);
 var testPanelUrl        = dashboardUrl + 'panel/' + bundleName + '/' + panelName;
-var panelComponentsUrl        = dashboardUrl + 'panel/' + bundleName + '/components';
+var panelComponentsUrl  = dashboardUrl + 'panel/' + bundleName + '/components';
 var graphicUrl          = dashboardUrl + 'graphics/' + bundleName;
+var singleInstanceUrl   = dashboardUrl + 'graphics/' + bundleName + '/single_instance.html';
 
 module.exports = {
     BUNDLE_NAME: bundleName,
@@ -27,5 +28,6 @@ module.exports = {
     TEST_PANEL_URL: testPanelUrl,
     PANEL_COMPONENTS_URL: panelComponentsUrl,
     GRAPHIC_URL: graphicUrl,
+    SINGLE_INSTANCE_URL: singleInstanceUrl,
     CONFIG: config
 };

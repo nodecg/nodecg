@@ -21,10 +21,18 @@
         "file": "panel.html"
       }
     ],
-    "graphics": [{
-      "file": "index.html",
-      "width": 1280,
-      "height": 720
-    }]
+    "graphics": [
+      {
+        "file": "index.html",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "file": "single_instance.html",
+        "width": 1280,
+        "height": 720,
+        "singleInstance": true
+      }
+    ]
   }
 }

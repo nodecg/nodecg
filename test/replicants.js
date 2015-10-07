@@ -396,13 +396,13 @@ describe('server-side replicants', function() {
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
             .executeAsync(function(done) {
-                var rep = window.dashboardApi.Replicant('extensionTest', { defaultValue: 'foo', persistent: false });
+                var rep = window.dashboardApi.Replicant('extensionTest', {defaultValue: 'foo', persistent: false});
                 rep.on('declared', function() {
                     done();
                 });
             })
             .then(function() {
-                var rep = e.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
+                var rep = e.apis.extension.Replicant('extensionTest', {defaultValue: 'bar'});
                 expect(rep.value).to.equal('foo');
 
                 done();
@@ -501,7 +501,7 @@ describe('server-side replicants', function() {
 
         it('should persist assignment to disk', function(done) {
             var rep = e.apis.extension.Replicant('extensionPersistence');
-            rep.value = { nested: 'hey we assigned!' };
+            rep.value = {nested: 'hey we assigned!'};
             setTimeout(function() {
                 fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', function(err, data) {
                     if (err) throw err;
