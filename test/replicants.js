@@ -304,23 +304,26 @@ describe('client-side replicants', function() {
         });
 
         it('should persist changes to disk', function(done) {
-            var serverRep = e.apis.extension.Replicant('clientPersistence');
+            var serverRep = e.apis.extension.Replicant('clientChangePersistence', {defaultValue: {nested: ''}});
             e.browser.client
                 .executeAsync(function(done) {
-                    var rep = window.dashboardApi.Replicant('clientPersistence');
-                    rep.value.nested = 'hey we changed!';
-                    rep.on('change', function() {
+                    window.clientChangePersistence = window.dashboardApi.Replicant('clientChangePersistence');
+                    window.clientChangePersistence.once('change', function() {
                         done();
                     });
                 })
                 .then(function() {
                     serverRep.on('change', function() {
-                        fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function(err, data) {
-                            if (err) throw err;
+                        // On a short timeout to give the Replicator time to write the new value to disk
+                        setTimeout(function() {
+                            var data = fs.readFileSync('./db/replicants/test-bundle/clientChangePersistence.rep', 'utf-8');
                             expect(data).to.equal('{"nested":"hey we changed!"}');
                             done();
-                        });
+                        }, 10);
                     });
+                })
+                .execute(function() {
+                    window.clientChangePersistence.value.nested = 'hey we changed!';
                 });
         });
 
@@ -474,14 +477,12 @@ describe('server-side replicants', function() {
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
             .executeAsync(function(done) {
-                var rep = window.dashboardApi.Replicant('clientDoubleApplyTest');
+                window.clientDoubleApplyTest = window.dashboardApi.Replicant('clientDoubleApplyTest');
 
-                rep.on('declared', function() {
-                    rep.on('change', function() {
+                window.clientDoubleApplyTest.on('declared', function() {
+                    window.clientDoubleApplyTest.on('change', function() {
                         done();
                     });
-
-                    rep.value.push('test');
                 });
             })
             .then(function() {
@@ -489,6 +490,9 @@ describe('server-side replicants', function() {
                     expect(newVal).to.deep.equal(['test']);
                     done();
                 });
+            })
+            .execute(function() {
+                window.clientDoubleApplyTest.value.push('test');
             });
     });
 
