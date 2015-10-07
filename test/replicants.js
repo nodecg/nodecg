@@ -467,14 +467,14 @@ describe('server-side replicants', function() {
     });
 
     it('should only apply array splices from the client once', function(done) {
-        this.timeout(7000);
+        this.timeout(10000);
 
         var serverRep = e.apis.extension.Replicant('clientDoubleApplyTest', {persistent: false, defaultValue: []});
 
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
             .executeAsync(function(done) {
-                var rep = window.dashboardApi.Replicant('clientDoubleApplyTest', {persistent: false});
+                var rep = window.dashboardApi.Replicant('clientDoubleApplyTest');
 
                 rep.on('declared', function() {
                     rep.on('change', function() {
