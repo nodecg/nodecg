@@ -487,7 +487,6 @@ describe('server-side replicants', function() {
             .then(function() {
                 serverRep.on('change', function(oldVal, newVal) {
                     expect(newVal).to.deep.equal(['test']);
-
                     done();
                 });
             });

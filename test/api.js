@@ -187,6 +187,7 @@ describe('server-side api', function() {
     it('should send messages', function(done) {
         this.timeout(10000);
 
+        var sendMessage;
         e.browser.client
             .switchTab(e.browser.tabs.dashboard)
             .execute(function() {
@@ -194,13 +195,12 @@ describe('server-side api', function() {
                 window.dashboardApi.listenFor('serverToClient', function() {
                     window.serverToClientReceived = true;
                 });
-            });
-
-        var sendMessage = setInterval(function() {
-            e.apis.extension.sendMessage('serverToClient');
-        }, 500);
-
-        e.browser.client
+            })
+            .then(function() {
+                sendMessage = setInterval(function() {
+                    e.apis.extension.sendMessage('serverToClient');
+                }, 500);
+            })
             .switchTab(e.browser.tabs.dashboard)
             .executeAsync(function(done) {
                 var checkMessageReceived;
@@ -213,7 +213,6 @@ describe('server-side api', function() {
             })
             .then(function() {
                 clearInterval(sendMessage);
-
                 done();
             });
     });
