@@ -9,7 +9,7 @@
 
 <dom-module id="ncg-dashboard-panel">
     <style>
-        .heading {
+        #heading {
             background-color: var(--google-grey-700);
             color: var(--google-grey-100);
         }
@@ -18,8 +18,20 @@
             margin-left: 15px;
         }
 
-        .body {
+        #body {
             padding: 0;
+        }
+
+        #dragHandle {
+            cursor: -webkit-grab;
+            cursor:    -moz-grab;
+            cursor:         grab;
+        }
+
+        #dragHandle:active {
+            cursor: -webkit-grabbing;
+            cursor:    -moz-grabbing;
+            cursor:         grabbing;
         }
 
         #expandBtn {
@@ -37,15 +49,16 @@
         ></iron-localstorage>
 
         <paper-material>
-            <div class="heading layout horizontal justified center">
+            <div id="heading" class="layout horizontal justified center">
                 <span id="displayTitle" class="paper-font-title">{{displayTitle}}</span>
                 <div class="layout horizontal center">
                     <paper-icon-button id="expandBtn" on-click="toggleCollapse" icon="expand-less"></paper-icon-button>
+                    <paper-icon-button id="dragHandle" icon="open-with"></paper-icon-button>
                     <paper-icon-button id="infoBtn" icon="info"></paper-icon-button>
                 </div>
             </div>
             <iron-collapse id="collapse" opened="{{opened}}">
-                <div class="body collapse-content">
+                <div id="body" class="collapse-content">
                     <content></content>
                 </div>
             </iron-collapse>
