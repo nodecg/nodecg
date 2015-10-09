@@ -2,32 +2,53 @@
 <link rel="import" href="/components/paper-material/paper-material.html">
 <link rel="import" href="/components/paper-styles/paper-styles.html">
 <link rel="import" href="/components/paper-styles/paper-styles-classes.html">
+<link rel="import" href="/components/iron-collapse/iron-collapse.html">
+<link rel="import" href="/components/iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="/components/iron-localstorage/iron-localstorage.html">
 <link rel="import" href="ncg-dashboard-panel-info-dialog.html">
 
 <dom-module id="ncg-dashboard-panel">
     <style>
         .heading {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             background-color: var(--google-grey-700);
             color: var(--google-grey-100);
-            padding: 0 15px;
+        }
+
+        #title {
+            margin-left: 15px;
         }
 
         .body {
             padding: 0;
         }
+
+        #expandBtn {
+            transition: transform 200ms ease-out;
+        }
+
+        :host[opened] #expandBtn {
+            transform: rotate(180deg);
+        }
     </style>
     <template>
+        <iron-localstorage name="{{computeLocalStorageName(bundle, panel)}}"
+                           value="{{opened}}"
+                           on-iron-localstorage-load-empty="initializeDefaultOpened"
+        ></iron-localstorage>
+
         <paper-material>
-            <div class="heading paper-font-title">
-                <span>{{title}}</span>
-                <paper-icon-button id="button" icon="info"></paper-icon-button>
+            <div class="heading layout horizontal justified center">
+                <span id="title" class="paper-font-title">{{title}}</span>
+                <div class="layout horizontal center">
+                    <paper-icon-button id="expandBtn" on-click="toggleCollapse" icon="expand-less"></paper-icon-button>
+                    <paper-icon-button id="infoBtn" icon="info"></paper-icon-button>
+                </div>
             </div>
-            <div class="body">
-                <content></content>
-            </div>
+            <iron-collapse id="collapse" opened="{{opened}}">
+                <div class="body collapse-content">
+                    <content></content>
+                </div>
+            </iron-collapse>
         </paper-material>
     </template>
 </dom-module>
@@ -47,7 +68,15 @@
             panel: {
                 type: String,
                 reflectToAttribute: true
+            },
+            opened: {
+                type: Boolean,
+                reflectToAttribute: true
             }
+        },
+
+        computeLocalStorageName: function(bundle, panel) {
+            return [bundle, panel, 'opened'].join('.');
         },
 
         ready: function() {
@@ -55,9 +84,17 @@
             infoDialog.bundle = this.bundle;
             document.body.appendChild(infoDialog);
 
-            this.$.button.addEventListener('click', function() {
+            this.$.infoBtn.addEventListener('click', function() {
                 infoDialog.open();
             });
+        },
+
+        toggleCollapse: function() {
+            this.$.collapse.toggle();
+        },
+
+        initializeDefaultOpened: function() {
+            this.opened = true;
         }
     });
 </script>

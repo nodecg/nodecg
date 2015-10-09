@@ -21,6 +21,7 @@ html(lang='en')
         link(rel='import', href='/components/paper-styles/paper-styles-classes.html')
         link(rel='import', href='/components/paper-toast/paper-toast.html')
         link(rel='import', href='/components/paper-toolbar/paper-toolbar.html')
+        link(rel='import', href='/components/paper-menu-button/paper-menu-button.html')
 
         //- our custom dashboard elements
         link(rel='import', href='/dashboard/elements/ncg-dashboard-panel.html')
@@ -71,6 +72,15 @@ html(lang='en')
             paper-toolbar
                 span.title
                     img.logo(src='/dashboard/img/navbar-logo.png' alt='NodeCG dashboard' title='NodeCG dashboard')
+                paper-menu-button
+                    paper-button.dropdown-trigger
+                        iron-icon(icon="check")
+                        span Graphics
+                    paper-menu.dropdown-content
+                        each bundle in bundles
+                            each graphic in bundle.graphics
+                                paper-item
+                                    a(href=graphic.url target='_blank')= bundle.name + '/' + graphic.file
                 paper-button.paper-font-button#showInstances(alt='Single Instances')
                     iron-icon(icon='image:looks-one')
                     | &ensp;Single Instances
