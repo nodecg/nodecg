@@ -93,7 +93,7 @@ html(lang='en')
                 each bundle in bundles
                     each panel in bundle.dashboard.panels
                         if !panel.dialog
-                            ncg-dashboard-panel(class='dashboard-panel width-' + panel.width, title=panel.title,
+                            ncg-dashboard-panel(class='dashboard-panel width-' + panel.width, display-title=panel.title,
                                 id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
                                 iframe(src='/panel/#{bundle.name}/#{panel.name}',
                                     frameborder='0', scrolling='no', style='width: 100%')

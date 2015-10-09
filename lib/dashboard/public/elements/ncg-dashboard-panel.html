@@ -14,7 +14,7 @@
             color: var(--google-grey-100);
         }
 
-        #title {
+        #displayTitle {
             margin-left: 15px;
         }
 
@@ -38,7 +38,7 @@
 
         <paper-material>
             <div class="heading layout horizontal justified center">
-                <span id="title" class="paper-font-title">{{title}}</span>
+                <span id="displayTitle" class="paper-font-title">{{displayTitle}}</span>
                 <div class="layout horizontal center">
                     <paper-icon-button id="expandBtn" on-click="toggleCollapse" icon="expand-less"></paper-icon-button>
                     <paper-icon-button id="infoBtn" icon="info"></paper-icon-button>
@@ -57,7 +57,7 @@
     Polymer({
         is: 'ncg-dashboard-panel',
         properties: {
-            title: {
+            displayTitle: {
                 type: String,
                 reflectToAttribute: true
             },
