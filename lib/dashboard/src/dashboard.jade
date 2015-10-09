@@ -94,7 +94,8 @@ html(lang='en')
                     each panel in bundle.dashboard.panels
                         if !panel.dialog
                             ncg-dashboard-panel(class='dashboard-panel width-' + panel.width, display-title=panel.title,
-                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
+                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name,
+                                header-color=panel.headerColor)
                                 iframe(src='/panel/#{bundle.name}/#{panel.name}',
                                     frameborder='0', scrolling='no', style='width: 100%')
         #dialogs

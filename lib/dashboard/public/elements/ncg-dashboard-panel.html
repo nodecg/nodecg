@@ -20,6 +20,7 @@
 
         #body {
             padding: 0;
+            background-color: #f5f5f5;
         }
 
         #dragHandle {
@@ -49,7 +50,7 @@
         ></iron-localstorage>
 
         <paper-material>
-            <div id="heading" class="layout horizontal justified center">
+            <div id="header" class="layout horizontal justified center">
                 <span id="displayTitle" class="paper-font-title">{{displayTitle}}</span>
                 <div class="layout horizontal center">
                     <paper-icon-button id="expandBtn" on-click="toggleCollapse" icon="expand-less"></paper-icon-button>
@@ -85,7 +86,16 @@
             opened: {
                 type: Boolean,
                 reflectToAttribute: true
+            },
+            headerColor: {
+                type: String,
+                reflectToAttribute: true,
+                observer: 'headerColorChanged'
             }
+        },
+
+        headerColorChanged: function(newVal) {
+            this.$.header.style.backgroundColor = newVal;
         },
 
         computeLocalStorageName: function(bundle, panel) {
