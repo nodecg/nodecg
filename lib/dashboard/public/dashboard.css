@@ -10,8 +10,6 @@ body {
 #panels {
   width: 100%;
   height: 100%;
-  overflow: auto;
-  padding: 32px;
 }
 #instancesList-empty {
   text-align: center;
@@ -74,4 +72,40 @@ body {
 }
 .navbar {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+}
+#ncg-sidebar-header {
+  background: none;
+  color: #212121;
+}
+.ncg-sidebar-group {
+  padding-top: 12px;
+  margin: 12px;
+}
+.ncg-sidebar-group paper-icon-item:focus {
+  outline: none;
+}
+.ncg-sidebar-group paper-icon-item:hover {
+  background-color: #f0f0f0;
+}
+.ncg-sidebar-group .iron-selected {
+  color: #00bebe;
+  background-color: #f0f0f0;
+}
+#ncg-pages {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+#ncg-pages section {
+  padding: 32px;
+}
+.ncg-graphics-card {
+  width: 100%;
+  max-width: 600px;
+}
+#ncg-title-selector span {
+  display: none;
+}
+#ncg-title-selector span.iron-selected {
+  display: inline;
 }

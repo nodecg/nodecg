@@ -7,21 +7,26 @@ html(lang='en')
         title NodeCG Dashboard
 
         //- import Polymer elements
+        link(rel='import', href='/components/iron-flex-layout/classes/iron-flex-layout.html')
         link(rel='import', href='/components/iron-icon/iron-icon.html')
         link(rel='import', href='/components/iron-icons/communication-icons.html')
         link(rel='import', href='/components/iron-icons/image-icons.html')
         link(rel='import', href='/components/iron-icons/iron-icons.html')
-        link(rel='import', href='/components/paper-dialog/paper-dialog.html')
+        link(rel='import', href='/components/iron-image/iron-image.html')
+        link(rel='import', href='/components/iron-pages/iron-pages.html')
         link(rel='import', href='/components/paper-button/paper-button.html')
-        link(rel='import', href='/components/paper-icon-button/paper-icon-button.html')
-        link(rel='import', href='/components/paper-item/paper-item.html')
-        link(rel='import', href='/components/paper-item/paper-item-body.html')
+        link(rel='import', href='/components/paper-card/paper-card.html')
+        link(rel='import', href='/components/paper-dialog/paper-dialog.html')
+        link(rel='import', href='/components/paper-drawer-panel/paper-drawer-panel.html')
         link(rel='import', href='/components/paper-header-panel/paper-header-panel.html')
+        link(rel='import', href='/components/paper-icon-button/paper-icon-button.html')
+        link(rel='import', href='/components/paper-item/paper-icon-item.html')
+        link(rel='import', href='/components/paper-menu-button/paper-menu-button.html')
         link(rel='import', href='/components/paper-styles/paper-styles.html')
         link(rel='import', href='/components/paper-styles/paper-styles-classes.html')
         link(rel='import', href='/components/paper-toast/paper-toast.html')
         link(rel='import', href='/components/paper-toolbar/paper-toolbar.html')
-        link(rel='import', href='/components/paper-menu-button/paper-menu-button.html')
+        link(rel='import', href='/components/more-routing/more-routing.html')
 
         //- our custom dashboard elements
         link(rel='import', href='/dashboard/elements/ncg-dashboard-panel.html')
@@ -67,45 +72,75 @@ html(lang='en')
                 --default-primary-color: #00bebe;
             }
 
+        //- Set up app routing
+        more-routing-config(driver='hash')
+        more-route(name='graphics', path='/graphics')
+        more-route(name='settings', path='/settings')
+        more-route(name='dashboard', path='/')
+
     body.fullbleed.vertical.layout
-        paper-header-panel.flex
-            paper-toolbar
-                span.title
-                    img.logo(src='/dashboard/img/navbar-logo.png' alt='NodeCG dashboard' title='NodeCG dashboard')
-                //-paper-menu-button
-                    paper-button.dropdown-trigger
-                        iron-icon(icon="check")
-                        span Graphics
-                    paper-menu.dropdown-content
-                        each bundle in bundles
-                            each graphic in bundle.graphics
-                                paper-item
-                                    a(href=graphic.url target='_blank')= bundle.name + '/' + graphic.file
-                paper-button.paper-font-button#showInstances(alt='Single Instances')
-                    iron-icon(icon='image:looks-one')
-                    | &ensp;Single Instances
-                if ncgConfig.login.enabled
-                    paper-button.paper-font-button#showKey(alt='View Key')
-                        iron-icon(icon='communication:vpn-key')
-                        | &ensp;View Key
-                    paper-icon-button.paper-font-button#logout(icon='exit-to-app', alt='Sign Out')
-            #panels
-                each bundle in bundles
-                    each panel in bundle.dashboard.panels
-                        if !panel.dialog
-                            ncg-dashboard-panel(class='dashboard-panel width-' + panel.width, display-title=panel.title,
-                                id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name,
-                                header-color=panel.headerColor)
-                                iframe(src='/panel/#{bundle.name}/#{panel.name}',
-                                    frameborder='0', scrolling='no', style='width: 100%')
+        paper-drawer-panel(force-narrow)
+            paper-header-panel(drawer)
+                paper-toolbar#ncg-sidebar-header
+                    paper-icon-button(icon='menu', paper-drawer-toggle)
+                    span.title
+                        iron-image.logo(src='/dashboard/img/navbar-logo.png' style='width:83px; height:28px;'
+                        sizing='contain' alt='NodeCG Menu' title='NodeCG Menu')
+                more-route-selector
+                    iron-selector.ncg-sidebar-group(role='list')
+                        paper-icon-item(route='/')
+                            iron-icon(icon='dashboard', item-icon)
+                            | Dashboard
+                        paper-icon-item(route='/graphics')
+                            iron-icon(icon='visibility', item-icon)
+                            | Graphics
+                        paper-icon-item(route='/settings')
+                            iron-icon(icon='settings', item-icon)
+                            | Settings
+            paper-header-panel(main)
+                paper-toolbar
+                    paper-icon-button(icon='menu', paper-drawer-toggle)
+                    more-route-selector.title
+                        iron-selector#ncg-title-selector
+                            span(route='/') Dashboard
+                            span(route='/graphics') Graphics
+                            span(route='/settings') Settings
+                    paper-button.paper-font-button#showInstances(alt='Single Instances')
+                        iron-icon(icon='image:looks-one')
+                        | &ensp;Single Instances
+                    if ncgConfig.login.enabled
+                        paper-button.paper-font-button#showKey(alt='View Key')
+                            iron-icon(icon='communication:vpn-key')
+                            | &ensp;View Key
+                        paper-icon-button.paper-font-button#logout(icon='exit-to-app', alt='Sign Out')
+                more-route-selector
+                    iron-pages#ncg-pages.layout.vertical
+                        section.flex.layout.vertical.center(route='/graphics')
+                            each bundle in bundles
+                                each graphic in bundle.graphics
+                                    paper-card.ncg-graphics-card(heading=bundle.name)
+                                        .card-content
+                                            a(href=graphic.url, target='_blank')=graphic.url
+                        section.flex.layout.vertical.center-center(route='/settings')
+                            span And settings here!
+                        section.flex(route='/')
+                            #panels
+                                each bundle in bundles
+                                    each panel in bundle.dashboard.panels
+                                        if !panel.dialog
+                                            ncg-dashboard-panel(class='dashboard-panel width-' + panel.width,
+                                            display-title=panel.title,id=bundle.name + '_' + panel.name,
+                                            bundle=bundle.name, panel=panel.name,header-color=panel.headerColor)
+                                                iframe(src='/panel/#{bundle.name}/#{panel.name}',frameborder='0',
+                                                scrolling='no', style='width: 100%')
         #dialogs
             each bundle in bundles
                 each panel in bundle.dashboard.panels
                     if panel.dialog
                         ncg-dialog(class='dashboard-panel width-' + panel.width, with-backdrop,
-                            id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
-                            iframe(src='/panel/#{bundle.name}/#{panel.name}',
-                                frameborder='0', scrolling='no', style='width: 100%')
+                        id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
+                            iframe(src='/panel/#{bundle.name}/#{panel.name}',frameborder='0',
+                            scrolling='no', style='width: 100%')
 
         //- Used by packery to establish the width of the columns
         #grid-sizer(class="width-1")
@@ -144,12 +179,12 @@ html(lang='en')
             .buttons
                 paper-button(dialog-dismiss) Close
 
-    //- other dashboard scripts
-    script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
-    script(src='/components/packery/dist/packery.pkgd.min.js')
-    script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
-    script(src='/components/iframe-resizer/js/iframeResizer.min.js')
-    script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
-    script(src='/dashboard/panel_packery.js')
-    script(src='/dashboard/dashboard.js')
-    script(src='/dashboard/single_instances.js')
+        //- other dashboard scripts
+        script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
+        script(src='/components/packery/dist/packery.pkgd.min.js')
+        script(src='/components/zeroclipboard/dist/ZeroClipboard.min.js')
+        script(src='/components/iframe-resizer/js/iframeResizer.min.js')
+        script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
+        script(src='/dashboard/panel_packery.js')
+        script(src='/dashboard/dashboard.js')
+        script(src='/dashboard/single_instances.js')
