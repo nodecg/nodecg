@@ -20,7 +20,8 @@
     "packery": "~1.4.3",
     "paper-elements": "PolymerElements/paper-elements#~1.0.1",
     "zeroclipboard": "~2.2.0",
-    "more-routing": "PolymerLabs/more-routing#~1.0.0"
+    "more-routing": "PolymerLabs/more-routing#~1.0.0",
+    "js-throttle-debounce": "~0.1.1"
   },
   "license": "MIT",
   "private": true,
