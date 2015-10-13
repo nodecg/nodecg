@@ -110,31 +110,9 @@ html(lang='en')
                 more-route-selector
                     iron-pages#ncg-pages.layout.vertical
                         section.flex.layout.vertical.center(route='/graphics')
-                            paper-card.ncg-card(heading='Active Single-Instance Graphics')
-                                .card-content
-                                    #instancesList
-                                    #instancesList-empty
-                                        span No single-instance graphics are currently open.
-                            each bundle in bundles
-                                each graphic in bundle.graphics
-                                    paper-card.ncg-card(heading=bundle.name)
-                                        .card-content
-                                            a(href=graphic.url, target='_blank')=graphic.url
+                            include graphics.jade
                         section.flex.layout.vertical.center(route='/settings')
-                            if ncgConfig.login.enabled
-                                paper-card.ncg-card(heading='Key')
-                                    .card-content
-                                        code.paper-font-code1#key
-                                        p.text-warning.paper-font-body1
-                                            | Resetting your key will disrupt all current sessions using it.<br/>
-                                            | When you reset your key, the dashboard will be refreshed so that a new key can be obtained.
-                                        .card-actions
-                                            paper-button#copyKey(data-clipboard-target='key')
-                                                iron-icon(icon='icons:content-copy')
-                                                | &ensp;Copy Key
-                                            paper-button#resetKey
-                                                iron-icon(icon='icons:refresh')
-                                                | &ensp;Reset Key
+                            include settings.jade
                         section.flex(route='/')
                             #panels
                                 each bundle in bundles
@@ -162,6 +140,7 @@ html(lang='en')
         paper-toast.paper-font-body1#socket-reconnectattempt(text='Attempting to reconnect to NodeCG server...')
         paper-toast.paper-font-body1#socket-reconnected(text='Reconnected to NodeCG server!')
         paper-toast.paper-font-body1#socket-reconnectfailed(text='Failed to reconnect to NodeCG server!')
+        paper-toast.paper-font-body1#text-copied(text='Text copied to clipboard.')
 
         //- other dashboard scripts
         script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
