@@ -81,13 +81,13 @@ html(lang='en')
     body.fullbleed.vertical.layout
         paper-drawer-panel(force-narrow)
             paper-header-panel(drawer)
-                paper-toolbar#ncg-sidebar-header
+                paper-toolbar#ncg-drawer-toolbar
                     paper-icon-button(icon='menu', paper-drawer-toggle)
                     span.title
                         iron-image.logo(src='/dashboard/img/navbar-logo.png' style='width:83px; height:28px;'
                         sizing='contain' alt='NodeCG Menu' title='NodeCG Menu')
                 more-route-selector
-                    iron-selector.ncg-sidebar-group(role='list')
+                    iron-selector.ncg-drawer-group(role='list')
                         paper-icon-item(route='/')
                             iron-icon(icon='dashboard', item-icon)
                             | Dashboard
@@ -98,7 +98,7 @@ html(lang='en')
                             iron-icon(icon='settings', item-icon)
                             | Settings
             paper-header-panel(main)
-                paper-toolbar
+                paper-toolbar#ncg-main-toolbar
                     paper-icon-button(icon='menu', paper-drawer-toggle)
                     more-route-selector.title
                         iron-selector#ncg-title-selector

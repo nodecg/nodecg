@@ -73,21 +73,21 @@ body {
 .navbar {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
 }
-#ncg-sidebar-header {
+#ncg-drawer-toolbar {
   background: none;
   color: #212121;
 }
-.ncg-sidebar-group {
+.ncg-drawer-group {
   padding-top: 12px;
   margin: 12px;
 }
-.ncg-sidebar-group paper-icon-item:focus {
+.ncg-drawer-group paper-icon-item:focus {
   outline: none;
 }
-.ncg-sidebar-group paper-icon-item:hover {
+.ncg-drawer-group paper-icon-item:hover {
   background-color: #f0f0f0;
 }
-.ncg-sidebar-group .iron-selected {
+.ncg-drawer-group .iron-selected {
   color: #00bebe;
   background-color: #f0f0f0;
 }
