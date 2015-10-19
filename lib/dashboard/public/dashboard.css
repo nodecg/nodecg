@@ -110,3 +110,6 @@ body {
 #ncg-title-selector span.iron-selected {
   display: inline;
 }
+ncg-dashboard-panel iframe {
+  vertical-align: middle;
+}
