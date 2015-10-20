@@ -91,10 +91,10 @@ a {
   letter-spacing: 0.018em;
   line-height: 24px;
   text-transform: uppercase;
+  color: #5C5CCE;
 }
 /* Overrides */
-body,
-a {
+body {
   color: #212121;
 }
 h1,
