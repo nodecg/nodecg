@@ -2,10 +2,10 @@ sudo: false
 
 language: node_js
 node_js:
-  - '4'
+  - '4.2'
+  - 'stable'
 
 os:
-  - osx
   - linux
 
 env:
@@ -16,12 +16,11 @@ env:
 addons:
   sauce_connect: true
 
-after_failure: cat /home/travis/sauce-connect.log
 after_success: npm run coveralls
 
 matrix:
   allow_failures:
-    - os: osx
+    - node_js: 'stable'
   fast_finish: true
 
 notifications:
