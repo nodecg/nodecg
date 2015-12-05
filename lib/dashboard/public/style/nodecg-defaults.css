@@ -1,47 +1,47 @@
 button.nodecg-info,
 paper-button.nodecg-info,
 p.nodecg-info {
-  background-color: #645ba6;
+  background-color: #645BA6;
   color: white;
 }
 span.nodecg-info {
-  color: #645ba6;
+  color: #645BA6;
 }
 button.nodecg-success,
 paper-button.nodecg-success,
 p.nodecg-success {
-  background-color: #5ba664;
+  background-color: #5BA664;
   color: white;
 }
 span.nodecg-success {
-  color: #5ba664;
+  color: #5BA664;
 }
 button.nodecg-warning,
 paper-button.nodecg-warning,
 p.nodecg-warning {
-  background-color: #ff7522;
+  background-color: #FF7522;
   color: white;
 }
 span.nodecg-warning {
-  color: #ff7522;
+  color: #FF7522;
 }
 button.nodecg-danger,
 paper-button.nodecg-danger,
 p.nodecg-danger {
-  background-color: #c9513e;
+  background-color: #C9513E;
   color: white;
 }
 span.nodecg-danger {
-  color: #c9513e;
+  color: #C9513E;
 }
 button.nodecg-configure,
 paper-button.nodecg-configure,
 p.nodecg-configure {
-  background-color: #a50074;
+  background-color: #A50074;
   color: white;
 }
 span.nodecg-configure {
-  color: #a50074;
+  color: #A50074;
 }
 /* Mixins */
 /* [paper-font] */
