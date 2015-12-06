@@ -1,23 +1,22 @@
 <link rel="import" href="/components/polymer/polymer.html">
 <link rel="import" href="/components/neon-animation/neon-animation-runner-behavior.html">
 <link rel="import" href="/components/paper-dialog-behavior/paper-dialog-behavior.html">
-<link rel="import" href="/components/paper-styles/paper-styles.html">
+<link rel="import" href="/components/paper-dialog-behavior/paper-dialog-shared-styles.html">
 
 <dom-module id="ncg-dialog">
-    <link rel="import" type="css" href="/components/paper-dialog-behavior/paper-dialog-common.css">
-
     <style>
-        :host > ::content > iframe {
+        :host > ::content iframe {
             box-sizing: border-box;
         }
 
-        :host > ::content > iframe {
+        :host > ::content iframe {
             margin: 0!important;
             padding: 0!important;
         }
     </style>
 
     <template>
+        <style include="paper-dialog-shared-styles"></style>
         <content></content>
     </template>
 </dom-module>
@@ -35,8 +34,13 @@
             Polymer.NeonAnimationRunnerBehavior
         ],
 
+        properties: {
+            panel: Object
+        },
+
         listeners: {
-            'neon-animation-finish': '_onNeonAnimationFinish'
+            'neon-animation-finish': '_onNeonAnimationFinish',
+            'iron-overlay-closed': '_onIronOverlayClosed'
         },
 
         _renderOpened: function() {
@@ -58,6 +62,15 @@
                 this._finishRenderOpened();
             } else {
                 this._finishRenderClosed();
+            }
+        },
+
+        _onIronOverlayClosed: function(e) {
+            var iframeDocument = this.querySelector('iframe').contentDocument;
+            if (e.detail.confirmed) {
+                iframeDocument.dispatchEvent(new CustomEvent('dialog-confirmed'));
+            } else {
+                iframeDocument.dispatchEvent(new CustomEvent('dialog-dismissed'));
             }
         }
 

@@ -19,6 +19,7 @@ html(lang='en')
         link(rel='import', href='/components/paper-card/paper-card.html')
         link(rel='import', href='/components/paper-drawer-panel/paper-drawer-panel.html')
         link(rel='import', href='/components/paper-dialog/paper-dialog.html')
+        link(rel='import', href='/components/paper-dialog-scrollable/paper-dialog-scrollable.html')
         link(rel='import', href='/components/paper-header-panel/paper-header-panel.html')
         link(rel='import', href='/components/paper-icon-button/paper-icon-button.html')
         link(rel='import', href='/components/paper-item/paper-icon-item.html')
@@ -128,9 +129,19 @@ html(lang='en')
                     if panel.dialog
                         ncg-dialog(class='dashboard-panel width-' + panel.width, with-backdrop,
                         id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
-                            iframe(src='/panel/#{bundle.name}/#{panel.name}',frameborder='0',
-                            scrolling='no', style='width: 100%')
-
+                            h2=panel.title
+                            paper-dialog-scrollable
+                                iframe(src='/panel/#{bundle.name}/#{panel.name}',frameborder='0',
+                                scrolling='no', style='width: 100%')
+                            if panel.dialogButtons
+                                div.buttons
+                                    each button in panel.dialogButtons
+                                        if button.type === 'confirm'
+                                            paper-button(dialog-confirm)=button.name
+                                        else if button.type === 'dismiss'
+                                            paper-button(dialog-dismiss)=button.name
+                                        else
+                                            paper-button=button.name
         //- Used by packery to establish the width of the columns
         #grid-sizer(class="width-1")
 
