@@ -313,10 +313,13 @@ describe('client-side replicants', function() {
                     });
                 })
                 .then(function() {
-                    serverRep.on('change', function() {
+                    serverRep.on('change', function(oldVal, newVal) {
+                        if (newVal.nested !== 'hey we changed!') return;
+
                         // On a short timeout to give the Replicator time to write the new value to disk
                         setTimeout(function() {
-                            var data = fs.readFileSync('./db/replicants/test-bundle/clientChangePersistence.rep', 'utf-8');
+                            var data = fs.readFileSync('./db/replicants/test-bundle/clientChangePersistence.rep',
+                                'utf-8');
                             expect(data).to.equal('{"nested":"hey we changed!"}');
                             done();
                         }, 10);
@@ -435,6 +438,8 @@ describe('server-side replicants', function() {
         });
 
         rep.on('change', function(oldVal, newVal, changes) {
+            if (newVal.a.b.c !== 'nestedChangeOK') return;
+
             expect(oldVal).to.deep.equal({a: {b: {c: 'c'}}});
             expect(newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
             expect(changes).to.have.length(1);
@@ -455,6 +460,8 @@ describe('server-side replicants', function() {
         });
 
         rep.on('change', function(oldVal, newVal, changes) {
+            if (!changes || changes[0].added[0] !== 'arrPushOK') return;
+
             expect(oldVal).to.deep.equal(['starting']);
             expect(newVal).to.deep.equal(['starting', 'arrPushOK']);
             expect(changes).to.have.length(1);
@@ -487,8 +494,10 @@ describe('server-side replicants', function() {
             })
             .then(function() {
                 serverRep.on('change', function(oldVal, newVal) {
-                    expect(newVal).to.deep.equal(['test']);
-                    done();
+                    if (Array.isArray(newVal) && newVal[0] === 'test') {
+                        expect(newVal).to.deep.equal(['test']);
+                        done();
+                    }
                 });
             })
             .execute(function() {
