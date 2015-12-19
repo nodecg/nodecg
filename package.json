@@ -57,7 +57,7 @@
     "start": "node index.js",
     "postinstall": "bower install",
     "pretest": "node test/setup/pretest",
-    "test": "istanbul cover -x bundles/** -x test/** node_modules/mocha/bin/_mocha -- -R spec",
+    "test": "istanbul cover -x bundles/** -x test/** ./node_modules/mocha/bin/_mocha -- -R spec",
     "posttest": "node test/setup/posttest",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf coverage"
   },
