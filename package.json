@@ -56,9 +56,9 @@
     "start": "node index.js",
     "postinstall": "bower install",
     "pretest": "node test/setup/pretest",
-    "test": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec",
+    "test": "istanbul cover -x bundles/** -x test/** node_modules/mocha/bin/_mocha -- -R spec",
     "posttest": "node test/setup/posttest",
-    "coveralls": "node node_modules/lcov-filter/index.js coverage/lcov.info test bundles | coveralls && rm -rf coverage"
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf coverage"
   },
   "engines": {
     "node": ">= 4.1.2"
@@ -82,7 +82,6 @@
     "grunt-contrib-less": "^1.0.1",
     "grunt-contrib-watch": "^0.6.1",
     "istanbul": "^0.3.2",
-    "lcov-filter": "0.0.1",
     "minifyify": "^7.1.0",
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "0.0.1",
