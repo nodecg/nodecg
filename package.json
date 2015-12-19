@@ -82,7 +82,7 @@
     "grunt-contrib-jshint": "^0.11.3",
     "grunt-contrib-less": "^1.0.1",
     "grunt-contrib-watch": "^0.6.1",
-    "istanbul": "^0.3.2",
+    "istanbul": "^0.4.1",
     "minifyify": "^7.1.0",
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "0.0.1",
