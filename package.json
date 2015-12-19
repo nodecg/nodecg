@@ -10,6 +10,7 @@
   "bugs": "https://github.com/nodecg/nodecg/issues",
   "license": "MIT",
   "dependencies": {
+    "@nodecg/logger": "^0.1.0",
     "aliasify": "^1.7.2",
     "body-parser": "^1.14.1",
     "bower": "^1.5.3",
