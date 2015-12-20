@@ -9,12 +9,19 @@ os:
   - linux
 
 env:
+  - CXX=g++-4.8
   global:
     - secure: UTOIm7gj3nevCdM2gWW4TKm26QIf+CtGLy7KRy03maWy8Yxfb5JbjtFeeXDSnuxKROr/HyBUotgD+bTOV48QQEjzRNMzjG215S0kbXo22D3p52rZ8Xdb3uQWifi5burqLNIDHx5F8suidN/bvuSxX2ZLO9MizdAmsxtQBtOjuvE=
     - secure: FXrHIYwBQrovaiB5EhLnnVznuWos7mmPyb2Vu0lFQJ7h0rKY+1FEfuRlnEb04ZV0otoUL2ZQRTEd2DDSqJ6gzFm4k/8bAXP6tn9grpWy0v/zN9B/Azje47TbafiziftOOEWXyEbMv60WOxB+0lHkrl4c1TOSI1r5RPsGNIdw8jo=
 
+
 addons:
   sauce_connect: true
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
 
 after_success: npm run coveralls
 
