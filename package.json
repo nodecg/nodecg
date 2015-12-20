@@ -51,7 +51,6 @@
   },
   "scripts": {
     "start": "node index.js",
-    "postinstall": "bower install",
     "pretest": "node test/setup/pretest",
     "test": "istanbul cover -x \"bundles/**\" -x \"test/**\" ./node_modules/mocha/bin/_mocha -- -R spec",
     "posttest": "node test/setup/posttest",
