@@ -11,12 +11,12 @@ var C = require('./setup/test-constants');
 before(function(done) {
     this.timeout(0);
 
-    if (C.CONFIG.login.enabled) {
+    if (C.CONFIG.login && C.CONFIG.login.enabled) {
         throw new Error('Login security is enabled! '
             + 'Please disable login security in cfg/nodecg.json before running tests');
     }
 
-    if (C.CONFIG.ssl.enabled) {
+    if (C.CONFIG.ssl && C.CONFIG.ssl.enabled) {
         throw new Error('SSL is enabled! Please disable SSL in cfg/nodecg.json before running tests');
     }
 
