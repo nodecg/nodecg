@@ -1,0 +1,9 @@
+{
+  "login": {
+    "enabled": true,
+    "sessionSecret": "secret",
+    "twitch": {
+      "enabled": true
+    }
+  }
+}
