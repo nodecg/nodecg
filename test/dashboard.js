@@ -1,7 +1,6 @@
 /* jshint -W030 */
 'use strict';
 
-var config = require(process.cwd() + '/lib/config').getConfig();
 var chai = require('chai');
 var expect = chai.expect;
 var e = require('./setup/test-environment');
@@ -16,7 +15,6 @@ describe('dashboard', function() {
                 .isExisting('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')
                 .then(function(isExisting) {
                     expect(isExisting).to.be.true;
-
                     done();
                 });
         });

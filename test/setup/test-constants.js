@@ -4,7 +4,7 @@ var path = require('path');
 var util = require('util');
 
 var rootDir = path.resolve(__dirname, '../..');
-var config = require(path.join(rootDir, '/lib/config')).getConfig();
+var config = require(path.join(rootDir, '/lib/config')).config;
 
 var bundleName          = 'test-bundle';
 var panelName           = 'test';
