@@ -2,6 +2,10 @@
 
 process.env.test = true;
 
+// Tell NodeCG to load a blank config file, to avoid any contamination.
+process.argv.push('--cfgPath');
+process.argv.push('./test/specimen/test.json');
+
 var fs = require('fs.extra');
 var webdriverio = require('webdriverio');
 var e = require('./setup/test-environment');
