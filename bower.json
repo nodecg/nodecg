@@ -35,7 +35,8 @@
     "paper-styles": "PolymerElements/paper-styles#^1.0.13",
     "paper-toast": "PolymerElements/paper-toast#^1.1.1",
     "paper-toolbar": "PolymerElements/paper-toolbar#^1.1.2",
-    "zeroclipboard": "~2.2.0"
+    "zeroclipboard": "~2.2.0",
+    "iron-collapse": "PolymerElements/iron-collapse#~1.0.5"
   },
   "license": "MIT",
   "private": true,
