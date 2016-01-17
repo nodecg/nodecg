@@ -12,6 +12,14 @@ module.exports = function(grunt) {
 
     var browserifyFiles = ['lib/api.js'];
 
+    var jsdocFiles = [
+        'lib/**/*.js',
+        '!lib/browser/dist/*.js',
+        '!lib/browser/shims/*.js',
+        'package.json',
+        'README.md'
+    ];
+
     var gruntConfig = {
         less: {
             compile: {
@@ -120,6 +128,22 @@ module.exports = function(grunt) {
                 options: {
                     debounceDelay: 250
                 }
+            },
+            documentation: {
+                files: jsdocFiles,
+                tasks: ['jsdoc'],
+                options: {
+                    debounceDelay: 250
+                }
+            }
+        },
+        jsdoc : {
+            dist : {
+                src: jsdocFiles,
+                dest: 'docs',
+                options: {
+                    configure: '.jsdoc.json'
+                }
             }
         }
     };
@@ -130,6 +154,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-jsdoc');
 
-    grunt.registerTask('default', ['less', 'jshint', 'browserify']);
+    grunt.registerTask('default', ['less', 'jshint', 'browserify', 'jsdoc']);
 };
