@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tutorial: package.json Manifest - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#.nearestElementWithAttribute">nearestElementWithAttribute</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Tutorial: package.json Manifest</h1>
+    
+
+    <section>
+
+<header>
+    
+
+    <h2>package.json Manifest</h2>
+</header>
+
+<article>
+    <p>Every bundle must have a <a href="https://docs.npmjs.com/files/package.json"><code>package.json</code></a>. In addition to the required fields
+like <code>name</code> and <code>version</code> outlined in that link, NodeCG bundles must also have a <code>nodecg</code> object in their <code>package.json</code>
+with some additional properties that tell NodeCG about the bundle and how to load it.</p>
+<p>The <code>nodecg</code> object in a bundle's <code>package.json</code> must follow this structure:</p>
+<pre class="prettyprint source"><code>{
+  &quot;name&quot;: &quot;example-bundle&quot;,
+  ...
+  &quot;nodecg&quot;: {
+    &quot;compatibleRange&quot;: &quot;~0.7.0&quot;,
+    &quot;bundleDependencies&quot;: {
+      &quot;other-bundle&quot;: &quot;^1.2.1&quot;
+    },
+    &quot;dashboardPanels&quot;: [
+      {
+        &quot;name&quot;: &quot;sample-panel&quot;,
+        &quot;title&quot;: &quot;Sample Panel&quot;,
+        &quot;width&quot;: 2,
+        &quot;headerColor&quot;: &quot;#2d4e8a&quot;,
+        &quot;file&quot;: &quot;sample-panel.html&quot;
+      },
+      {
+        &quot;name&quot;: &quot;sample-dialog&quot;,
+        &quot;title&quot;: &quot;Sample Dialog&quot;,
+        &quot;width&quot;: 2,
+        &quot;dialog&quot;: true,
+        &quot;dialogButtons&quot;: [
+          {
+            &quot;name&quot;: &quot;save&quot;,
+            &quot;type&quot;: &quot;confirm&quot;
+          },
+          {
+            &quot;name&quot;: &quot;cancel&quot;,
+            &quot;type&quot;: &quot;dismiss&quot;
+          }
+        ],
+        &quot;file&quot;: &quot;sample-dialog.html&quot;
+      }
+    ],
+    &quot;graphics&quot;: [
+      {
+        &quot;file&quot;: &quot;index.html&quot;,
+        &quot;width&quot;: 1280,
+        &quot;height&quot;: 720,
+        &quot;singleInstance&quot;: false
+      }
+    ]
+  }
+  ...
+}</code></pre><h2>nodecg.compatibleRange</h2><p>A <a href="http://semver.org/">semver</a> range that defines which version(s) of NodeCG this bundle is compatible with.
+This bundle will not load in NodeCG versions outside the specified range.</p>
+<p>This field is required.</p>
+<h2>nodecg.bundleDependencies</h2><p>Formatted identically to npm's <code>dependencies</code> field, but behaves differently.
+Bundles declared as <code>bundleDependencies</code> are not automatically installed.
+This field's only job is to ensure that dependant bundles are loaded first.
+In the above example, <code>other-bundle</code> would be loaded before <code>example-bundle</code>, and if <code>other-bundle</code> fails to load
+then so will <code>example-bundle</code>.</p>
+<p>This field is only required if your bundle makes use of <a href="NodeCG.html#extensions"><code>NodeCG#extensions</code></a>.</p>
+<h2>nodecg.dashboardPanels</h2><p>An array of objects, each object describing an individual dashboard panel or dialog.
+Every panel and dialog must have a <code>name</code>, <code>title</code>, and <code>file</code>. <code>file</code> is relative to the bundle's <code>dashboard</code> folder.
+<code>width</code> is optional, and defaults to <code>2</code>. The width scale is arbitrary and may change, 
+so you'll want to play around with this number to get the desired width.</p>
+<p>Panels also have an optional <code>headerColor</code> property that accepts a hex color string.</p>
+<p>To mark a panel as a dialog, it must have the <code>dialog</code> property set to <code>true</code>. Dialogs don't immediately display on the
+dashboard, and must be manually invoked. (<a href="http://i.imgur.com/xA4mDvF.png">Screenshot of an open dialog</a>)</p>
+<p>Dialogs have special buttons for confirmation and dismissal, which are defined in the <code>dialogButtons</code> property.
+There are only two types of dialogButton: <code>confirm</code> and <code>dismiss</code>. When one of these buttons is pressed, a 
+<code>dialog-confirmed</code> or <code>dialog-dismissed</code> event is emitted on the dialog's <code>document</code> to allow for easy handling with 
+less boilerplate.</p>
+<p>This field is only required if your bundle has dashboard panels.</p>
+<h2>nodecg.graphics</h2><p>An array of objects, each object describing a graphic.
+Each graphic must have a <code>file</code>, <code>width</code>, and <code>height</code>. <code>file</code> is relative to the bundle's <code>graphics</code> folder.
+If you wish to enforce that your graphic only ever be open in one place at a time, set <code>singleInstance</code> to <code>true</code>
+(defaults to <code>false</code>).</p>
+<p>This field is only required if your bundle has graphics.</p>
+</article>
+
+</section>
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Jan 18 2016 12:22:00 GMT-0600 (Central Standard Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

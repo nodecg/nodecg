@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tutorial: Performance Tips - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#.nearestElementWithAttribute">nearestElementWithAttribute</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Tutorial: Performance Tips</h1>
+    
+
+    <section>
+
+<header>
+    
+
+    <h2>Performance Tips</h2>
+</header>
+
+<article>
+    <h2>Minimize active <code>video</code> tags</h2><p>For animations that are always the same, pre-rendering them as webm video (which supports alpha transparency)
+is an option. However, care must be taken to remove these <code>video</code> nodes from the DOM when they are not in use.
+Even if a <code>video</code> tag is not currently playing, simply having it in the DOM can impact performance. For small,
+short animations, sprite sheets might be better suited.</p>
+<h2>Use sprite sheets when appropriate</h2><p>For short pre-rendered animations, a sprite sheet might be the best solution.
+If done right, they can be smaller in size and perform better than their <code>&lt;video&gt;</code> counterpart.
+There are many frameworks and tools out there for sprite sheet creation, but
+<a href="http://www.createjs.com/#!/EaselJS">EaselJS</a> (javascript framework) and
+<a href="https://www.codeandweb.com/texturepacker">TexturePacker</a> (sprite sheet creation program) are a good place to start.</p>
+<h2>A <code>&lt;div&gt;</code> is (generally) faster than a picture or video</h2><p>Videos and sprite sheets can be nice shortcuts to speed up production time, but if your graphic is
+struggling to maintain a solid framerate then you may need to consider breaking it down into smaller parts.
+A handful of <code>&lt;div&gt;</code>s will generally perform better than a video or sprite sheet, as long as you aren't
+applying too many performance-intensive CSS styles.</p>
+<h2>Minimize alpha pixels</h2><p>Alpha (transparency) is expensive to render. Try to keep your images and videos with alpha cropped as much as possible.</p>
+<h2>Avoid multiple CSS masks</h2><p><a href="http://www.html5rocks.com/en/tutorials/masking/adobe/">CSS masks</a> have their uses, but layering
+multiple masks in a scene can lead to significant performance reductions.
+When possible, use a culling <code>div</code> with <code>overflow: hidden</code> instead.</p>
+<h2>Compress your images</h2><p>Compressed images won't help framerate, but they will improve load times.
+Compressing your PNGs with a service such as <a href="https://tinypng.com/">TinyPNG</a> can result in dramatically
+reduced filesizes. Be careful when compressing images with subtle gradients, as some detail may be lost.</p>
+<h2>Keep <code>&lt;canvas&gt;</code> tags above 256x257 total pixels</h2><p>In Chrome, <code>&lt;canvas&gt;</code> tags are only hardware accelerated when their total size is at least 256x257 pixels.
+Below this size, canvases are software rasterized and can severely reduce the framerate and performance of a graphic.</p>
+<p>Sources:
+<a href="https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/NPSQdiXSK4w">1</a> 
+<a href="https://chromium.googlesource.com/external/Webkit/+/f10c2d38aefd143134545e397bc49c8e305d3ba8/Source/WebCore/page/Settings.cpp#133">2</a></p>
+</article>
+
+</section>
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Jan 18 2016 12:22:00 GMT-0600 (Central Standard Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
