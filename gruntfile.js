@@ -142,7 +142,6 @@ module.exports = function(grunt) {
                     'lib/**/*.js',
                     '!lib/browser/dist/*.js',
                     '!lib/browser/shims/*.js',
-                    'package.json',
                     'README.md'
                 ],
                 dest: 'docs',
@@ -150,6 +149,12 @@ module.exports = function(grunt) {
                     configure: '.jsdoc.json'
                 }
             }
+        },
+        'gh-pages': {
+            options: {
+                base: 'docs'
+            },
+            src: ['**']
         }
     };
 
@@ -160,6 +165,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-jsdoc');
+    grunt.loadNpmTasks('grunt-gh-pages');
 
     grunt.registerTask('default', ['less', 'jshint', 'browserify', 'jsdoc']);
 };

@@ -76,6 +76,7 @@
     "grunt-contrib-jshint": "^0.11.3",
     "grunt-contrib-less": "^1.0.1",
     "grunt-contrib-watch": "^0.6.1",
+    "grunt-gh-pages": "^1.0.0",
     "grunt-jsdoc": "^1.1.0",
     "inherits": "^2.0.1",
     "istanbul": "^0.4.1",
