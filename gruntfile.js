@@ -12,14 +12,6 @@ module.exports = function(grunt) {
 
     var browserifyFiles = ['lib/api.js'];
 
-    var jsdocFiles = [
-        'lib/**/*.js',
-        '!lib/browser/dist/*.js',
-        '!lib/browser/shims/*.js',
-        'package.json',
-        'README.md'
-    ];
-
     var gruntConfig = {
         less: {
             compile: {
@@ -130,7 +122,14 @@ module.exports = function(grunt) {
                 }
             },
             documentation: {
-                files: jsdocFiles,
+                files: [
+                    'lib/**/*.js',
+                    '!lib/browser/dist/*.js',
+                    '!lib/browser/shims/*.js',
+                    'tutorials/**/*',
+                    'package.json',
+                    'README.md'
+                ],
                 tasks: ['jsdoc'],
                 options: {
                     debounceDelay: 250
@@ -139,7 +138,13 @@ module.exports = function(grunt) {
         },
         jsdoc : {
             dist : {
-                src: jsdocFiles,
+                src: [
+                    'lib/**/*.js',
+                    '!lib/browser/dist/*.js',
+                    '!lib/browser/shims/*.js',
+                    'package.json',
+                    'README.md'
+                ],
                 dest: 'docs',
                 options: {
                     configure: '.jsdoc.json'

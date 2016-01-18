@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#.nearestElementWithAttribute">nearestElementWithAttribute</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#.nearestElementWithAttribute">nearestElementWithAttribute</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
 </nav>
 
 <div id="main">
@@ -61,7 +61,7 @@
 
 
 <div class="description">
-    <p>Creates a new NodeCG extension API instance. It should never be necessary to use this constructor in a bundle,
+    <p>Creates a new NodeCG API instance. It should never be necessary to use this constructor in a bundle,
 as NodeCG automatically injects a pre-made API instance.</p>
 </div>
 
@@ -206,7 +206,7 @@ as NodeCG automatically injects a pre-made API instance.</p>
 
 <div class="description">
     <p>An object containing references to all Replicants that have been declared in this <code>window</code>, sorted by bundle.
-I.e., <code>NodeCG.declaredReplicants.myBundle.myRep</code></p>
+E.g., <code>NodeCG.declaredReplicants.myBundle.myRep</code></p>
 </div>
 
 
@@ -244,7 +244,7 @@ I.e., <code>NodeCG.declaredReplicants.myBundle.myRep</code></p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line185">line 185</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line247">line 247</a>
     </li></ul></dd>
     
 
@@ -262,14 +262,14 @@ I.e., <code>NodeCG.declaredReplicants.myBundle.myRep</code></p>
 
         
             
-<h4 class="name" id="extensions"><span class="type-signature"></span>extensions<span class="type-signature"></span></h4>
+<h4 class="name" id="bundleConfig"><span class="type-signature"></span>bundleConfig<span class="type-signature"></span></h4>
 
 
 
 
 <div class="description">
-    <p><em>Extension only</em><br/>
-Object containing references to all other loaded extensions.</p>
+    <p>An object containing the parsed content of <code>cfg/&lt;bundle-name&gt;.json</code>, the contents of which
+are read once when NodeCG starts up. Used to quickly access per-bundle configuration properties.</p>
 </div>
 
 
@@ -355,7 +355,119 @@ Object containing references to all other loaded extensions.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line316">line 316</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line24">line 24</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="extensions"><span class="type-signature"></span>extensions<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p><em>Extension only</em><br/>
+Object containing references to all other loaded extensions. To access another bundle's extension,
+it <em>must</em> be declared as a <code>bundleDependency</code> in your bundle's <a href="tutorial-manifest.html"><code>package.json</code></a>.</p>
+</div>
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line428">line 428</a>
     </li></ul></dd>
     
 
@@ -508,7 +620,7 @@ Returns undefined if neither <code>startEl</code> nor any of its parents has the
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line244">line 244</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line356">line 356</a>
     </li></ul></dd>
     
 
@@ -667,7 +779,7 @@ Returns the specified dialog element.</p>
             
                 <td class="default">
                 
-                    CURRENT_BUNDLE_NAME
+                    CURR_BNDL
                 
                 </td>
             
@@ -713,7 +825,7 @@ Returns the specified dialog element.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line263">line 263</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line375">line 375</a>
     </li></ul></dd>
     
 
@@ -872,7 +984,7 @@ Returns the specified dialog's iframe document.</p>
             
                 <td class="default">
                 
-                    CURRENT_BUNDLE_NAME
+                    CURR_BNDL
                 
                 </td>
             
@@ -918,7 +1030,7 @@ Returns the specified dialog's iframe document.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line276">line 276</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line388">line 388</a>
     </li></ul></dd>
     
 
@@ -1019,7 +1131,7 @@ Gets the server Socket.IO context.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line287">line 287</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line399">line 399</a>
     </li></ul></dd>
     
 
@@ -1057,7 +1169,10 @@ Gets the server Socket.IO context.</p>
 
 
 <div class="description">
-    <p>Listens for a message.</p>
+    <p>Listens for a message, and invokes the provided callback each time the message is received.
+If any data was sent with the message, it will be passed to the callback.</p>
+<p>Messages are namespaced by bundle.
+To listen to a message in another bundle's namespace, provide it as the second argument.</p>
 </div>
 
 
@@ -1159,7 +1274,7 @@ Gets the server Socket.IO context.</p>
             
                 <td class="default">
                 
-                    CURRENT_BUNDLE_NAME
+                    CURR_BNDL
                 
                 </td>
             
@@ -1240,7 +1355,108 @@ Gets the server Socket.IO context.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line155">line 155</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line217">line 217</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>nodecg.listenFor('printMessage', function (message) {
+    console.log(message);
+});</code></pre>
+
+        <p class="code-caption">Listening to a message in another bundle's namespace:</p>
+    
+    <pre class="prettyprint"><code>nodecg.listenFor('printMessage', 'another-bundle', function (message) {
+    console.log(message);
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="log"><span class="type-signature"></span>log<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Provides access to NodeCG's logger, with the following methods. The logging level is set in <code>cfg/nodecg.json</code>,
+NodeCG's global config file.</p>
+<pre class="prettyprint source"><code>nodecg.log.trace('trace level logging');
+nodecg.log.debug('debug level logging');
+nodecg.log.info('info level logging');
+nodecg.log.warn('warn level logging');
+nodecg.log.error('error level logging');</code></pre>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line32">line 32</a>
     </li></ul></dd>
     
 
@@ -1324,7 +1540,7 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line295">line 295</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line407">line 407</a>
     </li></ul></dd>
     
 
@@ -1430,7 +1646,7 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
                 </td>
             
 
-            <td class="description last"><p>The name of the variable.</p></td>
+            <td class="description last"><p>The name of the replicant.</p></td>
         </tr>
 
     
@@ -1464,7 +1680,7 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
             
                 <td class="default">
                 
-                    CURRENT_BUNDLE_NAME
+                    CURR_BNDL
                 
                 </td>
             
@@ -1545,7 +1761,7 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line223">line 223</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line335">line 335</a>
     </li></ul></dd>
     
 
@@ -1570,6 +1786,382 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
 
 
 
+    <h5>Examples</h5>
+    
+        <p class="code-caption">From an extension:</p>
+    
+    <pre class="prettyprint"><code>// Extensions have immediate access to the database of Replicants.
+// For this reason, they can use readReplicant synchronously, without a callback.
+module.exports = function(nodecg) {
+    var myVal = nodecg.readReplicant('myVar', 'some-bundle');
+}</code></pre>
+
+        <p class="code-caption">From a graphic or dashboard panel:</p>
+    
+    <pre class="prettyprint"><code>// Graphics and dashboard panels must query the server to retrieve the value,
+// and therefore must provide a callback.
+nodecg.readSyncedVar('myVal', 'some-bundle', function(value) {
+    // I can use 'value' now!
+    console.log('myVar has the value '+ value +'!');
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="Replicant"><span class="type-signature"></span>Replicant<span class="signature">(name, bundle<span class="signature-attributes">opt</span>, opts<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Replicants are objcts which monitor changes to a variable's value.
+The changes are replicated across all extensions, graphics, and dashboard panels.
+When a Replicant changes in one of those places it is immediately updated in the rest,
+and a <code>change</code> event is emitted allowing bundles to react to the changes in the data.</p>
+<p>If a Replicant with a given name in a given bundle namespace has already been declared,
+the Replicant will automatically be assigned the existing value.</p>
+<p>Replicants must be declared in each context that wishes to use them. For instance,
+declaring a replicant in an extension does not automatically make it available in a graphic.
+The graphic must also declare it.</p>
+<p>By default Replicants will be saved to disk, meaning they will automatically be restored when NodeCG is restarted,
+such as after an unexpected crash.
+If you need to opt-out of this behaviour simply set <code>persistent: false</code> in the <code>opts</code> argument.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The name of the replicant.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>bundle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    CURR_BNDL
+                
+                </td>
+            
+
+            <td class="description last"><p>The bundle namespace to in which to look for this replicant.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The options for this replicant.</p>
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>defaultValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">mixed</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The default value to instantiate this Replicant with. The default value is only
+applied if this Replicant has not previously been declared and if it has no persisted value.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>persistent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether to persist the Replicant's value to disk on every change.
+Persisted values are re-loaded on startup.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line290">line 290</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>var myVar = nodecg.Replicant('myVar', {defaultValue: 123});
+
+myVar.on('change', function(oldValue, newValue) {
+    console.log('myVar changed from '+ oldValue +' to '+ newValue);
+});
+
+myVar.value = 'Hello!';
+myVar.value = {objects: 'work too!'};
+myVar.value = {objects: {can: {be: 'nested!'}}};
+myVar.value = ['Even', 'arrays', 'work!'];</code></pre>
+
+
 
         
             
@@ -1583,7 +2175,15 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
 
 
 <div class="description">
-    <p>Sends a message within the current bundle.</p>
+    <p>Sends a message with optional data within the current bundle.
+Messages can be sent from client to server, or server to client.</p>
+<p>Messages are namespaced by bundle. To send a message in another bundle's namespace,
+use <a href="NodeCG.html#sendMessageToBundle"><code>NodeCG#sendMessageToBundle</code></a>.</p>
+<p>If a message is sent from a client (graphic or dashboard panel), to the server (an extension),
+it may provide an optional callback called an <code>acknowledgement</code>.
+Acknowledgements will not work for client-to-client nor server-to-client messages.
+Only client-to-server messages support acknowledgements. This restriction is a limitation of
+<a href="http://socket.io/docs/#sending-and-getting-data-%28acknowledgements%29">Socket.IO</a>.</p>
 </div>
 
 
@@ -1753,7 +2353,7 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line104">line 104</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line150">line 150</a>
     </li></ul></dd>
     
 
@@ -1778,6 +2378,27 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
 
 
 
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Sending a normal message:</p>
+    
+    <pre class="prettyprint"><code>nodecg.sendMessage('printMessage', 'dope.');</code></pre>
+
+        <p class="code-caption">Sending a message and calling back with an acknowledgement:</p>
+    
+    <pre class="prettyprint"><code>// bundles/my-bundle/extension.js
+module.exports = function(nodecg) {
+    nodecg.listenFor('multiplyByTwo', function(value, callback) {
+         callback(value * 2);
+    });
+}
+
+// bundles/my-bundle/graphics/script.js
+nodecg.sendMessage('multiplyByTwo', 2, function(result) {
+    console.log(result); // Will eventually print '4'
+});</code></pre>
+
+
 
         
             
@@ -1791,7 +2412,8 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
 
 
 <div class="description">
-    <p>Sends a message to a specific bundle. Also available as a static method.</p>
+    <p>Sends a message to a specific bundle. Also available as a static method.
+See <a href="NodeCG.html#sendMessage"><code>NodeCG#sendMessage</code></a> for usage details.</p>
 </div>
 
 
@@ -1992,7 +2614,7 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line142">line 142</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line189">line 189</a>
     </li></ul></dd>
     
 
@@ -2036,7 +2658,7 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sun Jan 17 2016 01:11:52 GMT-0600 (Central Standard Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Jan 18 2016 11:27:25 GMT-0600 (Central Standard Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

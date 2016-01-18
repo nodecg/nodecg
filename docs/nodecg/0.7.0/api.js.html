@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#.nearestElementWithAttribute">nearestElementWithAttribute</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li></ul></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#.nearestElementWithAttribute">nearestElementWithAttribute</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
 </nav>
 
 <div id="main">
@@ -50,7 +50,7 @@ var replicator = require('./replicator');
 
 
 /**
- * Creates a new NodeCG extension API instance. It should never be necessary to use this constructor in a bundle,
+ * Creates a new NodeCG API instance. It should never be necessary to use this constructor in a bundle,
  * as NodeCG automatically injects a pre-made API instance.
  * @constructor
  * @param {object} bundle - The bundle object to build an API instance from.
@@ -60,9 +60,28 @@ function NodeCG(bundle, socket) {
 
     // Make bundle name and config publicly accessible
     this.bundleName = bundle.name;
+
+    /**
+     * An object containing the parsed content of `cfg/&lt;bundle-name>.json`, the contents of which
+     * are read once when NodeCG starts up. Used to quickly access per-bundle configuration properties.
+     * @property {Object}
+     * @name NodeCG#bundleConfig
+     */
     this.bundleConfig = bundle.config;
 
-    // Make logger publicly accessible
+    /**
+     * Provides access to NodeCG's logger, with the following methods. The logging level is set in `cfg/nodecg.json`,
+     * NodeCG's global config file.
+     * ```
+     * nodecg.log.trace('trace level logging');
+     * nodecg.log.debug('debug level logging');
+     * nodecg.log.info('info level logging');
+     * nodecg.log.warn('warn level logging');
+     * nodecg.log.error('error level logging');
+     * ```
+     * @function {Object}
+     * @name NodeCG#log
+     */
     this.log = require('./logger')(bundle.name);
 
     this._messageHandlers = [];
@@ -135,11 +154,38 @@ function NodeCG(bundle, socket) {
 // ###NodeCG prototype
 
 /**
- * Sends a message within the current bundle.
+ * Sends a message with optional data within the current bundle.
+ * Messages can be sent from client to server, or server to client.
+ *
+ * Messages are namespaced by bundle. To send a message in another bundle's namespace,
+ * use {@link NodeCG#sendMessageToBundle}.
+ *
+ * If a message is sent from a client (graphic or dashboard panel), to the server (an extension),
+ * it may provide an optional callback called an `acknowledgement`.
+ * Acknowledgements will not work for client-to-client nor server-to-client messages.
+ * Only client-to-server messages support acknowledgements. This restriction is a limitation of
+ * [Socket.IO](http://socket.io/docs/#sending-and-getting-data-%28acknowledgements%29).
+ *
  * @param {string} messageName - The name of the message.
  * @param {mixed} [data] - The data to send.
  * @param {function} [cb] - _Browser only_ The callback to handle the server's
  * [acknowledgement](http://socket.io/docs/#sending-and-getting-data-%28acknowledgements%29) message, if any.
+ *
+ * @example &lt;caption>Sending a normal message:&lt;/caption>
+ * nodecg.sendMessage('printMessage', 'dope.');
+ *
+ * @example &lt;caption>Sending a message and calling back with an acknowledgement:&lt;/caption>
+ * // bundles/my-bundle/extension.js
+ * module.exports = function(nodecg) {
+ *     nodecg.listenFor('multiplyByTwo', function(value, callback) {
+ *          callback(value * 2);
+ *     });
+ * }
+ *
+ * // bundles/my-bundle/graphics/script.js
+ * nodecg.sendMessage('multiplyByTwo', 2, function(result) {
+ *     console.log(result); // Will eventually print '4'
+ * });
  */
 NodeCG.prototype.sendMessage = function (messageName, data, cb) {
     if (typeof cb === 'undefined' &amp;&amp; typeof data === 'function') {
@@ -173,6 +219,7 @@ NodeCG.sendMessageToBundle = function (messageName, bundleName, data, cb) {
 
 /**
  * Sends a message to a specific bundle. Also available as a static method.
+ * See {@link NodeCG#sendMessage} for usage details.
  * @param {string} messageName - The name of the message.
  * @param {string} bundleName - The name of the target bundle.
  * @param {mixed} [data] - The data to send.
@@ -187,10 +234,25 @@ NodeCG.prototype.sendMessageToBundle = function (messageName, bundleName, data, 
 };
 
 /**
- * Listens for a message.
+ * Listens for a message, and invokes the provided callback each time the message is received.
+ * If any data was sent with the message, it will be passed to the callback.
+ *
+ * Messages are namespaced by bundle.
+ * To listen to a message in another bundle's namespace, provide it as the second argument.
+ *
  * @param {string} messageName - The name of the message.
- * @param {string} [bundleName=CURRENT_BUNDLE_NAME] - The bundle namespace to in which to listen for this message
+ * @param {string} [bundleName=CURR_BNDL] - The bundle namespace to in which to listen for this message
  * @param {function} handler - The callback fired when this message is received.
+ *
+ * @example
+ * nodecg.listenFor('printMessage', function (message) {
+ *     console.log(message);
+ * });
+ *
+ * @example &lt;caption>Listening to a message in another bundle's namespace:&lt;/caption>
+ * nodecg.listenFor('printMessage', 'another-bundle', function (message) {
+ *     console.log(message);
+ * });
  */
 NodeCG.prototype.listenFor = function (messageName, bundleName, handler) {
     if (typeof handler === 'undefined') {
@@ -220,7 +282,7 @@ NodeCG.prototype.listenFor = function (messageName, bundleName, handler) {
 
 /**
  * An object containing references to all Replicants that have been declared in this `window`, sorted by bundle.
- * I.e., `NodeCG.declaredReplicants.myBundle.myRep`
+ * E.g., `NodeCG.declaredReplicants.myBundle.myRep`
  */
 NodeCG.declaredReplicants = Replicant.declaredReplicants;
 
@@ -228,6 +290,43 @@ NodeCG.Replicant = function(name, bundle, opts) {
     return new Replicant(name, bundle, opts, process.env.browser ? window.socket : null);
 };
 
+/**
+ * Replicants are objcts which monitor changes to a variable's value.
+ * The changes are replicated across all extensions, graphics, and dashboard panels.
+ * When a Replicant changes in one of those places it is immediately updated in the rest,
+ * and a `change` event is emitted allowing bundles to react to the changes in the data.
+ *
+ * If a Replicant with a given name in a given bundle namespace has already been declared,
+ * the Replicant will automatically be assigned the existing value.
+ *
+ * Replicants must be declared in each context that wishes to use them. For instance,
+ * declaring a replicant in an extension does not automatically make it available in a graphic.
+ * The graphic must also declare it.
+ *
+ * By default Replicants will be saved to disk, meaning they will automatically be restored when NodeCG is restarted,
+ * such as after an unexpected crash.
+ * If you need to opt-out of this behaviour simply set `persistent: false` in the `opts` argument.
+ *
+ * @param {string} name - The name of the replicant.
+ * @param {string} [bundle=CURR_BNDL] - The bundle namespace to in which to look for this replicant.
+ * @param {object} [opts] - The options for this replicant.
+ * @param {mixed} [opts.defaultValue] - The default value to instantiate this Replicant with. The default value is only
+ * applied if this Replicant has not previously been declared and if it has no persisted value.
+ * @param {boolean} [opts.persistent=true] - Whether to persist the Replicant's value to disk on every change.
+ * Persisted values are re-loaded on startup.
+ *
+ * @example
+ * var myVar = nodecg.Replicant('myVar', {defaultValue: 123});
+ *
+ * myVar.on('change', function(oldValue, newValue) {
+ *     console.log('myVar changed from '+ oldValue +' to '+ newValue);
+ * });
+ *
+ * myVar.value = 'Hello!';
+ * myVar.value = {objects: 'work too!'};
+ * myVar.value = {objects: {can: {be: 'nested!'}}};
+ * myVar.value = ['Even', 'arrays', 'work!'];
+ */
 NodeCG.prototype.Replicant = function(name, bundle, opts) {
     if (!bundle || typeof bundle !== 'string') {
         opts = bundle;
@@ -256,9 +355,22 @@ NodeCG.readReplicant = function(name, bundle, cb) {
 
 /**
  * Reads the value of a replicant once, and doesn't create a subscription to it. Also available as a static method.
- * @param {string} name - The name of the variable.
- * @param {string} [bundle=CURRENT_BUNDLE_NAME] - The bundle namespace to in which to look for this replicant.
+ * @param {string} name - The name of the replicant.
+ * @param {string} [bundle=CURR_BNDL] - The bundle namespace to in which to look for this replicant.
  * @param {function} cb - _Browser only_ The callback that handles the server's response which contains the value.
+ * @example &lt;caption>From an extension:&lt;/caption>
+ * // Extensions have immediate access to the database of Replicants.
+ * // For this reason, they can use readReplicant synchronously, without a callback.
+ * module.exports = function(nodecg) {
+ *     var myVal = nodecg.readReplicant('myVar', 'some-bundle');
+ * }
+ * @example &lt;caption>From a graphic or dashboard panel:&lt;/caption>
+ * // Graphics and dashboard panels must query the server to retrieve the value,
+ * // and therefore must provide a callback.
+ * nodecg.readSyncedVar('myVal', 'some-bundle', function(value) {
+ *     // I can use 'value' now!
+ *     console.log('myVar has the value '+ value +'!');
+ * });
  */
 NodeCG.prototype.readReplicant = function(name, bundle, cb) {
     if (!bundle || typeof bundle !== 'string') {
@@ -297,7 +409,7 @@ if (process.env.browser) {
      * _Browser only_&lt;br/>
      * Returns the specified dialog element.
      * @param {string} name - The desired dialog's name.
-     * @param {string} [bundle=CURRENT_BUNDLE_NAME] - The bundle from which to select the dialog.
+     * @param {string} [bundle=CURR_BNDL] - The bundle from which to select the dialog.
      * @returns {object}
      */
     NodeCG.prototype.getDialog = function(name, bundle) {
@@ -310,7 +422,7 @@ if (process.env.browser) {
      * _Browser only_&lt;br/>
      * Returns the specified dialog's iframe document.
      * @param {string} name - The desired dialog's name.
-     * @param {string} [bundle=CURRENT_BUNDLE_NAME] - The bundle from which to select the dialog.
+     * @param {string} [bundle=CURR_BNDL] - The bundle from which to select the dialog.
      * @returns {object}
      */
     NodeCG.prototype.getDialogDocument = function(name, bundle) {
@@ -355,7 +467,8 @@ if (process.env.browser) {
 
     /**
      * _Extension only_&lt;br/>
-     * Object containing references to all other loaded extensions.
+     * Object containing references to all other loaded extensions. To access another bundle's extension,
+     * it _must_ be declared as a `bundleDependency` in your bundle's [`package.json`]{@tutorial manifest}.
      * @property {Object}
      * @name NodeCG#extensions
      */
@@ -380,7 +493,7 @@ module.exports = NodeCG;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sun Jan 17 2016 01:11:52 GMT-0600 (Central Standard Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Jan 18 2016 11:27:25 GMT-0600 (Central Standard Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
