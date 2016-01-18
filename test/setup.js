@@ -2,6 +2,10 @@
 
 process.env.test = true;
 
+// Tell NodeCG to load a blank config file, to avoid any contamination.
+process.argv.push('--cfgPath');
+process.argv.push('./test/specimen/test.json');
+
 var fs = require('fs.extra');
 var webdriverio = require('webdriverio');
 var e = require('./setup/test-environment');
@@ -11,19 +15,21 @@ var C = require('./setup/test-constants');
 before(function(done) {
     this.timeout(0);
 
-    if (C.CONFIG.login.enabled) {
+    if (C.CONFIG.login && C.CONFIG.login.enabled) {
         throw new Error('Login security is enabled! '
             + 'Please disable login security in cfg/nodecg.json before running tests');
     }
 
-    if (C.CONFIG.ssl.enabled) {
+    if (C.CONFIG.ssl && C.CONFIG.ssl.enabled) {
         throw new Error('SSL is enabled! Please disable SSL in cfg/nodecg.json before running tests');
     }
 
     // clientApi & extensionApi setup
     fs.mkdirpSync('./db/replicants/test-bundle/');
     fs.writeFileSync('./db/replicants/test-bundle/clientPersistence.rep', '"it work good!"');
+    fs.writeFileSync('./db/replicants/test-bundle/clientFalseyRead.rep', '0');
     fs.writeFileSync('./db/replicants/test-bundle/extensionPersistence.rep', '"it work good!"');
+    fs.writeFileSync('./db/replicants/test-bundle/extensionFalseyRead.rep', '0');
 
     e.server.once('started', function() {
         /** Extension API setup **/
@@ -37,6 +43,9 @@ before(function(done) {
                 tags: [process.env.TRAVIS_BRANCH, process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE],
                 browserName: 'chrome',
                 version: 'beta',
+                chromeOptions: {
+                    args: ['--disable-popup-blocking']
+                },
                 tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
             };
 
@@ -50,8 +59,7 @@ before(function(done) {
 
             if (process.env.TRAVIS_OS_NAME === 'linux') {
                 desiredCapabilities.platform = 'Linux';
-            }
-            else if (process.env.TRAVIS_OS_NAME === 'osx') {
+            } else if (process.env.TRAVIS_OS_NAME === 'osx') {
                 desiredCapabilities.platform = 'OS X 10.10';
             }
 
@@ -73,38 +81,34 @@ before(function(done) {
 
         e.browser.client
             .init()
-            .timeoutsAsyncScript(10000)
+            .timeoutsAsyncScript(30000)
             .newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
-            .getCurrentTabId(function(err, tabId) {
-                if (err) throw err;
+            .getCurrentTabId()
+            .then(function(tabId) {
                 e.browser.tabs.dashboard = tabId;
             })
             .executeAsync(function(done) {
                 var checkForApi;
-                checkForApi = setInterval(function(done) {
+                checkForApi = setInterval(function() {
                     if (typeof window.dashboardApi !== 'undefined') {
                         clearInterval(checkForApi);
                         done();
                     }
-                }, 50, done);
-            }, function(err) {
-                if (err) throw err;
+                }, 50);
             })
-            .newWindow(C.VIEW_URL, 'NodeCG test bundle view', '')
-            .getCurrentTabId(function(err, tabId) {
-                if (err) throw err;
-                e.browser.tabs.view = tabId;
+            .newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '')
+            .getCurrentTabId()
+            .then(function(tabId) {
+                e.browser.tabs.graphic = tabId;
             })
             .executeAsync(function(done) {
                 var checkForApi;
-                checkForApi = setInterval(function(done) {
-                    if (typeof window.viewApi !== 'undefined') {
+                checkForApi = setInterval(function() {
+                    if (typeof window.graphicApi !== 'undefined') {
                         clearInterval(checkForApi);
                         done();
                     }
-                }, 50, done);
-            }, function(err) {
-                if (err) throw err;
+                }, 50);
             })
             .timeoutsAsyncScript(5000)
             .call(done);

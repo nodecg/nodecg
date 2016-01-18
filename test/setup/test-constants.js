@@ -4,16 +4,19 @@ var path = require('path');
 var util = require('util');
 
 var rootDir = path.resolve(__dirname, '../..');
-var config = require(path.join(rootDir, '/lib/config')).getConfig();
+var config = require(path.join(rootDir, '/lib/config')).config;
 
 var bundleName          = 'test-bundle';
+var panelName           = 'test';
 var testBundleSrcPath   = path.resolve(rootDir, 'test/setup/', bundleName);
 var bundleDir           = path.resolve(rootDir, 'bundles', bundleName);
 var cfgDir              = path.resolve(rootDir, 'cfg');
 var bundleCfgPath       = path.resolve(cfgDir, bundleName + '.json');
 var dashboardUrl        = util.format('http://%s/', config.baseURL);
-var dashboardBundleUrl  = dashboardUrl + 'dashboard/' + bundleName;
-var viewUrl             = dashboardUrl + 'view/' + bundleName;
+var testPanelUrl        = dashboardUrl + 'panel/' + bundleName + '/' + panelName;
+var panelComponentsUrl  = dashboardUrl + 'panel/' + bundleName + '/components';
+var graphicUrl          = dashboardUrl + 'graphics/' + bundleName;
+var singleInstanceUrl   = dashboardUrl + 'graphics/' + bundleName + '/single_instance.html';
 
 module.exports = {
     BUNDLE_NAME: bundleName,
@@ -22,7 +25,9 @@ module.exports = {
     CFG_DIR: cfgDir,
     BUNDLE_CFG_PATH: bundleCfgPath,
     DASHBOARD_URL: dashboardUrl,
-    DASHBOARD_BUNDLE_URL: dashboardBundleUrl,
-    VIEW_URL: viewUrl,
+    TEST_PANEL_URL: testPanelUrl,
+    PANEL_COMPONENTS_URL: panelComponentsUrl,
+    GRAPHIC_URL: graphicUrl,
+    SINGLE_INSTANCE_URL: singleInstanceUrl,
     CONFIG: config
 };

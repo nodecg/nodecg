@@ -28,5 +28,8 @@ node_modules/
 /bundles2
 /bundles_off
 
+# Compiled docs
+docs
+
 # Don't ignore .empty_directory files
 !.empty_directory

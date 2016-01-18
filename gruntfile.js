@@ -3,10 +3,6 @@
 var istanbul = require('browserify-istanbul');
 
 module.exports = function(grunt) {
-    var lessFiles = {
-        'lib/dashboard/src/dashboard.less': 'lib/dashboard/public/dashboard.css'
-    };
-
     var jshintFiles = [
         'index.js',
         'lib/**/*.js',
@@ -19,7 +15,10 @@ module.exports = function(grunt) {
     var gruntConfig = {
         less: {
             compile: {
-                files: lessFiles
+                files: {
+                    'lib/dashboard/public/dashboard.css': 'lib/dashboard/src/dashboard.less',
+                    'lib/dashboard/public/style/nodecg-defaults.css': 'lib/dashboard/src/nodecg-defaults.less'
+                }
             }
         },
         jshint: {
@@ -47,7 +46,8 @@ module.exports = function(grunt) {
                         ['aliasify', {
                             aliases: {
                                 './logger': './lib/browser/logger',
-                                './replicant': './lib/browser/replicant'
+                                './replicant': './lib/browser/replicant',
+                                './config': './lib/browser/config'
                             },
                             verbose: false
                         }],
@@ -76,7 +76,8 @@ module.exports = function(grunt) {
                         ['aliasify', {
                             aliases: {
                                 './logger': './lib/browser/logger',
-                                './replicant': './lib/browser/replicant'
+                                './replicant': './lib/browser/replicant',
+                                './config': './lib/browser/config'
                             },
                             verbose: false
                         }],
@@ -97,7 +98,10 @@ module.exports = function(grunt) {
         },
         watch: {
             stylesheets: {
-                files: lessFiles,
+                files: [
+                    'lib/dashboard/src/dashboard.less',
+                    'lib/dashboard/src/nodecg-defaults.less'
+                ],
                 tasks: ['less'],
                 options: {
                     debounceDelay: 250
@@ -116,7 +120,42 @@ module.exports = function(grunt) {
                 options: {
                     debounceDelay: 250
                 }
+            },
+            documentation: {
+                files: [
+                    'lib/**/*.js',
+                    '!lib/browser/dist/*.js',
+                    '!lib/browser/shims/*.js',
+                    'tutorials/**/*',
+                    'package.json',
+                    'README.md'
+                ],
+                tasks: ['jsdoc'],
+                options: {
+                    debounceDelay: 250
+                }
             }
+        },
+        jsdoc : {
+            dist : {
+                src: [
+                    'lib/**/*.js',
+                    '!lib/browser/dist/*.js',
+                    '!lib/browser/shims/*.js',
+                    'README.md'
+                ],
+                dest: 'docs',
+                options: {
+                    configure: '.jsdoc.json'
+                }
+            }
+        },
+        'gh-pages': {
+            options: {
+                base: 'docs',
+                add: true
+            },
+            src: ['**']
         }
     };
 
@@ -126,6 +165,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-jsdoc');
+    grunt.loadNpmTasks('grunt-gh-pages');
 
-    grunt.registerTask('default', ['less', 'jshint', 'browserify']);
+    grunt.registerTask('default', ['less', 'jshint', 'browserify', 'jsdoc']);
 };

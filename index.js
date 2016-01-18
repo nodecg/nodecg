@@ -1,5 +1,11 @@
 'use strict';
 
+if (process.cwd() !== __dirname) {
+    console.warn('[nodecg] process.cwd is %s, expected %s', process.cwd(), __dirname);
+    process.chdir(__dirname);
+    console.info('[nodecg] Changed process.cwd to %s', __dirname);
+}
+
 process.on('uncaughtException', function(err) {
     console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
     console.error(err.stack);
