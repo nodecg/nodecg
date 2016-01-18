@@ -2,8 +2,7 @@
 
 For animations that are always the same, pre-rendering them as webm video (which supports alpha transparency)
 is an option. However, care must be taken to remove these `video` nodes from the DOM when they are not in use.
-Even if a `video` tag is not currently playing, simply having it in the DOM can impact performance. For small,
-short animations, sprite sheets might be better suited.
+Even if a `video` tag is not currently playing, simply having it in the DOM can impact performance.
 
 ## Use sprite sheets when appropriate
 
