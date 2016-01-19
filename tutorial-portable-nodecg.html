@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Making Dashboard Dialogs - Documentation</title>
+    <title>Tutorial: Portable NodeCG - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Tutorial: Making Dashboard Dialogs</h1>
+    <h1 class="page-title">Tutorial: Portable NodeCG</h1>
     
 
     <section>
@@ -36,34 +36,23 @@
 <header>
     
 
-    <h2>Making Dashboard Dialogs</h2>
+    <h2>Portable NodeCG</h2>
 </header>
 
 <article>
-    <p>Starting with NodeCG 0.7, all dashboard panels are iframes. This was done to provide full code and style encapsulation,
-eliminating the need for bundle authors to worry about what they are putting into the global scope with their panel.
-However, because every panel is an iframe, it is not possible for a panel to draw anything outside of its bounding box.
-This limitation made having dialogs and modals impossible, among other things. To address this, we created a dedicated
-system for displaying dialogs.</p>
-<p>A dialog is defined the same as any other dashboard panel would be in <a href="tutorial-manifest.html">package.json</a>, with an
-additional <code>dialog: true</code> property.</p>
-<h2>Opening dialogs</h2><p>To open a dialog, add a <code>nodecg-dialog</code> attribute to any clickable element on one of your panels. For example, this
-<code>&lt;paper-button&gt;</code> element will open the <code>edit-total</code> dialog when clicked:</p>
-<pre class="prettyprint source lang-html"><code>&lt;paper-button id=&quot;edit&quot; class=&quot;nodecg-configure&quot; nodecg-dialog=&quot;edit-total&quot;>Edit...&lt;/paper-button></code></pre><h2>Closing dialogs</h2><p>By default, a dialog can only be closed by clicking outside of it. Optional confirmation and dismissal buttons can be
-added via <code>package.json</code>. See the <a href="tutorial-manifest.html">package.json tutorial</a> for information on the <code>dialogButtons</code>
-property.</p>
-<p>When a <code>confirm</code> or <code>dismiss</code> button is pressed, NodeCG will emit a <code>dialog-confirmed</code> or <code>dialog-dismissed</code> event
-on your dialog's `document. For example:</p>
-<pre class="prettyprint source lang-html"><code>// bundles/my-bundle/dashboard/my-dialog.html
-&lt;script>
-    document.addEventListener('dialog-confirmed', function() {
-        // The user pressed the confirm button.
-    });
-
-    document.addEventListener('dialog-dismissed', function() {
-        // The user pressed the dismiss button.
-    });
-&lt;/script></code></pre>
+    <p>By bundling the main Node.js executable (<code>node.exe</code>) with a NodeCG instance, NodeCG can run from any folder without
+an installation process.</p>
+<ol>
+<li>To start, your NodeCG instance must be fully installed and configured. This means that all <code>npm</code> and <code>bower</code> dependencies
+for both NodeCG and all bundles should be installed. Run the instance once and make sure everything works before continuing.</li>
+<li>Once you have verified that the instance works and that all dependencies are installed, copy <code>node.exe</code> from your Node.js
+installation into the root of your NodeCG instance.</li>
+<li>In the same directory, create a batch file or shell script with the following content:<pre class="prettyprint source"><code>node index.js</code></pre></li>
+<li>Double-click that batch file/shell script to run NodeCG.</li>
+</ol>
+<p>With the above procedure, it is possibly to fully configure a NodeCG instance and put it on a USB stick that can be
+run on any PC. This is good for preparing for broadcasts ahead of time where the broadcast PC might not have Node.js, 
+git, and a compiler chain installed.</p>
 </article>
 
 </section>
