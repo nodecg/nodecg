@@ -29,7 +29,7 @@ on your dialog's `document. For example:
         // The user pressed the confirm button.
     });
     
-     document.addEventListener('dialog-dismissed', function() {
+    document.addEventListener('dialog-dismissed', function() {
         // The user pressed the dismiss button.
     });
 </script>
