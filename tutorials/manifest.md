@@ -76,7 +76,8 @@ so you'll want to play around with this number to get the desired width.
 Panels also have an optional `headerColor` property that accepts a hex color string.
 
 To mark a panel as a dialog, it must have the `dialog` property set to `true`. Dialogs don't immediately display on the
-dashboard, and must be manually invoked. ([Screenshot of an open dialog](http://i.imgur.com/xA4mDvF.png))
+dashboard, and must be manually invoked. See {@tutorial making-dialogs} for more info. 
+([Screenshot of an open dialog](http://i.imgur.com/xA4mDvF.png))
 
 Dialogs have special buttons for confirmation and dismissal, which are defined in the `dialogButtons` property.
 There are only two types of dialogButton: `confirm` and `dismiss`. When one of these buttons is pressed, a 

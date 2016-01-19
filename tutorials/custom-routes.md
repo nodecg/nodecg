@@ -8,7 +8,7 @@ var app = express();
 
 module.exports = function(nodecg) {
     app.get('/my-bundle/customroute', function(req, res) {
-      res.send('OK!');
+        res.send('OK!');
     });
 
     nodecg.mount(app); // The route '/my-bundle/customroute` is now available

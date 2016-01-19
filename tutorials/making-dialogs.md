@@ -9,7 +9,7 @@ additional `dialog: true` property.
 
 ## Opening dialogs
 To open a dialog, add a `nodecg-dialog` attribute to any clickable element on one of your panels. For example, this
-`<paper-button>` element will open the `edit-total` dialog when clicked:
+[`<paper-button>`](https://elements.polymer-project.org/elements/paper-button) element will open the `edit-total` dialog when clicked:
 ```html
 <paper-button id="edit" class="nodecg-configure" nodecg-dialog="edit-total">Edit...</paper-button>
 ```
@@ -20,7 +20,7 @@ added via `package.json`. See the [package.json tutorial]{@tutorial manifest} fo
 property.
 
 When a `confirm` or `dismiss` button is pressed, NodeCG will emit a `dialog-confirmed` or `dialog-dismissed` event
-on your dialog's `document. For example:
+on your dialog's `document`. For example:
 
 ```html
 // bundles/my-bundle/dashboard/my-dialog.html
