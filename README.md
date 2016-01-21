@@ -13,7 +13,7 @@ Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nodecg/nodecg)
 
 ## Installation
-Install [node.js & npm](http://nodejs.org/).  
+Install [node.js (version 4 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
 Then, run the following commands:
 ```
 git clone https://github.com/nodecg/nodecg.git
