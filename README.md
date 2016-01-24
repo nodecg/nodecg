@@ -19,6 +19,7 @@ Then, run the following commands:
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
 npm install --production
+bower install
 node index.js
 ```
 
