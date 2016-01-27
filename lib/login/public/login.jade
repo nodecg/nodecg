@@ -17,9 +17,9 @@ html(lang="en")
                         strong Access denied!
                         br
                         | Your account is not in the whitelist
-                if config.login.steam.enabled
+                if config.login.steam && config.login.steam.enabled
                     a(href='/login/steam')
                         img(src='/login/signin_steam.png')
-                if config.login.twitch.enabled
+                if config.login.twitch && config.login.twitch.enabled
                     a(href='/login/twitch')
                         img(src='/login/signin_twitch.png')
