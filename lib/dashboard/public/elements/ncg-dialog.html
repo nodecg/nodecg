@@ -69,6 +69,13 @@ Lange - 1/28/2016
             'iron-overlay-closed': '_onIronOverlayClosed'
         },
 
+        attached: function () {
+            var iframe = Polymer.dom(this).querySelector('iframe');
+            iframe.addEventListener('iframe-resized', function() {
+                this.refit();
+            }.bind(this));
+        },
+
         _renderOpened: function() {
             if (this.withBackdrop) {
                 this.backdropElement.open();
