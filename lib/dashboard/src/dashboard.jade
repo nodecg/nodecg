@@ -132,9 +132,6 @@ html(lang='en')
                         ncg-dialog(class='dashboard-panel width-' + panel.width, with-backdrop,
                         id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
                             h2=panel.title
-                            paper-dialog-scrollable
-                                iframe(src='/panel/#{bundle.name}/#{panel.name}',frameborder='0',
-                                scrolling='no', style='width: 100%')
                             if panel.dialogButtons
                                 div.buttons
                                     each button in panel.dialogButtons
@@ -144,6 +141,9 @@ html(lang='en')
                                             paper-button(dialog-dismiss)=button.name
                                         else
                                             paper-button=button.name
+                            paper-dialog-scrollable
+                                iframe(src='/panel/#{bundle.name}/#{panel.name}',frameborder='0',
+                                scrolling='no', style='width: 100%')
         //- Used by packery to establish the width of the columns
         #grid-sizer(class="width-1")
 
