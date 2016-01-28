@@ -66,10 +66,12 @@ html(lang='en')
                 window.socket = io.connect('//' + window.ncgConfig.baseURL + '/');
             }
 
-        //- custom styles for Polymer
+        //- Set the default color of many polymer elements.
+            Newer elements use --primary-color, older elements use --default-primary-color.
         style(is='custom-style').
             * {
                 --default-primary-color: #00bebe;
+                --primary-color: #00bebe;
             }
 
         //- Set up app routing
