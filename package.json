@@ -85,5 +85,8 @@
     "mocha-lcov-reporter": "0.0.1",
     "webdriverio": "^2.4.5",
     "wrench": "^1.5.8"
+  },
+  "publishConfig": {
+    "tag": "0.6.x"
   }
 }
