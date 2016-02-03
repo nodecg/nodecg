@@ -82,7 +82,7 @@
     "inherits": "^2.0.1",
     "istanbul": "^0.4.1",
     "jsdoc": "^3.4.0",
-    "minami": "^1.1.1",
+    "minami": "github:nodecg/minami",
     "minifyify": "^7.1.0",
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "0.0.1",
