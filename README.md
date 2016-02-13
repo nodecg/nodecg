@@ -69,6 +69,8 @@ Each NodeCG graphic is called a _bundle_. A bundle has one or more of the follow
 
 A bundle can have multiple graphics and dashboard panels, and an extension can be split up into multiple files.
 
+If you wish to quickly start a new bundle from a template, try [generator-nodecg](https://github.com/nodecg/generator-nodecg).
+
 ## Graphics
 
 Graphics are, as the name implies, the actual graphics intended for broadcast. 
