@@ -3,13 +3,13 @@
 
 var express = require('express');
 
-module.exports = function(nodecg) {
-    var app = express();
-    app.get('/test-bundle/test-route', function(req, res) {
-        res.sendStatus(200);
-    });
+module.exports = function (nodecg) {
+	var app = express();
+	app.get('/test-bundle/test-route', function (req, res) {
+		res.sendStatus(200);
+	});
 
-    nodecg.mount(app);
+	nodecg.mount(app);
 
-    return nodecg;
+	return nodecg;
 };

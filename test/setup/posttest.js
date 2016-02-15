@@ -6,15 +6,15 @@ var wrench = require('wrench');
 var C = require('./test-constants');
 
 try {
-    fs.unlinkSync(C.BUNDLE_CFG_PATH);
-    wrench.rmdirSyncRecursive(C.BUNDLE_DIR);
+	fs.unlinkSync(C.BUNDLE_CFG_PATH);
+	wrench.rmdirSyncRecursive(C.BUNDLE_DIR);
 } catch (e) {
-    if (fs.existsSync(C.BUNDLE_DIR)) {
-        try {
-            fs.unlinkSync(C.BUNDLE_DIR);
-        } catch (e) {
-            console.warn('Couldn\'t clean up test bundle files');
-        }
-    }
+	if (fs.existsSync(C.BUNDLE_DIR)) {
+		try {
+			fs.unlinkSync(C.BUNDLE_DIR);
+		} catch (e) {
+			console.warn('Couldn\'t clean up test bundle files');
+		}
+	}
 }
 

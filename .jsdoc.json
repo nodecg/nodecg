@@ -1,20 +1,33 @@
 {
-  "tags": {
-    "allowUnknownTags": true,
-    "dictionaries": ["jsdoc"]
-  },
-  "plugins": [
-    "plugins/markdown"
-  ],
-  "templates": {
-    "cleverLinks": false,
-    "monospaceLinks": true
-  },
-  "opts": {
-    "encoding": "utf8",
-    "private": true,
-    "recurse": true,
-    "template": "./node_modules/minami",
-    "tutorials": "./tutorials"
-  }
+	"source": {
+		"include": [
+			"./lib",
+			"./README.md"
+		],
+		"exclude": [
+			"./lib/browser/dist",
+			"./lib/browser/shims"
+		]
+	},
+	"tags": {
+		"allowUnknownTags": true,
+		"dictionaries": [
+			"jsdoc"
+		]
+	},
+	"plugins": [
+		"plugins/markdown"
+	],
+	"templates": {
+		"cleverLinks": false,
+		"monospaceLinks": true
+	},
+	"opts": {
+		"encoding": "utf8",
+		"private": true,
+		"recurse": true,
+		"template": "./node_modules/minami",
+		"tutorials": "./tutorials",
+		"destination": "./docs/"
+	}
 }
