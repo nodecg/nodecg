@@ -56,7 +56,6 @@
     "build:docs": "jsdoc -c .jsdoc.json",
     "build:css": "lessc lib/dashboard/src/dashboard.less lib/dashboard/public/dashboard.css && lessc lib/dashboard/src/nodecg-defaults.less lib/dashboard/public/style/nodecg-defaults.css",
     "publish:docs": "npm run build:docs && gh-pages -d docs -s ** -a",
-    "prepublish": "npm run build && npm run publish:docs"
   },
   "engines": {
     "node": ">= 4.1.2"
