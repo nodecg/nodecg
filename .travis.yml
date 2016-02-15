@@ -24,7 +24,7 @@ addons:
 
 before_script:
   - npm install -g bower
-  - npm install -g grunt
+  - npm install -g grunt-cli
   - bower install
 
 after_success: npm run coveralls
