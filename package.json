@@ -55,7 +55,7 @@
     "build": "npm run static && npm run build:docs && npm run build:css && grunt",
     "build:docs": "jsdoc -c .jsdoc.json",
     "build:css": "lessc lib/dashboard/src/dashboard.less lib/dashboard/public/dashboard.css && lessc lib/dashboard/src/nodecg-defaults.less lib/dashboard/public/style/nodecg-defaults.css",
-    "publish:docs": "npm run build:docs && gh-pages -d docs -s ** -a",
+    "publish:docs": "npm run build:docs && gh-pages -d docs -s ** -a"
   },
   "engines": {
     "node": ">= 4.1.2"
