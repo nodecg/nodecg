@@ -16,35 +16,38 @@ Lange - 1/28/2016
 -->
 
 <dom-module id="ncg-dialog">
-    <style>
-        :host {
-            flex-direction: column;
-        }
+	<style>
+		:host {
+			flex-direction: column;
+		}
 
-        :host > ::content iframe {
-            box-sizing: border-box;
-        }
+		:host > ::content iframe {
+			box-sizing: border-box;
+		}
 
-        :host > ::content iframe {
-            margin: 0!important;
-            padding: 0!important;
-        }
+		:host > ::content iframe {
+			margin: 0 !important;
+			padding: 0 !important;
+		}
 
-        :host > ::content .buttons {
-            order: 3;
-        }
-    </style>
+		:host > ::content .buttons {
+			order: 3;
+		}
+	</style>
 
-    <template>
-        <style include="paper-dialog-shared-styles"></style>
-        <style>
-            :host { display: flex; }
-            :host > ::content > *:last-child {
-                margin-bottom: 0;
-            }
-        </style>
-        <content></content>
-    </template>
+	<template>
+		<style include="paper-dialog-shared-styles"></style>
+		<style>
+			:host {
+				display: flex;
+			}
+
+			:host > ::content > *:last-child {
+				margin-bottom: 0;
+			}
+		</style>
+		<content></content>
+	</template>
 </dom-module>
 
 <script src="ncg-dialog.js"></script>
