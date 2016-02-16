@@ -18,15 +18,4 @@
     </template>
 </dom-module>
 
-<script>
-    Polymer({
-        is: 'ncg-single-instance',
-        properties: {
-            url: String
-        },
-
-        kill: function() {
-            window.socket.emit('killGraphic', this.url);
-        }
-    });
-</script>
+<script src="ncg-single-instance.js"></script>
