@@ -1,0 +1,39 @@
+<link rel="import" href="/components/polymer/polymer.html">
+<link rel="import" href="/components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="/components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/components/paper-spinner/paper-spinner-lite.html">
+
+<dom-module id="ncg-uploaded-file">
+	<style>
+		:host {
+			@apply(--layout-horizontal);
+			@apply(--layout-justified);
+			@apply(--layout-center);
+		}
+
+		#name {
+			text-transform: none;
+		}
+
+		#delete {
+			color: var(--nodecg-danger-color);
+		}
+
+		#delete:hover {
+			background: var(--paper-red-50);
+			border-radius: 50%;
+		}
+
+		#spinner {
+			--paper-spinner-color: var(--nodecg-danger-color);
+		}
+	</style>
+
+	<template>
+		<a id="name" href="[[file.url]]" target="_blank">[[file.base]]</a>
+		<paper-spinner-lite id="spinner" alt="Deleting" active></paper-spinner-lite>
+		<paper-icon-button id="delete" icon="delete" on-click="_handleDeleteClick">Delete</paper-icon-button>
+	</template>
+</dom-module>
+
+<script src="/dashboard/elements/ncg-uploaded-file.js"></script>
