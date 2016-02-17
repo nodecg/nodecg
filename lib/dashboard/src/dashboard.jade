@@ -77,7 +77,6 @@ html(lang='en')
 		//- Set up app routing
 		more-routing-config(driver='hash')
 		more-route(name='graphics', path='/graphics')
-		more-route(name='uploads', path='/uploads')
 		more-route(name='settings', path='/settings')
 		more-route(name='dashboard', path='/')
 
@@ -97,9 +96,6 @@ html(lang='en')
 						paper-icon-item(route='/graphics')
 							iron-icon(icon='visibility', item-icon)
 							| Graphics
-						paper-icon-item(route='/uploads')
-							iron-icon(icon='file-upload', item-icon)
-							| Uploads
 						paper-icon-item(route='/settings')
 							iron-icon(icon='settings', item-icon)
 							| Settings
@@ -110,7 +106,6 @@ html(lang='en')
 						iron-selector#ncg-title-selector
 							span(route='/') Dashboard
 							span(route='/graphics') Graphics
-							span(route='/uploads') Uploads
 							span(route='/settings') Settings
 					if ncgConfig.login.enabled
 						paper-icon-button.paper-font-button#logout(icon='exit-to-app', alt='Sign Out')
@@ -118,8 +113,6 @@ html(lang='en')
 					iron-pages#ncg-pages.layout.vertical
 						section.flex.layout.vertical.center(route='/graphics')
 							include graphics.jade
-						section.flex.layout.vertical.center(route='/uploads')
-							include uploads.jade
 						section.flex.layout.vertical.center(route='/settings')
 							include settings.jade
 						section.flex(route='/')
