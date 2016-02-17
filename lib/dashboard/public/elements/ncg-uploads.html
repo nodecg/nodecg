@@ -1,0 +1,72 @@
+<link rel="import" href="/components/polymer/polymer.html">
+<link rel="import" href="/components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="/components/paper-card/paper-card.html">
+<link rel="import" href="/components/paper-toast/paper-toast.html">
+<link rel="import" href="/components/vaadin-upload/vaadin-upload.html">
+<link rel="import" href="/components/nodecg-replicant/nodecg-replicant.html">
+<link rel="import" href="/dashboard/elements/ncg-uploaded-file.html">
+
+<dom-module id="ncg-uploads">
+	<style>
+		:host {
+			display: block;
+			width: 100%;
+			max-width: 600px;
+			margin-bottom: 12px;
+		}
+
+		paper-card {
+			width: 100%;
+		}
+
+		#header {
+			@apply(--layout-horizontal);
+			@apply(--layout-justified);
+			margin-bottom: 12px;
+		}
+
+		#title {
+			@apply(--paper-font-headline);
+		}
+
+		#files {
+			@apply(--layout-vertical);
+		}
+
+		vaadin-upload {
+			width: 400px;
+			margin: 16px;
+		}
+	</style>
+
+	<template>
+		<nodecg-replicant replicant-name="uploads" replicant-bundle="[[bundleName]]" value="{{files}}"></nodecg-replicant>
+		<paper-card>
+			<div class="card-content">
+				<div id="header">
+					<span id="title">[[bundleName]]</span>
+					<paper-button raised class="nodecg-configure" on-click="openUploadDialog">Add File(s)</paper-button>
+				</div>
+				<div id="files">
+					<template is="dom-repeat" items="[[files]]" as="file">
+						<ncg-uploaded-file file="[[file]]"
+										   on-deleted="_handleDeleted"
+										   on-deletion-failed="_handleDeletionFailed"></ncg-uploaded-file>
+					</template>
+				</div>
+			</div>
+		</paper-card>
+		<paper-toast id="toast"></paper-toast>
+		<input type="file" id="fileInput" on-change="_onFileInputChange" hidden accept="{{accept}}">
+
+		<paper-dialog id="uploadDialog" with-backdrop>
+			<vaadin-upload target="/uploads/[[bundleName]]" on-upload-before="_onUploadBefore"></vaadin-upload>
+
+			<div class="buttons">
+				<paper-button dialog-dismiss>Close</paper-button>
+			</div>
+		</paper-dialog>
+	</template>
+</dom-module>
+
+<script src="/dashboard/elements/ncg-uploads.js"></script>
