@@ -3,7 +3,7 @@
 <link rel="import" href="/components/paper-styles/paper-styles.html">
 <link rel="import" href="/components/paper-styles/paper-styles-classes.html">
 <link rel="import" href="/components/iron-collapse/iron-collapse.html">
-<link rel="import" href="/components/iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="/components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="/components/iron-localstorage/iron-localstorage.html">
 <link rel="import" href="ncg-dashboard-panel-info-dialog.html">
 
@@ -14,17 +14,39 @@
 		}
 
 		#header {
-			background-color: #9f9bbd;
 			color: var(--google-grey-100);
+			@apply(--layout-horizontal);
+			@apply(--layout-end-justified);
+			@apply(--layout-center);
+			overflow: hidden;
 		}
 
 		#displayTitle {
-			margin-left: 15px;
+			position: absolute;
+			left: 15px;
+			top: 6px;
 		}
 
-		#body {
-			padding: 0;
-			background-color: #f5f5f5;
+		#buttons {
+			@apply(--layout-horizontal);
+			@apply(--layout-center);
+			padding-left: 8px;
+			transform: translateX(100%);
+			transition: transform 200ms ease;
+		}
+
+		#more {
+			position: absolute;
+			right: 10px;
+			top: 8px;
+		}
+
+		#buttonsContainer {
+			z-index: 1;
+		}
+
+		#header:hover #buttons {
+			transform: translateX(0%);
 		}
 
 		#dragHandle {
@@ -39,12 +61,9 @@
 			cursor: grabbing;
 		}
 
-		#expandBtn {
-			transition: transform 200ms ease-out;
-		}
-
-		:host[opened] #expandBtn {
-			transform: rotate(180deg);
+		#body {
+			padding: 0;
+			background-color: #f5f5f5;
 		}
 	</style>
 	<template>
@@ -54,12 +73,15 @@
 		></iron-localstorage>
 
 		<paper-material>
-			<div id="header" class="layout horizontal justified center">
-				<span id="displayTitle" class="paper-font-title">{{displayTitle}}</span>
-				<div class="layout horizontal center">
-					<paper-icon-button id="expandBtn" on-click="toggleCollapse" icon="expand-less"></paper-icon-button>
-					<paper-icon-button id="dragHandle" icon="open-with"></paper-icon-button>
-					<paper-icon-button id="infoBtn" icon="info"></paper-icon-button>
+			<div id="header">
+				<span id="displayTitle" class="paper-font-title">[[displayTitle]]</span>
+				<div id="buttonsContainer">
+					<iron-icon id="more" icon="chevron-left"></iron-icon>
+					<div id="buttons">
+						<paper-icon-button id="expandBtn" on-click="toggleCollapse" icon="unfold-less"></paper-icon-button>
+						<paper-icon-button id="dragHandle" icon="open-with"></paper-icon-button>
+						<paper-icon-button id="infoBtn" icon="info"></paper-icon-button>
+					</div>
 				</div>
 			</div>
 			<iron-collapse id="collapse" opened="{{opened}}">
