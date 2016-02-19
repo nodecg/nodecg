@@ -1,3 +1,6 @@
 {
-	"extends": "xo"
+	"extends": "xo",
+	"rules": {
+		"new-cap": 0
+	}
 }
