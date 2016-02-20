@@ -1,3 +1,17 @@
+<a name="0.7.3"></a>
+## [0.7.3](https://github.com/nodecg/nodecg/compare/v0.7.2...v0.7.3) (2016-02-20)
+
+
+### Bug Fixes
+
+* **uploads:** prevent crash related to uninstalled bundles ([9d17dc3](https://github.com/nodecg/nodecg/commit/9d17dc3))
+
+### Features
+
+* **dashboard:** hide panel controls until mouseover ([7855a0b](https://github.com/nodecg/nodecg/commit/7855a0b))
+
+
+
 <a name="0.7.2"></a>
 ## [0.7.2](https://github.com/nodecg/nodecg/compare/v0.7.1...v0.7.2) (2016-02-17)
 
