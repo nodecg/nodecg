@@ -38,7 +38,7 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/* jshint unused:false */
+            <pre class="prettyprint source linenums"><code>/* eslint-env node, browser */
 'use strict';
 
 var Replicant = require('./replicant');
@@ -48,7 +48,6 @@ var filteredConfig = require('./config').filteredConfig;
 var utils = require('./util');
 var replicator = require('./replicator');
 
-
 /**
  * Creates a new NodeCG API instance. It should never be necessary to use this constructor in a bundle,
  * as NodeCG automatically injects a pre-made API instance.
@@ -56,99 +55,101 @@ var replicator = require('./replicator');
  * @param {object} bundle - The bundle object to build an API instance from.
  */
 function NodeCG(bundle, socket) {
-    var self = this;
+	var self = this;
 
-    // Make bundle name and config publicly accessible
-    this.bundleName = bundle.name;
+	// Make bundle name and config publicly accessible
+	this.bundleName = bundle.name;
 
-    /**
-     * An object containing the parsed content of `cfg/&lt;bundle-name>.json`, the contents of which
-     * are read once when NodeCG starts up. Used to quickly access per-bundle configuration properties.
-     * @property {Object}
-     * @name NodeCG#bundleConfig
-     */
-    this.bundleConfig = bundle.config;
+	/**
+	 * An object containing the parsed content of `cfg/&lt;bundle-name>.json`, the contents of which
+	 * are read once when NodeCG starts up. Used to quickly access per-bundle configuration properties.
+	 * @property {Object}
+	 * @name NodeCG#bundleConfig
+	 */
+	this.bundleConfig = bundle.config;
 
-    /**
-     * Provides access to NodeCG's logger, with the following methods. The logging level is set in `cfg/nodecg.json`,
-     * NodeCG's global config file.
-     * ```
-     * nodecg.log.trace('trace level logging');
-     * nodecg.log.debug('debug level logging');
-     * nodecg.log.info('info level logging');
-     * nodecg.log.warn('warn level logging');
-     * nodecg.log.error('error level logging');
-     * ```
-     * @function {Object}
-     * @name NodeCG#log
-     */
-    this.log = require('./logger')(bundle.name);
+	/**
+	 * Provides access to NodeCG's logger, with the following methods. The logging level is set in `cfg/nodecg.json`,
+	 * NodeCG's global config file.
+	 * ```
+	 * nodecg.log.trace('trace level logging');
+	 * nodecg.log.debug('debug level logging');
+	 * nodecg.log.info('info level logging');
+	 * nodecg.log.warn('warn level logging');
+	 * nodecg.log.error('error level logging');
+	 * ```
+	 * @function {Object}
+	 * @name NodeCG#log
+	 */
+	this.log = require('./logger')(bundle.name);
 
-    this._messageHandlers = [];
+	this._messageHandlers = [];
 
-    if (process.env.browser) {
-        // This constructor only works if socket.io is loaded
-        if (typeof io === 'undefined') {
-            throw new Error('[nodeceg] Socket.IO must be loaded before instantiating the API');
-        }
+	if (process.env.browser) {
+		// This constructor only works if socket.io is loaded
+		if (typeof io === 'undefined') {
+			throw new Error('[nodeceg] Socket.IO must be loaded before instantiating the API');
+		}
 
-        // If title isn't set, set it to the bundle name
-        document.addEventListener('DOMContentLoaded', function() {
-            if (document.title === '') document.title = self.bundleName;
-        }, false);
+		// If title isn't set, set it to the bundle name
+		document.addEventListener('DOMContentLoaded', function () {
+			if (document.title === '') {
+				document.title = self.bundleName;
+			}
+		}, false);
 
-        // Make socket accessible to public methods
-        this.socket = socket;
-        this.socket.emit('joinRoom', bundle.name);
+		// Make socket accessible to public methods
+		this.socket = socket;
+		this.socket.emit('joinRoom', bundle.name);
 
-        // Upon receiving a message, execute any handlers for it
-        socket.on('message', function onMessage(data) {
-            self.log.trace('Received message %s (sent to bundle %s) with data:',
-                self.bundleName, data.messageName, data.bundleName, data.content);
+		// Upon receiving a message, execute any handlers for it
+		socket.on('message', function onMessage(data) {
+			self.log.trace('Received message %s (sent to bundle %s) with data:',
+				self.bundleName, data.messageName, data.bundleName, data.content);
 
-            self._messageHandlers.forEach(function(handler) {
-                if (data.messageName === handler.messageName &amp;&amp;
-                    data.bundleName === handler.bundleName) {
-                    handler.func(data.content);
-                }
-            });
-        });
+			self._messageHandlers.forEach(function (handler) {
+				if (data.messageName === handler.messageName &amp;&amp;
+					data.bundleName === handler.bundleName) {
+					handler.func(data.content);
+				}
+			});
+		});
 
-        socket.on('error', function(err) {
-            if (err.type === 'UnauthorizedError') {
-                var url = [location.protocol, '//', location.host, location.pathname].join('');
-                window.location.href = '/authError?code='+err.code+'&amp;message='+err.message+'&amp;viewUrl='+url;
-            } else {
-                self.log.error('Unhandled socket error:', err);
-            }
-        });
-    } else {
-        io = server.getIO();
+		socket.on('error', function (err) {
+			if (err.type === 'UnauthorizedError') {
+				var url = [location.protocol, '//', location.host, location.pathname].join('');
+				window.location.href = '/authError?code=' + err.code + '&amp;message=' + err.message + '&amp;viewUrl=' + url;
+			} else {
+				self.log.error('Unhandled socket error:', err);
+			}
+		});
+	} else {
+		io = server.getIO();
 
-        io.on('connection', function onConnection(socket) {
-            socket.setMaxListeners(64); // Prevent console warnings when many extensions are installed
-            socket.on('message', function onMessage(data, cb) {
-                self.log.trace('[%s] Received message %s (sent to bundle %s) with data:',
-                    self.bundleName, data.messageName, data.bundleName, data.content);
+		io.on('connection', function onConnection(socket) {
+			socket.setMaxListeners(64); // Prevent console warnings when many extensions are installed
+			socket.on('message', function onMessage(data, cb) {
+				self.log.trace('[%s] Received message %s (sent to bundle %s) with data:',
+					self.bundleName, data.messageName, data.bundleName, data.content);
 
-                self._messageHandlers.forEach(function(handler) {
-                    if (data.messageName === handler.messageName &amp;&amp;
-                        data.bundleName === handler.bundleName) {
-                        handler.func(data.content, cb);
-                    }
-                });
-            });
-        });
-    }
+				self._messageHandlers.forEach(function (handler) {
+					if (data.messageName === handler.messageName &amp;&amp;
+						data.bundleName === handler.bundleName) {
+						handler.func(data.content, cb);
+					}
+				});
+			});
+		});
+	}
 
-    // Create read-only config property, which contains the current filtered NodeCG config
-    Object.defineProperty(this, 'config', {
-        value: filteredConfig,
-        writable: false,
-        enumerable: true
-    });
+	// Create read-only config property, which contains the current filtered NodeCG config
+	Object.defineProperty(this, 'config', {
+		value: filteredConfig,
+		writable: false,
+		enumerable: true
+	});
 
-    Object.freeze(this.config);
+	Object.freeze(this.config);
 }
 
 // ###NodeCG prototype
@@ -188,33 +189,33 @@ function NodeCG(bundle, socket) {
  * });
  */
 NodeCG.prototype.sendMessage = function (messageName, data, cb) {
-    if (typeof cb === 'undefined' &amp;&amp; typeof data === 'function') {
-        cb = data;
-        data = null;
-    }
+	if (typeof cb === 'undefined' &amp;&amp; typeof data === 'function') {
+		cb = data;
+		data = null;
+	}
 
-    this.sendMessageToBundle(messageName, this.bundleName, data, cb);
+	this.sendMessageToBundle(messageName, this.bundleName, data, cb);
 };
 
 NodeCG.sendMessageToBundle = function (messageName, bundleName, data, cb) {
-    if (process.env.browser) {
-        if (typeof cb === 'undefined' &amp;&amp; typeof data === 'function') {
-            cb = data;
-            data = null;
-        }
+	if (process.env.browser) {
+		if (typeof cb === 'undefined' &amp;&amp; typeof data === 'function') {
+			cb = data;
+			data = null;
+		}
 
-        window.socket.emit('message', {
-            bundleName: bundleName,
-            messageName: messageName,
-            content: data
-        }, cb);
-    } else {
-        io.emit('message', {
-            bundleName: bundleName,
-            messageName: messageName,
-            content: data
-        });
-    }
+		window.socket.emit('message', {
+			bundleName: bundleName,
+			messageName: messageName,
+			content: data
+		}, cb);
+	} else {
+		io.emit('message', {
+			bundleName: bundleName,
+			messageName: messageName,
+			content: data
+		});
+	}
 };
 
 /**
@@ -226,12 +227,14 @@ NodeCG.sendMessageToBundle = function (messageName, bundleName, data, cb) {
  * @param {function} [cb] - _Browser only_ The callback to handle the server's
  * [acknowledgement](http://socket.io/docs/#sending-and-getting-data-%28acknowledgements%29) message, if any.
  */
+/* eslint-disable no-unused-vars */
 NodeCG.prototype.sendMessageToBundle = function (messageName, bundleName, data, cb) {
-    this.log.trace('[%s] Sending message %s to bundle %s with data:',
-        this.bundleName, messageName, bundleName, data);
+	this.log.trace('[%s] Sending message %s to bundle %s with data:',
+		this.bundleName, messageName, bundleName, data);
 
-    NodeCG.sendMessageToBundle.apply(NodeCG, arguments);
+	NodeCG.sendMessageToBundle.apply(NodeCG, arguments);
 };
+/* eslint-enable no-unused-vars */
 
 /**
  * Listens for a message, and invokes the provided callback each time the message is received.
@@ -255,29 +258,29 @@ NodeCG.prototype.sendMessageToBundle = function (messageName, bundleName, data, 
  * });
  */
 NodeCG.prototype.listenFor = function (messageName, bundleName, handler) {
-    if (typeof handler === 'undefined') {
-        handler = bundleName;
-        bundleName = this.bundleName;
-    }
+	if (typeof handler === 'undefined') {
+		handler = bundleName;
+		bundleName = this.bundleName;
+	}
 
-    this.log.trace('[%s] Listening for %s from bundle %s', this.bundleName, messageName, bundleName);
+	this.log.trace('[%s] Listening for %s from bundle %s', this.bundleName, messageName, bundleName);
 
-    // Check if a handler already exists for this message
-    var len = this._messageHandlers.length;
-    for (var i = 0; i &lt; len; i++) {
-        var existingHandler = this._messageHandlers[i];
-        if (messageName === existingHandler.messageName &amp;&amp; bundleName === existingHandler.bundleName) {
-            this.log.error('%s attempted to declare a duplicate "listenFor" handler:',
-                this.bundleName, bundleName, messageName);
-            return;
-        }
-    }
+	// Check if a handler already exists for this message
+	var len = this._messageHandlers.length;
+	for (var i = 0; i &lt; len; i++) {
+		var existingHandler = this._messageHandlers[i];
+		if (messageName === existingHandler.messageName &amp;&amp; bundleName === existingHandler.bundleName) {
+			this.log.error('%s attempted to declare a duplicate "listenFor" handler:',
+				this.bundleName, bundleName, messageName);
+			return;
+		}
+	}
 
-    this._messageHandlers.push({
-        messageName: messageName,
-        bundleName: bundleName,
-        func: handler
-    });
+	this._messageHandlers.push({
+		messageName: messageName,
+		bundleName: bundleName,
+		func: handler
+	});
 };
 
 /**
@@ -286,8 +289,8 @@ NodeCG.prototype.listenFor = function (messageName, bundleName, handler) {
  */
 NodeCG.declaredReplicants = Replicant.declaredReplicants;
 
-NodeCG.Replicant = function(name, bundle, opts) {
-    return new Replicant(name, bundle, opts, process.env.browser ? window.socket : null);
+NodeCG.Replicant = function (name, bundle, opts) {
+	return new Replicant(name, bundle, opts, process.env.browser ? window.socket : null);
 };
 
 /**
@@ -327,30 +330,32 @@ NodeCG.Replicant = function(name, bundle, opts) {
  * myVar.value = {objects: {can: {be: 'nested!'}}};
  * myVar.value = ['Even', 'arrays', 'work!'];
  */
-NodeCG.prototype.Replicant = function(name, bundle, opts) {
-    if (!bundle || typeof bundle !== 'string') {
-        opts = bundle;
-        bundle = this.bundleName;
-    }
+NodeCG.prototype.Replicant = function (name, bundle, opts) {
+	if (!bundle || typeof bundle !== 'string') {
+		opts = bundle;
+		bundle = this.bundleName;
+	}
 
-    return NodeCG.Replicant(name, bundle, opts);
+	return new NodeCG.Replicant(name, bundle, opts);
 };
 
-NodeCG.readReplicant = function(name, bundle, cb) {
-    if (!name || typeof name !== 'string') {
-        throw new Error('Must supply a name when reading a Replicant');
-    }
+NodeCG.readReplicant = function (name, bundle, cb) {
+	if (!name || typeof name !== 'string') {
+		throw new Error('Must supply a name when reading a Replicant');
+	}
 
-    if (!bundle || typeof bundle !== 'string') {
-        throw new Error('Must supply a bundle name when reading a Replicant');
-    }
+	if (!bundle || typeof bundle !== 'string') {
+		throw new Error('Must supply a bundle name when reading a Replicant');
+	}
 
-    if (process.env.browser) {
-        window.socket.emit('readReplicant', {name: name, bundle: bundle}, cb);
-    } else {
-        var replicant = replicator.find(name, bundle);
-        if (replicant) return replicant.value;
-    }
+	if (process.env.browser) {
+		window.socket.emit('readReplicant', {name: name, bundle: bundle}, cb);
+	} else {
+		var replicant = replicator.find(name, bundle);
+		if (replicant) {
+			return replicant.value;
+		}
+	}
 };
 
 /**
@@ -372,128 +377,128 @@ NodeCG.readReplicant = function(name, bundle, cb) {
  *     console.log('myVar has the value '+ value +'!');
  * });
  */
-NodeCG.prototype.readReplicant = function(name, bundle, cb) {
-    if (!bundle || typeof bundle !== 'string') {
-        cb = bundle;
-        bundle = this.bundleName;
-    }
+NodeCG.prototype.readReplicant = function (name, bundle, cb) {
+	if (!bundle || typeof bundle !== 'string') {
+		cb = bundle;
+		bundle = this.bundleName;
+	}
 
-    return NodeCG.readReplicant(name, bundle, cb);
+	return NodeCG.readReplicant(name, bundle, cb);
 };
 
 if (process.env.browser) {
-    window.NodeCG = NodeCG;
+	window.NodeCG = NodeCG;
 
-    /**
-     * _Browser only_&lt;br/>
-     * Returns the nearest element with the desired attribute.
-     * Begins at `startEl` and then checks every parent, returning the first one that has the attribute.
-     * Returns undefined if neither `startEl` nor any of its parents has the attribute.
-     * @param {object} startEl - The element on which to begin the search.
-     * @param {string} attrName - The attribute name to look for.
-     * @returns {object}
-     */
-    NodeCG.nearestElementWithAttribute = function(startEl, attrName) {
-        var target = startEl;
-        while (target) {
-            if (target.hasAttribute) {
-                if (target.hasAttribute(attrName)) {
-                    return target;
-                }
-            }
-            target = target.parentNode;
-        }
-    };
+	/**
+	 * _Browser only_&lt;br/>
+	 * Returns the nearest element with the desired attribute.
+	 * Begins at `startEl` and then checks every parent, returning the first one that has the attribute.
+	 * Returns undefined if neither `startEl` nor any of its parents has the attribute.
+	 * @param {object} startEl - The element on which to begin the search.
+	 * @param {string} attrName - The attribute name to look for.
+	 * @returns {object}
+	 */
+	NodeCG.nearestElementWithAttribute = function (startEl, attrName) {
+		var target = startEl;
+		while (target) {
+			if (target.hasAttribute) {
+				if (target.hasAttribute(attrName)) {
+					return target;
+				}
+			}
+			target = target.parentNode;
+		}
+	};
 
-    /**
-     * _Browser only_&lt;br/>
-     * Returns the specified dialog element.
-     * @param {string} name - The desired dialog's name.
-     * @param {string} [bundle=CURR_BNDL] - The bundle from which to select the dialog.
-     * @returns {object}
-     */
-    NodeCG.prototype.getDialog = function(name, bundle) {
-        bundle = bundle || this.bundleName;
-        var topDoc = window.top.document;
-        return topDoc.getElementById(bundle + '_' + name);
-    };
+	/**
+	 * _Browser only_&lt;br/>
+	 * Returns the specified dialog element.
+	 * @param {string} name - The desired dialog's name.
+	 * @param {string} [bundle=CURR_BNDL] - The bundle from which to select the dialog.
+	 * @returns {object}
+	 */
+	NodeCG.prototype.getDialog = function (name, bundle) {
+		bundle = bundle || this.bundleName;
+		var topDoc = window.top.document;
+		return topDoc.getElementById(bundle + '_' + name);
+	};
 
-    /**
-     * _Browser only_&lt;br/>
-     * Returns the specified dialog's iframe document.
-     * @param {string} name - The desired dialog's name.
-     * @param {string} [bundle=CURR_BNDL] - The bundle from which to select the dialog.
-     * @returns {object}
-     */
-    NodeCG.prototype.getDialogDocument = function(name, bundle) {
-        bundle = bundle || this.bundleName;
-        var dialog = this.getDialog(name, bundle);
-        return dialog.querySelector('iframe').contentWindow.document;
-    };
+	/**
+	 * _Browser only_&lt;br/>
+	 * Returns the specified dialog's iframe document.
+	 * @param {string} name - The desired dialog's name.
+	 * @param {string} [bundle=CURR_BNDL] - The bundle from which to select the dialog.
+	 * @returns {object}
+	 */
+	NodeCG.prototype.getDialogDocument = function (name, bundle) {
+		bundle = bundle || this.bundleName;
+		var dialog = this.getDialog(name, bundle);
+		return dialog.querySelector('iframe').contentWindow.document;
+	};
 } else {
-    /**
-     * _Extension only_&lt;br/>
-     * Gets the server Socket.IO context.
-     * @function
-     */
-    NodeCG.prototype.getSocketIOServer = server.getIO;
+	/**
+	 * _Extension only_&lt;br/>
+	 * Gets the server Socket.IO context.
+	 * @function
+	 */
+	NodeCG.prototype.getSocketIOServer = server.getIO;
 
-    /**
-     * _Extension only_&lt;br/>
-     * Mounts express middleware to the main server express app.
-     * See the [express docs](http://expressjs.com/en/api.html#app.use) for usage.
-     * @function
-     */
-    NodeCG.prototype.mount = server.mount;
+	/**
+	 * _Extension only_&lt;br/>
+	 * Mounts express middleware to the main server express app.
+	 * See the [express docs](http://expressjs.com/en/api.html#app.use) for usage.
+	 * @function
+	 */
+	NodeCG.prototype.mount = server.mount;
 
-    NodeCG.prototype.util = {};
+	NodeCG.prototype.util = {};
 
-    /**
-     * _Extension only_&lt;br/>
-     * Checks if a session is authorized. Intended to be used in express routes.
-     * @param {object} req - A HTTP request.
-     * @param {object} res - A HTTP response.
-     * @param {function} next - The next middleware in the control flow.
-     */
-    NodeCG.prototype.util.authCheck = utils.authCheck;
+	/**
+	 * _Extension only_&lt;br/>
+	 * Checks if a session is authorized. Intended to be used in express routes.
+	 * @param {object} req - A HTTP request.
+	 * @param {object} res - A HTTP response.
+	 * @param {function} next - The next middleware in the control flow.
+	 */
+	NodeCG.prototype.util.authCheck = utils.authCheck;
 
-    /**
-     * _Extension only_&lt;br/>
-     * Finds and returns a session that matches the given parameters.
-     * @param {object} params - A NeDB search query [https://github.com/louischatriot/nedb#finding-documents].
-     * @returns {object}
-     */
-    NodeCG.prototype.util.findSession = utils.findSession;
+	/**
+	 * _Extension only_&lt;br/>
+	 * Finds and returns a session that matches the given parameters.
+	 * @param {object} params - A NeDB search query [https://github.com/louischatriot/nedb#finding-documents].
+	 * @returns {object}
+	 */
+	NodeCG.prototype.util.findSession = utils.findSession;
 
-    /**
-     * _Extension only_&lt;br/>
-     * Object containing references to all other loaded extensions. To access another bundle's extension,
-     * it _must_ be declared as a `bundleDependency` in your bundle's [`package.json`]{@tutorial manifest}.
-     * @property {Object}
-     * @name NodeCG#extensions
-     *
-     * @example
-     * // bundles/my-bundle/package.json
-     * {
+	/**
+	 * _Extension only_&lt;br/>
+	 * Object containing references to all other loaded extensions. To access another bundle's extension,
+	 * it _must_ be declared as a `bundleDependency` in your bundle's [`package.json`]{@tutorial manifest}.
+	 * @property {Object}
+	 * @name NodeCG#extensions
+	 *
+	 * @example
+	 * // bundles/my-bundle/package.json
+	 * {
      *     "name": "my-bundle"
      *     ...
      *     "bundleDependencies": {
      *         "other-bundle": "^1.0.0"
      *     }
      * }
-     *
-     * // bundles/my-bundle/extension.js
-     * module.exports = function(nodecg) {
+	 *
+	 * // bundles/my-bundle/extension.js
+	 * module.exports = function(nodecg) {
      *     var otherBundle = nodecg.extensions['other-bundle'];
      *     // Now I can use `otherBundle`!
      * }
-     */
-    Object.defineProperty(NodeCG.prototype, 'extensions', {
-        get: function() {
-            return server.getExtensions();
-        },
-        enumerable: true
-    });
+	 */
+	Object.defineProperty(NodeCG.prototype, 'extensions', {
+		get: function () {
+			return server.getExtensions();
+		},
+		enumerable: true
+	});
 }
 
 module.exports = NodeCG;
@@ -509,7 +514,7 @@ module.exports = NodeCG;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Feb 12 2016 22:20:10 GMT-0600 (Central Standard Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Feb 23 2016 12:16:58 GMT-0600 (Central Standard Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
