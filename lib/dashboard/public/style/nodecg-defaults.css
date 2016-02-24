@@ -118,6 +118,3 @@ a {
 a {
   text-decoration: none;
 }
-paper-button[disabled] {
-  opacity: 0.5;
-}
