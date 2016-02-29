@@ -1,6 +1,14 @@
 {
 	"extends": "xo",
 	"rules": {
-		"new-cap": 0
+		"new-cap": [
+			2,
+			{
+				"capIsNewExceptions": [
+					"Polymer",
+					"nodecg.Replicant"
+				]
+			}
+		]
 	}
 }
