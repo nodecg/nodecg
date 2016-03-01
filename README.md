@@ -9,6 +9,8 @@ including CasparCG. NodeCG is based on the overlay system developed for the
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
 [![Coverage Status](https://coveralls.io/repos/nodecg/nodecg/badge.svg?branch=master&service=github)](https://coveralls.io/github/nodecg/nodecg?branch=master)
 
+Looking for a list of NodeCG bundles and resources? Check out [awesome-nodecg](https://github.com/nodecg/awesome-nodecg/blob/master/README.md).
+
 Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!  
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nodecg/nodecg)
 
