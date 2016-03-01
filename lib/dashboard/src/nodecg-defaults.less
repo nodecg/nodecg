@@ -21,7 +21,7 @@
 .nodecgColorClass(@name, @color) {
   &.nodecg-@{name} {
 	button&,
-	paper-button&,
+	paper-button:not([disabled])&,
 	p& {
 	  background-color: @color;
 	  color: white;

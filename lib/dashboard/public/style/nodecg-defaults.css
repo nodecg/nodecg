@@ -1,5 +1,5 @@
 button.nodecg-info,
-paper-button.nodecg-info,
+paper-button:not([disabled]).nodecg-info,
 p.nodecg-info {
   background-color: #645BA6;
   color: white;
@@ -8,7 +8,7 @@ span.nodecg-info {
   color: #645BA6;
 }
 button.nodecg-success,
-paper-button.nodecg-success,
+paper-button:not([disabled]).nodecg-success,
 p.nodecg-success {
   background-color: #5BA664;
   color: white;
@@ -17,7 +17,7 @@ span.nodecg-success {
   color: #5BA664;
 }
 button.nodecg-warning,
-paper-button.nodecg-warning,
+paper-button:not([disabled]).nodecg-warning,
 p.nodecg-warning {
   background-color: #FF7522;
   color: white;
@@ -26,7 +26,7 @@ span.nodecg-warning {
   color: #FF7522;
 }
 button.nodecg-danger,
-paper-button.nodecg-danger,
+paper-button:not([disabled]).nodecg-danger,
 p.nodecg-danger {
   background-color: #C9513E;
   color: white;
@@ -35,7 +35,7 @@ span.nodecg-danger {
   color: #C9513E;
 }
 button.nodecg-configure,
-paper-button.nodecg-configure,
+paper-button:not([disabled]).nodecg-configure,
 p.nodecg-configure {
   background-color: #A50074;
   color: white;
