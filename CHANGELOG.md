@@ -1,3 +1,20 @@
+<a name="0.7.5"></a>
+## [0.7.5](https://github.com/nodecg/nodecg/compare/v0.7.4...v0.7.5) (2016-03-13)
+
+
+### Bug Fixes
+
+* **dashboard:** don't apply background color to disabled paper-button elements when using builti ([a34fc9d](https://github.com/nodecg/nodecg/commit/a34fc9d))
+
+### Features
+
+* **api:** deprecate nearestElementWithAttribute, replace usage with element.closest() ([45b272c](https://github.com/nodecg/nodecg/commit/45b272c)), closes [#141](https://github.com/nodecg/nodecg/issues/141)
+* **bundles:** Add configuration values allowing to disable bundle autodeps ([4a99774](https://github.com/nodecg/nodecg/commit/4a99774))
+* **caching:** disable caching ([a70b9be](https://github.com/nodecg/nodecg/commit/a70b9be))
+* **npm:** only install production dependencies for bundles ([be0e74c](https://github.com/nodecg/nodecg/commit/be0e74c))
+
+
+
 <a name="0.7.4"></a>
 ## [0.7.4](https://github.com/nodecg/nodecg/compare/v0.7.3...v0.7.4) (2016-03-01)
 
