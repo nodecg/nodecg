@@ -34,11 +34,11 @@
     "paper-styles": "PolymerElements/paper-styles#^1.0.13",
     "paper-toast": "PolymerElements/paper-toast#^1.1.1",
     "paper-toolbar": "PolymerElements/paper-toolbar#^1.1.2",
-    "zeroclipboard": "~2.2.0",
     "iron-collapse": "PolymerElements/iron-collapse#~1.0.5",
     "paper-spinner": "PolymerElements/paper-spinner#^1.1.0",
     "vaadin-upload": "vaadin/vaadin-upload#^1.0.0-alpha1",
-    "nodecg-replicant": "NodeCGElements/nodecg-replicant#^0.5.4"
+    "nodecg-replicant": "NodeCGElements/nodecg-replicant#^0.5.4",
+    "clipboard": "^1.5.9"
   },
   "license": "MIT",
   "private": true,
