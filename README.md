@@ -14,10 +14,17 @@ Looking for a list of NodeCG bundles and resources? Check out [awesome-nodecg](h
 Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!  
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nodecg/nodecg)
 
+## Who should use NodeCG?
+NodeCG is a programming framework. As such, it's most useful to developers capable of creating their own graphics
+using HTML, CSS, and JavaScript. NodeCG is still in beta and the ecosystem of bundles is quite small.
+Those expecting to download NodeCG and use off-the-shelf bundles to get a complete stream overlay
+without writing any code may be disappointed.
+
 ## Installation
 Install [node.js (version 4 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
-Then, run the following commands:
+Then, run the following commands from a terminal (command prompt):
 ```
+npm install -g bower
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
 npm install --production
@@ -31,10 +38,10 @@ To run NodeCG in production, [pm2](https://github.com/Unitech/pm2) is recommende
 NodeCG's individual graphics packages are called _bundles_. They can be installed either from the command-line
 (via [_nodecg-cli_](https://www.npmjs.com/package/nodecg-cli)), or by simply placing the folder into the `./bundles` directory.
 
-The easiest way to install bundles is via the command-line.
+The easiest way to install bundles is via the command-line using [_nodecg-cli_](https://www.npmjs.com/package/nodecg-cli).
 To install a bundle from Github, enter the owner and repository name:
 ```sh
-nodecg install gamesdonequick/agdq16-layouts
+nodecg install lange/lange-notify
 ```
 
 ... to install a bundle from Bitbucket, enter the owner and repository name prefixed with `bitbucket:`
