@@ -1,25 +1,33 @@
 doctype html
 html(lang="en")
-    head
-        meta(http-equiv="X-UA-Compatible", content="IE=edge; charset=UTF-8")
-        meta(name="viewport", content="width=device-width", initial-scale=1)
+	head
+		meta(http-equiv="X-UA-Compatible", content="IE=edge; charset=UTF-8")
+		meta(name="viewport", content="width=device-width", initial-scale=1)
 
-        title NodeCG login
+		title NodeCG login
 
-        link(rel='stylesheet', href='/login/login.css')
+		link(rel='import', href='/components/paper-styles/typography.html')
 
-    body
-        div.container
-            form(class='form-signin', role='form')
-                h2.form-signin-heading Please sign in
-                if user !== undefined && !user.allowed
-                    div(class='alert alert-danger')
-                        strong Access denied!
-                        br
-                        | Your account is not in the whitelist
-                if config.login.steam && config.login.steam.enabled
-                    a(href='/login/steam')
-                        img(src='/login/signin_steam.png')
-                if config.login.twitch && config.login.twitch.enabled
-                    a(href='/login/twitch')
-                        img(src='/login/signin_twitch.png')
+		style(is='custom-style' include='iron-flex iron-flex-alignment').
+			body {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 40px;
+				background-color: #eee;
+			}
+
+			h2 {
+				@apply(--paper-font-headline);
+			}
+
+	body
+		h2 Please sign in
+
+		if config.login.steam && config.login.steam.enabled
+			a(href='/login/steam')
+				img(src='/login/signin_steam.png')
+
+		if config.login.twitch && config.login.twitch.enabled
+			a(href='/login/twitch')
+				img(src='/login/signin_twitch.png')
