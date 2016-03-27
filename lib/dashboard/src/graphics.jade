@@ -8,8 +8,10 @@ each bundle in bundles
 		paper-card.ncg-card(heading=bundle.name)
 			.card-content.layout.vertical
 				each graphic in bundle.graphics
-					.layout.horizontal.center.justified
-						a(href=graphic.url, target='_blank')=graphic.url
+					.graphic
+						div(style='display: flex; flex-direction: column;')
+							a(href=graphic.url, target='_blank')=graphic.url
+							span #{graphic.width}x#{graphic.height}
 						paper-button.js-copy(data-copy-type='graphic')
 							iron-icon(icon='icons:content-copy')
 							| &ensp;Copy URL
