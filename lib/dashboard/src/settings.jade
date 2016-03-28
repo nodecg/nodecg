@@ -8,7 +8,7 @@ if ncgConfig.login.enabled
 				paper-button#showKey(alt='Show Key')
 					iron-icon(icon='communication:vpn-key')
 					| &ensp;Show Key
-				paper-button.js-copy(data-clipboard-target='key')
+				paper-button#copyKey.js-copy
 					iron-icon(icon='icons:content-copy')
 					| &ensp;Copy Key
 				paper-button#resetKey
