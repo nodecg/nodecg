@@ -92,7 +92,6 @@
     "minifyify": "^7.1.0",
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "0.0.1",
-    "webdriverio": "^4.0.3",
-    "wrench": "^1.5.8"
+    "webdriverio": "^4.0.3"
   }
 }
