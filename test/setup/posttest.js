@@ -1,13 +1,16 @@
 'use strict';
 
 // Remove test bundle
-var fs = require('fs');
-var wrench = require('wrench');
+var fs = require('fs.extra');
 var C = require('./test-constants');
 
 try {
 	fs.unlinkSync(C.BUNDLE_CFG_PATH);
-	wrench.rmdirSyncRecursive(C.BUNDLE_DIR);
+	fs.rmrf(C.BUNDLE_DIR, function (err) {
+		if (err) {
+			throw err;
+		}
+	});
 } catch (e) {
 	if (fs.existsSync(C.BUNDLE_DIR)) {
 		try {
