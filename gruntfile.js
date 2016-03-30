@@ -39,7 +39,7 @@ module.exports = function (grunt) {
 					ignore: [
 						'./lib/server/index.js',
 						'./lib/replicator.js',
-						'./lib/util.js'
+						'./lib/util/index.js'
 					]
 				}
 			},
