@@ -1,8 +1,8 @@
 /* eslint-env node, mocha, browser */
 'use strict';
 
-var e = require('./setup/test-environment');
-var C = require('./setup/test-constants');
+const e = require('./setup/test-environment');
+const C = require('./setup/test-constants');
 
 describe('single-instance graphics', function () {
 	this.timeout(10000);
@@ -12,16 +12,15 @@ describe('single-instance graphics', function () {
 		e.browser.client
 			.newWindow(C.SINGLE_INSTANCE_URL, 'NodeCG test single instance graphic', '')
 			.getCurrentTabId()
-			.then(function (tabId) {
+			.then(tabId => {
 				e.browser.tabs.singleInstance = tabId;
 				done();
 			});
 	});
 
 	it('shouldn\'t enter an infinite redirect loop when including a polymer element that loads an external stylesheet',
-		function (done) {
-			var singleInstance = require('../lib/graphics/single_instance');
-
+		done => {
+			const singleInstance = require('../lib/graphics/single_instance');
 			singleInstance.once('graphicAvailable', cb);
 
 			function cb(url) {
@@ -30,7 +29,7 @@ describe('single-instance graphics', function () {
 				}
 			}
 
-			setTimeout(function () {
+			setTimeout(() => {
 				singleInstance.removeListener('graphicAvailable', cb);
 				done();
 			}, 5000);

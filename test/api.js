@@ -2,63 +2,60 @@
 /* eslint-disable max-nested-callbacks */
 'use strict';
 
-var request = require('request');
-var chai = require('chai');
-var expect = chai.expect;
-var e = require('./setup/test-environment');
-var C = require('./setup/test-constants');
+const request = require('request');
+const chai = require('chai');
+const expect = chai.expect;
+const e = require('./setup/test-environment');
+const C = require('./setup/test-constants');
 
 describe('client-side api', function () {
 	this.timeout(10000);
 
-	context('on the dashboard', function () {
-		before(function (done) {
+	context('on the dashboard', () => {
+		before(done => {
 			e.browser.client
 				.switchTab(e.browser.tabs.dashboard)
 				.call(done);
 		});
 
 		// Check for basic connectivity. The rest of the test are run from the dashboard as well.
-		it('should receive messages', function (done) {
-			var sendMessage;
+		it('should receive messages', done => {
+			let sendMessage;
 			e.browser.client
-				.execute(function () {
+				.execute(() => {
 					window.serverToDashboardReceived = false;
-					window.dashboardApi.listenFor('serverToDashboard', function () {
+					window.dashboardApi.listenFor('serverToDashboard', () => {
 						window.serverToDashboardReceived = true;
 					});
 				})
-				.then(function () {
-					sendMessage = setInterval(function () {
+				.then(() => {
+					sendMessage = setInterval(() => {
 						e.apis.extension.sendMessage('serverToDashboard');
 					}, 500);
 				})
-				.executeAsync(function (done) {
-					var checkMessageReceived;
-					checkMessageReceived = setInterval(function () {
+				.executeAsync(done => {
+					const checkMessageReceived = setInterval(() => {
 						if (window.serverToDashboardReceived) {
 							clearInterval(checkMessageReceived);
 							done();
 						}
 					}, 50);
 				})
-				.then(function () {
+				.then(() => {
 					clearInterval(sendMessage);
 					done();
 				});
 		});
 
-		it('should send messages', function (done) {
+		it('should send messages', done => {
 			e.apis.extension.listenFor('dashboardToServer', done);
 			e.browser.client
-				.execute(function () {
-					window.dashboardApi.sendMessage('dashboardToServer');
-				});
+				.execute(() => window.dashboardApi.sendMessage('dashboardToServer'));
 		});
 	});
 
-	context('in a graphic', function () {
-		before(function (done) {
+	context('in a graphic', () => {
+		before(done => {
 			e.browser.client
 				.switchTab(e.browser.tabs.graphic)
 				.call(done);
@@ -66,181 +63,172 @@ describe('client-side api', function () {
 
 		// The graphic and dashboard APIs use the same file
 		// If dashboard API passes all its tests, we just need to make sure that the socket works
-		it('should receive messages', function (done) {
-			var sendMessage;
+		it('should receive messages', done => {
+			let sendMessage;
 			e.browser.client
-				.execute(function () {
+				.execute(() => {
 					window.serverToGraphicReceived = false;
-					window.graphicApi.listenFor('serverToGraphic', function () {
+					window.graphicApi.listenFor('serverToGraphic', () => {
 						window.serverToGraphicReceived = true;
 					});
 				})
-				.then(function () {
-					sendMessage = setInterval(function () {
+				.then(() => {
+					sendMessage = setInterval(() => {
 						e.apis.extension.sendMessage('serverToGraphic');
 					}, 500);
 				})
-				.executeAsync(function (done) {
-					var checkMessageReceived;
-					checkMessageReceived = setInterval(function () {
+				.executeAsync(done => {
+					const checkMessageReceived = setInterval(() => {
 						if (window.serverToGraphicReceived) {
 							clearInterval(checkMessageReceived);
 							done();
 						}
 					}, 50);
 				})
-				.then(function () {
+				.then(() => {
 					clearInterval(sendMessage);
 					done();
 				});
 		});
 
-		it('should send messages', function (done) {
+		it('should send messages', done => {
 			e.apis.extension.listenFor('graphicToServer', done);
 			e.browser.client
-				.execute(function () {
-					window.graphicApi.sendMessage('graphicToServer');
-				});
+				.execute(() => window.graphicApi.sendMessage('graphicToServer'));
 		});
 	});
 
-	describe('#config', function () {
-		before(function (done) {
+	describe('#config', () => {
+		before(done => {
 			e.browser.client
 				.switchTab(e.browser.tabs.dashboard)
 				.call(done);
 		});
 
-		it('should exist and have length', function (done) {
+		it('should exist and have length', done => {
 			e.browser.client
-				.execute(function () {
+				.execute(() => {
 					return window.dashboardApi.config;
 				})
-				.then(function (ret) {
+				.then(ret => {
 					expect(ret.value).to.not.be.empty();
-
 					done();
 				});
 		});
 
-		it('shouldn\'t reveal sensitive information', function (done) {
+		it('shouldn\'t reveal sensitive information', done => {
 			e.browser.client
-				.execute(function () {
+				.execute(() => {
 					return window.dashboardApi.config;
 				})
-				.then(function (ret) {
+				.then(ret => {
 					expect(ret.value.login).to.not.have.property('sessionSecret');
-
 					done();
 				});
 		});
 
-		it('shouldn\'t be writable', function (done) {
+		it('shouldn\'t be writable', done => {
 			e.browser.client
-				.execute(function () {
+				.execute(() => {
 					return Object.isFrozen(window.dashboardApi.config);
 				})
-				.then(function (ret) {
+				.then(ret => {
 					expect(ret.value).to.be.true();
 					done();
 				});
 		});
 	});
 
-	describe('#bundleConfig', function () {
-		before(function (done) {
+	describe('#bundleConfig', () => {
+		before(done => {
 			e.browser.client
 				.switchTab(e.browser.tabs.dashboard)
 				.call(done);
 		});
 
-		it('should exist and have length', function (done) {
+		it('should exist and have length', done => {
 			e.browser.client
-				.execute(function () {
+				.execute(() => {
 					return window.dashboardApi.bundleConfig;
 				})
-				.then(function (ret) {
+				.then(ret => {
 					expect(ret.value).to.not.be.empty();
-
 					done();
 				});
 		});
 	});
 });
 
-describe('server-side api', function () {
+describe('server-side api', () => {
 	it('should receive messages and fire acknowledgements', function (done) {
 		this.timeout(10000);
 
-		e.apis.extension.listenFor('clientToServer', function (data, cb) {
+		e.apis.extension.listenFor('clientToServer', (data, cb) => {
 			cb();
 		});
 
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
-			.executeAsync(function (done) {
-				window.dashboardApi.sendMessage('clientToServer', null, done);
-			})
+			.executeAsync(done => window.dashboardApi.sendMessage('clientToServer', null, done))
 			.call(done);
 	});
 
 	it('should send messages', function (done) {
 		this.timeout(10000);
 
-		var sendMessage;
+		let sendMessage;
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
-			.execute(function () {
+			.execute(() => {
 				window.serverToClientReceived = false;
-				window.dashboardApi.listenFor('serverToClient', function () {
+				window.dashboardApi.listenFor('serverToClient', () => {
 					window.serverToClientReceived = true;
 				});
 			})
-			.then(function () {
-				sendMessage = setInterval(function () {
+			.then(() => {
+				sendMessage = setInterval(() => {
 					e.apis.extension.sendMessage('serverToClient');
 				}, 500);
 			})
 			.switchTab(e.browser.tabs.dashboard)
-			.executeAsync(function (done) {
-				var checkMessageReceived;
-				checkMessageReceived = setInterval(function () {
+			.executeAsync(done => {
+				const checkMessageReceived = setInterval(() => {
 					if (window.serverToClientReceived) {
 						clearInterval(checkMessageReceived);
 						done();
 					}
 				}, 50);
 			})
-			.then(function () {
+			.then(() => {
 				clearInterval(sendMessage);
 				done();
 			});
 	});
 
-	it('should mount express middleware', function (done) {
-		request(C.DASHBOARD_URL + 'test-bundle/test-route', function (error, response) {
+	it('should mount express middleware', done => {
+		request(`${C.DASHBOARD_URL}test-bundle/test-route`, (error, response) => {
 			expect(error).to.be.null();
 			expect(response.statusCode).to.equal(200);
 			done();
 		});
 	});
 
-	describe('#config', function () {
-		it('should exist and have length', function () {
+	describe('#config', () => {
+		it('should exist and have length', () => {
 			expect(e.apis.extension.config).to.not.be.empty();
 		});
 
-		it('shouldn\'t reveal sensitive information', function () {
+		it('shouldn\'t reveal sensitive information', () => {
 			expect(e.apis.extension.config.login).to.not.have.property('sessionSecret');
 		});
 
-		it('shouldn\'t be writable', function () {
+		it('shouldn\'t be writable', () => {
 			expect(Object.isFrozen(e.apis.extension.config)).to.be.true();
 		});
 	});
 
-	describe('#bundleConfig', function () {
-		it('should exist and has length', function () {
+	describe('#bundleConfig', () => {
+		it('should exist and has length', () => {
 			expect(e.apis.extension.bundleConfig).to.not.be.empty();
 		});
 	});

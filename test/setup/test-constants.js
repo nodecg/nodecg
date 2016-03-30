@@ -1,22 +1,22 @@
 'use strict';
 
-var path = require('path');
-var util = require('util');
+const path = require('path');
+const util = require('util');
 
-var rootDir = path.resolve(__dirname, '../..');
-var config = require(path.join(rootDir, '/lib/config')).config;
+const rootDir = path.resolve(__dirname, '../..');
+const config = require(path.join(rootDir, '/lib/config')).config;
 
-var bundleName = 'test-bundle';
-var panelName = 'test';
-var testBundleSrcPath = path.resolve(rootDir, 'test/setup/', bundleName);
-var bundleDir = path.resolve(rootDir, 'bundles', bundleName);
-var cfgDir = path.resolve(rootDir, 'cfg');
-var bundleCfgPath = path.resolve(cfgDir, bundleName + '.json');
-var dashboardUrl = util.format('http://%s/', config.baseURL);
-var testPanelUrl = dashboardUrl + 'panel/' + bundleName + '/' + panelName;
-var panelComponentsUrl = dashboardUrl + 'panel/' + bundleName + '/components';
-var graphicUrl = dashboardUrl + 'graphics/' + bundleName;
-var singleInstanceUrl = dashboardUrl + 'graphics/' + bundleName + '/single_instance.html';
+const bundleName = 'test-bundle';
+const panelName = 'test';
+const testBundleSrcPath = path.resolve(rootDir, 'test/setup/', bundleName);
+const bundleDir = path.resolve(rootDir, 'bundles', bundleName);
+const cfgDir = path.resolve(rootDir, 'cfg');
+const bundleCfgPath = path.resolve(cfgDir, `${bundleName}.json`);
+const dashboardUrl = util.format('http://%s/', config.baseURL);
+const testPanelUrl = `${dashboardUrl}panel/${bundleName}/${panelName}`;
+const panelComponentsUrl = `${dashboardUrl}panel/${bundleName}/components`;
+const graphicUrl = `${dashboardUrl}graphics/${bundleName}`;
+const singleInstanceUrl = `${dashboardUrl}graphics/${bundleName}/single_instance.html`;
 
 module.exports = {
 	BUNDLE_NAME: bundleName,

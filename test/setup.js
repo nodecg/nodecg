@@ -7,10 +7,10 @@ process.env.test = true;
 process.argv.push('--cfgPath');
 process.argv.push('./test/specimen/test.json');
 
-var fs = require('fs.extra');
-var webdriverio = require('webdriverio');
-var e = require('./setup/test-environment');
-var C = require('./setup/test-constants');
+const fs = require('fs.extra');
+const webdriverio = require('webdriverio');
+const e = require('./setup/test-environment');
+const C = require('./setup/test-constants');
 
 // Global before and after
 before(function (done) {
@@ -32,14 +32,14 @@ before(function (done) {
 	fs.writeFileSync('./db/replicants/test-bundle/extensionPersistence.rep', '"it work good!"');
 	fs.writeFileSync('./db/replicants/test-bundle/extensionFalseyRead.rep', '0');
 
-	e.server.once('started', function () {
+	e.server.once('started', () => {
 		/** Extension API setup **/
 		e.apis.extension = e.server.getExtensions()[C.BUNDLE_NAME];
 
 		if (process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER) {
 			console.log('Travis environment detected, running WebDriver.io with Travis capabilities');
-			var desiredCapabilities = {
-				name: 'Travis job ' + process.env.TRAVIS_JOB_NUMBER,
+			const desiredCapabilities = {
+				name: `Travis job ${process.env.TRAVIS_JOB_NUMBER}`,
 				build: process.env.TRAVIS_BUILD_NUMBER,
 				tags: [process.env.TRAVIS_BRANCH, process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE],
 				browserName: 'chrome',
@@ -64,7 +64,7 @@ before(function (done) {
 			}
 
 			e.browser.client = webdriverio.remote({
-				desiredCapabilities: desiredCapabilities,
+				desiredCapabilities,
 				host: 'ondemand.saucelabs.com',
 				port: 80,
 				user: process.env.SAUCE_USERNAME,
@@ -84,12 +84,11 @@ before(function (done) {
 			.timeoutsAsyncScript(30000)
 			.newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
 			.getCurrentTabId()
-			.then(function (tabId) {
+			.then(tabId => {
 				e.browser.tabs.dashboard = tabId;
 			})
-			.executeAsync(function (done) {
-				var checkForApi;
-				checkForApi = setInterval(function () {
+			.executeAsync(done => {
+				const checkForApi = setInterval(() => {
 					if (typeof window.dashboardApi !== 'undefined') {
 						clearInterval(checkForApi);
 						done();
@@ -98,12 +97,11 @@ before(function (done) {
 			})
 			.newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '')
 			.getCurrentTabId()
-			.then(function (tabId) {
+			.then(tabId => {
 				e.browser.tabs.graphic = tabId;
 			})
-			.executeAsync(function (done) {
-				var checkForApi;
-				checkForApi = setInterval(function () {
+			.executeAsync(done => {
+				const checkForApi = setInterval(() => {
 					if (typeof window.graphicApi !== 'undefined') {
 						clearInterval(checkForApi);
 						done();
@@ -116,7 +114,7 @@ before(function (done) {
 	e.server.start();
 });
 
-after(function () {
+after(() => {
 	e.server.stop();
 	e.browser.client.end();
 });

@@ -1,11 +1,11 @@
 /* istanbul ignore next */
 'use strict';
 
-var express = require('express');
+const express = require('express');
 
 module.exports = function (nodecg) {
-	var app = express();
-	app.get('/test-bundle/test-route', function (req, res) {
+	const app = express();
+	app.get('/test-bundle/test-route', (req, res) => {
 		res.sendStatus(200);
 	});
 

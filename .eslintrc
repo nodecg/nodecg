@@ -1,12 +1,15 @@
 {
-	"extends": "xo",
+	"extends": "xo/esnext",
 	"rules": {
-		"new-cap": [
+		"new-cap": [0],
+		"babel/new-cap": [
 			2,
 			{
 				"capIsNewExceptions": [
 					"Polymer",
-					"nodecg.Replicant"
+					"nodecg.Replicant",
+					"e.apis.extension.Replicant",
+					"window.dashboardApi.Replicant"
 				]
 			}
 		]

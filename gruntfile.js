@@ -1,6 +1,6 @@
 'use strict';
 
-var istanbul = require('browserify-istanbul');
+const istanbul = require('browserify-istanbul');
 
 module.exports = function (grunt) {
 	require('load-grunt-tasks')(grunt);
@@ -22,6 +22,9 @@ module.exports = function (grunt) {
 						}]
 					],
 					transform: [
+						['babelify', {
+							presets: ['es2015']
+						}],
 						['aliasify', {
 							aliases: {
 								'./logger': './lib/browser/logger',

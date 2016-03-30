@@ -2,97 +2,87 @@
 /* eslint-disable new-cap, camelcase, max-nested-callbacks */
 'use strict';
 
-var chai = require('chai');
-var expect = chai.expect;
-var fs = require('fs');
-var e = require('./setup/test-environment');
+const chai = require('chai');
+const expect = chai.expect;
+const fs = require('fs');
+const e = require('./setup/test-environment');
 
 describe('client-side replicants', function () {
 	this.timeout(10000);
 
-	before(function (done) {
+	before(done => {
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
 			.call(done);
 	});
 
-	it('should only apply defaultValue when first declared', function (done) {
+	it('should only apply defaultValue when first declared', done => {
 		e.apis.extension.Replicant('clientTest', {defaultValue: 'foo', persistent: false});
 
 		e.browser.client
-			.executeAsync(function (done) {
-				var rep = window.dashboardApi.Replicant('clientTest', {defaultValue: 'bar'});
-				rep.on('declared', function () {
-					done(rep.value);
-				});
+			.executeAsync(done => {
+				const rep = window.dashboardApi.Replicant('clientTest', {defaultValue: 'bar'});
+				rep.on('declared', () => done(rep.value));
 			})
-			.then(function (ret) {
+			.then(ret => {
 				expect(ret.value).to.equal('foo');
-
 				done();
 			});
 	});
 
-	it('should be readable without subscription, via readReplicant', function (done) {
+	it('should be readable without subscription, via readReplicant', done => {
 		e.browser.client
-			.executeAsync(function (done) {
-				window.dashboardApi.readReplicant('clientTest', done);
-			})
-			.then(function (ret) {
+			.executeAsync(done => window.dashboardApi.readReplicant('clientTest', done))
+			.then(ret => {
 				expect(ret.value).to.equal('foo');
-
 				done();
 			});
 	});
 
-	it('should throw an error when no name is provided', function (done) {
+	it('should throw an error when no name is provided', done => {
 		e.browser.client
-			.executeAsync(function (done) {
+			.executeAsync(done => {
 				try {
 					window.dashboardApi.Replicant();
 				} catch (e) {
 					done(e.message);
 				}
 			})
-			.then(function (ret) {
+			.then(ret => {
 				expect(ret.value).to.equal('Must supply a name when instantiating a Replicant');
-
 				done();
 			});
 	});
 
-	it('should be assignable via the ".value" property', function (done) {
+	it('should be assignable via the ".value" property', done => {
 		e.browser.client
-			.executeAsync(function (done) {
-				var rep = window.dashboardApi.Replicant('clientAssignmentTest', {persistent: false});
-				rep.on('assignmentAccepted', function (data) {
-					done(data);
-				});
+			.executeAsync(done => {
+				const rep = window.dashboardApi.Replicant('clientAssignmentTest', {persistent: false});
+				rep.on('assignmentAccepted', data => done(data));
 				rep.value = 'assignmentOK';
 			})
-			.then(function (ret) {
+			.then(ret => {
 				expect(ret.value.newValue).to.equal('assignmentOK');
 				expect(ret.value.revision).to.equal(1);
-
 				done();
 			});
 	});
 
-	it('should react to changes in arrays', function (done) {
+	it('should react to changes in arrays', done => {
 		e.browser.client
-			.executeAsync(function (done) {
-				var rep = window.dashboardApi.Replicant('clientArrTest', {
+			.executeAsync(done => {
+				const rep = window.dashboardApi.Replicant('clientArrTest', {
 					persistent: false,
 					defaultValue: ['starting']
 				});
 
-				rep.on('declared', function () {
-					rep.on('change', function (oldVal, newVal, changes) {
+				rep.on('declared', () => {
+					rep.on('change', (oldVal, newVal, changes) => {
 						if (oldVal && newVal && changes) {
 							done({
-								oldVal: oldVal,
-								newVal: newVal,
-								changes: changes
+								oldVal,
+								newVal,
+								changes
 							});
 						}
 					});
@@ -100,7 +90,7 @@ describe('client-side replicants', function () {
 					rep.value.push('arrPushOK');
 				});
 			})
-			.then(function (ret) {
+			.then(ret => {
 				expect(ret.value.oldVal).to.deep.equal(['starting']);
 				expect(ret.value.newVal).to.deep.equal(['starting', 'arrPushOK']);
 				expect(ret.value.changes).to.have.length(1);
@@ -109,7 +99,6 @@ describe('client-side replicants', function () {
 				expect(ret.value.changes[0].removedCount).to.equal(0);
 				expect(ret.value.changes[0].added).to.deep.equal(['arrPushOK']);
 				expect(ret.value.changes[0].addedCount).to.equal(1);
-
 				done();
 			});
 	});
@@ -119,23 +108,19 @@ describe('client-side replicants', function () {
 		this.timeout(30000);
 
 		e.browser.client
-			.executeAsync(function (done) {
+			.executeAsync(done => {
 				window.clientRedeclare = window.dashboardApi.Replicant('clientRedeclare', {
 					defaultValue: 'foo',
 					persistent: false
 				});
 
-				window.clientRedeclare.once('declared', function () {
-					done();
-				});
+				window.clientRedeclare.once('declared', () => done());
 			})
-			.then(function () {
-				e.server.once('stopped', function () {
+			.then(() => {
+				e.server.once('stopped', () => {
 					e.browser.client
-						.executeAsync(function (done) {
-							window.clientRedeclare.once('declared', function () {
-								done();
-							});
+						.executeAsync(done => {
+							window.clientRedeclare.once('declared', () => done());
 						})
 						.call(done);
 
@@ -146,18 +131,17 @@ describe('client-side replicants', function () {
 			});
 	});
 
-	context('when an object', function () {
-		it('should not cause server-side replicants to lose observation', function (done) {
-			var rep = e.apis.extension.Replicant('clientServerObservation', {
+	context('when an object', () => {
+		it('should not cause server-side replicants to lose observation', done => {
+			const rep = e.apis.extension.Replicant('clientServerObservation', {
 				defaultValue: {foo: 'foo'},
 				persistent: false
 			});
 
 			e.browser.client
-				.executeAsync(function (done) {
-					var rep = window.dashboardApi.Replicant('clientServerObservation');
-
-					rep.on('change', function (oldVal, newVal) {
+				.executeAsync(done => {
+					const rep = window.dashboardApi.Replicant('clientServerObservation');
+					rep.on('change', (oldVal, newVal) => {
 						if (newVal.foo === 'bar') {
 							done(newVal);
 						} else {
@@ -165,10 +149,10 @@ describe('client-side replicants', function () {
 						}
 					});
 				})
-				.then(function (ret) {
+				.then(ret => {
 					expect(ret.value).to.deep.equal({foo: 'bar'});
 
-					rep.on('change', function (oldVal, newVal) {
+					rep.on('change', (oldVal, newVal) => {
 						if (newVal.foo === 'baz') {
 							done();
 						}
@@ -178,21 +162,21 @@ describe('client-side replicants', function () {
 				});
 		});
 
-		it('should react to changes in nested properties', function (done) {
+		it('should react to changes in nested properties', done => {
 			e.browser.client
-				.executeAsync(function (done) {
-					var rep = window.dashboardApi.Replicant('clientObjTest', {
+				.executeAsync(done => {
+					const rep = window.dashboardApi.Replicant('clientObjTest', {
 						persistent: false,
 						defaultValue: {a: {b: {c: 'c'}}}
 					});
 
-					rep.on('declared', function () {
-						rep.on('change', function (oldVal, newVal, changes) {
+					rep.on('declared', () => {
+						rep.on('change', (oldVal, newVal, changes) => {
 							if (oldVal && newVal && changes) {
 								done({
-									oldVal: oldVal,
-									newVal: newVal,
-									changes: changes
+									oldVal,
+									newVal,
+									changes
 								});
 							}
 						});
@@ -200,7 +184,7 @@ describe('client-side replicants', function () {
 						rep.value.a.b.c = 'nestedChangeOK';
 					});
 				})
-				.then(function (ret) {
+				.then(ret => {
 					expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
 					expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
 					expect(ret.value.changes).to.have.length(1);
@@ -208,7 +192,6 @@ describe('client-side replicants', function () {
 					expect(ret.value.changes[0].path).to.deep.equal(['a', 'b', 'c']);
 					expect(ret.value.changes[0].oldValue).to.equal('c');
 					expect(ret.value.changes[0].newValue).to.equal('nestedChangeOK');
-
 					done();
 				});
 		});
@@ -219,8 +202,8 @@ describe('client-side replicants', function () {
 		// and the clients should then digest that change and emit a "change" event.
 		// This test is to address a very specific bug reported by Love Olsson.
 		/* jshint -W106 */
-		it('should react to server-side changes of array properties', function (done) {
-			var serverRep = e.apis.extension.Replicant('s2c_nestedArrTest', {
+		it('should react to server-side changes of array properties', done => {
+			const serverRep = e.apis.extension.Replicant('s2c_nestedArrTest', {
 				persistent: false,
 				defaultValue: {
 					arr: []
@@ -228,34 +211,32 @@ describe('client-side replicants', function () {
 			});
 
 			e.browser.client
-				.executeAsync(function (done) {
+				.executeAsync(done => {
 					window.s2c_nestedArrTest = window.dashboardApi.Replicant('s2c_nestedArrTest');
-					window.s2c_nestedArrTest.on('declared', function () {
+					window.s2c_nestedArrTest.on('declared', () => {
 						done();
 
-						window.s2c_nestedArrTest.on('change', function (oldVal, newVal, changes) {
+						window.s2c_nestedArrTest.on('change', (oldVal, newVal, changes) => {
 							if (oldVal && newVal && changes) {
 								window.s2c_nestedArrChange = {
-									oldVal: oldVal,
-									newVal: newVal,
-									changes: changes
+									oldVal,
+									newVal,
+									changes
 								};
 							}
 						});
 					});
 				})
-				.call(function () {
-					serverRep.value.arr.push('test');
-				})
-				.executeAsync(function (done) {
-					var interval = setInterval(function () {
+				.call(() => serverRep.value.arr.push('test'))
+				.executeAsync(done => {
+					const interval = setInterval(() => {
 						if (window.s2c_nestedArrChange) {
 							clearInterval(interval);
 							done(window.s2c_nestedArrChange);
 						}
 					}, 50);
 				})
-				.then(function (ret) {
+				.then(ret => {
 					expect(ret.value.oldVal).to.deep.equal({arr: []});
 					expect(ret.value.newVal).to.deep.equal({arr: ['test']});
 					expect(ret.value.changes).to.have.length(1);
@@ -264,40 +245,34 @@ describe('client-side replicants', function () {
 					expect(ret.value.changes[0].added).to.deep.equal(['test']);
 					expect(ret.value.changes[0].addedCount).to.equal(1);
 					expect(ret.value.changes[0].removedCount).to.equal(0);
-
 					done();
 				});
 		});
 		/* jshint +W106 */
 	});
 
-	context('when "persistent" is set to "true"', function () {
-		it('should load persisted values when they exist', function (done) {
+	context('when "persistent" is set to "true"', () => {
+		it('should load persisted values when they exist', done => {
 			e.browser.client
-				.executeAsync(function (done) {
-					var rep = window.dashboardApi.Replicant('clientPersistence');
-					rep.on('declared', function () {
-						done(rep.value);
-					});
+				.executeAsync(done => {
+					const rep = window.dashboardApi.Replicant('clientPersistence');
+					rep.on('declared', () => done(rep.value));
 				})
-				.then(function (ret) {
+				.then(ret => {
 					expect(ret.value).to.equal('it work good!');
-
 					done();
 				});
 		});
 
-		it('should persist assignment to disk', function (done) {
+		it('should persist assignment to disk', done => {
 			e.browser.client
-				.executeAsync(function (done) {
-					var rep = window.dashboardApi.Replicant('clientPersistence');
+				.executeAsync(done => {
+					const rep = window.dashboardApi.Replicant('clientPersistence');
 					rep.value = {nested: 'hey we assigned!'};
-					rep.on('assignmentAccepted', function () {
-						done();
-					});
+					rep.on('assignmentAccepted', () => done());
 				})
-				.then(function () {
-					fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', function (err, data) {
+				.then(() => {
+					fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', (err, data) => {
 						if (err) {
 							throw err;
 						}
@@ -308,46 +283,42 @@ describe('client-side replicants', function () {
 				});
 		});
 
-		it('should persist changes to disk', function (done) {
-			var serverRep = e.apis.extension.Replicant('clientChangePersistence', {defaultValue: {nested: ''}});
+		it('should persist changes to disk', done => {
+			const serverRep = e.apis.extension.Replicant('clientChangePersistence', {defaultValue: {nested: ''}});
 			e.browser.client
-				.executeAsync(function (done) {
+				.executeAsync(done => {
 					window.clientChangePersistence = window.dashboardApi.Replicant('clientChangePersistence');
-					window.clientChangePersistence.once('change', function () {
-						done();
-					});
+					window.clientChangePersistence.once('change', () => done());
 				})
-				.then(function () {
-					serverRep.on('change', function (oldVal, newVal) {
+				.then(() => {
+					serverRep.on('change', (oldVal, newVal) => {
 						if (newVal.nested !== 'hey we changed!') {
 							return;
 						}
 
 						// On a short timeout to give the Replicator time to write the new value to disk
-						setTimeout(function () {
-							var data = fs.readFileSync('./db/replicants/test-bundle/clientChangePersistence.rep',
+						setTimeout(() => {
+							const data = fs.readFileSync('./db/replicants/test-bundle/clientChangePersistence.rep',
 								'utf-8');
 							expect(data).to.equal('{"nested":"hey we changed!"}');
 							done();
 						}, 10);
 					});
 				})
-				.execute(function () {
+				.execute(() => {
 					window.clientChangePersistence.value.nested = 'hey we changed!';
 				});
 		});
 
-		it('should persist falsey values to disk', function (done) {
+		it('should persist falsey values to disk', done => {
 			e.browser.client
-				.executeAsync(function (done) {
-					var rep = window.dashboardApi.Replicant('clientFalseyWrite');
+				.executeAsync(done => {
+					const rep = window.dashboardApi.Replicant('clientFalseyWrite');
 					rep.value = 0;
-					rep.on('assignmentAccepted', function () {
-						done();
-					});
+					rep.on('assignmentAccepted', () => done());
 				})
-				.then(function () {
-					fs.readFile('./db/replicants/test-bundle/clientFalseyWrite.rep', 'utf-8', function (err, data) {
+				.then(() => {
+					fs.readFile('./db/replicants/test-bundle/clientFalseyWrite.rep', 'utf-8', (err, data) => {
 						if (err) {
 							throw err;
 						}
@@ -358,43 +329,38 @@ describe('client-side replicants', function () {
 				});
 		});
 
-		it('should read falsey values from disk', function (done) {
+		it('should read falsey values from disk', done => {
 			e.browser.client
-				.executeAsync(function (done) {
-					var rep = window.dashboardApi.Replicant('clientFalseyRead');
-					rep.on('declared', function () {
-						done(rep.value);
-					});
+				.executeAsync(done => {
+					const rep = window.dashboardApi.Replicant('clientFalseyRead');
+					rep.on('declared', () => done(rep.value));
 				})
-				.then(function (ret) {
+				.then(ret => {
 					expect(ret.value).to.equal(0);
-
 					done();
 				});
 		});
 	});
 
-	context('when "persistent" is set to "false"', function () {
-		it('should not write their value to disk', function (done) {
-			fs.unlink('./db/replicants/test-bundle/clientTransience.rep', function (err) {
+	context('when "persistent" is set to "false"', () => {
+		it('should not write their value to disk', done => {
+			fs.unlink('./db/replicants/test-bundle/clientTransience.rep', err => {
 				if (err && err.code !== 'ENOENT') {
 					throw err;
 				}
 
 				e.browser.client
-					.executeAsync(function (done) {
-						var rep = window.dashboardApi.Replicant('clientTransience', {
+					.executeAsync(done => {
+						const rep = window.dashboardApi.Replicant('clientTransience', {
 							defaultValue: 'o no',
 							persistent: false
 						});
 
-						rep.on('declared', function () {
-							done();
-						});
+						rep.on('declared', () => done());
 					})
-					.then(function () {
-						fs.readFile('./db/replicants/test-bundle/clientTransience.rep', function (err) {
-							expect(function () {
+					.then(() => {
+						fs.readFile('./db/replicants/test-bundle/clientTransience.rep', err => {
+							expect(() => {
 								if (err) {
 									throw err;
 								}
@@ -407,49 +373,46 @@ describe('client-side replicants', function () {
 	});
 });
 
-describe('server-side replicants', function () {
+describe('server-side replicants', () => {
 	it('should only apply defaultValue when first declared', function (done) {
 		this.timeout(10000);
 
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
-			.executeAsync(function (done) {
-				var rep = window.dashboardApi.Replicant('extensionTest', {defaultValue: 'foo', persistent: false});
-				rep.on('declared', function () {
-					done();
-				});
+			.executeAsync(done => {
+				const rep = window.dashboardApi.Replicant('extensionTest', {defaultValue: 'foo', persistent: false});
+				rep.on('declared', () => done());
 			})
-			.then(function () {
-				var rep = e.apis.extension.Replicant('extensionTest', {defaultValue: 'bar'});
+			.then(() => {
+				const rep = e.apis.extension.Replicant('extensionTest', {defaultValue: 'bar'});
 				expect(rep.value).to.equal('foo');
-
 				done();
 			});
 	});
 
-	it('should be readable without subscription, via readReplicant', function () {
+	it('should be readable without subscription, via readReplicant', () => {
 		expect(e.apis.extension.readReplicant('extensionTest')).to.equal('foo');
 	});
 
-	it('should throw an error when no name is provided', function () {
-		expect(function () {
+	it('should throw an error when no name is provided', () => {
+		expect(() => {
 			e.apis.extension.Replicant();
 		}).to.throw(/Must supply a name when instantiating a Replicant/);
 	});
 
-	it('should be assignable via the ".value" property', function () {
-		var rep = e.apis.extension.Replicant('extensionAssignmentTest', {persistent: false});
+	it('should be assignable via the ".value" property', () => {
+		const rep = e.apis.extension.Replicant('extensionAssignmentTest', {persistent: false});
 		rep.value = 'assignmentOK';
 		expect(rep.value).to.equal('assignmentOK');
 	});
 
-	it('should react to changes in nested properties of objects', function (done) {
-		var rep = e.apis.extension.Replicant('extensionObjTest', {
+	it('should react to changes in nested properties of objects', done => {
+		const rep = e.apis.extension.Replicant('extensionObjTest', {
 			persistent: false,
 			defaultValue: {a: {b: {c: 'c'}}}
 		});
 
-		rep.on('change', function (oldVal, newVal, changes) {
+		rep.on('change', (oldVal, newVal, changes) => {
 			if (newVal.a.b.c !== 'nestedChangeOK') {
 				return;
 			}
@@ -467,13 +430,13 @@ describe('server-side replicants', function () {
 		rep.value.a.b.c = 'nestedChangeOK';
 	});
 
-	it('should react to changes in arrays', function (done) {
-		var rep = e.apis.extension.Replicant('extensionArrTest', {
+	it('should react to changes in arrays', done => {
+		const rep = e.apis.extension.Replicant('extensionArrTest', {
 			persistent: false,
 			defaultValue: ['starting']
 		});
 
-		rep.on('change', function (oldVal, newVal, changes) {
+		rep.on('change', (oldVal, newVal, changes) => {
 			if (!changes || changes[0].added[0] !== 'arrPushOK') {
 				return;
 			}
@@ -495,43 +458,39 @@ describe('server-side replicants', function () {
 	it('should only apply array splices from the client once', function (done) {
 		this.timeout(10000);
 
-		var serverRep = e.apis.extension.Replicant('clientDoubleApplyTest', {persistent: false, defaultValue: []});
+		const serverRep = e.apis.extension.Replicant('clientDoubleApplyTest', {persistent: false, defaultValue: []});
 
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
-			.executeAsync(function (done) {
+			.executeAsync(done => {
 				window.clientDoubleApplyTest = window.dashboardApi.Replicant('clientDoubleApplyTest');
 
-				window.clientDoubleApplyTest.on('declared', function () {
-					window.clientDoubleApplyTest.on('change', function () {
-						done();
-					});
+				window.clientDoubleApplyTest.on('declared', () => {
+					window.clientDoubleApplyTest.on('change', () => done());
 				});
 			})
-			.then(function () {
-				serverRep.on('change', function (oldVal, newVal) {
+			.then(() => {
+				serverRep.on('change', (oldVal, newVal) => {
 					if (Array.isArray(newVal) && newVal[0] === 'test') {
 						expect(newVal).to.deep.equal(['test']);
 						done();
 					}
 				});
 			})
-			.execute(function () {
-				window.clientDoubleApplyTest.value.push('test');
-			});
+			.execute(() => window.clientDoubleApplyTest.value.push('test'));
 	});
 
-	context('when "persistent" is set to "true"', function () {
-		it('should load persisted values when they exist', function () {
-			var rep = e.apis.extension.Replicant('extensionPersistence');
+	context('when "persistent" is set to "true"', () => {
+		it('should load persisted values when they exist', () => {
+			const rep = e.apis.extension.Replicant('extensionPersistence');
 			expect(rep.value).to.equal('it work good!');
 		});
 
-		it('should persist assignment to disk', function (done) {
-			var rep = e.apis.extension.Replicant('extensionPersistence');
+		it('should persist assignment to disk', done => {
+			const rep = e.apis.extension.Replicant('extensionPersistence');
 			rep.value = {nested: 'hey we assigned!'};
-			setTimeout(function () {
-				fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', function (err, data) {
+			setTimeout(() => {
+				fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', (err, data) => {
 					if (err) {
 						throw err;
 					}
@@ -542,11 +501,11 @@ describe('server-side replicants', function () {
 			}, 10);
 		});
 
-		it('should persist changes to disk', function (done) {
-			var rep = e.apis.extension.Replicant('extensionPersistence');
+		it('should persist changes to disk', done => {
+			const rep = e.apis.extension.Replicant('extensionPersistence');
 			rep.value.nested = 'hey we changed!';
-			setTimeout(function () {
-				fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', function (err, data) {
+			setTimeout(() => {
+				fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', (err, data) => {
 					if (err) {
 						throw err;
 					}
@@ -557,11 +516,11 @@ describe('server-side replicants', function () {
 			}, 10);
 		});
 
-		it('should persist falsey values to disk', function (done) {
-			var rep = e.apis.extension.Replicant('extensionFalseyWrite');
+		it('should persist falsey values to disk', done => {
+			const rep = e.apis.extension.Replicant('extensionFalseyWrite');
 			rep.value = 0;
-			setTimeout(function () {
-				fs.readFile('./db/replicants/test-bundle/extensionFalseyWrite.rep', 'utf-8', function (err, data) {
+			setTimeout(() => {
+				fs.readFile('./db/replicants/test-bundle/extensionFalseyWrite.rep', 'utf-8', (err, data) => {
 					if (err) {
 						throw err;
 					}
@@ -572,24 +531,24 @@ describe('server-side replicants', function () {
 			}, 10);
 		});
 
-		it('should read falsey values from disk', function () {
-			var rep = e.apis.extension.Replicant('extensionFalseyRead');
+		it('should read falsey values from disk', () => {
+			const rep = e.apis.extension.Replicant('extensionFalseyRead');
 			expect(rep.value).to.equal(0);
 		});
 	});
 
-	context('when "persistent" is set to "false"', function () {
-		it('should not write their value to disk', function (done) {
+	context('when "persistent" is set to "false"', () => {
+		it('should not write their value to disk', done => {
 			// Remove the file if it exists for some reason
-			fs.unlink('./db/replicants/test-bundle/extensionTransience.rep', function (err) {
+			fs.unlink('./db/replicants/test-bundle/extensionTransience.rep', err => {
 				if (err && err.code !== 'ENOENT') {
 					throw err;
 				}
 
-				var rep = e.apis.extension.Replicant('extensionTransience', {persistent: false});
+				const rep = e.apis.extension.Replicant('extensionTransience', {persistent: false});
 				rep.value = 'o no';
-				fs.readFile('./db/replicants/test-bundle/extensionTransience.rep', function (err) {
-					expect(function () {
+				fs.readFile('./db/replicants/test-bundle/extensionTransience.rep', err => {
+					expect(() => {
 						if (err) {
 							throw err;
 						}
