@@ -33,8 +33,7 @@ module.exports = function (grunt) {
 						['envify', {
 							_: 'purge',
 							browser: true
-						}],
-						'brfs'
+						}]
 					],
 					ignore: [
 						'./lib/server/index.js',
