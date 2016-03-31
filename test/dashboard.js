@@ -2,7 +2,7 @@
 'use strict';
 
 const chai = require('chai');
-const expect = chai.expect;
+const assert = chai.assert;
 const e = require('./setup/test-environment');
 
 describe('dashboard', function () {
@@ -14,7 +14,7 @@ describe('dashboard', function () {
 				.switchTab(e.browser.tabs.dashboard)
 				.isExisting('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')
 				.then(isExisting => {
-					expect(isExisting).to.be.true();
+					assert.isTrue(isExisting);
 					done();
 				});
 		});

@@ -5,6 +5,7 @@
 const request = require('request');
 const chai = require('chai');
 const expect = chai.expect;
+const assert = chai.assert;
 const e = require('./setup/test-environment');
 const C = require('./setup/test-constants');
 
@@ -111,7 +112,7 @@ describe('client-side api', function () {
 					return window.dashboardApi.config;
 				})
 				.then(ret => {
-					expect(ret.value).to.not.be.empty();
+					assert.isAbove(Object.keys(ret.value).length, 0);
 					done();
 				});
 		});
@@ -133,7 +134,7 @@ describe('client-side api', function () {
 					return Object.isFrozen(window.dashboardApi.config);
 				})
 				.then(ret => {
-					expect(ret.value).to.be.true();
+					assert.isTrue(ret.value);
 					done();
 				});
 		});
@@ -152,7 +153,7 @@ describe('client-side api', function () {
 					return window.dashboardApi.bundleConfig;
 				})
 				.then(ret => {
-					expect(ret.value).to.not.be.empty();
+					assert.isAbove(Object.keys(ret.value).length, 0);
 					done();
 				});
 		});
@@ -207,7 +208,7 @@ describe('server-side api', () => {
 
 	it('should mount express middleware', done => {
 		request(`${C.DASHBOARD_URL}test-bundle/test-route`, (error, response) => {
-			expect(error).to.be.null();
+			assert.isNull(error);
 			expect(response.statusCode).to.equal(200);
 			done();
 		});
@@ -215,7 +216,7 @@ describe('server-side api', () => {
 
 	describe('#config', () => {
 		it('should exist and have length', () => {
-			expect(e.apis.extension.config).to.not.be.empty();
+			assert.isAbove(Object.keys(e.apis.extension.config).length, 0);
 		});
 
 		it('shouldn\'t reveal sensitive information', () => {
@@ -223,13 +224,13 @@ describe('server-side api', () => {
 		});
 
 		it('shouldn\'t be writable', () => {
-			expect(Object.isFrozen(e.apis.extension.config)).to.be.true();
+			assert.isTrue(Object.isFrozen(e.apis.extension.config));
 		});
 	});
 
 	describe('#bundleConfig', () => {
 		it('should exist and has length', () => {
-			expect(e.apis.extension.bundleConfig).to.not.be.empty();
+			assert.isAbove(Object.keys(e.apis.extension.bundleConfig).length, 0);
 		});
 	});
 });
