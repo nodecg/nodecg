@@ -1,3 +1,13 @@
+<a name="0.7.7"></a>
+## [0.7.7](https://github.com/nodecg/nodecg/compare/v0.7.6...v0.7.7) (2016-03-31)
+
+
+### Bug Fixes
+
+* **api:** fix API erroring on page load ([fec7793](https://github.com/nodecg/nodecg/commit/fec7793))
+
+
+
 <a name="0.7.6"></a>
 ## [0.7.6](https://github.com/nodecg/nodecg/compare/v0.7.5...v0.7.6) (2016-03-31)
 
