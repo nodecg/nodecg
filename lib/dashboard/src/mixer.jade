@@ -1,0 +1,42 @@
+style(is="custom-style").
+	#mixer-masterCard {
+		background-color: rgb(0, 112, 112);
+		color: white;
+		margin-bottom: 16px;
+	}
+
+	#mixer-masterCard .card-content {
+		@apply(--layout-horizontal);
+		align-items: center;
+	}
+
+	#mixer-masterCard span {
+		@apply(--paper-font-display1);
+		@apply(--layout-flex);
+		font-size: 28px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	#masterFader {
+		width: 250px;
+		@apply(--layout-flex-none);
+		--paper-slider-active-color: white;
+		--paper-slider-knob-color: white;
+		--paper-input-container-focus-color: var(--google-blue-700);
+		--paper-input-container-color: white;
+		--paper-input-container-input-color: white;
+		--paper-slider-input: {
+			width: 80px;
+		};
+	}
+
+
+paper-card.ncg-card#mixer-masterCard
+	.card-content
+		span Master Fader
+		paper-slider#masterFader(min="0" max="100" step="1" editable)
+
+each bundle in bundles
+	if (bundle.soundCues && bundle.soundCues.length > 0)
+		ncg-sounds(bundle-name=bundle.name)

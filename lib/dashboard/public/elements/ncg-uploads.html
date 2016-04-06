@@ -1,9 +1,10 @@
-<link rel="import" href="/components/polymer/polymer.html">
 <link rel="import" href="/components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="/components/iron-icons/iron-icons.html">
+<link rel="import" href="/components/nodecg-replicant/nodecg-replicant.html">
 <link rel="import" href="/components/paper-card/paper-card.html">
 <link rel="import" href="/components/paper-toast/paper-toast.html">
+<link rel="import" href="/components/polymer/polymer.html">
 <link rel="import" href="/components/vaadin-upload/vaadin-upload.html">
-<link rel="import" href="/components/nodecg-replicant/nodecg-replicant.html">
 <link rel="import" href="/dashboard/elements/ncg-uploaded-file.html">
 
 <dom-module id="ncg-uploads">
@@ -11,8 +12,12 @@
 		:host {
 			display: block;
 			width: 100%;
-			max-width: 600px;
-			margin-bottom: 12px;
+			box-sizing: border-box;
+		}
+
+		#add {
+			display: flex;
+			align-items: center;
 		}
 
 		paper-card {
@@ -22,7 +27,7 @@
 		#header {
 			@apply(--layout-horizontal);
 			@apply(--layout-justified);
-			margin-bottom: 12px;
+			margin-bottom: 6px;
 		}
 
 		#title {
@@ -40,28 +45,34 @@
 	</style>
 
 	<template>
-		<nodecg-replicant replicant-name="uploads" replicant-bundle="[[bundleName]]" value="{{files}}"></nodecg-replicant>
+		<nodecg-replicant id="replicant" replicant-name="uploads:[[categoryName]]" replicant-bundle="[[bundleName]]"
+						  value="{{files}}"></nodecg-replicant>
 		<paper-toast id="toast"></paper-toast>
 
-		<paper-card>
-			<div class="card-content">
-				<div id="header">
-					<span id="title">[[bundleName]]</span>
-					<paper-button raised class="nodecg-configure" on-click="openUploadDialog">Add File(s)</paper-button>
-				</div>
-				<div id="files">
-					<template is="dom-repeat" items="[[files]]" as="file">
-						<ncg-uploaded-file file="[[file]]"
-										   on-deleted="_handleDeleted"
-										   on-deletion-failed="_handleDeletionFailed"></ncg-uploaded-file>
-					</template>
-				</div>
-			</div>
-		</paper-card>
+		<div id="header">
+			<span id="title">[[categoryTitle]]</span>
+			<paper-button id="add" raised class="nodecg-configure" on-click="openUploadDialog">
+				<iron-icon icon="add"></iron-icon>
+				Add File(s)
+			</paper-button>
+		</div>
+
+		<div id="files">
+			<template is="dom-repeat" items="[[files]]" as="file">
+				<ncg-uploaded-file file="[[file]]"
+								   on-deleted="_handleDeleted"
+								   on-deletion-failed="_handleDeletionFailed"></ncg-uploaded-file>
+			</template>
+		</div>
+
+		<div id="empty">
+			There are no uploads in this category.
+		</div>
 
 		<paper-dialog id="uploadDialog" with-backdrop>
-			<vaadin-upload id="uploader" target="/uploads/[[bundleName]]" on-upload-before="_onUploadBefore" on-file-reject="_onFileReject">
-				<template is="dom-if" if="[[allowedTypesArray.length]]">
+			<vaadin-upload id="uploader" target="/uploads/[[bundleName]]/[[categoryName]]"
+						   on-upload-before="_onUploadBefore" on-file-reject="_onFileReject">
+				<template is="dom-if" if="[[allowedTypes.length]]">
 					[[acceptsMsg]]
 				</template>
 			</vaadin-upload>

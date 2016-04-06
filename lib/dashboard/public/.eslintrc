@@ -1,4 +1,20 @@
 {
 	"root": true,
-	"extends": "xo/browser"
+	"extends": "xo/browser",
+	"globals": {
+		"Polymer": true,
+		"NodeCG": true
+	},
+	"rules": {
+		"new-cap": [
+			2,
+			{
+				"capIsNewExceptions": [
+					"Polymer",
+					"nodecg.Replicant",
+					"NodeCG.Replicant"
+				]
+			}
+		]
+	}
 }

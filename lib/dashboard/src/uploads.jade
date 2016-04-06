@@ -1,4 +1,14 @@
 each bundle in bundles
-	if (bundle.uploads && bundle.uploads.enabled)
-		- var stringifiedArray = JSON.stringify(bundle.uploads.allowedTypes)
-		ncg-uploads(bundle-name=bundle.name, allowed-types-array=stringifiedArray)
+	if (bundle.uploadCategories && bundle.uploadCategories.length > 0)
+		paper-card.ncg-card
+			.card-content
+				h2=bundle.name
+				if (bundle.hasAssignableSoundCues)
+					ncg-uploads.uploads-category(bundle-name=bundle.name, category-name='sounds',
+					category-title="Sounds", allowed-types="[\"mp3\",\"ogg\"]")
+					.uploads-divider
+				each category in bundle.uploadCategories
+					- var strinigifiedTypes = JSON.stringify(category.allowedTypes)
+					ncg-uploads.uploads-category(bundle-name=bundle.name, category-name=category.name,
+					category-title=category.title, allowed-types=strinigifiedTypes)
+					.uploads-divider

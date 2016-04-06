@@ -1,7 +1,8 @@
-<link rel="import" href="/components/polymer/polymer.html">
 <link rel="import" href="/components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="/components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="/components/iron-icons/iron-icons.html">
+<link rel="import" href="/components/paper-button/paper-button.html">
 <link rel="import" href="/components/paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="/components/polymer/polymer.html">
 
 <dom-module id="ncg-uploaded-file">
 	<style>
@@ -13,15 +14,15 @@
 
 		#name {
 			text-transform: none;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 
 		#delete {
+			display: flex;
+			align-items: center;
 			color: var(--nodecg-danger-color);
-		}
-
-		#delete:hover {
-			background: var(--paper-red-50);
-			border-radius: 50%;
+			flex-shrink: 0;
 		}
 
 		#spinner {
@@ -32,7 +33,10 @@
 	<template>
 		<a id="name" href="[[file.url]]" target="_blank">[[file.base]]</a>
 		<paper-spinner-lite id="spinner" alt="Deleting" active></paper-spinner-lite>
-		<paper-icon-button id="delete" icon="delete" on-click="_handleDeleteClick">Delete</paper-icon-button>
+		<paper-button id="delete" on-click="_handleDeleteClick">
+			<iron-icon icon="delete"></iron-icon>
+			Delete
+		</paper-button>
 	</template>
 </dom-module>
 

@@ -1,12 +1,6 @@
 body {
   background-color: #dedede;
 }
-#utils {
-  background-color: #e0e0e0;
-  height: 100%;
-  padding: 16px;
-  overflow-y: auto;
-}
 #panels {
   width: 100%;
   height: 100%;
@@ -16,14 +10,10 @@ body {
   pointer-events: none;
   transform: translateY(40px);
 }
-#instancesList-empty {
-  text-align: center;
-  border: 4px dashed #B7B7B7;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 24px;
+@media (max-width: 640px) {
+  #panels {
+    padding: 0 6px;
+  }
 }
 .dashboard-panel {
   width: 128px;
@@ -68,9 +58,6 @@ body {
 .panel-heading.green {
   background-color: #0b8043;
 }
-.panel-heading > core-icon {
-  opacity: 0.7;
-}
 .panel-body {
   color: #616161;
   padding: 15px;
@@ -108,6 +95,11 @@ body {
 #ncg-pages section {
   padding: 32px;
 }
+@media (max-width: 640px) {
+  #ncg-pages section {
+    padding: 12px 0;
+  }
+}
 .ncg-card {
   width: 100%;
   max-width: 600px;
@@ -122,6 +114,15 @@ body {
 ncg-dashboard-panel iframe {
   vertical-align: middle;
 }
+#instancesList-empty {
+  text-align: center;
+  border: 4px dashed #B7B7B7;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
 .graphic {
   display: flex;
   justify-content: space-between;
@@ -129,4 +130,12 @@ ncg-dashboard-panel iframe {
 }
 .graphic:not(:last-child) {
   margin-bottom: 6px;
+}
+.uploads-divider {
+  box-sizing: border-box;
+  margin: 12px 10px;
+  border-top: 1px solid #bdbdbd;
+}
+.uploads-divider:last-child {
+  display: none;
 }
