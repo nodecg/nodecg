@@ -10,7 +10,7 @@
   "bugs": "https://github.com/nodecg/nodecg/issues",
   "license": "MIT",
   "dependencies": {
-    "@nodecg/bundle-manager": "^0.2.1",
+    "@nodecg/bundle-manager": "^0.3.0",
     "@nodecg/logger": "^0.1.0",
     "body-parser": "^1.14.1",
     "cheerio": "^0.20.0",
@@ -33,7 +33,6 @@
     "nedb": "^1.2.1",
     "nested-observe": "^1.2.1",
     "node-localstorage": "^1.1.2",
-    "nodecg-bundle-parser": "^0.2.0",
     "object-path": "^0.9.2",
     "parse-authors": "^0.2.2",
     "passport": "^0.3.2",
