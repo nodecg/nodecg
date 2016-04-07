@@ -74,7 +74,10 @@ before(function (done) {
 			console.log('Running WebDriver.io with local capabilities');
 			e.browser.client = webdriverio.remote({
 				desiredCapabilities: {
-					browserName: 'chrome'
+					browserName: 'chrome',
+					loggingPrefs: {
+						browser: "ALL"
+					}
 				}
 			});
 		}
