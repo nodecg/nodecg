@@ -34,7 +34,7 @@
     "nedb": "^1.2.1",
     "nested-observe": "^1.2.1",
     "node-localstorage": "^1.1.2",
-    "nodecg-bundle-parser": "^0.1.16",
+    "nodecg-bundle-parser": "^0.2.0",
     "object-path": "^0.9.2",
     "parse-authors": "^0.2.2",
     "passport": "^0.3.2",
