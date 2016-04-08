@@ -117,7 +117,17 @@ before(function (done) {
 	e.server.start();
 });
 
-after(() => {
+after(function (done) {
 	e.server.stop();
-	e.browser.client.endAll();
+
+	// Only end the session if running on Travis.
+	// It's helpful to keep it open when running locally for debug purposes.
+	if (process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER) {
+		this.timeout(10000);
+		e.browser.client.end()
+			.then(() => done())
+			.catch(err => done(err));
+	} else {
+		done();
+	}
 });

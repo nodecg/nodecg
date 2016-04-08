@@ -5,7 +5,6 @@
 const fs = require('fs.extra');
 const assert = require('chai').assert;
 const e = require('./setup/test-environment');
-const C = require('./setup/test-constants');
 
 describe('sounds - mixer page', function () {
 	this.timeout(10000);
@@ -14,13 +13,11 @@ describe('sounds - mixer page', function () {
 		it('should list new sound Assets as they are uploaded', done => {
 			/*
 			 1. Switch to Dashboard tab
-			 2. Open Mixer by using hashbang URL
-			 3. Add a sound file directly to nodecg/assets/test-bundle/sounds
-			 4. Check the list of options in the dropdown select for all assignable cues
+			 2. Add a sound file directly to nodecg/assets/test-bundle/sounds
+			 3. Check the list of options in the dropdown select for all assignable cues
 			 */
 			e.browser.client
 				.switchTab(e.browser.tabs.dashboard)
-				.url(C.MIXER_URL)
 				.then(() => new Promise((resolve, reject) => {
 					fs.copy('test/fixtures/assets/test-bundle/sounds/success.ogg',
 						'assets/test-bundle/sounds/success.ogg', {replace: true}, err => {
