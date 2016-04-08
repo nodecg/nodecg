@@ -119,5 +119,5 @@ before(function (done) {
 
 after(() => {
 	e.server.stop();
-	e.browser.client.end();
+	e.browser.client.endAll();
 });
