@@ -32,8 +32,8 @@ node_modules/
 docs
 .grunt
 
-# Uploads
-/uploads
+# Assets
+/assets
 
 # Don't ignore .empty_directory files
 !.empty_directory

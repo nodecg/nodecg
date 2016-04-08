@@ -13,10 +13,10 @@
   "license": "MIT",
   "nodecg": {
     "compatibleRange": "~0.7.0",
-    "uploadCategories": [
+    "assetCategories": [
       {
-        "name": "uploads",
-        "title": "Uploads",
+        "name": "assets",
+        "title": "Assets",
         "allowedTypes": [
           "jpg",
           "jpeg",

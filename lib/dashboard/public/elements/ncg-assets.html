@@ -5,9 +5,9 @@
 <link rel="import" href="/components/paper-toast/paper-toast.html">
 <link rel="import" href="/components/polymer/polymer.html">
 <link rel="import" href="/components/vaadin-upload/vaadin-upload.html">
-<link rel="import" href="/dashboard/elements/ncg-uploaded-file.html">
+<link rel="import" href="/dashboard/elements/ncg-asset-file.html">
 
-<dom-module id="ncg-uploads">
+<dom-module id="ncg-assets">
 	<style>
 		:host {
 			display: block;
@@ -45,7 +45,7 @@
 	</style>
 
 	<template>
-		<nodecg-replicant id="replicant" replicant-name="uploads:[[categoryName]]" replicant-bundle="[[bundleName]]"
+		<nodecg-replicant id="replicant" replicant-name="assets:[[categoryName]]" replicant-bundle="[[bundleName]]"
 						  value="{{files}}"></nodecg-replicant>
 		<paper-toast id="toast"></paper-toast>
 
@@ -59,18 +59,18 @@
 
 		<div id="files">
 			<template is="dom-repeat" items="[[files]]" as="file">
-				<ncg-uploaded-file file="[[file]]"
+				<ncg-asset-file file="[[file]]"
 								   on-deleted="_handleDeleted"
-								   on-deletion-failed="_handleDeletionFailed"></ncg-uploaded-file>
+								   on-deletion-failed="_handleDeletionFailed"></ncg-asset-file>
 			</template>
 		</div>
 
 		<div id="empty">
-			There are no uploads in this category.
+			There are no assets in this category.
 		</div>
 
 		<paper-dialog id="uploadDialog" with-backdrop>
-			<vaadin-upload id="uploader" target="/uploads/[[bundleName]]/[[categoryName]]"
+			<vaadin-upload id="uploader" target="/assets/[[bundleName]]/[[categoryName]]"
 						   on-upload-before="_onUploadBefore" on-file-reject="_onFileReject">
 				<template is="dom-if" if="[[allowedTypes.length]]">
 					[[acceptsMsg]]
@@ -84,4 +84,4 @@
 	</template>
 </dom-module>
 
-<script src="/dashboard/elements/ncg-uploads.js"></script>
+<script src="/dashboard/elements/ncg-assets.js"></script>

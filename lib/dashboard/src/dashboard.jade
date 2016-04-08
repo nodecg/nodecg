@@ -34,7 +34,7 @@ html(lang='en')
 		link(rel='import', href='/dashboard/elements/ncg-dashboard-panel.html')
 		link(rel='import', href='/dashboard/elements/ncg-dialog.html')
 		link(rel='import', href='/dashboard/elements/ncg-single-instance.html')
-		link(rel='import', href='/dashboard/elements/ncg-uploads.html')
+		link(rel='import', href='/dashboard/elements/ncg-assets.html')
 		link(rel='import', href='/dashboard/elements/ncg-sounds.html')
 
 		//- dashboard CSS
@@ -96,7 +96,7 @@ html(lang='en')
 		more-routing-config(driver='hash')
 		more-route(name='graphics', path='/graphics')
 		more-route(name='mixer', path='/mixer')
-		more-route(name='uploads', path='/uploads')
+		more-route(name='assets', path='/assets')
 		more-route(name='settings', path='/settings')
 		more-route(name='dashboard', path='/')
 
@@ -119,9 +119,9 @@ html(lang='en')
 						paper-icon-item(route='/mixer')
 							iron-icon(icon='av:volume-up', item-icon)
 							| Mixer
-						paper-icon-item(route='/uploads')
+						paper-icon-item(route='/assets')
 							iron-icon(icon='file-upload', item-icon)
-							| Uploads
+							| Assets
 						paper-icon-item(route='/settings')
 							iron-icon(icon='settings', item-icon)
 							| Settings
@@ -133,7 +133,7 @@ html(lang='en')
 							span(route='/') Dashboard
 							span(route='/graphics') Graphics
 							span(route='/mixer') Mixer
-							span(route='/uploads') Uploads
+							span(route='/assets') Assets
 							span(route='/settings') Settings
 					if ncgConfig.login.enabled
 						paper-icon-button.paper-font-button#logout(icon='exit-to-app', alt='Sign Out')
@@ -143,8 +143,8 @@ html(lang='en')
 							include graphics.jade
 						section.flex.layout.vertical.center(route='/mixer')
 							include mixer.jade
-						section.flex.layout.vertical.center(route='/uploads')
-							include uploads.jade
+						section.flex.layout.vertical.center(route='/assets')
+							include assets.jade
 						section.flex.layout.vertical.center(route='/settings')
 							include settings.jade
 						section.flex(route='/')
