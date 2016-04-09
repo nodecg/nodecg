@@ -13,9 +13,11 @@ if (!semver.satisfies(process.version.substr(1), '>=4')) {
 }
 
 process.on('uncaughtException', err => {
-	console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
-	console.error(err.stack);
-	process.exit(1);
+	if (!global.rollbarEnabled) {
+		console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
+		console.error(err.stack);
+		process.exit(1);
+	}
 });
 
 const server = require('./lib/server')
