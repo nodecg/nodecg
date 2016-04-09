@@ -18,7 +18,7 @@ before(function (done) {
 
 	if (C.CONFIG.autodeps && (C.CONFIG.autodeps.npm === false || C.CONFIG.autodeps.bower === false)) {
 		throw new Error('Autodeps disabled! ' +
-			'Please enable auto-installing dpenedencies cfg/nodecg.json before running tests');
+			'Please enable auto-installing dependencies in cfg/nodecg.json before running tests');
 	}
 
 	if (C.CONFIG.login && C.CONFIG.login.enabled) {
