@@ -46,8 +46,21 @@
       {
         "name": "test",
         "title": "Test Panel",
-        "width": 1,
+        "width": 2,
         "file": "panel.html"
+      },
+      {
+        "name": "test-dialog",
+        "title": "Test Dialog",
+        "width": 2,
+        "file": "dialogs/dialog.html",
+        "dialog": true,
+        "dialogButtons": [
+          {
+            "name": "close",
+            "type": "dismiss"
+          }
+        ]
       }
     ],
     "graphics": [
