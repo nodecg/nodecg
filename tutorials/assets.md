@@ -30,10 +30,7 @@ for use in the bundle. To enable the Asset system in a bundle, add code like the
 }
 ```
 
-<div style='max-width:958px;position:relative;padding-bottom:calc(100% / 2.29)'>
-	<iframe src='https://gfycat.com/ifr/CharmingFlawedGalago' frameborder='0' scrolling='no' width='100%' height='100%' style='position:absolute;top:0;left:0;' allowfullscreen>
-	</iframe>
-</div>
+<iframe src='https://gfycat.com/ifr/CharmingFlawedGalago' frameborder='0' scrolling='no' width='640' height='279.47598253275106' allowfullscreen></iframe>
 
 NodeCG will automatically create a Replicant for each `assetCategory` in a bundle. To access these asset Replicants,
 declare them as you would any other Replicant in your bundle. For example:
