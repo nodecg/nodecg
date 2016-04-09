@@ -15,7 +15,7 @@ module.exports = {
 	CFG_DIR: cfgDir,
 	BUNDLE_CFG_PATH: path.join(cfgDir, `${bundleName}.json`),
 	DASHBOARD_URL: dashboardUrl,
-	TEST_PANEL_URL: `${dashboardUrl}/panel/${bundleName}/test`,
+	TEST_PANEL_URL: `${dashboardUrl}/panel/${bundleName}/panel.html`,
 	PANEL_COMPONENTS_URL: `${dashboardUrl}/panel/${bundleName}/components`,
 	GRAPHIC_URL: `${dashboardUrl}/graphics/${bundleName}`,
 	SINGLE_INSTANCE_URL: `${dashboardUrl}/graphics/${bundleName}/single_instance.html`,
