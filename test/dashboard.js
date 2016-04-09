@@ -18,5 +18,15 @@ describe('dashboard', function () {
 					done();
 				});
 		});
+
+		it('should show up standalone', done => {
+			e.browser.client
+				.switchTab(e.browser.tabs.panelStandalone)
+				.isExisting('#test-bundle-paragraph')
+				.then(isExisting => {
+					assert.isTrue(isExisting);
+					done();
+				});
+		});
 	});
 });
