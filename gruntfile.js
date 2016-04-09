@@ -32,10 +32,6 @@ module.exports = function (grunt) {
 								'./config': './lib/browser/config'
 							},
 							verbose: false
-						}],
-						['envify', {
-							_: 'purge',
-							browser: true
 						}]
 					],
 					ignore: [
@@ -61,10 +57,6 @@ module.exports = function (grunt) {
 								'./config': './lib/browser/config'
 							},
 							verbose: false
-						}],
-						['envify', {
-							_: 'purge',
-							browser: true
 						}],
 						'brfs',
 						istanbul

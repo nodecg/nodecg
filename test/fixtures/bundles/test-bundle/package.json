@@ -13,6 +13,35 @@
   "license": "MIT",
   "nodecg": {
     "compatibleRange": "~0.7.0",
+    "assetCategories": [
+      {
+        "name": "assets",
+        "title": "Assets",
+        "allowedTypes": [
+          "jpg",
+          "jpeg",
+          "gif",
+          "png"
+        ]
+      }
+    ],
+    "soundCues": [
+      {
+        "name": "name-only"
+      },
+      {
+        "name": "default-volume",
+        "defaultVolume": 80
+      },
+      {
+        "name": "non-assignable",
+        "assignable": false
+      },
+      {
+        "name": "default-file",
+        "defaultFile": "sound/default-file.ogg"
+      }
+    ],
     "dashboardPanels": [
       {
         "name": "test",

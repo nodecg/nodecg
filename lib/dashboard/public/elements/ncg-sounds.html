@@ -1,0 +1,61 @@
+<link rel="import" href="/components/polymer/polymer.html">
+<link rel="import" href="/components/paper-card/paper-card.html">
+<link rel="import" href="/dashboard/elements/ncg-sound-cue.html">
+
+<dom-module id="ncg-sounds">
+	<template>
+		<style>
+			:host {
+				display: block;
+				width: 100%;
+				max-width: 600px;
+			}
+
+			#bundleFaderContainer {
+				@apply(--layout-horizontal);
+				align-items: center;
+				margin-left: -16px;
+				margin-right: -16px;
+				padding-left: 16px;
+				padding-right: 16px;
+				background-color: #00bebe;
+				color: white;
+			}
+
+			#bundleFaderContainer > span {
+				@apply(--paper-font-title);
+				@apply(--layout-flex);
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			#bundleFader {
+				@apply(--layout-flex-none);
+				--paper-slider-active-color: white;
+				--paper-slider-knob-color: white;
+				--paper-input-container-focus-color: var(--google-blue-700);
+				--paper-input-container-color: white;
+				--paper-input-container-input-color: white;
+				--paper-slider-input: {
+					width: 80px;
+				};
+			}
+		</style>
+
+		<paper-card id="card" class="ncg-card">
+			<div class="card-content">
+				<h2>[[bundleName]]</h2>
+
+				<div id="bundleFaderContainer">
+					<span>Bundle Fader</span>
+					<paper-slider id="bundleFader" min="0" max="100" step="1" on-change="_onBundleFaderChange"
+								  editable></paper-slider>
+				</div>
+
+				<div id="cues"></div>
+			</div>
+		</paper-card>
+	</template>
+
+	<script src="ncg-sounds.js"></script>
+</dom-module>

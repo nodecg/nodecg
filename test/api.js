@@ -207,7 +207,7 @@ describe('server-side api', () => {
 	});
 
 	it('should mount express middleware', done => {
-		request(`${C.DASHBOARD_URL}test-bundle/test-route`, (error, response) => {
+		request(`${C.DASHBOARD_URL}/test-bundle/test-route`, (error, response) => {
 			assert.isNull(error);
 			expect(response.statusCode).to.equal(200);
 			done();

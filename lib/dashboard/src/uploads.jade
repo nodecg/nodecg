@@ -1,4 +1,0 @@
-each bundle in bundles
-	if (bundle.uploads && bundle.uploads.enabled)
-		- var stringifiedArray = JSON.stringify(bundle.uploads.allowedTypes)
-		ncg-uploads(bundle-name=bundle.name, allowed-types-array=stringifiedArray)

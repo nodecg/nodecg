@@ -10,6 +10,7 @@ if (!fs.existsSync(C.CFG_DIR)) {
 	fs.mkdirSync(C.CFG_DIR);
 }
 
+// Delete bundles/test-bundle if it exists, then make a fresh copy of fixtures/bundles/test-bundle
 fs.rmrf(C.BUNDLE_DIR, err => {
 	if (err) {
 		throw err;
@@ -22,11 +23,20 @@ fs.rmrf(C.BUNDLE_DIR, err => {
 	});
 });
 
+// Write the test bundle config, overwriting one if it exists.
 fs.writeFile(C.BUNDLE_CFG_PATH, JSON.stringify({test: 'the_test_string'}));
 
 // Delete any existing persisted replicants for the test bundle
 const replicantDir = path.resolve(__dirname, '../../db/replicants/test-bundle');
 fs.rmrf(replicantDir, err => {
+	if (err) {
+		throw err;
+	}
+});
+
+// Delete any existing assets for the test bundle
+const assetsDir = path.resolve(__dirname, '../../assets/test-bundle');
+fs.rmrf(assetsDir, err => {
 	if (err) {
 		throw err;
 	}

@@ -2,7 +2,7 @@ sudo: false
 
 language: node_js
 node_js:
-  - '4.2'
+  - '4'
   - 'stable'
 
 os:
@@ -33,7 +33,6 @@ matrix:
   fast_finish: true
 
 notifications:
-  email: false
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/8c1769bff63cbd033bf7
