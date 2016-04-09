@@ -6,6 +6,18 @@ html(lang='en')
 
 		title NodeCG Dashboard
 
+		if privateConfig.rollbar && privateConfig.rollbar.enabled
+			script(src='/components/rollbar/dist/rollbar.min.js')
+			script.
+				const _rollbarConfig = {
+					accessToken: '#{privateConfig.rollbar.postClientItem}',
+					captureUncaught: true,
+					payload: {
+						environment: '#{privateConfig.rollbar.environment}'
+					}
+				}
+				Rollbar.init(_rollbarConfig);
+
 		//- import Polymer elements
 		link(rel='import', href='/components/iron-flex-layout/classes/iron-flex-layout.html')
 		link(rel='import', href='/components/iron-icon/iron-icon.html')
@@ -50,7 +62,7 @@ html(lang='en')
 
 		//- make the global config available
 		script(type='text/javascript').
-			window.ncgConfig = !{ JSON.stringify(ncgConfig) };
+			window.ncgConfig = !{ JSON.stringify(publicConfig) };
 
 		//- make the API available
 		script(src='/nodecg-api.js')
@@ -135,7 +147,7 @@ html(lang='en')
 							span(route='/mixer') Mixer
 							span(route='/assets') Assets
 							span(route='/settings') Settings
-					if ncgConfig.login.enabled
+					if privateConfig.login.enabled
 						paper-icon-button.paper-font-button#logout(icon='exit-to-app', alt='Sign Out')
 				more-route-selector
 					iron-pages#ncg-pages.layout.vertical
