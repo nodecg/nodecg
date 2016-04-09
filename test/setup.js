@@ -16,6 +16,11 @@ const C = require('./setup/test-constants');
 before(function (done) {
 	this.timeout(0);
 
+	if (C.CONFIG.autodeps && (C.CONFIG.autodeps.npm === false || C.CONFIG.autodeps.bower === false)) {
+		throw new Error('Autodeps disabled! ' +
+			'Please enable auto-installing dependencies in cfg/nodecg.json before running tests');
+	}
+
 	if (C.CONFIG.login && C.CONFIG.login.enabled) {
 		throw new Error('Login security is enabled! ' +
 			'Please disable login security in cfg/nodecg.json before running tests');
@@ -89,6 +94,19 @@ before(function (done) {
 			.getCurrentTabId()
 			.then(tabId => {
 				e.browser.tabs.dashboard = tabId;
+			})
+			.executeAsync(done => {
+				const checkForApi = setInterval(() => {
+					if (typeof window.dashboardApi !== 'undefined') {
+						clearInterval(checkForApi);
+						done();
+					}
+				}, 50);
+			})
+			.newWindow(`${C.TEST_PANEL_URL}?standalone=true`, 'NodeCG test bundle standalone panel', '')
+			.getCurrentTabId()
+			.then(tabId => {
+				e.browser.tabs.panelStandalone = tabId;
 			})
 			.executeAsync(done => {
 				const checkForApi = setInterval(() => {
