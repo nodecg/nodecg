@@ -30,7 +30,7 @@ Your bundle will now have a card on the Mixer page of the Dashboard.
 
 <iframe src='https://gfycat.com/ifr/PrestigiousShyGoldeneye' frameborder='0' scrolling='no' width='640' height='426.6666666666667' allowfullscreen></iframe>
 
-`defaultFiles`s are audio files that you ship with your bundle. They will be available to that specific cue as a
+`defaultFile`s are audio files that you ship with your bundle. They will be available to that specific cue as a
 "Default" option in that cue's dropdown select on the Mixer.
 
 If your bundle has at least one cue that is `assignable`, it will gain a "Sounds" [Asset]{@tutorial assets} category.
