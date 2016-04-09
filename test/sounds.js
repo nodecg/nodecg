@@ -78,6 +78,60 @@ describe('sounds - client api', function () {
 			.catch(done);
 	});
 
+	// This test depends on the "should list new sound Assets as they are uploaded" test
+	it('#playSound should play the right sound after changing away from and then back to a sound', done => {
+		e.browser.client
+			// Play success.ogg
+			.switchTab(e.browser.tabs.dashboard)
+			.executeAsync(done => {
+				const ncgSoundCue = document.querySelector('#cues > ncg-sound-cue:nth-child(4)');
+				ncgSoundCue.$.select.value = 'success.ogg';
+				ncgSoundCue._retargetFile();
+
+				// Give the Replicant some time to update.
+				setTimeout(() => done(), 300);
+			})
+			.switchTab(e.browser.tabs.graphic)
+			.execute(() => {
+				const instance = window.graphicApi.playSound('default-file');
+				return {
+					playState: instance.playState,
+					src: instance.src.split('?')[0]
+				};
+			})
+			.then(ret => {
+				assert.equal(ret.value.playState, 'playSucceeded');
+				assert.equal(ret.value.src, '/assets/test-bundle/sounds/success.ogg');
+			})
+
+			// Play default sound
+			.switchTab(e.browser.tabs.dashboard)
+			.executeAsync(done => {
+				const ncgSoundCue = document.querySelector('#cues > ncg-sound-cue:nth-child(4)');
+				ncgSoundCue.$.select.value = 'default';
+				ncgSoundCue._retargetFile();
+
+				// Give the Replicant some time to update.
+				setTimeout(() => done(), 300);
+			})
+			.switchTab(e.browser.tabs.graphic)
+			.execute(() => {
+				const instance = window.graphicApi.playSound('default-file');
+				return {
+					playState: instance.playState,
+					src: instance.src.split('?')[0]
+				};
+			})
+			.then(ret => {
+				assert.equal(ret.value.playState, 'playSucceeded');
+				assert.equal(ret.value.src,
+					'/sound/test-bundle/default-file/default.ogg');
+			})
+
+			.then(() => done())
+			.catch(err => done(err));
+	});
+
 	it('#stopSound should stop all instances of a cue', done => {
 		e.browser.client
 			.execute(() => {
