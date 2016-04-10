@@ -81,6 +81,12 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
         "keyPath": "",
         "certificatePath": ""
     },
-    "developer": false
+    "developer": false,
+    "rollbar": {
+        "enabled": true,
+        "environment": "production",
+        "postServerItem": "YOUR_POST_SERVER_ITEM_ACCESS_TOKEN",
+        "postClientItem": "YOUR_POST_CLIENT_ITEM_ACCESS_TOKEN"
+    }
 }
 ```
