@@ -32,6 +32,11 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
     - `keyPath` _String_ The path to an SSL key file.
     - `certificatePath` _String_ The path to an SSL certificate file.
 - `developer` _Boolean_ Whether to enable features that speed up development. Not suitable for production.
+- `rollbar` _Object_ Contains [Rollbar](https://rollbar.com/) configuration properties. 
+	- `enabled` _Boolean_ Whether to enable Rollbar error tracking.
+	- `environment` _String_ An arbitrary name you choose for this environment. Something like `production`, `development`, `staging`, etc.
+	- `postServerItem` _String_ Your Rollbar project's POST_SERVER_ITEM_ACCESS_TOKEN
+	- `postClientItem` _String_ Your Rollbar project's POST_CLIENT_ITEM_ACCESS_TOKEN
 
 ### Example Config
 ```json
