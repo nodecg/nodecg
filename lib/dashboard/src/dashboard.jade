@@ -56,10 +56,6 @@ html(lang='en')
 		//- Web Component support
 		script(src='/components/webcomponentsjs/webcomponents-lite.min.js')
 
-		//- Polyfills and Shims
-		script(src='/components/observe-shim/lib/observe-shim.js')
-		script(src='/shims/WeakMap.js')
-
 		//- make the global config available
 		script(type='text/javascript').
 			window.ncgConfig = !{ JSON.stringify(publicConfig) };
