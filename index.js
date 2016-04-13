@@ -7,8 +7,8 @@ if (process.cwd() !== __dirname) {
 }
 
 const semver = require('semver');
-if (!semver.satisfies(process.version.substr(1), '>=4')) {
-	console.warn('WARNING: NodeCG requires Node.js >=4 and npm >=2\n\t',
+if (!semver.satisfies(process.version.substr(1), '>=6')) {
+	console.warn('WARNING: NodeCG requires Node.js >=6 and npm >=2\n\t',
 		'Your Node.js version:', process.version);
 }
 
