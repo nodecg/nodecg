@@ -13,7 +13,8 @@ describe('client-side replicants', function () {
 	before(done => {
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
-			.call(done);
+			.call(done)
+			.catch(err => done(err));
 	});
 
 	it('should only apply defaultValue when first declared', done => {
@@ -27,7 +28,8 @@ describe('client-side replicants', function () {
 			.then(ret => {
 				expect(ret.value).to.equal('foo');
 				done();
-			});
+			})
+			.catch(err => done(err));
 	});
 
 	it('should be readable without subscription, via readReplicant', done => {
@@ -36,7 +38,8 @@ describe('client-side replicants', function () {
 			.then(ret => {
 				expect(ret.value).to.equal('foo');
 				done();
-			});
+			})
+			.catch(err => done(err));
 	});
 
 	it('should throw an error when no name is provided', done => {
@@ -51,9 +54,11 @@ describe('client-side replicants', function () {
 			.then(ret => {
 				expect(ret.value).to.equal('Must supply a name when instantiating a Replicant');
 				done();
-			});
+			})
+			.catch(err => done(err));
 	});
 
+	// TODO: fix this test in the morning
 	it('should be assignable via the ".value" property', done => {
 		e.browser.client
 			.executeAsync(done => {
@@ -65,7 +70,8 @@ describe('client-side replicants', function () {
 				expect(ret.value.newValue).to.equal('assignmentOK');
 				expect(ret.value.revision).to.equal(1);
 				done();
-			});
+			})
+			.catch(err => done(err));
 	});
 
 	it('should react to changes in arrays', done => {
@@ -77,12 +83,12 @@ describe('client-side replicants', function () {
 				});
 
 				rep.on('declared', () => {
-					rep.on('change', (oldVal, newVal, changes) => {
-						if (oldVal && newVal && changes) {
+					rep.on('change', (newVal, oldVal, operations) => {
+						if (newVal && oldVal && operations) {
 							done({
-								oldVal,
 								newVal,
-								changes
+								oldVal,
+								operations
 							});
 						}
 					});
@@ -91,16 +97,16 @@ describe('client-side replicants', function () {
 				});
 			})
 			.then(ret => {
-				expect(ret.value.oldVal).to.deep.equal(['starting']);
 				expect(ret.value.newVal).to.deep.equal(['starting', 'arrPushOK']);
-				expect(ret.value.changes).to.have.length(1);
-				expect(ret.value.changes[0].type).to.equal('splice');
-				expect(ret.value.changes[0].removed).to.deep.equal([]);
-				expect(ret.value.changes[0].removedCount).to.equal(0);
-				expect(ret.value.changes[0].added).to.deep.equal(['arrPushOK']);
-				expect(ret.value.changes[0].addedCount).to.equal(1);
+				expect(ret.value.oldVal).to.deep.equal(['starting']);
+				expect(ret.value.operations).to.deep.equal([{
+					args: ['arrPushOK'],
+					path: '/',
+					method: 'push'
+				}]);
 				done();
-			});
+			})
+			.catch(err => done(err));
 	});
 
 	// need a better way to test this
@@ -128,7 +134,8 @@ describe('client-side replicants', function () {
 				});
 
 				e.server.stop();
-			});
+			})
+			.catch(err => done(err));
 	});
 
 	context('when an object', () => {
@@ -140,11 +147,13 @@ describe('client-side replicants', function () {
 
 			e.browser.client
 				.executeAsync(done => {
+					let barred = false;
 					const rep = window.dashboardApi.Replicant('clientServerObservation');
-					rep.on('change', (oldVal, newVal) => {
+					rep.on('change', newVal => {
 						if (newVal.foo === 'bar') {
 							done(newVal);
-						} else {
+						} else if (!barred) {
+							barred = true;
 							rep.value.foo = 'bar';
 						}
 					});
@@ -152,14 +161,16 @@ describe('client-side replicants', function () {
 				.then(ret => {
 					expect(ret.value).to.deep.equal({foo: 'bar'});
 
-					rep.on('change', (oldVal, newVal) => {
+					rep.on('change', newVal => {
+						console.log('CHANGE', newVal);
 						if (newVal.foo === 'baz') {
 							done();
 						}
 					});
 
 					rep.value.foo = 'baz';
-				});
+				})
+				.catch(err => done(err));
 		});
 
 		it('should react to changes in nested properties', done => {
@@ -171,12 +182,12 @@ describe('client-side replicants', function () {
 					});
 
 					rep.on('declared', () => {
-						rep.on('change', (oldVal, newVal, changes) => {
-							if (oldVal && newVal && changes) {
+						rep.on('change', (newVal, oldVal, operations) => {
+							if (newVal && oldVal && operations) {
 								done({
-									oldVal,
 									newVal,
-									changes
+									oldVal,
+									operations
 								});
 							}
 						});
@@ -187,13 +198,14 @@ describe('client-side replicants', function () {
 				.then(ret => {
 					expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
 					expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
-					expect(ret.value.changes).to.have.length(1);
-					expect(ret.value.changes[0].type).to.equal('update');
-					expect(ret.value.changes[0].path).to.deep.equal(['a', 'b', 'c']);
-					expect(ret.value.changes[0].oldValue).to.equal('c');
-					expect(ret.value.changes[0].newValue).to.equal('nestedChangeOK');
+					expect(ret.value.operations).to.deep.equal([{
+						args: ['nestedChangeOK'],
+						path: '/a/b/c',
+						method: 'update'
+					}]);
 					done();
-				});
+				})
+				.catch(err => done(err));
 		});
 
 		// This specifically tests the following case:
@@ -216,11 +228,11 @@ describe('client-side replicants', function () {
 					window.s2c_nestedArrTest.on('declared', () => {
 						done();
 
-						window.s2c_nestedArrTest.on('change', (oldVal, newVal, changes) => {
-							if (oldVal && newVal && changes) {
+						window.s2c_nestedArrTest.on('change', (newVal, oldVal, changes) => {
+							if (newVal && oldVal && changes) {
 								window.s2c_nestedArrChange = {
-									oldVal,
 									newVal,
+									oldVal,
 									changes
 								};
 							}
@@ -239,14 +251,15 @@ describe('client-side replicants', function () {
 				.then(ret => {
 					expect(ret.value.oldVal).to.deep.equal({arr: []});
 					expect(ret.value.newVal).to.deep.equal({arr: ['test']});
-					expect(ret.value.changes).to.have.length(1);
-					expect(ret.value.changes[0].type).to.equal('splice');
-					expect(ret.value.changes[0].path).to.deep.equal(['arr']);
-					expect(ret.value.changes[0].added).to.deep.equal(['test']);
-					expect(ret.value.changes[0].addedCount).to.equal(1);
-					expect(ret.value.changes[0].removedCount).to.equal(0);
+
+					expect(ret.value.operations).to.deep.equal([{
+						args: ['test'],
+						path: '/arr',
+						method: 'push'
+					}]);
 					done();
-				});
+				})
+				.catch(err => done(err));
 		});
 		/* jshint +W106 */
 	});
@@ -261,7 +274,8 @@ describe('client-side replicants', function () {
 				.then(ret => {
 					expect(ret.value).to.equal('it work good!');
 					done();
-				});
+				})
+				.catch(err => done(err));
 		});
 
 		it('should persist assignment to disk', done => {
@@ -280,7 +294,8 @@ describe('client-side replicants', function () {
 						expect(data).to.equal('{"nested":"hey we assigned!"}');
 						done();
 					});
-				});
+				})
+				.catch(err => done(err));
 		});
 
 		it('should persist changes to disk', done => {
@@ -291,7 +306,7 @@ describe('client-side replicants', function () {
 					window.clientChangePersistence.once('change', () => done());
 				})
 				.then(() => {
-					serverRep.on('change', (oldVal, newVal) => {
+					serverRep.on('change', newVal => {
 						if (newVal.nested !== 'hey we changed!') {
 							return;
 						}
@@ -307,7 +322,8 @@ describe('client-side replicants', function () {
 				})
 				.execute(() => {
 					window.clientChangePersistence.value.nested = 'hey we changed!';
-				});
+				})
+				.catch(err => done(err));
 		});
 
 		it('should persist falsey values to disk', done => {
@@ -326,7 +342,8 @@ describe('client-side replicants', function () {
 						expect(data).to.equal('0');
 						done();
 					});
-				});
+				})
+				.catch(err => done(err));
 		});
 
 		it('should read falsey values from disk', done => {
@@ -338,7 +355,8 @@ describe('client-side replicants', function () {
 				.then(ret => {
 					expect(ret.value).to.equal(0);
 					done();
-				});
+				})
+				.catch(err => done(err));
 		});
 	});
 
@@ -367,7 +385,8 @@ describe('client-side replicants', function () {
 							}).to.throw(/ENOENT/);
 						});
 					})
-					.call(done);
+					.call(done)
+					.catch(err => done(err));
 			});
 		});
 	});
@@ -387,7 +406,8 @@ describe('server-side replicants', () => {
 				const rep = e.apis.extension.Replicant('extensionTest', {defaultValue: 'bar'});
 				expect(rep.value).to.equal('foo');
 				done();
-			});
+			})
+			.catch(err => done(err));
 	});
 
 	it('should be readable without subscription, via readReplicant', () => {
@@ -412,7 +432,7 @@ describe('server-side replicants', () => {
 			defaultValue: {a: {b: {c: 'c'}}}
 		});
 
-		rep.on('change', (oldVal, newVal, changes) => {
+		rep.on('change', (newVal, oldVal, changes) => {
 			if (newVal.a.b.c !== 'nestedChangeOK') {
 				return;
 			}
@@ -436,7 +456,7 @@ describe('server-side replicants', () => {
 			defaultValue: ['starting']
 		});
 
-		rep.on('change', (oldVal, newVal, changes) => {
+		rep.on('change', (newVal, oldVal, changes) => {
 			if (!changes || changes[0].added[0] !== 'arrPushOK') {
 				return;
 			}
@@ -470,14 +490,15 @@ describe('server-side replicants', () => {
 				});
 			})
 			.then(() => {
-				serverRep.on('change', (oldVal, newVal) => {
+				serverRep.on('change', newVal => {
 					if (Array.isArray(newVal) && newVal[0] === 'test') {
 						expect(newVal).to.deep.equal(['test']);
 						done();
 					}
 				});
 			})
-			.execute(() => window.clientDoubleApplyTest.value.push('test'));
+			.execute(() => window.clientDoubleApplyTest.value.push('test'))
+			.catch(err => done(err));
 	});
 
 	context('when "persistent" is set to "true"', () => {
