@@ -4,6 +4,7 @@
 
 const chai = require('chai');
 const expect = chai.expect;
+const assert = chai.assert;
 const fs = require('fs');
 const e = require('./setup/test-environment');
 
@@ -14,6 +15,20 @@ describe('client-side replicants', function () {
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
 			.call(done)
+			.catch(err => done(err));
+	});
+
+	it('should return a reference to any already-declared replicant', done => {
+		e.browser.client
+			.execute(() => {
+				const rep1 = window.dashboardApi.Replicant('clientDupRef');
+				const rep2 = window.dashboardApi.Replicant('clientDupRef');
+				return rep1 === rep2;
+			})
+			.then(ret => {
+				assert.isTrue(ret.value);
+				done();
+			})
 			.catch(err => done(err));
 	});
 
@@ -410,6 +425,12 @@ describe('client-side replicants', function () {
 });
 
 describe('server-side replicants', () => {
+	it('should return a reference to any already-declared replicant', () => {
+		const rep1 = e.apis.extension.Replicant('dupRef');
+		const rep2 = e.apis.extension.Replicant('dupRef');
+		assert.strictEqual(rep1, rep2);
+	});
+
 	it('should only apply defaultValue when first declared', function (done) {
 		this.timeout(10000);
 
