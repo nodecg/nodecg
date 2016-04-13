@@ -58,16 +58,22 @@ describe('client-side replicants', function () {
 			.catch(err => done(err));
 	});
 
-	// TODO: fix this test in the morning
 	it('should be assignable via the ".value" property', done => {
 		e.browser.client
 			.executeAsync(done => {
 				const rep = window.dashboardApi.Replicant('clientAssignmentTest', {persistent: false});
-				rep.on('assignmentAccepted', data => done(data));
+				rep.on('change', newVal => {
+					if (newVal === 'assignmentOK') {
+						done({
+							value: rep.value,
+							revision: rep.revision
+						});
+					}
+				});
 				rep.value = 'assignmentOK';
 			})
 			.then(ret => {
-				expect(ret.value.newValue).to.equal('assignmentOK');
+				expect(ret.value.value).to.equal('assignmentOK');
 				expect(ret.value.revision).to.equal(1);
 				done();
 			})
@@ -199,8 +205,11 @@ describe('client-side replicants', function () {
 					expect(ret.value.oldVal).to.deep.equal({a: {b: {c: 'c'}}});
 					expect(ret.value.newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
 					expect(ret.value.operations).to.deep.equal([{
-						args: ['nestedChangeOK'],
-						path: '/a/b/c',
+						args: {
+							newValue: 'nestedChangeOK',
+							prop: 'c'
+						},
+						path: '/a/b',
 						method: 'update'
 					}]);
 					done();
@@ -228,18 +237,18 @@ describe('client-side replicants', function () {
 					window.s2c_nestedArrTest.on('declared', () => {
 						done();
 
-						window.s2c_nestedArrTest.on('change', (newVal, oldVal, changes) => {
-							if (newVal && oldVal && changes) {
+						window.s2c_nestedArrTest.on('change', (newVal, oldVal, operations) => {
+							if (newVal && oldVal && operations) {
 								window.s2c_nestedArrChange = {
 									newVal,
 									oldVal,
-									changes
+									operations
 								};
 							}
 						});
 					});
 				})
-				.call(() => serverRep.value.arr.push('test'))
+				.then(() => serverRep.value.arr.push('test'))
 				.executeAsync(done => {
 					const interval = setInterval(() => {
 						if (window.s2c_nestedArrChange) {
@@ -249,9 +258,9 @@ describe('client-side replicants', function () {
 					}, 50);
 				})
 				.then(ret => {
-					expect(ret.value.oldVal).to.deep.equal({arr: []});
+					console.log(ret);
 					expect(ret.value.newVal).to.deep.equal({arr: ['test']});
-
+					expect(ret.value.oldVal).to.deep.equal({arr: []});
 					expect(ret.value.operations).to.deep.equal([{
 						args: ['test'],
 						path: '/arr',
@@ -283,7 +292,11 @@ describe('client-side replicants', function () {
 				.executeAsync(done => {
 					const rep = window.dashboardApi.Replicant('clientPersistence');
 					rep.value = {nested: 'hey we assigned!'};
-					rep.on('assignmentAccepted', () => done());
+					rep.on('change', newVal => {
+						if (newVal.nested && newVal.nested === 'hey we assigned!') {
+							done();
+						}
+					});
 				})
 				.then(() => {
 					fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', (err, data) => {
