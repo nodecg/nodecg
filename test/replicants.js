@@ -344,7 +344,11 @@ describe('client-side replicants', function () {
 				.executeAsync(done => {
 					const rep = window.dashboardApi.Replicant('clientFalseyWrite');
 					rep.value = 0;
-					rep.on('assignmentAccepted', () => done());
+					rep.on('change', newVal => {
+						if (newVal === 0) {
+							done();
+						}
+					});
 				})
 				.then(() => {
 					fs.readFile('./db/replicants/test-bundle/clientFalseyWrite.rep', 'utf-8', (err, data) => {
@@ -445,18 +449,21 @@ describe('server-side replicants', () => {
 			defaultValue: {a: {b: {c: 'c'}}}
 		});
 
-		rep.on('change', (newVal, oldVal, changes) => {
+		rep.on('change', (newVal, oldVal, operations) => {
 			if (newVal.a.b.c !== 'nestedChangeOK') {
 				return;
 			}
 
 			expect(oldVal).to.deep.equal({a: {b: {c: 'c'}}});
 			expect(newVal).to.deep.equal({a: {b: {c: 'nestedChangeOK'}}});
-			expect(changes).to.have.length(1);
-			expect(changes[0].type).to.equal('update');
-			expect(changes[0].path).to.deep.equal(['a', 'b', 'c']);
-			expect(changes[0].oldValue).to.equal('c');
-			expect(changes[0].newValue).to.equal('nestedChangeOK');
+			expect(operations).to.deep.equal([{
+				args: {
+					newValue: 'nestedChangeOK',
+					prop: 'c'
+				},
+				method: 'update',
+				path: '/a/b'
+			}]);
 			done();
 		});
 
@@ -469,19 +476,18 @@ describe('server-side replicants', () => {
 			defaultValue: ['starting']
 		});
 
-		rep.on('change', (newVal, oldVal, changes) => {
-			if (!changes || changes[0].added[0] !== 'arrPushOK') {
+		rep.on('change', (newVal, oldVal, operations) => {
+			if (!operations) {
 				return;
 			}
 
 			expect(oldVal).to.deep.equal(['starting']);
 			expect(newVal).to.deep.equal(['starting', 'arrPushOK']);
-			expect(changes).to.have.length(1);
-			expect(changes[0].type).to.equal('splice');
-			expect(changes[0].removed).to.deep.equal([]);
-			expect(changes[0].removedCount).to.equal(0);
-			expect(changes[0].added).to.deep.equal(['arrPushOK']);
-			expect(changes[0].addedCount).to.equal(1);
+			expect(operations).to.deep.equal([{
+				args: ['arrPushOK'],
+				method: 'push',
+				path: '/'
+			}]);
 			done();
 		});
 
