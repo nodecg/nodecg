@@ -34,15 +34,6 @@ node index.js
 
 To run NodeCG in production, [pm2](https://github.com/Unitech/pm2) is recommended.
 
-### NOTICE - April 20, 2016
-As of Chrome 50, NodeCG does not work properly in the latest versions of any browser.
-Specifically, parts of the Replicant system will malfunction.
-Graphics will still work in the Browser Source plugins for OBS1, OBS Studio, XSplit, and CasparCG, as they do not use
-the latest version of Chrome. However, this means that you can no longer reliably use the NodeCG Dashboard in Chrome.
-
-To resolve this issue, we developed [Dashboard Standalone](https://github.com/nodecg/dashboard). It is **required** for all current versions of NodeCG.
-The dashboard will not run properly in any desktop browser. [Please see its README for more information](https://github.com/nodecg/dashboard/blob/master/README.md).
-
 ## Installing bundles
 NodeCG's individual graphics packages are called _bundles_. They can be installed either from the command-line
 (via [_nodecg-cli_](https://www.npmjs.com/package/nodecg-cli)), or by simply placing the folder into the `./bundles` directory.
