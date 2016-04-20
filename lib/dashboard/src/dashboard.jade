@@ -99,8 +99,9 @@ html(lang="en")
         if ncgConfig.login.enabled
             include ./includes/view_key_modal.jade
 
-        //- Polyfills and Shims
-        script(src='/components/observe-shim/lib/observe-shim.js')
+        //- Polyfills and Shim
+        script(src='/components/object.observe/dist/object-observe.min.js')
+        script(src='/components/array.observe/array-observe.min.js') 
         script(src='/shims/WeakMap.js')
 
         //- Core JavaScript
