@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#.nearestElementWithAttribute">nearestElementWithAttribute</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
 </nav>
 
 <div id="main">
@@ -155,7 +155,7 @@ as NodeCG automatically injects a pre-made API instance.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line17">line 17</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line18">line 18</a>
     </li></ul></dd>
     
 
@@ -244,7 +244,7 @@ E.g., <code>NodeCG.declaredReplicants.myBundle.myRep</code></p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line250">line 250</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line267">line 267</a>
     </li></ul></dd>
     
 
@@ -355,7 +355,7 @@ are read once when NodeCG starts up. Used to quickly access per-bundle configura
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line23">line 23</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line24">line 24</a>
     </li></ul></dd>
     
 
@@ -467,7 +467,7 @@ it <em>must</em> be declared as a <code>bundleDependency</code> in your bundle's
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line442">line 442</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line506">line 506</a>
     </li></ul></dd>
     
 
@@ -506,183 +506,6 @@ module.exports = function(nodecg) {
 
     
         <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id=".nearestElementWithAttribute"><span class="type-signature">(static) </span>nearestElementWithAttribute<span class="signature">(startEl, attrName)</span><span class="type-signature"> &rarr; {object}</span></h4>
-
-    
-
-
-
-<div class="description">
-    <p><em>Browser only</em><br/>
-Returns the nearest element with the desired attribute.
-Begins at <code>startEl</code> and then checks every parent, returning the first one that has the attribute.
-Returns undefined if neither <code>startEl</code> nor any of its parents has the attribute.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>startEl</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The element on which to begin the search.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>attrName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The attribute name to look for.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <dt class="important tag-deprecated">Deprecated:</dt><dd class="yes-def tag-deprecated"><ul class="dummy"><li>Yes</li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line363">line 363</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
 
         
             
@@ -845,7 +668,7 @@ Returns the specified dialog element.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line389">line 389</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line376">line 376</a>
     </li></ul></dd>
     
 
@@ -1050,7 +873,7 @@ Returns the specified dialog's iframe document.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line402">line 402</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line388">line 388</a>
     </li></ul></dd>
     
 
@@ -1151,7 +974,7 @@ Gets the server Socket.IO context.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line413">line 413</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line485">line 485</a>
     </li></ul></dd>
     
 
@@ -1375,7 +1198,7 @@ To listen to a message in another bundle's namespace, provide it as the second a
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line220">line 220</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line233">line 233</a>
     </li></ul></dd>
     
 
@@ -1476,7 +1299,7 @@ nodecg.log.error('error level logging');</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line31">line 31</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line32">line 32</a>
     </li></ul></dd>
     
 
@@ -1560,7 +1383,7 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line421">line 421</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line493">line 493</a>
     </li></ul></dd>
     
 
@@ -1583,6 +1406,273 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
 
 
 
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="playSound"><span class="type-signature"></span>playSound<span class="signature">(cueName, opts<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Object|undefined}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Plays the sound cue of the provided <code>cueName</code> in the current bundle.
+Does nothing if the cue doesn't exist or if the cue has no assigned file to play.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cueName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>updateVolume</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>Whether or not to let NodeCG automatically update this instance's volume
+when the user changes it on the dashboard.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line402">line 402</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>A SoundJS AbstractAudioInstance.</li>
+</ul>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -1781,7 +1871,7 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line340">line 340</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line357">line 357</a>
     </li></ul></dd>
     
 
@@ -1820,9 +1910,9 @@ module.exports = function(nodecg) {
     
     <pre class="prettyprint"><code>// Graphics and dashboard panels must query the server to retrieve the value,
 // and therefore must provide a callback.
-nodecg.readSyncedVar('myVar', 'some-bundle', function(value) {
+nodecg.readReplicant('myRep', 'some-bundle', function(value) {
     // I can use 'value' now!
-    console.log('myVar has the value '+ value +'!');
+    console.log('myRep has the value '+ value +'!');
 });</code></pre>
 
 
@@ -2143,7 +2233,7 @@ Persisted values are re-loaded on startup.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line293">line 293</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line310">line 310</a>
     </li></ul></dd>
     
 
@@ -2373,7 +2463,7 @@ Only client-to-server messages support acknowledgements. This restriction is a l
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line151">line 151</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line162">line 162</a>
     </li></ul></dd>
     
 
@@ -2634,7 +2724,220 @@ See <a href="NodeCG.html#sendMessage"><code>NodeCG#sendMessage</code></a> for us
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line191">line 191</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line202">line 202</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="stopAllSounds"><span class="type-signature"></span>stopAllSounds<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Stops all currently playing sounds on the page.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line472">line 472</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="stopSound"><span class="type-signature"></span>stopSound<span class="signature">(cueName)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Stops all currently playing instances of the provided <code>cueName</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cueName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line448">line 448</a>
     </li></ul></dd>
     
 
@@ -2678,7 +2981,7 @@ See <a href="NodeCG.html#sendMessage"><code>NodeCG#sendMessage</code></a> for us
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Mar 23 2016 09:30:14 GMT-0500 (Central Daylight Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 20 2016 11:35:56 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

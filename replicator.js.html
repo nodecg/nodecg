@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>replicator.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyOperations">applyOperations</a></li><li><a href="global.html#assign">assign</a></li><li><a href="global.html#declare">declare</a></li><li><a href="global.html#emitToClients">emitToClients</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#findOrDeclare">findOrDeclare</a></li><li><a href="global.html#saveReplicant">saveReplicant</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">replicator.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+const fs = require('fs');
+const clone = require('clone');
+const log = require('./logger')('replicator');
+const server = require('./server');
+const shared = require('./replicant/shared');
+const io = server.getIO();
+const declaredReplicants = {};
+const stores = {};
+
+// Make 'db/replicants' folder if it doesn't exist
+if (!fs.existsSync('db/replicants')) {
+	fs.mkdirSync('db/replicants');
+}
+
+module.exports = {
+	declare,
+	assign,
+	applyOperations,
+	find,
+	findOrDeclare,
+	emitToClients,
+	saveReplicant,
+	declaredReplicants,
+	stores
+};
+
+server.on('started', () => {
+	io.sockets.on('connection', socket => {
+		socket.on('replicant:declare', (data, cb) => {
+			log.replicants('received replicant:declare', data);
+			const replicant = findOrDeclare(data.name, data.bundle, data.defaultValue, data.persistent);
+			if (typeof cb === 'function') {
+				cb({
+					value: replicant.value,
+					revision: replicant.revision
+				});
+			}
+		});
+
+		socket.on('replicant:proposeAssignment', data => {
+			log.replicants('received replicant:proposeAssignment', data);
+			const serverReplicant = findOrDeclare(data.name, data.bundle, undefined, data.persistent);
+			assign(serverReplicant, data.value, data.originatorId);
+		});
+
+		socket.on('replicant:proposeOperations', (data, cb) => {
+			log.replicants('received replicant:proposeOperations', data);
+			const serverReplicant = findOrDeclare(data.name, data.bundle, undefined, data.persistent);
+			if (serverReplicant &amp;&amp; serverReplicant.revision !== data.revision) {
+				log.replicants('Change request %s:%s had mismatched revision (ours %s, theirs %s), ' +
+					'invoking callback with fullupdate',
+					data.bundle, data.name, serverReplicant.revision, data.revision);
+				if (typeof cb === 'function') {
+					cb(serverReplicant.value, serverReplicant.revision);
+				}
+			} else {
+				applyOperations(serverReplicant, data.operations, data.originatorId);
+			}
+		});
+
+		socket.on('replicant:read', (data, cb) => {
+			log.replicants('replicant:read', data);
+			const replicant = find(data.name, data.bundle);
+			if (typeof cb === 'function') {
+				if (replicant) {
+					cb(replicant.value);
+				} else {
+					cb();
+				}
+			}
+		});
+	});
+});
+
+/**
+ * Declares a Replicant.
+ * @param name {string} - The name of the Replicant to declare.
+ * @param bundle {string} - The name of the bundle to which this Replicant belongs.
+ * @param defaultValue {*} - The default value to assign to this Replicant, if it has no persisted value.
+ * @param persistent {boolean} - Whether to persist this Replicant's value to disk after every change.
+ * @returns {object}
+ */
+function declare(name, bundle, defaultValue, persistent) {
+	// Delay requiring the Replicant class until here, otherwise cryptic errors are thrown. Not sure why!
+	const Replicant = require('./replicant');
+	return new Replicant(name, bundle, {defaultValue, persistent});
+}
+
+/**
+ * Assigns a new value to a Replicant.
+ * @param replicant {object} - The Replicant to assign.
+ * @param value {*} - The new value to assign.
+ * @param originatorId {string} - The ID of the Replicant instance that originated this request.
+ */
+function assign(replicant, value, originatorId) {
+	const oldValue = replicant.value;
+	replicant.value = value;
+	replicant.revision++;
+	replicant.emit('change', value, oldValue);
+
+	replicant.log.replicants('Assigned:', value);
+
+	emitToClients(replicant.bundle, 'replicant:assignment', {
+		name: replicant.name,
+		bundle: replicant.bundle,
+		newValue: value,
+		oldValue,
+		revision: replicant.revision,
+		originatorId
+	});
+
+	saveReplicant(replicant);
+}
+
+/**
+ * Applies an array of operations to a replicant.
+ * @param replicant {object} - The Replicant to perform these operation on.
+ * @param operations {array} - An array of operations.
+ * @param originatorId {string} - The ID of the Replicant instance that originated this request.
+ */
+function applyOperations(replicant, operations, originatorId) {
+	const oldValue = clone(replicant.value);
+	operations.forEach(operation => shared.applyOperation(replicant, operation));
+	replicant.revision++;
+	replicant.emit('change', replicant.value, oldValue, operations);
+
+	emitToClients(replicant.bundle, 'replicant:operations', {
+		name: replicant.name,
+		bundle: replicant.bundle,
+		newValue: replicant.value,
+		oldValue,
+		revision: replicant.revision,
+		operations,
+		originatorId
+	});
+
+	saveReplicant(replicant);
+}
+
+/**
+ * Finds a Replicant, returns undefined if not found.
+ * @param name {string} - The name of the Replicant to find.
+ * @param bundle {string} - The name of the bundle in which to search.
+ * @returns {*}
+ */
+function find(name, bundle) {
+	// If there are no variables for that bundle, return undefined
+	if (!declaredReplicants.hasOwnProperty(bundle)) {
+		return undefined;
+	}
+
+	// If that variable doesn't exist for that bundle, return undefined
+	if (!declaredReplicants[bundle].hasOwnProperty(name)) {
+		return undefined;
+	}
+
+	// Return the variable's current value
+	return declaredReplicants[bundle][name];
+}
+
+/**
+ * Finds or declares a Replicant. If a Replicant with the given `name` is already present in `bundle`,
+ * returns that existing Replicant. Else, declares a new Replicant.
+ * @param name {string} - The name of the Replicant.
+ * @param bundle {string} - The name of the bundle that the Replicant belongs to.
+ * @param defaultValue {*} - The defaultValue to declare this Replicant with.
+ * @param persistent {boolean} - Whether or not this Replicant should persist its value to disk.
+ */
+function findOrDeclare(name, bundle, defaultValue, persistent) {
+	const existingReplicant = find(name, bundle);
+	if (typeof existingReplicant !== 'undefined') {
+		log.replicants('Replicant %s (%s) already existed:', name, bundle, existingReplicant);
+		return existingReplicant;
+	}
+
+	return declare(name, bundle, defaultValue, persistent);
+}
+
+/**
+ * Emits an event to all remote Socket.IO listeners.
+ * @param bundle {string} - The bundle namespace in which to emit this event. Only applies to Socket.IO listeners.
+ * @param eventName {string} - The name of the event to emit.
+ * @param data {*} - The data to emit with the event.
+ */
+function emitToClients(bundle, eventName, data) {
+	// Emit to clients (in the given bundle's room) using Socket.IO
+	log.replicants('emitting %s to %s:', eventName, bundle, data);
+	io.to(bundle).emit(eventName, data);
+}
+
+const _pendingSave = new Set();
+/**
+ * Persists a Replicant to disk. Does nothing if that Replicant has `persistent: false`.
+ * Delays saving until the end of the current task, and de-dupes save commands run multiple times
+ * during the same task.
+ * @param replicant {object} - The Replicant to save.
+ */
+function saveReplicant(replicant) {
+	if (!replicant.persistent) {
+		return;
+	}
+
+	if (_pendingSave.has(replicant)) {
+		return;
+	}
+
+	_pendingSave.add(replicant);
+
+	process.nextTick(() => {
+		_pendingSave.delete(replicant);
+
+		if (!replicant.persistent) {
+			return;
+		}
+
+		let value = replicant.value;
+		if (typeof value === 'object') {
+			value = JSON.stringify(value);
+		} else if (typeof value === 'undefined') {
+			value = '';
+		}
+
+		stores[replicant.bundle].setItem(`${replicant.name}.rep`, value);
+	});
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Apr 12 2016 19:14:58 GMT-0500 (Central Daylight Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+<script>
+  ((window.gitter = {}).chat = {}).options = {
+    room: 'nodecg/nodecg'
+  };
+</script>
+<script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+</body>
+</html>

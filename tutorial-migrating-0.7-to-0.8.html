@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Making Dashboard Dialogs - Documentation</title>
+    <title>Tutorial: Migrating from 0.7 to 0.8 - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Tutorial: Making Dashboard Dialogs</h1>
+    <h1 class="page-title">Tutorial: Migrating from 0.7 to 0.8</h1>
     
 
     <section>
@@ -36,34 +36,41 @@
 <header>
     
 
-    <h2>Making Dashboard Dialogs</h2>
+    <h2>Migrating from 0.7 to 0.8</h2>
 </header>
 
 <article>
-    <p>Starting with NodeCG 0.7, all dashboard panels are iframes. This was done to provide full code and style encapsulation,
-eliminating the need for bundle authors to worry about what they are putting into the global scope with their panel.
-However, because every panel is an iframe, it is not possible for a panel to draw anything outside of its bounding box.
-This limitation made having dialogs and modals impossible, among other things. To address this, we created a dedicated
-system for displaying dialogs.</p>
-<p>A dialog is defined the same as any other dashboard panel would be in <a href="tutorial-manifest.html">package.json</a>, with an
-additional <code>dialog: true</code> property.</p>
-<h2>Opening dialogs</h2><p>To open a dialog, add a <code>nodecg-dialog</code> attribute to any clickable element on one of your panels. For example, this
-<a href="https://elements.polymer-project.org/elements/paper-button"><code>&lt;paper-button&gt;</code></a> element will open the <code>edit-total</code> dialog when clicked:</p>
-<pre class="prettyprint source lang-html"><code>&lt;paper-button id=&quot;edit&quot; class=&quot;nodecg-configure&quot; nodecg-dialog=&quot;edit-total&quot;>Edit...&lt;/paper-button></code></pre><h2>Closing dialogs</h2><p>By default, a dialog can only be closed by clicking outside of it. Optional confirmation and dismissal buttons can be
-added via <code>package.json</code>. See the <a href="tutorial-manifest.html">package.json tutorial</a> for information on the <code>dialogButtons</code>
-property.</p>
-<p>When a <code>confirm</code> or <code>dismiss</code> button is pressed, NodeCG will emit a <code>dialog-confirmed</code> or <code>dialog-dismissed</code> event
-on your dialog's <code>document</code>. For example:</p>
-<pre class="prettyprint source lang-html"><code>// bundles/my-bundle/dashboard/my-dialog.html
-&lt;script>
-    document.addEventListener('dialog-confirmed', function() {
-        // The user pressed the confirm button.
-    });
+    <h2>Breaking Changes</h2><ul>
+<li><a href="#panel-routes">Dashboard panels are now served from <code>/panel/:bundleName/:panelFile</code> routes</a></li>
+<li><a href="#assets-and-categories">Uploads have been renamed to Assets, now have Categories</a></li>
+</ul>
+<p><h3 id="panel-routes">Panel Routes</h3>
+Dashboard panels are now served from <code>/panel/:bundleName/:panelFile</code> routes. Prior to v0.8, they were served from the
+<code>/panel/:bundleName/:panelName</code> route.</p>
+<p>This means that for a panel with the following declaration:</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;name&quot;: &quot;test&quot;,
+  &quot;title&quot;: &quot;Test Panel&quot;,
+  &quot;width&quot;: 2,
+  &quot;file&quot;: &quot;panel.html&quot;
+}</code></pre><p>... the route to access this panel is now <code>/panel/test-bundle/panel.html</code> instead of <code>/panel/test-bundle/test</code>.</p>
+<p>This also affects panels served from subfolders. Previously, the following panel:</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;name&quot;: &quot;test-dialog&quot;,
+  &quot;title&quot;: &quot;Test Dialog&quot;,
+  &quot;width&quot;: 2,
+  &quot;file&quot;: &quot;dialogs/test-dialog.html&quot;
+}</code></pre><p>... would have been served from <code>/panel/test-bundle/test-dialog</code>. It is now served from <code>/panel/test-bundle/dialogs/test-dialog.html</code>.</p>
+<p>If your panel or dialog is in a subfolder, you will need to update any relative links in your panel's HTML, CSS, and JS accordingly.
+For example, if <code>test-dialog</code> were importing <a href="https://elements.polymer-project.org/elements/paper-button?view=demo:demo/index.html"><code>&lt;paper-button&gt;</code></a>, 
+the URL it uses would have to change:</p>
+<pre class="prettyprint source lang-html"><code>&lt;!-- Won't work anymore. -->
+&lt;link rel=&quot;import&quot; href=&quot;components/paper-button/paper-button.html&quot;>
 
-    document.addEventListener('dialog-dismissed', function() {
-        // The user pressed the dismiss button.
-    });
-&lt;/script></code></pre>
+&lt;!-- Works with the new panel routes. -->
+&lt;link rel=&quot;import&quot; href=&quot;../components/paper-button/paper-button.html&quot;></code></pre><p><h3 id="assets-and-categories">Assets &amp; Asset Categories</h3>
+NodeCG v0.7.2 introduced the Uploads system. NodeCG v0.8 has renamed this system to &quot;Assets&quot;, and introduces
+the concept of categories. See the <a href="tutorial-assets.html">Assets tutorial</a> for more information on how to configure Assets for your bundle.</p>
 </article>
 
 </section>

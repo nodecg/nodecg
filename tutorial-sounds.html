@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Making Dashboard Dialogs - Documentation</title>
+    <title>Tutorial: Sounds - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Tutorial: Making Dashboard Dialogs</h1>
+    <h1 class="page-title">Tutorial: Sounds</h1>
     
 
     <section>
@@ -36,34 +36,48 @@
 <header>
     
 
-    <h2>Making Dashboard Dialogs</h2>
+    <h2>Sounds</h2>
 </header>
 
 <article>
-    <p>Starting with NodeCG 0.7, all dashboard panels are iframes. This was done to provide full code and style encapsulation,
-eliminating the need for bundle authors to worry about what they are putting into the global scope with their panel.
-However, because every panel is an iframe, it is not possible for a panel to draw anything outside of its bounding box.
-This limitation made having dialogs and modals impossible, among other things. To address this, we created a dedicated
-system for displaying dialogs.</p>
-<p>A dialog is defined the same as any other dashboard panel would be in <a href="tutorial-manifest.html">package.json</a>, with an
-additional <code>dialog: true</code> property.</p>
-<h2>Opening dialogs</h2><p>To open a dialog, add a <code>nodecg-dialog</code> attribute to any clickable element on one of your panels. For example, this
-<a href="https://elements.polymer-project.org/elements/paper-button"><code>&lt;paper-button&gt;</code></a> element will open the <code>edit-total</code> dialog when clicked:</p>
-<pre class="prettyprint source lang-html"><code>&lt;paper-button id=&quot;edit&quot; class=&quot;nodecg-configure&quot; nodecg-dialog=&quot;edit-total&quot;>Edit...&lt;/paper-button></code></pre><h2>Closing dialogs</h2><p>By default, a dialog can only be closed by clicking outside of it. Optional confirmation and dismissal buttons can be
-added via <code>package.json</code>. See the <a href="tutorial-manifest.html">package.json tutorial</a> for information on the <code>dialogButtons</code>
-property.</p>
-<p>When a <code>confirm</code> or <code>dismiss</code> button is pressed, NodeCG will emit a <code>dialog-confirmed</code> or <code>dialog-dismissed</code> event
-on your dialog's <code>document</code>. For example:</p>
-<pre class="prettyprint source lang-html"><code>// bundles/my-bundle/dashboard/my-dialog.html
-&lt;script>
-    document.addEventListener('dialog-confirmed', function() {
-        // The user pressed the confirm button.
-    });
+    <p>NodeCG features a system for management and playback of sound cues. To add sound cues to your bundle,
+create a <code>nodecg.soundCues</code> array in your <code>package.json</code>:</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;name&quot;: &quot;test-bundle&quot;,
+  &quot;nodecg&quot;: {
+    &quot;soundCues&quot;: [
+      {
+        &quot;name&quot;: &quot;name-only&quot;
+      },
+      {
+        &quot;name&quot;: &quot;default-volume&quot;,
+        &quot;defaultVolume&quot;: 80
+      },
+      {
+        &quot;name&quot;: &quot;non-assignable&quot;,
+        &quot;assignable&quot;: false,
+        &quot;defaultFile&quot;: &quot;sound/default-file.ogg&quot;
+      },
+      {
+        &quot;name&quot;: &quot;default-file&quot;,
+        &quot;defaultFile&quot;: &quot;sound/default-file.ogg&quot;
+      }
+    ]
+  }
+}</code></pre><p>Your bundle will now have a card on the Mixer page of the Dashboard.</p>
+<iframe src='https://gfycat.com/ifr/PrestigiousShyGoldeneye' frameborder='0' scrolling='no' width='640' height='426.6666666666667' allowfullscreen></iframe>
 
-    document.addEventListener('dialog-dismissed', function() {
-        // The user pressed the dismiss button.
-    });
-&lt;/script></code></pre>
+<p><code>defaultFile</code>s are audio files that you ship with your bundle. They will be available to that specific cue as a
+&quot;Default&quot; option in that cue's dropdown select on the Mixer.</p>
+<p>If your bundle has at least one cue that is <code>assignable</code>, it will gain a &quot;Sounds&quot; <a href="tutorial-assets.html">Asset</a> category.
+This category accepts <code>.ogg</code> and <code>.mp3</code> files. Any audio files uploaded to this category will become available as options
+in all of your <code>assignable</code> cues' dropdown boxes.</p>
+<p>If your bundle has Sound Cues, the following API methods will be available to your graphic:</p>
+<ul>
+<li><a href="NodeCG.html#playSound"><code>NodeCG#playSound</code></a></li>
+<li><a href="NodeCG.html#stopSound"><code>NodeCG#stopSound</code></a></li>
+<li><a href="NodeCG.html#stopAllSounds"><code>NodeCG#stopAllSounds</code></a></li>
+</ul>
 </article>
 
 </section>

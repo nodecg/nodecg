@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>util/injectscripts.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">util/injectscripts.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+const cheerio = require('cheerio');
+const fs = require('fs');
+const util = require('util');
+const config = require('../config').config;
+const filteredConfig = require('../config').filteredConfig;
+
+/**
+ * Injects the appropriate assets into a panel, dialog, or graphic.
+ * @param {string} pathOrHtml - Either the path to an HTML file, or a string of HTML.
+ * @param {('panel'|'dialog'|'graphic')} resourceType
+ * @param {Object} [opts] - The options object.
+ * @param {boolean} [opts.standalone=false] - Whether or not to inject the scripts required to serve a panel or dialog
+ * as a standlone webpage, outside of the dashboard. Only applies when `resourceType` is `panel` or `dialog`.
+ * @param {boolean} [opts.createApiInstance=false] - Whether or not to create a `nodecg` API instance object
+ * in the global scope of this asset.
+ * @param {boolean} [opts.singleInstance=false] - Whether or not to inject the singleInstance scripts.
+ * Only applies when `resourceType` is `graphic`.
+ * @param {boolean} [opts.sound=false] - Whether or not to inject the sound playback scripts.
+ * Only applies when `resourceType` is `graphic`.
+ * @param cb
+ */
+module.exports = function (pathOrHtml, resourceType, opts, cb) {
+	// Graphics only pass the path to the html file.
+	// Panels and dialogs pass a cached HTML string.
+	if (resourceType === 'graphic') {
+		fs.readFile(pathOrHtml, inject);
+	} else {
+		inject(null, pathOrHtml);
+	}
+
+	function inject(err, html) {
+		if (err) {
+			throw err;
+		}
+
+		const $ = cheerio.load(html);
+		let scripts = [];
+		let styles = [];
+
+		// Everything needs the shims and config
+		scripts.push('&lt;script src="/components/observe-shim/lib/observe-shim.js">&lt;/script>');
+		scripts.push('&lt;script src="/shims/WeakMap.js">&lt;/script>');
+		scripts.push(`&lt;script>window.ncgConfig = ${JSON.stringify(filteredConfig)};&lt;/script>`);
+
+		if (resourceType === 'panel' || resourceType === 'dialog') {
+			if (opts.standalone) {
+				// load the API
+				scripts.push('&lt;script src="/nodecg-api.js">&lt;/script>');
+			} else {
+				// Panels and dialogs can grab the API from the dashboard
+				scripts.push('&lt;script>window.NodeCG = window.top.NodeCG&lt;/script>');
+			}
+
+			// Both panels and dialogs need the main default style framework
+			scripts.push('&lt;link rel="import" href="/dashboard/style/nodecg-styles.html">');
+
+			if (opts.standalone) {
+				// load the socket
+				scripts.push('&lt;script src="/components/cookies-js/dist/cookies.min.js">&lt;/script>');
+				scripts.push('&lt;script src="/socket.io/socket.io.js">&lt;/script>');
+
+				// Uses cn-jsurl bower lib
+				scripts.push('&lt;script src="/components/cn-jsurl/url.min.js">&lt;/script>');
+				scripts.push(`&lt;script>
+					var url = new Url;
+					window.token = url.query.key || Cookies.get('socketToken');
+					if (window.token) {
+						window.socket = io.connect('//' + window.ncgConfig.baseURL + '/', {
+							query: 'token=' + window.token
+						});
+					} else {
+						window.socket = io.connect('//' + window.ncgConfig.baseURL + '/');
+					}
+				&lt;/script>`);
+			} else {
+				// They both also need to reference the dashboard window's socket, rather than make their own
+				scripts.push('&lt;script>window.socket = window.top.socket;&lt;/script>');
+			}
+
+			// Likewise, they both need the contentWindow portion of the iframeResizer.
+			// We put this at the start and make it async so it loads ASAP.
+			scripts.unshift('&lt;script async src="/components/iframe-resizer/js/iframeResizer.contentWindow.min.js">' +
+				'&lt;/script>');
+
+			// Panels need the default panel styles and the dialog_opener.
+			// Dialogs need the dialog_helper.
+			if (resourceType === 'panel') {
+				styles.push('&lt;link rel="stylesheet" href="/dashboard/style/panel.css">');
+				scripts.push('&lt;script async src="/dashboard/dialog_opener.js">&lt;/script>');
+			} else if (resourceType === 'dialog') {
+				scripts.push('&lt;script async src="/dashboard/dialog_helper.js">&lt;/script>');
+			}
+		} else if (resourceType === 'graphic') {
+			if (config.rollbar &amp;&amp; config.rollbar.enabled) {
+				scripts.unshift('&lt;script src="/components/rollbar/dist/rollbar.min.js">&lt;/script>');
+				scripts.unshift(`&lt;script>
+					const _rollbarConfig = {
+						accessToken: '${config.rollbar.token}',
+						captureUncaught: true,
+						payload: {
+							environment: '${config.rollbar.environment}'
+						}
+					};
+				&lt;/script>`);
+			}
+
+			// Graphics need to create their own socket
+			scripts.push('&lt;script src="/socket.io/socket.io.js">&lt;/script>');
+
+			// If login security is enabled, graphics must provide a valid token when they connect to the socket
+			// They also need cookies-js and a helper to manage URL query strings
+			let socketScript;
+			if (config.login.enabled) {
+				scripts.push('&lt;script src="/components/cookies-js/dist/cookies.min.js">&lt;/script>');
+				scripts.push('&lt;script src="/login/QueryString.js">&lt;/script>');
+				socketScript =
+					'&lt;script>\n' +
+					'window.token = qs["key"] || Cookies.get("socketToken");\n' +
+					'window.socket = io.connect("//%s/",{query: "token=" + window.token});\n' +
+					'&lt;/script>';
+			} else {
+				socketScript = '&lt;script>window.socket = io.connect("//%s/");&lt;/script>';
+			}
+			scripts.push(util.format(socketScript, filteredConfig.baseURL));
+
+			// If this bundle has sounds, inject SoundJS
+			if (opts.sound) {
+				scripts.push('&lt;script src="/components/SoundJS/lib/soundjs-0.6.2.min.js">&lt;/script>');
+			}
+
+			// Graphics must include the API script themselves before attempting to make an instance of it
+			scripts.push('&lt;script src="/nodecg-api.js">&lt;/script>');
+		} else {
+			throw new Error(`Invalid resourceType "${resourceType}"`);
+		}
+
+		// Inject a small script to create a NodeCG API instance, if requested.
+		if (opts.createApiInstance) {
+			const partialBundle = {
+				name: opts.createApiInstance.name,
+				config: opts.createApiInstance.config,
+				_hasSounds: opts.sound
+			};
+
+			scripts.push(
+				`&lt;script>window.nodecg = new NodeCG(${JSON.stringify(partialBundle)}, window.socket)&lt;/script>`
+			);
+		}
+
+		// Inject the scripts required for singleInstance behavior, if requested.
+		if (opts.singleInstance) {
+			scripts.push('&lt;script src="/instance/client_heart.js">&lt;/script>');
+		}
+
+		scripts = scripts.join('\n');
+
+		// Put our scripts before their first script or HTML import.
+		// If they have no scripts or imports, put our scripts at the end of &lt;body>.
+		const theirScriptsAndImports = $('script, link[rel="import"]');
+		if (theirScriptsAndImports.length > 0) {
+			theirScriptsAndImports.first().before(scripts);
+		} else {
+			$('body').append(scripts);
+		}
+
+		// Inject the needed stylesheets, if any.
+		// If there are &lt;script> tags in the head, inject before them.
+		// Otherwise, add at the end of the &lt;head>.
+		if (styles.length > 0) {
+			styles = styles.join('\n');
+
+			const headScripts = $('head').find('script');
+			if (headScripts.length > 0) {
+				headScripts.first().before(styles);
+			} else {
+				$('head').append(styles);
+			}
+		}
+
+		cb($.html());
+	}
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 20 2016 11:35:56 GMT-0500 (Central Daylight Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+<script>
+  ((window.gitter = {}).chat = {}).options = {
+    room: 'nodecg/nodecg'
+  };
+</script>
+<script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+</body>
+</html>

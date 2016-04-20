@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#.nearestElementWithAttribute">nearestElementWithAttribute</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
 </nav>
 
 <div id="main">
@@ -39,14 +39,15 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/* eslint-env node, browser */
+/* global createjs */
 'use strict';
 
-var Replicant = require('./replicant');
-var io = {};
-var server = require('./server');
-var filteredConfig = require('./config').filteredConfig;
-var utils = require('./util');
-var replicator = require('./replicator');
+const Replicant = require('./replicant');
+const server = require('./server');
+const filteredConfig = require('./config').filteredConfig;
+const utils = require('./util');
+const replicator = require('./replicator');
+let io;
 
 /**
  * Creates a new NodeCG API instance. It should never be necessary to use this constructor in a bundle,
@@ -55,7 +56,7 @@ var replicator = require('./replicator');
  * @param {object} bundle - The bundle object to build an API instance from.
  */
 function NodeCG(bundle, socket) {
-	var self = this;
+	const self = this;
 
 	// Make bundle name and config publicly accessible
 	this.bundleName = bundle.name;
@@ -85,14 +86,9 @@ function NodeCG(bundle, socket) {
 
 	this._messageHandlers = [];
 
-	if (process.env.browser) {
-		// This constructor only works if socket.io is loaded
-		if (typeof io === 'undefined') {
-			throw new Error('[nodeceg] Socket.IO must be loaded before instantiating the API');
-		}
-
+	if (process.browser) {
 		// If title isn't set, set it to the bundle name
-		document.addEventListener('DOMContentLoaded', function () {
+		document.addEventListener('DOMContentLoaded', () => {
 			if (document.title === '') {
 				document.title = self.bundleName;
 			}
@@ -102,12 +98,27 @@ function NodeCG(bundle, socket) {
 		this.socket = socket;
 		this.socket.emit('joinRoom', bundle.name);
 
+		if (bundle._hasSounds &amp;&amp; window.createjs &amp;&amp; createjs.Sound) {
+			this._soundCues = new Replicant('soundCues', this.bundleName, {}, socket);
+			this._soundFiles = new Replicant('assets:sounds', this.bundleName, {}, socket);
+			this._bundleVolume = new Replicant(`volume:${this.bundleName}`, '_sounds', {}, socket);
+			this._masterVolume = new Replicant(`volume:master`, '_sounds', {}, socket);
+
+			this._soundCues.on('change', () => {
+				_updateInstanceVolumes(this);
+				_registerSounds(this);
+			});
+			this._soundFiles.on('change', () => _registerSounds(this));
+			this._bundleVolume.on('change', () => _updateInstanceVolumes(this));
+			this._masterVolume.on('change', () => _updateInstanceVolumes(this));
+		}
+
 		// Upon receiving a message, execute any handlers for it
-		socket.on('message', function onMessage(data) {
+		socket.on('message', data => {
 			self.log.trace('Received message %s (sent to bundle %s) with data:',
 				data.messageName, data.bundleName, data.content);
 
-			self._messageHandlers.forEach(function (handler) {
+			self._messageHandlers.forEach(handler => {
 				if (data.messageName === handler.messageName &amp;&amp;
 					data.bundleName === handler.bundleName) {
 					handler.func(data.content);
@@ -115,10 +126,10 @@ function NodeCG(bundle, socket) {
 			});
 		});
 
-		socket.on('error', function (err) {
+		socket.on('error', err => {
 			if (err.type === 'UnauthorizedError') {
-				var url = [location.protocol, '//', location.host, location.pathname].join('');
-				window.location.href = '/authError?code=' + err.code + '&amp;message=' + err.message + '&amp;viewUrl=' + url;
+				const url = [location.protocol, '//', location.host, location.pathname].join('');
+				window.location.href = `/authError?code=${err.code}&amp;message=${err.message}&amp;viewUrl=${url}`;
 			} else {
 				self.log.error('Unhandled socket error:', err);
 			}
@@ -126,13 +137,13 @@ function NodeCG(bundle, socket) {
 	} else {
 		io = server.getIO();
 
-		io.on('connection', function onConnection(socket) {
+		io.on('connection', socket => {
 			socket.setMaxListeners(64); // Prevent console warnings when many extensions are installed
-			socket.on('message', function onMessage(data, cb) {
+			socket.on('message', (data, cb) => {
 				self.log.trace('[%s] Received message %s (sent to bundle %s) with data:',
 					self.bundleName, data.messageName, data.bundleName, data.content);
 
-				self._messageHandlers.forEach(function (handler) {
+				self._messageHandlers.forEach(handler => {
 					if (data.messageName === handler.messageName &amp;&amp;
 						data.bundleName === handler.bundleName) {
 						handler.func(data.content, cb);
@@ -198,21 +209,21 @@ NodeCG.prototype.sendMessage = function (messageName, data, cb) {
 };
 
 NodeCG.sendMessageToBundle = function (messageName, bundleName, data, cb) {
-	if (process.env.browser) {
+	if (process.browser) {
 		if (typeof cb === 'undefined' &amp;&amp; typeof data === 'function') {
 			cb = data;
 			data = null;
 		}
 
 		window.socket.emit('message', {
-			bundleName: bundleName,
-			messageName: messageName,
+			bundleName,
+			messageName,
 			content: data
 		}, cb);
 	} else {
 		io.emit('message', {
-			bundleName: bundleName,
-			messageName: messageName,
+			bundleName,
+			messageName,
 			content: data
 		});
 	}
@@ -232,7 +243,9 @@ NodeCG.prototype.sendMessageToBundle = function (messageName, bundleName, data, 
 	this.log.trace('[%s] Sending message %s to bundle %s with data:',
 		this.bundleName, messageName, bundleName, data);
 
+	/* eslint-disable prefer-spread */
 	NodeCG.sendMessageToBundle.apply(NodeCG, arguments);
+	/* eslint-enable prefer-spread */
 };
 /* eslint-enable no-unused-vars */
 
@@ -263,12 +276,16 @@ NodeCG.prototype.listenFor = function (messageName, bundleName, handler) {
 		bundleName = this.bundleName;
 	}
 
+	if (typeof handler !== 'function') {
+		throw new Error(`argument "handler" must be a function, but you provided a(n) ${typeof handler}`);
+	}
+
 	this.log.trace('[%s] Listening for %s from bundle %s', this.bundleName, messageName, bundleName);
 
 	// Check if a handler already exists for this message
-	var len = this._messageHandlers.length;
-	for (var i = 0; i &lt; len; i++) {
-		var existingHandler = this._messageHandlers[i];
+	const len = this._messageHandlers.length;
+	for (let i = 0; i &lt; len; i++) {
+		const existingHandler = this._messageHandlers[i];
 		if (messageName === existingHandler.messageName &amp;&amp; bundleName === existingHandler.bundleName) {
 			this.log.error('%s attempted to declare a duplicate "listenFor" handler:',
 				this.bundleName, bundleName, messageName);
@@ -277,8 +294,8 @@ NodeCG.prototype.listenFor = function (messageName, bundleName, handler) {
 	}
 
 	this._messageHandlers.push({
-		messageName: messageName,
-		bundleName: bundleName,
+		messageName,
+		bundleName,
 		func: handler
 	});
 };
@@ -290,7 +307,7 @@ NodeCG.prototype.listenFor = function (messageName, bundleName, handler) {
 NodeCG.declaredReplicants = Replicant.declaredReplicants;
 
 NodeCG.Replicant = function (name, bundle, opts) {
-	return new Replicant(name, bundle, opts, process.env.browser ? window.socket : null);
+	return new Replicant(name, bundle, opts, process.browser ? window.socket : null);
 };
 
 /**
@@ -348,10 +365,10 @@ NodeCG.readReplicant = function (name, bundle, cb) {
 		throw new Error('Must supply a bundle name when reading a Replicant');
 	}
 
-	if (process.env.browser) {
-		window.socket.emit('readReplicant', {name: name, bundle: bundle}, cb);
+	if (process.browser) {
+		window.socket.emit('readReplicant', {name, bundle}, cb);
 	} else {
-		var replicant = replicator.find(name, bundle);
+		const replicant = replicator.find(name, bundle);
 		if (replicant) {
 			return replicant.value;
 		}
@@ -372,9 +389,9 @@ NodeCG.readReplicant = function (name, bundle, cb) {
  * @example &lt;caption>From a graphic or dashboard panel:&lt;/caption>
  * // Graphics and dashboard panels must query the server to retrieve the value,
  * // and therefore must provide a callback.
- * nodecg.readSyncedVar('myVar', 'some-bundle', function(value) {
+ * nodecg.readReplicant('myRep', 'some-bundle', function(value) {
  *     // I can use 'value' now!
- *     console.log('myVar has the value '+ value +'!');
+ *     console.log('myRep has the value '+ value +'!');
  * });
  */
 NodeCG.prototype.readReplicant = function (name, bundle, cb) {
@@ -386,38 +403,8 @@ NodeCG.prototype.readReplicant = function (name, bundle, cb) {
 	return NodeCG.readReplicant(name, bundle, cb);
 };
 
-if (process.env.browser) {
+if (process.browser) {
 	window.NodeCG = NodeCG;
-
-	var printedNearestElementDepNotice = false;
-	/**
-	 * _Browser only_&lt;br/>
-	 * Returns the nearest element with the desired attribute.
-	 * Begins at `startEl` and then checks every parent, returning the first one that has the attribute.
-	 * Returns undefined if neither `startEl` nor any of its parents has the attribute.
-	 * @param {object} startEl - The element on which to begin the search.
-	 * @param {string} attrName - The attribute name to look for.
-	 * @returns {object}
-	 * @deprecated
-	 */
-	NodeCG.nearestElementWithAttribute = function (startEl, attrName) {
-		if (!printedNearestElementDepNotice) {
-			console.warn('NodeCG.nearestElementWithAttribute is deprecated, ' +
-				'and will be removed in 0.8.0. Use element.closest() instead: ' +
-				'https://developer.mozilla.org/en-US/docs/Web/API/Element/closest');
-			printedNearestElementDepNotice = true;
-		}
-
-		var target = startEl;
-		while (target) {
-			if (target.hasAttribute) {
-				if (target.hasAttribute(attrName)) {
-					return target;
-				}
-			}
-			target = target.parentNode;
-		}
-	};
 
 	/**
 	 * _Browser only_&lt;br/>
@@ -428,8 +415,7 @@ if (process.env.browser) {
 	 */
 	NodeCG.prototype.getDialog = function (name, bundle) {
 		bundle = bundle || this.bundleName;
-		var topDoc = window.top.document;
-		return topDoc.getElementById(bundle + '_' + name);
+		return window.top.document.getElementById(`${bundle}_${name}`);
 	};
 
 	/**
@@ -441,8 +427,94 @@ if (process.env.browser) {
 	 */
 	NodeCG.prototype.getDialogDocument = function (name, bundle) {
 		bundle = bundle || this.bundleName;
-		var dialog = this.getDialog(name, bundle);
-		return dialog.querySelector('iframe').contentWindow.document;
+		return this.getDialog(name, bundle).querySelector('iframe').contentWindow.document;
+	};
+
+	/**
+	 * Plays the sound cue of the provided `cueName` in the current bundle.
+	 * Does nothing if the cue doesn't exist or if the cue has no assigned file to play.
+	 * @param cueName {String}
+	 * @param [opts] {Object}
+	 * @param [opts.updateVolume=true] - Whether or not to let NodeCG automatically update this instance's volume
+	 * when the user changes it on the dashboard.
+	 * @returns {Object|undefined} - A SoundJS AbstractAudioInstance.
+	 */
+	NodeCG.prototype.playSound = function (cueName, opts) {
+		if (!this._soundCues) {
+			throw new Error(`Bundle "${this.bundleName}" has no soundCues`);
+		}
+
+		const cue = this._soundCues.value.find(cue => cue.name === cueName);
+		if (!cue) {
+			throw new Error(`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`);
+		}
+
+		if (!window.createjs || !window.createjs.Sound) {
+			throw new Error('NodeCG Sound API methods are not available when SoundJS isn\'t present');
+		}
+
+		if (!cue.file) {
+			return;
+		}
+
+		opts = opts || {};
+		if (opts.updateVolume === undefined) {
+			opts.updateVolume = true;
+		}
+
+		// Create an instance of the sound, which begins playing immediately.
+		const instance = createjs.Sound.play(cueName);
+		instance.cueName = cueName;
+
+		// Set the volume.
+		this._soundCues.value.some(cue => {
+			if (cue.name === cueName) {
+				_setInstanceVolume(this, instance, cue);
+				return true;
+			}
+
+			return false;
+		});
+
+		instance.updateVolume = opts.updateVolume;
+
+		return instance;
+	};
+
+	/**
+	 * Stops all currently playing instances of the provided `cueName`.
+	 * @param cueName {String}
+	 */
+	NodeCG.prototype.stopSound = function (cueName) {
+		if (!this._soundCues) {
+			throw new Error(`Bundle "${this.bundleName}" has no soundCues`);
+		}
+
+		if (!this._soundCues.value.find(cue => cue.name === cueName)) {
+			throw new Error(`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`);
+		}
+
+		if (!window.createjs || !window.createjs.Sound) {
+			throw new Error('NodeCG Sound API methods are not available when SoundJS isn\'t present');
+		}
+
+		for (let i = createjs.Sound._instances.length - 1; i >= 0; i--) {
+			const instance = createjs.Sound._instances[i];
+			if (instance.cueName === cueName) {
+				instance.stop();
+			}
+		}
+	};
+
+	/**
+	 * Stops all currently playing sounds on the page.
+	 */
+	NodeCG.prototype.stopAllSounds = function () {
+		if (!window.createjs || !window.createjs.Sound) {
+			throw new Error('NodeCG Sound API methods are not available when SoundJS isn\'t present');
+		}
+
+		createjs.Sound.stop();
 	};
 } else {
 	/**
@@ -473,14 +545,6 @@ if (process.env.browser) {
 
 	/**
 	 * _Extension only_&lt;br/>
-	 * Finds and returns a session that matches the given parameters.
-	 * @param {object} params - A NeDB search query [https://github.com/louischatriot/nedb#finding-documents].
-	 * @returns {object}
-	 */
-	NodeCG.prototype.util.findSession = utils.findSession;
-
-	/**
-	 * _Extension only_&lt;br/>
 	 * Object containing references to all other loaded extensions. To access another bundle's extension,
 	 * it _must_ be declared as a `bundleDependency` in your bundle's [`package.json`]{@tutorial manifest}.
 	 * @property {Object}
@@ -503,10 +567,40 @@ if (process.env.browser) {
      * }
 	 */
 	Object.defineProperty(NodeCG.prototype, 'extensions', {
-		get: function () {
+		get() {
 			return server.getExtensions();
 		},
 		enumerable: true
+	});
+}
+
+function _registerSounds(ctx) {
+	ctx._soundCues.value.forEach(cue => {
+		if (!cue.file) {
+			return;
+		}
+
+		createjs.Sound.registerSound(`${cue.file.url}?sum=${cue.file.sum}`, cue.name, {channels: 100});
+	});
+
+	if (!ctx.soundsReady) {
+		ctx.soundsReady = true;
+		window.dispatchEvent(new CustomEvent('ncgSoundsReady'));
+	}
+}
+
+function _setInstanceVolume(ctx, instance, cue) {
+	instance.volume = (ctx._masterVolume.value / 100) * (ctx._bundleVolume.value / 100) * (cue.volume / 100);
+}
+
+function _updateInstanceVolumes(ctx) {
+	// Update the volume of any playing instances that haven't opted out of automatic volume updates.
+	ctx._soundCues.value.forEach(cue => {
+		createjs.Sound._instances.forEach(instance => {
+			if (instance.cueName === cue.name &amp;&amp; instance.updateVolume) {
+				_setInstanceVolume(ctx, instance, cue);
+			}
+		});
 	});
 }
 
@@ -523,7 +617,7 @@ module.exports = NodeCG;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Mar 23 2016 09:30:14 GMT-0500 (Central Daylight Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 20 2016 11:35:56 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

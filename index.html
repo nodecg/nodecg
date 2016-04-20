@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#.nearestElementWithAttribute">nearestElementWithAttribute</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
 </nav>
 
 <div id="main">
@@ -68,6 +68,12 @@ cd nodecg
 npm install --production
 bower install
 node index.js</code></pre><p>To run NodeCG in production, <a href="https://github.com/Unitech/pm2">pm2</a> is recommended.</p>
+<h3>NOTICE - April 20, 2016</h3><p>As of Chrome 50, NodeCG does not work properly in the latest versions of any browser.
+Specifically, parts of the Replicant system will malfunction.
+Graphics will still work in the Browser Source plugins for OBS1, OBS Studio, XSplit, and CasparCG, as they do not use
+the latest version of Chrome. However, this means that you can no longer reliably use the NodeCG Dashboard in Chrome.</p>
+<p>To resolve this issue, we developed <a href="https://github.com/nodecg/dashboard">Dashboard Standalone</a>. It is <strong>required</strong> for all current versions of NodeCG.
+The dashboard will not run properly in any desktop browser. <a href="https://github.com/nodecg/dashboard/blob/master/README.md">Please see its README for more information</a>.</p>
 <h2>Installing bundles</h2><p>NodeCG's individual graphics packages are called <em>bundles</em>. They can be installed either from the command-line
 (via <a href="https://www.npmjs.com/package/nodecg-cli"><em>nodecg-cli</em></a>), or by simply placing the folder into the <code>./bundles</code> directory.</p>
 <p>The easiest way to install bundles is via the command-line using <a href="https://www.npmjs.com/package/nodecg-cli"><em>nodecg-cli</em></a>.
@@ -168,7 +174,7 @@ with some additional properties that tell NodeCG about the bundle and how to loa
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Mar 23 2016 09:30:14 GMT-0500 (Central Daylight Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 20 2016 11:35:56 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

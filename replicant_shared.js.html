@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>replicant/shared.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyOperations">applyOperations</a></li><li><a href="global.html#assign">assign</a></li><li><a href="global.html#declare">declare</a></li><li><a href="global.html#emitToClients">emitToClients</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#findOrDeclare">findOrDeclare</a></li><li><a href="global.html#saveReplicant">saveReplicant</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">replicant/shared.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable camelcase */
+'use strict';
+
+const objectPath = require('object-path');
+const proxyMap = new WeakMap();
+
+const ARRAY_MUTATOR_METHODS = [
+	'copyWithin',
+	'fill',
+	'pop',
+	'push',
+	'reverse',
+	'shift',
+	'sort',
+	'splice',
+	'unshift'
+];
+
+// TODO: add "delete" traps
+
+const CHILD_ARRAY_HANDLER = {
+	get(target, prop) {
+		const metadata = proxyMap.get(target);
+		if (metadata.replicant._ignoreProxy) {
+			return target[prop];
+		}
+
+		if (ARRAY_MUTATOR_METHODS.indexOf(prop) >= 0) {
+			return function () {
+				metadata.replicant._addOperation(metadata.path, prop, Array.prototype.slice.call(arguments));
+			};
+		}
+
+		return target[prop];
+	},
+
+	set(target, prop, newValue) {
+		const metadata = proxyMap.get(target);
+		const replicant = metadata.replicant;
+		if (replicant._ignoreProxy) {
+			target[prop] = newValue;
+			return true;
+		}
+
+		if (target.hasOwnProperty(prop)) {
+			replicant._addOperation(metadata.path, 'update', {prop, newValue});
+		} else {
+			replicant._addOperation(metadata.path, 'add', {prop, newValue});
+		}
+
+		return true;
+	}
+};
+
+const CHILD_OBJECT_HANDLER = {
+	get(target, prop) {
+		return target[prop];
+	},
+
+	set(target, prop, newValue) {
+		const metadata = proxyMap.get(target);
+		const replicant = metadata.replicant;
+		if (replicant._ignoreProxy) {
+			target[prop] = newValue;
+			return target[prop];
+		}
+
+		if (target.hasOwnProperty(prop)) {
+			replicant._addOperation(metadata.path, 'update', {prop, newValue});
+		} else {
+			replicant._addOperation(metadata.path, 'add', {prop, newValue});
+		}
+
+		// TODO: this is probably bad.
+		return true;
+	}
+};
+
+module.exports = {
+	ARRAY_MUTATOR_METHODS,
+
+	/**
+	 * Recursively Proxies an Array or Object. Does nothing to primitive values.
+	 * @param replicant {object} - The Replicant in which to do the work.
+	 * @param value {*} - The value to recursively Proxy.
+	 * @param path {string} - The objectPath to this value.
+	 * @returns {*} - The recursively Proxied value (or just `value` unchanged, if `value` is a primitive)
+	 * @private
+	 */
+	_proxyRecursive(replicant, value, path) {
+		if (typeof value === 'object') {
+			if (proxyMap.has(value)) {
+				return;
+			}
+
+			replicant.log.info('_proxyRecursive | value: %s, path: %s', value, path);
+			proxyMap.set(value, {replicant, path});
+
+			const handler = Array.isArray(value) ? CHILD_ARRAY_HANDLER : CHILD_OBJECT_HANDLER;
+			const p = new Proxy(value, handler);
+			for (const key in value) {
+				if (!value.hasOwnProperty(key)) {
+					continue;
+				}
+
+				const escapedKey = key.replace(/\//g, '~1');
+				if (path) {
+					const joinedPath = path.endsWith('/') ? `${path}${escapedKey}` : `${path}/${escapedKey}`;
+					value[key] = this._proxyRecursive(replicant, value[key], joinedPath);
+				} else {
+					value[key] = this._proxyRecursive(replicant, value[key], escapedKey);
+				}
+			}
+			return p;
+		}
+
+		return value;
+	},
+
+	/**
+	 * If the operation is an array mutator method, call it on the target array with the operation arguments.
+	 * Else, handle it with objectPath.
+	 * @param replicant {object} - The Replicant to perform the operation on.
+	 * @param operation {object} - The operation to perform.
+	 */
+	applyOperation(replicant, operation) {
+		replicant._ignoreProxy = true;
+
+		let path = operation.path.substr(1).split('/').map(part => {
+			// De-tokenize '/' characters in path name
+			return part.replace(/~1/g, '/');
+		});
+
+		// For some reason, empty paths in array formats cause errors.
+		// To prevent this, we replace the path with an empty string if this is the case.
+		if (path.length === 1 &amp;&amp; path[0] === '') {
+			path = [];
+		}
+
+		if (ARRAY_MUTATOR_METHODS.indexOf(operation.method) >= 0) {
+			// TODO: items added via these methods aren't proxied
+			/* eslint-disable prefer-spread */
+			const arr = objectPath.get(replicant.value, path);
+			arr[operation.method].apply(arr, operation.args);
+
+			// Recursively check for any objects that may have been added by the above method
+			// and that need to be Proxied.
+			this._proxyRecursive(replicant, arr, operation.path);
+			/* eslint-enable prefer-spread */
+		} else {
+			switch (operation.method) {
+				case 'add':
+				case 'update': {
+					path.push(operation.args.prop);
+
+					let newValue = operation.args.newValue;
+					if (typeof newValue === 'object') {
+						newValue = this._proxyRecursive(replicant, newValue, operation.path);
+					}
+
+					objectPath.set(replicant.value, path, newValue);
+					break;
+				}
+				case 'delete':
+					objectPath.del(replicant.value, path);
+					break;
+				default:
+					throw new Error(`Unexpected operation method "${operation.method}"`);
+			}
+		}
+
+		replicant._ignoreProxy = false;
+	}
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Apr 12 2016 19:14:59 GMT-0500 (Central Daylight Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+<script>
+  ((window.gitter = {}).chat = {}).options = {
+    room: 'nodecg/nodecg'
+  };
+</script>
+<script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+</body>
+</html>

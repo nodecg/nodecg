@@ -53,6 +53,7 @@ h1 {
 h1.page-title {
   font-size: 48px;
   margin: 1em 30px;
+  line-height: 1;
 }
 
 h2 {
@@ -116,6 +117,10 @@ section {
   display: block;
   background-color: #fff;
   padding: 0 30px;
+}
+
+section img {
+  max-width: 100%;
 }
 
 .variation {
