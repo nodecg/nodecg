@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#.nearestElementWithAttribute">nearestElementWithAttribute</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
 </nav>
 
 <div id="main">
@@ -57,8 +57,6 @@ const filteredConfig = require('../config').filteredConfig;
  * in the global scope of this asset.
  * @param {boolean} [opts.singleInstance=false] - Whether or not to inject the singleInstance scripts.
  * Only applies when `resourceType` is `graphic`.
- * @param {boolean} [opts.sound=false] - Whether or not to inject the sound playback scripts.
- * Only applies when `resourceType` is `graphic`.
  * @param cb
  */
 module.exports = function (pathOrHtml, resourceType, opts, cb) {
@@ -76,13 +74,16 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 		}
 
 		const $ = cheerio.load(html);
-		let scripts = [];
-		let styles = [];
 
 		// Everything needs the shims and config
-		scripts.push('&lt;script src="/components/observe-shim/lib/observe-shim.js">&lt;/script>');
-		scripts.push('&lt;script src="/shims/WeakMap.js">&lt;/script>');
-		scripts.push(`&lt;script>window.ncgConfig = ${JSON.stringify(filteredConfig)};&lt;/script>`);
+		let scripts = [
+			'&lt;script src="/components/object.observe/dist/object-observe.min.js">&lt;/script>',
+			'&lt;script src="/components/array.observe/array-observe.min.js">&lt;/script>',
+			'&lt;script src="/shims/WeakMap.js">&lt;/script>',
+			`&lt;script>window.ncgConfig = ${JSON.stringify(filteredConfig)};&lt;/script>`
+		];
+
+		let styles = [];
 
 		if (resourceType === 'panel' || resourceType === 'dialog') {
 			if (opts.standalone) {
@@ -99,16 +100,14 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 			if (opts.standalone) {
 				// load the socket
 				scripts.push('&lt;script src="/components/cookies-js/dist/cookies.min.js">&lt;/script>');
-				scripts.push('&lt;script src="/socket.io/socket.io.js">&lt;/script>');
-
-				// Uses cn-jsurl bower lib
 				scripts.push('&lt;script src="/components/cn-jsurl/url.min.js">&lt;/script>');
+				scripts.push('&lt;script src="/socket.io/socket.io.js">&lt;/script>');
 				scripts.push(`&lt;script>
 					var url = new Url;
 					window.token = url.query.key || Cookies.get('socketToken');
 					if (window.token) {
 						window.socket = io.connect('//' + window.ncgConfig.baseURL + '/', {
-							query: 'token=' + window.token
+							query: 'token=' + window.token +
 						});
 					} else {
 						window.socket = io.connect('//' + window.ncgConfig.baseURL + '/');
@@ -133,19 +132,6 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 				scripts.push('&lt;script async src="/dashboard/dialog_helper.js">&lt;/script>');
 			}
 		} else if (resourceType === 'graphic') {
-			if (config.rollbar &amp;&amp; config.rollbar.enabled) {
-				scripts.unshift('&lt;script src="/components/rollbar/dist/rollbar.min.js">&lt;/script>');
-				scripts.unshift(`&lt;script>
-					const _rollbarConfig = {
-						accessToken: '${config.rollbar.token}',
-						captureUncaught: true,
-						payload: {
-							environment: '${config.rollbar.environment}'
-						}
-					};
-				&lt;/script>`);
-			}
-
 			// Graphics need to create their own socket
 			scripts.push('&lt;script src="/socket.io/socket.io.js">&lt;/script>');
 
@@ -165,11 +151,6 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 			}
 			scripts.push(util.format(socketScript, filteredConfig.baseURL));
 
-			// If this bundle has sounds, inject SoundJS
-			if (opts.sound) {
-				scripts.push('&lt;script src="/components/SoundJS/lib/soundjs-0.6.2.min.js">&lt;/script>');
-			}
-
 			// Graphics must include the API script themselves before attempting to make an instance of it
 			scripts.push('&lt;script src="/nodecg-api.js">&lt;/script>');
 		} else {
@@ -180,8 +161,7 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 		if (opts.createApiInstance) {
 			const partialBundle = {
 				name: opts.createApiInstance.name,
-				config: opts.createApiInstance.config,
-				_hasSounds: opts.sound
+				config: opts.createApiInstance.config
 			};
 
 			scripts.push(
@@ -234,7 +214,7 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 20 2016 11:35:56 GMT-0500 (Central Daylight Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 20 2016 18:57:36 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
