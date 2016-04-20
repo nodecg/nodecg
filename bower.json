@@ -20,7 +20,6 @@
     "iron-selector": "PolymerElements/iron-selector#1.0.7",
     "js-throttle-debounce": "~0.1.1",
     "more-routing": "PolymerLabs/more-routing#^1.0.0",
-    "observe-shim": "~0.4.2",
     "packery": "~1.4.3",
     "paper-button": "PolymerElements/paper-button#^1.0.10",
     "paper-card": "PolymerElements/paper-card#^1.0.8",
@@ -38,7 +37,9 @@
     "paper-spinner": "PolymerElements/paper-spinner#^1.1.1",
     "vaadin-upload": "vaadin/vaadin-upload#^1.0.0-alpha1",
     "nodecg-replicant": "NodeCGElements/nodecg-replicant#^0.5.4",
-    "clipboard": "^1.5.9"
+    "clipboard": "^1.5.9",
+    "object.observe": "~0.2.6",
+    "array.observe": "~0.0.1"
   },
   "license": "MIT",
   "private": true,
