@@ -36,7 +36,6 @@ before(function(done) {
                 build: process.env.TRAVIS_BUILD_NUMBER,
                 tags: [process.env.TRAVIS_BRANCH, process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE],
                 browserName: 'chrome',
-                version: 'beta',
                 tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
             };
 
