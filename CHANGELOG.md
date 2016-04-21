@@ -1,3 +1,14 @@
+<a name="0.7.8"></a>
+## [0.7.8](https://github.com/nodecg/nodecg/compare/v0.7.7...v0.7.8) (2016-04-20)
+
+
+### Bug Fixes
+
+* **api:** throw error when handler is not a function ([9804a84](https://github.com/nodecg/nodecg/commit/9804a84))
+* **dashboard:** fix "Copy Url" buttons on graphics page ([3ed107f](https://github.com/nodecg/nodecg/commit/3ed107f))
+* **package:** fix docs:publish script ([d5d3160](https://github.com/nodecg/nodecg/commit/d5d3160))
+* **replicants:** Remove observe-shim for object.observe bower component  ([490dd0e](https://github.com/nodecg/nodecg/commit/490dd0e))
+
 <a name="0.7.7"></a>
 ## [0.7.7](https://github.com/nodecg/nodecg/compare/v0.7.6...v0.7.7) (2016-03-31)
 
