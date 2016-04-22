@@ -183,7 +183,6 @@ describe('client-side replicants', function () {
 					expect(ret.value).to.deep.equal({foo: 'bar'});
 
 					rep.on('change', newVal => {
-						console.log('CHANGE', newVal);
 						if (newVal.foo === 'baz') {
 							done();
 						}
