@@ -89,7 +89,7 @@ before(function (done) {
 
 		e.browser.client
 			.init()
-			.timeoutsAsyncScript(60000)
+			.timeoutsAsyncScript(90000)
 			.newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
 			.getCurrentTabId()
 			.then(tabId => {
