@@ -14,9 +14,10 @@ env:
     - CXX=g++-4.8
 
 cache:
+  apt: true
   directories:
-  - node_modules
-  - '$HOME/.npm'
+    - node_modules
+    - '$HOME/.npm'
 
 addons:
   sauce_connect: true
