@@ -51,7 +51,11 @@ before(function (done) {
 				chromeOptions: {
 					args: ['--disable-popup-blocking']
 				},
-				tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+				tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+
+				/* Can be removed after Friday, April 26, 2016 */
+				seleniumVersion: '2.53.0',
+				chromedriverVersion: '2.21'
 			};
 
 			if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
@@ -89,7 +93,7 @@ before(function (done) {
 
 		e.browser.client
 			.init()
-			.timeoutsAsyncScript(90000)
+			.timeoutsAsyncScript(30000)
 			.newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
 			.getCurrentTabId()
 			.then(tabId => {
