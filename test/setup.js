@@ -52,10 +52,6 @@ before(function (done) {
 					args: ['--disable-popup-blocking']
 				},
 				tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-
-				/* Can be removed after Friday, April 26, 2016 */
-				seleniumVersion: '2.53.0',
-				chromedriverVersion: '2.21'
 			};
 
 			if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
