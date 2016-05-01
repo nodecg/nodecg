@@ -51,7 +51,7 @@ before(function (done) {
 				chromeOptions: {
 					args: ['--disable-popup-blocking']
 				},
-				tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+				tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
 			};
 
 			if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
@@ -81,7 +81,7 @@ before(function (done) {
 				desiredCapabilities: {
 					browserName: 'chrome',
 					loggingPrefs: {
-						browser: "ALL"
+						browser: 'ALL'
 					}
 				}
 			});
