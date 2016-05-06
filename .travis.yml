@@ -17,6 +17,7 @@ cache:
   apt: true
   directories:
     - node_modules
+    - bower_components
     - '$HOME/.npm'
 
 addons:
