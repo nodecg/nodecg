@@ -14,6 +14,10 @@ Looking for a list of NodeCG bundles and resources? Check out [awesome-nodecg](h
 Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!  
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nodecg/nodecg)
 
+> **NOTICE**: NodeCG v0.8 and above require Node.js >= 6 and Chrome >= 49. 
+**This means that as of right now, NodeCG graphics will not work in OBS1, XSplit, or CasparCG.** 
+The only platform that can currently display NodeCG graphics is OBS Studio with the latest release of its Browser Source plugin.
+
 ## Who should use NodeCG?
 NodeCG is a programming framework. As such, it's most useful to developers capable of creating their own graphics
 using HTML, CSS, and JavaScript. NodeCG is still in beta and the ecosystem of bundles is quite small.
@@ -21,7 +25,7 @@ Those expecting to download NodeCG and use off-the-shelf bundles to get a comple
 without writing any code may be disappointed.
 
 ## Installation
-Install [node.js (version 4 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
+Install [node.js (version 6 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
 Then, run the following commands from a terminal (command prompt):
 ```
 npm install -g bower

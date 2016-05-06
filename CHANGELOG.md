@@ -1,6 +1,7 @@
 <a name="0.8.0"></a>
 # [0.8.0](https://github.com/nodecg/nodecg/compare/v0.7.7...v0.8.0) (2016-05-06)
 
+**NOTICE:** This release relies on Node.js >= 6 and Chrome >= 49. **This means that as of right now, NodeCG graphics will not work in OBS1, XSplit, or CasparCG.** The only platform that can currently display NodeCG graphics is OBS Studio with the latest release of its Browser Source plugin.
 
 ### Bug Fixes
 
@@ -19,7 +20,7 @@
 ### Features
 
 * **rollbar:** add support for automatically reporting uncaught exceptions to Rollbar([80f0ea6](https://github.com/nodecg/nodecg/commit/80f0ea6))
-  * [More info can be found in the Sounds docs on nodecg.com](http://nodecg.com/tutorial-rollbar.html)
+  * [More info can be found in the Rollbar docs on nodecg.com](http://nodecg.com/tutorial-rollbar.html)
 * **sounds:** add sounds feature, rename uploads to assets, add categories to assets([52a9045](https://github.com/nodecg/nodecg/commit/52a9045))
   * [More info can be found in the Sounds docs on nodecg.com](http://nodecg.com/tutorial-sounds.html)
 
@@ -48,6 +49,11 @@
 * replicants: The third Replicant `change` event argument has been changed. Previously it was `changes`, an array of Object.observe change records. It is now `operations`, an array of operation records in NodeCG's internal format. This format is likely to continue changing as we figure out what works best. Any further changes to this format will be considered breaking.
 * replicants: WeakMap and Object.observe shims have been removed. This probably won't affect anyone, as any browser that supports Proxy also supports WeakMap, but be aware of it.
 * panels: the routes for panels are now `/panel/:bundleName/:panelFile` as opposed to `/panel/:bundleName/:panelName`.
+
+	Closes #144 
+
+	To migrate, any relative URLs present in panels (or dialogs) that are in subfolders will need to be re-written to reflect the new path that the panel is being served from.
+
 * uploads: uploads are now called assets, and their manifest format has changed.
 
 	To migrate, [see the new Assets documentation on nodecg.com](http://nodecg.com/tutorial-assets.html).
