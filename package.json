@@ -56,7 +56,8 @@
     "build:css": "lessc lib/dashboard/src/dashboard.less lib/dashboard/public/dashboard.css && lessc lib/dashboard/src/nodecg-defaults.less lib/dashboard/public/style/nodecg-defaults.css",
     "docs": "npm run docs:build && npm run docs:publish",
     "docs:build": "jsdoc -c .jsdoc.json",
-    "docs:publish": "npm run build:docs && gh-pages -d docs -s ** -a"
+    "docs:publish": "npm run build:docs && gh-pages -d docs -s ** -a",
+    "release": "standard-version"
   },
   "engines": {
     "node": ">= 4.1.2"
@@ -94,6 +95,7 @@
     "minifyify": "^7.1.0",
     "mocha": "^2.3.3",
     "mocha-lcov-reporter": "1.2.0",
+    "standard-version": "^2.2.1",
     "webdriverio": "^4.0.3"
   }
 }
