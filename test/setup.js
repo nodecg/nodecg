@@ -63,7 +63,11 @@ before(function (done) {
 			}
 
 			if (process.env.TRAVIS_OS_NAME === 'linux') {
-				desiredCapabilities.platform = 'Linux';
+				// desiredCapabilities.platform = 'Linux';
+
+				// Use Windows until Sauce Labs has at least Chrome 49 on Linux
+				// https://saucelabs.com/platforms/#linux
+				desiredCapabilities.platform = 'Windows 10';
 			} else if (process.env.TRAVIS_OS_NAME === 'osx') {
 				desiredCapabilities.platform = 'OS X 10.10';
 			}
@@ -81,7 +85,7 @@ before(function (done) {
 				desiredCapabilities: {
 					browserName: 'chrome',
 					loggingPrefs: {
-						browser: "ALL"
+						browser: 'ALL'
 					}
 				}
 			});

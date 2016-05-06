@@ -21,7 +21,7 @@
     "iron-selector": "PolymerElements/iron-selector#1.0.7",
     "js-throttle-debounce": "~0.1.1",
     "more-routing": "PolymerLabs/more-routing#^1.0.0",
-    "nodecg-replicant": "NodeCGElements/nodecg-replicant#^0.5.4",
+    "nodecg-replicant": "NodeCGElements/nodecg-replicant#proxy-replicants",
     "observe-shim": "~0.4.2",
     "packery": "~1.4.3",
     "paper-button": "PolymerElements/paper-button#^1.0.10",
@@ -38,9 +38,9 @@
     "paper-styles": "PolymerElements/paper-styles#^1.0.13",
     "paper-toast": "PolymerElements/paper-toast#^1.1.1",
     "paper-toolbar": "PolymerElements/paper-toolbar#^1.1.2",
+    "rollbar": "^1.8.5",
     "SoundJS": "0.6.2",
-    "vaadin-upload": "vaadin/vaadin-upload#^1.0.0-alpha1",
-    "rollbar": "^1.8.5"
+    "vaadin-upload": "vaadin/vaadin-upload#^1.0.0-alpha1"
   },
   "license": "MIT",
   "private": true,

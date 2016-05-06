@@ -6,7 +6,8 @@
 		],
 		"exclude": [
 			"./lib/browser/dist",
-			"./lib/browser/shims"
+			"./lib/browser/shims",
+			"./lib/browser/replicant"
 		]
 	},
 	"tags": {

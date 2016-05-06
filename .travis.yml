@@ -2,8 +2,7 @@ sudo: false
 
 language: node_js
 node_js:
-  - '4'
-  - 'stable'
+  - '6'
 
 os:
   - linux
@@ -14,6 +13,13 @@ env:
     - secure: FXrHIYwBQrovaiB5EhLnnVznuWos7mmPyb2Vu0lFQJ7h0rKY+1FEfuRlnEb04ZV0otoUL2ZQRTEd2DDSqJ6gzFm4k/8bAXP6tn9grpWy0v/zN9B/Azje47TbafiziftOOEWXyEbMv60WOxB+0lHkrl4c1TOSI1r5RPsGNIdw8jo=
     - CXX=g++-4.8
 
+cache:
+  apt: true
+  directories:
+    - node_modules
+    - bower_components
+    - '$HOME/.npm'
+
 addons:
   sauce_connect: true
   apt:
@@ -21,6 +27,10 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+
+install:
+  - npm prune
+  - npm install
 
 before_script:
   - npm install -g bower
