@@ -1,3 +1,59 @@
+<a name="0.8.0"></a>
+# [0.8.0](https://github.com/nodecg/nodecg/compare/v0.7.7...v0.8.0) (2016-05-06)
+
+
+### Bug Fixes
+
+* **api:** throw error when `listenFor` handler is not a function([9804a84](https://github.com/nodecg/nodecg/commit/9804a84))
+* **dashboard:** fix "Copy Url" buttons on graphics page([3ed107f](https://github.com/nodecg/nodecg/commit/3ed107f))
+* **dashboard:** fix invalid javascript on standalone panels([fcba09b](https://github.com/nodecg/nodecg/commit/fcba09b))
+* **panels:** panels are now served by filename rather than panel name([9f3e54b](https://github.com/nodecg/nodecg/commit/9f3e54b)), closes [#144](https://github.com/nodecg/nodecg/issues/144)
+* **tests:** test standalone panels, ensure autodeps are enabled([366422d](https://github.com/nodecg/nodecg/commit/366422d))
+
+
+### Code Refactoring
+
+* **replicants:** use Proxy instead of Object.observe ([#163](https://github.com/nodecg/nodecg/issues/163))([05ec891](https://github.com/nodecg/nodecg/commit/05ec891))
+
+
+### Features
+
+* **rollbar:** add support for automatically reporting uncaught exceptions to Rollbar([80f0ea6](https://github.com/nodecg/nodecg/commit/80f0ea6))
+  * [More info can be found in the Sounds docs on nodecg.com](http://nodecg.com/tutorial-rollbar.html)
+* **sounds:** add sounds feature, rename uploads to assets, add categories to assets([52a9045](https://github.com/nodecg/nodecg/commit/52a9045))
+  * [More info can be found in the Sounds docs on nodecg.com](http://nodecg.com/tutorial-sounds.html)
+
+
+### BREAKING CHANGES
+
+* replicants: The order of Replicant `change` event arguments has been swapped. `newVal` is now the first argument, `oldVal` is the second argument. Be sure to update all of your `change` event handlers accordingly.
+
+	To migrate, follow the example below:
+
+	Before:
+
+	```
+	myRep.on('change', function (oldVal, newVal) {
+		// do work
+	});
+	```
+
+	After:
+
+	```
+	myRep.on('change', function (newVal, oldVal) {
+		// do work
+	});
+	```
+* replicants: The third Replicant `change` event argument has been changed. Previously it was `changes`, an array of Object.observe change records. It is now `operations`, an array of operation records in NodeCG's internal format. This format is likely to continue changing as we figure out what works best. Any further changes to this format will be considered breaking.
+* replicants: WeakMap and Object.observe shims have been removed. This probably won't affect anyone, as any browser that supports Proxy also supports WeakMap, but be aware of it.
+* panels: the routes for panels are now `/panel/:bundleName/:panelFile` as opposed to `/panel/:bundleName/:panelName`.
+* uploads: uploads are now called assets, and their manifest format has changed.
+
+	To migrate, [see the new Assets documentation on nodecg.com](http://nodecg.com/tutorial-assets.html).
+
+
+
 <a name="0.7.8"></a>
 ## [0.7.8](https://github.com/nodecg/nodecg/compare/v0.7.7...v0.7.8) (2016-04-20)
 
