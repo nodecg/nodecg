@@ -1,6 +1,20 @@
 ## Breaking Changes
+- [The order of arguments to the Replicant `change` event handler has been swapped](#replicant-change-event)
 - [Dashboard panels are now served from `/panel/:bundleName/:panelFile` routes](#panel-routes)
 - [Uploads have been renamed to Assets, now have Categories](#assets-and-categories)
+
+<h3 id="replicant-change-event">Replicant Change Event</h3>
+Prior to NodeCG v0.8, the Replicant change handler had the following signature:
+```js
+// NodeCG v0.7 and earlier
+myRep.on('change', function (oldVal, newVal, changes) {});
+```
+
+In v0.8, `newVal` and `oldVal` have been swapped, as `newVal` is frequently used whereas `oldVal` is less frequently used.
+```js
+// NodeCG v0.8 and later
+myRep.on('change', function (newVal, oldVal, operations) {});
+```
 
 <h3 id="panel-routes">Panel Routes</h3>
 Dashboard panels are now served from `/panel/:bundleName/:panelFile` routes. Prior to v0.8, they were served from the
