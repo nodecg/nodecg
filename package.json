@@ -89,7 +89,7 @@
     "grunt-browserify": "^5.0.0",
     "istanbul": "^0.4.1",
     "jsdoc": "^3.4.0",
-    "less": "^2.6.0",
+    "less": "^2.7.0",
     "load-grunt-tasks": "^3.4.0",
     "minami": "github:nodecg/minami",
     "minifyify": "^7.1.0",
