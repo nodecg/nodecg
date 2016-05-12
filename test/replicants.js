@@ -344,6 +344,23 @@ describe('client-side replicants', function () {
 				})
 				.catch(err => done(err));
 		});
+
+		it.only('should properly proxy new objects assigned to properties', done => {
+			const rep = e.apis.extension.Replicant('serverObjProp', {
+				defaultValue: {foo: {bar: 'bar'}}
+			});
+
+			rep.value.foo = {baz: 'baz'};
+
+			rep.on('change', newVal => {
+				if (newVal.foo.baz === 'bax') {
+					assert.equal(newVal.foo.baz, 'bax');
+					done();
+				}
+			});
+
+			rep.value.foo.baz = 'bax';
+		});
 	});
 
 	context('when "persistent" is set to "true"', () => {
