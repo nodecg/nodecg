@@ -190,6 +190,21 @@ describe('client-side replicants', function () {
 				})
 				.catch(err => done(err));
 		});
+
+		it('should proxy objects added to arrays via array insertion methods', done => {
+			const rep = e.apis.extension.Replicant('serverArrInsertObj', {defaultValue: []});
+			rep.value.push({foo: 'foo'});
+			rep.on('change', newVal => {
+				if (newVal[0].foo === 'bar') {
+					assert.deepEqual(newVal, [{foo: 'bar'}]);
+					done();
+				}
+			});
+
+			process.nextTick(() => {
+				rep.value[0].foo = 'bar';
+			});
+		});
 	});
 
 	context('when an object', () => {
@@ -345,7 +360,7 @@ describe('client-side replicants', function () {
 				.catch(err => done(err));
 		});
 
-		it.only('should properly proxy new objects assigned to properties', done => {
+		it('should properly proxy new objects assigned to properties', done => {
 			const rep = e.apis.extension.Replicant('serverObjProp', {
 				defaultValue: {foo: {bar: 'bar'}}
 			});
@@ -359,7 +374,9 @@ describe('client-side replicants', function () {
 				}
 			});
 
-			rep.value.foo.baz = 'bax';
+			process.nextTick(() => {
+				rep.value.foo.baz = 'bax';
+			});
 		});
 	});
 
