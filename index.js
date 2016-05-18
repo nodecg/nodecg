@@ -7,9 +7,11 @@ if (process.cwd() !== __dirname) {
 }
 
 const semver = require('semver');
-if (!semver.satisfies(process.version.substr(1), '>=6')) {
-	console.warn('WARNING: NodeCG requires Node.js >=6 and npm >=2\n\t',
-		'Your Node.js version:', process.version);
+const nodeVersion = process.versions.node;
+if (!semver.satisfies(nodeVersion, '>=6')) {
+	console.error('ERROR: NodeCG requires Node.js >=6 and npm >=2');
+	console.error(`       Your Node.js version: v${nodeVersion}`);
+	return;
 }
 
 process.on('uncaughtException', err => {
