@@ -21,7 +21,7 @@
     "iron-selector": "PolymerElements/iron-selector#1.0.7",
     "js-throttle-debounce": "~0.1.1",
     "more-routing": "PolymerLabs/more-routing#^1.0.0",
-    "nodecg-replicant": "NodeCGElements/nodecg-replicant#proxy-replicants",
+    "nodecg-replicant": "NodeCGElements/nodecg-replicant#^0.5.6",
     "observe-shim": "~0.4.2",
     "packery": "~1.4.3",
     "paper-button": "PolymerElements/paper-button#^1.0.10",
