@@ -87,6 +87,7 @@
     "gh-pages": "^0.11.0",
     "grunt": "^1.0.0",
     "grunt-browserify": "^5.0.0",
+    "grunt-vulcanize": "^1.0.0",
     "istanbul": "^0.4.1",
     "jsdoc": "^3.4.0",
     "less": "^2.7.0",
