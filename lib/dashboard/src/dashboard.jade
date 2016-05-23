@@ -172,7 +172,8 @@ html(lang='en')
 					if panel.dialog
 						ncg-dialog(class='dashboard-panel width-' + panel.width, with-backdrop,
 						id=bundle.name + '_' + panel.name, bundle=bundle.name, panel=panel.name)
-							h2=panel.title
+							if panel.title
+								h2=panel.title
 							if panel.dialogButtons
 								div.buttons
 									each button in panel.dialogButtons
