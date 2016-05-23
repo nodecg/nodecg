@@ -81,7 +81,7 @@ html(lang='en')
 		//- Set the default color of many polymer elements.
 			Newer elements use --primary-color, older elements use --default-primary-color.
 		style(is='custom-style').
-			* {
+			:root {
 				--default-primary-color: #00bebe;
 				--primary-color: #00bebe;
 			}
@@ -98,6 +98,12 @@ html(lang='en')
 				--paper-spinner-layer-2-color: var(--nodecg-configure-color);
 				--paper-spinner-layer-3-color: var(--nodecg-success-color);
 				--paper-spinner-layer-4-color: var(--nodecg-danger-color);
+			}
+
+			ncg-dialog paper-dialog-scrollable {
+				--paper-dialog-scrollable: {
+					max-width: none!important;
+				}
 			}
 
 		//- Set up app routing

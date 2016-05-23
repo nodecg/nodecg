@@ -19,6 +19,11 @@ Lange - 1/28/2016
 	<style>
 		:host {
 			flex-direction: column;
+			max-width: 100%;
+			--paper-dialog-scrollable: {
+				background-color: wheat;
+				max-width: none;
+			}
 		}
 
 		:host > ::content iframe {
