@@ -93,7 +93,7 @@
     "load-grunt-tasks": "^3.4.0",
     "minami": "github:nodecg/minami",
     "minifyify": "^7.1.0",
-    "mocha": "^2.3.3",
+    "mocha": "^2.5.3",
     "mocha-lcov-reporter": "1.2.0",
     "standard-version": "^2.2.1",
     "webdriverio": "^4.0.3"
