@@ -83,15 +83,13 @@ describe('sounds - client api', function () {
 		e.browser.client
 			// Play success.ogg
 			.switchTab(e.browser.tabs.dashboard)
-			.executeAsync(done => {
+			.execute(() => {
 				const ncgSoundCue = document.querySelector('#cues > ncg-sound-cue:nth-child(4)');
 				ncgSoundCue.$.select.value = 'success.ogg';
 				ncgSoundCue._retargetFile();
-
-				// Give the Replicant some time to update.
-				setTimeout(() => done(), 300);
 			})
 			.switchTab(e.browser.tabs.graphic)
+			.pause(1000) // Give the Replicant some time to update.
 			.execute(() => {
 				const instance = window.graphicApi.playSound('default-file');
 				return {
@@ -106,15 +104,13 @@ describe('sounds - client api', function () {
 
 			// Play default sound
 			.switchTab(e.browser.tabs.dashboard)
-			.executeAsync(done => {
+			.execute(() => {
 				const ncgSoundCue = document.querySelector('#cues > ncg-sound-cue:nth-child(4)');
 				ncgSoundCue.$.select.value = 'default';
 				ncgSoundCue._retargetFile();
-
-				// Give the Replicant some time to update.
-				setTimeout(() => done(), 300);
 			})
 			.switchTab(e.browser.tabs.graphic)
+			.pause(1000) // Give the Replicant some time to update.
 			.execute(() => {
 				const instance = window.graphicApi.playSound('default-file');
 				return {
@@ -124,12 +120,10 @@ describe('sounds - client api', function () {
 			})
 			.then(ret => {
 				assert.equal(ret.value.playState, 'playSucceeded');
-				assert.equal(ret.value.src,
-					'/sound/test-bundle/default-file/default.ogg');
+				assert.equal(ret.value.src, '/sound/test-bundle/default-file/default.ogg');
+				done();
 			})
-
-			.then(() => done())
-			.catch(err => done(err));
+			.catch(done);
 	});
 
 	it('#stopSound should stop all instances of a cue', done => {
