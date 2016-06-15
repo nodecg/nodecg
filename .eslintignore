@@ -1,3 +1,4 @@
 lib/browser/dist/*.js
 lib/browser/shims/*.js
 lib/dashboard/public/twitch.min.js
+bundles/
