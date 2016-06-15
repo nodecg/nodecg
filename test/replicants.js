@@ -33,7 +33,10 @@ describe('client-side replicants', function () {
 	});
 
 	it('should only apply defaultValue when first declared', done => {
-		e.apis.extension.Replicant('clientTest', {defaultValue: 'foo', persistent: false});
+		e.apis.extension.Replicant('clientTest', {
+			defaultValue: 'foo',
+			persistent: false
+		});
 
 		e.browser.client
 			.executeAsync(done => {
@@ -172,7 +175,11 @@ describe('client-side replicants', function () {
 						if (newVal[0] === 'foo') {
 							delete rep.value[0];
 						} else if (newVal[0] === undefined) {
-							done({newVal, oldVal, operations});
+							done({
+								newVal,
+								oldVal,
+								operations
+							});
 						}
 					});
 				})
@@ -335,7 +342,10 @@ describe('client-side replicants', function () {
 			e.browser.client
 				.executeAsync(done => {
 					const rep = window.dashboardApi.Replicant('clientObjectDelete', {
-						defaultValue: {foo: 'foo', bar: 'bar'},
+						defaultValue: {
+							foo: 'foo',
+							bar: 'bar'
+						},
 						persistent: false
 					});
 
@@ -343,13 +353,20 @@ describe('client-side replicants', function () {
 						if (newVal.foo) {
 							delete rep.value.foo;
 						} else if (newVal.bar) {
-							done({newVal, oldVal, operations});
+							done({
+								newVal,
+								oldVal,
+								operations
+							});
 						}
 					});
 				})
 				.then(ret => {
 					expect(ret.value.newVal).to.deep.equal({bar: 'bar'});
-					expect(ret.value.oldVal).to.deep.equal({foo: 'foo', bar: 'bar'});
+					expect(ret.value.oldVal).to.deep.equal({
+						foo: 'foo',
+						bar: 'bar'
+					});
 					expect(ret.value.operations).to.deep.equal([{
 						args: {prop: 'foo'},
 						path: '/',
@@ -529,7 +546,10 @@ describe('server-side replicants', () => {
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
 			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('extensionTest', {defaultValue: 'foo', persistent: false});
+				const rep = window.dashboardApi.Replicant('extensionTest', {
+					defaultValue: 'foo',
+					persistent: false
+				});
 				rep.on('declared', () => done());
 			})
 			.then(() => {
@@ -586,7 +606,10 @@ describe('server-side replicants', () => {
 	it('should only apply array splices from the client once', function (done) {
 		this.timeout(10000);
 
-		const serverRep = e.apis.extension.Replicant('clientDoubleApplyTest', {persistent: false, defaultValue: []});
+		const serverRep = e.apis.extension.Replicant('clientDoubleApplyTest', {
+			persistent: false,
+			defaultValue: []
+		});
 
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
