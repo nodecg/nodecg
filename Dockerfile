@@ -1,11 +1,5 @@
 FROM node:6
 
-# Update packages and clean temp/cache files
-RUN apt-get update \
-  && apt-get install -yq jq \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /var/tmp/* /tmp/*
-
 WORKDIR /usr/src/app
 
 # Copy NodeCG (just the files we need)
