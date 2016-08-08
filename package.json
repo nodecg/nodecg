@@ -12,7 +12,7 @@
   "dependencies": {
     "@nodecg/bundle-manager": "^0.4.0",
     "@nodecg/logger": "^0.1.0",
-    "body-parser": "^1.14.1",
+    "body-parser": "^1.15.1",
     "cheerio": "^0.20.0",
     "chokidar": "^1.4.2",
     "clone": "^1.0.2",
