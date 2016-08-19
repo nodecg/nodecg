@@ -11,8 +11,6 @@ RUN npm install -g bower
 RUN npm install --production
 RUN bower install --allow-root
 
-VOLUME /usr/src/app/db/
-
 # The command to run
 EXPOSE 9090
 CMD ["node", "index.js"]
