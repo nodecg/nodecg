@@ -41,14 +41,15 @@
     "request": "^2.64.0",
     "rollbar": "^0.6.0",
     "semver": "^5.0.3",
+    "sha1": "^1.1.1",
     "sha1-file": "^1.0.0",
     "socket.io": "^1.4.5",
     "uuid": "^2.0.1"
   },
   "scripts": {
     "start": "node index.js",
-    "pretest": "npm run build && node test/setup/pretest",
-    "test": "istanbul cover -x \"bundles/**\" -x \"test/**\" ./node_modules/mocha/bin/_mocha -- -R spec",
+    "pretest": "node test/setup/pretest",
+    "test": "mocha -R spec",
     "posttest": "node test/setup/posttest",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf coverage",
     "static": "eslint index.js lib/**/*.js test/**/*.js",
