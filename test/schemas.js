@@ -6,7 +6,7 @@ const assert = chai.assert;
 const e = require('./setup/test-environment');
 
 describe('client-side replicant schemas', function () {
-	this.timeout(4000);
+	this.timeout(10000);
 
 	before(done => {
 		e.browser.client
