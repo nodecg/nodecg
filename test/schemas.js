@@ -8,6 +8,12 @@ const e = require('./setup/test-environment');
 describe('client-side replicant schemas', function () {
 	this.timeout(10000);
 
+	before(done => {
+		e.browser.client
+			.switchTab(e.browser.tabs.dashboard)
+			.call(done);
+	});
+
 	it('should create a default value based on the schema, if none is provided', done => {
 		e.browser.client
 			.executeAsync(done => {
@@ -51,10 +57,9 @@ describe('client-side replicant schemas', function () {
 			.catch(err => done(err));
 	});
 
-	it.only('should throw when defaultValue fails validation', done => {
+	it('should throw when defaultValue fails validation', done => {
 		e.browser.client
 			.executeAsync(done => {
-				console.log('declaring client_schemaDefaultValueFail');
 				const rep = window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
 					defaultValue: {
 						string: 0
@@ -62,7 +67,6 @@ describe('client-side replicant schemas', function () {
 				});
 
 				rep.once('declarationRejected', reason => {
-					console.log('caught error for client_schemaDefaultValueFail, done');
 					done(reason);
 				});
 			})
@@ -73,14 +77,12 @@ describe('client-side replicant schemas', function () {
 			.catch(err => done(err));
 	});
 
-	it.only('should accept the persisted value when it passes validation', done => {
+	it('should accept the persisted value when it passes validation', done => {
 		// Persisted value is copied from fixtures
 		e.browser.client
 			.executeAsync(done => {
-				console.log('declaring client_schemaPersistencePass');
 				const rep = window.dashboardApi.Replicant('client_schemaPersistencePass');
 				rep.on('declared', () => {
-					console.log('declared client_schemaPersistencePass, done');
 					done(rep.value);
 				});
 			})
@@ -361,8 +363,8 @@ describe('client-side replicant schemas', function () {
 					}
 				});
 
-				window.errorOnce(event => {
-					done(event.error.message);
+				rep.once('assignmentRejected', reason => {
+					done(reason);
 				});
 			})
 			.then(ret => {
@@ -385,9 +387,8 @@ describe('client-side replicant schemas', function () {
 					}
 				});
 
-				window.errorOnce(event => {
-					event.preventDefault();
-					done(event.error.message);
+				rep.once('operationsRejected', reason => {
+					done(reason);
 				});
 			})
 			.then(ret => {
@@ -427,9 +428,6 @@ describe('server-side replicant schemas', () => {
 					string: 0
 				}
 			});
-			console.log(rep.schema);
-			console.log(rep.schemaSum);
-			console.log(rep.value);
 		}, /Invalid value for replicant/);
 	});
 

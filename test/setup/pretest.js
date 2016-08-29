@@ -47,16 +47,3 @@ fs.rmrf(C.BUNDLE_DIR, err => {
 		}
 	});
 });
-
-// Enable extra debugging on TravisCI
-if (process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER) {
-	fs.writeFileSync('cfg/nodecg.json', JSON.stringify({
-		logging: {
-			console: {
-				enabled: true,
-				level: 'debug'
-			},
-			replicants: true
-		}
-	}), 'utf-8');
-}

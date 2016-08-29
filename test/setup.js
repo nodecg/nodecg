@@ -142,20 +142,10 @@ after(function (done) {
 	if (process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER) {
 		this.timeout(10000);
 		e.browser.client
-			.log('browser')
-			.then(response => {
-				console.log(response.value);
-			})
 			.end()
-			.then(() => done())
+			.call(done)
 			.catch(err => done(err));
 	} else {
-		e.browser.client
-			.log('browser')
-			.then(response => {
-				console.log(response.value);
-				done();
-			})
-			.catch(err => done(err));
+		done();
 	}
 });
