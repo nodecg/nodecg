@@ -14,8 +14,9 @@ describe('client-side replicant schemas', function () {
 			.execute(() => {
 				window.errorOnce = function (callback) {
 					window.addEventListener('error', e => {
+						e.preventDefault();
 						e.target.removeEventListener(e.type, callback);
-						return callback(e);
+						callback(e);
 					});
 				};
 			})
@@ -68,18 +69,15 @@ describe('client-side replicant schemas', function () {
 	it.only('should throw when defaultValue fails validation', done => {
 		e.browser.client
 			.executeAsync(done => {
-				/* window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
+				window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
 					defaultValue: {
 						string: 0
 					}
-				}); */
+				});
 
-
-				/* window.errorOnce(event => {
-					event.preventDefault();
+				window.errorOnce(event => {
 					done(event.error.message);
-				}); */
-				done();
+				});
 			})
 			.then(ret => {
 				assert.isTrue(ret.value.startsWith('Invalid value for replicant "client_schemaDefaultValueFail"'));
@@ -377,7 +375,6 @@ describe('client-side replicant schemas', function () {
 				});
 
 				window.errorOnce(event => {
-					event.preventDefault();
 					done(event.error.message);
 				});
 			})
