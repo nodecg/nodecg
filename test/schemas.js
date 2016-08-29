@@ -22,7 +22,7 @@ describe('client-side replicant schemas', function () {
 			.call(done);
 	});
 
-	it.only('should create a default value based on the schema, if none is provided', done => {
+	it('should create a default value based on the schema, if none is provided', done => {
 		e.browser.client
 			.executeAsync(done => {
 				const rep = window.dashboardApi.Replicant('client_schemaDefaults');
@@ -40,7 +40,7 @@ describe('client-side replicant schemas', function () {
 			.catch(err => done(err));
 	});
 
-	it.only('should accept the defaultValue when it passes validation', done => {
+	it('should accept the defaultValue when it passes validation', done => {
 		e.browser.client
 			.executeAsync(done => {
 				const rep = window.dashboardApi.Replicant('client_schemaDefaultValuePass', {
@@ -65,7 +65,7 @@ describe('client-side replicant schemas', function () {
 			.catch(err => done(err));
 	});
 
-	it('should throw when defaultValue fails validation', done => {
+	it.only('should throw when defaultValue fails validation', done => {
 		e.browser.client
 			.executeAsync(done => {
 				window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
