@@ -10,6 +10,7 @@ describe('client-side replicant schemas', function () {
 
 	before(done => {
 		e.browser.client
+			.timeouts('script', 10000)
 			.switchTab(e.browser.tabs.dashboard)
 			.execute(() => {
 				window.errorOnce = function (callback) {
@@ -19,6 +20,12 @@ describe('client-side replicant schemas', function () {
 					});
 				};
 			})
+			.call(done);
+	});
+
+	after(done => {
+		e.browser.client
+			.timeouts('script', 5000)
 			.call(done);
 	});
 
