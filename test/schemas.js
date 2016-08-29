@@ -8,21 +8,6 @@ const e = require('./setup/test-environment');
 describe('client-side replicant schemas', function () {
 	this.timeout(10000);
 
-	before(done => {
-		e.browser.client
-			.switchTab(e.browser.tabs.dashboard)
-			.execute(() => {
-				window.errorOnce = function (callback) {
-					window.addEventListener('error', e => {
-						e.preventDefault();
-						e.target.removeEventListener(e.type, callback);
-						callback(e);
-					});
-				};
-			})
-			.call(done);
-	});
-
 	it('should create a default value based on the schema, if none is provided', done => {
 		e.browser.client
 			.executeAsync(done => {
@@ -70,15 +55,15 @@ describe('client-side replicant schemas', function () {
 		e.browser.client
 			.executeAsync(done => {
 				console.log('declaring client_schemaDefaultValueFail');
-				window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
+				const rep = window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
 					defaultValue: {
 						string: 0
 					}
 				});
 
-				window.errorOnce(event => {
+				rep.once('declarationRejected', reason => {
 					console.log('caught error for client_schemaDefaultValueFail, done');
-					done(event.error.message);
+					done(reason);
 				});
 			})
 			.then(ret => {
