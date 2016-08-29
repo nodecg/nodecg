@@ -48,8 +48,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "pretest": "node test/setup/pretest",
-    "test": "mocha -R spec",
+    "pretest": "npm run build && node test/setup/pretest",
+    "test": "istanbul cover -x \"bundles/**\" -x \"test/**\" ./node_modules/mocha/bin/_mocha -- -R spec",
     "posttest": "node test/setup/posttest",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf coverage",
     "static": "eslint index.js lib/**/*.js test/**/*.js",

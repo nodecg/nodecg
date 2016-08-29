@@ -138,6 +138,7 @@ describe('client-side replicants', function () {
 
 					rep.on('declared', () => {
 						rep.on('change', (newVal, oldVal, operations) => {
+							console.log('change', newVal, oldVal, operations);
 							if (newVal && oldVal && operations) {
 								done({
 									newVal,

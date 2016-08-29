@@ -7,7 +7,6 @@ process.env.test = true;
 process.argv.push('--cfgPath');
 process.argv.push('./test/specimen/test.json');
 
-const fs = require('fs.extra');
 const webdriverio = require('webdriverio');
 const e = require('./setup/test-environment');
 const C = require('./setup/test-constants');
