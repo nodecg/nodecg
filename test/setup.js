@@ -150,6 +150,12 @@ after(function (done) {
 			.then(() => done())
 			.catch(err => done(err));
 	} else {
-		done();
+		e.browser.client
+			.log('browser')
+			.then(response => {
+				console.log(response.value);
+				done();
+			})
+			.catch(err => done(err));
 	}
 });

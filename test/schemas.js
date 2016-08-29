@@ -12,10 +12,6 @@ describe('client-side replicant schemas', function () {
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
 			.execute(() => {
-				window.onerror = function () {
-					console.log('onerror');
-				};
-
 				window.errorOnce = function (callback) {
 					window.addEventListener('error', e => {
 						e.preventDefault();
@@ -73,6 +69,7 @@ describe('client-side replicant schemas', function () {
 	it.only('should throw when defaultValue fails validation', done => {
 		e.browser.client
 			.executeAsync(done => {
+				console.log('declaring client_schemaDefaultValueFail');
 				window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
 					defaultValue: {
 						string: 0
@@ -80,6 +77,7 @@ describe('client-side replicant schemas', function () {
 				});
 
 				window.errorOnce(event => {
+					console.log('caught error for client_schemaDefaultValueFail, done');
 					done(event.error.message);
 				});
 			})
@@ -94,10 +92,10 @@ describe('client-side replicant schemas', function () {
 		// Persisted value is copied from fixtures
 		e.browser.client
 			.executeAsync(done => {
-				console.log('declaring');
+				console.log('declaring client_schemaPersistencePass');
 				const rep = window.dashboardApi.Replicant('client_schemaPersistencePass');
 				rep.on('declared', () => {
-					console.log('declared, done');
+					console.log('declared client_schemaPersistencePass, done');
 					done(rep.value);
 				});
 			})
