@@ -12,6 +12,10 @@ describe('client-side replicant schemas', function () {
 		e.browser.client
 			.switchTab(e.browser.tabs.dashboard)
 			.execute(() => {
+				window.onerror = function () {
+					console.log('onerror');
+				};
+
 				window.errorOnce = function (callback) {
 					window.addEventListener('error', e => {
 						e.preventDefault();
