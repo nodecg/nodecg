@@ -10,7 +10,6 @@ describe('client-side replicant schemas', function () {
 
 	before(done => {
 		e.browser.client
-			.timeouts('script', 10000)
 			.switchTab(e.browser.tabs.dashboard)
 			.execute(() => {
 				window.errorOnce = function (callback) {
@@ -20,12 +19,6 @@ describe('client-side replicant schemas', function () {
 					});
 				};
 			})
-			.call(done);
-	});
-
-	after(done => {
-		e.browser.client
-			.timeouts('script', 5000)
 			.call(done);
 	});
 
@@ -93,12 +86,16 @@ describe('client-side replicant schemas', function () {
 			.catch(err => done(err));
 	});
 
-	it('should accept the persisted value when it passes validation', done => {
+	it.only('should accept the persisted value when it passes validation', done => {
 		// Persisted value is copied from fixtures
 		e.browser.client
 			.executeAsync(done => {
+				console.log('declaring');
 				const rep = window.dashboardApi.Replicant('client_schemaPersistencePass');
-				rep.on('declared', () => done(rep.value));
+				rep.on('declared', () => {
+					console.log('declared, done');
+					done(rep.value);
+				});
 			})
 			.then(ret => {
 				assert.deepEqual(ret.value, {
@@ -107,8 +104,13 @@ describe('client-side replicant schemas', function () {
 						numA: 1
 					}
 				});
-				done();
 			})
+			.log('browser')
+			.then(logs => {
+				console.log('got them logs');
+				console.log(logs.value);
+			})
+			.call(done)
 			.catch(err => done(err));
 	});
 
