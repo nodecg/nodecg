@@ -430,13 +430,16 @@ describe('server-side replicant schemas', () => {
 		});
 	});
 
-	it('should throw when defaultValue fails validation', () => {
+	it.only('should throw when defaultValue fails validation', () => {
 		assert.throws(() => {
-			e.apis.extension.Replicant('schema3', {
+			const rep = e.apis.extension.Replicant('schema3', {
 				defaultValue: {
 					string: 0
 				}
 			});
+			console.log(rep.schema);
+			console.log(rep.schemaSum);
+			console.log(rep.value);
 		}, /Invalid value for replicant/);
 	});
 
