@@ -103,13 +103,8 @@ describe('client-side replicant schemas', function () {
 						numA: 1
 					}
 				});
+				done();
 			})
-			.log('browser')
-			.then(logs => {
-				console.log('got them logs');
-				console.log(logs.value);
-			})
-			.call(done)
 			.catch(err => done(err));
 	});
 
