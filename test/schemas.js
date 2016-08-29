@@ -75,7 +75,6 @@ describe('client-side replicant schemas', function () {
 				});
 
 				window.errorOnce(event => {
-					event.preventDefault();
 					done(event.error.message);
 				});
 			})
