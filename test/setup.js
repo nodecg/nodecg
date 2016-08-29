@@ -43,7 +43,10 @@ before(function (done) {
 				chromeOptions: {
 					args: ['--disable-popup-blocking']
 				},
-				tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+				tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+				loggingPrefs: {
+					browser: 'ALL'
+				}
 			};
 
 			if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
@@ -125,7 +128,7 @@ before(function (done) {
 					}
 				}, 50);
 			})
-			.timeoutsAsyncScript(5000)
+			.timeouts('script', 5000)
 			.call(done);
 	});
 	e.server.start();
@@ -138,7 +141,12 @@ after(function (done) {
 	// It's helpful to keep it open when running locally for debug purposes.
 	if (process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER) {
 		this.timeout(10000);
-		e.browser.client.end()
+		e.browser.client
+			.log('client')
+			.then(response => {
+				console.log(response.value)
+			})
+			.end()
 			.then(() => done())
 			.catch(err => done(err));
 	} else {
