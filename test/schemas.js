@@ -430,7 +430,7 @@ describe('server-side replicant schemas', () => {
 		});
 	});
 
-	it.only('should throw when defaultValue fails validation', () => {
+	it('should throw when defaultValue fails validation', () => {
 		assert.throws(() => {
 			const rep = e.apis.extension.Replicant('schema3', {
 				defaultValue: {
