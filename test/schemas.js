@@ -68,16 +68,18 @@ describe('client-side replicant schemas', function () {
 	it.only('should throw when defaultValue fails validation', done => {
 		e.browser.client
 			.executeAsync(done => {
-				window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
+				/* window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
 					defaultValue: {
 						string: 0
 					}
-				});
+				}); */
+
 
 				/* window.errorOnce(event => {
 					event.preventDefault();
 					done(event.error.message);
 				}); */
+				done();
 			})
 			.then(ret => {
 				assert.isTrue(ret.value.startsWith('Invalid value for replicant "client_schemaDefaultValueFail"'));
