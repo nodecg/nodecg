@@ -74,9 +74,10 @@ describe('client-side replicant schemas', function () {
 					}
 				});
 
-				window.errorOnce(event => {
+				/* window.errorOnce(event => {
+					event.preventDefault();
 					done(event.error.message);
-				});
+				}); */
 			})
 			.then(ret => {
 				assert.isTrue(ret.value.startsWith('Invalid value for replicant "client_schemaDefaultValueFail"'));
