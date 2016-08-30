@@ -7,7 +7,7 @@ html(lang='en')
 		title NodeCG Dashboard
 
 		if privateConfig.rollbar && privateConfig.rollbar.enabled
-			script(src='/components/rollbar/dist/rollbar.min.js')
+			script(src='/bower_components/rollbar/dist/rollbar.min.js')
 			script.
 				const _rollbarConfig = {
 					accessToken: '#{privateConfig.rollbar.postClientItem}',
@@ -18,43 +18,17 @@ html(lang='en')
 				}
 				Rollbar.init(_rollbarConfig);
 
-		//- import Polymer elements
-		link(rel='import', href='/components/iron-flex-layout/classes/iron-flex-layout.html')
-		link(rel='import', href='/components/iron-icon/iron-icon.html')
-		link(rel='import', href='/components/iron-icons/av-icons.html')
-		link(rel='import', href='/components/iron-icons/communication-icons.html')
-		link(rel='import', href='/components/iron-icons/image-icons.html')
-		link(rel='import', href='/components/iron-icons/iron-icons.html')
-		link(rel='import', href='/components/iron-image/iron-image.html')
-		link(rel='import', href='/components/iron-pages/iron-pages.html')
-		link(rel='import', href='/components/more-routing/more-routing.html')
-		link(rel='import', href='/components/paper-button/paper-button.html')
-		link(rel='import', href='/components/paper-card/paper-card.html')
-		link(rel='import', href='/components/paper-dialog-scrollable/paper-dialog-scrollable.html')
-		link(rel='import', href='/components/paper-dialog/paper-dialog.html')
-		link(rel='import', href='/components/paper-drawer-panel/paper-drawer-panel.html')
-		link(rel='import', href='/components/paper-header-panel/paper-header-panel.html')
-		link(rel='import', href='/components/paper-icon-button/paper-icon-button.html')
-		link(rel='import', href='/components/paper-item/paper-icon-item.html')
-		link(rel='import', href='/components/paper-spinner/paper-spinner.html')
-		link(rel='import', href='/components/paper-styles/paper-styles-classes.html')
-		link(rel='import', href='/components/paper-styles/paper-styles.html')
-		link(rel='import', href='/components/paper-toast/paper-toast.html')
-		link(rel='import', href='/components/paper-toolbar/paper-toolbar.html')
+		//- Web Component support
+		script(src='/bower_components/webcomponentsjs/webcomponents-lite.min.js')
 
-		//- our custom dashboard elements
-		link(rel='import', href='/dashboard/elements/ncg-dashboard-panel.html')
-		link(rel='import', href='/dashboard/elements/ncg-dialog.html')
-		link(rel='import', href='/dashboard/elements/ncg-single-instance.html')
-		link(rel='import', href='/dashboard/elements/ncg-assets.html')
-		link(rel='import', href='/dashboard/elements/ncg-sounds.html')
+		//- import Polymer elements
+		if privateConfig.developer
+			link(rel='import', href='/dashboard/elements/elements.html')
+		else
+			link(rel='import', href='/dashboard/elements/elements.vulcanized.html')
 
 		//- dashboard CSS
 		link(rel='stylesheet', href='/dashboard/dashboard.css')
-		link(rel='import', href='/dashboard/style/nodecg-styles.html')
-
-		//- Web Component support
-		script(src='/components/webcomponentsjs/webcomponents-lite.min.js')
 
 		//- make the global config available
 		script(type='text/javascript').
@@ -64,8 +38,8 @@ html(lang='en')
 		script(src='/nodecg-api.js')
 
 		//- initialize the socket
-		script(src='/components/cookies-js/dist/cookies.min.js')
-		script(src='/components/cn-jsurl/url.min.js')
+		script(src='/bower_components/cookies-js/dist/cookies.min.js')
+		script(src='/bower_components/cn-jsurl/url.min.js')
 		script(src='/socket.io/socket.io.js')
 		script(type='text/javascript').
 			var url = new Url;
@@ -196,12 +170,12 @@ html(lang='en')
 		paper-toast.paper-font-body1#mainToast
 
 		//- other dashboard scripts
-		script(src='/components/draggabilly/dist/draggabilly.pkgd.min.js')
-		script(src='/components/iframe-resizer/js/iframeResizer.min.js')
-		script(src='/components/imagesloaded/imagesloaded.pkgd.min.js')
-		script(src='/components/js-throttle-debounce/build/js-throttle-debounce.min.js')
-		script(src='/components/packery/dist/packery.pkgd.min.js')
-		script(src='/components/clipboard/dist/clipboard.min.js')
+		script(src='/bower_components/draggabilly/dist/draggabilly.pkgd.min.js')
+		script(src='/bower_components/iframe-resizer/js/iframeResizer.min.js')
+		script(src='/bower_components/imagesloaded/imagesloaded.pkgd.min.js')
+		script(src='/bower_components/js-throttle-debounce/build/js-throttle-debounce.min.js')
+		script(src='/bower_components/packery/dist/packery.pkgd.min.js')
+		script(src='/bower_components/clipboard/dist/clipboard.min.js')
 		script(src='/dashboard/panel_packery.js')
 		script(src='/dashboard/dashboard.js')
 		script(src='/dashboard/single_instances.js')

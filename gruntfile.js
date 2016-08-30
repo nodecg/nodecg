@@ -69,8 +69,22 @@ module.exports = function (grunt) {
 					]
 				}
 			}
+		},
+		vulcanize: {
+			dist: {
+				options: {
+					redirects: [
+						'/bower_components|./bower_components',
+						'/dashboard/elements|./lib/dashboard/public/elements'
+					],
+					targetUrl: './lib/dashboard/public/elements/elements.html'
+				},
+				files: {
+					'./lib/dashboard/public/elements/elements.vulcanized.html': './lib/dashboard/public/elements/elements.html'
+				}
+			}
 		}
 	});
 
-	grunt.registerTask('default', ['browserify:dist']);
+	grunt.registerTask('default', ['browserify:dist', 'vulcanize:dist']);
 };
