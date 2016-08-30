@@ -20,7 +20,7 @@
     "cookie-parser": "^1.4.1",
     "deep-equal": "^1.0.1",
     "express": "^4.13.3",
-    "express-favicon": "^1.0.1",
+    "express-favicon": "^2.0.0",
     "express-nedb-session": "^0.1.1",
     "express-session": "^1.11.3",
     "extend": "^3.0.0",
