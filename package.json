@@ -96,6 +96,6 @@
     "mocha": "^3.0.0",
     "mocha-lcov-reporter": "1.2.0",
     "standard-version": "^2.2.1",
-    "webdriverio": "^4.0.3"
+    "webdriverio": "^4.2.13"
   }
 }
