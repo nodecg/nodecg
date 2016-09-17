@@ -1,5 +1,5 @@
 each bundle in bundles
-	if (bundle.assetCategories && bundle.assetCategories.length > 0)
+	if (bundle.hasAssignableSoundCues || (bundle.assetCategories && bundle.assetCategories.length > 0))
 		paper-card.ncg-card
 			.card-content
 				h2=bundle.name
