@@ -8,7 +8,6 @@
   ],
   "description": "Live, controllable graphics system rendered in a browser",
   "dependencies": {
-    "cn-jsurl": "~1.0.0",
     "cookies-js": "~1.2.1",
     "cryptojslib": "~3.1.2",
     "draggabilly": "~1.2.4",

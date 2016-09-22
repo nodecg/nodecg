@@ -56,11 +56,10 @@ html(lang='en')
 
 		//- initialize the socket
 		script(src='/components/cookies-js/dist/cookies.min.js')
-		script(src='/components/cn-jsurl/url.min.js')
 		script(src='/socket.io/socket.io.js')
 		script(type='text/javascript').
-			var url = new Url;
-			window.token = url.query.key || Cookies.get('socketToken');
+			const params = new URLSearchParams(location.search);
+			window.token = params.key || Cookies.get('socketToken');
 			if (window.token) {
 				window.socket = io.connect('//' + window.ncgConfig.baseURL + '/', {
 					query: 'token=' + window.token
