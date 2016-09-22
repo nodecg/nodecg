@@ -8,7 +8,6 @@
   "description": "Live, controllable graphics system rendered in a browser",
   "dependencies": {
     "clipboard": "^1.5.9",
-    "cn-jsurl": "~1.0.0",
     "cookies-js": "~1.2.1",
     "draggabilly": "~1.2.4",
     "iframe-resizer": "~3.4.2",
