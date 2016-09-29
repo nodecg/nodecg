@@ -133,9 +133,13 @@ html(lang='en')
 						paper-icon-item(route='/assets')
 							iron-icon(icon='file-upload', item-icon)
 							| Assets
-						paper-icon-item(route='/settings')
-							iron-icon(icon='settings', item-icon)
-							| Settings
+
+						// Currently the only "Setting" we have related to login security.
+						// So if login security isn't enabled, we have nothing to show here.
+						if privateConfig.login.enabled
+							paper-icon-item(route='/settings')
+								iron-icon(icon='settings', item-icon)
+								| Settings
 			paper-header-panel(main)
 				paper-toolbar#ncg-main-toolbar
 					paper-icon-button(icon='menu', paper-drawer-toggle)
