@@ -131,6 +131,10 @@ ncg-dashboard-panel iframe {
 .graphic:not(:last-child) {
   margin-bottom: 6px;
 }
+.graphic paper-button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 .assets-divider {
   box-sizing: border-box;
   margin: 12px 10px;
