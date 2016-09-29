@@ -7,7 +7,6 @@ process.env.test = true;
 process.argv.push('--cfgPath');
 process.argv.push('./test/specimen/test.json');
 
-const fs = require('fs.extra');
 const webdriverio = require('webdriverio');
 const e = require('./setup/test-environment');
 const C = require('./setup/test-constants');
@@ -30,13 +29,6 @@ before(function (done) {
 		throw new Error('SSL is enabled! Please disable SSL in cfg/nodecg.json before running tests');
 	}
 
-	// clientApi & extensionApi setup
-	fs.mkdirpSync('./db/replicants/test-bundle/');
-	fs.writeFileSync('./db/replicants/test-bundle/clientPersistence.rep', '"it work good!"');
-	fs.writeFileSync('./db/replicants/test-bundle/clientFalseyRead.rep', '0');
-	fs.writeFileSync('./db/replicants/test-bundle/extensionPersistence.rep', '"it work good!"');
-	fs.writeFileSync('./db/replicants/test-bundle/extensionFalseyRead.rep', '0');
-
 	e.server.once('started', () => {
 		/** Extension API setup **/
 		e.apis.extension = e.server.getExtensions()[C.BUNDLE_NAME];
@@ -51,7 +43,10 @@ before(function (done) {
 				chromeOptions: {
 					args: ['--disable-popup-blocking']
 				},
-				tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+				tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+				loggingPrefs: {
+					browser: 'ALL'
+				}
 			};
 
 			if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
@@ -93,7 +88,7 @@ before(function (done) {
 
 		e.browser.client
 			.init()
-			.timeoutsAsyncScript(30000)
+			.timeouts('script', 30000)
 			.newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
 			.getCurrentTabId()
 			.then(tabId => {
@@ -133,7 +128,7 @@ before(function (done) {
 					}
 				}, 50);
 			})
-			.timeoutsAsyncScript(5000)
+			.timeouts('script', 5000)
 			.call(done);
 	});
 	e.server.start();
@@ -146,8 +141,9 @@ after(function (done) {
 	// It's helpful to keep it open when running locally for debug purposes.
 	if (process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER) {
 		this.timeout(10000);
-		e.browser.client.end()
-			.then(() => done())
+		e.browser.client
+			.end()
+			.call(done)
 			.catch(err => done(err));
 	} else {
 		done();

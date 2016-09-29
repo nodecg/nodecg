@@ -10,19 +10,6 @@ if (!fs.existsSync(C.CFG_DIR)) {
 	fs.mkdirSync(C.CFG_DIR);
 }
 
-// Delete bundles/test-bundle if it exists, then make a fresh copy of fixtures/bundles/test-bundle
-fs.rmrf(C.BUNDLE_DIR, err => {
-	if (err) {
-		throw err;
-	}
-
-	fs.copyRecursive(C.TEST_BUNDLE_SRC_PATH, C.BUNDLE_DIR, err => {
-		if (err) {
-			throw err;
-		}
-	});
-});
-
 // Write the test bundle config, overwriting one if it exists.
 fs.writeFile(C.BUNDLE_CFG_PATH, JSON.stringify({test: 'the_test_string'}));
 
@@ -40,4 +27,23 @@ fs.rmrf(assetsDir, err => {
 	if (err) {
 		throw err;
 	}
+});
+
+// Delete bundles/test-bundle if it exists, then make a fresh copy of fixtures/bundles/test-bundle
+fs.rmrf(C.BUNDLE_DIR, err => {
+	if (err) {
+		throw err;
+	}
+
+	fs.copyRecursive(C.TEST_BUNDLE_SRC_PATH, C.BUNDLE_DIR, err => {
+		if (err) {
+			throw err;
+		}
+	});
+
+	fs.copyRecursive('test/fixtures/db', 'db', err => {
+		if (err) {
+			throw err;
+		}
+	});
 });
