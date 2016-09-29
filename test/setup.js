@@ -30,7 +30,7 @@ before(function (done) {
 	}
 
 	e.server.once('started', () => {
-		/** Extension API setup **/
+		// Extension API setup
 		e.apis.extension = e.server.getExtensions()[C.BUNDLE_NAME];
 
 		if (process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER) {
