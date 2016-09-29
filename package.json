@@ -19,6 +19,7 @@
     "compression": "^1.6.0",
     "cookie-parser": "^1.4.1",
     "deep-equal": "^1.0.1",
+    "eslint": "^3.6.1",
     "express": "^4.13.3",
     "express-favicon": "^2.0.0",
     "express-nedb-session": "^0.1.1",
