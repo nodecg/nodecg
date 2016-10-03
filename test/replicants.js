@@ -157,7 +157,8 @@ describe('client-side replicants', function () {
 					expect(ret.value.operations).to.deep.equal([{
 						args: ['arrPushOK'],
 						path: '/',
-						method: 'push'
+						method: 'push',
+						result: 2
 					}]);
 					done();
 				})
@@ -192,7 +193,8 @@ describe('client-side replicants', function () {
 					expect(ret.value.operations).to.deep.equal([{
 						args: {prop: '0'},
 						path: '/',
-						method: 'delete'
+						method: 'delete',
+						result: true
 					}]);
 					done();
 				})
@@ -280,7 +282,8 @@ describe('client-side replicants', function () {
 							prop: 'c'
 						},
 						path: '/a/b',
-						method: 'update'
+						method: 'update',
+						result: 'c'
 					}]);
 					done();
 				})
@@ -332,7 +335,8 @@ describe('client-side replicants', function () {
 					expect(ret.value.operations).to.deep.equal([{
 						args: ['test'],
 						path: '/arr',
-						method: 'push'
+						method: 'push',
+						result: 1
 					}]);
 					done();
 				})
@@ -371,7 +375,8 @@ describe('client-side replicants', function () {
 					expect(ret.value.operations).to.deep.equal([{
 						args: {prop: 'foo'},
 						path: '/',
-						method: 'delete'
+						method: 'delete',
+						result: true
 					}]);
 					done();
 				})
