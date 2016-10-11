@@ -37,7 +37,7 @@
     "parse-authors": "^0.2.2",
     "passport": "^0.3.2",
     "passport-steam": "^1.0.2",
-    "passport-twitch": "^1.0.2",
+    "passport-twitch": "^1.0.3",
     "q": "^1.4.1",
     "request": "^2.64.0",
     "rollbar": "^0.6.0",
