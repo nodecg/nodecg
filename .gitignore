@@ -1,6 +1,7 @@
 # Node / Bower
-bower_components/
-node_modules/
+bower_components
+node_modules
+npm-debug.log
 
 # Local bundles
 /bundles/**
@@ -18,8 +19,11 @@ node_modules/
 .DS_Store
 
 # JetBrains IDEs (IntelliJ/WebStorm)
-.idea/
-*.iml
+/.idea/compiler.xml
+/.idea/encodings.xml
+/.idea/copyright/profiles_settings.xml
+/.idea/workspace.xml
+/.idea/shelf/
 
 # Code coverage results
 /coverage

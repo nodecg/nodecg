@@ -2,3 +2,5 @@ lib/browser/dist/*.js
 lib/browser/shims/*.js
 lib/dashboard/public/twitch.min.js
 bundles/
+node_modules
+bower_components
