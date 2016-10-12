@@ -20,6 +20,10 @@ create a `nodecg.soundCues` array in your `package.json`:
       {
         "name": "default-file",
         "defaultFile": "sound/default-file.ogg"
+      },
+      {
+      	"name": "single-channel",
+      	"channels": 1
       }
     ]
   }
@@ -32,6 +36,9 @@ Your bundle will now have a card on the Mixer page of the Dashboard.
 
 `defaultFile`s are audio files that you ship with your bundle. They will be available to that specific cue as a
 "Default" option in that cue's dropdown select on the Mixer.
+
+`channels` determines how many instances of a sound can be playing simultaneously. The default value is `100`. If set to `1`,
+only one instance can play at a time, and a new instance cannot be started until the currently playing instance has completed.
 
 If your bundle has at least one cue that is `assignable`, it will gain a "Sounds" [Asset]{@tutorial assets} category.
 This category accepts `.ogg` and `.mp3` files. Any audio files uploaded to this category will become available as options
