@@ -1,6 +1,10 @@
 {
 	"root": true,
-	"extends": "xo/browser",
+	"extends": "xo/esnext",
+	"env": {
+		"node": false,
+		"browser": true
+	},
 	"globals": {
 		"Polymer": true,
 		"NodeCG": true
