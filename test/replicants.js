@@ -98,6 +98,26 @@ describe('client-side replicants', function () {
 			.catch(err => done(err));
 	});
 
+	it('should emit a "change" event after successful declaration when the value is undefined', done => {
+		e.browser.client
+			.executeAsync(done => {
+				const rep = window.dashboardApi.Replicant('clientUndefinedChangeTest', {persistent: false});
+				rep.on('change', () => {
+					done({
+						// Little hack to workaround the fact that `undefined` gets serialized to `null`.
+						valueWasUndefined: rep.value === undefined,
+						revision: rep.revision
+					});
+				});
+			})
+			.then(ret => {
+				expect(ret.value.valueWasUndefined).to.equal(true);
+				expect(ret.value.revision).to.equal(0);
+				done();
+			})
+			.catch(err => done(err));
+	});
+
 	// need a better way to test this
 	it.skip('should redeclare after reconnecting to Socket.IO', function (done) {
 		this.timeout(30000);
