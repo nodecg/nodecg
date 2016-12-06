@@ -51,8 +51,13 @@ describe('client-side replicants', function () {
 	});
 
 	it('should be readable without subscription, via readReplicant', done => {
+		e.apis.extension.Replicant('clientReadReplicentTest', {
+			defaultValue: 'foo',
+			persistent: false
+		});
+
 		e.browser.client
-			.executeAsync(done => window.dashboardApi.readReplicant('clientTest', done))
+			.executeAsync(done => window.dashboardApi.readReplicant('clientReadReplicentTest', done))
 			.then(ret => {
 				expect(ret.value).to.equal('foo');
 				done();

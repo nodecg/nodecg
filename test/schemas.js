@@ -71,7 +71,7 @@ describe('client-side replicant schemas', function () {
 				});
 			})
 			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value for replicant "client_schemaDefaultValueFail"'));
+				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaDefaultValueFail"'));
 				done();
 			})
 			.catch(err => done(err));
@@ -163,7 +163,7 @@ describe('client-side replicant schemas', function () {
 				});
 			})
 			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value for replicant "client_schemaAssignFail"'));
+				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaAssignFail"'));
 				done();
 			})
 			.catch(err => done(err));
@@ -207,7 +207,7 @@ describe('client-side replicant schemas', function () {
 				});
 			})
 			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value for replicant "client_schemaDeletionFail"'));
+				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaDeletionFail"'));
 				done();
 			})
 			.catch(err => done(err));
@@ -251,7 +251,7 @@ describe('client-side replicant schemas', function () {
 				});
 			})
 			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value for replicant "client_schemaArrayMutatorFail"'));
+				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaArrayMutatorFail"'));
 				done();
 			})
 			.catch(err => done(err));
@@ -295,7 +295,7 @@ describe('client-side replicant schemas', function () {
 				});
 			})
 			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value for replicant "client_schemaArrayChangeFail"'));
+				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaArrayChangeFail"'));
 				done();
 			})
 			.catch(err => done(err));
@@ -339,7 +339,7 @@ describe('client-side replicant schemas', function () {
 				});
 			})
 			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value for replicant "client_schemaObjectChangeFail"'));
+				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaObjectChangeFail"'));
 				done();
 			})
 			.catch(err => done(err));
@@ -428,7 +428,7 @@ describe('server-side replicant schemas', () => {
 					string: 0
 				}
 			});
-		}, /Invalid value for replicant/);
+		}, /Invalid value rejected for replicant/);
 	});
 
 	it('should accept the persisted value when it passes validation', () => {
@@ -471,7 +471,7 @@ describe('server-side replicant schemas', () => {
 			rep.value = {
 				string: 0
 			};
-		}, /Invalid value for replicant/);
+		}, /Invalid value rejected for replicant/);
 	});
 
 	it('should accept valid property deletion', () => {
@@ -485,7 +485,7 @@ describe('server-side replicant schemas', () => {
 		assert.throws(() => {
 			const rep = e.apis.extension.Replicant('schemaDeletionFail');
 			delete rep.value.object.numA;
-		}, /Invalid value for replicant/);
+		}, /Invalid value rejected for replicant/);
 	});
 
 	it('should accept valid array mutation via array mutator methods', () => {
@@ -499,7 +499,7 @@ describe('server-side replicant schemas', () => {
 		assert.throws(() => {
 			const rep = e.apis.extension.Replicant('schemaArrayMutatorFail');
 			rep.value.array.push(0);
-		}, /Invalid value for replicant/);
+		}, /Invalid value rejected for replicant/);
 	});
 
 	it('should accept valid property changes to arrays', () => {
@@ -513,7 +513,7 @@ describe('server-side replicant schemas', () => {
 		assert.throws(() => {
 			const rep = e.apis.extension.Replicant('schemaArrayChangeFail');
 			rep.value.array[0] = 0;
-		}, /Invalid value for replicant/);
+		}, /Invalid value rejected for replicant/);
 	});
 
 	it('should accept valid property changes to objects', () => {
@@ -527,6 +527,6 @@ describe('server-side replicant schemas', () => {
 		assert.throws(() => {
 			const rep = e.apis.extension.Replicant('schemaObjectChangeFail');
 			rep.value.object.numA = 'foo';
-		}, /Invalid value for replicant/);
+		}, /Invalid value rejected for replicant/);
 	});
 });
