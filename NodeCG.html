@@ -467,7 +467,7 @@ it <em>must</em> be declared as a <code>bundleDependency</code> in your bundle's
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line532">line 532</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line539">line 539</a>
     </li></ul></dd>
     
 
@@ -668,7 +668,7 @@ Returns the specified dialog element.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line402">line 402</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line409">line 409</a>
     </li></ul></dd>
     
 
@@ -873,7 +873,7 @@ Returns the specified dialog's iframe document.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line414">line 414</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line421">line 421</a>
     </li></ul></dd>
     
 
@@ -974,7 +974,7 @@ Gets the server Socket.IO context.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line511">line 511</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line518">line 518</a>
     </li></ul></dd>
     
 
@@ -1383,7 +1383,7 @@ See the <a href="http://expressjs.com/en/api.html#app.use">express docs</a> for 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line519">line 519</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line526">line 526</a>
     </li></ul></dd>
     
 
@@ -1623,7 +1623,7 @@ when the user changes it on the dashboard.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line428">line 428</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line435">line 435</a>
     </li></ul></dd>
     
 
@@ -1871,7 +1871,7 @@ when the user changes it on the dashboard.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line383">line 383</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line390">line 390</a>
     </li></ul></dd>
     
 
@@ -1922,7 +1922,7 @@ nodecg.readReplicant('myRep', 'some-bundle', function(value) {
 
     
 
-    <h4 class="name" id="Replicant"><span class="type-signature"></span>Replicant<span class="signature">(name, bundle<span class="signature-attributes">opt</span>, opts<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Replicant"><span class="type-signature"></span>Replicant<span class="signature">(name, namespace<span class="signature-attributes">opt</span>, opts<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -1970,8 +1970,6 @@ See <a href="tutorial-replicant-schemas.html">Replicant Validation</a> for more 
         
 
         
-        <th>Default</th>
-        
 
         <th class="last">Description</th>
     </tr>
@@ -2005,10 +2003,6 @@ See <a href="tutorial-replicant-schemas.html">Replicant Validation</a> for more 
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last"><p>The name of the replicant.</p></td>
         </tr>
@@ -2017,7 +2011,7 @@ See <a href="tutorial-replicant-schemas.html">Replicant Validation</a> for more 
 
         <tr>
             
-                <td class="name"><code>bundle</code></td>
+                <td class="name"><code>namespace</code></td>
             
 
             <td class="type">
@@ -2042,14 +2036,8 @@ See <a href="tutorial-replicant-schemas.html">Replicant Validation</a> for more 
             
 
             
-                <td class="default">
-                
-                    CURR_BNDL
-                
-                </td>
-            
 
-            <td class="description last"><p>The bundle namespace to in which to look for this replicant.</p></td>
+            <td class="description last"><p>The namespace to in which to look for this replicant. Defaults to the name of the current bundle.</p></td>
         </tr>
 
     
@@ -2080,10 +2068,6 @@ See <a href="tutorial-replicant-schemas.html">Replicant Validation</a> for more 
                 </td>
             
 
-            
-                <td class="default">
-                
-                </td>
             
 
             <td class="description last"><p>The options for this replicant.</p>
@@ -2122,7 +2106,7 @@ See <a href="tutorial-replicant-schemas.html">Replicant Validation</a> for more 
             <td class="type">
             
                 
-<span class="param-type">mixed</span>
+<span class="param-type">*</span>
 
 
             
@@ -2191,6 +2175,44 @@ Persisted values are re-loaded on startup.</p></td>
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>schemaPath</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The filepath at which to look for a JSON Schema for this Replicant.
+Defaults to <code>nodecg/bundles/${bundleName}/schemas/${replicantName}.json</code>.</p></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -2235,7 +2257,7 @@ Persisted values are re-loaded on startup.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line333">line 333</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line335">line 335</a>
     </li></ul></dd>
     
 
@@ -2262,16 +2284,16 @@ Persisted values are re-loaded on startup.</p></td>
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var myVar = nodecg.Replicant('myVar', {defaultValue: 123});
+    <pre class="prettyprint"><code>const myRep = nodecg.Replicant('myRep', {defaultValue: 123});
 
-myVar.on('change', function(newValue, oldValue) {
-    console.log('myVar changed from '+ oldValue +' to '+ newValue);
+myRep.on('change', function(newValue, oldValue) {
+    console.log('myRep changed from '+ oldValue +' to '+ newValue);
 });
 
-myVar.value = 'Hello!';
-myVar.value = {objects: 'work too!'};
-myVar.value = {objects: {can: {be: 'nested!'}}};
-myVar.value = ['Even', 'arrays', 'work!'];</code></pre>
+myRep.value = 'Hello!';
+myRep.value = {objects: 'work too!'};
+myRep.value = {objects: {can: {be: 'nested!'}}};
+myRep.value = ['Even', 'arrays', 'work!'];</code></pre>
 
 
 
@@ -2808,7 +2830,7 @@ See <a href="NodeCG.html#sendMessage"><code>NodeCG#sendMessage</code></a> for us
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line498">line 498</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line505">line 505</a>
     </li></ul></dd>
     
 
@@ -2939,7 +2961,7 @@ See <a href="NodeCG.html#sendMessage"><code>NodeCG#sendMessage</code></a> for us
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="api.js.html">api.js</a>, <a href="api.js.html#line474">line 474</a>
+        <a href="api.js.html">api.js</a>, <a href="api.js.html#line481">line 481</a>
     </li></ul></dd>
     
 
@@ -2983,7 +3005,7 @@ See <a href="NodeCG.html#sendMessage"><code>NodeCG#sendMessage</code></a> for us
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Wed Oct 12 2016 09:47:57 GMT-0500 (Central Daylight Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Tue Dec 06 2016 17:24:13 GMT-0600 (Central Standard Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
