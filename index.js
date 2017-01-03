@@ -1,5 +1,7 @@
 'use strict';
 
+global.exitOnUncaught = true;
+
 if (process.cwd() !== __dirname) {
 	console.warn('[nodecg] process.cwd is %s, expected %s', process.cwd(), __dirname);
 	process.chdir(__dirname);
@@ -16,9 +18,17 @@ if (!semver.satisfies(nodeVersion, '>=6')) {
 
 process.on('uncaughtException', err => {
 	if (!global.rollbarEnabled) {
-		console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
-		console.error(err.stack);
-		process.exit(1);
+		if (global.exitOnUncaught) {
+			console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
+		} else {
+			console.error('UNCAUGHT EXCEPTION!');
+		}
+
+		console.error(err);
+
+		if (global.exitOnUncaught) {
+			process.exit(1);
+		}
 	}
 });
 
