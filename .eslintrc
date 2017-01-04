@@ -1,11 +1,5 @@
 {
 	"extends": "xo/esnext",
-	"parser": "babel-eslint",
-	"settings": {
-		"ecmaFeatures": {
-			"classes": true
-		}
-	},
 	"rules": {
 		"new-cap": [
 			2,

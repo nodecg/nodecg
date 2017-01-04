@@ -23,8 +23,7 @@ module.exports = function (grunt) {
 					],
 					transform: [
 						['babelify', {
-							presets: ['es2015'],
-							plugins: ['transform-class-properties']
+							presets: ['es2015']
 						}],
 						['aliasify', {
 							aliases: {
