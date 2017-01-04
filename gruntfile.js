@@ -1,7 +1,5 @@
 'use strict';
 
-const istanbul = require('browserify-istanbul');
-
 module.exports = function (grunt) {
 	require('load-grunt-tasks')(grunt);
 
@@ -40,7 +38,7 @@ module.exports = function (grunt) {
 						'./lib/util/index.js'
 					]
 				}
-			},
+			}/* ,
 			coverage: {
 				files: {
 					'./lib/browser/dist/browserifiedTestApi.js': 'lib/api.js'
@@ -67,7 +65,7 @@ module.exports = function (grunt) {
 						'./lib/util.js'
 					]
 				}
-			}
+			} */
 		}
 	});
 
