@@ -18,13 +18,13 @@ Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!
 **This means that as of right now, NodeCG graphics will not work in OBS1, XSplit, or CasparCG.** 
 The only platforms that can currently display NodeCG graphics are [OBS Studio](https://obsproject.com/) (with [v1.21 of its Browser Source plugin](https://github.com/kc5nra/obs-browser/releases/tag/1.21)) and [vMix](http://www.vmix.com/).
 
-## Who should use NodeCG?
+# Who should use NodeCG?
 NodeCG is a programming framework. As such, it's most useful to developers capable of creating their own graphics
 using HTML, CSS, and JavaScript. NodeCG is still in beta and the ecosystem of bundles is quite small.
 Those expecting to download NodeCG and use off-the-shelf bundles to get a complete stream overlay
 without writing any code may be disappointed.
 
-## Installation
+# Installation
 Install [node.js (version 6 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
 Then, run the following commands from a terminal (command prompt):
 ```
@@ -74,7 +74,6 @@ Avoid installing or uninstalling bundles while NodeCG is running.
 See the [NodeCG Configuration tutorial](http://nodecg.com/tutorial-nodecg-configuration.html) for more information on configuring NodeCG.
 
 # Bundles
-
 Each NodeCG graphic is called a _bundle_. A bundle has one or more of the following:
 - _Graphics_: Visual elements to render and broadcast
 - _Dashboard Panels_: Controls used to manipulate and manage the bundle
@@ -85,13 +84,11 @@ A bundle can have multiple graphics and dashboard panels, and an extension can b
 If you wish to quickly start a new bundle from a template, try [generator-nodecg](https://github.com/nodecg/generator-nodecg).
 
 ## Graphics
-
 Graphics are, as the name implies, the actual graphics intended for broadcast. 
 They are standard HTML webpages, and there are no restrictions on their content. 
 When serving a graphic, NodeCG injects an instance of the API into the global scope.
 
 ## Dashboard Panels
-
 Dashboard panels are the interface used to control and manage a bundle. They too are standard HTML webpages. 
 Each panel is served as an iframe on the dashboard. This is done to ensure full code and style encapsulation. 
 Because dashboard panels are iframes, they cannot render any content outside of their bounding box. 
@@ -106,7 +103,6 @@ The official [NodeCGElements](https://github.com/NodeCGElements) organization al
 a selection of Polymer elements that are integrated with NodeCG's API.
 
 ## Extensions
-
 Extensions are server-side code. They are standard Node.js JavaScript files. An extension must export a function
 that accepts a single argument. That argument will be an instance of the NodeCG API:
 ```js
@@ -128,14 +124,13 @@ and keep all those files in a single `extension` folder. If using an `extension`
 `your-bundle/extension/index.js`**. It is up to you to load any other files that your extension needs via `require`.
 
 ## package.json manifest
-
 Every bundle must have a [`package.json`](https://docs.npmjs.com/files/package.json). In addition to the required fields
 like `name` and `version` outlined in that link, NodeCG bundles must also have a `nodecg` object in their `package.json`
 with some additional properties that tell NodeCG about the bundle and how to load it.
 
 See the [manifest tutorial](http://nodecg.com/tutorial-manifest.html) for more information on creating a valid `package.json` for a bundle.
 
-## Contributing
+# Contributing
 1. Fork it ( http://github.com/nodecg/nodecg/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
@@ -152,15 +147,15 @@ Check which branch you should PR to. NodeCG is still in an unstable state, so we
 - Bug fixes and new features go to the next 'patch' branch (`0.current.x`)
 - Breaking changes go to the next 'minor' branch (`0.next.0`)
 
-## License
+# License
 NodeCG is provided under the MIT license, which is available to read in the 
 [LICENSE](https://github.com/nodecg/nodecg/blob/master/LICENSE) file.
 
-## Contributors
+# Contributors
 * [Matt "Bluee" McNamara](http://mattmcn.com/)  
 * [Alex "Lange" Van Camp](http://alexvan.camp)  
 * ["tsc"](http://fwdcp.net)  
 
-### Special Thanks
+## Special Thanks
 * [Atmo](https://github.com/atmosfar), original dashboard concept and code  
 * [Alex "Lange" Van Camp](http://alexvan.camp), designer & developer of [toth-overlay](https://github.com/TipoftheHats/toth-overlay)  
