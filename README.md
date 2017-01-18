@@ -147,6 +147,11 @@ Check which branch you should PR to. NodeCG is still in an unstable state, so we
 - Bug fixes and new features go to the next 'patch' branch (`0.current.x`)
 - Breaking changes go to the next 'minor' branch (`0.next.0`)
 
+## Running tests locally
+1. Install selenium-standalone (`npm install --global selenium-standalone`), then run the installer (`selenium-standalone install`)
+2. Open one terminal and start Selenium: `selenium-standalone start`
+3. Open a second terminal, navigate to the NodeCG root and run `npm test`
+
 # License
 NodeCG is provided under the MIT license, which is available to read in the 
 [LICENSE](https://github.com/nodecg/nodecg/blob/master/LICENSE) file.
