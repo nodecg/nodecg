@@ -1,4 +1,7 @@
-sudo: false
+sudo: required
+
+services:
+  - docker
 
 language: node_js
 node_js:
@@ -31,6 +34,7 @@ addons:
 install:
   - npm prune
   - npm install
+  - docker-compose -f test/setup/docker-compose.yml up -d
 
 before_script:
   - npm install -g bower

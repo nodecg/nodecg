@@ -67,13 +67,25 @@ before(function (done) {
 				desiredCapabilities.platform = 'OS X 10.10';
 			}
 
+			// docker-tests: temporarily disable saucelabs testing
+			// Ideally we would use full sauce labs tests on master and chrome-only docker tests for PRs
+			console.log('Running WebDriver.io with local capabilities');
 			e.browser.client = webdriverio.remote({
-				desiredCapabilities,
-				host: 'ondemand.saucelabs.com',
-				port: 80,
-				user: process.env.SAUCE_USERNAME,
-				key: process.env.SAUCE_ACCESS_KEY
+				desiredCapabilities: {
+					browserName: 'chrome',
+					loggingPrefs: {
+						browser: 'ALL'
+					}
+				}
 			});
+
+			// e.browser.client = webdriverio.remote({
+			// 	desiredCapabilities,
+			// 	host: 'ondemand.saucelabs.com',
+			// 	port: 80,
+			// 	user: process.env.SAUCE_USERNAME,
+			// 	key: process.env.SAUCE_ACCESS_KEY
+			// });
 		} else {
 			console.log('Running WebDriver.io with local capabilities');
 			e.browser.client = webdriverio.remote({
