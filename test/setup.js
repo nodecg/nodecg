@@ -68,11 +68,14 @@ before(function (done) {
 			}
 
 			// docker-tests: temporarily disable saucelabs testing
-			// Ideally we would use full sauce labs tests on master and chrome-only docker tests for PRs
+			// Ideally we would use full sauce labs tests on master and chrome-only tests for PRs
 			console.log('Running WebDriver.io with local capabilities');
 			e.browser.client = webdriverio.remote({
 				desiredCapabilities: {
 					browserName: 'chrome',
+					chromeOptions: {
+						args: ['--no-sandbox']
+					},
 					loggingPrefs: {
 						browser: 'ALL'
 					}
