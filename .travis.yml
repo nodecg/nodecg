@@ -1,4 +1,5 @@
 sudo: false
+dist: trusty
 
 language: node_js
 node_js:
@@ -25,8 +26,15 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+      - google-chrome
     packages:
       - g++-4.8
+      - google-chrome-stable
+
+before_install:
+  - export CHROME_BIN=/usr/bin/google-chrome
+  - export DISPLAY=:99.0
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./test/setup/travis_pr_setup.sh; fi'
 
 install:
   - npm prune
