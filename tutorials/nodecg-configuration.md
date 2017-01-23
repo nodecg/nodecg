@@ -37,6 +37,8 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
 	- `environment` _String_ An arbitrary name you choose for this environment. Something like `production`, `development`, `staging`, etc.
 	- `postServerItem` _String_ Your Rollbar project's POST_SERVER_ITEM_ACCESS_TOKEN
 	- `postClientItem` _String_ Your Rollbar project's POST_CLIENT_ITEM_ACCESS_TOKEN
+- `bundles` _Object_ Contains configuration for bundles.
+	- `disabled` _Array of strings_ An array of bundle directories for modules that should be disabled (not loaded during NodeCG bootstrap).
 
 ### Example Config
 ```json
@@ -87,6 +89,11 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
         "environment": "production",
         "postServerItem": "YOUR_POST_SERVER_ITEM_ACCESS_TOKEN",
         "postClientItem": "YOUR_POST_CLIENT_ITEM_ACCESS_TOKEN"
+    },
+    "bundles": {
+        "disabled": [
+            "bundle-name"
+        ]
     }
 }
 ```
