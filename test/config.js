@@ -41,4 +41,9 @@ describe('config loader', () => {
 		expect(result.config.host).to.equal('localhost');
 		expect(result.config.port).to.equal(9090);
 	});
+
+	it('should not have any disabled bundles by default', () => {
+		const result = loadConfig('');
+		expect(result.config.bundles.disabled).to.have.lengthOf(0);
+	});
 });
