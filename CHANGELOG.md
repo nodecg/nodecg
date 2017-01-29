@@ -1,3 +1,29 @@
+<a name="0.8.6"></a>
+## [0.8.6](https://github.com/nodecg/nodecg/compare/v0.8.5...v0.8.6) (2017-01-29)
+
+
+### Bug Fixes
+
+* **api:** call encodeURIComponent on "namespace" and "name" when autogenerating schemaPath ([0fd2a19](https://github.com/nodecg/nodecg/commit/0fd2a19))
+* **assets:** avoid thrashing asset replicants on startup ([1250dd4](https://github.com/nodecg/nodecg/commit/1250dd4))
+* **dashboard:** fix `dialog-dismiss` and `dialog-confirm` buttons sometimes not working ([5f06166](https://github.com/nodecg/nodecg/commit/5f06166))
+* **replicant:** fix potential case where a proxied Array with custom methods wouldn't behave as expected ([d772f05](https://github.com/nodecg/nodecg/commit/d772f05))
+* **replicants:** fix case where Replicants with a value of `undefined` would not emit `change` events after declaration ([a218dbe](https://github.com/nodecg/nodecg/commit/a218dbe)), closes [#228](https://github.com/nodecg/nodecg/issues/228)
+* fix favicon not being served ([3dcdc83](https://github.com/nodecg/nodecg/commit/3dcdc83))
+* **rollbar:** add reporting of unhandled promise rejections ([c1a33b4](https://github.com/nodecg/nodecg/commit/c1a33b4))
+* **rollbar:** fix browser-side Rollbar not receiving the correct access token from the config ([2b810fd](https://github.com/nodecg/nodecg/commit/2b810fd))
+* **single_instance:** fix "Kill" buttons always being visible, even if no instance was open ([6f4bc77](https://github.com/nodecg/nodecg/commit/6f4bc77))
+
+
+### Features
+
+* add ability to disable bundles via config ([#248](https://github.com/nodecg/nodecg/issues/248)) ([58480bd](https://github.com/nodecg/nodecg/commit/58480bd))
+* **auth:** secure `/graphics` routes ([#249](https://github.com/nodecg/nodecg/issues/249)) ([975c17f](https://github.com/nodecg/nodecg/commit/975c17f))
+* **config:** add "exitOnUncaught" config param ([a77bccf](https://github.com/nodecg/nodecg/commit/a77bccf))
+* **rollbar:** automatically report errors logged with `nodecg.log.error` to Rollbar, if Rollbar is enabled ([7b19eaa](https://github.com/nodecg/nodecg/commit/7b19eaa))
+
+
+
 <a name="0.8.5"></a>
 ## [0.8.5](https://github.com/nodecg/nodecg/compare/v0.8.4...v0.8.5) (2016-10-12)
 
