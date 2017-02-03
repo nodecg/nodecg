@@ -8,6 +8,7 @@ including CasparCG. NodeCG is based on the overlay system developed for the
 
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
 [![Coverage Status](https://coveralls.io/repos/nodecg/nodecg/badge.svg?branch=master&service=github)](https://coveralls.io/github/nodecg/nodecg?branch=master)
+[![Greenkeeper badge](https://badges.greenkeeper.io/nodecg/nodecg.svg)](https://greenkeeper.io/)
 
 Looking for a list of NodeCG bundles and resources? Check out [awesome-nodecg](https://github.com/nodecg/awesome-nodecg/blob/master/README.md).
 
@@ -19,6 +20,7 @@ Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!
 The only platforms that can currently display NodeCG graphics are [OBS Studio](https://obsproject.com/) (with [v1.21 of its Browser Source plugin](https://github.com/kc5nra/obs-browser/releases/tag/1.21)) and [vMix](http://www.vmix.com/).
 
 # Who should use NodeCG?
+
 NodeCG is a programming framework. As such, it's most useful to developers capable of creating their own graphics
 using HTML, CSS, and JavaScript. NodeCG is still in beta and the ecosystem of bundles is quite small.
 Those expecting to download NodeCG and use off-the-shelf bundles to get a complete stream overlay
