@@ -19,6 +19,8 @@ Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!
 The only platforms that can currently display NodeCG graphics are [OBS Studio](https://obsproject.com/) (with [v1.21 of its Browser Source plugin](https://github.com/kc5nra/obs-browser/releases/tag/1.21)) and [vMix](http://www.vmix.com/).
 
 # Who should use NodeCG?
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/nodecg/nodecg.svg)](https://greenkeeper.io/)
 NodeCG is a programming framework. As such, it's most useful to developers capable of creating their own graphics
 using HTML, CSS, and JavaScript. NodeCG is still in beta and the ecosystem of bundles is quite small.
 Those expecting to download NodeCG and use off-the-shelf bundles to get a complete stream overlay
