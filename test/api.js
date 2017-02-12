@@ -19,6 +19,20 @@ describe('client-side api', function () {
 				.call(done);
 		});
 
+		it('should ensure that duplicate bundleName-messageName pairs are ignored', () => {
+			assert.throws(() => {
+				const cb = function () {};
+				e.apis.extension.listenFor('testMessageName', 'testBundleName', cb);
+				e.apis.extension.listenFor('testMessageName', 'testBundleName', cb);
+			}, Error, 'test-bundle attempted to declare a duplicate "listenFor" handler: testBundleName:testMessageName');
+		});
+
+		it('should produce an error if a callback isn\'t given', () => {
+			assert.throws(() => {
+				e.apis.extension.listenFor('testMessageName', 'test');
+			}, Error, 'argument "handler" must be a function, but you provided a(n) string');
+		});
+
 		// Check for basic connectivity. The rest of the test are run from the dashboard as well.
 		it('should receive messages', done => {
 			let sendMessage;
