@@ -13,15 +13,13 @@ module.exports = function (grunt) {
 					browserifyOptions: {
 						debug: true
 					},
-					plugin: [
-						['minifyify', {
-							map: '/nodecg-api.map.json',
-							output: 'lib/browser/dist/browserifiedApi.map.json'
-						}]
-					],
 					transform: [
 						['babelify', {
-							presets: ['es2015']
+							global: true,
+							presets: ['babili'],
+							comments: false,
+							minified: true,
+							sourceMaps: true
 						}],
 						['aliasify', {
 							aliases: {
@@ -66,8 +64,16 @@ module.exports = function (grunt) {
 					]
 				}
 			} */
+		},
+		exorcise: {
+			app: {
+				options: {},
+				files: {
+					'./lib/browser/dist/browserifiedApi.min.js.map': ['./lib/browser/dist/browserifiedApi.min.js']
+				}
+			}
 		}
 	});
 
-	grunt.registerTask('default', ['browserify:dist']);
+	grunt.registerTask('default', ['browserify:dist', 'exorcise']);
 };
