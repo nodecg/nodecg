@@ -39,4 +39,4 @@ paper-card.ncg-card#mixer-masterCard
 
 each bundle in bundles
 	if (bundle.soundCues && bundle.soundCues.length > 0)
-		ncg-sounds(bundle-name=bundle.name)
+		ncg-sounds(bundle-name=bundle.name, enable-custom-cues=bundle.enableCustomCues)

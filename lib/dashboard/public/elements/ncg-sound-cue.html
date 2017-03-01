@@ -1,11 +1,12 @@
 <link rel="import" href="/components/polymer/polymer.html">
 <link rel="import" href="/components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="/components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="/components/paper-slider/paper-slider.html">
 <link rel="import" href="/components/paper-styles/typography.html">
 
 <dom-module id="ncg-sound-cue">
 	<template>
-		<style>
+		<style include="iron-flex iron-flex-alignment">
 			:host {
 				@apply(--layout-horizontal);
 				align-items: center;
@@ -13,7 +14,6 @@
 
 			#name {
 				@apply(--paper-font-title);
-				@apply(--layout-flex);
 				overflow: hidden;
 				text-overflow: ellipsis;
 			}
@@ -24,6 +24,13 @@
 				@apply(--layout-flex-none);
 			}
 
+			#delete {
+				min-width: 0;
+				padding: 0;
+				width: 20px;
+				margin-left: 0;
+			}
+
 			paper-slider {
 				@apply(--layout-flex-none);
 				--paper-slider-input: {
@@ -32,7 +39,17 @@
 			}
 		</style>
 
-		<span id="name">[[name]]</span>
+		<paper-button id="delete" hidden="[[!custom]]" on-tap="emitDelete" class="nodecg-danger" raised>
+			X
+		</paper-button>
+
+		<div class="layout vertical flex center-justified" style="min-width: 0; padding-right: 8px;">
+			<span id="name">[[name]]</span>
+			<template is="dom-if" if="[[custom]]">
+				<span id="timestamp">Created on [[parseTimestamp(createdTimestamp)]]</span>
+			</template>
+		</div>
+
 		<select id="select" on-change="_retargetFile"></select>
 		<paper-slider id="slider" min="0" max="100" step="1" on-change="_onSliderChange" editable></paper-slider>
 	</template>
