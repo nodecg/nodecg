@@ -1,0 +1,28 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "array",
+	"default": [],
+	"items": {
+		"type": "object",
+		"additionalProperties": false,
+		"properties": {
+			"name": {
+				"type": "string",
+				"default": ""
+			},
+			"volume": {
+				"type": "number",
+				"default": "30"
+			},
+			"createdTimestamp": {
+				"type": "number",
+				"default": 0
+			},
+			"file": {
+				"type": ["object", "null"],
+				"default": null
+			}
+		},
+		"required": ["name", "volume", "createdTimestamp", "file"]
+	}
+}
