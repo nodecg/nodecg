@@ -1,3 +1,21 @@
+<a name="0.8.7"></a>
+## [0.8.7](https://github.com/nodecg/nodecg/compare/v0.8.6...v0.8.7) (2017-03-02)
+
+
+### Bug Fixes
+
+* **api:** throw an error instead of just logging a warning when adding a duplicate `listenFor` handler ([187b601](https://github.com/nodecg/nodecg/commit/187b601))
+* **dashboard:** fix panels all being moved to top left corner when window is resized while a non-Dashboard tab is selected ([89812f4](https://github.com/nodecg/nodecg/commit/89812f4)), closes [#217](https://github.com/nodecg/nodecg/issues/217)
+* ensure NodeCG binds to the host and port provided in `cfg/nodecg.json` (thanks @vibhavp!) ([fa5b57e](https://github.com/nodecg/nodecg/commit/fa5b57e))
+
+
+### Features
+
+* **sound:** add support for user-defined sound cues ([#254](https://github.com/nodecg/nodecg/issues/254)) ([05878eb](https://github.com/nodecg/nodecg/commit/05878eb))
+  * This is an advanced and currently undocumented feature. It requires much additional code within a bundle to be useful. We do not recommend trying to use it at this time.
+
+
+
 <a name="0.8.6"></a>
 ## [0.8.6](https://github.com/nodecg/nodecg/compare/v0.8.5...v0.8.6) (2017-01-29)
 
