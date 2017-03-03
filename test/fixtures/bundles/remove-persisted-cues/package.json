@@ -1,0 +1,20 @@
+{
+  "name": "remove-persisted-cues",
+  "version": "0.0.0",
+  "description": "",
+  "homepage": "",
+  "author": {
+    "name": "NodeCG",
+    "url": "https://nodecg.com"
+  },
+  "nodecg": {
+    "compatibleRange": "~0.8.0",
+    "soundCues": [
+      {
+        "name": "persisted-cue-1"
+      }
+    ]
+  },
+  "repository": "https://github.com/nodecg/nodecg.git",
+  "license": "MIT"
+}
