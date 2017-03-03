@@ -13,5 +13,6 @@ module.exports = {
 	GRAPHIC_URL: `${dashboardUrl}/graphics/${bundleName}`,
 	SINGLE_INSTANCE_URL: `${dashboardUrl}/graphics/${bundleName}/single_instance.html`,
 	CONFIG: config,
-	REPLICANTS_ROOT: path.join(process.env.NODECG_ROOT, 'db/replicants')
+	REPLICANTS_ROOT: path.join(process.env.NODECG_ROOT, 'db/replicants'),
+	ASSETS_ROOT: path.join(process.env.NODECG_ROOT, 'assets')
 };
