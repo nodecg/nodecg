@@ -1,0 +1,14 @@
+[
+   {
+      "name":"persisted-cue-1",
+      "assignable":true,
+      "file":null,
+      "volume":30
+   },
+   {
+      "name":"persisted-cue-2",
+      "assignable":true,
+      "file":null,
+      "volume":30
+  }
+]

@@ -1,0 +1,57 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+
+	"definitions": {
+		"cueFile": {
+			"type": ["object", "null"],
+			"properties": {
+				"sum": {
+					"type": "string"
+				},
+				"base": {
+					"type": "string"
+				},
+				"ext": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"url": {
+					"type": "string"
+				},
+				"default": {
+					"type": "boolean"
+				}
+			}
+		}
+	},
+
+	"type": "array",
+	"default": [],
+	"items": {
+		"type": "object",
+		"additionalProperties": false,
+		"properties": {
+			"name": {
+				"type": "string"
+			},
+			"volume": {
+				"type": "number"
+			},
+			"defaultVolume": {
+				"type": ["number", null]
+			},
+			"file": {
+				"$ref": "#/definitions/cueFile"
+			},
+			"defaultFile": {
+				"$ref": "#/definitions/cueFile"
+			},
+			"assignable": {
+				"type": "boolean"
+			}
+		},
+		"required": ["name", "volume", "file", "assignable"]
+	}
+}
