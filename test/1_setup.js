@@ -2,10 +2,23 @@
 'use strict';
 
 process.env.test = true;
+process.env.NODECG_TEST = true;
+const path = require('path');
+const fse = require('fs-extra');
+const temp = require('temp');
+const tempFolder = temp.mkdirSync();
 
-// Tell NodeCG to load a blank config file, to avoid any contamination.
-process.argv.push('--cfgPath');
-process.argv.push('./test/specimen/test.json');
+// Automatically track and cleanup files at exit.
+temp.track();
+
+fse.copySync('test/fixtures/assets', path.join(tempFolder, 'assets'));
+fse.copySync('test/fixtures/bundles', path.join(tempFolder, 'bundles'));
+fse.copySync('test/fixtures/cfg', path.join(tempFolder, 'cfg'));
+fse.copySync('test/fixtures/db', path.join(tempFolder, 'db'));
+
+// Tell NodeCG to look in our new temp folder for bundles, cfg, db, and assets, rather than whatever ones the user
+// may have. We don't want to touch any existing user data!
+process.env.NODECG_ROOT = tempFolder;
 
 const webdriverio = require('webdriverio');
 const e = require('./setup/test-environment');
@@ -143,6 +156,7 @@ before(function (done) {
 			.timeouts('script', 5000)
 			.call(done);
 	});
+
 	e.server.start();
 });
 

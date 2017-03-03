@@ -2,9 +2,11 @@
 /* global createjs */
 'use strict';
 
-const fs = require('fs.extra');
+const path = require('path');
+const fs = require('fs-extra');
 const assert = require('chai').assert;
 const e = require('./setup/test-environment');
+const C = require('./setup/test-constants');
 
 describe('sounds - mixer page', function () {
 	this.timeout(10000);
@@ -20,7 +22,7 @@ describe('sounds - mixer page', function () {
 				.switchTab(e.browser.tabs.dashboard)
 				.then(() => new Promise((resolve, reject) => {
 					fs.copy('test/fixtures/assets/test-bundle/sounds/success.ogg',
-						'assets/test-bundle/sounds/success.ogg', {replace: true}, err => {
+						path.join(C.ASSETS_ROOT, '/test-bundle/sounds/success.ogg'), {replace: true}, err => {
 							if (err) {
 								reject(err);
 								return;

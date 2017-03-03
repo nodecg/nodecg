@@ -2,7 +2,8 @@
   "name": "test-bundle",
   "version": "0.0.1",
   "dependencies": {
-    "commander": "^2.6.0"
+    "commander": "^2.6.0",
+    "express": "^4.15.0"
   },
   "homepage": "http://github.com/nodecg",
   "authors": [

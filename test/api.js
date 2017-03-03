@@ -6,11 +6,16 @@ const request = require('request');
 const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
-const e = require('./setup/test-environment');
-const C = require('./setup/test-constants');
+let e;
+let C;
 
 describe('client-side api', function () {
 	this.timeout(10000);
+
+	before(() => {
+		e = require('./setup/test-environment');
+		C = require('./setup/test-constants');
+	});
 
 	context('on the dashboard', () => {
 		before(done => {

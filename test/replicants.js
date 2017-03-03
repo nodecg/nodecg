@@ -2,10 +2,12 @@
 /* eslint-disable new-cap, camelcase, max-nested-callbacks, no-sparse-arrays */
 'use strict';
 
+const path = require('path');
 const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
 const fs = require('fs');
+const C = require('./setup/test-constants');
 const e = require('./setup/test-environment');
 
 describe('client-side replicants', function () {
@@ -454,7 +456,8 @@ describe('client-side replicants', function () {
 					});
 				})
 				.then(() => {
-					fs.readFile('./db/replicants/test-bundle/clientPersistence.rep', 'utf-8', (err, data) => {
+					const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/clientPersistence.rep');
+					fs.readFile(replicantPath, 'utf-8', (err, data) => {
 						if (err) {
 							throw err;
 						}
@@ -481,8 +484,8 @@ describe('client-side replicants', function () {
 
 						// On a short timeout to give the Replicator time to write the new value to disk
 						setTimeout(() => {
-							const data = fs.readFileSync('./db/replicants/test-bundle/clientChangePersistence.rep',
-								'utf-8');
+							const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/clientChangePersistence.rep');
+							const data = fs.readFileSync(replicantPath, 'utf-8');
 							expect(data).to.equal('{"nested":"hey we changed!"}');
 							done();
 						}, 10);
@@ -506,7 +509,8 @@ describe('client-side replicants', function () {
 					});
 				})
 				.then(() => {
-					fs.readFile('./db/replicants/test-bundle/clientFalseyWrite.rep', 'utf-8', (err, data) => {
+					const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/clientFalseyWrite.rep');
+					fs.readFile(replicantPath, 'utf-8', (err, data) => {
 						if (err) {
 							throw err;
 						}
@@ -534,7 +538,8 @@ describe('client-side replicants', function () {
 
 	context('when "persistent" is set to "false"', () => {
 		it('should not write their value to disk', done => {
-			fs.unlink('./db/replicants/test-bundle/clientTransience.rep', err => {
+			const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/clientTransience.rep');
+			fs.unlink(replicantPath, err => {
 				if (err && err.code !== 'ENOENT') {
 					throw err;
 				}
@@ -549,7 +554,7 @@ describe('client-side replicants', function () {
 						rep.on('declared', () => done());
 					})
 					.then(() => {
-						fs.readFile('./db/replicants/test-bundle/clientTransience.rep', err => {
+						fs.readFile(replicantPath, err => {
 							expect(() => {
 								if (err) {
 									throw err;
@@ -721,7 +726,8 @@ describe('server-side replicants', () => {
 			const rep = e.apis.extension.Replicant('extensionPersistence');
 			rep.value = {nested: 'hey we assigned!'};
 			setTimeout(() => {
-				fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', (err, data) => {
+				const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionPersistence.rep');
+				fs.readFile(replicantPath, 'utf-8', (err, data) => {
 					if (err) {
 						throw err;
 					}
@@ -736,7 +742,8 @@ describe('server-side replicants', () => {
 			const rep = e.apis.extension.Replicant('extensionPersistence');
 			rep.value.nested = 'hey we changed!';
 			setTimeout(() => {
-				fs.readFile('./db/replicants/test-bundle/extensionPersistence.rep', 'utf-8', (err, data) => {
+				const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionPersistence.rep');
+				fs.readFile(replicantPath, 'utf-8', (err, data) => {
 					if (err) {
 						throw err;
 					}
@@ -751,7 +758,8 @@ describe('server-side replicants', () => {
 			const rep = e.apis.extension.Replicant('extensionFalseyWrite');
 			rep.value = 0;
 			setTimeout(() => {
-				fs.readFile('./db/replicants/test-bundle/extensionFalseyWrite.rep', 'utf-8', (err, data) => {
+				const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionFalseyWrite.rep');
+				fs.readFile(replicantPath, 'utf-8', (err, data) => {
 					if (err) {
 						throw err;
 					}
@@ -771,14 +779,15 @@ describe('server-side replicants', () => {
 	context('when "persistent" is set to "false"', () => {
 		it('should not write their value to disk', done => {
 			// Remove the file if it exists for some reason
-			fs.unlink('./db/replicants/test-bundle/extensionTransience.rep', err => {
+			const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionTransience.rep');
+			fs.unlink(replicantPath, err => {
 				if (err && err.code !== 'ENOENT') {
 					throw err;
 				}
 
 				const rep = e.apis.extension.Replicant('extensionTransience', {persistent: false});
 				rep.value = 'o no';
-				fs.readFile('./db/replicants/test-bundle/extensionTransience.rep', err => {
+				fs.readFile(replicantPath, err => {
 					expect(() => {
 						if (err) {
 							throw err;

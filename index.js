@@ -8,6 +8,10 @@ if (process.cwd() !== __dirname) {
 	console.info('[nodecg] Changed process.cwd to %s', __dirname);
 }
 
+if (!process.env.NODECG_ROOT) {
+	process.env.NODECG_ROOT = process.cwd();
+}
+
 const semver = require('semver');
 const nodeVersion = process.versions.node;
 if (!semver.satisfies(nodeVersion, '>=6')) {
