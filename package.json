@@ -23,6 +23,7 @@
     "express-nedb-session": "^0.1.1",
     "express-session": "^1.11.3",
     "extend": "^3.0.0",
+    "fs-extra": "^2.0.0",
     "httpolyglot": "^0.1.1",
     "is-my-json-valid": "^2.12.3",
     "jade": "^1.11.0",
@@ -43,13 +44,13 @@
     "sha1": "^1.1.1",
     "sha1-file": "^1.0.0",
     "socket.io": "^1.4.5",
+    "temp": "^0.8.3",
     "uuid": "^3.0.0"
   },
   "scripts": {
     "start": "node index.js",
-    "pretest": "npm run build && node test/setup/pretest",
+    "pretest": "npm run build",
     "test": "istanbul cover -x \"bundles/**\" -x \"test/**\" ./node_modules/mocha/bin/_mocha -- -R spec",
-    "posttest": "node test/setup/posttest",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf coverage",
     "static": "eslint index.js lib/**/*.js test/**/*.js",
     "build": "npm run static && npm run docs:build && npm run build:css && grunt",
