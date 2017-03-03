@@ -9,8 +9,7 @@ const temp = require('temp');
 const tempFolder = temp.mkdirSync();
 
 // Automatically track and cleanup files at exit.
-// temp.track();
-console.log(tempFolder);
+temp.track();
 
 fse.copySync('test/fixtures/assets', path.join(tempFolder, 'assets'));
 fse.copySync('test/fixtures/bundles', path.join(tempFolder, 'bundles'));
