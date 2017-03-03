@@ -1,3 +1,19 @@
+<a name="0.8.8"></a>
+## [0.8.8](https://github.com/nodecg/nodecg/compare/v0.8.7...v0.8.8) (2017-03-03)
+
+
+### Bug Fixes
+
+* **auth:** fix case where token auth via cookies would fail when `host` was set to `0.0.0.0` ([#255](https://github.com/nodecg/nodecg/issues/255)) ([cb89d25](https://github.com/nodecg/nodecg/commit/cb89d25))
+* **sounds:** persist the soundCues replicant to disk ([#258](https://github.com/nodecg/nodecg/issues/258)) ([775c158](https://github.com/nodecg/nodecg/commit/775c158))
+
+
+### Features
+
+* add `NODECG_ROOT` environment variable ([#257](https://github.com/nodecg/nodecg/issues/257)) ([ec0fcb1](https://github.com/nodecg/nodecg/commit/ec0fcb1))
+
+
+
 <a name="0.8.7"></a>
 ## [0.8.7](https://github.com/nodecg/nodecg/compare/v0.8.6...v0.8.7) (2017-03-02)
 
