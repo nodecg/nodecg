@@ -1,3 +1,13 @@
+<a name="0.8.9"></a>
+## [0.8.9](https://github.com/nodecg/nodecg/compare/v0.8.8...v0.8.9) (2017-03-08)
+
+
+### Bug Fixes
+
+* **login:** fix case where an invalid `socketToken` cookie would prevent a user from ever being able to log in ([7392249](https://github.com/nodecg/nodecg/commit/7392249))
+
+
+
 <a name="0.8.8"></a>
 ## [0.8.8](https://github.com/nodecg/nodecg/compare/v0.8.7...v0.8.8) (2017-03-03)
 
