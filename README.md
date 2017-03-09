@@ -17,7 +17,7 @@ Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!
 
 > **NOTICE**: NodeCG v0.8 and above require Node.js >= 6 and Chrome >= 49. 
 **This means that as of right now, NodeCG graphics will not work in OBS1, XSplit, or CasparCG.** 
-The only platforms that can currently display NodeCG graphics are [OBS Studio](https://obsproject.com/) (with [v1.21 of its Browser Source plugin](https://github.com/kc5nra/obs-browser/releases/tag/1.21)) and [vMix](http://www.vmix.com/).
+The only platforms that can currently display NodeCG graphics are [OBS Studio](https://obsproject.com/) (with a recent release of its [Browser Source plugin](https://github.com/kc5nra/obs-browser/releases/tag/1.21)) and [vMix](http://www.vmix.com/).
 
 # Who should use NodeCG?
 
