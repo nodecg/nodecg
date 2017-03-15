@@ -43,7 +43,7 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
 ### Example Config
 ```json
 {
-    "host": "example.com",
+    "host": "0.0.0.0",
     "port": 9090,
     "login": {
         "enabled": true,
