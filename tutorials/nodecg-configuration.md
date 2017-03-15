@@ -38,7 +38,8 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
 	- `postServerItem` _String_ Your Rollbar project's POST_SERVER_ITEM_ACCESS_TOKEN
 	- `postClientItem` _String_ Your Rollbar project's POST_CLIENT_ITEM_ACCESS_TOKEN
 - `bundles` _Object_ Contains configuration for bundles.
-	- `disabled` _Array of strings_ An array of bundle directories for modules that should be disabled (not loaded during NodeCG bootstrap).
+	- `enabled` _Array of strings_ A whitelist array of bundle names that will be the only ones loaded at startup. Cannot be used with `bundles.disabled`.
+	- `disabled` _Array of strings_ A blacklist array of bundle names that will not be loaded at startup. Cannot be used with `bundles.enabled`.
 
 ### Example Config
 ```json
