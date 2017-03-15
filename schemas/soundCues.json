@@ -39,8 +39,14 @@
 			"volume": {
 				"type": "number"
 			},
+			"channels": {
+				"type": "number"
+			},
+			"bundleName": {
+				"type": "string"
+			},
 			"defaultVolume": {
-				"type": ["number", null]
+				"type": ["number", "null"]
 			},
 			"file": {
 				"$ref": "#/definitions/cueFile"
