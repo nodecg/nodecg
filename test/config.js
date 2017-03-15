@@ -38,12 +38,12 @@ describe('config loader', () => {
 
 	it('should load defaults when the config file does not exist', () => {
 		const result = loadConfig('');
-		expect(result.config.host).to.equal('localhost');
+		expect(result.config.host).to.equal('0.0.0.0');
 		expect(result.config.port).to.equal(9090);
 	});
 
 	it('should not have any disabled bundles by default', () => {
 		const result = loadConfig('');
-		expect(result.config.bundles.disabled).to.have.lengthOf(0);
+		expect(result.config.bundles.disabled).to.equal(null);
 	});
 });
