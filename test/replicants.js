@@ -125,7 +125,7 @@ describe('client-side replicants', function () {
 			.catch(err => done(err));
 	});
 
-	// need a better way to test this
+	// Need a better way to test this
 	it.skip('should redeclare after reconnecting to Socket.IO', function (done) {
 		this.timeout(30000);
 
