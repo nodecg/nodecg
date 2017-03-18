@@ -1,27 +1,24 @@
-<link rel="import" href="/components/polymer/polymer.html">
-<link rel="import" href="/components/neon-animation/neon-animation-runner-behavior.html">
-<link rel="import" href="/components/paper-dialog-behavior/paper-dialog-behavior.html">
-<link rel="import" href="/components/paper-styles/paper-styles.html">
-<link rel="import" href="/components/paper-item/paper-item-body.html">
+<link rel="import" href="/bower_components/neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="/bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="/bower_components/paper-item/paper-item-body.html">
 
 <dom-module id="ncg-dashboard-panel-info-dialog">
-	<link rel="import" type="css" href="/components/paper-dialog-behavior/paper-dialog-common.css">
-	<style>
-		.list {
-			margin: 12px;
-		}
-
-		paper-item-body > * {
-			white-space: normal;
-		}
-
-		:host {
-			width: 500px;
-			max-width: 92vw;
-		}
-	</style>
-
 	<template>
+		<style>
+			.list {
+				margin: 12px;
+			}
+
+			paper-item-body > * {
+				white-space: normal;
+			}
+
+			:host {
+				width: 500px;
+				max-width: 92vw;
+			}
+		</style>
+
 		<h2>Bundle Details</h2>
 
 		<div id="stuff" class="list">
@@ -100,6 +97,6 @@
 			<paper-button dialog-dismiss>Close</paper-button>
 		</div>
 	</template>
-</dom-module>
 
-<script src="/dashboard/elements/ncg-dashboard-panel-info-dialog.js"></script>
+	<script src="/dashboard/elements/ncg-dashboard-panel-info-dialog.js"></script>
+</dom-module>
