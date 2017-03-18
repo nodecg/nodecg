@@ -1,0 +1,114 @@
+doctype html
+html(lang='en')
+	head
+		meta(http-equiv='X-UA-Compatible', content='IE=edge; charset=UTF-8')
+		meta(name='viewport', content='width=device-width', initial-scale=1)
+
+		title NodeCG Dashboard
+
+		if privateConfig.rollbar && privateConfig.rollbar.enabled
+			script(src='/bower_components/rollbar/dist/rollbar.min.js')
+			script.
+				const _rollbarConfig = {
+					accessToken: '#{privateConfig.rollbar.postClientItem}',
+					captureUncaught: true,
+					payload: {
+						environment: '#{privateConfig.rollbar.environment}'
+					}
+				}
+				Rollbar.init(_rollbarConfig);
+
+		//- other dashboard scripts
+		script(src='/bower_components/draggabilly/dist/draggabilly.pkgd.min.js')
+		script(src='/bower_components/iframe-resizer/js/iframeResizer.min.js')
+		script(src='/bower_components/imagesloaded/imagesloaded.pkgd.min.js')
+		script(src='/bower_components/js-throttle-debounce/build/js-throttle-debounce.min.js')
+		script(src='/bower_components/packery/dist/packery.pkgd.min.js')
+		script(src='/bower_components/clipboard/dist/clipboard.min.js')
+
+		script(type='text/javascript').
+			// Make the global config (and other render-time data) available during runtime.
+			window.ncgConfig = !{JSON.stringify(publicConfig)};
+			window.__renderData__ = {
+				bundles: !{JSON.stringify(bundles)},
+				workspaces: !{JSON.stringify(workspaces)}
+			};
+			Object.freeze(window.__renderData__);
+
+			// Setup Polymer options
+			window.Polymer = {
+				// Cannot use shadow DOM due to: https://github.com/davidjbradshaw/iframe-resizer/issues/454
+				lazyRegister: true,
+			};
+
+			// Load webcomponentsjs polyfill if browser does not support native
+			// Web Components
+			(function () {
+				'use strict';
+				var onload = function () {
+					// For native Imports, manually fire WebComponentsReady so user code
+					// can use the same code path for native and polyfill'd imports.
+					if (!window.HTMLImports) {
+						document.dispatchEvent(
+							new CustomEvent('WebComponentsReady', {bubbles: true})
+						);
+					}
+				};
+				var webComponentsSupported = (
+					'registerElement' in document
+					&& 'import' in document.createElement('link')
+					&& 'content' in document.createElement('template')
+				);
+				if (webComponentsSupported) {
+					onload();
+				} else {
+					var script = document.createElement('script');
+					script.async = true;
+					script.src = '/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+					script.onload = onload;
+					document.head.appendChild(script);
+				}
+			})();
+
+		//- dashboard CSS
+		link(rel='stylesheet', href='/dashboard/dashboard.css')
+		link(rel='import', href='/dashboard/style/nodecg-styles.html')
+
+		//- our custom dashboard elements
+		link(rel='import', href='/dashboard/elements/ncg-dashboard.html')
+
+		//- make the API available
+		script(src='/nodecg-api.js')
+
+		//- initialize the socket
+		script(src='/bower_components/cookies-js/dist/cookies.min.js')
+		script(src='/socket.io/socket.io.js')
+		script(type='text/javascript').
+			const params = new URLSearchParams(location.search);
+			window.token = params.key || Cookies.get('socketToken');
+			if (window.token) {
+				window.socket = io(undefined, {query: 'token=' + window.token});
+			} else {
+				window.socket = io();
+			}
+
+		//- Set the default color of many polymer elements.
+			Newer elements use --primary-color, older elements use --default-primary-color.
+		style(is='custom-style').
+			:root {
+				--default-primary-color: #00bebe;
+				--primary-color: #00bebe;
+				--width-sm: 640px;
+			}
+
+			body {
+				background-color: #dedede;
+				@apply(--layout-vertical);
+				@apply(--layout-fullbleed);
+			}
+
+	body
+		ncg-dashboard
+
+		//- Used by packery to establish the width of the columns
+		#grid-sizer(class='width-1')

@@ -7,7 +7,10 @@
 	},
 	"globals": {
 		"Polymer": true,
-		"NodeCG": true
+		"NodeCG": true,
+		"Clipboard": true,
+		"Packery": true,
+		"Draggabilly": true
 	},
 	"rules": {
 		"new-cap": [
