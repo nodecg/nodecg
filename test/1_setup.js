@@ -82,7 +82,7 @@ before(function (done) {
 				}
 
 				if (process.env.TRAVIS_OS_NAME === 'linux') {
-					// desiredCapabilities.platform = 'Linux';
+					// Disabled for now: desiredCapabilities.platform = 'Linux';
 
 					// Use Windows until Sauce Labs has at least Chrome 49 on Linux
 					// https://saucelabs.com/platforms/#linux
