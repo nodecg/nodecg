@@ -1,8 +1,6 @@
 <link rel="import" href="/bower_components/app-layout/app-layout.html">
-<link rel="import" href="/bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="/bower_components/app-route/app-location.html">
 <link rel="import" href="/bower_components/app-route/app-route.html">
-<link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="/bower_components/iron-icons/av-icons.html">
 <link rel="import" href="/bower_components/iron-icons/communication-icons.html">
@@ -28,7 +26,7 @@
 
 <dom-module id="ncg-dashboard">
 	<template>
-		<style include="iron-flex iron-flex-alignment">
+		<style>
 			:host {
 				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 				overflow: hidden;
@@ -91,8 +89,13 @@
 			paper-tab a {
 				color: inherit;
 				font-weight: inherit;
+				font-size: inherit;
 				@apply(--layout-vertical);
 				@apply(--layout-center-center);
+			}
+
+			.workspaceTab {
+				font-size: 14px;
 			}
 
 			paper-icon-button {
@@ -182,8 +185,7 @@
 			}
 
 			/**
-			 * Narrow, but not quite phone narrow.
-			 * TBH, this should probably be all just be one single breakpoint.
+			 * Phone
 			 */
 			@media (max-width: 640px) {
 				#pages {
@@ -193,12 +195,7 @@
 				#panels {
 					padding: 6px;
 				}
-			}
 
-			/**
-			 * Phone
-			 */
-			@media (max-width: 689px) {
 				paper-tabs {
 					display: none;
 				}
@@ -217,7 +214,7 @@
 			data="{{routeData}}"
 			tail="{{subRoute}}"></app-route>
 
-		<iron-media-query query="max-width: 689px" query-matches="{{smallScreen}}"></iron-media-query>
+		<iron-media-query query="max-width: 640px" query-matches="{{smallScreen}}"></iron-media-query>
 
 		<app-drawer-layout drawer-width="288px" force-narrow>
 			<!-- navigation drawer for small screen sizes -->
@@ -226,7 +223,7 @@
 					<app-toolbar id="drawerToolbar">
 						<paper-icon-button icon="close" aria-label="Close" drawer-toggle></paper-icon-button>
 						<span>NodeCG</span>
-						<img class="logo" src="/dashboard/img/square-logo.png">
+						<img class="logo" src="/dashboard/img/square-logo.png" alt="NodeCG">
 					</app-toolbar>
 
 					<iron-selector class="list" selected="[[routeData.page]]" attr-for-selected="data-route">
@@ -267,7 +264,7 @@
 							alt="Toogle navigation menu"
 							hidden="[[!smallScreen]]"></paper-icon-button>
 
-						<img class="logo" src="/dashboard/img/square-logo.png">
+						<img class="logo" src="/dashboard/img/square-logo.png" alt="NodeCG">
 
 						<template is="dom-if" if="[[!smallScreen]]">
 							<paper-tabs

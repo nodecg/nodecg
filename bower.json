@@ -21,7 +21,6 @@
     "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.6",
     "iron-pages": "PolymerElements/iron-pages#^1.0.8",
     "iron-selector": "PolymerElements/iron-selector#^1.5.2",
-    "js-throttle-debounce": "^0.1.1",
     "nodecg-replicant": "NodeCGElements/nodecg-replicant#^0.5.8",
     "packery": "^2.1.1",
     "paper-button": "PolymerElements/paper-button#^1.0.14",

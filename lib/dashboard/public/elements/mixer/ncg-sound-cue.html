@@ -1,15 +1,29 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 <link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="/bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="/bower_components/paper-styles/typography.html">
 
 <dom-module id="ncg-sound-cue">
 	<template>
-		<style include="iron-flex iron-flex-alignment">
+		<style>
 			:host {
 				@apply(--layout-horizontal);
 				align-items: center;
+			}
+
+			#delete {
+				min-width: 0;
+				padding: 0;
+				width: 20px;
+				margin-left: 0;
+			}
+
+			#leftWrapper {
+				min-width: 0;
+				padding-right: 8px;
+				@apply(--layout-vertical);
+				@apply(--layout-flex);
+				@apply(--layout-center-justified);
 			}
 
 			#name {
@@ -24,12 +38,7 @@
 				@apply(--layout-flex-none);
 			}
 
-			#delete {
-				min-width: 0;
-				padding: 0;
-				width: 20px;
-				margin-left: 0;
-			}
+
 
 			paper-slider {
 				@apply(--layout-flex-none);
@@ -49,11 +58,16 @@
 			}
 		</style>
 
-		<paper-button id="delete" hidden="[[!custom]]" on-tap="emitDelete" class="nodecg-danger" raised>
+		<paper-button
+			id="delete"
+			hidden="[[!custom]]"
+			on-tap="emitDelete"
+			class="nodecg-danger"
+			raised>
 			X
 		</paper-button>
 
-		<div class="layout vertical flex center-justified" style="min-width: 0; padding-right: 8px;">
+		<div id="leftWrapper">
 			<span id="name">[[name]]</span>
 			<template is="dom-if" if="[[custom]]">
 				<span id="timestamp">Created on [[parseTimestamp(createdTimestamp)]]</span>
