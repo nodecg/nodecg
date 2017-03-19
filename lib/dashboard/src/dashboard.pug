@@ -3,6 +3,7 @@ html(lang='en')
 	head
 		meta(http-equiv='X-UA-Compatible', content='IE=edge; charset=UTF-8')
 		meta(name='viewport', content='width=device-width', initial-scale=1)
+		meta(name='theme-color' content='#ffffff')
 		link(rel='manifest', href='/manifest.json')
 
 		title NodeCG Dashboard
@@ -13,7 +14,6 @@ html(lang='en')
 				navigator.serviceWorker.register('/service-worker.js')
 					.then(function (registration) {
 						// Service worker successfully installed.
-						console.log('Service Worker registration successful with scope: ', registration.scope);
 					}).catch(function (err) {
 						console.error('Error installing service worker!');
 						console.error(err);
@@ -33,11 +33,10 @@ html(lang='en')
 				Rollbar.init(_rollbarConfig);
 
 		//- other dashboard scripts
-		script(src='/bower_components/draggabilly/dist/draggabilly.pkgd.min.js')
-		script(src='/bower_components/iframe-resizer/js/iframeResizer.min.js')
-		script(src='/bower_components/imagesloaded/imagesloaded.pkgd.min.js')
-		script(src='/bower_components/js-throttle-debounce/build/js-throttle-debounce.min.js')
-		script(src='/bower_components/packery/dist/packery.pkgd.min.js')
+		script(src='/bower_components/draggabilly/dist/draggabilly.pkgd.min.js' async)
+		script(src='/bower_components/iframe-resizer/js/iframeResizer.min.js' async)
+		script(src='/bower_components/imagesloaded/imagesloaded.pkgd.min.js' async)
+		script(src='/bower_components/packery/dist/packery.pkgd.min.js' async)
 		script(src='/bower_components/clipboard/dist/clipboard.min.js')
 
 		script(type='text/javascript').
@@ -85,8 +84,7 @@ html(lang='en')
 			})();
 
 		//- dashboard CSS
-		link(rel='stylesheet', href='/dashboard/dashboard.css')
-		link(rel='import', href='/dashboard/style/nodecg-styles.html')
+		link(rel='import', href='/dashboard/style/nodecg-styles.html', async)
 
 		//- our custom dashboard elements
 		link(rel='import', href='/dashboard/elements/ncg-dashboard.html')
@@ -120,8 +118,20 @@ html(lang='en')
 				@apply(--layout-fullbleed);
 			}
 
+		style.
+			.text-warning {
+				color: #c53929;
+			}
+
+			.ncg-card {
+				width: 100%;
+				max-width: 600px;
+				margin-bottom: 12px;
+			}
+
+			ncg-dashboard-panel iframe {
+				vertical-align: middle;
+			}
+
 	body
 		ncg-dashboard
-
-		//- Used by packery to establish the width of the columns
-		#grid-sizer(class='width-1')
