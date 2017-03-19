@@ -105,8 +105,10 @@
 				height: 48px;
 			}
 
-			.leftItem [icon] {
-				display: none;
+			#drawerToolbar {
+				@apply(--layout-horizontal);
+				@apply(--layout-center);
+				@apply(--layout-justified);
 			}
 
 			.list {
@@ -122,8 +124,11 @@
 				color: #7c7c7c;
 			}
 
-			.list a.active {
-				color: black;
+			.list a.iron-selected {
+				color: #00bebe;
+			}
+
+			.list a.iron-selected paper-icon-item {
 				font-weight: bold;
 			}
 
@@ -158,11 +163,10 @@
 				opacity: 0;
 				pointer-events: none;
 				transform: translateY(40px);
-				padding-bottom: 32px;
+				box-sizing: border-box;
 			}
 
 			section {
-				padding: 32px;
 				box-sizing: border-box;
 				@apply(--layout-vertical);
 				@apply(--layout-flex);
@@ -170,20 +174,20 @@
 			}
 
 			#pages {
-				overflow-y: scroll;
+				overflow-y: auto;
 				box-sizing: border-box;
+				padding: 32px;
 				@apply(--layout-vertical);
 				@apply(--layout-flex-auto);
 			}
 
 			/**
-			 * Narrow, but not quite phone narrow. --width-sm is currently 640px.
-			 * TBH, this should probably be refactored out.
+			 * Narrow, but not quite phone narrow.
+			 * TBH, this should probably be all just be one single breakpoint.
 			 */
-			@media (max-width: var(--width-sm)) {
-				section {
+			@media (max-width: 640px) {
+				#pages {
 					padding: 0;
-					background-color:wheat;
 				}
 
 				#panels {
@@ -198,19 +202,11 @@
 				paper-tabs {
 					display: none;
 				}
-			}
 
-			@media (max-width: var(--width-sm)) {
-				/* TODO: figure out why this doesn't work??? */
-				section{
-					padding: 0;
-					background-color:wheat;
+				#mainToolbar .logo {
+					/* makes the menu button have equal negative space on the left and the right */
+					padding-left: 16px;
 				}
-
-				.ncg-dashboard-0 #panels.ncg-dashboard {
-					padding: 6px;
-				}
-
 			}
 		</style>
 
@@ -227,17 +223,35 @@
 			<!-- navigation drawer for small screen sizes -->
 			<app-drawer id="drawer" swipe-open="[[smallScreen]]">
 				<template is="dom-if" if="[[smallScreen]]">
-					<app-toolbar>
+					<app-toolbar id="drawerToolbar">
 						<paper-icon-button icon="close" aria-label="Close" drawer-toggle></paper-icon-button>
+						<span>NodeCG</span>
 						<img class="logo" src="/dashboard/img/square-logo.png">
 					</app-toolbar>
 
-					<iron-selector class="list" selected="[[routeData.page]]" attr-for-selected="route">
+					<iron-selector class="list" selected="[[routeData.page]]" attr-for-selected="data-route">
+						<template is="dom-repeat" items="[[workspaces]]" as="workspace" initial-count="1">
+							<a data-route$="[[workspace.route]]"
+							   href="#[[workspace.route]]"
+							   aria-label="[[workspace.name]]"
+							   on-tap="closeDrawer">
+								<paper-icon-item>
+									<iron-icon item-icon icon="dashboard"></iron-icon>
+									[[workspace.name]]
+								</paper-icon-item>
+							</a>
+						</template>
+
 						<template is="dom-repeat" items="[[pages]]" as="page" initial-count="1">
-							<paper-icon-item route="[[page.name]]" aria-label="[[page.name]]">
-								<iron-icon item-icon icon="[[page.icon]]"></iron-icon>
-								[[page.name]]
-							</paper-icon-item>
+							<a data-route$="[[page.route]]"
+							   href="#[[page.route]]"
+							   aria-label="[[page.name]]"
+							   on-tap="closeDrawer">
+								<paper-icon-item>
+									<iron-icon item-icon icon="[[page.icon]]"></iron-icon>
+									[[page.name]]
+								</paper-icon-item>
+							</a>
 						</template>
 					</iron-selector>
 				</template>

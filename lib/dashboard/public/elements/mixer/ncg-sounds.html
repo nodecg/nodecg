@@ -11,6 +11,7 @@
 				display: block;
 				width: 100%;
 				max-width: 600px;
+				white-space: nowrap;
 			}
 
 			#bundleFaderContainer {
@@ -26,13 +27,15 @@
 
 			#bundleFaderContainer > span {
 				@apply(--paper-font-title);
-				@apply(--layout-flex);
+				min-width: 166px; /* same width as "Master Fader" label */
+				flex-grow: 1;
+				flex-shrink: 0;
 				overflow: hidden;
 				text-overflow: ellipsis;
 			}
 
 			#bundleFader {
-				@apply(--layout-flex-none);
+				flex-shrink: 1;
 				--paper-slider-active-color: white;
 				--paper-slider-knob-color: white;
 				--paper-input-container-focus-color: var(--google-blue-700);

@@ -37,6 +37,16 @@
 					width: 80px;
 				}
 			}
+
+			@media (max-width: 500px) {
+				#select {
+					width: 120px;
+				}
+
+				paper-slider {
+					width: 150px;
+				}
+			}
 		</style>
 
 		<paper-button id="delete" hidden="[[!custom]]" on-tap="emitDelete" class="nodecg-danger" raised>

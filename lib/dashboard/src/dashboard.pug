@@ -3,19 +3,33 @@ html(lang='en')
 	head
 		meta(http-equiv='X-UA-Compatible', content='IE=edge; charset=UTF-8')
 		meta(name='viewport', content='width=device-width', initial-scale=1)
+		link(rel='manifest', href='/manifest.json')
 
 		title NodeCG Dashboard
 
+		//- Register service worker
+		script(type='text/javascript').
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.register('/service-worker.js')
+					.then(function (registration) {
+						// Service worker successfully installed.
+						console.log('Service Worker registration successful with scope: ', registration.scope);
+					}).catch(function (err) {
+						console.error('Error installing service worker!');
+						console.error(err);
+					});
+			}
+
 		if privateConfig.rollbar && privateConfig.rollbar.enabled
 			script(src='/bower_components/rollbar/dist/rollbar.min.js')
-			script.
+			script(type='text/javascript').
 				const _rollbarConfig = {
 					accessToken: '#{privateConfig.rollbar.postClientItem}',
 					captureUncaught: true,
 					payload: {
 						environment: '#{privateConfig.rollbar.environment}'
 					}
-				}
+				};
 				Rollbar.init(_rollbarConfig);
 
 		//- other dashboard scripts
@@ -98,7 +112,6 @@ html(lang='en')
 			:root {
 				--default-primary-color: #00bebe;
 				--primary-color: #00bebe;
-				--width-sm: 640px;
 			}
 
 			body {
