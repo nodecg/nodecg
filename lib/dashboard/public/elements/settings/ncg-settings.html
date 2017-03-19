@@ -20,6 +20,8 @@
 			}
 
 			.card-actions {
+				padding: 0;
+				padding-top: 8px;
 				@apply(--layout-horizontal);
 				@apply(--layout-center-center);
 			}
@@ -27,6 +29,28 @@
 			paper-button {
 				@apply(--layout-horizontal);
 				@apply(--layout-center-center);
+			}
+
+			paper-button iron-icon {
+				margin-right: 0.5em;
+			}
+
+			paper-button span {
+				white-space: nowrap;
+			}
+
+			paper-button:first-of-type {
+				margin-left: 0;
+			}
+
+			paper-button:last-of-type {
+				margin-right: 0;
+			}
+
+			@media (max-width: 400px) {
+				paper-button iron-icon {
+					display: none;
+				}
 			}
 		</style>
 
@@ -38,13 +62,16 @@
 				</p>
 				<div class="card-actions">
 					<paper-button raised  id="copyKey">
-						<iron-icon icon="icons:content-copy"></iron-icon>&ensp;Copy Key
+						<iron-icon icon="icons:content-copy"></iron-icon>
+						<span>Copy Key</span>
 					</paper-button>
 					<paper-button raised id="showKey" class="nodecg-configure" title="Show Key" on-tap="openShowKeyDialog">
-						<iron-icon icon="communication:vpn-key"></iron-icon>&ensp;Show Key
+						<iron-icon icon="communication:vpn-key"></iron-icon>
+						<span>Show Key</span>
 					</paper-button>
 					<paper-button raised id="resetKey" class="nodecg-danger" on-tap="openResetKeyDialog">
-						<iron-icon icon="icons:refresh"></iron-icon>&ensp;Reset Key
+						<iron-icon icon="icons:refresh"></iron-icon>
+						<span>Reset Key</span>
 					</paper-button>
 				</div>
 			</div>
