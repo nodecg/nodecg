@@ -102,7 +102,7 @@
 				--paper-icon-button-ink-color: #00bebe;
 			}
 
-			.logo {
+			#mainLogo {
 				width: 48px;
 				height: 48px;
 			}
@@ -110,7 +110,12 @@
 			#drawerToolbar {
 				@apply(--layout-horizontal);
 				@apply(--layout-center);
-				@apply(--layout-justified);
+			}
+
+			#drawerLogo {
+				width: 83px;
+				height: 28px;
+				padding-left: 16px;
 			}
 
 			.list {
@@ -171,7 +176,7 @@
 					display: none;
 				}
 
-				#mainToolbar .logo {
+				#mainLogo {
 					/* makes the menu button have equal negative space on the left and the right */
 					padding-left: 16px;
 				}
@@ -193,8 +198,7 @@
 				<template is="dom-if" if="[[smallScreen]]">
 					<app-toolbar id="drawerToolbar">
 						<paper-icon-button icon="close" aria-label="Close" drawer-toggle></paper-icon-button>
-						<span>NodeCG</span>
-						<img class="logo" src="/dashboard/img/square-logo.png" alt="NodeCG">
+						<img id="drawerLogo" src="/dashboard/img/horiz-logo-2x.png" alt="NodeCG">
 					</app-toolbar>
 
 					<iron-selector class="list" selected="[[routeData.page]]" attr-for-selected="data-route">
@@ -235,7 +239,7 @@
 							alt="Toogle navigation menu"
 							hidden="[[!smallScreen]]"></paper-icon-button>
 
-						<img class="logo" src="/dashboard/img/square-logo.png" alt="NodeCG">
+						<img id="mainLogo" src="/dashboard/img/square-logo.png" alt="NodeCG">
 
 						<template is="dom-if" if="[[!smallScreen]]">
 							<paper-tabs
