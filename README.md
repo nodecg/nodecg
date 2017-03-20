@@ -1,23 +1,27 @@
-[![NodeCG Logo](http://i.imgur.com/8PjMIL4.png)](http://nodecg.com/)
-
-NodeCG is a broadcast graphics framework and application.
-It is primarily aimed at [Twitch](http://twitch.tv) broadcasters using 
-[Open Broadcaster Software](https://obsproject.com/), but is usable in any environment that can render HTML,
-including CasparCG. NodeCG is based on the overlay system developed for the 
-[Tip of the Hats 2014](https://www.youtube.com/watch?v=x9PzBHgN29U) charity event.
+[![NodeCG](media/splash.png)](https://nodecg.com/)
+> Create broadcast graphics using Node.js & whatever browser frameworks or libraries you want.
 
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
 [![Coverage Status](https://coveralls.io/repos/nodecg/nodecg/badge.svg?branch=master&service=github)](https://coveralls.io/github/nodecg/nodecg?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/nodecg/nodecg.svg)](https://greenkeeper.io/)
 
+NodeCG is a broadcast graphics framework and application. It enables you to write complex, dynamic broadcast graphics
+using the web platform. NodeCG has no graphics or drawing primitives of its own. Instead, NodeCG provides
+a structure for your code and an API to facilitate moving data between the dashboard, the server, and your graphics.
+It makes no assumptions about how to best code a graphic, and gives you complete freedom to use whatever libraries, 
+frameworks, tools, and methodologies you want. As such, NodeCG graphics can be rendered in any environment that
+can render HTML, including:
+- [OBS Studio](https://obsproject.com/) (via the [obs-browser](https://github.com/kc5nra/obs-browser) plugin)
+- [vMix](http://www.vmix.com/)
+
+> Don't see your preferred streaming software on this list? NodeCG graphics require Chrome 49 or newer.
+As long as your streaming software has support for HTML and uses a somewhat recent version of Chrome, 
+NodeCG will probably work.
+
 Looking for a list of NodeCG bundles and resources? Check out [awesome-nodecg](https://github.com/nodecg/awesome-nodecg/blob/master/README.md).
 
 Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!  
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nodecg/nodecg)
-
-> **NOTICE**: NodeCG v0.8 and above require Node.js >= 6 and Chrome >= 49. 
-**This means that as of right now, NodeCG graphics will not work in OBS1, XSplit, or CasparCG.** 
-The only platforms that can currently display NodeCG graphics are [OBS Studio](https://obsproject.com/) (with a recent release of its [Browser Source plugin](https://github.com/kc5nra/obs-browser/releases/tag/1.21)) and [vMix](http://www.vmix.com/).
 
 # Who should use NodeCG?
 
