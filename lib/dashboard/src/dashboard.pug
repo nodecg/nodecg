@@ -40,6 +40,9 @@ html(lang='en')
 		script(src='/bower_components/clipboard/dist/clipboard.min.js')
 
 		script(type='text/javascript').
+			// Allow child iframes to reliably find this parent frame
+			window.__nodecg__ = true;
+
 			// Make the global config (and other render-time data) available during runtime.
 			window.ncgConfig = !{JSON.stringify(publicConfig)};
 			window.__renderData__ = {
