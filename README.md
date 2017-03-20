@@ -48,8 +48,11 @@ To run NodeCG in production, [pm2](https://github.com/Unitech/pm2) is recommende
 NodeCG's individual graphics packages are called _bundles_. They can be installed either from the command-line
 (via [_nodecg-cli_](https://www.npmjs.com/package/nodecg-cli)), or by simply placing the folder into the `./bundles` directory.
 
-The easiest way to install bundles is via the command-line using [_nodecg-cli_](https://www.npmjs.com/package/nodecg-cli).
-To install a bundle from Github, enter the owner and repository name:
+The easiest way to install bundles is via the command-line using [nodecg-cli](https://www.npmjs.com/package/nodecg-cli).
+You will need to install [nodecg-cli](https://www.npmjs.com/package/nodecg-cli) before you can use the `nodecg`
+terminal commands.
+
+(Once you have [nodecg-cli](https://www.npmjs.com/package/nodecg-cli) installed) To install a bundle from Github, enter the owner and repository name:
 ```sh
 nodecg install lange/lange-notify
 ```
