@@ -310,7 +310,8 @@
 									bundle="[[panel.bundleName]]"
 									panel="[[panel.name]]"
 									header-color="[[panel.headerColor]]"
-									width="[[panel.width]]">
+									width="[[panel.width]]"
+									on-transitioning-changed="_handlePanelCollapseTransition">
 									<iframe
 										src="/panel/[[panel.bundleName]]/[[panel.file]]"
 										frameborder="0"
