@@ -73,9 +73,9 @@ Avoid installing or uninstalling bundles while NodeCG is running.
 
 # Usage
 - Install a bundle to the `bundles` folder
-- Start NodeCG
-- Open the dashboard (`http://localhost:9090`)
-- Open a graphic from the "Graphics" menu, accessible by clicking the top-left menu button on the dashboard
+- Start NodeCG (`node index.js` or `nodecg start` if you have [nodecg-cli](https://www.npmjs.com/package/nodecg-cli) installed);
+- Open the dashboard (`http://localhost:9090` by default)
+- Open a graphic from the "Graphics" menu
 - You can configure NodeCG by creating and editing [cfg/nodecg.json](http://nodecg.com/tutorial-nodecg-configuration.html).
 
 ## Configuration
@@ -106,18 +106,18 @@ For example, it is not possible to have a tooltip in a panel that extends beyond
 When serving panels, NodeCG injects an instance of the API into the global scope, as well as a few default styles.
 
 It is strongly recommended to use Polymer elements to build panels, though it is not required. 
-Google's [official Polymer elements](https://elements.polymer-project.org/), specifically their 
-[Paper elements](https://elements.polymer-project.org/browse?package=paper-elements), are a great place to start.
-The official [NodeCGElements](https://github.com/NodeCGElements) organization also has 
-a selection of Polymer elements that are integrated with NodeCG's API.
+Google's [official Polymer elements](https://www.webcomponents.org/collection/Polymer/elements), specifically their 
+[Paper elements](https://www.webcomponents.org/collection/PolymerElements/paper-elements), are a great place to start.
+The official [nodecg-dashboard-elements](https://www.webcomponents.org/collection/NodeCGElements/nodecg-dashboard-elements) 
+collection also has a selection of Polymer elements that are integrated with NodeCG's API.
 
 ## Extensions
 Extensions are server-side code. They are standard Node.js JavaScript files. An extension must export a function
 that accepts a single argument. That argument will be an instance of the NodeCG API:
 ```js
 // bundles/my-bundle/extension.js
-module.exports = function(nodecg) {
-    nodecg.listenFor('foo', function() {
+module.exports = nodecg => {
+    nodecg.listenFor('foo', () => {
         console.log('bar');
     });
 };
@@ -169,6 +169,7 @@ NodeCG is provided under the MIT license, which is available to read in the
 * [Matt "Bluee" McNamara](http://mattmcn.com/)  
 * [Alex "Lange" Van Camp](http://alexvan.camp)  
 * ["tsc"](http://fwdcp.net)  
+* [Chris Hanel](http://www.chrishanel.com)
 
 ## Special Thanks
 * [Atmo](https://github.com/atmosfar), original dashboard concept and code  
