@@ -14,14 +14,13 @@
 <link rel="import" href="/bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="/bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="/bower_components/paper-item/paper-icon-item.html">
-<link rel="import" href="/bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="/bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="assets/ncg-assets.html">
 <link rel="import" href="graphics/ncg-graphics.html">
 <link rel="import" href="mixer/ncg-mixer.html">
-<link rel="import" href="ncg-dashboard-panel.html">
 <link rel="import" href="ncg-dialog.html">
+<link rel="import" href="ncg-workspace.html">
 <link rel="import" href="settings/ncg-settings.html">
 
 <dom-module id="ncg-dashboard">
@@ -135,38 +134,10 @@
 				font-weight: bold;
 			}
 
-			iframe {
-				width: 100%;
-			}
-
-			#loadingSpinner {
-				position: fixed;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%);
-				width: 68px;
-				height: 68px;
-				--paper-spinner-stroke-width: 5px;
-				--paper-spinner-layer-1-color: var(--nodecg-info-color);
-				--paper-spinner-layer-2-color: var(--nodecg-configure-color);
-				--paper-spinner-layer-3-color: var(--nodecg-success-color);
-				--paper-spinner-layer-4-color: var(--nodecg-danger-color);
-			}
-
 			ncg-dialog paper-dialog-scrollable {
 				--paper-dialog-scrollable: {
 					max-width: none!important;
 				}
-			}
-
-			#panels {
-				width: 100%;
-				height: 100%;
-				transition: opacity 500ms ease, transform 600ms ease-out;
-				opacity: 0;
-				pointer-events: none;
-				transform: translateY(40px);
-				box-sizing: border-box;
 			}
 
 			section {
@@ -192,7 +163,7 @@
 					padding: 0;
 				}
 
-				#panels {
+				ncg-workspace {
 					padding: 6px;
 				}
 
@@ -301,28 +272,11 @@
 				</app-header>
 
 				<iron-pages id="pages" selected="[[route.path]]" attr-for-selected="route">
-					<section route="">
-						<div id="panels" on-tap="shiftPackery">
-							<template is="dom-repeat" items="[[panels]]" as="panel">
-								<ncg-dashboard-panel
-									id="[[panel.bundleName]]_[[panel.name]]"
-									display-title="[[panel.title]]"
-									bundle="[[panel.bundleName]]"
-									panel="[[panel.name]]"
-									header-color="[[panel.headerColor]]"
-									width="[[panel.width]]"
-									on-transitioning-changed="_handlePanelCollapseTransition">
-									<iframe
-										src="/panel/[[panel.bundleName]]/[[panel.file]]"
-										frameborder="0"
-										scrolling="no">
-									</iframe>
-								</ncg-dashboard-panel>
-							</template>
-						</div>
-
-						<paper-spinner id="loadingSpinner" active></paper-spinner>
-					</section>
+					<template is="dom-repeat" items="[[workspaces]]" as="workspace">
+						<section route="[[workspace.route]]">
+							<ncg-workspace workspace="[[workspace]]" route="[[route]]"></ncg-workspace>
+						</section>
+					</template>
 
 					<section route="graphics">
 						<ncg-graphics></ncg-graphics>
