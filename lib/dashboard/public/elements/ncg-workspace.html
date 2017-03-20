@@ -1,0 +1,65 @@
+<link rel="import" href="/bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="ncg-dashboard-panel.html">
+
+<dom-module id="ncg-workspace">
+	<template>
+		<style>
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+				transition: opacity 500ms ease, transform 600ms ease-out;
+				opacity: 0;
+				pointer-events: none;
+				transform: translateY(40px);
+				box-sizing: border-box;
+			}
+
+			#panels {
+				width: 100%;
+				height: 100%;
+			}
+
+			#loadingSpinner {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%);
+				width: 68px;
+				height: 68px;
+				--paper-spinner-stroke-width: 5px;
+				--paper-spinner-layer-1-color: var(--nodecg-info-color);
+				--paper-spinner-layer-2-color: var(--nodecg-configure-color);
+				--paper-spinner-layer-3-color: var(--nodecg-success-color);
+				--paper-spinner-layer-4-color: var(--nodecg-danger-color);
+			}
+
+			iframe {
+				width: 100%;
+			}
+		</style>
+
+		<div id="panels">
+			<template is="dom-repeat" items="[[panels]]" as="panel">
+				<ncg-dashboard-panel
+					id="[[panel.bundleName]]_[[panel.name]]"
+					display-title="[[panel.title]]"
+					bundle="[[panel.bundleName]]"
+					panel="[[panel.name]]"
+					header-color="[[panel.headerColor]]"
+					width="[[panel.width]]"
+					on-transitioning-changed="_handlePanelCollapseTransition">
+					<iframe
+						src="/panel/[[panel.bundleName]]/[[panel.file]]"
+						frameborder="0"
+						scrolling="no">
+					</iframe>
+				</ncg-dashboard-panel>
+			</template>
+		</div>
+
+		<paper-spinner id="loadingSpinner" active></paper-spinner>
+	</template>
+
+	<script src="ncg-workspace.js"></script>
+</dom-module>
