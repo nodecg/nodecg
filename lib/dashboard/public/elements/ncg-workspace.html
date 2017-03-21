@@ -52,7 +52,9 @@
 					<iframe
 						src="/panel/[[panel.bundleName]]/[[panel.file]]"
 						frameborder="0"
-						scrolling="no">
+						scrolling="no"
+						id="[[panel.bundleName]]_[[panel.name]]_iframe"
+						on-iframe-resized="shiftPackery">
 					</iframe>
 				</ncg-dashboard-panel>
 			</template>
