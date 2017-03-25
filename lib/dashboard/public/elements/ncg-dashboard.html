@@ -79,18 +79,12 @@
 				--paper-tab-content: {
 					font-weight: 500!important; /* don't bold when focused */
 					color: #00bebe;
+					@apply(--layout-vertical);
+					@apply(--layout-center-center);
 				};
 				--paper-tab-content-unselected: {
 					color: black;
 				};
-			}
-
-			paper-tab a {
-				color: inherit;
-				font-weight: inherit;
-				font-size: inherit;
-				@apply(--layout-vertical);
-				@apply(--layout-center-center);
 			}
 
 			.workspaceTab {
@@ -265,27 +259,27 @@
 								selected="[[routeData.page]]"
 								attr-for-selected="route">
 								<template is="dom-repeat" items="[[workspaces]]" as="workspace">
-									<paper-tab class="workspaceTab" route="[[workspace.route]]" aria-label="[[workspace.name]]">
-										<a href="#[[workspace.route]]">[[workspace.name]]</a>
+									<paper-tab
+										class="workspaceTab"
+										route="[[workspace.route]]"
+										aria-label="[[workspace.name]]"
+										on-tap="_selectRoute">
+										[[workspace.name]]
 									</paper-tab>
 								</template>
 							</paper-tabs>
 
 							<paper-tabs selected="[[routeData.page]]" attr-for-selected="route">
 								<template is="dom-repeat" items="[[pages]]" as="page" initial-count="1">
-									<paper-tab route="[[page.route]]" aria-label="[[page.name]]">
-										<a href="#[[page.route]]">
-											<iron-icon item-icon icon="[[page.icon]]"></iron-icon>
-											[[page.name]]
-										</a>
+									<paper-tab route="[[page.route]]" aria-label="[[page.name]]" on-tap="_selectRoute">
+										<iron-icon item-icon icon="[[page.icon]]"></iron-icon>
+										[[page.name]]
 									</paper-tab>
 								</template>
 
-								<paper-tab hidden="[[loginDisabled]]" aria-label="Sign Out">
-									<a href="/logout" on-tap="logout">
-										<iron-icon item-icon icon="exit-to-app"></iron-icon>
-										Sign Out
-									</a>
+								<paper-tab hidden="[[loginDisabled]]" aria-label="Sign Out" on-tap="logout">
+									<iron-icon item-icon icon="exit-to-app"></iron-icon>
+									Sign Out
 								</paper-tab>
 							</paper-tabs>
 						</template>
