@@ -10,7 +10,7 @@
   "bugs": "https://github.com/nodecg/nodecg/issues",
   "license": "MIT",
   "dependencies": {
-    "@nodecg/bundle-manager": "^0.5.4",
+    "@nodecg/bundle-manager": "^0.5.5",
     "@nodecg/logger": "^0.2.0",
     "body-parser": "^1.14.1",
     "cheerio": "^0.22.0",
