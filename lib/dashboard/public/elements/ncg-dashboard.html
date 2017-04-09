@@ -141,15 +141,19 @@
 
 			section {
 				box-sizing: border-box;
-				@apply(--layout-vertical);
 				@apply(--layout-flex);
+			}
+
+			section:not(.section-workspace) {
+				padding: 32px;
+				@apply(--layout-vertical);
 				@apply(--layout-center);
 			}
 
 			#pages {
+				height: 100%;
 				overflow-y: auto;
 				box-sizing: border-box;
-				padding: 32px;
 				@apply(--layout-vertical);
 				@apply(--layout-flex-auto);
 			}
@@ -175,11 +179,11 @@
 			 * Phone
 			 */
 			@media (max-width: 640px) {
-				#pages {
-					padding: 0;
+				section {
+					padding: 0!important;
 				}
 
-				ncg-workspace {
+				ncg-workspace:not([fullbleed]) {
 					padding: 6px;
 				}
 
@@ -264,7 +268,7 @@
 										route="[[workspace.route]]"
 										aria-label="[[workspace.name]]"
 										on-tap="_selectRoute">
-										[[workspace.name]]
+										[[workspace.label]]
 									</paper-tab>
 								</template>
 							</paper-tabs>
@@ -288,7 +292,7 @@
 
 				<iron-pages id="pages" selected="[[route.path]]" attr-for-selected="route">
 					<template is="dom-repeat" items="[[workspaces]]" as="workspace">
-						<section route="[[workspace.route]]">
+						<section route="[[workspace.route]]" class="section-workspace">
 							<ncg-workspace workspace="[[workspace]]" route="[[route]]"></ncg-workspace>
 						</section>
 					</template>

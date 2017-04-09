@@ -8,17 +8,28 @@
 				display: block;
 				width: 100%;
 				height: 100%;
-				transition: opacity 500ms ease, transform 600ms ease-out;
-				opacity: 0;
 				pointer-events: none;
-				transform: translateY(40px);
 				box-sizing: border-box;
+				overflow: hidden;
+			}
+
+			#panels {
+				transform: translateY(40px);
+				opacity: 0;
+				transition: opacity 500ms ease, transform 600ms ease-out;
+			}
+
+			:host(:not([fullbleed])) {
+				padding: 32px;
+			}
+
+			:host(:not([fullbleed])) #panels {
+				padding-bottom: 32px;
 			}
 
 			#panels {
 				width: 100%;
 				height: 100%;
-				padding-bottom: 32px;
 			}
 
 			#loadingSpinner {
@@ -49,13 +60,15 @@
 					panel="[[panel.name]]"
 					header-color="[[panel.headerColor]]"
 					width="[[panel.width]]"
-					on-transitioning-changed="_handlePanelCollapseTransition">
+					on-transitioning-changed="_handlePanelCollapseTransition"
+					fullbleed="[[panel.fullbleed]]">
 					<iframe
 						src="/panel/[[panel.bundleName]]/[[panel.file]]"
 						frameborder="0"
-						scrolling="no"
+						scrolling$="[[_calcIframeScrolling(panel.fullbleed)]]"
 						id="[[panel.bundleName]]_[[panel.name]]_iframe"
-						on-iframe-resized="shiftPackery">
+						on-iframe-resized="shiftPackery"
+						fullbleed$="[[panel.fullbleed]]">
 					</iframe>
 				</ncg-dashboard-panel>
 			</template>

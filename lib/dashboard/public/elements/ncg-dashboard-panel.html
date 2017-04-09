@@ -13,6 +13,11 @@
 				width: 128px;
 			}
 
+			:host([fullbleed]) {
+				width: 100%!important;
+				height: 100%!important;
+			}
+
 			:host([width="1"]) {
 				width: 128px;
 			}
@@ -106,6 +111,23 @@
 				padding: 0;
 				background-color: #f5f5f5;
 			}
+
+			:host([fullbleed]) {
+				@apply(--layout-vertical);
+			}
+
+			/* When fullbleed, buttons are always visible */
+			:host([fullbleed]) #buttons {
+				transform: translateX(0%);
+			}
+
+			:host([fullbleed]) #body {
+				@apply(--layout-flex);
+			}
+
+			:host([fullbleed]) ::content iframe {
+				height: 100%;
+			}
 		</style>
 
 		<iron-localstorage
@@ -113,18 +135,28 @@
 		   	value="{{opened}}"
 		   	on-iron-localstorage-load-empty="initializeDefaultOpened"></iron-localstorage>
 
-		<paper-material>
+		<paper-material id="material">
 			<div id="header">
 				<span id="displayTitle">[[displayTitle]]</span>
 				<div id="buttonsContainer">
 					<iron-icon id="more" icon="chevron-left"></iron-icon>
 					<div id="buttons">
-						<paper-icon-button id="expandBtn" on-click="toggleCollapse" icon="unfold-less"></paper-icon-button>
-						<paper-icon-button id="dragHandle" icon="open-with"></paper-icon-button>
+						<paper-icon-button
+							id="expandBtn"
+							on-click="toggleCollapse"
+							icon="unfold-less"
+							hidden="[[fullbleed]]"></paper-icon-button>
+
+						<paper-icon-button
+							id="dragHandle"
+							icon="open-with"
+							hidden="[[fullbleed]]"></paper-icon-button>
+
 						<paper-icon-button id="infoBtn" icon="info"></paper-icon-button>
 					</div>
 				</div>
 			</div>
+
 			<iron-collapse id="collapse" opened="{{opened}}" transitioning="{{transitioning}}">
 				<div id="body" class="collapse-content">
 					<content></content>
