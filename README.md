@@ -201,4 +201,4 @@ Check which branch you should PR to. NodeCG is still in an unstable state, so we
 
 ## License
 
-[MIT Liencese](https://github.com/nodecg/nodecg/blob/master/LICENSE) © 2016 Alex Van Camp, Matthew McNamara, and contributors
+[MIT Liencese](https://github.com/nodecg/nodecg/blob/master/LICENSE) © 2017 Alex Van Camp, Matthew McNamara, and contributors
