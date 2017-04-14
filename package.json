@@ -8,7 +8,9 @@
     "url": "https://github.com/nodecg/nodecg.git"
   },
   "bugs": "https://github.com/nodecg/nodecg/issues",
+  "homepage": "http://nodecg.com/",
   "license": "MIT",
+  "keywords": ["graphics", "nodecg", "node", "dynamic"],
   "dependencies": {
     "@nodecg/bundle-manager": "^0.5.5",
     "@nodecg/logger": "^0.2.0",
