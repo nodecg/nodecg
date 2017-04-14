@@ -1,9 +1,13 @@
-[![NodeCG](media/splash.png)](https://nodecg.com/)
-> Create broadcast graphics using Node.js & whatever browser frameworks or libraries you want.
+# NodeCG
 
+[![NodeCG](media/splash.png)](https://nodecg.com/)
+
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nodecg/nodecg)
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
 [![Coverage Status](https://coveralls.io/repos/nodecg/nodecg/badge.svg?branch=master&service=github)](https://coveralls.io/github/nodecg/nodecg?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/nodecg/nodecg.svg)](https://greenkeeper.io/)
+
+> Create broadcast graphics using Node.js and a browser
 
 NodeCG is a broadcast graphics framework and application. It enables you to write complex, dynamic broadcast graphics
 using the web platform. NodeCG has no graphics or drawing primitives of its own. Instead, NodeCG provides
@@ -15,25 +19,45 @@ can render HTML, including:
 - [vMix](http://www.vmix.com/)
 
 > Don't see your preferred streaming software on this list? NodeCG graphics require Chrome 49 or newer.
+
 As long as your streaming software has support for HTML and uses a somewhat recent version of Chrome, 
 NodeCG will probably work.
 
 Looking for a list of NodeCG bundles and resources? Check out [awesome-nodecg](https://github.com/nodecg/awesome-nodecg/blob/master/README.md).
 
-Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!  
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nodecg/nodecg)
+Have questions about NodeCG, or just want to say 'hi'? [Join our Gitter chatroom](https://gitter.im/nodecg/nodecg)!
 
-# Who should use NodeCG?
+**Who should use NodeCG?**
 
 NodeCG is a programming framework. As such, it's most useful to developers capable of creating their own graphics
 using HTML, CSS, and JavaScript. NodeCG is still in beta and the ecosystem of bundles is quite small.
 Those expecting to download NodeCG and use off-the-shelf bundles to get a complete stream overlay
 without writing any code may be disappointed.
 
-# Installation
-Install [node.js (version 6 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
+## Table of Contents
+
+- [Install](#install)
+	- [Installing bundles](#installing-bundles)
+- [Usage](#usage)
+	- [Configuration](#configuration)
+- [Bundles](#bundles)
+	- [Graphics](#graphics)
+	- [Dashboard Panels](#dashboard-panels)
+	- [Extensions](#extensions)
+	- [`package.json` manifest](#packagejson-manifest)
+- [Maintainers](#maintainers)
+	- [Special Thanks](#special-thanks)
+- [Contribute](#contribute)
+	- [Running tests locally](#running-tests-locally)
+- [License](#license)
+
+## Install
+
+Install [Node.js (version 6 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
+
 Then, run the following commands from a terminal (command prompt):
-```
+
+```sh
 npm install -g bower
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
@@ -44,7 +68,7 @@ node index.js
 
 To run NodeCG in production, [pm2](https://github.com/Unitech/pm2) is recommended.
 
-## Installing bundles
+### Installing bundles
 NodeCG's individual graphics packages are called _bundles_. They can be installed either from the command-line
 (via [_nodecg-cli_](https://www.npmjs.com/package/nodecg-cli)), or by simply placing the folder into the `./bundles` directory.
 
@@ -64,40 +88,40 @@ nodecg install bitbucket:username/repo-name
 
 ... to install a bundle from any other git provider, enter the git URL:
 ```sh
-nodecg install https://github.com/GamesDoneQuick/agdq16-layouts.git
+nodecg install https://gitlab.com/username/repo-name.git
 ```
 
 Bundles are just directories inside the `./bundles` folder. 
 They can always be added and removed by simply moving them into or out of that folder. 
 Avoid installing or uninstalling bundles while NodeCG is running.
 
-# Usage
-- Install a bundle to the `bundles` folder
-- Start NodeCG (`node index.js` or `nodecg start` if you have [nodecg-cli](https://www.npmjs.com/package/nodecg-cli) installed);
-- Open the dashboard (`http://localhost:9090` by default)
-- Open a graphic from the "Graphics" menu
+## Usage
+- Install a bundle to the `bundles` folder.
+- Start NodeCG (`node index.js` or `nodecg start` if you have [nodecg-cli](https://www.npmjs.com/package/nodecg-cli) installed).
+- Open the dashboard (`http://localhost:9090` by default).
+- Open a graphic from the "Graphics" menu.
 - You can configure NodeCG by creating and editing [cfg/nodecg.json](http://nodecg.com/tutorial-nodecg-configuration.html).
 
-## Configuration
+### Configuration
 `./cfg/nodecg.json` is an optional file that you can create to configure NodeCG.
 See the [NodeCG Configuration tutorial](http://nodecg.com/tutorial-nodecg-configuration.html) for more information on configuring NodeCG.
 
-# Bundles
+## Bundles
 Each NodeCG graphic is called a _bundle_. A bundle has one or more of the following:
-- _Graphics_: Visual elements to render and broadcast
-- _Dashboard Panels_: Controls used to manipulate and manage the bundle
-- _Extension_: Server-side code
+- _Graphics_: Visual elements to render and broadcast.
+- _Dashboard Panels_: Controls used to manipulate and manage the bundle.
+- _Extension_: Server-side code.
 
 A bundle can have multiple graphics and dashboard panels, and an extension can be split up into multiple files.
 
 If you wish to quickly start a new bundle from a template, try [generator-nodecg](https://github.com/nodecg/generator-nodecg).
 
-## Graphics
+### Graphics
 Graphics are, as the name implies, the actual graphics intended for broadcast. 
 They are standard HTML webpages, and there are no restrictions on their content. 
 When serving a graphic, NodeCG injects an instance of the API into the global scope.
 
-## Dashboard Panels
+### Dashboard Panels
 Dashboard panels are the interface used to control and manage a bundle. They too are standard HTML webpages. 
 Each panel is served as an iframe on the dashboard. This is done to ensure full code and style encapsulation. 
 Because dashboard panels are iframes, they cannot render any content outside of their bounding box. 
@@ -111,7 +135,7 @@ Google's [official Polymer elements](https://www.webcomponents.org/collection/Po
 The official [nodecg-dashboard-elements](https://www.webcomponents.org/collection/NodeCGElements/nodecg-dashboard-elements) 
 collection also has a selection of Polymer elements that are integrated with NodeCG's API.
 
-## Extensions
+### Extensions
 Extensions are server-side code. They are standard Node.js JavaScript files. An extension must export a function
 that accepts a single argument. That argument will be an instance of the NodeCG API:
 ```js
@@ -132,14 +156,28 @@ use the former approach. If your extension is broken up into multiple files, you
 and keep all those files in a single `extension` folder. If using an `extension` folder, **NodeCG will only load
 `your-bundle/extension/index.js`**. It is up to you to load any other files that your extension needs via `require`.
 
-## package.json manifest
+### `package.json` manifest
 Every bundle must have a [`package.json`](https://docs.npmjs.com/files/package.json). In addition to the required fields
 like `name` and `version` outlined in that link, NodeCG bundles must also have a `nodecg` object in their `package.json`
 with some additional properties that tell NodeCG about the bundle and how to load it.
 
 See the [manifest tutorial](http://nodecg.com/tutorial-manifest.html) for more information on creating a valid `package.json` for a bundle.
 
-# Contributing
+## Maintainers
+
+* [Matt "Bluee" McNamara](http://mattmcn.com/)  
+* [Alex "Lange" Van Camp](http://alexvan.camp)  
+* ["tsc"](http://fwdcp.net)  
+* [Chris Hanel](http://www.chrishanel.com)
+
+### Special Thanks
+* [Atmo](https://github.com/atmosfar), original dashboard concept and code  
+* [Alex "Lange" Van Camp](http://alexvan.camp), designer & developer of [toth-overlay](https://github.com/TipoftheHats/toth-overlay)  
+
+## Contribute
+
+Please contribute! This is an open source project. If you would like to report a bug or suggest a feature, [open an issue](https://github.com/nodecg/nodecg/issues). Or, to open a Pull Request:
+
 1. Fork it ( http://github.com/nodecg/nodecg/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
@@ -148,29 +186,19 @@ See the [manifest tutorial](http://nodecg.com/tutorial-manifest.html) for more i
 
 **Before creating your pull request:**
 
-1. Ensure your code matches our existing style using our provided [EditorConfig](http://editorconfig.org/) options
-2. Ensure the existing tests pass, or are updated appropriately, with `npm test`
-3. For new features, you should add new tests
+1. Ensure your code matches our existing style using our provided [EditorConfig](http://editorconfig.org/) options.
+2. Ensure the existing tests pass, or are updated appropriately, with `npm test`.
+3. For new features, you should add new tests.
 
 Check which branch you should PR to. NodeCG is still in an unstable state, so we follow these [semver](http://semver.org/) guidelines:
 - Bug fixes and new features go to the next 'patch' branch (`0.current.x`)
 - Breaking changes go to the next 'minor' branch (`0.next.0`)
 
-## Running tests locally
+### Running tests locally
 1. Install selenium-standalone (`npm install --global selenium-standalone`), then run the installer (`selenium-standalone install`)
 2. Open one terminal and start Selenium: `selenium-standalone start`
 3. Open a second terminal, navigate to the NodeCG root and run `npm test`
 
-# License
-NodeCG is provided under the MIT license, which is available to read in the 
-[LICENSE](https://github.com/nodecg/nodecg/blob/master/LICENSE) file.
+## License
 
-# Contributors
-* [Matt "Bluee" McNamara](http://mattmcn.com/)  
-* [Alex "Lange" Van Camp](http://alexvan.camp)  
-* ["tsc"](http://fwdcp.net)  
-* [Chris Hanel](http://www.chrishanel.com)
-
-## Special Thanks
-* [Atmo](https://github.com/atmosfar), original dashboard concept and code  
-* [Alex "Lange" Van Camp](http://alexvan.camp), designer & developer of [toth-overlay](https://github.com/TipoftheHats/toth-overlay)  
+[MIT Liencese](https://github.com/nodecg/nodecg/blob/master/LICENSE) © 2016 Alex Van Camp, Matthew McNamara, and contributors
