@@ -199,6 +199,10 @@ Check which branch you should PR to. NodeCG is still in an unstable state, so we
 2. Open one terminal and start Selenium: `selenium-standalone start`
 3. Open a second terminal, navigate to the NodeCG root and run `npm test`
 
+### Code of Conduct
+
+Note that all contributions and discussions around NodeCG take place under our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## License
 
 [MIT Liencese](https://github.com/nodecg/nodecg/blob/master/LICENSE) © 2017 Alex Van Camp, Matthew McNamara, and contributors
