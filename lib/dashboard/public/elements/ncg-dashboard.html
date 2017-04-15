@@ -151,8 +151,8 @@
 			}
 
 			#pages {
-				height: 100%;
-				overflow-y: auto;
+				height: 1px; /* just need to specify *any* height, the rest is then taken care of somehow? */
+				overflow: auto;
 				box-sizing: border-box;
 				@apply(--layout-vertical);
 				@apply(--layout-flex-auto);
