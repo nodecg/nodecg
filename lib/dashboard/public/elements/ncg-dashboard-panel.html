@@ -67,6 +67,10 @@
 				overflow: hidden;
 			}
 
+			#header a {
+				color: inherit;
+			}
+
 			#displayTitle {
 				position: absolute;
 				left: 15px;
@@ -141,6 +145,13 @@
 				<div id="buttonsContainer">
 					<iron-icon id="more" icon="chevron-left"></iron-icon>
 					<div id="buttons">
+						<a href="[[standaloneUrl]]" target="_blank" hidden="[[fullbleed]]">
+							<paper-icon-button
+								id="openStandalone"
+								icon="open-in-new"></paper-icon-button>
+						</a>
+
+
 						<paper-icon-button
 							id="expandBtn"
 							on-click="toggleCollapse"
