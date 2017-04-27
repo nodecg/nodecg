@@ -23,7 +23,7 @@
     "express-nedb-session": "^0.1.1",
     "express-session": "^1.11.3",
     "extend": "^3.0.0",
-    "fs-extra": "^2.0.0",
+    "fs-extra": "^3.0.0",
     "httpolyglot": "^0.1.1",
     "is-my-json-valid": "^2.12.3",
     "jade": "^1.11.0",
