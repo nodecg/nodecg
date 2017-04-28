@@ -18,7 +18,7 @@
     "broadcast"
   ],
   "dependencies": {
-    "@nodecg/bundle-manager": "^0.5.5",
+    "@nodecg/bundle-manager": "github:nodecg/bundle-manager#4deca0060e5e73b8ebaf642888ae81f88138df3f",
     "@nodecg/logger": "^0.2.0",
     "body-parser": "^1.14.1",
     "cheerio": "^0.22.0",
