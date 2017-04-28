@@ -10,7 +10,13 @@
   "bugs": "https://github.com/nodecg/nodecg/issues",
   "homepage": "http://nodecg.com/",
   "license": "MIT",
-  "keywords": ["graphics", "nodecg", "node", "dynamic", "broadcast"],
+  "keywords": [
+    "graphics",
+    "nodecg",
+    "node",
+    "dynamic",
+    "broadcast"
+  ],
   "dependencies": {
     "@nodecg/bundle-manager": "^0.5.5",
     "@nodecg/logger": "^0.2.0",
@@ -20,6 +26,7 @@
     "clone": "^2.0.0",
     "compression": "^1.6.0",
     "cookie-parser": "^1.4.1",
+    "deasync": "^0.1.9",
     "deep-equal": "^1.0.1",
     "express": "^4.13.3",
     "express-nedb-session": "^0.1.1",
@@ -29,6 +36,7 @@
     "httpolyglot": "^0.1.1",
     "is-my-json-valid": "^2.12.3",
     "json-schema-defaults": "^0.3.0",
+    "json-schema-ref-parser": "^3.1.2",
     "lodash.debounce": "^4.0.8",
     "minimist": "^1.2.0",
     "multer": "^1.1.0",
