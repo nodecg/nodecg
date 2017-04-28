@@ -8,16 +8,8 @@ const request = require('request');
 const C = require('./setup/test-constants');
 
 describe('per-bundle bower dependencies', () => {
-	it('should be accessible via /panel', done => {
-		request(`${C.PANEL_COMPONENTS_URL}/webcomponentsjs/webcomponents.js`, (error, response) => {
-			assert.isNull(error);
-			expect(response.statusCode).to.equal(200);
-			done();
-		});
-	});
-
-	it('should be accessible via /graphics', done => {
-		request(`${C.GRAPHIC_URL}/components/webcomponentsjs/webcomponents.js`, (error, response) => {
+	it('should be accessible via /bundle/:bundleName/bower_components', done => {
+		request(`${C.BUNDLE_BOWER_COMPONENTS_URL}/webcomponentsjs/webcomponents.js`, (error, response) => {
 			assert.isNull(error);
 			expect(response.statusCode).to.equal(200);
 			done();
