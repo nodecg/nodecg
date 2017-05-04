@@ -154,7 +154,10 @@ before(function (done) {
 				}, 50);
 			})
 			.timeouts('script', 5000)
-			.call(done);
+			.call(done)
+			.catch(err => {
+				done(err);
+			});
 	});
 
 	e.server.start();

@@ -397,6 +397,40 @@ describe('client-side replicant schemas', function () {
 			})
 			.catch(err => done(err));
 	});
+
+	// This isn't _actually_ testing schemas, it's just a bug that is easiest to detect when using a schema.
+	// The problem was that certain cases were assigning incorrect paths to the metadataMap.
+	// This use case (from another project) just so happened to trigger this error.
+	// I more or less copied that code and schema directly here just to write the test as fast as possible.
+	// This test should probably be re-written to be more targeted and remove any cruft.
+	// Lange - 2017/05/04
+	it('shouldn\'t fuck up', done => {
+		e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('schedule:state');
+			rep.once('declared', () => {
+				rep.value.matchMap = [
+					false, false, false, false,
+					false, false, false, false
+				];
+
+				rep.on('change', newVal => {
+					if (!newVal.matchMap.includes(true)) {
+						try {
+							rep.value.matchMap[6] = true;
+							done(true);
+						} catch (e) {
+							done(e.message);
+						}
+					}
+				});
+			});
+		})
+		.then(ret => {
+			assert.isTrue(ret.value);
+			done();
+		})
+		.catch(err => done(err));
+	});
 });
 
 describe('server-side replicant schemas', () => {
