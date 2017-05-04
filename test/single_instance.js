@@ -8,14 +8,22 @@ describe('single-instance graphics', function () {
 	this.timeout(10000);
 
 	before(function (done) {
-		this.timeout(0);
+		this.timeout(30000);
 		e.browser.client
 			.newWindow(C.SINGLE_INSTANCE_URL, 'NodeCG test single instance graphic', '')
 			.getCurrentTabId()
 			.then(tabId => {
 				e.browser.tabs.singleInstance = tabId;
-				done();
-			});
+			})
+			.executeAsync(done => {
+				const checkForApi = setInterval(() => {
+					if (typeof window.singleInstanceApi !== 'undefined') {
+						clearInterval(checkForApi);
+						done();
+					}
+				}, 50);
+			})
+			.call(done);
 	});
 
 	it('shouldn\'t enter an infinite redirect loop when including a polymer element that loads an external stylesheet',
