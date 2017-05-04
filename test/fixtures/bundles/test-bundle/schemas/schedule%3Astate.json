@@ -1,0 +1,18 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"matchMap": {
+			"type": "array",
+			"minItems": 8,
+			"maxItems": 8,
+			"items": {
+				"type": "boolean"
+			}
+		}
+	},
+	"default": {
+		"matchMap": [true, true, true, false, false, false, false, false]
+	}
+}
