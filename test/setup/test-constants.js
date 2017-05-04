@@ -12,7 +12,7 @@ module.exports = {
 	TEST_PANEL_URL: `${TEST_BUNDLE_ROOT}/dashboard/panel.html`,
 	BUNDLE_BOWER_COMPONENTS_URL: `${TEST_BUNDLE_ROOT}/bower_components`,
 	GRAPHIC_URL: `${TEST_BUNDLE_ROOT}/graphics`,
-	SINGLE_INSTANCE_URL: `${TEST_BUNDLE_ROOT}/single_instance.html`,
+	SINGLE_INSTANCE_URL: `${TEST_BUNDLE_ROOT}/graphics/single_instance.html`,
 	CONFIG: config,
 	REPLICANTS_ROOT: path.join(process.env.NODECG_ROOT, 'db/replicants'),
 	ASSETS_ROOT: path.join(process.env.NODECG_ROOT, 'assets')
