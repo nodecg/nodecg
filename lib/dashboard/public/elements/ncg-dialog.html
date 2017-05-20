@@ -68,26 +68,24 @@ Lange - 1/28/2016
 				width: 1424px;
 			}
 
-			:host > ::content iframe {
+			:host > ::slotted(iframe) {
 				box-sizing: border-box;
 				width: 100%;
-			}
-
-			:host > ::content iframe {
 				margin: 0 !important;
 				padding: 0 !important;
 			}
 
-			:host > ::content .buttons {
+			:host > ::slotted(.buttons) {
 				order: 3;
 			}
 
-			:host > ::content > *:last-child {
+			/* TODO: check that this still does the right thing */
+			:host > ::slotted(*:last-child) {
 				margin-bottom: 0;
 			}
 		</style>
 
-		<content></content>
+		<slot></slot>
 	</template>
 
 	<script src="/dashboard/elements/ncg-dialog.js"></script>

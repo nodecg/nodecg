@@ -7,7 +7,7 @@
 	<template>
 		<style>
 			:host {
-				@apply(--layout-horizontal);
+				@apply --layout-horizontal;
 				align-items: center;
 			}
 
@@ -21,13 +21,13 @@
 			#leftWrapper {
 				min-width: 0;
 				padding-right: 8px;
-				@apply(--layout-vertical);
-				@apply(--layout-flex);
-				@apply(--layout-center-justified);
+				@apply --layout-vertical;
+				@apply --layout-flex;
+				@apply --layout-center-justified;
 			}
 
 			#name {
-				@apply(--paper-font-title);
+				@apply --paper-font-title;
 				overflow: hidden;
 				text-overflow: ellipsis;
 			}
@@ -35,13 +35,13 @@
 			#select {
 				display: none;
 				width: 150px;
-				@apply(--layout-flex-none);
+				@apply --layout-flex-none;
 			}
 
 
 
 			paper-slider {
-				@apply(--layout-flex-none);
+				@apply --layout-flex-none;
 				--paper-slider-input: {
 					width: 80px;
 				}

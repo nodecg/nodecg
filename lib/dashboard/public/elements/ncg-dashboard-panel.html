@@ -60,10 +60,10 @@
 
 			#header {
 				color: var(--google-grey-100);
-				@apply(--layout-horizontal);
-				@apply(--layout-end-justified);
-				@apply(--layout-center);
-				@apply(--paper-font-title);
+				@apply --layout-horizontal;
+				@apply --layout-end-justified;
+				@apply --layout-center;
+				@apply --paper-font-title;
 				overflow: hidden;
 			}
 
@@ -78,8 +78,8 @@
 			}
 
 			#buttons {
-				@apply(--layout-horizontal);
-				@apply(--layout-center);
+				@apply --layout-horizontal;
+				@apply --layout-center;
 				padding-left: 8px;
 				transform: translateX(100%);
 				transition: transform 200ms ease;
@@ -117,7 +117,7 @@
 			}
 
 			:host([fullbleed]) {
-				@apply(--layout-vertical);
+				@apply --layout-vertical;
 			}
 
 			/* When fullbleed, buttons are always visible */
@@ -126,10 +126,10 @@
 			}
 
 			:host([fullbleed]) #body {
-				@apply(--layout-flex);
+				@apply --layout-flex;
 			}
 
-			:host([fullbleed]) ::content iframe {
+			:host([fullbleed]) ::slotted(iframe) {
 				height: 100%;
 			}
 		</style>
@@ -170,7 +170,7 @@
 
 			<iron-collapse id="collapse" opened="{{opened}}" transitioning="{{transitioning}}">
 				<div id="body" class="collapse-content">
-					<content></content>
+					<slot></slot>
 				</div>
 			</iron-collapse>
 		</paper-material>

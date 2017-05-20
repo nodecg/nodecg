@@ -16,6 +16,9 @@
 <link rel="import" href="/bower_components/paper-item/paper-icon-item.html">
 <link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="/bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="/bower_components/polymer/lib/elements/custom-style.html">
+<link rel="import" href="/bower_components/polymer/lib/utils/debounce.html">
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
 <link rel="import" href="assets/ncg-assets.html">
 <link rel="import" href="graphics/ncg-graphics.html">
 <link rel="import" href="mixer/ncg-mixer.html">
@@ -29,7 +32,7 @@
 			:host {
 				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 				overflow: hidden;
-				@apply(--layout-fullbleed);
+				@apply --layout-fullbleed;
 			}
 
 			app-drawer-layout,
@@ -40,7 +43,7 @@
 			app-header {
 				background-color: rgb(255, 255, 255);
 				--app-header-shadow: {
-					box-shadow: inset 0px 5px 6px -3px rgba(0, 0, 0, 0.2);
+					box-shadow: inset 0 5px 6px -3px rgba(0, 0, 0, 0.2);
 					height: 10px;
 					bottom: -10px;
 				};
@@ -53,15 +56,15 @@
 			}
 
 			.spacer {
-				@apply(--layout);
-				@apply(--layout-flex-auto);
-				@apply(--layout-center-center);
+				@apply --layout;
+				@apply --layout-flex-auto;
+				@apply --layout-center-center;
 			}
 
 			paper-tabs {
 				height: 100%;
-				@apply(--layout-horizontal);
-				@apply(--layout-center);
+				@apply --layout-horizontal;
+				@apply --layout-center;
 				--paper-tabs-selection-bar-color: #00bebe;
 				--paper-tabs-selection-bar: {
 					border-bottom-width: 5px;
@@ -73,14 +76,14 @@
 				text-transform: uppercase;
 				user-select: none;
 
-				@apply(--layout-flex-none);
+				@apply --layout-flex-none;
 
 				--paper-tab-ink: #00bebe;
 				--paper-tab-content: {
 					font-weight: 500!important; /* don't bold when focused */
 					color: #00bebe;
-					@apply(--layout-vertical);
-					@apply(--layout-center-center);
+					@apply --layout-vertical;
+					@apply --layout-center-center;
 				};
 				--paper-tab-content-unselected: {
 					color: black;
@@ -102,8 +105,8 @@
 			}
 
 			#drawerToolbar {
-				@apply(--layout-horizontal);
-				@apply(--layout-center);
+				@apply --layout-horizontal;
+				@apply --layout-center;
 			}
 
 			#drawerLogo {
@@ -141,26 +144,26 @@
 
 			section {
 				box-sizing: border-box;
-				@apply(--layout-flex);
+				@apply --layout-flex;
 			}
 
 			section:not(.section-workspace) {
 				padding: 32px;
-				@apply(--layout-vertical);
-				@apply(--layout-center);
+				@apply --layout-vertical;
+				@apply --layout-center;
 			}
 
 			#pages {
 				height: 1px; /* just need to specify *any* height, the rest is then taken care of somehow? */
 				overflow: auto;
 				box-sizing: border-box;
-				@apply(--layout-vertical);
-				@apply(--layout-flex-auto);
+				@apply --layout-vertical;
+				@apply --layout-flex-auto;
 			}
 
 			#reconnectToast {
-				@apply(--layout-horizontal);
-				@apply(--layout-center);
+				@apply --layout-horizontal;
+				@apply --layout-center;
 			}
 
 			#reconnectToast paper-spinner {

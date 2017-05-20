@@ -38,6 +38,7 @@ html(lang='en')
 		script(src='/bower_components/imagesloaded/imagesloaded.pkgd.min.js')
 		script(src='/bower_components/packery/dist/packery.pkgd.min.js')
 		script(src='/bower_components/clipboard/dist/clipboard.min.js')
+		script(src='/bower_components/webcomponentsjs/webcomponents-loader.js')
 
 		script(type='text/javascript').
 			// Allow child iframes to reliably find this parent frame
@@ -51,43 +52,9 @@ html(lang='en')
 			};
 			Object.freeze(window.__renderData__);
 
-			// Setup Polymer options
-			window.Polymer = {
-				// Cannot use shadow DOM due to: https://github.com/davidjbradshaw/iframe-resizer/issues/454
-				lazyRegister: true,
-			};
-
-			// Load webcomponentsjs polyfill if browser does not support native
-			// Web Components
-			(function () {
-				'use strict';
-				var onload = function () {
-					// For native Imports, manually fire WebComponentsReady so user code
-					// can use the same code path for native and polyfill'd imports.
-					if (!window.HTMLImports) {
-						document.dispatchEvent(
-							new CustomEvent('WebComponentsReady', {bubbles: true})
-						);
-					}
-				};
-				var webComponentsSupported = (
-					'registerElement' in document
-					&& 'import' in document.createElement('link')
-					&& 'content' in document.createElement('template')
-				);
-				if (webComponentsSupported) {
-					onload();
-				} else {
-					var script = document.createElement('script');
-					script.async = true;
-					script.src = '/bower_components/webcomponentsjs/webcomponents-lite.min.js';
-					script.onload = onload;
-					document.head.appendChild(script);
-				}
-			})();
-
 		//- dashboard CSS
 		link(rel='import', href='/dashboard/style/nodecg-styles.html', async)
+		link(rel='import', href='/bower_components/shadycss/apply-shim.html')
 
 		//- our custom dashboard elements
 		link(rel='import', href='/dashboard/elements/ncg-dashboard.html')
@@ -109,18 +76,19 @@ html(lang='en')
 
 		//- Set the default color of many polymer elements.
 			Newer elements use --primary-color, older elements use --default-primary-color.
-		style(is='custom-style').
-			:root {
-				--default-primary-color: #00bebe;
-				--primary-color: #00bebe;
-			}
+		custom-style
+			style.
+				html {
+					--default-primary-color: #00bebe;
+					--primary-color: #00bebe;
+				}
 
-			body {
-				overflow: hidden;
-				background-color: #dedede;
-				@apply(--layout-vertical);
-				@apply(--layout-fullbleed);
-			}
+				body {
+					overflow: hidden;
+					background-color: #dedede;
+					@apply(--layout-vertical);
+					@apply(--layout-fullbleed);
+				}
 
 		style.
 			.text-warning {
