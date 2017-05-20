@@ -154,7 +154,7 @@ describe('client-side replicants', function () {
 			.catch(err => done(err));
 	});
 
-	it.only('should log a warning when attempting to access .value before the Replicant has finished declaring', done => {
+	it('should log a warning when attempting to access .value before the Replicant has finished declaring', done => {
 		e.browser.client
 			.executeAsync(done => {
 				const rep = window.dashboardApi.Replicant('clientEarlyValueAccess', {persistent: false});
