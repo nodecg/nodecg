@@ -154,6 +154,28 @@ describe('client-side replicants', function () {
 			.catch(err => done(err));
 	});
 
+	it.only('should log a warning when attempting to access .value before the Replicant has finished declaring', done => {
+		e.browser.client
+			.executeAsync(done => {
+				const rep = window.dashboardApi.Replicant('clientEarlyValueAccess', {persistent: false});
+
+				// TODO: Replace this with sinon.
+				const originalWarn = rep.log.warn;
+				rep.log.warn = function () {
+					rep.log.warn = originalWarn;
+					done(arguments);
+				};
+
+				const val = rep.value; // eslint-disable-line no-unused-vars
+			})
+			.then(ret => {
+				expect(ret.value[0]).to.equal('Attempted to get value before Replicant had finished declaring. ' +
+					'This will always return undefined. See trace below:');
+				done();
+			})
+			.catch(err => done(err));
+	});
+
 	context('when an array', () => {
 		it('should react to changes', done => {
 			e.browser.client
