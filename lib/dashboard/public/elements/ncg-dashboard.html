@@ -178,6 +178,11 @@
 				--paper-spinner-layer-4-color: var(--nodecg-danger-color);
 			}
 
+			iron-icon {
+				color: black;
+				--iron-icon-fill-color: black;
+			}
+
 			/**
 			 * Phone
 			 */
@@ -226,7 +231,7 @@
 							   aria-label="[[workspace.name]]"
 							   on-tap="closeDrawer">
 								<paper-icon-item>
-									<iron-icon item-icon icon="dashboard"></iron-icon>
+									<iron-icon slot="item-icon" icon="dashboard"></iron-icon>
 									[[workspace.name]]
 								</paper-icon-item>
 							</a>
@@ -238,7 +243,7 @@
 							   aria-label="[[page.name]]"
 							   on-tap="closeDrawer">
 								<paper-icon-item>
-									<iron-icon item-icon icon="[[page.icon]]"></iron-icon>
+									<iron-icon slot="item-icon" icon="[[page.icon]]"></iron-icon>
 									[[page.name]]
 								</paper-icon-item>
 							</a>
@@ -279,13 +284,13 @@
 							<paper-tabs selected="[[routeData.page]]" attr-for-selected="route">
 								<template is="dom-repeat" items="[[pages]]" as="page" initial-count="1">
 									<paper-tab route="[[page.route]]" aria-label="[[page.name]]" on-tap="_selectRoute">
-										<iron-icon item-icon icon="[[page.icon]]"></iron-icon>
+										<iron-icon slot="item-icon" icon="[[page.icon]]"></iron-icon>
 										[[page.name]]
 									</paper-tab>
 								</template>
 
 								<paper-tab hidden="[[loginDisabled]]" aria-label="Sign Out" on-tap="logout">
-									<iron-icon item-icon icon="exit-to-app"></iron-icon>
+									<iron-icon slot="item-icon" icon="exit-to-app"></iron-icon>
 									Sign Out
 								</paper-tab>
 							</paper-tabs>
