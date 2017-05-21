@@ -13,19 +13,19 @@ and avoiding certain bugs relating to the de-duplication of HTML Imports (and so
 
 Old (don't use these anymore!):
 ```
-/panels/bliz-overwatch/rosters.html
-/graphics/bliz-overwatch/roster.html
+/panels/my-bundle/rosters.html
+/graphics/my-bundle/roster.html
 
 # Two different routes to the same file! This breaks the de-duplication of HTML Imports and causes errors.
-/panels/bliz-overwatch/components/polymer/polymer.html
-/graphics/bliz-overwatch/components/polymer/polymer.html
+/panels/my-bundle/components/polymer/polymer.html
+/graphics/my-bundlecomponents/polymer/polymer.html
 ```
 
 New:
 ```
-/bundles/bliz-overwatch/dashboard/rosters.html
-/bundles/bliz-overwatch/graphics/roster.html
+/bundles/my-bundle/dashboard/rosters.html
+/bundles/my-bundle/graphics/roster.html
 
 # Now, there is only one single route to any given file.
-/bundles/bliz-overwatch/bower_components/polymer/polymer.html
+/bundles/my-bundle/bower_components/polymer/polymer.html
 ```
