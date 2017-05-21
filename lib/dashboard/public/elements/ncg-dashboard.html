@@ -288,7 +288,7 @@
 							<paper-tabs selected="[[routeData.page]]" attr-for-selected="route">
 								<template is="dom-repeat" items="[[pages]]" as="page" initial-count="1">
 									<paper-tab route="[[page.route]]" aria-label="[[page.name]]" on-tap="_selectRoute">
-										<iron-icon slot="item-icon" icon="[[page.icon]]"></iron-icon>
+										<iron-icon icon="[[page.icon]]"></iron-icon>
 										[[page.name]]
 									</paper-tab>
 								</template>
