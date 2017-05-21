@@ -170,7 +170,7 @@ describe('client-side replicants', function () {
 			})
 			.then(ret => {
 				expect(ret.value[0]).to.equal('Attempted to get value before Replicant had finished declaring. ' +
-					'This will always return undefined. See trace below:');
+					'This will always return undefined.');
 				done();
 			})
 			.catch(err => done(err));
