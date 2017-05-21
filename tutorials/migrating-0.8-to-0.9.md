@@ -13,8 +13,8 @@ and avoiding certain bugs relating to the de-duplication of HTML Imports (and so
 
 Old (don't use these anymore!):
 ```
-/panels/my-bundle/rosters.html
-/graphics/my-bundle/roster.html
+/panels/my-bundle/panel.html
+/graphics/my-bundle/graphic.html
 
 # Two different routes to the same file! This breaks the de-duplication of HTML Imports and causes errors.
 /panels/my-bundle/components/polymer/polymer.html
@@ -23,8 +23,8 @@ Old (don't use these anymore!):
 
 New:
 ```
-/bundles/my-bundle/dashboard/rosters.html
-/bundles/my-bundle/graphics/roster.html
+/bundles/my-bundle/dashboard/panel.html
+/bundles/my-bundle/graphics/graphic.html
 
 # Now, there is only one single route to any given file.
 /bundles/my-bundle/bower_components/polymer/polymer.html
