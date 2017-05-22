@@ -1,12 +1,1 @@
-/* global nodecg */
-document.addEventListener('click', e => {
-	'use strict';
-
-	const elWithDialogAttr = e.target.closest('[nodecg-dialog]');
-	if (elWithDialogAttr) {
-		const dialogName = elWithDialogAttr.getAttribute('nodecg-dialog');
-		const dialogIg = nodecg.bundleName + '_' + dialogName;
-		const dialogElement = window.top.document.getElementById(dialogIg);
-		dialogElement.open();
-	}
-}, false);
+document.addEventListener('click',(a)=>{'use strict';const b=a.target.closest('[nodecg-dialog]');if(b){const c=b.getAttribute('nodecg-dialog'),d=nodecg.bundleName+'_'+c,f=window.top.document.getElementById(d);f.open()}},!1);
