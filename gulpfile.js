@@ -1,7 +1,6 @@
 'use strict';
 
 const babel = require('gulp-babel');
-const babiliPreset = require('babel-preset-babili');
 const browserify = require('browserify');
 const buffer = require('vinyl-buffer');
 const cleanCSS = require('gulp-clean-css');
@@ -31,7 +30,11 @@ function waitFor(stream) {
 	});
 }
 
-gulp.task('browser-api', () => {
+gulp.task('clean', () => {
+	return del([buildDirectory]);
+});
+
+gulp.task('browser-api', ['clean'], () => {
 	// Set up the browserify instance on a task basis
 	const b = browserify({
 		entries: './lib/api.js',
@@ -69,20 +72,15 @@ gulp.task('browser-api', () => {
 		.pipe(source('nodecg-api.min.js'))
 		.pipe(buffer())
 		.pipe(transform(() => {
-			return exorcist('src/nodecg-api.min.js.map');
+			return exorcist('build/src/nodecg-api.min.js.map');
 		}))
 		.on('error', gutil.log)
-		.pipe(gulp.dest('./src/'));
+		.pipe(gulp.dest('build/src'));
 });
 
-// Adapted from polymer-cli
-gulp.task('polymer-build', ['browser-api'], async () => {
+gulp.task('polymer-build', ['clean'], async () => {
 	// Lets create some inline code splitters in case you need them later in your build.
 	const buildStreamSplitter = new polymerBuild.HtmlSplitter();
-
-	// Okay, so first thing we do is clear the build directory
-	console.log(`Deleting ${buildDirectory} directory...`);
-	await del([buildDirectory]);
 
 	const sourcesStream = polymerProject.sources()
 		.pipe(gulpif(/\.(png|gif|jpg|svg)$/, imagemin()));
@@ -95,7 +93,6 @@ gulp.task('polymer-build', ['browser-api'], async () => {
 			console.log('Analyzing build dependencies...');
 		})
 
-		// .pipe(sourcemaps.init())
 		.pipe(buildStreamSplitter.split())
 		.pipe(gulpif(/\.css$/, cleanCSS()))
 		.pipe(gulpif(/\.html$/, htmlmin({
@@ -103,22 +100,18 @@ gulp.task('polymer-build', ['browser-api'], async () => {
 			removeComments: true,
 			minifyCSS: true
 		})))
+		// .pipe(gulpif(/\.js$/, sourcemaps.init({loadMaps: true})))
 		.pipe(gulpif(/\.js$/, babel({
-			presets: [
-				babiliPreset(null, {
-					unsafe: {simplifyComparisons: false}
-				})
-			],
-
-			// This one file has an enormous regex in it that makes babili explode.
-			// This will probably be fixed eventually? When it is, we can remove this ignore line.
-			ignore: ['**/property-effects.html_script_0.js']
+			presets: ['babili']
 		})))
+		// .pipe(gulpif(/\.js$/, sourcemaps.write('src/maps')))
 		.pipe(buildStreamSplitter.rejoin())
-		// .pipe(sourcemaps.write())
 
 		// Can't enable sourcemaps until this issue is resolved:
 		// https://github.com/Polymer/polymer-bundler/issues/516
+		// The core problem here seems to be bugs in the source-map lib.
+		// This lib hasn't had a new release in over a year and does not seem to be maintained.
+		// There are several critical issues and mergable pull requests with no replies on them.
 		.pipe(polymerProject.bundler({sourcemaps: false, stripComments: true}))
 		.pipe(gulp.dest(buildDirectory));
 
@@ -127,6 +120,10 @@ gulp.task('polymer-build', ['browser-api'], async () => {
 
 	// You did it!
 	console.log('Build complete!');
+});
+
+process.on('unhandledRejection', r => {
+	console.error('UNHANDLED PROMISE REJECTION:\n', r.stack ? r.stack : r);
 });
 
 gulp.task('default', ['browser-api', 'polymer-build']);

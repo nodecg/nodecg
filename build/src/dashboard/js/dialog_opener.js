@@ -1,1 +1,1 @@
-document.addEventListener('click',(a)=>{'use strict';const b=a.target.closest('[nodecg-dialog]');if(b){const c=b.getAttribute('nodecg-dialog'),d=nodecg.bundleName+'_'+c,f=window.top.document.getElementById(d);f.open()}},!1);
+document.addEventListener('click',(a)=>{'use strict';const b=a.target.closest('[nodecg-dialog]');if(b){const a=b.getAttribute('nodecg-dialog'),c=nodecg.bundleName+'_'+a,d=window.top.document.getElementById(c);d.open()}},!1);
