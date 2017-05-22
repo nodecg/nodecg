@@ -1,6 +1,4 @@
-lib/browser/dist/*.js
-lib/browser/shims/*.js
-lib/dashboard/public/twitch.min.js
-bundles/
+/bundles/
 node_modules
 bower_components
+nodecg-api.min.js
