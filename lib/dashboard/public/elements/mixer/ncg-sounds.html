@@ -12,6 +12,8 @@
 				width: 100%;
 				max-width: 600px;
 				white-space: nowrap;
+				@apply --layout-vertical;
+				@apply --layout-stretch;
 			}
 
 			#bundleFaderContainer {
@@ -51,9 +53,13 @@
 				margin-left: 0;
 				margin-right: 0;
 			}
+
+			paper-card {
+				margin-bottom: 12px;
+			}
 		</style>
 
-		<paper-card id="card" class="ncg-card">
+		<paper-card id="card">
 			<div class="card-content">
 				<h2>[[bundleName]]</h2>
 

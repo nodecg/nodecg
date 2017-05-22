@@ -10,8 +10,9 @@
 		<style include="iron-flex iron-flex-alignment">
 			:host {
 				width: 100%;
+				max-width: 600px;
 				@apply --layout-vertical;
-				@apply --layout-center;
+				@apply --layout-stretch;
 			}
 
 			#instancesList-empty {
@@ -40,9 +41,13 @@
 				white-space: nowrap;
 				flex-shrink: 0;
 			}
+
+			paper-card {
+				margin-bottom: 12px;
+			}
 		</style>
 
-		<paper-card class="ncg-card" heading="Active Single-Instance Graphics">
+		<paper-card heading="Active Single-Instance Graphics">
 			<div class="card-content">
 				<div id="instancesList"></div>
 				<div id="instancesList-empty">
@@ -51,9 +56,8 @@
 			</div>
 		</paper-card>
 
-
 		<template is="dom-repeat" items="[[bundlesWithGraphics]]" as="bundle">
-			<paper-card class="ncg-card" heading="[[bundle.name]]">
+			<paper-card heading="[[bundle.name]]">
 				<div class="card-content layout vertical">
 					<template is="dom-repeat" items="[[bundle.graphics]]" as="graphic">
 						<div class="graphic">
