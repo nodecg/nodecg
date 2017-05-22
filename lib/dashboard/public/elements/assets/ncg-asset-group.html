@@ -48,6 +48,13 @@
 				margin-top: 8px;
 				text-align: center;
 			}
+
+			#add {
+				--paper-button: {
+					background-color: var(--nodecg-configure-color);
+					color: white;
+				}
+			}
 		</style>
 
 		<nodecg-replicant
@@ -59,7 +66,7 @@
 
 		<div id="header">
 			<span id="title">[[categoryTitle]]</span>
-			<paper-button id="add" raised class="nodecg-configure" on-click="openUploadDialog">
+			<paper-button id="add" raised on-click="openUploadDialog">
 				<iron-icon icon="add"></iron-icon>
 				Add File(s)
 			</paper-button>

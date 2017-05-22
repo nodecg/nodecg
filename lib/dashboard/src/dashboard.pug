@@ -51,8 +51,6 @@ html(lang='en')
 			};
 			Object.freeze(window.__renderData__);
 
-		//- dashboard CSS
-		link(rel='import', href='/dashboard/style/nodecg-styles.html', async)
 		link(rel='import', href='/bower_components/shadycss/apply-shim.html')
 
 		//- our custom dashboard elements
@@ -78,8 +76,29 @@ html(lang='en')
 		custom-style
 			style.
 				html {
-					--default-primary-color: #00bebe;
-					--primary-color: #00bebe;
+					--nodecg-brand-blue: #00bebe;
+					--default-primary-color: var(--nodecg-brand-blue);
+					--primary-color: var(--nodecg-brand-blue);
+
+					--nodecg-info-color: #645BA6;
+					--nodecg-info-color--light: #9f9bbd;
+					--nodecg-info-color--dark: #4a4668;
+
+					--nodecg-success-color: #5BA664;
+					--nodecg-success-color--light: #9bbd9f;
+					--nodecg-success-color--dark: #46684a;
+
+					--nodecg-warning-color: #FF7522;
+					--nodecg-warning-color--light: #e9aa84;
+					--nodecg-warning-color--dark: #945530;
+
+					--nodecg-danger-color: #C9513E;
+					--nodecg-danger-color--light: #ce978e;
+					--nodecg-danger-color--dark: #79433a;
+
+					--nodecg-configure-color: #A50074;
+					--nodecg-configure-color--light: #b4699e;
+					--nodecg-configure-color--dark: #5e1347;
 				}
 
 				body {

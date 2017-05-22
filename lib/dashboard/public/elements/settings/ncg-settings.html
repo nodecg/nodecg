@@ -17,7 +17,21 @@
 
 			#copyKey {
 				color: white;
-				background-color: #00bebe;
+				background-color: var(--nodecg-brand-blue);
+			}
+
+			#showKey {
+				--paper-button: {
+					background-color: var(--nodecg-configure-color);
+					color: white;
+				}
+			}
+
+			#resetKey {
+				--paper-button: {
+					background-color: var(--nodecg-danger-color);
+					color: white;
+				}
 			}
 
 			.card-actions {
@@ -70,11 +84,11 @@
 						<iron-icon icon="icons:content-copy"></iron-icon>
 						<span>Copy Key</span>
 					</paper-button>
-					<paper-button raised id="showKey" class="nodecg-configure" title="Show Key" on-tap="openShowKeyDialog">
+					<paper-button raised id="showKey" title="Show Key" on-tap="openShowKeyDialog">
 						<iron-icon icon="communication:vpn-key"></iron-icon>
 						<span>Show Key</span>
 					</paper-button>
-					<paper-button raised id="resetKey" class="nodecg-danger" on-tap="openResetKeyDialog">
+					<paper-button raised id="resetKey" on-tap="openResetKeyDialog">
 						<iron-icon icon="icons:refresh"></iron-icon>
 						<span>Reset Key</span>
 					</paper-button>

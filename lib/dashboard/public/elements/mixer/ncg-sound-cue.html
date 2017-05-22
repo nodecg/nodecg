@@ -16,6 +16,10 @@
 				padding: 0;
 				width: 20px;
 				margin-left: 0;
+				--paper-button: {
+					background-color: var(--nodecg-danger-color);
+					color: white;
+				}
 			}
 
 			#leftWrapper {
@@ -37,8 +41,6 @@
 				width: 150px;
 				@apply --layout-flex-none;
 			}
-
-
 
 			paper-slider {
 				@apply --layout-flex-none;
@@ -62,7 +64,6 @@
 			id="delete"
 			hidden="[[!custom]]"
 			on-tap="emitDelete"
-			class="nodecg-danger"
 			raised>
 			X
 		</paper-button>

@@ -23,7 +23,7 @@
 				margin-right: -16px;
 				padding-left: 16px;
 				padding-right: 16px;
-				background-color: #00bebe;
+				background-color: var(--nodecg-brand-blue);
 				color: white;
 			}
 
@@ -52,6 +52,10 @@
 				width: 100%;
 				margin-left: 0;
 				margin-right: 0;
+				--paper-button: {
+					background-color: var(--nodecg-configure-color);
+					color: white;
+				}
 			}
 
 			paper-card {
@@ -75,7 +79,6 @@
 				<template is="dom-if" if="[[enableCustomCues]]">
 					<paper-button
 						id="addCustomCue"
-						class="nodecg-configure"
 						on-tap="openAddCustomCueDialog"
 						raised>
 						Add A Custom Cue
