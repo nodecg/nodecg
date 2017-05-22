@@ -1,8 +1,15 @@
 {
+	"entrypoint": "lib/dashboard/public/elements/ncg-dashboard.html",
 	"sources": [
 		"lib/dashboard/public/elements/**"
 	],
 	"lint": {
 		"rules": ["polymer-2"]
-	}
+	},
+	"builds": [{
+		"bundle": true,
+		"js": {"minify": true},
+		"css": {"minify": true},
+		"html": {"minify": true}
+	}]
 }

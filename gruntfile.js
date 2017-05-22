@@ -7,7 +7,7 @@ module.exports = function (grunt) {
 		browserify: {
 			dist: {
 				files: {
-					'./lib/browser/dist/browserifiedApi.min.js': 'lib/api.js'
+					'./src/nodecg-api.min.js': 'lib/api.js'
 				},
 				options: {
 					browserifyOptions: {
@@ -69,7 +69,7 @@ module.exports = function (grunt) {
 			app: {
 				options: {},
 				files: {
-					'./lib/browser/dist/browserifiedApi.min.js.map': ['./lib/browser/dist/browserifiedApi.min.js']
+					'./src/nodecg-api.min.js.map': ['./src/nodecg-api.min.js']
 				}
 			}
 		}
