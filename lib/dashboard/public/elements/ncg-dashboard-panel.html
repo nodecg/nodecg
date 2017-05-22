@@ -123,6 +123,12 @@
 				background-color: #f5f5f5;
 			}
 
+			paper-icon-button[hidden] {
+				/* For whatever reason, paper-icon-button doesn't specify its own [hidden] style.
+				   https://github.com/PolymerElements/paper-icon-button/issues/103 */
+				display: none !important;
+			}
+
 			:host([fullbleed]) {
 				@apply --layout-vertical;
 			}
