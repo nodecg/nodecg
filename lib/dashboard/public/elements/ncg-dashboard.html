@@ -187,6 +187,12 @@
 				--iron-icon-fill-color: black;
 			}
 
+			paper-icon-button[hidden] {
+				/* For whatever reason, paper-icon-button doesn't specify its own [hidden] style.
+				   https://github.com/PolymerElements/paper-icon-button/issues/103 */
+				display: none !important;
+			}
+
 			/**
 			 * Phone
 			 */
@@ -221,7 +227,7 @@
 
 		<app-drawer-layout drawer-width="288px" force-narrow>
 			<!-- navigation drawer for small screen sizes -->
-			<app-drawer id="drawer" swipe-open="[[smallScreen]]">
+			<app-drawer id="drawer" swipe-open="[[smallScreen]]" slot="drawer">
 				<template is="dom-if" if="[[smallScreen]]">
 					<app-toolbar id="drawerToolbar">
 						<paper-icon-button icon="close" aria-label="Close" drawer-toggle></paper-icon-button>
@@ -294,7 +300,7 @@
 								</template>
 
 								<paper-tab hidden="[[loginDisabled]]" aria-label="Sign Out" on-tap="logout">
-									<iron-icon slot="item-icon" icon="exit-to-app"></iron-icon>
+									<iron-icon icon="exit-to-app"></iron-icon>
 									Sign Out
 								</paper-tab>
 							</paper-tabs>
