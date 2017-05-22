@@ -73,7 +73,7 @@
   ],
   "devDependencies": {
     "aliasify": "^2.1.0",
-    "babel-preset-babili": "0.0.12",
+    "babel-preset-babili": "0.1.0",
     "babelify": "^7.2.0",
     "brfs": "^1.4.1",
     "chai": "^3.5.0",
