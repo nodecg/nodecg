@@ -6,8 +6,9 @@
 		<style>
 			:host {
 				width: 100%;
-				@apply(--layout-vertical);
-				@apply(--layout-center);
+				max-width: 600px;
+				@apply --layout-vertical;
+				@apply --layout-stretch;
 			}
 
 			.assets-divider {
@@ -19,10 +20,14 @@
 			.assets-divider:last-of-type {
 				display: none;
 			}
+
+			paper-card {
+				margin-bottom: 12px;
+			}
 		</style>
 
 		<template is="dom-repeat" items="[[bundlesWithAssets]]" as="bundle">
-			<paper-card class="ncg-card">
+			<paper-card>
 				<div class="card-content">
 					<h2>[[bundle.name]]</h2>
 

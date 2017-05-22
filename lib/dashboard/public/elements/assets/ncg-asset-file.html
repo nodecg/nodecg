@@ -8,15 +8,21 @@
 	<template>
 		<style>
 			:host {
-				@apply(--layout-horizontal);
-				@apply(--layout-justified);
-				@apply(--layout-center);
+				@apply --layout-horizontal;
+				@apply --layout-justified;
+				@apply --layout-center;
 			}
 
 			#name {
-				text-transform: none;
+				color: #5C5CCE;
+				font-size: 14px;
+				font-weight: 500;
+				letter-spacing: 0.018em;
+				line-height: 24px;
 				overflow: hidden;
+				text-decoration: none;
 				text-overflow: ellipsis;
+				text-transform: none;
 			}
 
 			#delete {

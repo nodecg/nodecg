@@ -10,25 +10,40 @@
 		<style>
 			:host {
 				width: 100%;
-				@apply(--layout-vertical);
-				@apply(--layout-center);
+				max-width: 600px;
+				@apply --layout-vertical;
+				@apply --layout-stretch;
 			}
 
 			#copyKey {
 				color: white;
-				background-color: #00bebe;
+				background-color: var(--nodecg-brand-blue);
+			}
+
+			#showKey {
+				--paper-button: {
+					background-color: var(--nodecg-configure-color);
+					color: white;
+				}
+			}
+
+			#resetKey {
+				--paper-button: {
+					background-color: var(--nodecg-danger-color);
+					color: white;
+				}
 			}
 
 			.card-actions {
 				padding: 0;
 				padding-top: 8px;
-				@apply(--layout-horizontal);
-				@apply(--layout-center-center);
+				@apply --layout-horizontal;
+				@apply --layout-center-center;
 			}
 
 			paper-button {
-				@apply(--layout-horizontal);
-				@apply(--layout-center-center);
+				@apply --layout-horizontal;
+				@apply --layout-center-center;
 			}
 
 			paper-button iron-icon {
@@ -47,6 +62,10 @@
 				margin-right: 0;
 			}
 
+			.text-warning {
+				color: #c53929;
+			}
+
 			@media (max-width: 400px) {
 				paper-button iron-icon {
 					display: none;
@@ -54,7 +73,7 @@
 			}
 		</style>
 
-		<paper-card heading="Your Key" class="ncg-card">
+		<paper-card heading="Your Key">
 			<div class="card-content">
 				<p class="text-warning paper-font-body1">
 					Resetting your key will disrupt all current sessions using it.<br/>
@@ -65,11 +84,11 @@
 						<iron-icon icon="icons:content-copy"></iron-icon>
 						<span>Copy Key</span>
 					</paper-button>
-					<paper-button raised id="showKey" class="nodecg-configure" title="Show Key" on-tap="openShowKeyDialog">
+					<paper-button raised id="showKey" title="Show Key" on-tap="openShowKeyDialog">
 						<iron-icon icon="communication:vpn-key"></iron-icon>
 						<span>Show Key</span>
 					</paper-button>
-					<paper-button raised id="resetKey" class="nodecg-danger" on-tap="openResetKeyDialog">
+					<paper-button raised id="resetKey" on-tap="openResetKeyDialog">
 						<iron-icon icon="icons:refresh"></iron-icon>
 						<span>Reset Key</span>
 					</paper-button>

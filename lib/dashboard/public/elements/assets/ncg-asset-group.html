@@ -25,18 +25,18 @@
 			}
 
 			#header {
-				@apply(--layout-horizontal);
-				@apply(--layout-justified);
-				@apply(--layout-center);
+				@apply --layout-horizontal;
+				@apply --layout-justified;
+				@apply --layout-center;
 				margin-bottom: 6px;
 			}
 
 			#title {
-				@apply(--paper-font-headline);
+				@apply --paper-font-headline;
 			}
 
 			#files {
-				@apply(--layout-vertical);
+				@apply --layout-vertical;
 			}
 
 			vaadin-upload {
@@ -47,6 +47,13 @@
 			#acceptsMsg {
 				margin-top: 8px;
 				text-align: center;
+			}
+
+			#add {
+				--paper-button: {
+					background-color: var(--nodecg-configure-color);
+					color: white;
+				}
 			}
 		</style>
 
@@ -59,7 +66,7 @@
 
 		<div id="header">
 			<span id="title">[[categoryTitle]]</span>
-			<paper-button id="add" raised class="nodecg-configure" on-click="openUploadDialog">
+			<paper-button id="add" raised on-click="openUploadDialog">
 				<iron-icon icon="add"></iron-icon>
 				Add File(s)
 			</paper-button>

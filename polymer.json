@@ -1,0 +1,8 @@
+{
+	"sources": [
+		"lib/dashboard/public/elements/**"
+	],
+	"lint": {
+		"rules": ["polymer-2"]
+	}
+}

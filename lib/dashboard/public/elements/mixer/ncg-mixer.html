@@ -6,8 +6,9 @@
 			:host {
 				white-space: nowrap;
 				width: 100%;
-				@apply(--layout-vertical);
-				@apply(--layout-center);
+				max-width: 600px;
+				@apply --layout-vertical;
+				@apply --layout-stretch;
 			}
 
 			#mixer-masterCard {
@@ -17,12 +18,12 @@
 			}
 
 			#mixer-masterCard .card-content {
-				@apply(--layout-horizontal);
+				@apply --layout-horizontal;
 				align-items: center;
 			}
 
 			#mixer-masterCard span {
-				@apply(--paper-font-title);
+				@apply --paper-font-title;
 				font-size: 28px;
 				flex-grow: 1;
 				flex-shrink: 0;
@@ -42,9 +43,13 @@
 					width: 80px;
 				};
 			}
+
+			paper-card {
+				margin-bottom: 12px;
+			}
 		</style>
 
-		<paper-card id="mixer-masterCard" class="ncg-card">
+		<paper-card id="mixer-masterCard">
 			<div class="card-content">
 				<span>Master Fader</span>
 				<paper-slider id="masterFader" min="0" max="100" step="1" editable></paper-slider>

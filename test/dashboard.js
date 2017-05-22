@@ -12,9 +12,15 @@ describe('dashboard', function () {
 		it('should show up on the dashboard', done => {
 			e.browser.client
 				.switchTab(e.browser.tabs.dashboard)
-				.isExisting('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')
-				.then(isExisting => {
-					assert.isTrue(isExisting);
+				.execute(() => {
+					return Boolean(
+						document.querySelector('ncg-dashboard').shadowRoot
+							.querySelector('ncg-workspace').shadowRoot
+							.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')
+					);
+				})
+				.then(ret => {
+					assert.isTrue(ret.value);
 					done();
 				});
 		});

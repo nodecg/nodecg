@@ -10,8 +10,9 @@
 		<style include="iron-flex iron-flex-alignment">
 			:host {
 				width: 100%;
-				@apply(--layout-vertical);
-				@apply(--layout-center);
+				max-width: 600px;
+				@apply --layout-vertical;
+				@apply --layout-stretch;
 			}
 
 			#instancesList-empty {
@@ -36,13 +37,27 @@
 
 			.copyButton {
 				color: white;
-				background-color: #00bebe;
+				background-color: var(--nodecg-brand-blue);
 				white-space: nowrap;
 				flex-shrink: 0;
 			}
+
+			paper-card {
+				margin-bottom: 12px;
+			}
+
+			a {
+				color: #5C5CCE;
+				font-size: 14px;
+				font-weight: 500;
+				letter-spacing: 0.018em;
+				line-height: 24px;
+				text-decoration: none;
+				text-transform: uppercase;
+			}
 		</style>
 
-		<paper-card class="ncg-card" heading="Active Single-Instance Graphics">
+		<paper-card heading="Active Single-Instance Graphics">
 			<div class="card-content">
 				<div id="instancesList"></div>
 				<div id="instancesList-empty">
@@ -51,9 +66,8 @@
 			</div>
 		</paper-card>
 
-
 		<template is="dom-repeat" items="[[bundlesWithGraphics]]" as="bundle">
-			<paper-card class="ncg-card" heading="[[bundle.name]]">
+			<paper-card heading="[[bundle.name]]">
 				<div class="card-content layout vertical">
 					<template is="dom-repeat" items="[[bundle.graphics]]" as="graphic">
 						<div class="graphic">
