@@ -15,6 +15,7 @@ const imagemin = require('gulp-imagemin');
 const mergeStream = require('merge-stream');
 const polymerBuild = require('polymer-build');
 const source = require('vinyl-source-stream');
+const sourcemaps = require('gulp-sourcemaps');
 const transform = require('vinyl-transform');
 
 const polymerProject = new polymerBuild.PolymerProject(require('./polymer.json'));
@@ -94,13 +95,13 @@ gulp.task('polymer-build', ['browser-api'], async () => {
 			console.log('Analyzing build dependencies...');
 		})
 
+		// .pipe(sourcemaps.init())
 		.pipe(buildStreamSplitter.split())
 		.pipe(gulpif(/\.css$/, cleanCSS()))
 		.pipe(gulpif(/\.html$/, htmlmin({
 			collapseWhitespace: true,
 			removeComments: true,
-			minifyCSS: true,
-			uglifyJS: true
+			minifyCSS: true
 		})))
 		.pipe(gulpif(/\.js$/, babel({
 			presets: [
@@ -114,8 +115,11 @@ gulp.task('polymer-build', ['browser-api'], async () => {
 			ignore: ['**/property-effects.html_script_0.js']
 		})))
 		.pipe(buildStreamSplitter.rejoin())
+		// .pipe(sourcemaps.write())
 
-		.pipe(polymerProject.bundler())
+		// Can't enable sourcemaps until this issue is resolved:
+		// https://github.com/Polymer/polymer-bundler/issues/516
+		.pipe(polymerProject.bundler({sourcemaps: false, stripComments: true}))
 		.pipe(gulp.dest(buildDirectory));
 
 	// WaitFor the buildStream to complete
