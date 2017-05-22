@@ -15,7 +15,7 @@ const imagemin = require('gulp-imagemin');
 const mergeStream = require('merge-stream');
 const polymerBuild = require('polymer-build');
 const source = require('vinyl-source-stream');
-const sourcemaps = require('gulp-sourcemaps');
+// Const sourcemaps = require('gulp-sourcemaps');
 const transform = require('vinyl-transform');
 
 const polymerProject = new polymerBuild.PolymerProject(require('./polymer.json'));
