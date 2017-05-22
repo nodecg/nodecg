@@ -115,6 +115,18 @@
 				padding-left: 16px;
 			}
 
+			.button-label {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			paper-icon-item {
+				--paper-item-icon: {
+					min-width: 56px;
+				}
+			}
+
 			.list {
 				margin-left: 20px;
 				margin-right: 20px;
@@ -237,7 +249,7 @@
 							   on-tap="closeDrawer">
 								<paper-icon-item>
 									<iron-icon slot="item-icon" icon="dashboard"></iron-icon>
-									[[workspace.name]]
+									<span class="button-label">[[workspace.label]]</span>
 								</paper-icon-item>
 							</a>
 						</template>
