@@ -5,8 +5,11 @@ const buffer = require('vinyl-buffer');
 const exorcist = require('exorcist');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
+const mergeStream = require('merge-stream');
+const PolymerProject = require('polymer-build').PolymerProject;
 const source = require('vinyl-source-stream');
 const transform = require('vinyl-transform');
+const project = new PolymerProject(require('./polymer.json'));
 
 gulp.task('browser-api', () => {
 	// Set up the browserify instance on a task basis
@@ -51,3 +54,11 @@ gulp.task('browser-api', () => {
 			.on('error', gutil.log)
 		.pipe(gulp.dest('./src/'));
 });
+
+gulp.task('polymer-build', ['browser-api'], () => {
+	mergeStream(project.sources(), project.dependencies())
+		.pipe(project.bundler())
+		.pipe(gulp.dest('build/'));
+});
+
+gulp.task('default', ['browser-api', 'polymer-build']);
