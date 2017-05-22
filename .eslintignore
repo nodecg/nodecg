@@ -4,3 +4,4 @@ lib/dashboard/public/twitch.min.js
 bundles/
 node_modules
 bower_components
+nodecg-api.min.js
