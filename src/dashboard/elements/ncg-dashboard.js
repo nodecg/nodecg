@@ -13,7 +13,8 @@
 					observer: '_routeChanged'
 				},
 				smallScreen: {
-					type: Boolean
+					type: Boolean,
+					observer: '_smallSreenChanged'
 				},
 				loginDisabled: {
 					type: Boolean,
@@ -169,6 +170,12 @@
 
 		closeDrawer() {
 			this.$.drawer.close();
+		}
+
+		_smallSreenChanged(newVal) {
+			if (!newVal) {
+				this.closeDrawer();
+			}
 		}
 
 		_equal(a, b) {
