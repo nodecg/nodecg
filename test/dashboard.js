@@ -18,7 +18,8 @@ describe('dashboard', function () {
 					'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]'
 				])
 				.then(ret => {
-					assert.isTrue(Boolean(ret.value));
+					assert.isObject(ret.value);
+					assert.isFunction(ret.value.someFunc);
 					done();
 				})
 				.catch(done);
@@ -33,6 +34,20 @@ describe('dashboard', function () {
 					done();
 				})
 				.catch(done);
+		});
+	});
+
+	describe('shared sources', () => {
+		it('should serve files', done => {
+			e.browser.client
+				.switchTab(e.browser.tabs.panelStandalone)
+				.execute(() => {
+					return window.SharedUtility;
+				})
+				.then(ret => {
+					assert.isAbove(Object.keys(ret.value).length, 0);
+					done();
+				});
 		});
 	});
 });
