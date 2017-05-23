@@ -23,6 +23,7 @@ process.env.NODECG_ROOT = tempFolder;
 const webdriverio = require('webdriverio');
 const e = require('./setup/test-environment');
 const C = require('./setup/test-constants');
+const addCustomBrowserCommands = require('./setup/custom-webdriver-commands');
 
 // Global before and after
 before(function (done) {
@@ -110,6 +111,9 @@ before(function (done) {
 				}
 			});
 		}
+
+		// Attach our custom methods to this browser instance.
+		addCustomBrowserCommands(e.browser.client);
 
 		e.browser.client
 			.init()

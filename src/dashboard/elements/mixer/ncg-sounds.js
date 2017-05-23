@@ -5,7 +5,10 @@ class NcgSounds extends Polymer.Element {
 
 	static get properties() {
 		return {
-			bundleName: String,
+			bundleName: {
+				type: String,
+				reflectToAttribute: true
+			},
 			soundCues: Array,
 			enableCustomCues: {
 				type: Boolean,

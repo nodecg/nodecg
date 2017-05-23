@@ -12,17 +12,16 @@ describe('dashboard', function () {
 		it('should show up on the dashboard', done => {
 			e.browser.client
 				.switchTab(e.browser.tabs.dashboard)
-				.execute(() => {
-					return Boolean(
-						document.querySelector('ncg-dashboard').shadowRoot
-							.querySelector('ncg-workspace').shadowRoot
-							.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')
-					);
-				})
+				.shadowDomElement([
+					'ncg-dashboard',
+					'ncg-workspace',
+					'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]'
+				])
 				.then(ret => {
-					assert.isTrue(ret.value);
+					assert.isTrue(Boolean(ret.value));
 					done();
-				});
+				})
+				.catch(done);
 		});
 
 		it('should show up standalone', done => {
@@ -32,7 +31,8 @@ describe('dashboard', function () {
 				.then(isExisting => {
 					assert.isTrue(isExisting);
 					done();
-				});
+				})
+				.catch(done);
 		});
 	});
 });
