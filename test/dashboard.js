@@ -35,4 +35,18 @@ describe('dashboard', function () {
 				.catch(done);
 		});
 	});
+
+	describe('shared sources', () => {
+		it('should serve files', done => {
+			e.browser.client
+				.switchTab(e.browser.tabs.panelStandalone)
+				.execute(() => {
+					return window.SharedUtility;
+				})
+				.then(ret => {
+					assert.isAbove(Object.keys(ret.value).length, 0);
+					done();
+				});
+		});
+	});
 });
