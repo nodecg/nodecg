@@ -18,8 +18,7 @@ describe('dashboard', function () {
 					'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]'
 				])
 				.then(ret => {
-					assert.isObject(ret.value);
-					assert.isFunction(ret.value.someFunc);
+					assert.isTrue(Boolean(ret.value));
 					done();
 				})
 				.catch(done);
