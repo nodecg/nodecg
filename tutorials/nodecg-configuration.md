@@ -15,7 +15,8 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
         - `enabled` _Boolean_ Whether to enable Twitch authentication.
         - `clientID` _String_ A Twitch application ClientID [http://twitch.tv/kraken/oauth2/clients/new](http://twitch.tv/kraken/oauth2/clients/new)
         - `clientSecret` _String_ A Twitch application ClientSecret [http://twitch.tv/kraken/oauth2/clients/new](http://twitch.tv/kraken/oauth2/clients/new)
-        - `scope` _String_ A space-separated string of Twitch application [permissions](https://github.com/justintv/Twitch-API/blob/master/authentication.md#scope).
+          - _Note:_ Configure your Twitch OAuth credentials with a Redirect URI to `{baseURL}/login/auth/twitch`
+        - `scope` _String_ A space-separated string of Twitch application [permissions](https://dev.twitch.tv/docs/v5/guides/authentication/#scopes).
         - `allowedUsernames` _Array of strings_ Which Twitch usernames to allow.
 - `logging` _Object_ Contains other configuration properties.
     - `replicants` _Boolean_ Whether to enable logging of the Replicants subsystem. Very spammy.
@@ -32,7 +33,7 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
     - `keyPath` _String_ The path to an SSL key file.
     - `certificatePath` _String_ The path to an SSL certificate file.
 - `developer` _Boolean_ Whether to enable features that speed up development. Not suitable for production.
-- `rollbar` _Object_ Contains [Rollbar](https://rollbar.com/) configuration properties. 
+- `rollbar` _Object_ Contains [Rollbar](https://rollbar.com/) configuration properties.
 	- `enabled` _Boolean_ Whether to enable Rollbar error tracking.
 	- `environment` _String_ An arbitrary name you choose for this environment. Something like `production`, `development`, `staging`, etc.
 	- `postServerItem` _String_ Your Rollbar project's POST_SERVER_ITEM_ACCESS_TOKEN
