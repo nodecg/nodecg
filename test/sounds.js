@@ -124,17 +124,33 @@ describe('sounds - mixer page', function () {
 							resolve();
 						});
 				}))
-				.selectorExecuteAsync('ncg-sounds[bundle-name="test-bundle"] ncg-sound-cue:nth-child(1) > #select', (elements, done) => {
+				.executeAsync(done => {
+					const el = document.querySelector('ncg-dashboard').shadowRoot
+						.querySelector('ncg-mixer').shadowRoot
+						.querySelector('ncg-sounds[bundle-name="test-bundle"]').shadowRoot
+						.querySelector('ncg-sound-cue:nth-child(1)').shadowRoot
+						.querySelector('#select');
+
+					if (!el) {
+						return done('NoSuchElement');
+					}
+
 					const interval = setInterval(() => {
-						const options = elements[0].options;
+						const options = el.options;
 						if (options.length === 2 && options[1].value === 'success.ogg') {
 							clearInterval(interval);
 							done();
 						}
 					}, 50);
 				})
-				.then(() => done())
-				.catch(err => done(err));
+				.then(ret => {
+					if (ret.value === 'NoSuchElement') {
+						done(ret.value);
+					} else {
+						done();
+					}
+				})
+				.catch(done);
 		});
 	});
 });
