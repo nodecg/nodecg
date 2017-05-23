@@ -38,7 +38,7 @@
     "passport-steam": "^1.0.2",
     "passport-twitch": "^1.0.2",
     "request": "^2.64.0",
-    "rollbar": "^0.6.0",
+    "rollbar": "^2.0.2",
     "semver": "^5.0.3",
     "serve-favicon": "^2.3.2",
     "sha1": "^1.1.1",
