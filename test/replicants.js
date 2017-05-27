@@ -176,6 +176,22 @@ describe('client-side replicants', function () {
 			.catch(err => done(err));
 	});
 
+	it('should remove .once listeners when quickfired', done => {
+		e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('clientRemoveOnceListener', {
+				persistent: false
+			});
+
+			rep.once('declared', () => {
+				rep.once('change', () => {});
+				done(rep.listenerCount('change'));
+			});
+		}).then(ret => {
+			assert.equal(ret.value, 0);
+			done();
+		}).catch(done);
+	});
+
 	context('when an array', () => {
 		it('should react to changes', done => {
 			e.browser.client
@@ -687,6 +703,15 @@ describe('server-side replicants', () => {
 			})
 			.execute(() => window.clientDoubleApplyTest.value.push('test'))
 			.catch(err => done(err));
+	});
+
+	it('should remove .once listeners when quickfired', () => {
+		const rep = e.apis.extension.Replicant('serverRemoveOnceListener', {
+			persistent: false
+		});
+
+		rep.once('change', () => {});
+		assert.equal(rep.listenerCount('change'), 0);
 	});
 
 	context('when an array', () => {
