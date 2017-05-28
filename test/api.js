@@ -6,16 +6,11 @@ const request = require('request');
 const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
-let e;
-let C;
+const e = require('./setup/test-environment');
+const C = require('./setup/test-constants');
 
 describe('client-side api', function () {
 	this.timeout(10000);
-
-	before(() => {
-		e = require('./setup/test-environment');
-		C = require('./setup/test-constants');
-	});
 
 	context('on the dashboard', () => {
 		before(done => {
@@ -38,7 +33,7 @@ describe('client-side api', function () {
 			}, Error, 'argument "handler" must be a function, but you provided a(n) string');
 		});
 
-		// Check for basic connectivity. The rest of the test are run from the dashboard as well.
+		// Check for basic connectivity. The rest of the tests are run from the dashboard as well.
 		it('should receive messages', done => {
 			let sendMessage;
 			e.browser.client
@@ -191,6 +186,25 @@ describe('server-side api', () => {
 			.switchTab(e.browser.tabs.dashboard)
 			.executeAsync(done => window.dashboardApi.sendMessage('clientToServer', null, done))
 			.call(done);
+	});
+
+	it('should serialize errors sent to acknowledgements', function (done) {
+		this.timeout(10000);
+
+		e.apis.extension.listenFor('ackErrors', (data, cb) => {
+			cb(new Error('boom'));
+		});
+
+		e.browser.client
+			.switchTab(e.browser.tabs.dashboard)
+			.executeAsync(done => window.dashboardApi.sendMessage('ackErrors', null, err => {
+				done(err.message);
+			}))
+			.then(res => {
+				assert.equal(res.value, 'boom');
+				done();
+			})
+			.catch(done);
 	});
 
 	it('should send messages', function (done) {
