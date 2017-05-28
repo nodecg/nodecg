@@ -9,6 +9,81 @@ const assert = chai.assert;
 const e = require('./setup/test-environment');
 const C = require('./setup/test-constants');
 
+describe('api', function () {
+	this.timeout(10000);
+
+	it('should receive messages and fire acknowledgements', done => {
+		e.apis.extension.listenFor('clientToServer', (data, cb) => {
+			cb();
+		});
+
+		e.browser.client
+			.switchTab(e.browser.tabs.dashboard)
+			.executeAsync(done => window.dashboardApi.sendMessage('clientToServer', null, done))
+			.then(() => {
+				done();
+			})
+			.catch(done);
+	});
+
+	it('should serialize errors sent to acknowledgements', done => {
+		e.apis.extension.listenFor('ackErrors', (data, cb) => {
+			cb(new Error('boom'));
+		});
+
+		e.browser.client
+			.switchTab(e.browser.tabs.dashboard)
+			.executeAsync(done => window.dashboardApi.sendMessage('ackErrors', null, err => {
+				done(err.message);
+			}))
+			.then(res => {
+				assert.equal(res.value, 'boom');
+				done();
+			})
+			.catch(done);
+	});
+
+	it('should resolve acknowledgement promises', done => {
+		e.apis.extension.listenFor('ackPromiseResolve', (data, cb) => {
+			cb();
+		});
+
+		e.browser.client
+			.switchTab(e.browser.tabs.dashboard)
+			.executeAsync(done => {
+				window.dashboardApi.sendMessage('ackPromiseResolve').then(() => {
+					done();
+				}).catch(done);
+			})
+			.then(res => {
+				// Res.value should be empty. If not, this test will fail.
+				done(res.value);
+			})
+			.catch(done);
+	});
+
+	it('should reject acknowledgement promises if there was an error', done => {
+		e.apis.extension.listenFor('ackPromiseReject', (data, cb) => {
+			cb(new Error('boom'));
+		});
+
+		e.browser.client
+			.switchTab(e.browser.tabs.dashboard)
+			.executeAsync(done => {
+				window.dashboardApi.sendMessage('ackPromiseReject').then(() => {
+					done(new Error('Promise resolved when it should have rejected.'));
+				}).catch(err => {
+					done(err.message);
+				});
+			})
+			.then(res => {
+				assert.equal(res.value, 'boom');
+				done();
+			})
+			.catch(done);
+	});
+});
+
 describe('client-side api', function () {
 	this.timeout(10000);
 
@@ -175,38 +250,6 @@ describe('client-side api', function () {
 });
 
 describe('server-side api', () => {
-	it('should receive messages and fire acknowledgements', function (done) {
-		this.timeout(10000);
-
-		e.apis.extension.listenFor('clientToServer', (data, cb) => {
-			cb();
-		});
-
-		e.browser.client
-			.switchTab(e.browser.tabs.dashboard)
-			.executeAsync(done => window.dashboardApi.sendMessage('clientToServer', null, done))
-			.call(done);
-	});
-
-	it('should serialize errors sent to acknowledgements', function (done) {
-		this.timeout(10000);
-
-		e.apis.extension.listenFor('ackErrors', (data, cb) => {
-			cb(new Error('boom'));
-		});
-
-		e.browser.client
-			.switchTab(e.browser.tabs.dashboard)
-			.executeAsync(done => window.dashboardApi.sendMessage('ackErrors', null, err => {
-				done(err.message);
-			}))
-			.then(res => {
-				assert.equal(res.value, 'boom');
-				done();
-			})
-			.catch(done);
-	});
-
 	it('should send messages', function (done) {
 		this.timeout(10000);
 
