@@ -9,44 +9,30 @@ describe('dashboard', function () {
 	this.timeout(10000);
 
 	describe('panels', () => {
-		it('should show up on the dashboard', done => {
-			e.browser.client
-				.switchTab(e.browser.tabs.dashboard)
-				.shadowDomElement([
-					'ncg-dashboard',
-					'ncg-workspace',
-					'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]'
-				])
-				.then(ret => {
-					assert.isTrue(Boolean(ret.value));
-					done();
-				})
-				.catch(done);
+		it('should show up on the dashboard', async () => {
+			await e.browser.client.switchTab(e.browser.tabs.dashboard);
+			const res = await e.browser.client.shadowDomElement([
+				'ncg-dashboard',
+				'ncg-workspace',
+				'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]'
+			]);
+			assert.isTrue(Boolean(res.value));
 		});
 
-		it('should show up standalone', done => {
-			e.browser.client
-				.switchTab(e.browser.tabs.panelStandalone)
-				.isExisting('#test-bundle-paragraph')
-				.then(isExisting => {
-					assert.isTrue(isExisting);
-					done();
-				})
-				.catch(done);
+		it('should show up standalone', async () => {
+			await e.browser.client.switchTab(e.browser.tabs.panelStandalone);
+			const isExisting = await e.browser.client.isExisting('#test-bundle-paragraph');
+			assert.isTrue(isExisting);
 		});
 	});
 
 	describe('shared sources', () => {
-		it('should serve files', done => {
-			e.browser.client
-				.switchTab(e.browser.tabs.panelStandalone)
-				.execute(() => {
-					return window.SharedUtility;
-				})
-				.then(ret => {
-					assert.isAbove(Object.keys(ret.value).length, 0);
-					done();
-				});
+		it('should serve files', async () => {
+			await e.browser.client.switchTab(e.browser.tabs.panelStandalone);
+			const res = await e.browser.client.execute(() => {
+				return window.SharedUtility;
+			});
+			assert.isAbove(Object.keys(res.value).length, 0);
 		});
 	});
 });

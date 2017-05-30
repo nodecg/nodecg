@@ -159,20 +159,14 @@ before(function (done) {
 			})
 			.timeouts('script', 5000)
 			.call(done)
-			.catch(err => {
-				done(err);
-			});
+			.catch(done);
 	});
 
 	e.server.start();
 });
 
-after(function (done) {
+after(function () {
 	e.server.stop();
-
 	this.timeout(10000);
-	e.browser.client
-		.end()
-		.call(done)
-		.catch(err => done(err));
+	return e.browser.client.end();
 });
