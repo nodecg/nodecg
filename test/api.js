@@ -177,6 +177,15 @@ describe('client-side api', function () {
 			assert.isAbove(Object.keys(res.value).length, 0);
 		});
 	});
+
+	describe('#Logger', () => {
+		it('should exist and be the Logger constructor', async () => {
+			const res = await e.browser.client.execute(() => {
+				return window.dashboardApi.Logger && typeof window.dashboardApi.Logger === 'function';
+			});
+			assert.isTrue(res.value);
+		});
+	});
 });
 
 describe('server-side api', () => {
@@ -232,6 +241,12 @@ describe('server-side api', () => {
 	describe('#bundleConfig', () => {
 		it('should exist and has length', () => {
 			assert.isAbove(Object.keys(e.apis.extension.bundleConfig).length, 0);
+		});
+	});
+
+	describe('#Logger', () => {
+		it('should exist and be the Logger constructor', () => {
+			assert.isFunction(e.apis.extension.Logger);
 		});
 	});
 });
