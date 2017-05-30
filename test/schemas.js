@@ -8,394 +8,307 @@ const e = require('./setup/test-environment');
 describe('client-side replicant schemas', function () {
 	this.timeout(10000);
 
-	before(done => {
-		e.browser.client
-			.switchTab(e.browser.tabs.dashboard)
-			.call(done);
+	before(() => {
+		return e.browser.client.switchTab(e.browser.tabs.dashboard);
 	});
 
-	it('should create a default value based on the schema, if none is provided', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaDefaults');
-				rep.on('declared', () => done(rep.value));
-			})
-			.then(ret => {
-				assert.deepEqual(ret.value, {
-					string: '',
-					object: {
-						numA: 0
-					}
-				});
-				done();
-			})
-			.catch(err => done(err));
+	it('should create a default value based on the schema, if none is provided', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaDefaults');
+			rep.on('declared', () => done(rep.value));
+		});
+		assert.deepEqual(res.value, {
+			string: '',
+			object: {
+				numA: 0
+			}
+		});
 	});
 
-	it('should accept the defaultValue when it passes validation', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaDefaultValuePass', {
-					defaultValue: {
-						string: 'foo',
-						object: {
-							numA: 1
-						}
-					}
-				});
-				rep.on('declared', () => done(rep.value));
-			})
-			.then(ret => {
-				assert.deepEqual(ret.value, {
+	it('should accept the defaultValue when it passes validation', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaDefaultValuePass', {
+				defaultValue: {
 					string: 'foo',
 					object: {
 						numA: 1
 					}
-				});
-				done();
-			})
-			.catch(err => done(err));
+				}
+			});
+			rep.on('declared', () => done(rep.value));
+		});
+		assert.deepEqual(res.value, {
+			string: 'foo',
+			object: {
+				numA: 1
+			}
+		});
 	});
 
-	it('should throw when defaultValue fails validation', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
-					defaultValue: {
+	it('should throw when defaultValue fails validation', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
+				defaultValue: {
+					string: 0
+				}
+			});
+
+			rep.once('declarationRejected', reason => {
+				done(reason);
+			});
+		});
+		assert.isTrue(res.value.startsWith('Invalid value rejected for replicant "client_schemaDefaultValueFail"'));
+	});
+
+	it('should accept the persisted value when it passes validation', async () => {
+		// Persisted value is copied from fixtures
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaPersistencePass');
+			rep.on('declared', () => {
+				done(rep.value);
+			});
+		});
+		assert.deepEqual(res.value, {
+			string: 'foo',
+			object: {
+				numA: 1
+			}
+		});
+	});
+
+	it('should reject the persisted value when it fails validation, replacing with schemaDefaults', async () => {
+		// Persisted value is copied from fixtures
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaPersistenceFail');
+			rep.on('declared', () => done(rep.value));
+		});
+		assert.deepEqual(res.value, {
+			string: '',
+			object: {
+				numA: 0
+			}
+		});
+	});
+
+	it('should accept valid assignment', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaAssignPass');
+			rep.once('declared', () => {
+				rep.value = {
+					string: 'foo',
+					object: {
+						numA: 1
+					}
+				};
+
+				rep.on('change', newVal => {
+					if (newVal.string === 'foo') {
+						done(rep.value);
+					}
+				});
+			});
+		});
+		assert.deepEqual(res.value, {
+			string: 'foo',
+			object: {
+				numA: 1
+			}
+		});
+	});
+
+	it('should throw on invalid assignment', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaAssignFail');
+			rep.once('declared', () => {
+				try {
+					rep.value = {
 						string: 0
-					}
-				});
-
-				rep.once('declarationRejected', reason => {
-					done(reason);
-				});
-			})
-			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaDefaultValueFail"'));
-				done();
-			})
-			.catch(err => done(err));
+					};
+				} catch (e) {
+					done(e.message);
+				}
+			});
+		});
+		assert.isTrue(res.value.startsWith('Invalid value rejected for replicant "client_schemaAssignFail"'));
 	});
 
-	it('should accept the persisted value when it passes validation', done => {
-		// Persisted value is copied from fixtures
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaPersistencePass');
-				rep.on('declared', () => {
-					done(rep.value);
-				});
-			})
-			.then(ret => {
-				assert.deepEqual(ret.value, {
-					string: 'foo',
-					object: {
-						numA: 1
+	it('should accept valid property deletion', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaDeletionPass');
+			rep.once('declared', () => {
+				delete rep.value.object.numB;
+				rep.on('change', newVal => {
+					if (!newVal.object.numB) {
+						done(rep.value);
 					}
 				});
-				done();
-			})
-			.catch(err => done(err));
+			});
+		});
+		assert.deepEqual(res.value, {
+			string: '',
+			object: {
+				numA: 0
+			}
+		});
 	});
 
-	it('should reject the persisted value when it fails validation, replacing with schemaDefaults', done => {
-		// Persisted value is copied from fixtures
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaPersistenceFail');
-				rep.on('declared', () => done(rep.value));
-			})
-			.then(ret => {
-				assert.deepEqual(ret.value, {
-					string: '',
-					object: {
-						numA: 0
+	it('should throw on invalid property deletion', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaDeletionFail');
+			rep.once('declared', () => {
+				try {
+					delete rep.value.object.numA;
+				} catch (e) {
+					done(e.message);
+				}
+			});
+		});
+		assert.isTrue(res.value.startsWith('Invalid value rejected for replicant "client_schemaDeletionFail"'));
+	});
+
+	it('should accept valid array mutation via array mutator methods', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaArrayMutatorPass');
+			rep.once('declared', () => {
+				rep.value.array.push('foo');
+				rep.on('change', newVal => {
+					if (newVal.array.length === 1) {
+						done(rep.value);
 					}
 				});
-				done();
-			})
-			.catch(err => done(err));
+			});
+		});
+		assert.deepEqual(res.value, {
+			string: '',
+			array: [
+				'foo'
+			]
+		});
 	});
 
-	it('should accept valid assignment', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaAssignPass');
-				rep.once('declared', () => {
+	it('should throw on invalid array mutation via array mutator methods', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaArrayMutatorFail');
+			rep.once('declared', () => {
+				try {
+					rep.value.array.push(0);
+				} catch (e) {
+					done(e.message);
+				}
+			});
+		});
+		assert.isTrue(res.value.startsWith('Invalid value rejected for replicant "client_schemaArrayMutatorFail"'));
+	});
+
+	it('should accept valid property changes to arrays', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaArrayChangePass');
+			rep.once('declared', () => {
+				rep.value.array[0] = 'bar';
+				rep.on('change', newVal => {
+					if (newVal.array[0] === 'bar') {
+						done(rep.value);
+					}
+				});
+			});
+		});
+		assert.deepEqual(res.value, {
+			string: '',
+			array: [
+				'bar'
+			]
+		});
+	});
+
+	it('should throw on invalid property changes to arrays', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaArrayChangeFail');
+			rep.once('declared', () => {
+				try {
+					rep.value.array[0] = 0;
+				} catch (e) {
+					done(e.message);
+				}
+			});
+		});
+		assert.isTrue(res.value.startsWith('Invalid value rejected for replicant "client_schemaArrayChangeFail"'));
+	});
+
+	it('should accept valid property changes to objects', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaObjectChangePass');
+			rep.once('declared', () => {
+				rep.value.object.numA = 1;
+				rep.on('change', newVal => {
+					if (newVal.object.numA === 1) {
+						done(rep.value);
+					}
+				});
+			});
+		});
+		assert.deepEqual(res.value, {
+			string: '',
+			object: {
+				numA: 1
+			}
+		});
+	});
+
+	it('should throw on invalid property changes to objects', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaObjectChangeFail');
+			rep.once('declared', () => {
+				try {
+					rep.value.object.numA = 'foo';
+				} catch (e) {
+					done(e.message);
+				}
+			});
+		});
+		assert.isTrue(res.value.startsWith('Invalid value rejected for replicant "client_schemaObjectChangeFail"'));
+	});
+
+	it('should reject assignment if it was validated against a different version of the schema', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaAssignMismatch');
+			rep.once('declared', () => {
+				rep.schemaSum = 'baz';
+				try {
 					rep.value = {
 						string: 'foo',
 						object: {
 							numA: 1
 						}
 					};
+				} catch (e) {
+					done(e.message);
+				}
+			});
 
-					rep.on('change', newVal => {
-						if (newVal.string === 'foo') {
-							done(rep.value);
-						}
-					});
-				});
-			})
-			.then(ret => {
-				assert.deepEqual(ret.value, {
-					string: 'foo',
-					object: {
-						numA: 1
-					}
-				});
-				done();
-			})
-			.catch(err => done(err));
+			rep.once('assignmentRejected', reason => {
+				done(reason);
+			});
+		});
+		assert.isTrue(res.value.startsWith('Mismatched schema version, assignment rejected'));
 	});
 
-	it('should throw on invalid assignment', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaAssignFail');
-				rep.once('declared', () => {
-					try {
-						rep.value = {
-							string: 0
-						};
-					} catch (e) {
-						done(e.message);
-					}
-				});
-			})
-			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaAssignFail"'));
-				done();
-			})
-			.catch(err => done(err));
-	});
-
-	it('should accept valid property deletion', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaDeletionPass');
-				rep.once('declared', () => {
-					delete rep.value.object.numB;
-					rep.on('change', newVal => {
-						if (!newVal.object.numB) {
-							done(rep.value);
-						}
-					});
-				});
-			})
-			.then(ret => {
-				assert.deepEqual(ret.value, {
-					string: '',
-					object: {
-						numA: 0
-					}
-				});
-				done();
-			})
-			.catch(err => done(err));
-	});
-
-	it('should throw on invalid property deletion', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaDeletionFail');
-				rep.once('declared', () => {
-					try {
-						delete rep.value.object.numA;
-					} catch (e) {
-						done(e.message);
-					}
-				});
-			})
-			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaDeletionFail"'));
-				done();
-			})
-			.catch(err => done(err));
-	});
-
-	it('should accept valid array mutation via array mutator methods', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaArrayMutatorPass');
-				rep.once('declared', () => {
-					rep.value.array.push('foo');
-					rep.on('change', newVal => {
-						if (newVal.array.length === 1) {
-							done(rep.value);
-						}
-					});
-				});
-			})
-			.then(ret => {
-				assert.deepEqual(ret.value, {
-					string: '',
-					array: [
-						'foo'
-					]
-				});
-				done();
-			})
-			.catch(err => done(err));
-	});
-
-	it('should throw on invalid array mutation via array mutator methods', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaArrayMutatorFail');
-				rep.once('declared', () => {
-					try {
-						rep.value.array.push(0);
-					} catch (e) {
-						done(e.message);
-					}
-				});
-			})
-			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaArrayMutatorFail"'));
-				done();
-			})
-			.catch(err => done(err));
-	});
-
-	it('should accept valid property changes to arrays', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaArrayChangePass');
-				rep.once('declared', () => {
-					rep.value.array[0] = 'bar';
-					rep.on('change', newVal => {
-						if (newVal.array[0] === 'bar') {
-							done(rep.value);
-						}
-					});
-				});
-			})
-			.then(ret => {
-				assert.deepEqual(ret.value, {
-					string: '',
-					array: [
-						'bar'
-					]
-				});
-				done();
-			})
-			.catch(err => done(err));
-	});
-
-	it('should throw on invalid property changes to arrays', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaArrayChangeFail');
-				rep.once('declared', () => {
-					try {
-						rep.value.array[0] = 0;
-					} catch (e) {
-						done(e.message);
-					}
-				});
-			})
-			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaArrayChangeFail"'));
-				done();
-			})
-			.catch(err => done(err));
-	});
-
-	it('should accept valid property changes to objects', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaObjectChangePass');
-				rep.once('declared', () => {
+	it('should reject operations if they were validated against a different version of the schema', async () => {
+		const res = await e.browser.client.executeAsync(done => {
+			const rep = window.dashboardApi.Replicant('client_schemaOperationMismatch');
+			rep.once('declared', () => {
+				rep.schemaSum = 'baz';
+				try {
 					rep.value.object.numA = 1;
-					rep.on('change', newVal => {
-						if (newVal.object.numA === 1) {
-							done(rep.value);
-						}
-					});
-				});
-			})
-			.then(ret => {
-				assert.deepEqual(ret.value, {
-					string: '',
-					object: {
-						numA: 1
-					}
-				});
-				done();
-			})
-			.catch(err => done(err));
-	});
+				} catch (e) {
+					done(e.message);
+				}
+			});
 
-	it('should throw on invalid property changes to objects', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaObjectChangeFail');
-				rep.once('declared', () => {
-					try {
-						rep.value.object.numA = 'foo';
-					} catch (e) {
-						done(e.message);
-					}
-				});
-			})
-			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Invalid value rejected for replicant "client_schemaObjectChangeFail"'));
-				done();
-			})
-			.catch(err => done(err));
-	});
-
-	it('should reject assignment if it was validated against a different version of the schema', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaAssignMismatch');
-				rep.once('declared', () => {
-					rep.schemaSum = 'baz';
-					try {
-						rep.value = {
-							string: 'foo',
-							object: {
-								numA: 1
-							}
-						};
-					} catch (e) {
-						done(e.message);
-					}
-				});
-
-				rep.once('assignmentRejected', reason => {
-					done(reason);
-				});
-			})
-			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Mismatched schema version, assignment rejected'));
-				done();
-			})
-			.catch(err => done(err));
-	});
-
-	it('should reject operations if they were validated against a different version of the schema', done => {
-		e.browser.client
-			.executeAsync(done => {
-				const rep = window.dashboardApi.Replicant('client_schemaOperationMismatch');
-				rep.once('declared', () => {
-					rep.schemaSum = 'baz';
-					try {
-						rep.value.object.numA = 1;
-					} catch (e) {
-						done(e.message);
-					}
-				});
-
-				rep.once('operationsRejected', reason => {
-					done(reason);
-				});
-			})
-			.then(ret => {
-				assert.isTrue(ret.value.startsWith('Mismatched schema version, assignment rejected'));
-				done();
-			})
-			.catch(err => done(err));
+			rep.once('operationsRejected', reason => {
+				done(reason);
+			});
+		});
+		assert.isTrue(res.value.startsWith('Mismatched schema version, assignment rejected'));
 	});
 
 	// This isn't _actually_ testing schemas, it's just a bug that is easiest to detect when using a schema.
@@ -404,8 +317,8 @@ describe('client-side replicant schemas', function () {
 	// I more or less copied that code and schema directly here just to write the test as fast as possible.
 	// This test should probably be re-written to be more targeted and remove any cruft.
 	// Lange - 2017/05/04
-	it('shouldn\'t fuck up', done => {
-		e.browser.client.executeAsync(done => {
+	it('shouldn\'t fuck up', async () => {
+		const res = await e.browser.client.executeAsync(done => {
 			const rep = window.dashboardApi.Replicant('schedule:state');
 			rep.once('declared', () => {
 				rep.value.matchMap = [
@@ -424,12 +337,8 @@ describe('client-side replicant schemas', function () {
 					}
 				});
 			});
-		})
-		.then(ret => {
-			assert.isTrue(ret.value);
-			done();
-		})
-		.catch(err => done(err));
+		});
+		assert.isTrue(res.value);
 	});
 });
 

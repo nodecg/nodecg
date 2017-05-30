@@ -3,7 +3,8 @@ dist: trusty
 
 language: node_js
 node_js:
-  - '6'
+# Upgrade to Node 8 as soon as it is out, so we can use npm5 which will greatly speed up tests.
+  - '7'
 
 os:
   - linux

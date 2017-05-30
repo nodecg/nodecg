@@ -13,11 +13,8 @@ const e = require('./setup/test-environment');
 describe('client-side replicants', function () {
 	this.timeout(10000);
 
-	before(done => {
-		e.browser.client
-			.switchTab(e.browser.tabs.dashboard)
-			.call(done)
-			.catch(err => done(err));
+	before(() => {
+		return e.browser.client.switchTab(e.browser.tabs.dashboard);
 	});
 
 	it('should return a reference to any already-declared replicant', done => {
@@ -144,7 +141,8 @@ describe('client-side replicants', function () {
 						.executeAsync(done => {
 							window.clientRedeclare.once('declared', () => done());
 						})
-						.call(done);
+						.then(done)
+						.catch(done);
 
 					e.server.start();
 				});
@@ -599,8 +597,8 @@ describe('client-side replicants', function () {
 							}).to.throw(/ENOENT/);
 						});
 					})
-					.call(done)
-					.catch(err => done(err));
+					.then(done)
+					.catch(done);
 			});
 		});
 	});
