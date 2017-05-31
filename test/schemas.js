@@ -1,9 +1,16 @@
 /* eslint-env node, mocha, browser */
 'use strict';
 
+// Native
+const path = require('path');
+
+// Packages
 const chai = require('chai');
-const assert = chai.assert;
+
+// Ours
 const e = require('./setup/test-environment');
+
+const assert = chai.assert;
 
 describe('client-side replicant schemas', function () {
 	this.timeout(10000);
@@ -471,5 +478,17 @@ describe('server-side replicant schemas', () => {
 			const rep = e.apis.extension.Replicant('schemaObjectChangeFail');
 			rep.value.object.numA = 'foo';
 		}, /Invalid value rejected for replicant/);
+	});
+
+	it('should properly load schemas provided with an absolute path', () => {
+		const rep = e.apis.extension.Replicant('schemaAbsolutePath', {
+			schemaPath: path.resolve(__dirname, 'fixtures/absolute-path-schemas/schemaAbsolutePath.json')
+		});
+		assert.deepEqual(rep.value, {
+			string: '',
+			object: {
+				numA: 0
+			}
+		});
 	});
 });
