@@ -20,7 +20,7 @@
     "iron-localstorage": "PolymerElements/iron-localstorage#^2.0.0",
     "iron-pages": "PolymerElements/iron-pages#^2.0.0",
     "iron-selector": "PolymerElements/iron-selector#^2.0.0",
-    "nodecg-replicant": "NodeCGElements/nodecg-replicant#^0.5.9",
+    "nodecg-replicant": "NodeCGElements/nodecg-replicant#^1.0.0",
     "packery": "^2.1.1",
     "paper-button": "PolymerElements/paper-button#^2.0.0",
     "paper-card": "PolymerElements/paper-card#^2.0.0",
