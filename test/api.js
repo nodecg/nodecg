@@ -186,6 +186,26 @@ describe('client-side api', function () {
 			assert.isTrue(res.value);
 		});
 	});
+
+	describe('#getDialog', () => {
+		it('works', async () => {
+			const res = await e.browser.client.execute(() => {
+				const dialog = window.dashboardApi.getDialog('test-dialog');
+				return dialog && dialog.tagName === 'NCG-DIALOG';
+			});
+			assert.isTrue(res.value);
+		});
+	});
+
+	describe('#getDialogDocument', () => {
+		it('works', async () => {
+			const res = await e.browser.client.execute(() => {
+				const document = window.dashboardApi.getDialogDocument('test-dialog');
+				return document && document.body && document.body.tagName === 'BODY';
+			});
+			assert.isTrue(res.value);
+		});
+	});
 });
 
 describe('server-side api', () => {
