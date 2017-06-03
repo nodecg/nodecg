@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "@nodecg/bundle-manager": "github:nodecg/bundle-manager#4deca0060e5e73b8ebaf642888ae81f88138df3f",
-    "@nodecg/logger": "^0.2.0",
+    "@nodecg/logger": "github:nodecg/logger#nodecg-v0.9-beta.1",
     "body-parser": "^1.14.1",
     "cheerio": "^0.22.0",
     "chokidar": "^1.4.2",
@@ -49,6 +49,8 @@
     "passport-steam": "^1.0.2",
     "passport-twitch": "^1.0.2",
     "pug": "^2.0.0-beta11",
+    "raven": "^2.0.2",
+    "report-rejected-promises-to-sentry": "^1.0.1",
     "request": "^2.64.0",
     "rollbar": "^0.6.0",
     "semver": "^5.0.3",

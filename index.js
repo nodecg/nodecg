@@ -21,7 +21,7 @@ if (!semver.satisfies(nodeVersion, '>=6')) {
 }
 
 process.on('uncaughtException', err => {
-	if (!global.rollbarEnabled) {
+	if (!global.sentryEnabled) {
 		if (global.exitOnUncaught) {
 			console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
 		} else {

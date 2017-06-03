@@ -8,6 +8,20 @@ html(lang='en')
 
 		title NodeCG Dashboard
 
+		if privateConfig.sentry && privateConfig.sentry.enabled
+			script(src='/bower_components/raven-js/dist/raven.min.js')
+			script(type='text/javascript').
+				Raven.config('#{privateConfig.sentry.publicDsn}', {
+					release: '#{nodecgVersion}',
+					tags: {
+						nodecgHost: '#{privateConfig.host}',
+						nodecgBaseURL: `#{privateConfig.baseURL}`
+					}
+				}).install();
+				window.addEventListener('unhandledrejection', function (err) {
+					Raven.captureException(err.reason);
+				});
+
 		//- Register service worker
 		script(type='text/javascript').
 			if ('serviceWorker' in navigator) {
@@ -19,18 +33,6 @@ html(lang='en')
 						console.error(err);
 					});
 			}
-
-		if privateConfig.rollbar && privateConfig.rollbar.enabled
-			script(src='/bower_components/rollbar/dist/rollbar.min.js')
-			script(type='text/javascript').
-				const _rollbarConfig = {
-					accessToken: '#{privateConfig.rollbar.postClientItem}',
-					captureUncaught: true,
-					payload: {
-						environment: '#{privateConfig.rollbar.environment}'
-					}
-				};
-				Rollbar.init(_rollbarConfig);
 
 		//- other dashboard scripts
 		script(src='/bower_components/draggabilly/dist/draggabilly.pkgd.min.js' async)
