@@ -53,21 +53,18 @@ class NcgDashboardPanel extends Polymer.Element {
 			infoDialog.open();
 		});
 
-		setTimeout(() => {
+		Polymer.RenderStatus.afterNextRender(this, () => {
 			const distributedNodes = this.$.slot.assignedNodes({flatten: true});
 			const iframe = distributedNodes.find(el => el.tagName === 'IFRAME');
 
 			if (!this.fullbleed) {
-				// Once all the panel iFrames are loaded, this func (from the iframe-resize bower dep)
-				// automagically fixes the height of all the iframes.
-				window.iFrameResize({
-					log: false,
-					resizeFrom: 'child',
-					heightCalculationMethod: 'documentElementOffset',
-					resizedCallback(data) {
-						data.iframe.dispatchEvent(new CustomEvent('iframe-resized'));
-					}
-				}, iframe);
+				if (iframe.contentWindow.document.readyState === 'complete') {
+					this._attachIframeResize(iframe);
+				} else {
+					iframe.addEventListener('load', () => {
+						this._attachIframeResize(iframe);
+					});
+				}
 			}
 
 			// Sometimes, we just need to know when a dang click event occurred. No matter where it happened.
@@ -75,7 +72,19 @@ class NcgDashboardPanel extends Polymer.Element {
 			iframe.contentDocument.addEventListener('click', e => {
 				document.dispatchEvent(new CustomEvent('panelClick', e.target));
 			});
-		}, 0);
+		});
+	}
+
+	_attachIframeResize(iframe) {
+		window.iFrameResize({
+			log: false,
+			resizeFrom: 'child',
+			heightCalculationMethod: 'documentElementOffset',
+			resizedCallback: data => {
+				this.$.collapse.updateSize('auto', false);
+				data.iframe.dispatchEvent(new CustomEvent('iframe-resized'));
+			}
+		}, iframe);
 	}
 
 	connectedCallback() {
