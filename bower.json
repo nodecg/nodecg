@@ -35,10 +35,10 @@
     "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
     "paper-toast": "PolymerElements/paper-toast#^2.0.0",
     "paper-toolbar": "PolymerElements/paper-toolbar#^2.0.0",
-    "rollbar": "^1.9.4",
     "SoundJS": "^0.6.2",
     "vaadin-upload": "vaadin/vaadin-upload#^2.0.0-alpha3",
-    "polymer": "Polymer/polymer#2.0.0"
+    "polymer": "Polymer/polymer#2.0.0",
+    "raven-js": "^3.15.0"
   },
   "license": "MIT",
   "private": true,

@@ -1,3 +1,4 @@
+/* global Raven */
 class NcgDashboardPanel extends Polymer.Element {
 	static get is() {
 		return 'ncg-dashboard-panel';
@@ -56,6 +57,16 @@ class NcgDashboardPanel extends Polymer.Element {
 		Polymer.RenderStatus.afterNextRender(this, () => {
 			const distributedNodes = this.$.slot.assignedNodes({flatten: true});
 			const iframe = distributedNodes.find(el => el.tagName === 'IFRAME');
+
+			// If Raven is loaded, use it to report errors in panels to Sentry.io.
+			if (Raven) {
+				iframe.contentWindow.addEventListener('error', event => {
+					Raven.captureException(event.error);
+				});
+				iframe.contentWindow.addEventListener('unhandledrejection', err => {
+					Raven.captureException(err.reason);
+				});
+			}
 
 			if (!this.fullbleed) {
 				if (iframe.contentWindow.document.readyState === 'complete') {
