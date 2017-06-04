@@ -36,6 +36,13 @@ process.on('uncaughtException', err => {
 	}
 });
 
+process.on('unhandledRejection', err => {
+	if (!global.sentryEnabled) {
+		console.error('UNHANDLED PROMISE REJECTION!');
+		console.error(err);
+	}
+});
+
 const server = require('./lib/server')
 	.on('error', () => process.exit(1))
 	.on('stopped', () => process.exit(0));

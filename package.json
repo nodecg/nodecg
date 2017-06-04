@@ -50,7 +50,6 @@
     "passport-twitch": "^1.0.2",
     "pug": "^2.0.0-beta11",
     "raven": "^2.0.2",
-    "report-rejected-promises-to-sentry": "^1.0.1",
     "request": "^2.64.0",
     "rollbar": "^0.6.0",
     "semver": "^5.0.3",
