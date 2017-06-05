@@ -76,7 +76,7 @@
     "babel-preset-babili": "0.0.12",
     "babelify": "^7.2.0",
     "brfs": "^1.4.1",
-    "chai": "^3.5.0",
+    "chai": "^4.0.2",
     "coveralls": "^2.11.16",
     "eslint": "^3.18.0",
     "eslint-config-xo": "^0.18.0",
