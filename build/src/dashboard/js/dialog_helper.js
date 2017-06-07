@@ -1,1 +1,20 @@
-document.addEventListener('click',(a)=>{'use strict';const b=window.frameElement.closest('ncg-dialog'),c=a.target.closest('[dialog-dismiss]');if(c)return b._updateClosingReasonConfirmed(!1),void b.close();const d=a.target.closest('[dialog-confirm]');d&&(b._updateClosingReasonConfirmed(!0),b.close())},!1);
+document.addEventListener('click', e => {
+	'use strict';
+
+	const parentDialogEl = window.frameElement.closest('ncg-dialog');
+
+	// If the clicked item (or any of its parents) have the `dialog-dismiss` attribute, dismiss the dialog.
+	const dialogDismissEl = e.target.closest('[dialog-dismiss]');
+	if (dialogDismissEl) {
+		parentDialogEl._updateClosingReasonConfirmed(false);
+		parentDialogEl.close();
+		return;
+	}
+
+	// If the clicked item (or any of its parents) have the `dialog-confirm` attribute, confirm the dialog.
+	const dialogConfirmEl = e.target.closest('[dialog-confirm]');
+	if (dialogConfirmEl) {
+		parentDialogEl._updateClosingReasonConfirmed(true);
+		parentDialogEl.close();
+	}
+}, false);

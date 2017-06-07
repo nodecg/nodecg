@@ -1,6 +1,6 @@
 'use strict';
 
-const babel = require('gulp-babel');
+// Const babel = require('gulp-babel');
 const browserify = require('browserify');
 const buffer = require('vinyl-buffer');
 const cleanCSS = require('gulp-clean-css');
@@ -100,19 +100,16 @@ gulp.task('polymer-build', ['clean'], async () => {
 			removeComments: true,
 			minifyCSS: true
 		})))
+
+		// Bundling and JS minification and  are disabled until the source map bugs are fixed.
 		// .pipe(gulpif(/\.js$/, sourcemaps.init({loadMaps: true})))
-		.pipe(gulpif(/\.js$/, babel({
-			presets: ['babili']
-		})))
+		// .pipe(gulpif(/\.js$/, babel({
+		// 	presets: ['babili']
+		// })))
 		// .pipe(gulpif(/\.js$/, sourcemaps.write('src/maps')))
 		.pipe(buildStreamSplitter.rejoin())
 
-		// Can't enable sourcemaps until this issue is resolved:
-		// https://github.com/Polymer/polymer-bundler/issues/516
-		// The core problem here seems to be bugs in the source-map lib.
-		// This lib hasn't had a new release in over a year and does not seem to be maintained.
-		// There are several critical issues and mergable pull requests with no replies on them.
-		.pipe(polymerProject.bundler({sourcemaps: false, stripComments: true}))
+		// .pipe(polymerProject.bundler({sourcemaps: false, stripComments: true}))
 		.pipe(gulp.dest(buildDirectory));
 
 	// WaitFor the buildStream to complete
