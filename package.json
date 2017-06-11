@@ -86,6 +86,7 @@
   "devDependencies": {
     "aliasify": "^2.1.0",
     "babel-preset-babili": "^0.1.1",
+    "babel-preset-es2015-nostrict": "^6.6.2",
     "babelify": "^7.3.0",
     "brfs": "^1.4.1",
     "browserify": "^14.3.0",
