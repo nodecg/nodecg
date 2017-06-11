@@ -43,7 +43,12 @@ gulp.task('browser-api', ['clean'], () => {
 		transform: [
 			['babelify', {
 				global: true,
-				presets: ['babili'],
+
+				// Once MacOS High Sierra and iOS 11 are out, we can remove the `es2015-nostrict` preset.
+				// It's needed for now because Safari currently does not properly scope the `let` keyword,
+				// meaning that we have to compile our code down to ES5 to work on Safari/iOS.
+				// This is fixed in Safari Tech Preview, and should be included in the next release in Fall.
+				presets: ['es2015-nostrict', 'babili'],
 				comments: false,
 				minified: true,
 				sourceMaps: true
