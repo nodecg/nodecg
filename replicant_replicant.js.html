@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
 </nav>
 
 <div id="main">
@@ -40,6 +40,7 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 
+const path = require('path');
 const sha1 = require('sha1');
 const fs = require('fs');
 const EventEmitter = require('events');
@@ -48,6 +49,7 @@ const clone = require('clone');
 const schemaDefaults = require('json-schema-defaults');
 const replicator = require('../replicator');
 const shared = require('./shared');
+const REPLICANTS_ROOT = path.join(process.env.NODECG_ROOT, 'db/replicants');
 
 const REPLICANT_HANDLER = {
 	get(target, prop) {
@@ -115,21 +117,24 @@ class Replicant extends EventEmitter {
 		};
 
 		// If present, parse the schema and generate the validator function.
-		if (fs.existsSync(opts.schemaPath)) {
-			try {
-				const rawSchema = fs.readFileSync(opts.schemaPath);
-				this.schema = JSON.parse(rawSchema);
-				this.schemaSum = sha1(rawSchema);
-				this.validate = shared.generateValidator(this);
-			} catch (e) {
-				this.log.error('Schema could not be loaded, are you sure that it is valid JSON?');
-				this.log.error(e.stack);
+		if (opts.schemaPath) {
+			const fullSchemaPath = path.join(process.env.NODECG_ROOT, opts.schemaPath);
+			if (fs.existsSync(fullSchemaPath)) {
+				try {
+					const rawSchema = fs.readFileSync(fullSchemaPath);
+					this.schema = JSON.parse(rawSchema);
+					this.schemaSum = sha1(rawSchema);
+					this.validate = shared.generateValidator(this);
+				} catch (e) {
+					this.log.error('Schema could not be loaded, are you sure that it is valid JSON?');
+					this.log.error(e.stack);
+				}
 			}
 		}
 
 		// Initialize the storage object if not present
 		if (!{}.hasOwnProperty.call(replicator.stores, namespace)) {
-			replicator.stores[namespace] = new LocalStorage(`./db/replicants/${namespace}`);
+			replicator.stores[namespace] = new LocalStorage(path.join(REPLICANTS_ROOT, namespace));
 		}
 
 		// Get the existing value, if any, and JSON parse if its an object
@@ -137,10 +142,6 @@ class Replicant extends EventEmitter {
 		try {
 			existingValue = JSON.parse(existingValue);
 		} catch (e) {}
-
-		if (name === 'schemaPersistencePass') {
-			console.log('existingValue', existingValue);
-		}
 
 		// If `opts.persistent` is true and this replicant has a persisted value, try to load that persisted value.
 		// Else, apply `opts.defaultValue`.
@@ -238,7 +239,7 @@ module.exports = Replicant;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Sun Jan 29 2017 16:33:24 GMT-0600 (Central Standard Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Jun 12 2017 13:54:46 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

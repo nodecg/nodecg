@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
 </nav>
 
 <div id="main">
@@ -57,8 +57,11 @@
 <li><code>twitch</code> <em>Object</em> Contains twitch login configuration properties.<ul>
 <li><code>enabled</code> <em>Boolean</em> Whether to enable Twitch authentication.</li>
 <li><code>clientID</code> <em>String</em> A Twitch application ClientID <a href="http://twitch.tv/kraken/oauth2/clients/new">http://twitch.tv/kraken/oauth2/clients/new</a></li>
-<li><code>clientSecret</code> <em>String</em> A Twitch application ClientSecret <a href="http://twitch.tv/kraken/oauth2/clients/new">http://twitch.tv/kraken/oauth2/clients/new</a></li>
-<li><code>scope</code> <em>String</em> A space-separated string of Twitch application <a href="https://github.com/justintv/Twitch-API/blob/master/authentication.md#scope">permissions</a>.</li>
+<li><code>clientSecret</code> <em>String</em> A Twitch application ClientSecret <a href="http://twitch.tv/kraken/oauth2/clients/new">http://twitch.tv/kraken/oauth2/clients/new</a><ul>
+<li><em>Note:</em> Configure your Twitch OAuth credentials with a Redirect URI to <code>{baseURL}/login/auth/twitch</code></li>
+</ul>
+</li>
+<li><code>scope</code> <em>String</em> A space-separated string of Twitch application <a href="https://dev.twitch.tv/docs/v5/guides/authentication/#scopes">permissions</a>.</li>
 <li><code>allowedUsernames</code> <em>Array of strings</em> Which Twitch usernames to allow.</li>
 </ul>
 </li>
@@ -87,7 +90,7 @@
 </ul>
 </li>
 <li><code>developer</code> <em>Boolean</em> Whether to enable features that speed up development. Not suitable for production.</li>
-<li><code>rollbar</code> <em>Object</em> Contains <a href="https://rollbar.com/">Rollbar</a> configuration properties. <ul>
+<li><code>rollbar</code> <em>Object</em> Contains <a href="https://rollbar.com/">Rollbar</a> configuration properties.<ul>
 <li><code>enabled</code> <em>Boolean</em> Whether to enable Rollbar error tracking.</li>
 <li><code>environment</code> <em>String</em> An arbitrary name you choose for this environment. Something like <code>production</code>, <code>development</code>, <code>staging</code>, etc.</li>
 <li><code>postServerItem</code> <em>String</em> Your Rollbar project's POST_SERVER_ITEM_ACCESS_TOKEN</li>
@@ -95,12 +98,13 @@
 </ul>
 </li>
 <li><code>bundles</code> <em>Object</em> Contains configuration for bundles.<ul>
-<li><code>disabled</code> <em>Array of strings</em> An array of bundle directories for modules that should be disabled (not loaded during NodeCG bootstrap).</li>
+<li><code>enabled</code> <em>Array of strings</em> A whitelist array of bundle names that will be the only ones loaded at startup. Cannot be used with <code>bundles.disabled</code>.</li>
+<li><code>disabled</code> <em>Array of strings</em> A blacklist array of bundle names that will not be loaded at startup. Cannot be used with <code>bundles.enabled</code>.</li>
 </ul>
 </li>
 </ul>
 <h3>Example Config</h3><pre class="prettyprint source lang-json"><code>{
-    &quot;host&quot;: &quot;example.com&quot;,
+    &quot;host&quot;: &quot;0.0.0.0&quot;,
     &quot;port&quot;: 9090,
     &quot;login&quot;: {
         &quot;enabled&quot;: true,
@@ -162,7 +166,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Sun Jan 29 2017 16:33:24 GMT-0600 (Central Standard Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Jun 12 2017 13:54:46 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
 </nav>
 
 <div id="main">
@@ -99,10 +99,13 @@ function NodeCG(bundle, socket) {
 		this.socket.emit('joinRoom', bundle.name);
 
 		if (bundle._hasSounds &amp;&amp; window.createjs &amp;&amp; createjs.Sound) {
-			this._soundCues = new Replicant('soundCues', this.bundleName, {}, socket);
+			const soundCuesRep = new Replicant('soundCues', this.bundleName, {}, socket);
+			const customCuesRep = new Replicant('customSoundCues', this.bundleName, {}, socket);
 			this._soundFiles = new Replicant('assets:sounds', this.bundleName, {}, socket);
 			this._bundleVolume = new Replicant(`volume:${this.bundleName}`, '_sounds', {}, socket);
 			this._masterVolume = new Replicant(`volume:master`, '_sounds', {}, socket);
+
+			this._soundCues = [];
 
 			const loadedSums = new Set();
 			createjs.Sound.on('fileload', e => {
@@ -111,7 +114,7 @@ function NodeCG(bundle, socket) {
 				}
 
 				loadedSums.add(e.data.sum);
-				const foundUnloaded = this._soundCues.value.some(cue => {
+				const foundUnloaded = this._soundCues.some(cue => {
 					if (cue.file) {
 						return !loadedSums.has(cue.file.sum);
 					}
@@ -124,10 +127,17 @@ function NodeCG(bundle, socket) {
 				}
 			});
 
-			this._soundCues.on('change', () => {
+			soundCuesRep.on('change', handleAnyCuesRepChange.bind(this));
+			customCuesRep.on('change', handleAnyCuesRepChange.bind(this));
+
+			/* eslint-disable no-inner-declarations */
+			function handleAnyCuesRepChange() {
+				_updateSoundCuesHas(this, soundCuesRep, customCuesRep);
 				_updateInstanceVolumes(this);
 				_registerSounds(this);
-			});
+			}
+			/* eslint-enable no-inner-declarations */
+
 			this._soundFiles.on('change', () => _registerSounds(this));
 			this._bundleVolume.on('change', () => _updateInstanceVolumes(this));
 			this._masterVolume.on('change', () => _updateInstanceVolumes(this));
@@ -307,9 +317,7 @@ NodeCG.prototype.listenFor = function (messageName, bundleName, handler) {
 	for (let i = 0; i &lt; len; i++) {
 		const existingHandler = this._messageHandlers[i];
 		if (messageName === existingHandler.messageName &amp;&amp; bundleName === existingHandler.bundleName) {
-			this.log.error('%s attempted to declare a duplicate "listenFor" handler:',
-				this.bundleName, bundleName, messageName);
-			return;
+			throw new Error(`${this.bundleName} attempted to declare a duplicate "listenFor" handler: ${bundleName}:${messageName}`);
 		}
 	}
 
@@ -465,6 +473,16 @@ if (process.browser) {
 	};
 
 	/**
+	 * Returns the sound cue of the provided `cueName` in the current bundle.
+	 * Returns undefined if a cue by that name cannot be found in this bundle.
+	 * @param cueName {String}
+	 * @returns {Object|undefined} - A NodeCG cue object.
+	 */
+	NodeCG.prototype.findCue = function (cueName) {
+		return this._soundCues.find(cue => cue.name === cueName);
+	};
+
+	/**
 	 * Plays the sound cue of the provided `cueName` in the current bundle.
 	 * Does nothing if the cue doesn't exist or if the cue has no assigned file to play.
 	 * @param cueName {String}
@@ -478,7 +496,7 @@ if (process.browser) {
 			throw new Error(`Bundle "${this.bundleName}" has no soundCues`);
 		}
 
-		const cue = this._soundCues.value.find(cue => cue.name === cueName);
+		const cue = this.findCue(cueName);
 		if (!cue) {
 			throw new Error(`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`);
 		}
@@ -501,15 +519,7 @@ if (process.browser) {
 		instance.cueName = cueName;
 
 		// Set the volume.
-		this._soundCues.value.some(cue => {
-			if (cue.name === cueName) {
-				_setInstanceVolume(this, instance, cue);
-				return true;
-			}
-
-			return false;
-		});
-
+		_setInstanceVolume(this, instance, cue);
 		instance.updateVolume = opts.updateVolume;
 
 		return instance;
@@ -524,7 +534,7 @@ if (process.browser) {
 			throw new Error(`Bundle "${this.bundleName}" has no soundCues`);
 		}
 
-		if (!this._soundCues.value.find(cue => cue.name === cueName)) {
+		if (!this._soundCues.find(cue => cue.name === cueName)) {
 			throw new Error(`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`);
 		}
 
@@ -608,8 +618,22 @@ if (process.browser) {
 	});
 }
 
+function _updateSoundCuesHas(ctx, soundCuesRep, customCuesRep) {
+	if (soundCuesRep.value &amp;&amp; !customCuesRep.value) {
+		ctx._soundCues = soundCuesRep.value;
+		return;
+	}
+
+	if (!soundCuesRep.value &amp;&amp; customCuesRep.value) {
+		ctx._soundCues = customCuesRep.value;
+		return;
+	}
+
+	ctx._soundCues = soundCuesRep.value.concat(customCuesRep.value);
+}
+
 function _registerSounds(ctx) {
-	ctx._soundCues.value.forEach(cue => {
+	ctx._soundCues.forEach(cue => {
 		if (!cue.file) {
 			return;
 		}
@@ -627,7 +651,7 @@ function _setInstanceVolume(ctx, instance, cue) {
 
 function _updateInstanceVolumes(ctx) {
 	// Update the volume of any playing instances that haven't opted out of automatic volume updates.
-	ctx._soundCues.value.forEach(cue => {
+	ctx._soundCues.forEach(cue => {
 		createjs.Sound._instances.forEach(instance => {
 			if (instance.cueName === cue.name &amp;&amp; instance.updateVolume) {
 				_setInstanceVolume(ctx, instance, cue);
@@ -649,7 +673,7 @@ module.exports = NodeCG;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a> on Sun Jan 29 2017 16:33:24 GMT-0600 (Central Standard Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Jun 12 2017 13:54:46 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
