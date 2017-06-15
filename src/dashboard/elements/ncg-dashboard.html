@@ -200,6 +200,13 @@
 				display: none !important;
 			}
 
+			#dialogs iframe {
+				box-sizing: border-box;
+				width: 100%;
+				margin: 0 !important;
+				padding: 0 !important;
+			}
+
 			/**
 			 * Phone
 			 */
@@ -354,6 +361,15 @@
 						<h2>[[dialog.title]]</h2>
 					</template>
 
+					<paper-dialog-scrollable>
+						<iframe
+							src="/bundles/[[dialog.bundleName]]/dashboard/[[dialog.file]]"
+							frameborder="0"
+							scrolling="no"
+							id="[[dialog.bundleName]]_[[dialog.name]]_iframe">
+						</iframe>
+					</paper-dialog-scrollable>
+
 					<template is="dom-if" if="[[dialog.dialogButtons]]">
 						<div class="buttons">
 							<template is="dom-repeat" items="[[dialog.dialogButtons]]" as="button">
@@ -365,15 +381,6 @@
 							</template>
 						</div>
 					</template>
-
-					<paper-dialog-scrollable>
-						<iframe
-							src="/bundles/[[dialog.bundleName]]/dashboard/[[dialog.file]]"
-							frameborder="0"
-							scrolling="no"
-							id="[[dialog.bundleName]]_[[dialog.name]]_iframe">
-						</iframe>
-					</paper-dialog-scrollable>
 				</ncg-dialog>
 			</template>
 		</div>

@@ -1,3 +1,4 @@
+/* global Raven */
 class NcgDialog extends Polymer.mixinBehaviors([
 	Polymer.NeonAnimationRunnerBehavior,
 	Polymer.PaperDialogBehavior
@@ -30,6 +31,34 @@ class NcgDialog extends Polymer.mixinBehaviors([
 		this.addEventListener('neon-animation-finish', this._onNeonAnimationFinish);
 		this.addEventListener('iron-overlay-opened', this._onIronOverlayOpened);
 		this.addEventListener('iron-overlay-closed', this._onIronOverlayClosed);
+
+		Polymer.RenderStatus.afterNextRender(this, () => {
+			const iframe = this.querySelector('iframe');
+
+			// If Raven is loaded, use it to report errors in panels to Sentry.io.
+			if (typeof Raven !== 'undefined') {
+				iframe.contentWindow.addEventListener('error', event => {
+					Raven.captureException(event.error);
+				});
+				iframe.contentWindow.addEventListener('unhandledrejection', err => {
+					Raven.captureException(err.reason);
+				});
+			}
+
+			if (iframe.contentWindow.document.readyState === 'complete') {
+				this._attachIframeResize(iframe);
+			} else {
+				iframe.addEventListener('load', () => {
+					this._attachIframeResize(iframe);
+				});
+			}
+
+			// Sometimes, we just need to know when a dang click event occurred. No matter where it happened.
+			// This adds a `panelClick` event to all panels.
+			iframe.contentDocument.addEventListener('click', e => {
+				document.dispatchEvent(new CustomEvent('panelClick', e.target));
+			});
+		});
 	}
 
 	connectedCallback() {
@@ -39,6 +68,17 @@ class NcgDialog extends Polymer.mixinBehaviors([
 		iframe.addEventListener('iframe-resized', () => {
 			this.refit();
 		});
+	}
+
+	_attachIframeResize(iframe) {
+		window.iFrameResize({
+			log: false,
+			resizeFrom: 'child',
+			heightCalculationMethod: 'documentElementOffset',
+			resizedCallback: data => {
+				data.iframe.dispatchEvent(new CustomEvent('iframe-resized'));
+			}
+		}, iframe);
 	}
 
 	_renderOpened() {
