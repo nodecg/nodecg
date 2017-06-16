@@ -76,6 +76,10 @@ class NcgGraphics extends Polymer.Element {
 		});
 	}
 
+	calcShortUrl(graphicUrl) {
+		return graphicUrl.split('/').slice(4).join('/');
+	}
+
 	_computeFullGraphicUrl(url) {
 		const a = document.createElement('a');
 		a.href = url;
