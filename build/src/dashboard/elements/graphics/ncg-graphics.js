@@ -65,14 +65,16 @@ class NcgGraphics extends Polymer.Element {
 	connectedCallback() {
 		super.connectedCallback();
 
-		const buttons = this.querySelectorAll('.copyButton');
-		const clipboard = new Clipboard(buttons);
-		clipboard.on('success', () => {
-			this.$.copyToast.show('Graphic URL copied to clipboard.');
-		});
-		clipboard.on('error', e => {
-			this.$.copyToast.show('Failed to copy graphic URL to clipboard!');
-			console.error(e);
+		Polymer.RenderStatus.afterNextRender(this, () => {
+			const buttons = this.shadowRoot.querySelectorAll('.copyButton');
+			const clipboard = new Clipboard(buttons);
+			clipboard.on('success', () => {
+				this.$.copyToast.show('Graphic URL copied to clipboard.');
+			});
+			clipboard.on('error', e => {
+				this.$.copyToast.show('Failed to copy graphic URL to clipboard!');
+				console.error(e);
+			});
 		});
 	}
 
