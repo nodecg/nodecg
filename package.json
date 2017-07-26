@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "@nodecg/bundle-manager": "github:nodecg/bundle-manager#1cebc61dc0af098fccabab42c7030465f66d6224",
-    "@nodecg/logger": "github:nodecg/logger#nodecg-v0.9-beta.2",
+    "@nodecg/logger": "github:nodecg/logger#nodecg-v0.9-beta.1",
     "body-parser": "^1.14.1",
     "cheerio": "^0.22.0",
     "chokidar": "^1.4.2",
