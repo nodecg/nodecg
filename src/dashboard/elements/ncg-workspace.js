@@ -37,11 +37,11 @@
 		ready() {
 			super.ready();
 
-			this.addEventListener('tap', this.shiftPackery);
-
 			window.addEventListener('load', () => {
 				this.$.loadingSpinner.active = false;
+				this.applyPackery();
 				setTimeout(() => {
+					this.addEventListener('tap', this.shiftPackery);
 					this.$.panels.style.opacity = 1;
 					this.$.panels.style.transform = 'translateY(0)';
 					this.$.panels.style.pointerEvents = 'auto';
