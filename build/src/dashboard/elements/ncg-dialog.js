@@ -3,7 +3,6 @@ class NcgDialog extends Polymer.mixinBehaviors([
 	Polymer.NeonAnimationRunnerBehavior,
 	Polymer.PaperDialogBehavior
 ], Polymer.Element) {
-
 	static get is() {
 		return 'ncg-dialog';
 	}
