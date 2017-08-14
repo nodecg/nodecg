@@ -6,7 +6,7 @@ document.addEventListener('click', e => {
 	if (elWithDialogAttr) {
 		const dialogName = elWithDialogAttr.getAttribute('nodecg-dialog');
 		const dialogIg = nodecg.bundleName + '_' + dialogName;
-		const dialogElement = window.top.document.getElementById(dialogIg);
+		const dialogElement = window.top.document.querySelector('ncg-dashboard').shadowRoot.getElementById(dialogIg);
 		dialogElement.open();
 	}
 }, false);
