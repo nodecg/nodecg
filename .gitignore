@@ -27,6 +27,7 @@ npm-debug.log
 
 # Code coverage results
 /coverage
+.nyc_output
 
 # Test folders
 /bundles2
