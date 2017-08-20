@@ -54,6 +54,21 @@ describe('api', function () {
 		});
 		assert.equal(res.value, 'boom');
 	});
+
+	it('should not resolve nor reject the promise if the user provided a callback', async () => {
+		e.apis.extension.listenFor('ackPromiseCallback', (data, cb) => cb());
+		const res = await e.browser.client.executeAsync(done => {
+			window.dashboardApi.sendMessage('ackPromiseCallback', () => {
+				// Delay this so that it fires after the promise would resolve.
+				setTimeout(() => {
+					done();
+				}, 10);
+			}).then(() => {
+				done('promise resolved when it should not');
+			}).catch(done);
+		});
+		assert.isNull(res.value);
+	});
 });
 
 describe('client-side api', function () {
