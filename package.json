@@ -62,7 +62,7 @@
   "scripts": {
     "start": "node index.js",
     "pretest": "npm run build",
-    "test": "nyc mocha -R spec",
+    "test": "nyc mocha -R spec && nyc report --reporter=html",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "static": "eslint index.js lib/**/*.js src/**/*.js test/**/*.js",
     "build": "npm run static && npm run docs:build && gulp",
