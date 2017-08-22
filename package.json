@@ -13,7 +13,7 @@
     "@nodecg/bundle-manager": "^0.5.7",
     "@nodecg/logger": "^0.2.0",
     "body-parser": "^1.14.1",
-    "cheerio": "^0.22.0",
+    "cheerio": "^1.0.0-rc.2",
     "chokidar": "^1.4.2",
     "clone": "^2.0.0",
     "compression": "^1.6.0",
