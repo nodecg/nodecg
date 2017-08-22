@@ -3,6 +3,7 @@
 
 process.env.test = true;
 process.env.NODECG_TEST = true;
+const fs = require('fs');
 const path = require('path');
 const fse = require('fs-extra');
 const temp = require('temp');
@@ -165,7 +166,32 @@ before(function (done) {
 	e.server.start();
 });
 
-after(function () {
+after(async function () {
+	/* eslint-disable no-await-in-loop */
+	for (const tabName in e.browser.tabs) {
+		if (!{}.hasOwnProperty.call(e.browser.tabs, tabName)) {
+			continue;
+		}
+
+		await e.browser.client.switchTab(e.browser.tabs[tabName]);
+		const {value: coverageObj} = await e.browser.client.execute('return window.__coverage__;');
+
+		const newCoverageObj = {};
+		for (const key in coverageObj) {
+			if (!{}.hasOwnProperty.call(e.browser.tabs, tabName)) {
+				continue;
+			}
+
+			const absKey = path.resolve('src', key);
+			coverageObj[key].path = absKey;
+			newCoverageObj[absKey] = coverageObj[key];
+		}
+
+		console.log('writing coverage for:', tabName);
+		fs.writeFileSync(`.nyc_output/browser-${tabName}.json`, JSON.stringify(newCoverageObj), 'utf-8');
+	}
+	/* eslint-enable no-await-in-loop */
+
 	e.server.stop();
 	this.timeout(10000);
 	return e.browser.client.end();

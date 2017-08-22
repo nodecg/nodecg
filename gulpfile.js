@@ -31,7 +31,12 @@ function waitFor(stream) {
 }
 
 gulp.task('clean', () => {
-	return del([buildDirectory]);
+	return del([
+		buildDirectory,
+		'.nyc_output',
+		'coverage',
+		'instrumented'
+	]);
 });
 
 gulp.task('browser-api', ['clean'], () => {
@@ -51,7 +56,8 @@ gulp.task('browser-api', ['clean'], () => {
 				presets: ['es2015-nostrict', 'babili'],
 				comments: false,
 				minified: true,
-				sourceMaps: true
+				sourceMaps: true,
+				plugins: ['istanbul']
 			}],
 			['aliasify', {
 				aliases: {
