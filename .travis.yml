@@ -37,7 +37,6 @@ before_install:
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./test/setup/travis_pr_setup.sh; fi'
 
 install:
-  - npm prune
   - npm install
 
 before_script:
