@@ -167,6 +167,8 @@ before(function (done) {
 });
 
 after(async function () {
+	this.timeout(15000);
+
 	/* eslint-disable no-await-in-loop */
 	for (const tabName in e.browser.tabs) {
 		if (!{}.hasOwnProperty.call(e.browser.tabs, tabName)) {
@@ -187,12 +189,10 @@ after(async function () {
 			newCoverageObj[absKey] = coverageObj[key];
 		}
 
-		console.log('writing coverage for:', tabName);
 		fs.writeFileSync(`.nyc_output/browser-${tabName}.json`, JSON.stringify(newCoverageObj), 'utf-8');
 	}
 	/* eslint-enable no-await-in-loop */
 
 	e.server.stop();
-	this.timeout(10000);
 	return e.browser.client.end();
 });
