@@ -40,6 +40,13 @@ gulp.task('clean', () => {
 });
 
 gulp.task('browser-api', ['clean'], () => {
+	return Promise.all([
+		waitFor(buh()),
+		waitFor(buh({instrument: true}))
+	]);
+});
+
+function buh({instrument} = {}) {
 	// Set up the browserify instance on a task basis
 	const b = browserify({
 		entries: './lib/api.js',
@@ -57,7 +64,7 @@ gulp.task('browser-api', ['clean'], () => {
 				comments: false,
 				minified: true,
 				sourceMaps: true,
-				plugins: ['istanbul']
+				plugins: instrument ? ['istanbul'] : []
 			}],
 			['aliasify', {
 				aliases: {
@@ -83,11 +90,11 @@ gulp.task('browser-api', ['clean'], () => {
 		.pipe(source('nodecg-api.min.js'))
 		.pipe(buffer())
 		.pipe(transform(() => {
-			return exorcist('build/src/nodecg-api.min.js.map');
+			return exorcist(instrument ? 'instrumented/nodecg-api.min.js.map' : 'build/src/nodecg-api.min.js.map');
 		}))
 		.on('error', gutil.log)
-		.pipe(gulp.dest('build/src'));
-});
+		.pipe(gulp.dest(instrument ? 'instrumented' : 'build/src'));
+}
 
 gulp.task('polymer-build', ['clean'], async () => {
 	// Lets create some inline code splitters in case you need them later in your build.

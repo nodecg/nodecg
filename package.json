@@ -75,7 +75,6 @@
   "nyc": {
     "include": [
       "lib/**",
-      "src/**",
       "index.js"
     ],
     "all": true
