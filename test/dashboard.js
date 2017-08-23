@@ -1,38 +1,32 @@
-/* eslint-env node, mocha, browser */
 'use strict';
 
-const chai = require('chai');
-const assert = chai.assert;
-const e = require('./setup/test-environment');
+// Packages
+const test = require('ava');
 
-describe('dashboard', function () {
-	this.timeout(10000);
+// Ours
+require('./helpers/nodecg-and-webdriver')(test); // Must be first.
+const e = require('./helpers/test-environment');
 
-	describe('panels', () => {
-		it('should show up on the dashboard', async () => {
-			await e.browser.client.switchTab(e.browser.tabs.dashboard);
-			const res = await e.browser.client.shadowDomElement([
-				'ncg-dashboard',
-				'ncg-workspace',
-				'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]'
-			]);
-			assert.isTrue(Boolean(res.value));
-		});
+test.serial('panels - should show up on the dashboard', async t => {
+	await e.browser.client.switchTab(e.browser.tabs.dashboard);
+	const res = await e.browser.client.shadowDomElement([
+		'ncg-dashboard',
+		'ncg-workspace',
+		'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]'
+	]);
+	t.true(Boolean(res.value));
+});
 
-		it('should show up standalone', async () => {
-			await e.browser.client.switchTab(e.browser.tabs.panelStandalone);
-			const isExisting = await e.browser.client.isExisting('#test-bundle-paragraph');
-			assert.isTrue(isExisting);
-		});
+test.serial('panels - should show up standalone', async t => {
+	await e.browser.client.switchTab(e.browser.tabs.panelStandalone);
+	const isExisting = await e.browser.client.isExisting('#test-bundle-paragraph');
+	t.true(isExisting);
+});
+
+test.serial('shared sources - should serve files', async t => {
+	await e.browser.client.switchTab(e.browser.tabs.panelStandalone);
+	const res = await e.browser.client.execute(() => {
+		return window.SharedUtility;
 	});
-
-	describe('shared sources', () => {
-		it('should serve files', async () => {
-			await e.browser.client.switchTab(e.browser.tabs.panelStandalone);
-			const res = await e.browser.client.execute(() => {
-				return window.SharedUtility;
-			});
-			assert.isAbove(Object.keys(res.value).length, 0);
-		});
-	});
+	t.true(Object.keys(res.value).length > 0);
 });

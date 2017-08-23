@@ -1,5 +1,6 @@
 'use strict';
 
+process.title = 'NodeCG';
 global.exitOnUncaught = true;
 
 if (process.cwd() !== __dirname) {

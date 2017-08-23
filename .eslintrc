@@ -1,5 +1,11 @@
 {
-	"extends": "xo/esnext",
+	"extends": [
+		"xo/esnext",
+		"plugin:ava/recommended"
+	],
+	"plugins": [
+		"ava"
+	],
 	"rules": {
 		"new-cap": [
 			2,

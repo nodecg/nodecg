@@ -34,7 +34,7 @@ addons:
 before_install:
   - export CHROME_BIN=/usr/bin/google-chrome
   - export DISPLAY=:99.0
-  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./test/setup/travis_pr_setup.sh; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./test/helpers/travis_pr_setup.sh; fi'
 
 install:
   - npm install
