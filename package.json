@@ -36,7 +36,7 @@
     "is-error": "^2.2.1",
     "is-my-json-valid": "^2.12.3",
     "json-schema-defaults": "^0.3.0",
-    "json-schema-lib": "Lange/json-schema-lib#ac59fe29fad5c54647e4c483c7255a923cc430dd",
+    "json-schema-lib": "github:Lange/json-schema-lib#ac59fe29fad5c54647e4c483c7255a923cc430dd",
     "lodash.debounce": "^4.0.8",
     "minimist": "^1.2.0",
     "multer": "^1.1.0",

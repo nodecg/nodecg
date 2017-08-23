@@ -39,11 +39,12 @@ module.exports = function (test) {
 			throw new Error('SSL is enabled! Please disable SSL in cfg/nodecg.json before running tests');
 		}
 
-		const port = await getPort();
-		process.env.NODECG_TEST_PORT = port;
 		process.env.NODECG_ROOT = tempFolder;
-
-		e.server.start({portOverride: port});
+		await new Promise((resolve, reject) => {
+			e.server.on('started', resolve);
+			e.server.on('error', reject);
+			e.server.start();
+		});
 
 		// Extension API setup
 		e.apis.extension = e.server.getExtensions()[C.BUNDLE_NAME];
