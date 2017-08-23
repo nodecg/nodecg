@@ -7,7 +7,6 @@ const path = require('path');
 
 // Packages
 const fse = require('fs-extra');
-const getPort = require('get-port');
 const temp = require('temp');
 const webdriverio = require('webdriverio');
 
