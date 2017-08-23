@@ -1,0 +1,20 @@
+{
+	"gameAudioChannels": [
+		{
+			"sd": 17,
+			"hd": 25
+		},
+		{
+			"sd": 19,
+			"hd": 27
+		},
+		{
+			"sd": 21,
+			"hd": null
+		},
+		{
+			"sd": 23,
+			"hd": null
+		}
+	]
+}

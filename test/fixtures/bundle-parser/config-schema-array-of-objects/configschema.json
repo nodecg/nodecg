@@ -1,0 +1,23 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+
+	"properties": {
+		"gameAudioChannels": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"sd": {
+						"type": ["integer", "null"]
+					},
+					"hd": {
+						"type": ["integer", "null"]
+					}
+				}
+			},
+			"minItems": 4,
+			"maxItems": 4
+		}
+	}
+}
