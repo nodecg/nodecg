@@ -101,14 +101,14 @@ test('logging methods should all prepend the instance name to the output', t => 
 	['trace', 'debug', 'info', 'warn', 'error'].forEach(level => {
 		sinon.spy(Logger._winston, level);
 		t.context.logger[level](level);
-		t.deepEqual(Logger._winston[level].getCall(0).args, ['[testServer]', level]);
+		t.deepEqual(Logger._winston[level].getCall(0).args, [`[testServer] ${level}`]);
 		Logger._winston[level].restore();
 	});
 
 	// Replicants has to be tested differently than the others
 	sinon.spy(Logger._winston, 'info');
 	t.context.logger.replicants('replicants');
-	t.deepEqual(Logger._winston.info.getCall(0).args, ['[testServer]', 'replicants']);
+	t.deepEqual(Logger._winston.info.getCall(0).args, ['[testServer] replicants']);
 	Logger._winston.info.restore();
 });
 
