@@ -1,0 +1,11 @@
+{
+  "name": "no-nodecg-prop",
+  "version": "0.0.1",
+  "homepage": "http://github.com/nodecg",
+  "author": [
+    "Alex Van Camp <email@alexvan.camp>",
+    "Matt McNamara"
+  ],
+  "description": "A test bundle",
+  "license": "MIT"
+}

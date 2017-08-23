@@ -1,0 +1,68 @@
+{
+  "name": "good-bundle",
+  "version": "0.0.1",
+  "dependencies": {
+    "commander": "^2.6.0"
+  },
+  "homepage": "http://github.com/nodecg",
+  "author": "Alex Van Camp <email@alexvan.camp>",
+  "contributors": [
+    "Matt McNamara"
+  ],
+  "description": "A test bundle",
+  "license": "MIT",
+  "nodecg": {
+    "compatibleRange": "~0.7.0",
+    "dashboardPanels": [
+      {
+        "name": "test",
+        "title": "Test Panel",
+        "width": 1,
+        "file": "panel.html"
+      },{
+        "name": "test-workspace-panel",
+        "title": "Test Workspace Panel",
+        "width": 1,
+        "file": "workspace-panel.html",
+        "workspace": "foo",
+        "headerColor": "#ffffff"
+      },{
+        "name": "test-fullbleed-panel",
+        "title": "Test Fullbleed Panel",
+        "file": "fullbleed-panel.html",
+        "fullbleed": true
+      },{
+        "name": "test-dialog",
+        "title": "Test Dialog",
+        "width": 3,
+        "headerColor": "#333222",
+        "file": "dialog.html",
+        "dialog": true
+      }
+    ],
+    "graphics": [
+      {
+        "file": "index.html",
+        "width": 1280,
+        "height": 720
+      }
+    ],
+    "soundCues": [
+      {
+        "name": "name-only"
+      },
+      {
+        "name": "default-volume",
+        "defaultVolume": 80
+      },
+      {
+        "name": "non-assignable",
+        "assignable": false
+      },
+      {
+        "name": "default-file",
+        "defaultFile": "../default-file.ogg"
+      }
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "dupe-graphic-file",
+  "version": "0.0.1",
+  "homepage": "http://github.com/nodecg",
+  "author": [
+    "Alex Van Camp <email@alexvan.camp>",
+    "Matt McNamara"
+  ],
+  "description": "A test bundle",
+  "license": "MIT",
+  "nodecg": {
+    "compatibleRange": "~0.7.0",
+    "graphics": [
+      {
+        "file": "index.html",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "file": "index.html",
+        "width": 1280,
+        "height": 720
+      }
+    ]
+  }
+}

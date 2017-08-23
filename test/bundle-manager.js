@@ -2,22 +2,36 @@
 
 // Native
 const fs = require('fs');
+const path = require('path');
 
 // Packages
-const rimraf = require('rimraf');
+const fse = require('fs-extra');
+const isWindows = require('is-windows');
+const temp = require('temp');
 const test = require('ava');
-const wrench = require('wrench');
 
 // Ours
 const Logger = require('../lib/logger/server')({console: {enabled: true}});
 
+const BUNDLE_FIXTURES_SRC = 'test/fixtures/bundle-manager/bundles';
+const tempFolder = temp.mkdirSync();
+temp.track(); // Automatically track and cleanup files at exit.
+
 let bundleManager;
 test.cb.before(t => {
-	if (!fs.existsSync('_workingTest')) {
-		fs.mkdirSync('_workingTest');
-	}
+	fse.copySync('test/fixtures/bundle-manager/cfg', path.join(tempFolder, 'cfg'));
+	fs.readdirSync(BUNDLE_FIXTURES_SRC).forEach(bundleFolderName => {
+		if (bundleFolderName === 'change-panel-symlink' && isWindows()) {
+			return;
+		}
 
-	wrench.copyDirSyncRecursive('test/fixtures/bundle-manager', '_workingTest', {forceDelete: true});
+		const bundlePath = path.join(BUNDLE_FIXTURES_SRC, bundleFolderName);
+		if (!fs.statSync(bundlePath).isDirectory()) {
+			return;
+		}
+
+		fse.copySync(bundlePath, path.join(tempFolder, 'bundles', bundleFolderName));
+	});
 
 	const nodecgConfig = {
 		bundles: {
@@ -28,7 +42,7 @@ test.cb.before(t => {
 	};
 
 	bundleManager = require('../lib/bundle-manager');
-	bundleManager.init('_workingTest', '0.7.0', nodecgConfig, Logger);
+	bundleManager.init(tempFolder, '0.7.0', nodecgConfig, Logger);
 
 	// Needs a little extra wait time for some reason.
 	// Without this, tests randomly fail.
@@ -37,13 +51,8 @@ test.cb.before(t => {
 	}, 100);
 });
 
-test.cb.after(t => {
+test.after(() => {
 	bundleManager._stopWatching();
-	process.nextTick(() => {
-		rimraf('_workingTest', () => {
-			t.end();
-		});
-	});
 });
 
 test.serial('loader - should detect and load bundle configuration files', t => {
@@ -62,14 +71,14 @@ test.serial('loader - should not load a bundle that has been disabled', t => {
 });
 
 test.cb.serial('watcher - hould emit a change event when the manifest file changes', t => {
-	const manifest = JSON.parse(fs.readFileSync('_workingTest/bundles/change-manifest/package.json'));
+	const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-manifest/package.json`));
 	bundleManager.once('bundleChanged', bundle => {
 		t.is(bundle.name, 'change-manifest');
 		t.end();
 	});
 
 	manifest._changed = true;
-	fs.writeFileSync('_workingTest/bundles/change-manifest/package.json', JSON.stringify(manifest));
+	fs.writeFileSync(`${tempFolder}/bundles/change-manifest/package.json`, JSON.stringify(manifest));
 });
 
 test.cb.serial('watcher - should remove the bundle when the manifest file is renamed', t => {
@@ -79,8 +88,8 @@ test.cb.serial('watcher - should remove the bundle when the manifest file is ren
 		t.end();
 	});
 
-	fs.renameSync('_workingTest/bundles/rename-manifest/package.json',
-		'_workingTest/bundles/rename-manifest/package.json.renamed');
+	fs.renameSync(`${tempFolder}/bundles/rename-manifest/package.json`,
+		`${tempFolder}/bundles/rename-manifest/package.json.renamed`);
 });
 
 test.cb.serial('watcher - should emit a removed event when the manifest file is removed', t => {
@@ -90,7 +99,7 @@ test.cb.serial('watcher - should emit a removed event when the manifest file is 
 		t.end();
 	});
 
-	fs.unlinkSync('_workingTest/bundles/remove-manifest/package.json');
+	fs.unlinkSync(`${tempFolder}/bundles/remove-manifest/package.json`);
 });
 
 test.cb.serial('watcher - should emit a change event when a panel HTML file changes', t => {
@@ -99,27 +108,31 @@ test.cb.serial('watcher - should emit a change event when a panel HTML file chan
 		t.end();
 	});
 
-	const panelPath = '_workingTest/bundles/change-panel/dashboard/panel.html';
+	const panelPath = `${tempFolder}/bundles/change-panel/dashboard/panel.html`;
 	let panel = fs.readFileSync(panelPath);
 	panel += '\n';
 	fs.writeFileSync(panelPath, panel);
 });
 
-test.cb.serial('watcher - should detect panel HTML file changes when the bundle is symlinked', t => {
-	bundleManager.once('bundleChanged', bundle => {
-		t.is(bundle.name, 'change-panel-symlink');
-		t.end();
+if (!isWindows()) {
+	// This can't be tested on Windows unless run with admin privs.
+	// For some reason, creating symlinks on Windows requires admin.
+	test.cb.serial('watcher - should detect panel HTML file changes when the bundle is symlinked', t => {
+		bundleManager.once('bundleChanged', bundle => {
+			t.is(bundle.name, 'change-panel-symlink');
+			t.end();
+		});
+
+		const panelPath = `${tempFolder}/bundles/change-panel-symlink/dashboard/panel.html`;
+		let panel = fs.readFileSync(panelPath);
+		panel += '\n';
+		fs.writeFileSync(panelPath, panel);
 	});
-
-	const panelPath = '_workingTest/bundles/change-panel-symlink/dashboard/panel.html';
-	let panel = fs.readFileSync(panelPath);
-	panel += '\n';
-	fs.writeFileSync(panelPath, panel);
-});
+}
 
 test.cb.serial('watcher - should reload the bundle\'s config when the bundle is reloaded due to a change', t => {
-	const manifest = JSON.parse(fs.readFileSync('_workingTest/bundles/change-config/package.json'));
-	const config = JSON.parse(fs.readFileSync('_workingTest/cfg/change-config.json'));
+	const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-config/package.json`));
+	const config = JSON.parse(fs.readFileSync(`${tempFolder}/cfg/change-config.json`));
 
 	bundleManager.once('bundleChanged', bundle => {
 		t.is(bundle.name, 'change-config');
@@ -132,8 +145,8 @@ test.cb.serial('watcher - should reload the bundle\'s config when the bundle is 
 
 	config._changed = true;
 	manifest._changed = true;
-	fs.writeFileSync('_workingTest/bundles/change-config/package.json', JSON.stringify(manifest));
-	fs.writeFileSync('_workingTest/cfg/change-config.json', JSON.stringify(config));
+	fs.writeFileSync(`${tempFolder}/bundles/change-config/package.json`, JSON.stringify(manifest));
+	fs.writeFileSync(`${tempFolder}/cfg/change-config.json`, JSON.stringify(config));
 });
 
 // This has to be the last test.
@@ -154,5 +167,5 @@ test.cb.serial('watcher - should produce an unhandled exception when a panel HTM
 		t.end();
 	});
 
-	fs.unlinkSync('_workingTest/bundles/remove-panel/dashboard/panel.html');
+	fs.unlinkSync(`${tempFolder}/bundles/remove-panel/dashboard/panel.html`);
 });
