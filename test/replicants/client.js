@@ -6,7 +6,7 @@ const path = require('path');
 const test = require('ava');
 
 // Ours
-require('../helpers/nodecg-and-webdriver')(test); // Must be first.
+require('../helpers/nodecg-and-webdriver')(test, ['dashboard']); // Must be first.
 const e = require('../helpers/test-environment');
 const C = require('../helpers/test-constants');
 

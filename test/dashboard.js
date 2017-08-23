@@ -4,7 +4,7 @@
 const test = require('ava');
 
 // Ours
-require('./helpers/nodecg-and-webdriver')(test); // Must be first.
+require('./helpers/nodecg-and-webdriver')(test, ['dashboard', 'standalone']); // Must be first.
 const e = require('./helpers/test-environment');
 
 test.serial('panels - should show up on the dashboard', async t => {

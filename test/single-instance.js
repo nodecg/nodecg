@@ -4,21 +4,11 @@
 const test = require('ava');
 
 // Ours
-require('./helpers/nodecg-and-webdriver')(test); // Must be first.
+require('./helpers/nodecg-and-webdriver')(test, ['single-insatnce']); // Must be first.
 const e = require('./helpers/test-environment');
-const C = require('./helpers/test-constants');
 
 test.beforeEach(async () => {
-	await e.browser.client.newWindow(C.SINGLE_INSTANCE_URL, 'NodeCG test single instance graphic', '');
-	e.browser.tabs.singleInstance = await e.browser.client.getCurrentTabId();
-	return e.browser.client.executeAsync(done => {
-		const checkForApi = setInterval(() => {
-			if (typeof window.singleInstanceApi !== 'undefined') {
-				clearInterval(checkForApi);
-				done();
-			}
-		}, 50);
-	});
+	await e.browser.client.switchTab(e.browser.tabs.singleInstance);
 });
 
 test.cb('single-instance graphics shouldn\'t enter an infinite redirect loop when including a polymer element ' +

@@ -6,7 +6,7 @@ const path = require('path');
 const test = require('ava');
 
 // Ours
-require('../helpers/nodecg-and-webdriver')(test); // Must be first.
+require('../helpers/nodecg-and-webdriver')(test, ['dashboard']); // Must be first.
 const e = require('../helpers/test-environment');
 const C = require('../helpers/test-constants');
 
@@ -17,7 +17,6 @@ test('should return a reference to any already-declared replicant', t => {
 });
 
 test.serial('should only apply defaultValue when first declared', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
 	await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('extensionTest', {
 			defaultValue: 'foo',
@@ -86,7 +85,6 @@ test.cb('should only apply array splices from the client once', t => {
 	});
 
 	e.browser.client
-		.switchTab(e.browser.tabs.dashboard)
 		.executeAsync(done => {
 			window.clientDoubleApplyTest = window.dashboardApi.Replicant('clientDoubleApplyTest');
 

@@ -8,7 +8,6 @@ const path = require('path');
 // Packages
 const fse = require('fs-extra');
 const temp = require('temp');
-const webdriverio = require('webdriverio');
 
 const tempFolder = temp.mkdirSync();
 temp.track(); // Automatically track and cleanup files at exit.
@@ -27,7 +26,7 @@ const addCustomBrowserCommands = require('./custom-webdriver-commands');
 const C = require('./test-constants');
 const e = require('./test-environment');
 
-module.exports = function (test) {
+module.exports = function (test, tabs) {
 	test.before(async () => {
 		if (C.CONFIG.login && C.CONFIG.login.enabled) {
 			throw new Error('Login security is enabled! ' +
@@ -48,6 +47,12 @@ module.exports = function (test) {
 		// Extension API setup
 		e.apis.extension = e.server.getExtensions()[C.BUNDLE_NAME];
 
+		// Only start up Selenium if the test requested some tabs.
+		if (!tabs || tabs.length <= 0) {
+			return;
+		}
+
+		const webdriverio = require('webdriverio');
 		if (process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER) {
 			const isPR = process.env.TRAVIS_PULL_REQUEST !== 'false';
 			if (isPR) {
@@ -116,53 +121,82 @@ module.exports = function (test) {
 		// Attach our custom methods to this browser instance.
 		addCustomBrowserCommands(e.browser.client);
 
-		return e.browser.client
-			.init()
-			.timeouts('script', 30000)
-			.newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
-			.getCurrentTabId()
-			.then(tabId => {
-				e.browser.tabs.dashboard = tabId;
-			})
-			.executeAsync(done => {
-				/* eslint-disable no-undef */
-				const checkForApi = setInterval(() => {
-					if (typeof window.dashboardApi !== 'undefined' && typeof Polymer !== 'undefined') {
-						clearInterval(checkForApi);
-						Polymer.RenderStatus.afterNextRender(this, () => {
+		await e.browser.client.init();
+		await e.browser.client.timeouts('script', 30000);
+
+		if (tabs.includes('dashboard')) {
+			await e.browser.client
+				.newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
+				.getCurrentTabId()
+				.then(tabId => {
+					e.browser.tabs.dashboard = tabId;
+				})
+				.executeAsync(done => {
+					/* eslint-disable no-undef */
+					const checkForApi = setInterval(() => {
+						if (typeof window.dashboardApi !== 'undefined' && typeof Polymer !== 'undefined') {
+							clearInterval(checkForApi);
+							Polymer.RenderStatus.afterNextRender(this, () => {
+								done();
+							});
+						}
+					}, 50);
+					/* eslint-enable no-undef */
+				});
+		}
+
+		if (tabs.includes('standalone')) {
+			await e.browser.client
+				.newWindow(`${C.TEST_PANEL_URL}?standalone=true`, 'NodeCG test bundle standalone panel', '')
+				.getCurrentTabId()
+				.then(tabId => {
+					e.browser.tabs.panelStandalone = tabId;
+				})
+				.executeAsync(done => {
+					const checkForApi = setInterval(() => {
+						if (typeof window.dashboardApi !== 'undefined') {
+							clearInterval(checkForApi);
 							done();
-						});
-					}
-				}, 50);
-				/* eslint-enable no-undef */
-			})
-			.newWindow(`${C.TEST_PANEL_URL}?standalone=true`, 'NodeCG test bundle standalone panel', '')
-			.getCurrentTabId()
-			.then(tabId => {
-				e.browser.tabs.panelStandalone = tabId;
-			})
-			.executeAsync(done => {
-				const checkForApi = setInterval(() => {
-					if (typeof window.dashboardApi !== 'undefined') {
-						clearInterval(checkForApi);
-						done();
-					}
-				}, 50);
-			})
-			.newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '')
-			.getCurrentTabId()
-			.then(tabId => {
-				e.browser.tabs.graphic = tabId;
-			})
-			.executeAsync(done => {
-				const checkForApi = setInterval(() => {
-					if (typeof window.graphicApi !== 'undefined') {
-						clearInterval(checkForApi);
-						done();
-					}
-				}, 50);
-			})
-			.timeouts('script', 5000);
+						}
+					}, 50);
+				});
+		}
+
+		if (tabs.includes('graphic')) {
+			await e.browser.client
+				.newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '')
+				.getCurrentTabId()
+				.then(tabId => {
+					e.browser.tabs.graphic = tabId;
+				})
+				.executeAsync(done => {
+					const checkForApi = setInterval(() => {
+						if (typeof window.graphicApi !== 'undefined') {
+							clearInterval(checkForApi);
+							done();
+						}
+					}, 50);
+				});
+		}
+
+		if (tabs.includes('single-instance')) {
+			await e.browser.client
+				.newWindow(C.SINGLE_INSTANCE_URL, 'NodeCG test single instance graphic', '')
+				.getCurrentTabId()
+				.then(tabId => {
+					e.browser.tabs.singleInstance = tabId;
+				})
+				.executeAsync(done => {
+					const checkForApi = setInterval(() => {
+						if (typeof window.singleInstanceApi !== 'undefined') {
+							clearInterval(checkForApi);
+							done();
+						}
+					}, 50);
+				});
+		}
+
+		await e.browser.client.timeouts('script', 5000);
 	});
 
 	test.after.always(async () => {

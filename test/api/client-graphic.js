@@ -4,12 +4,8 @@
 const test = require('ava');
 
 // Ours
-require('../helpers/nodecg-and-webdriver')(test); // Must be first.
+require('../helpers/nodecg-and-webdriver')(test, ['graphic']); // Must be first.
 const e = require('../helpers/test-environment');
-
-test.beforeEach(() => {
-	return e.browser.client.switchTab(e.browser.tabs.graphic);
-});
 
 // The graphic and dashboard APIs use the same file
 // If dashboard API passes all its tests, we just need to make sure that the socket works

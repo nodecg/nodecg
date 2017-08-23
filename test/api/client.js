@@ -4,12 +4,8 @@
 const test = require('ava');
 
 // Ours
-require('../helpers/nodecg-and-webdriver')(test); // Must be first.
+require('../helpers/nodecg-and-webdriver')(test, ['dashboard']); // Must be first.
 const e = require('../helpers/test-environment');
-
-test.beforeEach(() => {
-	return e.browser.client.switchTab(e.browser.tabs.dashboard);
-});
 
 test('#config - should exist and have length', async t => {
 	const res = await e.browser.client.execute(() => {
