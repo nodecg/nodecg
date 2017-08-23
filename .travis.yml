@@ -20,6 +20,7 @@ cache:
     - node_modules
     - bower_components
     - '$HOME/.npm'
+    - $(npm config get prefix)
 
 addons:
   sauce_connect: true
