@@ -12,10 +12,10 @@ const temp = require('temp');
 const tempFolder = temp.mkdirSync();
 temp.track(); // Automatically track and cleanup files at exit.
 
-fse.copySync('test/fixtures/assets', path.join(tempFolder, 'assets'));
-fse.copySync('test/fixtures/bundles', path.join(tempFolder, 'bundles'));
-fse.copySync('test/fixtures/cfg', path.join(tempFolder, 'cfg'));
-fse.copySync('test/fixtures/db', path.join(tempFolder, 'db'));
+fse.copySync('test/fixtures/nodecg-core/assets', path.join(tempFolder, 'assets'));
+fse.copySync('test/fixtures/nodecg-core/bundles', path.join(tempFolder, 'bundles'));
+fse.copySync('test/fixtures/nodecg-core/cfg', path.join(tempFolder, 'cfg'));
+fse.copySync('test/fixtures/nodecg-core/db', path.join(tempFolder, 'db'));
 
 // Tell NodeCG to look in our new temp folder for bundles, cfg, db, and assets, rather than whatever ones the user
 // may have. We don't want to touch any existing user data!
