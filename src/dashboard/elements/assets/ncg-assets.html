@@ -1,5 +1,5 @@
 <link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
-<link rel="import" href="ncg-asset-group.html">
+<link rel="import" href="ncg-asset-category.html">
 
 <dom-module id="ncg-assets">
 	<template>
@@ -21,31 +21,31 @@
 				display: none;
 			}
 
+			.collectionName {
+				display: block;
+				font-size: 2em;
+				font-weight: bold;
+			}
+
 			paper-card {
 				margin-bottom: 12px;
 			}
 		</style>
 
-		<template is="dom-repeat" items="[[bundlesWithAssets]]" as="bundle">
+		<nodecg-replicant
+			replicant-name="collections"
+			replicant-bundle="_assets"
+			value="{{collections}}"></nodecg-replicant>
+
+		<template is="dom-repeat" items="[[collections]]" as="collection">
 			<paper-card>
 				<div class="card-content">
-					<h2>[[bundle.name]]</h2>
+					<div class="collectionName">[[collection.name]]</div>
 
-					<template is="dom-if" if="[[bundle.hasAssignableSoundCues]]">
-						<ncg-asset-group
-							bundle-name="[[bundle.name]]"
-							category-name="sounds"
-							category-title="Sounds"
-							allowed-types='["mp3","ogg"]'></ncg-asset-group>
-						<div class="assets-divider"></div>
-					</template>
-
-					<template is="dom-repeat" items="[[bundle.assetCategories]]" as="category">
-						<ncg-asset-group
-							bundle-name="[[bundle.name]]"
-							category-name="[[category.name]]"
-							category-title="[[category.title]]"
-							allowed-types="[[category.allowedTypes]]"></ncg-asset-group>
+					<template is="dom-repeat" items="[[collection.categories]]" as="category" mutable-data>
+						<ncg-asset-category
+							collection-name="[[collection.name]]"
+							category="[[category]]"></ncg-asset-category>
 						<div class="assets-divider"></div>
 					</template>
 				</div>

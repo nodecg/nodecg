@@ -61,7 +61,7 @@
   "scripts": {
     "start": "node index.js",
     "pretest": "npm run build && npm run instrument",
-    "test": "nyc ava && nyc report --reporter=html",
+    "test": "nyc ava --reporter=html",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "static": "eslint index.js lib/**/*.js src/**/*.js test/**/*.js",
     "build": "npm run static && npm run docs:build && gulp",

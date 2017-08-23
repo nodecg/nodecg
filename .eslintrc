@@ -12,7 +12,9 @@
 			{
 				"capIsNewExceptions": [
 					"Polymer",
+					"Polymer.MutableData",
 					"nodecg.Replicant",
+					"NodeCG.Replicant",
 					"e.apis.extension.Replicant",
 					"window.dashboardApi.Replicant"
 				]

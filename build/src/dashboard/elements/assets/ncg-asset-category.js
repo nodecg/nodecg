@@ -1,23 +1,24 @@
-class NcgAssetGroup extends Polymer.Element {
+class NcgAssetCategory extends Polymer.MutableData(Polymer.Element) {
 	static get is() {
-		return 'ncg-asset-group';
+		return 'ncg-asset-category';
 	}
 
 	static get properties() {
 		return {
 			files: Array,
-			bundleName: String,
-			categoryName: String,
-			categoryTitle: String,
-			allowedTypes: {
-				type: Array,
-				observer: '_onAllowedTypesChanged'
-			},
+			collectionName: String,
+			category: Object,
 			acceptsMsg: {
 				type: String,
-				computed: '_computeAcceptsMsg(allowedTypes)'
+				computed: '_computeAcceptsMsg(category.allowedTypes)'
 			}
 		};
+	}
+
+	static get observers() {
+		return [
+			'_onAllowedTypesChanged(category.allowedTypes)'
+		];
 	}
 
 	ready() {
@@ -30,6 +31,16 @@ class NcgAssetGroup extends Polymer.Element {
 				this.$.empty.style.display = 'block';
 			}
 		});
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
+		this.$.uploadDialog.fitInto = document.body.querySelector('ncg-dashboard').shadowRoot.getElementById('pages');
+		this.$.uploadDialog.resetFit();
+	}
+
+	refitUploadDialog() {
+		this.$.uploadDialog.refit();
 	}
 
 	_onAllowedTypesChanged(allowedTypes) {
@@ -68,6 +79,7 @@ class NcgAssetGroup extends Polymer.Element {
 
 	openUploadDialog() {
 		this.$.uploadDialog.open();
+		this.refitUploadDialog();
 	}
 
 	_onUploadBefore(event) {
@@ -77,9 +89,10 @@ class NcgAssetGroup extends Polymer.Element {
 	}
 
 	_onFileReject(event) {
+		this.refitUploadDialog();
 		this.$.toast.text = `${event.detail.file.name} error: ${event.detail.error}`;
 		this.$.toast.open();
 	}
 }
 
-customElements.define('ncg-asset-group', NcgAssetGroup);
+customElements.define(NcgAssetCategory.is, NcgAssetCategory);

@@ -1,6 +1,4 @@
 {
-	"root": true,
-	"extends": "xo/esnext",
 	"env": {
 		"node": false,
 		"browser": true
@@ -11,17 +9,5 @@
 		"Clipboard": true,
 		"Packery": true,
 		"Draggabilly": true
-	},
-	"rules": {
-		"new-cap": [
-			2,
-			{
-				"capIsNewExceptions": [
-					"Polymer",
-					"nodecg.Replicant",
-					"NodeCG.Replicant"
-				]
-			}
-		]
 	}
 }
