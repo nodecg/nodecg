@@ -1,0 +1,11 @@
+{
+  "name": "test-disabled-bundle",
+  "version": "1.0.0",
+  "homepage": "http://github.com/nodecg",
+  "author": "madmatt <matt@madman.net.nz>",
+  "description": "A test bundle that shouldn't be loaded",
+  "license": "MIT",
+  "nodecg": {
+    "compatibleRange": "~0.7.0"
+  }
+}

@@ -41,6 +41,7 @@
     "multer": "^1.1.0",
     "nedb": "^1.2.1",
     "node-localstorage": "^1.3.0",
+    "nodecg-bundle-parser": "github:nodecg/nodecg-bundle-parser#83d14fd72fc6994447db4910f451c76cf7b7760c",
     "object-path": "^0.11.1",
     "parse-authors": "^0.2.2",
     "passport": "^0.3.2",
@@ -127,6 +128,7 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "vinyl-transform": "^1.0.0",
-    "webdriverio": "^4.6.2"
+    "webdriverio": "^4.6.2",
+    "wrench": "^1.5.9"
   }
 }
