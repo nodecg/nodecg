@@ -22,6 +22,7 @@ cache:
     - '$HOME/.npm'
 
 addons:
+  sauce_connect: true
   apt:
     sources:
       - ubuntu-toolchain-r-test
@@ -33,7 +34,7 @@ addons:
 before_install:
   - export CHROME_BIN=/usr/bin/google-chrome
   - export DISPLAY=:99.0
-  - bash ./test/helpers/travis_pr_setup.sh
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./test/helpers/travis_pr_setup.sh; fi'
 
 install:
   - npm install
