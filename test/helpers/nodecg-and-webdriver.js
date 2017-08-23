@@ -205,6 +205,10 @@ module.exports = function (test, tabs) {
 		}
 
 		if (e.browser && e.browser.client && typeof e.browser.client.end === 'function') {
+			if (!fs.existsSync('.nyc_output')) {
+				fs.mkdirSync('.nyc_output');
+			}
+
 			/* eslint-disable no-await-in-loop */
 			for (const tabName in e.browser.tabs) {
 				if (!{}.hasOwnProperty.call(e.browser.tabs, tabName)) {
