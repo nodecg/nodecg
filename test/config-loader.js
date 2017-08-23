@@ -8,7 +8,7 @@ const loadConfig = require('../lib/config/loader');
 
 test('should throw an error when the config file is not valid JSON', t => {
 	const error = t.throws(
-		loadConfig.bind(loadConfig, 'test/fixtures/cfg/invalidJSON.json')
+		loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidJSON.json')
 	);
 
 	t.true(error.message.includes('Please ensure that it contains only valid JSON'));
@@ -16,34 +16,34 @@ test('should throw an error when the config file is not valid JSON', t => {
 
 test('should validate the "login" object when "login.enabled" is "true"', t => {
 	const error = t.throws(
-		loadConfig.bind(loadConfig, 'test/fixtures/cfg/invalidLogin.json')
+		loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidLogin.json')
 	);
 
-	t.true(error.message.includes('test/fixtures/cfg/invalidLogin.json is invalid'));
+	t.true(error.message.includes('test/fixtures/nodecg-core/cfg/invalidLogin.json is invalid'));
 });
 
 test('should validate the "login.steam" object when "login.steam.enabled" is "true"', t => {
 	const error = t.throws(
-		loadConfig.bind(loadConfig, 'test/fixtures/cfg/invalidSteam.json')
+		loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidSteam.json')
 	);
 
-	t.true(error.message.includes('test/fixtures/cfg/invalidSteam.json is invalid'));
+	t.true(error.message.includes('test/fixtures/nodecg-core/cfg/invalidSteam.json is invalid'));
 });
 
 test('should validate the "login.twitch" object when "login.steam.twitch" is "true"', t => {
 	const error = t.throws(
-		loadConfig.bind(loadConfig, 'test/fixtures/cfg/invalidTwitch.json')
+		loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidTwitch.json')
 	);
 
-	t.true(error.message.includes('test/fixtures/cfg/invalidTwitch.json is invalid'));
+	t.true(error.message.includes('test/fixtures/nodecg-core/cfg/invalidTwitch.json is invalid'));
 });
 
 test('should validate the "ssl" object when "ssl.enabled" is "true"', t => {
 	const error = t.throws(
-		loadConfig.bind(loadConfig, 'test/fixtures/cfg/invalidSSL.json')
+		loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidSSL.json')
 	);
 
-	t.true(error.message.includes('est/fixtures/cfg/invalidSSL.json is invalid'));
+	t.true(error.message.includes('test/fixtures/nodecg-core/cfg/invalidSSL.json is invalid'));
 });
 
 test('should load defaults when the config file does not exist', t => {

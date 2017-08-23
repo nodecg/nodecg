@@ -154,7 +154,7 @@ test('should throw on invalid property changes to objects', t => {
 
 test('should properly load schemas provided with an absolute path', t => {
 	const rep = e.apis.extension.Replicant('schemaAbsolutePath', {
-		schemaPath: path.resolve(__dirname, '../fixtures/absolute-path-schemas/schemaAbsolutePath.json')
+		schemaPath: path.resolve(__dirname, '../fixtures/nodecg-core/absolute-path-schemas/schemaAbsolutePath.json')
 	});
 
 	t.deepEqual(rep.value, {

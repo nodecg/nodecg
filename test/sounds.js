@@ -110,7 +110,7 @@ test.serial('mixer - assignable cues - should list new sound Assets as they are 
 	await e.browser.client.switchTab(e.browser.tabs.dashboard);
 	await e.browser.client.then(() => new Promise((resolve, reject) => {
 		const oggPath = path.join(C.ASSETS_ROOT, 'test-bundle/sounds/success.ogg');
-		fs.copy('test/fixtures/assets/test-bundle/sounds/success.ogg', oggPath, {replace: true}, err => {
+		fs.copy('test/fixtures/nodecg-core/assets/test-bundle/sounds/success.ogg', oggPath, {replace: true}, err => {
 			if (err) {
 				reject(err);
 				return;
