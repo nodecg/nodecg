@@ -1,3 +1,73 @@
+<a name="0.9.0-beta"></a>
+# [0.9.0-beta](https://github.com/nodecg/nodecg/compare/v0.8.9...v0.9.0-beta) (2017-08-24)
+
+
+### Bug Fixes
+
+* **api:** print more useful error message when a replicant fails schema validation due to having additional properties ([037709a](https://github.com/nodecg/nodecg/commit/037709a))
+* **assets:** improve appearance of dialogs. refactor back and frontend code to allow for potential future features. ([7025d51](https://github.com/nodecg/nodecg/commit/7025d51)), closes [#309](https://github.com/nodecg/nodecg/issues/309)
+* **config:** default `host` to `0.0.0.0` instead of `localhost` ([7a3276d](https://github.com/nodecg/nodecg/commit/7a3276d))
+* **config:** default baseURL to `localhost` when host is `0.0.0.0` ([3a4496b](https://github.com/nodecg/nodecg/commit/3a4496b))
+* **dashboard:** add `raised` attribute to KILL button on single-instance graphics ([1e116db](https://github.com/nodecg/nodecg/commit/1e116db))
+* **dashboard:** close drawer when viewport increases to a wide layout ([20bafef](https://github.com/nodecg/nodecg/commit/20bafef)), closes [#282](https://github.com/nodecg/nodecg/issues/282)
+* **replicants:** fixed a case where re-assigning a nested object could result in a broken replicant ([9e72b86](https://github.com/nodecg/nodecg/commit/9e72b86))
+* **replicants:** harden logging of validation errors ([250b3fe](https://github.com/nodecg/nodecg/commit/250b3fe))
+* **replicants:** prevent .once('change') listeners from potentially being called twice ([78a11c8](https://github.com/nodecg/nodecg/commit/78a11c8)), closes [#296](https://github.com/nodecg/nodecg/issues/296)
+* **replicants:** properly load schemas when schemaPath is absolute ([4201906](https://github.com/nodecg/nodecg/commit/4201906))
+* **replicants:** set status to "declared" _before_ emitting the post-declare change event ([a62d25d](https://github.com/nodecg/nodecg/commit/a62d25d))
+* **soundCues:** fix case where valid soundCues could fail schema validation ([f0c17ba](https://github.com/nodecg/nodecg/commit/f0c17ba))
+
+
+### Code Refactoring
+
+* **dashboard:** port to Polymer 2 ([2084237](https://github.com/nodecg/nodecg/commit/2084237)), closes [#218](https://github.com/nodecg/nodecg/issues/218)
+* The following modules have been merged back into the main NodeCG codebase, instead of being kept as separate packages:
+  - [nodecg-bundle-parser](https://github.com/nodecg/nodecg-bundle-parser)
+  - [@nodecg/bundle-manager](https://github.com/nodecg/bundle-manager)
+  - [@nodecg/logger](https://github.com/nodecg/logger)
+- **tests:** rewrote tests to use `ava` instead of `mocha`
+
+
+### Features
+
+* **api:** add nodecg.unlisten method ([ea45b3f](https://github.com/nodecg/nodecg/commit/ea45b3f))
+* **api:** expose Logger class ([5882dc4](https://github.com/nodecg/nodecg/commit/5882dc4))
+* **api:** if an acknowledgement is called with an error as the first callback, serialize that error ([#300](https://github.com/nodecg/nodecg/issues/300)) ([1c05f81](https://github.com/nodecg/nodecg/commit/1c05f81))
+* **api:** make client-side sendMessage return a Promise ([#301](https://github.com/nodecg/nodecg/issues/301)) ([fe93c73](https://github.com/nodecg/nodecg/commit/fe93c73)), closes [#297](https://github.com/nodecg/nodecg/issues/297)
+* **config:** add support for whitelisted loading of bundles ([31533a8](https://github.com/nodecg/nodecg/commit/31533a8))
+* **dashboard:** add support for multiple tabs of panels, called "workspaces". See the [Manifest tutorial](http://nodecg.com/tutorial-manifest.html) (specifically the `nodecg.dashboardPanels` section) for more info.
+* **dashboard:** add support for "fullbleed" workspaces, which have one single panel that takes up the entire dashboard
+* **dashboard:** add "open in standalone window" button to panel headers ([ba077c0](https://github.com/nodecg/nodecg/commit/ba077c0))
+* **dashboard:** add default body background color style to panels ([3433529](https://github.com/nodecg/nodecg/commit/3433529))
+* **dashboard:** re-design dashboard with tabbed navigation ([8214b43](https://github.com/nodecg/nodecg/commit/8214b43))
+* **dashboard:** show a much shorter and easier to read URL for each graphic on the Graphics page ([5b91af1](https://github.com/nodecg/nodecg/commit/5b91af1))
+* **replicants:** add .validationErrors property ([59f3c82](https://github.com/nodecg/nodecg/commit/59f3c82))
+* **replicants:** log a warning when attempting to access .value before the Replicant has finished declaring ([#274](https://github.com/nodecg/nodecg/issues/274)) ([293acf5](https://github.com/nodecg/nodecg/commit/293acf5)), closes [#265](https://github.com/nodecg/nodecg/issues/265)
+* **replicants:** support external $refs in schemas ([3c34450](https://github.com/nodecg/nodecg/commit/3c34450))
+* add convenience 'shared' directory ([#295](https://github.com/nodecg/nodecg/issues/295)) ([63a1119](https://github.com/nodecg/nodecg/commit/63a1119))
+* add Sentry integration for error tracking ([#305](https://github.com/nodecg/nodecg/issues/305)) ([92cd540](https://github.com/nodecg/nodecg/commit/92cd540))
+* adopt new routing style (/bundles/:bundleName/*) ([1663670](https://github.com/nodecg/nodecg/commit/1663670))
+* log unhandled promise rejections if Sentry is not enabled ([59dc75e](https://github.com/nodecg/nodecg/commit/59dc75e))
+
+
+### Performance Improvements
+
+* implement polymer-build ([#286](https://github.com/nodecg/nodecg/issues/286)) ([cad6a42](https://github.com/nodecg/nodecg/commit/cad6a42))
+
+
+### BREAKING CHANGES
+
+For detailed instructions on how to migrate your v0.8 bundles to v0.9, [check out the tutorial on NodeCG.com](http://nodecg.com/tutorial-migrating-0.8-to-0.9.html)
+
+* NodeCG no longer automatically installs the `npm` and `bower` dependencies of installed bundles. Users must do this manually.
+* replicants: Replicants now set their state to `declared` *before* they emit their post-declare `change` event. This is unlikely to break any existing code, but it is technically a breaking change.
+* The Rollbar integration for error tracking has been removed, and has been replaced with a [Sentry](https://sentry.io/welcome/) integration.
+* api: If the first argument you provide to a message acknowledgement is an Error, it will be serialized instead of being sent as an empty object.
+* dashboard: Removed most of the helper styles and classes, such as `nodecg-configure`, which were being injected into panels. Most of it would not work in Polymer 2 without extra effort.
+* Old `/panel` and `/graphics` routes no longer work. You must update all routes to the new `/bundles/:bundleName/*` format.
+
+
+
 <a name="0.8.9"></a>
 ## [0.8.9](https://github.com/nodecg/nodecg/compare/v0.8.8...v0.8.9) (2017-03-08)
 
