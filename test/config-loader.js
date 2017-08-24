@@ -19,7 +19,7 @@ test('should validate the "login" object when "login.enabled" is "true"', t => {
 		loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidLogin.json')
 	);
 
-	t.true(error.message.includes('test/fixtures/nodecg-core/cfg/invalidLogin.json is invalid'));
+	t.is(error.message, 'login.sessionSecret: must be of type String');
 });
 
 test('should validate the "login.steam" object when "login.steam.enabled" is "true"', t => {
@@ -27,7 +27,7 @@ test('should validate the "login.steam" object when "login.steam.enabled" is "tr
 		loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidSteam.json')
 	);
 
-	t.true(error.message.includes('test/fixtures/nodecg-core/cfg/invalidSteam.json is invalid'));
+	t.is(error.message, 'login.steam.apiKey: must be of type String');
 });
 
 test('should validate the "login.twitch" object when "login.steam.twitch" is "true"', t => {
@@ -35,7 +35,7 @@ test('should validate the "login.twitch" object when "login.steam.twitch" is "tr
 		loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidTwitch.json')
 	);
 
-	t.true(error.message.includes('test/fixtures/nodecg-core/cfg/invalidTwitch.json is invalid'));
+	t.is(error.message, 'login.twitch.clientID: must be of type String\nlogin.twitch.clientSecret: must be of type String');
 });
 
 test('should validate the "ssl" object when "ssl.enabled" is "true"', t => {
@@ -43,7 +43,7 @@ test('should validate the "ssl" object when "ssl.enabled" is "true"', t => {
 		loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidSSL.json')
 	);
 
-	t.true(error.message.includes('test/fixtures/nodecg-core/cfg/invalidSSL.json is invalid'));
+	t.is(error.message, 'ssl.keyPath: must be of type String\nssl.certificatePath: must be of type String');
 });
 
 test('should load defaults when the config file does not exist', t => {
@@ -52,7 +52,8 @@ test('should load defaults when the config file does not exist', t => {
 	t.is(result.config.port, 9090);
 });
 
-test('should not have any disabled bundles by default', t => {
+test('should not have any whitelisted nor blacklisted bundles by default', t => {
 	const result = loadConfig('');
+	t.is(result.config.bundles.enabled, null);
 	t.is(result.config.bundles.disabled, null);
 });
