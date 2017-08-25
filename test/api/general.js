@@ -47,17 +47,12 @@ test('should reject acknowledgement promises if there was an error', async t => 
 	t.is(res.value, 'boom');
 });
 
-test('should not resolve nor reject the promise if the user provided a callback', async t => {
+test('should not return a promise if the user provided a callback ', async t => {
 	e.apis.extension.listenFor('ackPromiseCallback', (data, cb) => cb());
 	const res = await e.browser.client.executeAsync(done => {
-		window.dashboardApi.sendMessage('ackPromiseCallback', () => {
-			// Delay this so that it fires after the promise would resolve.
-			setTimeout(() => {
-				done();
-			}, 10);
-		}).then(() => {
-			done('promise resolved when it should not');
-		}).catch(done);
+		const returnVal = window.dashboardApi.sendMessage('ackPromiseCallback', () => {
+			done(returnVal === undefined);
+		});
 	});
-	t.is(res.value, null);
+	t.true(res.value);
 });
