@@ -17,8 +17,9 @@ frameworks, tools, and methodologies you want. As such, NodeCG graphics can be r
 can render HTML, including:
 - [OBS Studio](https://obsproject.com/) (via the [obs-browser](https://github.com/kc5nra/obs-browser) plugin)
 - [vMix](http://www.vmix.com/)
+- [XSplit](https://www.xsplit.com/)
 
-> Don't see your preferred streaming software on this list? NodeCG graphics require Chrome 49 or newer.
+> Don't see your preferred streaming software on this list? NodeCG graphics require Chrome 49 or newer. If your streaming software's implementation of browser source uses a build of CEF that is based on at least Chrome 49, chances are that NodeCG graphics will work in it. You can check what version of Chrome your streaming software uses for its browser sources by opening http://www.whatversion.net/chrome/ as a browser source.
 
 As long as your streaming software has support for HTML and uses a somewhat recent version of Chrome, 
 NodeCG will probably work.
