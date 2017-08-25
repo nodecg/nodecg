@@ -13,25 +13,21 @@ const test = require('ava');
 // Ours
 const Logger = require('../lib/logger/server')({console: {enabled: true}});
 
-const BUNDLE_FIXTURES_SRC = 'test/fixtures/bundle-manager/bundles';
 const tempFolder = temp.mkdirSync();
 temp.track(); // Automatically track and cleanup files at exit.
 
 let bundleManager;
 test.cb.before(t => {
-	fse.copySync('test/fixtures/bundle-manager/cfg', path.join(tempFolder, 'cfg'));
-	fs.readdirSync(BUNDLE_FIXTURES_SRC).forEach(bundleFolderName => {
-		if (bundleFolderName === 'change-panel-symlink' && isWindows()) {
-			return;
-		}
+	fse.copySync('test/fixtures/bundle-manager', tempFolder);
 
-		const bundlePath = path.join(BUNDLE_FIXTURES_SRC, bundleFolderName);
-		if (!fs.statSync(bundlePath).isDirectory()) {
-			return;
-		}
-
-		fse.copySync(bundlePath, path.join(tempFolder, 'bundles', bundleFolderName));
-	});
+	// The symlink test can't run on Windows unless run with admin privs.
+	// For some reason, creating symlinks on Windows requires admin.
+	if (!isWindows()) {
+		fs.symlinkSync(
+			path.join(tempFolder, 'change-panel-symlink-target'),
+			path.join(tempFolder, 'bundles/change-panel-symlink')
+		);
+	}
 
 	const nodecgConfig = {
 		bundles: {
