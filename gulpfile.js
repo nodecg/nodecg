@@ -60,7 +60,7 @@ function buh({instrument} = {}) {
 				// It's needed for now because Safari currently does not properly scope the `let` keyword,
 				// meaning that we have to compile our code down to ES5 to work on Safari/iOS.
 				// This is fixed in Safari Tech Preview, and should be included in the next release in Fall.
-				presets: ['es2015-nostrict', 'babili'],
+				presets: ['es2015-nostrict', 'minify'],
 				comments: false,
 				minified: true,
 				sourceMaps: true,
@@ -122,7 +122,7 @@ gulp.task('polymer-build', ['clean'], async () => {
 		// Bundling and JS minification and  are disabled until the source map bugs are fixed.
 		// .pipe(gulpif(/\.js$/, sourcemaps.init({loadMaps: true})))
 		// .pipe(gulpif(/\.js$/, babel({
-		// 	presets: ['babili']
+		// 	presets: ['minify']
 		// })))
 		// .pipe(gulpif(/\.js$/, sourcemaps.write('src/maps')))
 		.pipe(buildStreamSplitter.rejoin())

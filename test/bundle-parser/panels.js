@@ -32,11 +32,6 @@ test('when two panels have the same name, throw an error', t => {
 	t.true(error.message.includes('has the same name as another panel'));
 });
 
-test('when a panel\'s file has no <head> tag, throw an error', t => {
-	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/no-head'));
-	t.true(error.message.includes('has no <head>'));
-});
-
 test('when a panel\'s file has no <!DOCTYPE>, throw an error', t => {
 	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/no-doctype'));
 	t.true(error.message.includes('has no DOCTYPE'));

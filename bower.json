@@ -9,7 +9,7 @@
   "dependencies": {
     "app-layout": "PolymerElements/app-layout#^2.0.0",
     "app-route": "PolymerElements/app-route#^2.0.0",
-    "clipboard": "^1.6.1",
+    "clipboard": "^1.7.1",
     "cookies-js": "^1.2.3",
     "draggabilly": "^2.1.1",
     "iframe-resizer": "^3.5.14",
@@ -35,10 +35,10 @@
     "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
     "paper-toast": "PolymerElements/paper-toast#^2.0.0",
     "paper-toolbar": "PolymerElements/paper-toolbar#^2.0.0",
-    "SoundJS": "^0.6.2",
-    "vaadin-upload": "vaadin/vaadin-upload#^2.0.0-alpha3",
     "polymer": "Polymer/polymer#2.0.0",
-    "raven-js": "^3.15.0"
+    "raven-js": "^3.17.0",
+    "SoundJS": "^0.6.2",
+    "vaadin-upload": "vaadin/vaadin-upload#^2.0.0"
   },
   "license": "MIT",
   "private": true,
@@ -50,16 +50,16 @@
     "tests"
   ],
   "resolutions": {
-    "polymer": "2.0.0",
-    "webcomponentsjs": "^v1.0.0",
     "app-layout": "^2.0.0",
     "app-route": "^2.0.0",
-    "iron-location": "^2.0.0",
     "iron-collapse": "^2.0.0",
     "iron-flex-layout": "^2.0.0",
+    "iron-icon": "^2.0.0",
     "iron-icons": "^2.0.0",
+    "iron-iconset-svg": "^2.0.0",
     "iron-image": "^2.0.0",
     "iron-localstorage": "^2.0.0",
+    "iron-location": "^2.0.0",
     "iron-pages": "^2.0.0",
     "iron-selector": "^2.0.0",
     "paper-button": "^2.0.0",
@@ -69,15 +69,15 @@
     "paper-dialog-scrollable": "^2.0.0",
     "paper-icon-button": "^2.0.0",
     "paper-item": "^2.0.0",
+    "paper-progress": "^2.0.0",
+    "paper-ripple": "^2.0.0",
     "paper-slider": "^2.0.0",
     "paper-spinner": "^2.0.0",
     "paper-styles": "^2.0.0",
     "paper-tabs": "^2.0.0",
     "paper-toast": "^2.0.0",
     "paper-toolbar": "^2.0.0",
-    "paper-progress": "^2.0.0",
-    "iron-icon": "^2.0.0",
-    "iron-iconset-svg": "^2.0.0",
-    "paper-ripple": "^2.0.0"
+    "polymer": "2.0.0",
+    "webcomponentsjs": "^v1.0.0"
   }
 }
