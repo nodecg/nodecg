@@ -10,7 +10,7 @@ test.beforeEach(() => {
 	return e.browser.client.switchTab(e.browser.tabs.dashboard);
 });
 
-test('should create a default value based on the schema, if none is provided', async t => {
+test.serial('should create a default value based on the schema, if none is provided', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaDefaults');
 		rep.on('declared', () => done(rep.value));
@@ -24,7 +24,7 @@ test('should create a default value based on the schema, if none is provided', a
 	});
 });
 
-test('should accept the defaultValue when it passes validation', async t => {
+test.serial('should accept the defaultValue when it passes validation', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaDefaultValuePass', {
 			defaultValue: {
@@ -45,7 +45,7 @@ test('should accept the defaultValue when it passes validation', async t => {
 	});
 });
 
-test('should throw when defaultValue fails validation', async t => {
+test.serial('should throw when defaultValue fails validation', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
 			defaultValue: {
@@ -61,7 +61,7 @@ test('should throw when defaultValue fails validation', async t => {
 	t.true(res.value.startsWith('Invalid value rejected for replicant "client_schemaDefaultValueFail"'));
 });
 
-test('should accept the persisted value when it passes validation', async t => {
+test.serial('should accept the persisted value when it passes validation', async t => {
 	// Persisted value is copied from fixtures
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaPersistencePass');
@@ -78,7 +78,7 @@ test('should accept the persisted value when it passes validation', async t => {
 	});
 });
 
-test('should reject the persisted value when it fails validation, replacing with schemaDefaults', async t => {
+test.serial('should reject the persisted value when it fails validation, replacing with schemaDefaults', async t => {
 	// Persisted value is copied from fixtures
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaPersistenceFail');
@@ -93,7 +93,7 @@ test('should reject the persisted value when it fails validation, replacing with
 	});
 });
 
-test('should accept valid assignment', async t => {
+test.serial('should accept valid assignment', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaAssignPass');
 		rep.once('declared', () => {
@@ -120,7 +120,7 @@ test('should accept valid assignment', async t => {
 	});
 });
 
-test('should throw on invalid assignment', async t => {
+test.serial('should throw on invalid assignment', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaAssignFail');
 		rep.once('declared', () => {
@@ -137,7 +137,7 @@ test('should throw on invalid assignment', async t => {
 	t.true(res.value.startsWith('Invalid value rejected for replicant "client_schemaAssignFail"'));
 });
 
-test('should accept valid property deletion', async t => {
+test.serial('should accept valid property deletion', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaDeletionPass');
 		rep.once('declared', () => {
@@ -158,7 +158,7 @@ test('should accept valid property deletion', async t => {
 	});
 });
 
-test('should throw on invalid property deletion', async t => {
+test.serial('should throw on invalid property deletion', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaDeletionFail');
 		rep.once('declared', () => {
@@ -173,7 +173,7 @@ test('should throw on invalid property deletion', async t => {
 	t.true(res.value.startsWith('Invalid value rejected for replicant "client_schemaDeletionFail"'));
 });
 
-test('should accept valid array mutation via array mutator methods', async t => {
+test.serial('should accept valid array mutation via array mutator methods', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaArrayMutatorPass');
 		rep.once('declared', () => {
@@ -194,7 +194,7 @@ test('should accept valid array mutation via array mutator methods', async t => 
 	});
 });
 
-test('should throw on invalid array mutation via array mutator methods', async t => {
+test.serial('should throw on invalid array mutation via array mutator methods', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaArrayMutatorFail');
 		rep.once('declared', () => {
@@ -209,7 +209,7 @@ test('should throw on invalid array mutation via array mutator methods', async t
 	t.true(res.value.startsWith('Invalid value rejected for replicant "client_schemaArrayMutatorFail"'));
 });
 
-test('should accept valid property changes to arrays', async t => {
+test.serial('should accept valid property changes to arrays', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaArrayChangePass');
 		rep.once('declared', () => {
@@ -230,7 +230,7 @@ test('should accept valid property changes to arrays', async t => {
 	});
 });
 
-test('should throw on invalid property changes to arrays', async t => {
+test.serial('should throw on invalid property changes to arrays', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaArrayChangeFail');
 		rep.once('declared', () => {
@@ -245,7 +245,7 @@ test('should throw on invalid property changes to arrays', async t => {
 	t.true(res.value.startsWith('Invalid value rejected for replicant "client_schemaArrayChangeFail"'));
 });
 
-test('should accept valid property changes to objects', async t => {
+test.serial('should accept valid property changes to objects', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaObjectChangePass');
 		rep.once('declared', () => {
@@ -266,7 +266,7 @@ test('should accept valid property changes to objects', async t => {
 	});
 });
 
-test('should throw on invalid property changes to objects', async t => {
+test.serial('should throw on invalid property changes to objects', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaObjectChangeFail');
 		rep.once('declared', () => {
@@ -281,7 +281,7 @@ test('should throw on invalid property changes to objects', async t => {
 	t.true(res.value.startsWith('Invalid value rejected for replicant "client_schemaObjectChangeFail"'));
 });
 
-test('should reject assignment if it was validated against a different version of the schema', async t => {
+test.serial('should reject assignment if it was validated against a different version of the schema', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaAssignMismatch');
 		rep.once('declared', () => {
@@ -306,7 +306,7 @@ test('should reject assignment if it was validated against a different version o
 	t.true(res.value.startsWith('Mismatched schema version, assignment rejected'));
 });
 
-test('should reject operations if they were validated against a different version of the schema', async t => {
+test.serial('should reject operations if they were validated against a different version of the schema', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('client_schemaOperationMismatch');
 		rep.once('declared', () => {
@@ -332,7 +332,7 @@ test('should reject operations if they were validated against a different versio
 // I more or less copied that code and schema directly here just to write the test as fast as possible.
 // This test should probably be re-written to be more targeted and remove any cruft.
 // Lange - 2017/05/04
-test('shouldn\'t fuck up', async t => {
+test.serial('shouldn\'t fuck up', async t => {
 	const res = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('schedule:state');
 		rep.once('declared', () => {
