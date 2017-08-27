@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Logger.html">Logger</a></li><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li><li data-type='method'><a href="NodeCG.html#unlisten">unlisten</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-migrating-0.8-to-0.9.html">Migrating from 0.8 to 0.9</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-sentry.html">Error Reporting with Sentry.io</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_stopWatching">_stopWatching</a></li><li><a href="global.html#add">add</a></li><li><a href="global.html#all">all</a></li><li><a href="global.html#ENUM_LEVELS">ENUM_LEVELS</a></li><li><a href="global.html#extractBundleName">extractBundleName</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#isManifest">isManifest</a></li><li><a href="global.html#isPanelHTMLFile">isPanelHTMLFile</a></li><li><a href="global.html#remove">remove</a></li><li><a href="global.html#resetBackoffTimer">resetBackoffTimer</a></li><li><a href="global.html#wrapAcknowledgement">wrapAcknowledgement</a></li></ul>
 </nav>
 
 <div id="main">
@@ -84,18 +84,18 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 		if (resourceType === 'panel' || resourceType === 'dialog') {
 			if (opts.standalone) {
 				// Load the API
-				scripts.push('&lt;script src="/nodecg-api.js">&lt;/script>');
+				scripts.push('&lt;script src="/nodecg-api.min.js">&lt;/script>');
 			} else {
 				// Panels and dialogs can grab the API from the dashboard
 				scripts.push('&lt;script>window.NodeCG = window.top.NodeCG&lt;/script>');
 			}
 
-			// Both panels and dialogs need the main default style framework
-			scripts.push('&lt;link rel="import" href="/dashboard/style/nodecg-styles.html">');
+			// Both panels and dialogs need the main default styles
+			scripts.push('&lt;link rel="stylesheet" href="/dashboard/css/panel-and-dialog-defaults.css">');
 
 			if (opts.standalone) {
 				// Load the socket
-				scripts.push('&lt;script src="/components/cookies-js/dist/cookies.min.js">&lt;/script>');
+				scripts.push('&lt;script src="/bower_components/cookies-js/dist/cookies.min.js">&lt;/script>');
 				scripts.push('&lt;script src="/socket.io/socket.io.js">&lt;/script>');
 
 				scripts.push(`&lt;script>
@@ -114,30 +114,34 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 
 			// Likewise, they both need the contentWindow portion of the iframeResizer.
 			// We put this at the start and make it async so it loads ASAP.
-			scripts.unshift('&lt;script async src="/components/iframe-resizer/js/iframeResizer.contentWindow.min.js">' +
-				'&lt;/script>');
+			if (!opts.fullbleed) {
+				scripts.unshift('&lt;script async src="/bower_components/iframe-resizer/js/iframeResizer.contentWindow.min.js">' +
+					'&lt;/script>');
+			}
 
 			// Panels need the default panel styles and the dialog_opener.
 			// Dialogs need the dialog_helper.
 			if (resourceType === 'panel') {
-				styles.push('&lt;link rel="stylesheet" href="/dashboard/style/panel.css">');
-				scripts.push('&lt;script async src="/dashboard/dialog_opener.js">&lt;/script>');
+				styles.push('&lt;link rel="stylesheet" href="/dashboard/css/panel-defaults.css">');
+				scripts.push('&lt;script async src="/dashboard/js/dialog_opener.js">&lt;/script>');
 			} else if (resourceType === 'dialog') {
-				scripts.push('&lt;script async src="/dashboard/dialog_helper.js">&lt;/script>');
+				scripts.push('&lt;script async src="/dashboard/js/dialog_helper.js">&lt;/script>');
 			}
 		} else if (resourceType === 'graphic') {
-			if (config.rollbar &amp;&amp; config.rollbar.enabled) {
+			if (config.sentry &amp;&amp; config.sentry.enabled) {
 				scripts.unshift(
-					'&lt;script src="/components/rollbar/dist/rollbar.min.js">&lt;/script>',
+					'&lt;script src="/bower_components/raven-js/dist/raven.min.js">&lt;/script>',
 					`&lt;script>
-						Rollbar.init({
-							accessToken: '${config.rollbar.postClientItem}',
-							captureUncaught: true,
-							captureUnhandledRejections: true,
-							payload: {
-								environment: '${config.rollbar.environment}'
+						Raven.config('${config.sentry.publicDsn}', {
+							release: '${require('../../package.json').version}',
+							tags: {
+								nodecgHost: '${config.host}',
+								nodecgBaseURL: '${config.baseURL}'
 							}
-						})
+						}).install();
+						window.addEventListener('unhandledrejection', function (err) {
+							Raven.captureException(err.reason);
+						});
 					&lt;/script>`
 				);
 			}
@@ -148,7 +152,7 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 			// If login security is enabled, graphics must provide a valid token when they connect to the socket
 			// They also need cookies-js and a helper to manage URL query strings
 			if (config.login.enabled) {
-				scripts.push('&lt;script src="/components/cookies-js/dist/cookies.min.js">&lt;/script>');
+				scripts.push('&lt;script src="/bower_components/cookies-js/dist/cookies.min.js">&lt;/script>');
 				scripts.push('&lt;script src="/login/QueryString.js">&lt;/script>');
 				scripts.push(`&lt;script>
 					window.token = qs['key'] || Cookies.get('socketToken');
@@ -160,11 +164,11 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 
 			// If this bundle has sounds, inject SoundJS
 			if (opts.sound) {
-				scripts.push('&lt;script src="/components/SoundJS/lib/soundjs-0.6.2.min.js">&lt;/script>');
+				scripts.push('&lt;script src="/bower_components/SoundJS/lib/soundjs-0.6.2.min.js">&lt;/script>');
 			}
 
 			// Graphics must include the API script themselves before attempting to make an instance of it
-			scripts.push('&lt;script src="/nodecg-api.js">&lt;/script>');
+			scripts.push('&lt;script src="/nodecg-api.min.js">&lt;/script>');
 		} else {
 			throw new Error(`Invalid resourceType "${resourceType}"`);
 		}
@@ -227,7 +231,7 @@ module.exports = function (pathOrHtml, resourceType, opts, cb) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Jun 12 2017 13:54:46 GMT-0500 (Central Daylight Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Aug 27 2017 09:46:28 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

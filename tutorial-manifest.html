@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Logger.html">Logger</a></li><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li><li data-type='method'><a href="NodeCG.html#unlisten">unlisten</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-migrating-0.8-to-0.9.html">Migrating from 0.8 to 0.9</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-sentry.html">Error Reporting with Sentry.io</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_stopWatching">_stopWatching</a></li><li><a href="global.html#add">add</a></li><li><a href="global.html#all">all</a></li><li><a href="global.html#ENUM_LEVELS">ENUM_LEVELS</a></li><li><a href="global.html#extractBundleName">extractBundleName</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#isManifest">isManifest</a></li><li><a href="global.html#isPanelHTMLFile">isPanelHTMLFile</a></li><li><a href="global.html#remove">remove</a></li><li><a href="global.html#resetBackoffTimer">resetBackoffTimer</a></li><li><a href="global.html#wrapAcknowledgement">wrapAcknowledgement</a></li></ul>
 </nav>
 
 <div id="main">
@@ -76,6 +76,18 @@ with some additional properties that tell NodeCG about the bundle and how to loa
           }
         ],
         &quot;file&quot;: &quot;sample-dialog.html&quot;
+      },
+      {
+        &quot;name&quot;: &quot;custom-workspace&quot;,
+        &quot;title&quot;: &quot;Custom Workspace Panel&quot;,
+        &quot;width&quot;: 4,
+        &quot;file&quot;: &quot;custom-workspace.html&quot;,
+        &quot;workspace&quot;: &quot;My Workspace&quot;
+      },
+      {
+        &quot;name&quot;: &quot;fullbleed-panel&quot;,
+        &quot;title&quot;: &quot;Fullbleed Panel&quot;,
+        &quot;fullbleed&quot;: true
       }
     ],
     &quot;graphics&quot;: [
@@ -102,6 +114,15 @@ Every panel and dialog must have a <code>name</code>, <code>title</code>, and <c
 <code>width</code> is optional, and defaults to <code>2</code>. The width scale is arbitrary and may change, 
 so you'll want to play around with this number to get the desired width.</p>
 <p>Panels also have an optional <code>headerColor</code> property that accepts a hex color string.</p>
+<p>You can split your panels up into multiple <code>workspace</code>s. By default all panels are added to the same workspace.
+If you'd like to specify a different workspace, simply provide a workspace name as the <code>workspace</code> property.
+Workspaces work across bundles. If <code>my-bundle</code> and <code>your-bundle</code> both declare a panel in the <code>Shared Workspace</code> 
+workspace, then both of our panels will show up together.</p>
+<p>If you have a really big panel that simply needs to be in its own workspace and have maximized screenspace, give it
+the <code>fullbleed</code> property. Fullbleed panels are put into their own workspace and have no margins around them. This is
+good for when you have a large, complex UI that you need more fine-grained control over.</p>
+<iframe src='https://gfycat.com/ifr/SarcasticDeterminedFugu' frameborder='0' scrolling='no' width='640' height='402' allowfullscreen></iframe>
+
 <p>To mark a panel as a dialog, it must have the <code>dialog</code> property set to <code>true</code>. Dialogs don't immediately display on the
 dashboard, and must be manually invoked. See <a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a> for more info. 
 (<a href="http://i.imgur.com/xA4mDvF.png">Screenshot of an open dialog</a>)</p>
@@ -124,7 +145,7 @@ If you wish to enforce that your graphic only ever be open in one place at a tim
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Jun 12 2017 13:54:46 GMT-0500 (Central Daylight Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Aug 27 2017 09:46:28 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

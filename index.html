@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-rollbar.html">Error Tracking with Rollbar</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Logger.html">Logger</a></li><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li><li data-type='method'><a href="NodeCG.html#unlisten">unlisten</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-migrating-0.8-to-0.9.html">Migrating from 0.8 to 0.9</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-sentry.html">Error Reporting with Sentry.io</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_stopWatching">_stopWatching</a></li><li><a href="global.html#add">add</a></li><li><a href="global.html#all">all</a></li><li><a href="global.html#ENUM_LEVELS">ENUM_LEVELS</a></li><li><a href="global.html#extractBundleName">extractBundleName</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#isManifest">isManifest</a></li><li><a href="global.html#isPanelHTMLFile">isPanelHTMLFile</a></li><li><a href="global.html#remove">remove</a></li><li><a href="global.html#resetBackoffTimer">resetBackoffTimer</a></li><li><a href="global.html#wrapAcknowledgement">wrapAcknowledgement</a></li></ul>
 </nav>
 
 <div id="main">
@@ -47,77 +47,117 @@
 
 
     <section class="readme">
-        <article><p><a href="http://nodecg.com/"><img src="http://i.imgur.com/8PjMIL4.png" alt="NodeCG Logo"></a></p>
-<p>NodeCG is a broadcast graphics framework and application.
-It is primarily aimed at <a href="http://twitch.tv">Twitch</a> broadcasters using 
-<a href="https://obsproject.com/">Open Broadcaster Software</a>, but is usable in any environment that can render HTML,
-including CasparCG. NodeCG is based on the overlay system developed for the 
-<a href="https://www.youtube.com/watch?v=x9PzBHgN29U">Tip of the Hats 2014</a> charity event.</p>
-<p><a href="https://travis-ci.org/nodecg/nodecg"><img src="https://travis-ci.org/nodecg/nodecg.svg?branch=master" alt="Build Status"></a>
+        <article><h1>NodeCG</h1><p><a href="https://nodecg.com/"><img src="media/splash.png" alt="NodeCG"></a></p>
+<p><a href="https://gitter.im/nodecg/nodecg"><img src="https://badges.gitter.im/gitterHQ/gitter.png" alt="Gitter chat"></a>
+<a href="https://travis-ci.org/nodecg/nodecg"><img src="https://travis-ci.org/nodecg/nodecg.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/github/nodecg/nodecg?branch=master"><img src="https://coveralls.io/repos/nodecg/nodecg/badge.svg?branch=master&amp;service=github" alt="Coverage Status"></a>
 <a href="https://greenkeeper.io/"><img src="https://badges.greenkeeper.io/nodecg/nodecg.svg" alt="Greenkeeper badge"></a></p>
-<p>Looking for a list of NodeCG bundles and resources? Check out <a href="https://github.com/nodecg/awesome-nodecg/blob/master/README.md">awesome-nodecg</a>.</p>
-<p>Have questions about NodeCG, or just want to say 'hi'? Join our Gitter chatroom!<br><a href="https://gitter.im/nodecg/nodecg"><img src="https://badges.gitter.im/gitterHQ/gitter.png" alt="Gitter chat"></a></p>
 <blockquote>
-<p><strong>NOTICE</strong>: NodeCG v0.8 and above require Node.js &gt;= 6 and Chrome &gt;= 49. 
-<strong>This means that as of right now, NodeCG graphics will not work in OBS1, XSplit, or CasparCG.</strong> 
-The only platforms that can currently display NodeCG graphics are <a href="https://obsproject.com/">OBS Studio</a> (with a recent release of its <a href="https://github.com/kc5nra/obs-browser/releases/tag/1.21">Browser Source plugin</a>) and <a href="http://www.vmix.com/">vMix</a>.</p>
+<p>Create broadcast graphics using Node.js and a browser</p>
 </blockquote>
-<h1>Who should use NodeCG?</h1><p>NodeCG is a programming framework. As such, it's most useful to developers capable of creating their own graphics
+<p>NodeCG is a broadcast graphics framework and application. It enables you to write complex, dynamic broadcast graphics
+using the web platform. NodeCG has no graphics or drawing primitives of its own. Instead, NodeCG provides
+a structure for your code and an API to facilitate moving data between the dashboard, the server, and your graphics.
+It makes no assumptions about how to best code a graphic, and gives you complete freedom to use whatever libraries, 
+frameworks, tools, and methodologies you want. As such, NodeCG graphics can be rendered in any environment that
+can render HTML, including:</p>
+<ul>
+<li><a href="https://obsproject.com/">OBS Studio</a> (via the <a href="https://github.com/kc5nra/obs-browser">obs-browser</a> plugin)</li>
+<li><a href="http://www.vmix.com/">vMix</a></li>
+<li><a href="https://www.xsplit.com/">XSplit</a></li>
+</ul>
+<blockquote>
+<p>Don't see your preferred streaming software on this list? NodeCG graphics require Chrome 49 or newer. If your streaming software's implementation of browser source uses a build of CEF that is based on at least Chrome 49, chances are that NodeCG graphics will work in it. You can check what version of Chrome your streaming software uses for its browser sources by opening http://www.whatversion.net/chrome/ as a browser source.</p>
+</blockquote>
+<p>As long as your streaming software has support for HTML and uses a somewhat recent version of Chrome, 
+NodeCG will probably work.</p>
+<p>Looking for a list of NodeCG bundles and resources? Check out <a href="https://github.com/nodecg/awesome-nodecg/blob/master/README.md">awesome-nodecg</a>.</p>
+<p>Have questions about NodeCG, or just want to say 'hi'? <a href="https://gitter.im/nodecg/nodecg">Join our Gitter chatroom</a>!</p>
+<p><strong>Who should use NodeCG?</strong></p>
+<p>NodeCG is a programming framework. As such, it's most useful to developers capable of creating their own graphics
 using HTML, CSS, and JavaScript. NodeCG is still in beta and the ecosystem of bundles is quite small.
 Those expecting to download NodeCG and use off-the-shelf bundles to get a complete stream overlay
 without writing any code may be disappointed.</p>
-<h1>Installation</h1><p>Install <a href="http://nodejs.org/">node.js (version 6 or greater) &amp; npm (version 2 or greater)</a>.<br>Then, run the following commands from a terminal (command prompt):</p>
-<pre class="prettyprint source"><code>npm install -g bower
+<h2>Table of Contents</h2><ul>
+<li><a href="#install">Install</a><ul>
+<li><a href="#installing-bundles">Installing bundles</a></li>
+</ul>
+</li>
+<li><a href="#usage">Usage</a><ul>
+<li><a href="#configuration">Configuration</a></li>
+</ul>
+</li>
+<li><a href="#bundles">Bundles</a><ul>
+<li><a href="#graphics">Graphics</a></li>
+<li><a href="#dashboard-panels">Dashboard Panels</a></li>
+<li><a href="#extensions">Extensions</a></li>
+<li><a href="#packagejson-manifest"><code>package.json</code> manifest</a></li>
+</ul>
+</li>
+<li><a href="#maintainers">Maintainers</a><ul>
+<li><a href="#special-thanks">Special Thanks</a></li>
+</ul>
+</li>
+<li><a href="#contribute">Contribute</a><ul>
+<li><a href="#running-tests-locally">Running tests locally</a></li>
+</ul>
+</li>
+<li><a href="#license">License</a></li>
+</ul>
+<h2>Install</h2><p>Install <a href="http://nodejs.org/">Node.js (version 6 or greater) &amp; npm (version 2 or greater)</a>.  </p>
+<p>Then, run the following commands from a terminal (command prompt):</p>
+<pre class="prettyprint source lang-sh"><code>npm install -g bower
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
 npm install --production
 bower install
 node index.js</code></pre><p>To run NodeCG in production, <a href="https://github.com/Unitech/pm2">pm2</a> is recommended.</p>
-<h2>Installing bundles</h2><p>NodeCG's individual graphics packages are called <em>bundles</em>. They can be installed either from the command-line
+<h3>Installing bundles</h3><p>NodeCG's individual graphics packages are called <em>bundles</em>. They can be installed either from the command-line
 (via <a href="https://www.npmjs.com/package/nodecg-cli"><em>nodecg-cli</em></a>), or by simply placing the folder into the <code>./bundles</code> directory.</p>
-<p>The easiest way to install bundles is via the command-line using <a href="https://www.npmjs.com/package/nodecg-cli"><em>nodecg-cli</em></a>.
-To install a bundle from Github, enter the owner and repository name:</p>
+<p>The easiest way to install bundles is via the command-line using <a href="https://www.npmjs.com/package/nodecg-cli">nodecg-cli</a>.
+You will need to install <a href="https://www.npmjs.com/package/nodecg-cli">nodecg-cli</a> before you can use the <code>nodecg</code>
+terminal commands.</p>
+<p>(Once you have <a href="https://www.npmjs.com/package/nodecg-cli">nodecg-cli</a> installed) To install a bundle from Github, enter the owner and repository name:</p>
 <pre class="prettyprint source lang-sh"><code>nodecg install lange/lange-notify</code></pre><p>... to install a bundle from Bitbucket, enter the owner and repository name prefixed with <code>bitbucket:</code></p>
 <pre class="prettyprint source lang-sh"><code>nodecg install bitbucket:username/repo-name</code></pre><p>... to install a bundle from any other git provider, enter the git URL:</p>
-<pre class="prettyprint source lang-sh"><code>nodecg install https://github.com/GamesDoneQuick/agdq16-layouts.git</code></pre><p>Bundles are just directories inside the <code>./bundles</code> folder. 
+<pre class="prettyprint source lang-sh"><code>nodecg install https://gitlab.com/username/repo-name.git</code></pre><p>Bundles are just directories inside the <code>./bundles</code> folder. 
 They can always be added and removed by simply moving them into or out of that folder. 
 Avoid installing or uninstalling bundles while NodeCG is running.</p>
-<h1>Usage</h1><ul>
-<li>Install a bundle to the <code>bundles</code> folder</li>
-<li>Start NodeCG</li>
-<li>Open the dashboard (<code>http://localhost:9090</code>)</li>
-<li>Open a graphic from the &quot;Graphics&quot; menu, accessible by clicking the top-left menu button on the dashboard</li>
+<h2>Usage</h2><ul>
+<li>Install a bundle to the <code>bundles</code> folder.</li>
+<li>Start NodeCG (<code>node index.js</code> or <code>nodecg start</code> if you have <a href="https://www.npmjs.com/package/nodecg-cli">nodecg-cli</a> installed).</li>
+<li>Open the dashboard (<code>http://localhost:9090</code> by default).</li>
+<li>Open a graphic from the &quot;Graphics&quot; menu.</li>
 <li>You can configure NodeCG by creating and editing <a href="http://nodecg.com/tutorial-nodecg-configuration.html">cfg/nodecg.json</a>.</li>
 </ul>
-<h2>Configuration</h2><p><code>./cfg/nodecg.json</code> is an optional file that you can create to configure NodeCG.
+<h3>Configuration</h3><p><code>./cfg/nodecg.json</code> is an optional file that you can create to configure NodeCG.
 See the <a href="http://nodecg.com/tutorial-nodecg-configuration.html">NodeCG Configuration tutorial</a> for more information on configuring NodeCG.</p>
-<h1>Bundles</h1><p>Each NodeCG graphic is called a <em>bundle</em>. A bundle has one or more of the following:</p>
+<h2>Bundles</h2><p>Each NodeCG graphic is called a <em>bundle</em>. A bundle has one or more of the following:</p>
 <ul>
-<li><em>Graphics</em>: Visual elements to render and broadcast</li>
-<li><em>Dashboard Panels</em>: Controls used to manipulate and manage the bundle</li>
-<li><em>Extension</em>: Server-side code</li>
+<li><em>Graphics</em>: Visual elements to render and broadcast.</li>
+<li><em>Dashboard Panels</em>: Controls used to manipulate and manage the bundle.</li>
+<li><em>Extension</em>: Server-side code.</li>
 </ul>
 <p>A bundle can have multiple graphics and dashboard panels, and an extension can be split up into multiple files.</p>
 <p>If you wish to quickly start a new bundle from a template, try <a href="https://github.com/nodecg/generator-nodecg">generator-nodecg</a>.</p>
-<h2>Graphics</h2><p>Graphics are, as the name implies, the actual graphics intended for broadcast. 
+<h3>Graphics</h3><p>Graphics are, as the name implies, the actual graphics intended for broadcast. 
 They are standard HTML webpages, and there are no restrictions on their content. 
 When serving a graphic, NodeCG injects an instance of the API into the global scope.</p>
-<h2>Dashboard Panels</h2><p>Dashboard panels are the interface used to control and manage a bundle. They too are standard HTML webpages. 
+<h3>Dashboard Panels</h3><p>Dashboard panels are the interface used to control and manage a bundle. They too are standard HTML webpages. 
 Each panel is served as an iframe on the dashboard. This is done to ensure full code and style encapsulation. 
 Because dashboard panels are iframes, they cannot render any content outside of their bounding box. 
 For example, it is not possible to have a tooltip in a panel that extends beyond the bounding box of the panel itself.</p>
 <p>When serving panels, NodeCG injects an instance of the API into the global scope, as well as a few default styles.</p>
 <p>It is strongly recommended to use Polymer elements to build panels, though it is not required. 
-Google's <a href="https://elements.polymer-project.org/">official Polymer elements</a>, specifically their 
-<a href="https://elements.polymer-project.org/browse?package=paper-elements">Paper elements</a>, are a great place to start.
-The official <a href="https://github.com/NodeCGElements">NodeCGElements</a> organization also has 
-a selection of Polymer elements that are integrated with NodeCG's API.</p>
-<h2>Extensions</h2><p>Extensions are server-side code. They are standard Node.js JavaScript files. An extension must export a function
+Google's <a href="https://www.webcomponents.org/collection/Polymer/elements">official Polymer elements</a>, specifically their 
+<a href="https://www.webcomponents.org/collection/PolymerElements/paper-elements">Paper elements</a>, are a great place to start.
+The official <a href="https://www.webcomponents.org/collection/NodeCGElements/nodecg-dashboard-elements">nodecg-dashboard-elements</a> 
+collection also has a selection of Polymer elements that are integrated with NodeCG's API.</p>
+<h3>Extensions</h3><p>Extensions are server-side code. They are standard Node.js JavaScript files. An extension must export a function
 that accepts a single argument. That argument will be an instance of the NodeCG API:</p>
 <pre class="prettyprint source lang-js"><code>// bundles/my-bundle/extension.js
-module.exports = function(nodecg) {
-    nodecg.listenFor('foo', function() {
+module.exports = nodecg => {
+    nodecg.listenFor('foo', () => {
         console.log('bar');
     });
 };</code></pre><p>NodeCG automatically attempts to load the following files as extensions:</p>
@@ -129,11 +169,22 @@ module.exports = function(nodecg) {
 use the former approach. If your extension is broken up into multiple files, you may want to use the latter structure
 and keep all those files in a single <code>extension</code> folder. If using an <code>extension</code> folder, <strong>NodeCG will only load
 <code>your-bundle/extension/index.js</code></strong>. It is up to you to load any other files that your extension needs via <code>require</code>.</p>
-<h2>package.json manifest</h2><p>Every bundle must have a <a href="https://docs.npmjs.com/files/package.json"><code>package.json</code></a>. In addition to the required fields
+<h3><code>package.json</code> manifest</h3><p>Every bundle must have a <a href="https://docs.npmjs.com/files/package.json"><code>package.json</code></a>. In addition to the required fields
 like <code>name</code> and <code>version</code> outlined in that link, NodeCG bundles must also have a <code>nodecg</code> object in their <code>package.json</code>
 with some additional properties that tell NodeCG about the bundle and how to load it.</p>
 <p>See the <a href="http://nodecg.com/tutorial-manifest.html">manifest tutorial</a> for more information on creating a valid <code>package.json</code> for a bundle.</p>
-<h1>Contributing</h1><ol>
+<h2>Maintainers</h2><ul>
+<li><a href="http://mattmcn.com/">Matt &quot;Bluee&quot; McNamara</a>  </li>
+<li><a href="http://alexvan.camp">Alex &quot;Lange&quot; Van Camp</a>  </li>
+<li><a href="http://fwdcp.net">&quot;tsc&quot;</a>  </li>
+<li><a href="http://www.chrishanel.com">Chris Hanel</a></li>
+</ul>
+<h3>Special Thanks</h3><ul>
+<li><a href="https://github.com/atmosfar">Atmo</a>, original dashboard concept and code  </li>
+<li><a href="http://alexvan.camp">Alex &quot;Lange&quot; Van Camp</a>, designer &amp; developer of <a href="https://github.com/TipoftheHats/toth-overlay">toth-overlay</a>  </li>
+</ul>
+<h2>Contribute</h2><p>Please contribute! This is an open source project. If you would like to report a bug or suggest a feature, <a href="https://github.com/nodecg/nodecg/issues">open an issue</a>. Or, to open a Pull Request:</p>
+<ol>
 <li>Fork it ( http://github.com/nodecg/nodecg/fork )</li>
 <li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
 <li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
@@ -142,31 +193,22 @@ with some additional properties that tell NodeCG about the bundle and how to loa
 </ol>
 <p><strong>Before creating your pull request:</strong></p>
 <ol>
-<li>Ensure your code matches our existing style using our provided <a href="http://editorconfig.org/">EditorConfig</a> options</li>
-<li>Ensure the existing tests pass, or are updated appropriately, with <code>npm test</code></li>
-<li>For new features, you should add new tests</li>
+<li>Ensure your code matches our existing style using our provided <a href="http://editorconfig.org/">EditorConfig</a> options.</li>
+<li>Ensure the existing tests pass, or are updated appropriately, with <code>npm test</code>.</li>
+<li>For new features, you should add new tests.</li>
 </ol>
 <p>Check which branch you should PR to. NodeCG is still in an unstable state, so we follow these <a href="http://semver.org/">semver</a> guidelines:</p>
 <ul>
 <li>Bug fixes and new features go to the next 'patch' branch (<code>0.current.x</code>)</li>
 <li>Breaking changes go to the next 'minor' branch (<code>0.next.0</code>)</li>
 </ul>
-<h2>Running tests locally</h2><ol>
+<h3>Running tests locally</h3><ol>
 <li>Install selenium-standalone (<code>npm install --global selenium-standalone</code>), then run the installer (<code>selenium-standalone install</code>)</li>
 <li>Open one terminal and start Selenium: <code>selenium-standalone start</code></li>
 <li>Open a second terminal, navigate to the NodeCG root and run <code>npm test</code></li>
 </ol>
-<h1>License</h1><p>NodeCG is provided under the MIT license, which is available to read in the 
-<a href="https://github.com/nodecg/nodecg/blob/master/LICENSE">LICENSE</a> file.</p>
-<h1>Contributors</h1><ul>
-<li><a href="http://mattmcn.com/">Matt &quot;Bluee&quot; McNamara</a>  </li>
-<li><a href="http://alexvan.camp">Alex &quot;Lange&quot; Van Camp</a>  </li>
-<li><a href="http://fwdcp.net">&quot;tsc&quot;</a>  </li>
-</ul>
-<h2>Special Thanks</h2><ul>
-<li><a href="https://github.com/atmosfar">Atmo</a>, original dashboard concept and code  </li>
-<li><a href="http://alexvan.camp">Alex &quot;Lange&quot; Van Camp</a>, designer &amp; developer of <a href="https://github.com/TipoftheHats/toth-overlay">toth-overlay</a>  </li>
-</ul></article>
+<h3>Code of Conduct</h3><p>Note that all contributions and discussions around NodeCG take place under our <a href="CODE_OF_CONDUCT.md">Code of Conduct</a>.</p>
+<h2>License</h2><p><a href="https://github.com/nodecg/nodecg/blob/master/LICENSE">MIT Liencese</a> © 2017 Alex Van Camp, Matthew McNamara, and contributors</p></article>
     </section>
 
 
@@ -179,7 +221,7 @@ with some additional properties that tell NodeCG about the bundle and how to loa
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Jun 12 2017 13:54:46 GMT-0500 (Central Daylight Time) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Aug 27 2017 09:46:28 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

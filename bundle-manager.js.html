@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>bundle-manager.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Logger.html">Logger</a></li><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li><li data-type='method'><a href="NodeCG.html#unlisten">unlisten</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-migrating-0.8-to-0.9.html">Migrating from 0.8 to 0.9</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-sentry.html">Error Reporting with Sentry.io</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_stopWatching">_stopWatching</a></li><li><a href="global.html#add">add</a></li><li><a href="global.html#all">all</a></li><li><a href="global.html#ENUM_LEVELS">ENUM_LEVELS</a></li><li><a href="global.html#extractBundleName">extractBundleName</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#isManifest">isManifest</a></li><li><a href="global.html#isPanelHTMLFile">isPanelHTMLFile</a></li><li><a href="global.html#remove">remove</a></li><li><a href="global.html#resetBackoffTimer">resetBackoffTimer</a></li><li><a href="global.html#wrapAcknowledgement">wrapAcknowledgement</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">bundle-manager.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+// Native
+const EventEmitter = require('events').EventEmitter;
+const fs = require('fs.extra');
+const path = require('path');
+
+// Packages
+const chokidar = require('chokidar');
+const debounce = require('lodash.debounce');
+const semver = require('semver');
+
+// Ours
+const parseBundle = require('./bundle-parser');
+
+// Start up the watcher, but don't watch any files yet.
+// We'll add the files we want to watch later, in the init() method.
+const watcher = chokidar.watch([
+	'!**/*___jb_*___', // Ignore temp files created by JetBrains IDEs
+	'!**/node_modules/**', // Ignore node_modules folders
+	'!**/bower_components/**' // Ignore bower_components folders
+], {
+	ignored: /[/\\]\./,
+	persistent: true,
+	ignoreInitial: true,
+	followSymlinks: true
+});
+
+const emitter = new EventEmitter();
+const bundles = [];
+let bundlesPath;
+let log;
+let root;
+let backoffTimer = null;
+let hasChanged = {};
+let initialized = false;
+
+// This is on a debouncer to avoid false-positives that can happen when editing a manifest.
+const debouncedManifestDeletionCheck = debounce((bundleName, manifestPath) => {
+	if (!fs.existsSync(manifestPath)) {
+		log.debug('Processing removed event for', bundleName);
+		log.info('%s\'s package.json can no longer be found on disk, ' +
+			'assuming the bundle has been deleted or moved', bundleName);
+		module.exports.remove(bundleName);
+		emitter.emit('bundleRemoved', bundleName);
+	}
+}, 100);
+
+module.exports = emitter;
+
+/**
+ * Constructs a bundle-manager.
+ * @param rootPath {String} - The directory where NodeCG's "bundles" and "cfg" folders can be found.
+ * @param nodecgVersion {String} - The value of "version" in NodeCG's package.json.
+ * @param nodecgConfig {Object} - The global NodeCG config.
+ * @param Logger {Function} - A preconfigured @nodecg/logger constructor.
+ * @return {Object} - A bundle-manager instance.
+ */
+module.exports.init = function (rootPath, nodecgVersion, nodecgConfig, Logger) {
+	if (initialized) {
+		throw new Error('Cannot initialize when already initialized');
+	}
+
+	initialized = true;
+
+	root = rootPath;
+	log = new Logger('nodecg/lib/bundles');
+	log.trace('Loading bundles');
+
+	bundlesPath = path.join(rootPath, '/bundles');
+
+	// Create the "bundles" dir if it does not exist.
+	/* istanbul ignore if: We know this code works and testing it is tedious, so we don't bother to test it. */
+	if (!fs.existsSync(bundlesPath)) {
+		fs.mkdirpSync(bundlesPath);
+	}
+
+	/* istanbul ignore next */
+	watcher.on('add', filePath => {
+		const bundleName = extractBundleName(filePath);
+
+		// In theory, the bundle parser would have thrown an error long before this block would execute,
+		// because in order for us to be adding a panel HTML file, that means that the file would have been missing,
+		// which the parser does not allow and would throw an error for.
+		// Just in case though, its here.
+		if (isPanelHTMLFile(bundleName, filePath)) {
+			handleChange(bundleName);
+		}
+	});
+
+	watcher.on('change', filePath => {
+		const bundleName = extractBundleName(filePath);
+
+		if (isManifest(bundleName, filePath)) {
+			handleChange(bundleName);
+		} else if (isPanelHTMLFile(bundleName, filePath)) {
+			handleChange(bundleName);
+		}
+	});
+
+	watcher.on('unlink', filePath => {
+		const bundleName = extractBundleName(filePath);
+
+		if (isPanelHTMLFile(bundleName, filePath)) {
+			// This will cause NodeCG to crash, because the parser will throw an error due to
+			// a panel's HTML file no longer being present.
+			handleChange(bundleName);
+		} else if (isManifest(bundleName, filePath)) {
+			debouncedManifestDeletionCheck(bundleName, filePath);
+		}
+	});
+
+	/* istanbul ignore next */
+	watcher.on('error', error => {
+		log.error(error.stack);
+	});
+
+	// Do an initial load of each bundle in the "bundles" folder.
+	// During runtime, any changes to a bundle's "dashboard" folder will trigger a re-load of that bundle,
+	// as will changes to its `package.json`.
+	fs.readdirSync(bundlesPath).forEach(bundleFolderName => {
+		const bundlePath = path.join(bundlesPath, bundleFolderName);
+		if (!fs.statSync(bundlePath).isDirectory()) {
+			return;
+		}
+
+		if (nodecgConfig &amp;&amp; nodecgConfig.bundles &amp;&amp; nodecgConfig.bundles.disabled &amp;&amp;
+			nodecgConfig.bundles.disabled.indexOf(bundleFolderName) > -1) {
+			log.debug('Not loading bundle ' + bundleFolderName + ' as it is disabled in config');
+			return;
+		}
+
+		if (nodecgConfig &amp;&amp; nodecgConfig.bundles &amp;&amp; nodecgConfig.bundles.enabled &amp;&amp;
+			nodecgConfig.bundles.enabled.indexOf(bundleFolderName) &lt; 0) {
+			log.debug('Not loading bundle ' + bundleFolderName + ' as it is not enabled in config');
+			return;
+		}
+
+		// Parse each bundle and push the result onto the bundles array
+		let bundle;
+		const bundleCfgPath = path.join(rootPath, '/cfg/', bundleFolderName + '.json');
+		if (fs.existsSync(bundleCfgPath)) {
+			bundle = parseBundle(bundlePath, bundleCfgPath);
+		} else {
+			bundle = parseBundle(bundlePath);
+		}
+
+		// Check if the bundle is compatible with this version of NodeCG
+		if (!semver.satisfies(nodecgVersion, bundle.compatibleRange)) {
+			log.error('%s requires NodeCG version %s, current version is %s',
+				bundle.name, bundle.compatibleRange, nodecgVersion);
+			return;
+		}
+
+		// This block can probably be removed in 0.8, but let's leave it for 0.7 just in case.
+		/* istanbul ignore next: Given how strict nodecg-bundle-parser is,
+		 it should not be possible for "bundle" to be undefined. */
+		if (typeof bundle === 'undefined') {
+			log.error('Could not load bundle in directory', bundleFolderName);
+			return;
+		}
+
+		bundles.push(bundle);
+	});
+
+	// Workaround for https://github.com/paulmillr/chokidar/issues/419
+	// This workaround is necessary to fully support symlinks.
+	fs.readdirSync(bundlesPath)
+		.map(name => path.join(bundlesPath, name))
+		.filter(source => fs.statSync(source).isDirectory())
+		.forEach(bundlePath => {
+			watcher.add([
+				path.join(bundlePath, 'dashboard'), // Watch dashboard folders
+				path.join(bundlePath, '/package.json') // Watch bundle package.json files
+			]);
+		});
+};
+
+/**
+ * Returns a shallow-cloned array of all currently active bundles.
+ * @returns {Array.&lt;Object>}
+ */
+module.exports.all = function () {
+	return bundles.slice(0);
+};
+
+/**
+ * Returns the bundle with the given name. undefined if not found.
+ * @param name {String} - The name of the bundle to find.
+ * @returns {Object|undefined}
+ */
+module.exports.find = function (name) {
+	const len = bundles.length;
+	for (let i = 0; i &lt; len; i++) {
+		if (bundles[i].name === name) {
+			return bundles[i];
+		}
+	}
+};
+
+/**
+ * Adds a bundle to the internal list, replacing any existing bundle with the same name.
+ * @param bundle {Object}
+ */
+module.exports.add = function (bundle) {
+	/* istanbul ignore if: Again, it shouldn't be possible for "bundle" to be undefined, but just in case... */
+	if (!bundle) {
+		return;
+	}
+
+	// Remove any existing bundles with this name
+	if (module.exports.find(bundle.name)) {
+		module.exports.remove(bundle.name);
+	}
+
+	bundles.push(bundle);
+};
+
+/**
+ * Removes a bundle with the given name from the internal list. Does nothing if no match found.
+ * @param bundleName {String}
+ */
+module.exports.remove = function (bundleName) {
+	const len = bundles.length;
+	for (let i = 0; i &lt; len; i++) {
+		// TODO: this check shouldn't have to happen, idk why things in this array can sometimes be undefined
+		if (!bundles[i]) {
+			continue;
+		}
+
+		if (bundles[i].name === bundleName) {
+			bundles.splice(i, 1);
+		}
+	}
+};
+
+/**
+ * Only used by tests.
+ */
+module.exports._stopWatching = function () {
+	watcher.close();
+};
+
+function handleChange(bundleName) {
+	setTimeout(() => {
+		_handleChange(bundleName);
+	}, 100);
+}
+
+function _handleChange(bundleName) {
+	const bundle = module.exports.find(bundleName);
+
+	/* istanbul ignore if: It's rare for `bundle` to be undefined here, but it can happen when using black/whitelisting. */
+	if (!bundle) {
+		return;
+	}
+
+	if (backoffTimer) {
+		log.debug('Backoff active, delaying processing of change detected in', bundleName);
+		hasChanged[bundleName] = true;
+		resetBackoffTimer();
+	} else {
+		log.debug('Processing change event for', bundleName);
+		resetBackoffTimer();
+
+		let reparsedBundle;
+		const bundleCfgPath = path.join(root, '/cfg/', bundleName + '.json');
+		if (fs.existsSync(bundleCfgPath)) {
+			reparsedBundle = parseBundle(bundle.dir, bundleCfgPath);
+		} else {
+			reparsedBundle = parseBundle(bundle.dir);
+		}
+
+		console.log(reparsedBundle);
+
+		module.exports.add(reparsedBundle);
+		emitter.emit('bundleChanged', reparsedBundle);
+	}
+}
+
+/**
+ * Resets the backoff timer used to avoid event thrashing when many files change rapidly.
+ */
+function resetBackoffTimer() {
+	clearTimeout(backoffTimer);
+	backoffTimer = setTimeout(() => {
+		backoffTimer = null;
+		for (const bundleName in hasChanged) {
+			/* istanbul ignore if: Standard hasOwnProperty check, doesn't need to be tested */
+			if (!{}.hasOwnProperty.call(hasChanged, bundleName)) {
+				continue;
+			}
+
+			log.debug('Backoff finished, emitting change event for', bundleName);
+			handleChange(bundleName);
+		}
+		hasChanged = {};
+	}, 500);
+}
+
+/**
+ * Returns the name of a bundle that owns a given path.
+ * @param filePath {String} - The path of the file to extract a bundle name from.
+ * @returns {String} - The name of the bundle that owns this path.
+ * @private
+ */
+function extractBundleName(filePath) {
+	const parts = filePath.replace(bundlesPath, '').split(path.sep);
+	return parts[1];
+}
+
+/**
+ * Checks if a given path is a panel HTML file of a given bundle.
+ * @param bundleName {String}
+ * @param filePath {String}
+ * @returns {Boolean}
+ * @private
+ */
+function isPanelHTMLFile(bundleName, filePath) {
+	const bundle = module.exports.find(bundleName);
+	if (bundle) {
+		return bundle.dashboard.panels.some(panel => {
+			return panel.path.endsWith(filePath);
+		});
+	}
+
+	return false;
+}
+
+/**
+ * Checks if a given path is the manifest file for a given bundle.
+ * @param bundleName {String}
+ * @param filePath {String}
+ * @returns {Boolean}
+ * @private
+ */
+function isManifest(bundleName, filePath) {
+	return path.dirname(filePath).endsWith(bundleName) &amp;&amp; path.basename(filePath) === 'package.json';
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Aug 27 2017 09:46:28 GMT-0500 (Central Daylight Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+<script>
+  ((window.gitter = {}).chat = {}).options = {
+    room: 'nodecg/nodecg'
+  };
+</script>
+<script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+</body>
+</html>

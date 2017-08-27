@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tutorial: Migrating from 0.8 to 0.9 - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Logger.html">Logger</a></li><li><a href="NodeCG.html">NodeCG</a><ul class='methods'><li data-type='method'><a href="NodeCG.html#findCue">findCue</a></li><li data-type='method'><a href="NodeCG.html#getDialog">getDialog</a></li><li data-type='method'><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></li><li data-type='method'><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></li><li data-type='method'><a href="NodeCG.html#listenFor">listenFor</a></li><li data-type='method'><a href="NodeCG.html#log">log</a></li><li data-type='method'><a href="NodeCG.html#mount">mount</a></li><li data-type='method'><a href="NodeCG.html#playSound">playSound</a></li><li data-type='method'><a href="NodeCG.html#readReplicant">readReplicant</a></li><li data-type='method'><a href="NodeCG.html#Replicant">Replicant</a></li><li data-type='method'><a href="NodeCG.html#sendMessage">sendMessage</a></li><li data-type='method'><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></li><li data-type='method'><a href="NodeCG.html#stopSound">stopSound</a></li><li data-type='method'><a href="NodeCG.html#unlisten">unlisten</a></li></ul></li></ul><h3>Tutorials</h3><ul><li><a href="tutorial-assets.html">Assets</a></li><li><a href="tutorial-bundle-configuration.html">Bundle Configuration</a></li><li><a href="tutorial-custom-routes.html">Custom Routes</a></li><li><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li><a href="tutorial-manifest.html">package.json Manifest</a></li><li><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li><a href="tutorial-migrating-0.8-to-0.9.html">Migrating from 0.8 to 0.9</a></li><li><a href="tutorial-nodecg-configuration.html">NodeCG Configuration</a></li><li><a href="tutorial-performance-tips.html">Performance Tips</a></li><li><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li><a href="tutorial-sentry.html">Error Reporting with Sentry.io</a></li><li><a href="tutorial-sounds.html">Sounds</a></li><li><a href="tutorial-using-bower.html">Using Bower Dependencies</a></li><li><a href="tutorial-using-npm.html">Using npm Dependencies</a></li></ul><h3>Global</h3><ul><li><a href="global.html#_stopWatching">_stopWatching</a></li><li><a href="global.html#add">add</a></li><li><a href="global.html#all">all</a></li><li><a href="global.html#ENUM_LEVELS">ENUM_LEVELS</a></li><li><a href="global.html#extractBundleName">extractBundleName</a></li><li><a href="global.html#find">find</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#isManifest">isManifest</a></li><li><a href="global.html#isPanelHTMLFile">isPanelHTMLFile</a></li><li><a href="global.html#remove">remove</a></li><li><a href="global.html#resetBackoffTimer">resetBackoffTimer</a></li><li><a href="global.html#wrapAcknowledgement">wrapAcknowledgement</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Tutorial: Migrating from 0.8 to 0.9</h1>
+    
+
+    <section>
+
+<header>
+    
+
+    <h2>Migrating from 0.8 to 0.9</h2>
+</header>
+
+<article>
+    <h2>Breaking Changes</h2><ul>
+<li><a href="#routing-changes">Dashboard Panel, Graphics, and Bower Components routes have changed</a></li>
+<li><a href="#removed-default-styles">Most default styles and classes injected into Panels have been removed</a></li>
+<li><a href="#ack-errors">Errors sent to sendMessage acknowledgements (callbacks) will be properly serialized</a></li>
+<li><a href="#no-auto-deps"><code>npm</code> and <code>bower</code> dependencies are no longer automatically installed</a></li>
+<li><a href="#removed-rollbar-added-sentry">Removed Rollbar integration, replaced it with Sentry</a></li>
+</ul>
+<h3 id="routing-changes">Routing Changes</h3>
+NodeCG's routing has always been a little arbitrary and confusing. It did not match the structure of the filesystem, and there wasn't really a good reason for this. This arbitrary routing structure was hard to remember and prevented bundle authors from taking advantage of their IDE's autocomplete functionality. It also made using filesystem-aware tools like the <a href="https://github.com/Polymer/polymer-bundler"><code>polymer-bundler</code></a> (formerly called <code>vulcanize</code>) needlessly difficult.
+
+The new routing structure matches the structure of the filesystem, making routes easier to work with and avoiding certain bugs relating to the de-duplication of HTML Imports (and soon, ES Modules).
+
+Old (don't use these anymore!):
+<code>/panels/my-bundle/panel.html
+/graphics/my-bundle/graphic.html
+
+# Two different routes to the same file! This breaks the de-duplication of HTML Imports and causes errors.
+/panels/my-bundle/components/polymer/polymer.html
+/graphics/my-bundlecomponents/polymer/polymer.html</code>
+
+New:
+<code>/bundles/my-bundle/dashboard/panel.html
+/bundles/my-bundle/graphics/graphic.html
+
+# Now, there is only one single route to any given file.
+/bundles/my-bundle/bower_components/polymer/polymer.html</code>
+
+<h3 id="removed-default-styles">Removed Default Styles</h3>
+
+<p>Up until now, NodeCG has injected some default styles and helper classes into each and every panel. The idea was to provide a set of base styles that every bundle author could use to try to create a cohesive NodeCG panel design across all bundles.</p>
+<p>However, this set of styles was far too small and limited to achieve that, and upon further reflection we decided that NodeCG core was not the place to attempt to accomplish this. Additionally, it's possible for these injected styles to cause frustrating conflicts.</p>
+<p>NodeCG <em>does</em> still inject a few default styles, but the number of styles has been dramatically reduced to just a few necessary things, such as the background color for panels. And, as always, this value can be easily overridden in your panel's CSS.</p>
+<p>If your panels relied on any of these default styles or helper classes such as <code>nodecg-configure</code>, you will need to manually specify new styles instead.</p>
+<h3 id="ack-errors">sendMessage acknowledgement Errors</h3>
+
+<p>In the past, if you tried to reply to a <code>sendMessage</code> with an <code>Error</code>, you'd end up with just an empty Object at the other end (<code>{}</code>). This is because by default, JavaScript <code>Error</code>s are serialized as an empty Object by <code>JSON.stringify</code>.</p>
+<p>Now, if the first argument to a <a href="NodeCG.html#sendMessage"><code>NodeCG#sendMessage</code></a>  acknowledgement is an error, it will be properly serialized and sent across the wire. As part of this, we are now strongly encouraging that all <a href="NodeCG.html#sendMessage"><code>NodeCG#sendMessage</code></a> acknowledgements always be treated as standard error-first Node.js-style callbacks.</p>
+<p>In addition, client-side <a href="NodeCG.html#sendMessage"><code>NodeCG#sendMessage</code></a>  now also returns a <code>Promise</code>, so that you may use <code>.then</code>/<code>.catch</code> instead of a callback function. See the updated <a href="NodeCG.html#sendMessage"><code>NodeCG#sendMessage</code></a> documentation for more information.</p>
+<p>Please note that if you do not specify a callback to your <code>sendMessage</code>, then it will always return a Promise. Additionally, the first argument send back in your acknowledgement is always assumed to be either an <code>Error</code> or <code>null</code>. If this value is truthy, then it will be used to <code>reject</code> the Promise. For this reason, it is strongly encouraged that all <code>sendMessage</code> acknowledgements strictly adhere to the error-first style of callbacks.</p>
+<h3 id="routing-changes">No Auto-Installation of Dependencies</h3>
+
+<p>Since the earliest versions of NodeCG, it has attempted to be helpful by automatically running both <code>npm install --production</code> and <code>bower install</code> on every installed bundle, every time you started up NodeCG. While some users may have found this helpful, over time we've come to realize that this was a misguided decision, and that installation of each bundle's dependencies should really be left to the user.</p>
+<p>The main rationale for the removal of this feature is that there's a lot more package managers out there than just <code>npm</code> and <code>bower</code>, and it's not reasonable for NodeCG to know about every single one of them and to be able to properly invoke them. The auto-dependency installation system made a lot of assumptions, and it's going to become more and more frequent that these assumptions just aren't valid. For example, if a bundle doesn't have a <code>bower.json</code>, then running <code>bower install</code> on it would actually have unintended side-effects. This is just one example that is easy to fix on its own, but there are many such examples of odd side-effects and unintended consequences of this automatic installation behavior. Together, they paint a clear picture that this feature was misguided, and should be removed.</p>
+<p>Going forward, users will always need to manually run whatever dependency installation steps are required by the bundle in question. For most bundles, this still means just running <code>npm install --production &amp;&amp; bower install</code>, but this will not always be the case. Each bundle will need to add their dependency installation steps to their READMEs, and make sure that users are educated in the fact that pulling down new updates to a bundle means that they may need to also install updated dependencies. </p>
+<h3 id="rremoved-rollbar-added-sentry">Removed Default Styles</h3>
+
+<p>In NodeCG v0.8, we introduced a first-class integration with the Rollbar error tracking service. This was very helpful and made NodeCG safer to use in production, but we were unhappy with the level of service and features that Rollbar provided. In NodeCG v0.9, we have removed the Rollbar integration and replaced it with a Sentry integration. See the <a href="tutorial-sentry.html">Sentry tutorial</a> for more info on how to set up Sentry in your NodeCG deployment.</p>
+</article>
+
+</section>
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sun Aug 27 2017 09:46:28 GMT-0500 (Central Daylight Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+<script>
+  ((window.gitter = {}).chat = {}).options = {
+    room: 'nodecg/nodecg'
+  };
+</script>
+<script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+</body>
+</html>

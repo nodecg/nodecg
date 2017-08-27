@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Migrating from 0.7 to 0.8 - Documentation</title>
+    <title>logger/browser.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,58 +28,194 @@
 
 <div id="main">
     
-    <h1 class="page-title">Tutorial: Migrating from 0.7 to 0.8</h1>
+    <h1 class="page-title">logger/browser.js</h1>
     
 
+    
+
+
+
+    
     <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-env browser */
+'use strict';
 
-<header>
-    
+const {format, inspect} = require('util');
 
-    <h2>Migrating from 0.7 to 0.8</h2>
-</header>
+const LOG_LEVELS = {
+	trace: 0,
+	debug: 1,
+	info: 2,
+	warn: 3,
+	error: 4,
+	_infinite: Infinity
+};
 
-<article>
-    <h2>Breaking Changes</h2><ul>
-<li><a href="#replicant-change-event">The order of arguments to the Replicant <code>change</code> event handler has been swapped</a></li>
-<li><a href="#panel-routes">Dashboard panels are now served from <code>/panel/:bundleName/:panelFile</code> routes</a></li>
-<li><a href="#assets-and-categories">Uploads have been renamed to Assets, now have Categories</a></li>
-</ul>
-<p><h3 id="replicant-change-event">Replicant Change Event</h3>
-Prior to NodeCG v0.8, the Replicant change handler had the following signature:</p>
-<pre class="prettyprint source lang-js"><code>// NodeCG v0.7 and earlier
-myRep.on('change', function (oldVal, newVal, changes) {});</code></pre><p>In v0.8, <code>newVal</code> and <code>oldVal</code> have been swapped, as <code>newVal</code> is frequently used whereas <code>oldVal</code> is less frequently used.</p>
-<pre class="prettyprint source lang-js"><code>// NodeCG v0.8 and later
-myRep.on('change', function (newVal, oldVal, operations) {});</code></pre><p><h3 id="panel-routes">Panel Routes</h3>
-Dashboard panels are now served from <code>/panel/:bundleName/:panelFile</code> routes. Prior to v0.8, they were served from the
-<code>/panel/:bundleName/:panelName</code> route.</p>
-<p>This means that for a panel with the following declaration:</p>
-<pre class="prettyprint source lang-json"><code>{
-  &quot;name&quot;: &quot;test&quot;,
-  &quot;title&quot;: &quot;Test Panel&quot;,
-  &quot;width&quot;: 2,
-  &quot;file&quot;: &quot;panel.html&quot;
-}</code></pre><p>... the route to access this panel is now <code>/panel/test-bundle/panel.html</code> instead of <code>/panel/test-bundle/test</code>.</p>
-<p>This also affects panels served from subfolders. Previously, the following panel:</p>
-<pre class="prettyprint source lang-json"><code>{
-  &quot;name&quot;: &quot;test-dialog&quot;,
-  &quot;title&quot;: &quot;Test Dialog&quot;,
-  &quot;width&quot;: 2,
-  &quot;file&quot;: &quot;dialogs/test-dialog.html&quot;
-}</code></pre><p>... would have been served from <code>/panel/test-bundle/test-dialog</code>. It is now served from <code>/panel/test-bundle/dialogs/test-dialog.html</code>.</p>
-<p>If your panel or dialog is in a subfolder, you will need to update any relative links in your panel's HTML, CSS, and JS accordingly.
-For example, if <code>test-dialog</code> were importing <a href="https://elements.polymer-project.org/elements/paper-button?view=demo:demo/index.html"><code>&lt;paper-button&gt;</code></a>, 
-the URL it uses would have to change:</p>
-<pre class="prettyprint source lang-html"><code>&lt;!-- Won't work anymore. -->
-&lt;link rel=&quot;import&quot; href=&quot;components/paper-button/paper-button.html&quot;>
+/**
+ * Enum logging level values.
+ * @enum {String}
+ */
+const ENUM_LEVELS = { // eslint-disable-line no-unused-vars
+	trace: 'The highest level of logging, logs everything.',
+	debug: 'Less spammy than trace, includes most info relevant for debugging.',
+	info: 'The default logging level. Logs useful info, warnings, and errors.',
+	warn: 'Only logs warnings and errors.',
+	error: 'Only logs errors.'
+};
 
-&lt;!-- Works with the new panel routes. -->
-&lt;link rel=&quot;import&quot; href=&quot;../components/paper-button/paper-button.html&quot;></code></pre><p><h3 id="assets-and-categories">Assets &amp; Asset Categories</h3>
-NodeCG v0.7.2 introduced the Uploads system. NodeCG v0.8 has renamed this system to &quot;Assets&quot;, and introduces
-the concept of categories. See the <a href="tutorial-assets.html">Assets tutorial</a> for more information on how to configure Assets for your bundle.</p>
-</article>
+/**
+ * A factory that configures and returns a Logger constructor.
+ * @param [initialOpts] {Object} - Configuration for the logger.
+ *
+ * @param [initialOpts.console] {Object} - Configuration for the console logging.
+ * @param [initialOpts.console.enabled=false] {Boolean} - Whether to enable console logging.
+ * @param [initialOpts.console.level="info"] {ENUM_LEVELS} - The level of logging to output to the console.
+ *
+ * @param [initialOpts.replicants=false] {Boolean} - Whether to enable logging specifically for the Replicants system.
+ *
+ * @param [Raven] {Object} - A pre-configured client-side Raven instance, for reporting errors to Sentry.io
+ *
+ * @returns {function} - A constructor used to create discrete logger instances.
+ */
+module.exports = function (initialOpts, Raven) {
+	initialOpts = initialOpts || {};
+	initialOpts.console = initialOpts.console || {};
 
-</section>
+	/**
+	 * Constructs a new Logger instance that prefixes all output with the given name.
+	 * @param name {String} - The label to prefix all output of this logger with.
+	 * @returns {Object} - A Logger instance.
+	 * @constructor
+	 */
+	class Logger {
+		constructor(name) {
+			this.name = name;
+		}
+
+		trace() {
+			if (Logger._silent) {
+				return;
+			}
+
+			if (LOG_LEVELS[Logger._level] > LOG_LEVELS.trace) {
+				return;
+			}
+
+			console.info(`[${this.name}]`, ...arguments);
+		}
+
+		debug() {
+			if (Logger._silent) {
+				return;
+			}
+
+			if (LOG_LEVELS[Logger._level] > LOG_LEVELS.debug) {
+				return;
+			}
+
+			console.info(`[${this.name}]`, ...arguments);
+		}
+
+		info() {
+			if (Logger._silent) {
+				return;
+			}
+
+			if (LOG_LEVELS[Logger._level] > LOG_LEVELS.info) {
+				return;
+			}
+
+			console.info(`[${this.name}]`, ...arguments);
+		}
+
+		warn() {
+			if (Logger._silent) {
+				return;
+			}
+
+			if (LOG_LEVELS[Logger._level] > LOG_LEVELS.warn) {
+				return;
+			}
+
+			console.warn(`[${this.name}]`, ...arguments);
+		}
+
+		error() {
+			if (Logger._silent) {
+				return;
+			}
+
+			if (LOG_LEVELS[Logger._level] > LOG_LEVELS.error) {
+				return;
+			}
+
+			console.error(`[${this.name}]`, ...arguments);
+
+			if (Raven) {
+				const formattedArgs = Array.from(arguments).map(argument => {
+					return typeof argument === 'object' ?
+						inspect(argument, {depth: null, showProxy: true}) :
+						argument;
+				});
+
+				Raven.captureException(new Error(format(`[${this.name}]`, ...formattedArgs)), {
+					logger: 'client @nodecg/logger'
+				});
+			}
+		}
+
+		replicants() {
+			if (Logger._silent) {
+				return;
+			}
+
+			if (!Logger._shouldLogReplicants) {
+				return;
+			}
+
+			console.info(`[${this.name}]`, ...arguments);
+		}
+
+		static globalReconfigure(opts) {
+			_configure(opts);
+		}
+	}
+
+	// Initialize with defaults
+	Logger._level = 'info';
+	Logger._silent = true;
+	Logger._shouldLogReplicants = false;
+
+	_configure(initialOpts);
+
+	function _configure(opts) {
+		// Initialize opts with empty objects, if nothing was provided.
+		opts = opts || {};
+		opts.console = opts.console || {};
+
+		if (typeof opts.console.enabled !== 'undefined') {
+			Logger._silent = !opts.console.enabled;
+		}
+
+		if (typeof opts.console.level !== 'undefined') {
+			Logger._level = opts.console.level;
+		}
+
+		if (typeof opts.replicants !== 'undefined') {
+			Logger._shouldLogReplicants = opts.replicants;
+		}
+	}
+
+	return Logger;
+};
+
+</code></pre>
+        </article>
+    </section>
+
+
+
 
 </div>
 
