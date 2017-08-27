@@ -1,0 +1,24 @@
+{
+  "name": "dialog-workspace",
+  "version": "0.0.1",
+  "homepage": "http://github.com/nodecg",
+  "author": [
+    "Alex Van Camp <email@alexvan.camp>",
+    "Matt McNamara"
+  ],
+  "description": "A test bundle",
+  "license": "MIT",
+  "nodecg": {
+    "compatibleRange": "~0.7.0",
+    "dashboardPanels": [
+      {
+        "name": "test",
+        "title": "Test Panel",
+        "width": 1,
+        "file": "panel.html",
+        "dialog": true,
+        "workspace": "foo"
+      }
+    ]
+  }
+}

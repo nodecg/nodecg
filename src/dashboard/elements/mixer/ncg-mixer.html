@@ -1,0 +1,67 @@
+<link rel="import" href="ncg-sounds.html">
+
+<dom-module id="ncg-mixer">
+	<template>
+		<style>
+			:host {
+				white-space: nowrap;
+				width: 100%;
+				max-width: 600px;
+				@apply --layout-vertical;
+				@apply --layout-stretch;
+			}
+
+			#mixer-masterCard {
+				background-color: rgb(0, 112, 112);
+				color: white;
+				margin-bottom: 16px;
+			}
+
+			#mixer-masterCard .card-content {
+				@apply --layout-horizontal;
+				align-items: center;
+			}
+
+			#mixer-masterCard span {
+				@apply --paper-font-title;
+				font-size: 28px;
+				flex-grow: 1;
+				flex-shrink: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			#masterFader {
+				width: 250px;
+				flex-shrink: 1;
+				--paper-slider-active-color: white;
+				--paper-slider-knob-color: white;
+				--paper-input-container-focus-color: var(--google-blue-700);
+				--paper-input-container-color: white;
+				--paper-input-container-input-color: white;
+				--paper-slider-input: {
+					width: 80px;
+				};
+			}
+
+			paper-card {
+				margin-bottom: 12px;
+			}
+		</style>
+
+		<paper-card id="mixer-masterCard">
+			<div class="card-content">
+				<span>Master Fader</span>
+				<paper-slider id="masterFader" min="0" max="100" step="1" editable></paper-slider>
+			</div>
+		</paper-card>
+
+		<template is="dom-repeat" items="[[bundlesWithSounds]]" as="bundle">
+			<ncg-sounds
+				bundle-name="[[bundle.name]]"
+				enable-custom-cues="[[bundle.enableCustomCues]]"></ncg-sounds>
+		</template>
+	</template>
+
+	<script src="ncg-mixer.js"></script>
+</dom-module>

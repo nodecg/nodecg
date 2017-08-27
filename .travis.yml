@@ -3,7 +3,7 @@ dist: trusty
 
 language: node_js
 node_js:
-  - '6'
+  - '8'
 
 os:
   - linux
@@ -20,6 +20,7 @@ cache:
     - node_modules
     - bower_components
     - '$HOME/.npm'
+    - $(npm config get prefix)
 
 addons:
   sauce_connect: true
@@ -34,10 +35,9 @@ addons:
 before_install:
   - export CHROME_BIN=/usr/bin/google-chrome
   - export DISPLAY=:99.0
-  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./test/setup/travis_pr_setup.sh; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./test/helpers/travis_pr_setup.sh; fi'
 
 install:
-  - npm prune
   - npm install
 
 before_script:

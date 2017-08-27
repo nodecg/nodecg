@@ -27,10 +27,12 @@ npm-debug.log
 
 # Code coverage results
 /coverage
+.nyc_output
 
 # Test folders
 /bundles2
 /bundles_off
+/_workingTest
 
 # Compiled docs
 docs
@@ -38,6 +40,8 @@ docs
 
 # Assets
 /assets
+
+/instrumented
 
 # Don't ignore .empty_directory files
 !.empty_directory

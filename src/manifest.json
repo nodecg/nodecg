@@ -1,0 +1,25 @@
+{
+	"short_name": "NodeCG",
+	"name": "NodeCG Dashboard",
+	"icons": [
+		{
+			"src": "/dashboard/img/launcher-icon-1x.png",
+			"type": "image/png",
+			"sizes": "48x48"
+		},
+		{
+			"src": "/dashboard/img/launcher-icon-2x.png",
+			"type": "image/png",
+			"sizes": "96x96"
+		},
+		{
+			"src": "/dashboard/img/launcher-icon-4x.png",
+			"type": "image/png",
+			"sizes": "192x192"
+		}
+	],
+	"start_url": "/dashboard?homescreen=true",
+	"background_color": "#ffffff",
+	"theme_color": "#ffffff",
+	"display": "standalone"
+}

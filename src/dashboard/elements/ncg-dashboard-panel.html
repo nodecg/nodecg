@@ -1,0 +1,196 @@
+<link rel="import" href="../../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../../bower_components/paper-styles/element-styles/paper-material-styles.html">
+<link rel="import" href="../../../bower_components/paper-styles/typography.html">
+<link rel="import" href="ncg-dashboard-panel-info-dialog.html">
+
+<dom-module id="ncg-dashboard-panel">
+	<template>
+		<style include="paper-material-styles">
+			:host {
+				display: inline-block;
+				width: 128px;
+			}
+
+			:host([fullbleed]) {
+				width: 100%!important;
+				height: 100%!important;
+			}
+
+			:host(:not([fullbleed])) {
+				@apply --paper-material-elevation-1;
+			}
+
+			:host([width="1"]) {
+				width: 128px;
+			}
+
+			:host([width="2"]) {
+				width: 272px;
+			}
+
+			:host([width="3"]) {
+				width: 416px;
+			}
+
+			:host([width="4"]) {
+				width: 560px;
+			}
+
+			:host([width="5"]) {
+				width: 704px;
+			}
+
+			:host([width="6"]) {
+				width: 848px;
+			}
+
+			:host([width="7"]) {
+				width: 992px;
+			}
+
+			:host([width="8"]) {
+				width: 1136px;
+			}
+
+			:host([width="9"]) {
+				width: 1280px;
+			}
+
+			:host([width="10"]) {
+				width: 1424px;
+			}
+
+			#header {
+				position: relative;
+				color: var(--google-grey-100);
+				@apply --layout-horizontal;
+				@apply --layout-end-justified;
+				@apply --layout-center;
+				@apply --layout-flex-none;
+				@apply --paper-font-title;
+				overflow: hidden;
+			}
+
+			#header a {
+				color: inherit;
+			}
+
+			#displayTitle {
+				position: absolute;
+				left: 15px;
+				top: 6px;
+			}
+
+			#buttons {
+				@apply --layout-horizontal;
+				@apply --layout-center;
+				padding-left: 8px;
+				transform: translateX(100%);
+				transition: transform 200ms ease;
+			}
+
+			#more {
+				position: absolute;
+				right: 10px;
+				top: 8px;
+			}
+
+			#buttonsContainer {
+				z-index: 1;
+			}
+
+			#header:hover #buttons {
+				transform: translateX(0%);
+			}
+
+			#dragHandle {
+				cursor: -webkit-grab;
+				cursor: -moz-grab;
+				cursor: grab;
+			}
+
+			#dragHandle:active {
+				cursor: -webkit-grabbing;
+				cursor: -moz-grabbing;
+				cursor: grabbing;
+			}
+
+			#body {
+				min-height: 1px;
+				padding: 0;
+				background-color: #f5f5f5;
+			}
+
+			paper-icon-button[hidden] {
+				/* For whatever reason, paper-icon-button doesn't specify its own [hidden] style.
+				   https://github.com/PolymerElements/paper-icon-button/issues/103 */
+				display: none !important;
+			}
+
+			:host([fullbleed]) {
+				@apply --layout-vertical;
+			}
+
+			/* When fullbleed, buttons are always visible */
+			:host([fullbleed]) #buttons {
+				transform: translateX(0%);
+			}
+
+			:host([fullbleed]) #collapse {
+				@apply --layout-flex;
+				@apply --layout-vertical;
+			}
+
+			:host([fullbleed]) #body {
+				@apply --layout-flex;
+			}
+
+			:host([fullbleed]) ::slotted(iframe) {
+				height: 100%;
+			}
+		</style>
+
+		<iron-localstorage
+			name="{{computeLocalStorageName(bundle, panel)}}"
+		   	value="{{opened}}"
+		   	on-iron-localstorage-load-empty="initializeDefaultOpened"></iron-localstorage>
+
+		<div id="header">
+			<span id="displayTitle">[[displayTitle]]</span>
+			<div id="buttonsContainer">
+				<iron-icon id="more" icon="chevron-left"></iron-icon>
+				<div id="buttons">
+					<a href="[[standaloneUrl]]" target="_blank">
+						<paper-icon-button
+							id="openStandalone"
+							icon="open-in-new"></paper-icon-button>
+					</a>
+
+					<paper-icon-button
+						id="expandBtn"
+						on-click="toggleCollapse"
+						icon="unfold-less"
+						hidden="[[fullbleed]]"></paper-icon-button>
+
+					<paper-icon-button
+						id="dragHandle"
+						icon="open-with"
+						hidden="[[fullbleed]]"></paper-icon-button>
+
+					<paper-icon-button id="infoBtn" icon="info"></paper-icon-button>
+				</div>
+			</div>
+		</div>
+
+		<iron-collapse id="collapse" opened="{{opened}}" transitioning="{{transitioning}}">
+			<div id="body">
+				<slot id="slot"></slot>
+			</div>
+		</iron-collapse>
+	</template>
+
+	<script src="ncg-dashboard-panel.js"></script>
+</dom-module>
+

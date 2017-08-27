@@ -1,0 +1,94 @@
+<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="ncg-single-instance.html">
+
+<dom-module id="ncg-graphics">
+	<template>
+		<style include="iron-flex iron-flex-alignment">
+			:host {
+				width: 100%;
+				max-width: 600px;
+				@apply --layout-vertical;
+				@apply --layout-stretch;
+			}
+
+			#instancesList-empty {
+				text-align: center;
+				border: 4px dashed #B7B7B7;
+				height: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 24px;
+			}
+
+			.graphic {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.graphic:not(:last-child) {
+				margin-bottom: 6px;
+			}
+
+			.copyButton {
+				color: white;
+				background-color: var(--nodecg-brand-blue);
+				white-space: nowrap;
+				flex-shrink: 0;
+			}
+
+			paper-card {
+				margin-bottom: 12px;
+			}
+
+			a {
+				color: #5C5CCE;
+				font-size: 14px;
+				font-weight: 500;
+				letter-spacing: 0.018em;
+				line-height: 24px;
+				text-decoration: none;
+				text-transform: uppercase;
+			}
+		</style>
+
+		<paper-card heading="Active Single-Instance Graphics">
+			<div class="card-content">
+				<div id="instancesList"></div>
+				<div id="instancesList-empty">
+					<span>No single-instance graphics are currently open.</span>
+				</div>
+			</div>
+		</paper-card>
+
+		<template is="dom-repeat" items="[[bundlesWithGraphics]]" as="bundle">
+			<paper-card heading="[[bundle.name]]">
+				<div class="card-content layout vertical">
+					<template is="dom-repeat" items="[[bundle.graphics]]" as="graphic">
+						<div class="graphic">
+							<div class="layout vertical">
+								<a href$="[[_computeFullGraphicUrl(graphic.url)]]" target="_blank">
+									[[calcShortUrl(graphic.url)]]
+								</a>
+								<span>[[graphic.width]]x[[graphic.height]]</span>
+							</div>
+							<paper-button class="copyButton" raised data-clipboard-text$="[[_computeFullGraphicUrl(graphic.url)]]">
+								<iron-icon icon="content-copy"></iron-icon>
+								&ensp;Copy URL
+							</paper-button>
+						</div>
+					</template>
+				</div>
+			</paper-card>
+		</template>
+
+		<paper-toast id="copyToast"></paper-toast>
+	</template>
+
+	<script src="ncg-graphics.js"></script>
+</dom-module>

@@ -1,5 +1,6 @@
 'use strict';
 
+process.title = 'NodeCG';
 global.exitOnUncaught = true;
 
 if (process.cwd() !== __dirname) {
@@ -21,7 +22,7 @@ if (!semver.satisfies(nodeVersion, '>=6')) {
 }
 
 process.on('uncaughtException', err => {
-	if (!global.rollbarEnabled) {
+	if (!global.sentryEnabled) {
 		if (global.exitOnUncaught) {
 			console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
 		} else {
@@ -33,6 +34,13 @@ process.on('uncaughtException', err => {
 		if (global.exitOnUncaught) {
 			process.exit(1);
 		}
+	}
+});
+
+process.on('unhandledRejection', err => {
+	if (!global.sentryEnabled) {
+		console.error('UNHANDLED PROMISE REJECTION!');
+		console.error(err);
 	}
 });
 

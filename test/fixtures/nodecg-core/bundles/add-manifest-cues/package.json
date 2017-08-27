@@ -1,0 +1,23 @@
+{
+  "name": "add-manifest-cues",
+  "version": "0.0.0",
+  "description": "",
+  "homepage": "",
+  "author": {
+    "name": "NodeCG",
+    "url": "https://nodecg.com"
+  },
+  "nodecg": {
+    "compatibleRange": "0.9.0-beta",
+    "soundCues": [
+      {
+        "name": "persisted-cue-1"
+      },
+      {
+        "name": "manifest-cue-1"
+      }
+    ]
+  },
+  "repository": "https://github.com/nodecg/nodecg.git",
+  "license": "MIT"
+}

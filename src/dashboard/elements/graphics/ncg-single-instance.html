@@ -1,0 +1,26 @@
+<link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="ncg-single-instance">
+	<template>
+		<style>
+			:host {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: 8px;
+			}
+
+			#kill {
+				--paper-button: {
+					background-color: var(--nodecg-danger-color);
+					color: white;
+				}
+			}
+		</style>
+
+		<span>{{url}}</span>
+		<paper-button id="kill" on-click="kill" raised>KILL</paper-button>
+	</template>
+
+	<script src="ncg-single-instance.js"></script>
+</dom-module>

@@ -1,0 +1,119 @@
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../bower_components/nodecg-replicant/nodecg-replicant.html">
+<link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../../../bower_components/polymer/lib/mixins/mutable-data.html">
+<link rel="import" href="../../../../bower_components/vaadin-upload/vaadin-upload.html">
+<link rel="import" href="../util-scrollable.html">
+<link rel="import" href="ncg-asset-file.html">
+
+<dom-module id="ncg-asset-category">
+	<template>
+		<style>
+			:host {
+				display: block;
+				width: 100%;
+				box-sizing: border-box;
+			}
+
+			#add {
+				display: flex;
+				align-items: center;
+			}
+
+			paper-card {
+				width: 100%;
+			}
+
+			#header {
+				@apply --layout-horizontal;
+				@apply --layout-justified;
+				@apply --layout-center;
+				margin-bottom: 6px;
+			}
+
+			#title {
+				@apply --paper-font-headline;
+			}
+
+			#files {
+				max-height: 400px;
+				--util-scrollable: {
+					padding: 0;
+				};
+				@apply --layout-vertical;
+			}
+
+			vaadin-upload {
+				width: 400px;
+				margin: 16px;
+			}
+
+			#acceptsMsg {
+				margin-top: 8px;
+				text-align: center;
+			}
+
+			#add {
+				--paper-button: {
+					background-color: var(--nodecg-configure-color);
+					color: white;
+				}
+			}
+		</style>
+
+		<nodecg-replicant
+			id="replicant"
+			replicant-name="assets:[[category.name]]"
+			replicant-bundle="[[collectionName]]"
+			value="{{files}}"></nodecg-replicant>
+
+		<paper-toast id="toast"></paper-toast>
+
+		<div id="header">
+			<span id="title">[[category.title]]</span>
+			<paper-button id="add" raised on-click="openUploadDialog">
+				<iron-icon icon="add"></iron-icon>
+				Add File(s)
+			</paper-button>
+		</div>
+
+		<util-scrollable id="files">
+			<template is="dom-repeat" items="[[files]]" as="file" mutable-data>
+				<ncg-asset-file
+					file="[[file]]"
+					on-deleted="_handleDeleted"
+					on-deletion-failed="_handleDeletionFailed"></ncg-asset-file>
+			</template>
+		</util-scrollable>
+
+		<div id="empty">
+			There are no assets in this category.
+		</div>
+
+		<!-- 2017/03/18: Had to remove with-backdrop during the dashboard re-write -->
+		<paper-dialog id="uploadDialog">
+			<paper-dialog-scrollable>
+				<vaadin-upload
+					id="uploader"
+					target="/assets/[[collectionName]]/[[category.name]]"
+					on-upload-start="refitUploadDialog"
+					on-upload-before="_onUploadBefore"
+					on-file-reject="_onFileReject">
+					<template is="dom-if" if="[[category.allowedTypes.length]]">
+						<div id="acceptsMsg">[[acceptsMsg]]</div>
+					</template>
+				</vaadin-upload>
+			</paper-dialog-scrollable>
+
+			<div class="buttons">
+				<paper-button dialog-dismiss>Close</paper-button>
+			</div>
+		</paper-dialog>
+	</template>
+
+	<script src="ncg-asset-category.js"></script>
+</dom-module>

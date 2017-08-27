@@ -37,6 +37,18 @@ The `nodecg` object in a bundle's `package.json` must follow this structure:
           }
         ],
         "file": "sample-dialog.html"
+      },
+      {
+        "name": "custom-workspace",
+        "title": "Custom Workspace Panel",
+        "width": 4,
+        "file": "custom-workspace.html",
+        "workspace": "My Workspace"
+      },
+      {
+        "name": "fullbleed-panel",
+        "title": "Fullbleed Panel",
+        "fullbleed": true
       }
     ],
     "graphics": [
@@ -74,6 +86,17 @@ Every panel and dialog must have a `name`, `title`, and `file`. `file` is relati
 so you'll want to play around with this number to get the desired width.
 
 Panels also have an optional `headerColor` property that accepts a hex color string.
+
+You can split your panels up into multiple `workspace`s. By default all panels are added to the same workspace.
+If you'd like to specify a different workspace, simply provide a workspace name as the `workspace` property.
+Workspaces work across bundles. If `my-bundle` and `your-bundle` both declare a panel in the `Shared Workspace` 
+workspace, then both of our panels will show up together.
+
+If you have a really big panel that simply needs to be in its own workspace and have maximized screenspace, give it
+the `fullbleed` property. Fullbleed panels are put into their own workspace and have no margins around them. This is
+good for when you have a large, complex UI that you need more fine-grained control over.
+
+<iframe src='https://gfycat.com/ifr/SarcasticDeterminedFugu' frameborder='0' scrolling='no' width='640' height='402' allowfullscreen></iframe>
 
 To mark a panel as a dialog, it must have the `dialog` property set to `true`. Dialogs don't immediately display on the
 dashboard, and must be manually invoked. See {@tutorial making-dialogs} for more info. 

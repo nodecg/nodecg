@@ -1,0 +1,49 @@
+<link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../../bower_components/paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../../../../bower_components/polymer/polymer.html">
+
+<dom-module id="ncg-asset-file">
+	<template>
+		<style>
+			:host {
+				@apply --layout-horizontal;
+				@apply --layout-justified;
+				@apply --layout-center;
+			}
+
+			#name {
+				color: #5C5CCE;
+				font-size: 14px;
+				font-weight: 500;
+				letter-spacing: 0.018em;
+				line-height: 24px;
+				overflow: hidden;
+				text-decoration: none;
+				text-overflow: ellipsis;
+				text-transform: none;
+			}
+
+			#delete {
+				display: flex;
+				align-items: center;
+				color: var(--nodecg-danger-color);
+				flex-shrink: 0;
+			}
+
+			#spinner {
+				--paper-spinner-color: var(--nodecg-danger-color);
+			}
+		</style>
+
+		<a id="name" href="[[file.url]]" target="_blank">[[file.base]]</a>
+		<paper-spinner-lite id="spinner" alt="Deleting" active></paper-spinner-lite>
+		<paper-button id="delete" on-click="_handleDeleteClick">
+			<iron-icon icon="delete"></iron-icon>
+			&ensp;Delete
+		</paper-button>
+	</template>
+
+	<script src="ncg-asset-file.js"></script>
+</dom-module>

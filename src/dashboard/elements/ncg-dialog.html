@@ -1,0 +1,80 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="../../../bower_components/paper-dialog-behavior/paper-dialog-shared-styles.html">
+
+<!--
+You may notice some oddness with this element. Namely that the `.buttons` div appears before the
+`paper-dialog-scrollable` element in `dashboard.pug`, but in the below `<style>` tag I've forced
+`.buttons` to have an `order` of `3`, making it appear after `paper-dialog-scrollable`.
+
+This was done to fix a bizarre issue wherein any nodes placed after the `paper-dialog-scrollable`
+were not appearing in the DOM. I do not know how or why this was happening, so this flexbox hack
+is the only thing I could come up with. Let us never speak of this again.
+
+Lange - 1/28/2016
+-->
+
+<dom-module id="ncg-dialog">
+	<template>
+		<style include="paper-dialog-shared-styles">
+			:host {
+				display: flex;
+				flex-direction: column;
+				max-width: 100%;
+				--paper-dialog-scrollable: {
+					max-width: none;
+				}
+			}
+
+			:host([width="1"]) {
+				width: 128px;
+			}
+
+			:host([width="2"]) {
+				width: 272px;
+			}
+
+			:host([width="3"]) {
+				width: 416px;
+			}
+
+			:host([width="4"]) {
+				width: 560px;
+			}
+
+			:host([width="5"]) {
+				width: 704px;
+			}
+
+			:host([width="6"]) {
+				width: 848px;
+			}
+
+			:host([width="7"]) {
+				width: 992px;
+			}
+
+			:host([width="8"]) {
+				width: 1136px;
+			}
+
+			:host([width="9"]) {
+				width: 1280px;
+			}
+
+			:host([width="10"]) {
+				width: 1424px;
+			}
+
+			/* TODO: check that this still does the right thing */
+			:host > ::slotted(*:last-child) {
+				margin-bottom: 0;
+			}
+		</style>
+
+		<slot id="slot"></slot>
+	</template>
+
+	<script src="ncg-dialog.js"></script>
+</dom-module>

@@ -10,7 +10,7 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 indent_size = 4
 
-[{package.json,*.yml}]
+[{package.json,*.yml,*.md}]
 indent_style = space
 indent_size = 2
 

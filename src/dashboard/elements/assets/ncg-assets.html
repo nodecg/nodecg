@@ -1,0 +1,57 @@
+<link rel="import" href="../../../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="ncg-asset-category.html">
+
+<dom-module id="ncg-assets">
+	<template>
+		<style>
+			:host {
+				width: 100%;
+				max-width: 600px;
+				@apply --layout-vertical;
+				@apply --layout-stretch;
+			}
+
+			.assets-divider {
+				box-sizing: border-box;
+				margin: 12px 10px;
+				border-top: 1px solid #bdbdbd;
+			}
+
+			.assets-divider:last-of-type {
+				display: none;
+			}
+
+			.collectionName {
+				display: block;
+				font-size: 2em;
+				font-weight: bold;
+			}
+
+			paper-card {
+				margin-bottom: 12px;
+			}
+		</style>
+
+		<nodecg-replicant
+			replicant-name="collections"
+			replicant-bundle="_assets"
+			value="{{collections}}"></nodecg-replicant>
+
+		<template is="dom-repeat" items="[[collections]]" as="collection">
+			<paper-card>
+				<div class="card-content">
+					<div class="collectionName">[[collection.name]]</div>
+
+					<template is="dom-repeat" items="[[collection.categories]]" as="category" mutable-data>
+						<ncg-asset-category
+							collection-name="[[collection.name]]"
+							category="[[category]]"></ncg-asset-category>
+						<div class="assets-divider"></div>
+					</template>
+				</div>
+			</paper-card>
+		</template>
+	</template>
+
+	<script src="ncg-assets.js"></script>
+</dom-module>

@@ -1,0 +1,13 @@
+{
+	"env": {
+		"node": false,
+		"browser": true
+	},
+	"globals": {
+		"Polymer": true,
+		"NodeCG": true,
+		"Clipboard": true,
+		"Packery": true,
+		"Draggabilly": true
+	}
+}

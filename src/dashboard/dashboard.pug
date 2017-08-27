@@ -1,0 +1,114 @@
+doctype html
+html(lang='en')
+	head
+		meta(http-equiv='X-UA-Compatible', content='IE=edge; charset=UTF-8')
+		meta(name='viewport', content='width=device-width', initial-scale=1)
+		meta(name='theme-color' content='#ffffff')
+		link(rel='manifest', href='/manifest.json')
+
+		title NodeCG Dashboard
+
+		if privateConfig.sentry && privateConfig.sentry.enabled
+			script(src='/bower_components/raven-js/dist/raven.min.js')
+			script(type='text/javascript').
+				Raven.config('#{privateConfig.sentry.publicDsn}', {
+					release: '#{nodecgVersion}',
+					tags: {
+						nodecgHost: '#{privateConfig.host}',
+						nodecgBaseURL: `#{privateConfig.baseURL}`
+					}
+				}).install();
+				window.addEventListener('unhandledrejection', function (err) {
+					Raven.captureException(err.reason);
+				});
+
+		//- Register service worker
+		script(type='text/javascript').
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.register('/service-worker.js')
+					.then(function (registration) {
+						// Service worker successfully installed.
+					}).catch(function (err) {
+						console.error('Error installing service worker!');
+						console.error(err);
+					});
+			}
+
+		//- other dashboard scripts
+		script(src='/bower_components/draggabilly/dist/draggabilly.pkgd.min.js' async)
+		script(src='/bower_components/iframe-resizer/js/iframeResizer.min.js' async)
+		script(src='/bower_components/packery/dist/packery.pkgd.min.js')
+		script(src='/bower_components/clipboard/dist/clipboard.min.js')
+		script(src='/bower_components/webcomponentsjs/webcomponents-loader.js')
+
+		script(type='text/javascript').
+			// Allow child iframes to reliably find this parent frame
+			window.__nodecg__ = true;
+
+			// Make the global config (and other render-time data) available during runtime.
+			window.ncgConfig = !{JSON.stringify(publicConfig)};
+			window.__renderData__ = {
+				bundles: !{JSON.stringify(bundles)},
+				workspaces: !{JSON.stringify(workspaces)}
+			};
+			Object.freeze(window.__renderData__);
+
+		link(rel='import', href='../bower_components/shadycss/apply-shim.html')
+
+		//- our custom dashboard elements
+		link(rel='import', href='elements/ncg-dashboard.html')
+
+		//- make the API available
+		script(src='/nodecg-api.min.js')
+
+		//- initialize the socket
+		script(src='/bower_components/cookies-js/dist/cookies.min.js')
+		script(src='/socket.io/socket.io.js')
+		script(type='text/javascript').
+			const params = new URLSearchParams(location.search);
+			window.token = params.key || Cookies.get('socketToken');
+			if (window.token) {
+				window.socket = io(undefined, {query: 'token=' + window.token});
+			} else {
+				window.socket = io();
+			}
+
+		//- Set the default color of many polymer elements.
+			Newer elements use --primary-color, older elements use --default-primary-color.
+		custom-style
+			style.
+				html {
+					--nodecg-brand-blue: #00bebe;
+					--default-primary-color: var(--nodecg-brand-blue);
+					--primary-color: var(--nodecg-brand-blue);
+
+					--nodecg-info-color: #645BA6;
+					--nodecg-info-color--light: #9f9bbd;
+					--nodecg-info-color--dark: #4a4668;
+
+					--nodecg-success-color: #5BA664;
+					--nodecg-success-color--light: #9bbd9f;
+					--nodecg-success-color--dark: #46684a;
+
+					--nodecg-warning-color: #FF7522;
+					--nodecg-warning-color--light: #e9aa84;
+					--nodecg-warning-color--dark: #945530;
+
+					--nodecg-danger-color: #C9513E;
+					--nodecg-danger-color--light: #ce978e;
+					--nodecg-danger-color--dark: #79433a;
+
+					--nodecg-configure-color: #A50074;
+					--nodecg-configure-color--light: #b4699e;
+					--nodecg-configure-color--dark: #5e1347;
+				}
+
+				body {
+					overflow: hidden;
+					background-color: #dedede;
+					@apply(--layout-vertical);
+					@apply(--layout-fullbleed);
+				}
+
+	body
+		ncg-dashboard
