@@ -232,9 +232,7 @@
 		}
 
 		_fixPackery() {
-			if (this.route.path === '') {
-				this.applyPackery();
-			}
+			this.applyPackery();
 		}
 
 		_computePanels(workspace) {
