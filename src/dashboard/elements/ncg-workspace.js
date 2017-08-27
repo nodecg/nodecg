@@ -37,16 +37,35 @@
 		ready() {
 			super.ready();
 
-			window.addEventListener('load', () => {
-				this.$.loadingSpinner.active = false;
-				this.applyPackery();
-				setTimeout(() => {
-					this.addEventListener('tap', this.shiftPackery);
-					this.$.panels.style.opacity = 1;
-					this.$.panels.style.transform = 'translateY(0)';
-					this.$.panels.style.pointerEvents = 'auto';
-				}, 750);
-			});
+			// 2018-08-26: This is a quick fix for workspaces never initializing on Firefox.
+			// For some reason FF never fires the `load` event, or it's firing it before we start listening.
+			// This is less than ideal for us, because this quick fix doesn't _actually_ hide the loads,
+			// so it looks quite ugly.
+			// This might need to move to listening for the load events of each individual iframe instead?
+			if (document.readyState === 'complete') {
+				this._init();
+			} else {
+				window.addEventListener('load', () => {
+					this._init();
+				});
+			}
+		}
+
+		_init() {
+			if (this._initialized) {
+				throw new Error('attempted multiple init');
+			}
+
+			this._initialized = true;
+
+			this.$.loadingSpinner.active = false;
+			this.applyPackery();
+			setTimeout(() => {
+				this.addEventListener('tap', this.shiftPackery);
+				this.$.panels.style.opacity = 1;
+				this.$.panels.style.transform = 'translateY(0)';
+				this.$.panels.style.pointerEvents = 'auto';
+			}, 750);
 		}
 
 		connectedCallback() {
