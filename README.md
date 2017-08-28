@@ -226,7 +226,7 @@ To build the docs, run the following commands (after you have cloned NodeCG and 
 npm run docs:build
 ```
 
-After that, you can just open `docs/index.html` directly in your web browser.
+After that, you can open `docs/index.html` directly in your web browser.
 
 Once you've made your changes, follow the steps above in the [Contribute](#contribute) section to open a pull request.
 
