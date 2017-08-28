@@ -6,6 +6,7 @@
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
 [![Coverage Status](https://coveralls.io/repos/nodecg/nodecg/badge.svg?branch=master&service=github)](https://coveralls.io/github/nodecg/nodecg?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/nodecg/nodecg.svg)](https://greenkeeper.io/)
+[![Twitter](https://img.shields.io/twitter/url/https/twitter.com/fold_left.svg?style=social&label=Follow%20%40NodeCG)](https://twitter.com/NodeCG)
 
 > Create broadcast graphics using Node.js and a browser
 
