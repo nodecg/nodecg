@@ -1,6 +1,6 @@
 # NodeCG
 
-[![NodeCG](https://raw.githubusercontent.com/nodecg/nodecg/master/media/splash.png)](https://nodecg.com/)
+[![NodeCG](https://raw.githubusercontent.com/nodecg/nodecg/master/media/splash.png)](http://nodecg.com/)
 
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nodecg/nodecg)
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
