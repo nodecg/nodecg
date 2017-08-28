@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.2"></a>
+## [0.9.2](https://github.com/nodecg/nodecg/compare/v0.9.1...v0.9.2) (2017-08-28)
+
+
+### Bug Fixes
+
+* **package:** make fs.extra a production dependency, instead of a devDependency ([5ac2c88](https://github.com/nodecg/nodecg/commit/5ac2c88))
+
+
+
 <a name="0.9.1"></a>
 ## [0.9.1](https://github.com/nodecg/nodecg/compare/v0.9.0...v0.9.1) (2017-08-28)
 
