@@ -179,7 +179,7 @@ See the [manifest tutorial](http://nodecg.com/tutorial-manifest.html) for more i
 
 Please contribute! This is an open source project. If you would like to report a bug or suggest a feature, [open an issue](https://github.com/nodecg/nodecg/issues). Or, to open a Pull Request:
 
-1. Fork it ( http://github.com/nodecg/nodecg/fork )
+1. Fork it ([http://github.com/nodecg/nodecg/fork](http://github.com/nodecg/nodecg/fork))
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
@@ -194,6 +194,20 @@ Please contribute! This is an open source project. If you would like to report a
 Check which branch you should PR to. NodeCG is still in an unstable state, so we follow these [semver](http://semver.org/) guidelines:
 - Bug fixes and new features go to the next 'patch' branch (`0.current.x`)
 - Breaking changes go to the next 'minor' branch (`0.next.0`)
+
+### Building and viewing the docs locally
+Documentation contributions are always welcome and very appreciated!
+
+NodeCG's documentation site, [nodecg.com](http://nodecg.com), is automatically generated based on NodeCG's JSDoc comments and the markdown files in the [`tutorials`](https://github.com/nodecg/nodecg/tree/master/tutorials) folder.
+
+To build the docs, run the following commands (after you have cloned NodeCG and installed its dependencies via `npm install`):
+```bash
+npm run docs:build
+```
+
+After that, you can just open `docs/index.html` directly in your web browser.
+
+Once you've made your changes, follow the steps above in the [Contribute](#contribute) section to open a pull request.
 
 ### Running tests locally
 1. Install selenium-standalone (`npm install --global selenium-standalone`), then run the installer (`selenium-standalone install`)
