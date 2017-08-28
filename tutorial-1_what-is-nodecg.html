@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Sounds - Documentation</title>
+    <title>What is NodeCG? - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Sounds</h1>
+    <h1 class="page-title">What is NodeCG?</h1>
     
 
     <section>
@@ -39,49 +39,15 @@
 </header>
 
 <article>
-    <p>NodeCG features a system for management and playback of sound cues. To add sound cues to your bundle,
-create a <code>nodecg.soundCues</code> array in your <code>package.json</code>:</p>
-<pre class="prettyprint source lang-json"><code>{
-  &quot;name&quot;: &quot;test-bundle&quot;,
-  &quot;nodecg&quot;: {
-    &quot;soundCues&quot;: [
-      {
-        &quot;name&quot;: &quot;name-only&quot;
-      },
-      {
-        &quot;name&quot;: &quot;default-volume&quot;,
-        &quot;defaultVolume&quot;: 80
-      },
-      {
-        &quot;name&quot;: &quot;non-assignable&quot;,
-        &quot;assignable&quot;: false,
-        &quot;defaultFile&quot;: &quot;sound/default-file.ogg&quot;
-      },
-      {
-        &quot;name&quot;: &quot;default-file&quot;,
-        &quot;defaultFile&quot;: &quot;sound/default-file.ogg&quot;
-      },
-      {
-          &quot;name&quot;: &quot;single-channel&quot;,
-          &quot;channels&quot;: 1
-      }
-    ]
-  }
-}</code></pre><p>Your bundle will now have a card on the Mixer page of the Dashboard.</p>
-<iframe src='https://gfycat.com/ifr/PrestigiousShyGoldeneye' frameborder='0' scrolling='no' width='640' height='426.6666666666667' allowfullscreen></iframe>
-
-<p><code>defaultFile</code>s are audio files that you ship with your bundle. They will be available to that specific cue as a
-&quot;Default&quot; option in that cue's dropdown select on the Mixer.</p>
-<p><code>channels</code> determines how many instances of a sound can be playing simultaneously. The default value is <code>100</code>. If set to <code>1</code>,
-only one instance can play at a time, and a new instance cannot be started until the currently playing instance has completed.</p>
-<p>If your bundle has at least one cue that is <code>assignable</code>, it will gain a &quot;Sounds&quot; <a href="tutorial-assets.html">Asset</a> category.
-This category accepts <code>.ogg</code> and <code>.mp3</code> files. Any audio files uploaded to this category will become available as options
-in all of your <code>assignable</code> cues' dropdown boxes.</p>
-<p>If your bundle has Sound Cues, the following API methods will be available to your graphic:</p>
+    <p>NodeCG is two things:</p>
+<ol>
+<li>A programming framework with which to create broadcast graphics and control panels.</li>
+<li>An application for serving those graphics and control panels.</li>
+</ol>
+<p>The best way to quickly get a feel for what NodeCG does is to watch these videos that go over some bundles that have been made with it:</p>
 <ul>
-<li><a href="NodeCG.html#playSound"><code>NodeCG#playSound</code></a></li>
-<li><a href="NodeCG.html#stopSound"><code>NodeCG#stopSound</code></a></li>
-<li><a href="NodeCG.html#stopAllSounds"><code>NodeCG#stopAllSounds</code></a></li>
+<li><a href="https://www.youtube.com/watch?v=vBAZXchbI3U&amp;list=PLTEhlYdONYxv1wk2FsIpEz92X3x2E7bSx">A twelve-part video series breaking down the graphics used at Awesome Games Done Quick 2017</a></li>
+<li><a href="https://www.youtube.com/watch?v=F0xGN-aSytA">A 20-minute video detailing the graphics for Tip of the Hats 2016 (a smaller charity fundraiser)</a></li>
 </ul>
 </article>
 
