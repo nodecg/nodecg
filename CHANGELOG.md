@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file. See [standa
 * **bundle-manager:** fix case where changes to a bundle's manifest could get ignored ([882f406](https://github.com/nodecg/nodecg/commit/882f406))
 * **bundle-manager:** remove debug print ([91546e2](https://github.com/nodecg/nodecg/commit/91546e2))
 * **replicants:** improve how revision mismatch errors are logged to console on the client ([e99dcbc](https://github.com/nodecg/nodecg/commit/e99dcbc))
+* **package:** fix version number in `package.json` (this prevented most bundles from loading - whoops!)
 
 
 
