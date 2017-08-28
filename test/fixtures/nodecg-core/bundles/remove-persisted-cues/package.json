@@ -8,7 +8,7 @@
     "url": "https://nodecg.com"
   },
   "nodecg": {
-    "compatibleRange": "0.9.0-beta",
+    "compatibleRange": "~0.9.0",
     "soundCues": [
       {
         "name": "persisted-cue-1"

@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+<a name="0.9.1"></a>
+## [0.9.1](https://github.com/nodecg/nodecg/compare/v0.9.0...v0.9.1) (2017-08-28)
+
+
+### Bug Fixes
+
+* **bundle-manager:** fix case where changes to a bundle's manifest could get ignored ([882f406](https://github.com/nodecg/nodecg/commit/882f406))
+* **bundle-manager:** remove debug print ([91546e2](https://github.com/nodecg/nodecg/commit/91546e2))
+* **replicants:** improve how revision mismatch errors are logged to console on the client ([e99dcbc](https://github.com/nodecg/nodecg/commit/e99dcbc))
+
+
+
 <a name="0.9.0"></a>
 # [0.9.0](https://github.com/nodecg/nodecg/compare/v0.8.9...v0.9.0) (2017-08-27)
 
@@ -475,6 +491,3 @@ For detailed instructions on how to migrate your v0.8 bundles to v0.9, [check ou
 
 <a name="0.0.1"></a>
 ## 0.0.1 (2014-10-07)
-
-
-
