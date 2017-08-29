@@ -34,5 +34,8 @@
 		"template": "./node_modules/minami",
 		"tutorials": "./tutorials",
 		"destination": "./docs/"
+	},
+	"markdown": {
+		"idInHeadings": true
 	}
 }
