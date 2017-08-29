@@ -44,29 +44,9 @@
 <h3>Schema</h3><ul>
 <li><code>host</code> <em>String</em> The IP address or hostname that NodeCG should bind to.</li>
 <li><code>port</code> <em>Integer</em> The port that NodeCG should listen on.</li>
-<li><code>baseURL</code> <em>String</em> The URL NodeCG will be accessed via in advanced server setups. Defaults to <code>host:port</code>.</li>
-<li><code>login</code> <em>Object</em> Contains other configuration properties.<ul>
-<li><code>enabled</code> <em>Boolean</em> Whether to enable login security.</li>
-<li><code>sessionSecret</code> <em>String</em> The secret used to salt sessions.</li>
-<li><code>steam</code> <em>Object</em> Contains steam login configuration properties.<ul>
-<li><code>enabled</code> <em>Boolean</em> Whether to enable Steam authentication.</li>
-<li><code>apiKey</code> <em>String</em> A Steam API Key. Obtained from <a href="http://steamcommunity.com/dev/apikey">http://steamcommunity.com/dev/apikey</a></li>
-<li><code>allowedIds</code> <em>Array of strings</em> Which 64 bit Steam IDs to allow. Can be obtained from <a href="https://steamid.io/">https://steamid.io/</a></li>
-</ul>
-</li>
-<li><code>twitch</code> <em>Object</em> Contains twitch login configuration properties.<ul>
-<li><code>enabled</code> <em>Boolean</em> Whether to enable Twitch authentication.</li>
-<li><code>clientID</code> <em>String</em> A Twitch application ClientID <a href="http://twitch.tv/kraken/oauth2/clients/new">http://twitch.tv/kraken/oauth2/clients/new</a></li>
-<li><code>clientSecret</code> <em>String</em> A Twitch application ClientSecret <a href="http://twitch.tv/kraken/oauth2/clients/new">http://twitch.tv/kraken/oauth2/clients/new</a><ul>
-<li><em>Note:</em> Configure your Twitch OAuth credentials with a Redirect URI to <code>{baseURL}/login/auth/twitch</code></li>
-</ul>
-</li>
-<li><code>scope</code> <em>String</em> A space-separated string of Twitch application <a href="https://dev.twitch.tv/docs/v5/guides/authentication/#scopes">permissions</a>.</li>
-<li><code>allowedUsernames</code> <em>Array of strings</em> Which Twitch usernames to allow.</li>
-</ul>
-</li>
-</ul>
-</li>
+<li><code>baseURL</code> <em>String</em> The URL of this instance. Used for things like cookies. Defaults to HOST:PORT. If you use a reverse proxy, you\'ll likely need to set this value.</li>
+<li><code>developer</code> <em>Boolean</em> Whether to enable features that speed up development. Not suitable for production.</li>
+<li><code>exitOnUncaught</code> <em>Boolean</em> Whether or not to exit on uncaught exceptions.</li>
 <li><code>logging</code> <em>Object</em> Contains other configuration properties.<ul>
 <li><code>replicants</code> <em>Boolean</em> Whether to enable logging of the Replicants subsystem. Very spammy.</li>
 <li><code>console</code> <em>Object</em> Contains properties for console logging.<ul>
@@ -82,6 +62,32 @@
 </li>
 </ul>
 </li>
+<li><code>bundles</code> <em>Object</em> Contains configuration for bundles.<ul>
+<li><code>enabled</code> <em>Array of strings</em> A whitelist array of bundle names that will be the only ones loaded at startup. Cannot be used with <code>bundles.disabled</code>.</li>
+<li><code>disabled</code> <em>Array of strings</em> A blacklist array of bundle names that will not be loaded at startup. Cannot be used with <code>bundles.enabled</code>.</li>
+</ul>
+</li>
+<li><code>login</code> <em>Object</em> Contains other configuration properties.<ul>
+<li><code>enabled</code> <em>Boolean</em> Whether to enable login security.</li>
+<li><code>sessionSecret</code> <em>String</em> The secret used to salt sessions.</li>
+<li><code>forceHttpsReturn</code> <em>Boolean</em> orces Steam &amp; Twitch login return URLs to use HTTPS instead of HTTP. Useful in reverse proxy setups.</li>
+<li><code>steam</code> <em>Object</em> Contains steam login configuration properties.<ul>
+<li><code>enabled</code> <em>Boolean</em> Whether to enable Steam authentication.</li>
+<li><code>apiKey</code> <em>String</em> A Steam API Key. Obtained from <a href="http://steamcommunity.com/dev/apikey">http://steamcommunity.com/dev/apikey</a></li>
+<li><code>allowedIds</code> <em>Array of strings</em> Which 64 bit Steam IDs to allow. Can be obtained from <a href="https://steamid.io/">https://steamid.io/</a></li>
+</ul>
+</li>
+<li><code>twitch</code> <em>Object</em> Contains twitch login configuration properties.<ul>
+<li><code>enabled</code> <em>Boolean</em> Whether to enable Twitch authentication.</li>
+<li><code>clientID</code> <em>String</em> A Twitch application ClientID <a href="http://twitch.tv/kraken/oauth2/clients/new">http://twitch.tv/kraken/oauth2/clients/new</a></li>
+<li><code>clientSecret</code> <em>String</em> A Twitch application ClientSecret <a href="http://twitch.tv/kraken/oauth2/clients/new">http://twitch.tv/kraken/oauth2/clients/new</a></li>
+<li><em>Note:</em> Configure your Twitch OAuth credentials with a Redirect URI to <code>{baseURL}/login/auth/twitch</code></li>
+<li><code>scope</code> <em>String</em> A space-separated string of Twitch application <a href="https://dev.twitch.tv/docs/v5/guides/authentication/#scopes">permissions</a>.</li>
+<li><code>allowedUsernames</code> <em>Array of strings</em> Which Twitch usernames to allow.</li>
+</ul>
+</li>
+</ul>
+</li>
 <li><code>ssl</code> <em>Object</em> Contains HTTPS/SSL configuration properties.<ul>
 <li><code>enabled</code> <em>Boolean</em> Whether to enable SSL/HTTPS encryption.</li>
 <li><code>allowHTTP</code> <em>Boolean</em> Whether to allow insecure HTTP connections while SSL is active.</li>
@@ -89,23 +95,22 @@
 <li><code>certificatePath</code> <em>String</em> The path to an SSL certificate file.</li>
 </ul>
 </li>
-<li><code>developer</code> <em>Boolean</em> Whether to enable features that speed up development. Not suitable for production.</li>
-<li><code>rollbar</code> <em>Object</em> Contains <a href="https://rollbar.com/">Rollbar</a> configuration properties.<ul>
-<li><code>enabled</code> <em>Boolean</em> Whether to enable Rollbar error tracking.</li>
-<li><code>environment</code> <em>String</em> An arbitrary name you choose for this environment. Something like <code>production</code>, <code>development</code>, <code>staging</code>, etc.</li>
-<li><code>postServerItem</code> <em>String</em> Your Rollbar project's POST_SERVER_ITEM_ACCESS_TOKEN</li>
-<li><code>postClientItem</code> <em>String</em> Your Rollbar project's POST_CLIENT_ITEM_ACCESS_TOKEN</li>
-</ul>
-</li>
-<li><code>bundles</code> <em>Object</em> Contains configuration for bundles.<ul>
-<li><code>enabled</code> <em>Array of strings</em> A whitelist array of bundle names that will be the only ones loaded at startup. Cannot be used with <code>bundles.disabled</code>.</li>
-<li><code>disabled</code> <em>Array of strings</em> A blacklist array of bundle names that will not be loaded at startup. Cannot be used with <code>bundles.enabled</code>.</li>
+<li><code>sentry</code> <em>Object</em> Contains <a href="https://sentry.io/support-class/">Sentry</a> configuration properties.<ul>
+<li><code>enabled</code> <em>Boolean</em> Whether to enable Sentry error reporting.</li>
+<li><code>dsn</code> <em>String</em> Your private DSN, for server-side error reporting.</li>
+<li><code>publicDsn</code> <em>String</em> Your public sentry DSN, for browser error reporting.</li>
 </ul>
 </li>
 </ul>
 <h3>Example Config</h3><pre class="prettyprint source lang-json"><code>{
     &quot;host&quot;: &quot;0.0.0.0&quot;,
     &quot;port&quot;: 9090,
+    &quot;developer&quot;: false,
+    &quot;bundles&quot;: {
+        &quot;enabled&quot;: [
+            &quot;bundle-name&quot;
+        ]
+    },
     &quot;login&quot;: {
         &quot;enabled&quot;: true,
         &quot;sessionSecret&quot;: &quot;supersecret&quot;,
@@ -144,17 +149,10 @@
         &quot;keyPath&quot;: &quot;&quot;,
         &quot;certificatePath&quot;: &quot;&quot;
     },
-    &quot;developer&quot;: false,
-    &quot;rollbar&quot;: {
+    &quot;sentry&quot;: {
         &quot;enabled&quot;: true,
-        &quot;environment&quot;: &quot;production&quot;,
-        &quot;postServerItem&quot;: &quot;YOUR_POST_SERVER_ITEM_ACCESS_TOKEN&quot;,
-        &quot;postClientItem&quot;: &quot;YOUR_POST_CLIENT_ITEM_ACCESS_TOKEN&quot;
-    },
-    &quot;bundles&quot;: {
-        &quot;disabled&quot;: [
-            &quot;bundle-name&quot;
-        ]
+        &quot;dsn&quot;: &quot;https://xxx:yyy@sentry.io/zzz&quot;,
+        &quot;publicDsn&quot;: &quot;https://xxx@sentry.io/zzz&quot;
     }
 }</code></pre>
 </article>
@@ -166,7 +164,7 @@
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Tue Aug 29 2017 09:49:53 GMT-0500 (Central Daylight Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Tue Aug 29 2017 09:59:34 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
