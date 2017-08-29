@@ -3,11 +3,11 @@ Extensions can make their own express apps, and mount them via {@link NodeCG#mou
 
 ```javascript
 // bundles/my-bundle/extension.js
-var express = require('express');
-var app = express();
+const express = require('express');
+const app = express();
 
-module.exports = function(nodecg) {
-    app.get('/my-bundle/customroute', function(req, res) {
+module.exports = function (nodecg) {
+    app.get('/my-bundle/customroute', (req, res) => {
         res.send('OK!');
     });
 
