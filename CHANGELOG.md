@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.3"></a>
+## [0.9.3](https://github.com/nodecg/nodecg/compare/v0.9.2...v0.9.3) (2017-08-29)
+
+
+### Bug Fixes
+
+* **config:** properly load baseURL param ([8c3d76b](https://github.com/nodecg/nodecg/commit/8c3d76b))
+
+
+
 <a name="0.9.2"></a>
 ## [0.9.2](https://github.com/nodecg/nodecg/compare/v0.9.1...v0.9.2) (2017-08-28)
 
