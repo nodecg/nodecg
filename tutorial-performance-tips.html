@@ -40,31 +40,39 @@
 </header>
 
 <article>
-    <h3>Be careful which CSS properties you animate</h3><p>Many CSS properties trigger <code>layout</code> events when changed. That means that changing one property can sometimes cause
+    <h3 id="be-careful-which-css-properties-you-animate">Be careful which CSS properties you animate</h3>
+<p>Many CSS properties trigger <code>layout</code> events when changed. That means that changing one property can sometimes cause
 the entire page to be re-rendered, which imposes a significant performance hit. <a href="http://csstriggers.com/">CSS Triggers</a> is a website
 that lets you quickly check which CSS properties are expensive to animate. (Spoilers: <code>transform</code> and <code>opacity</code> are just about the only
 CSS properties that can be freely maniuplated with little overhead).</p>
-<h3>Minimize active <code>&lt;video&gt;</code> tags</h3><p>For animations that are always the same, pre-rendering them as webm video (which supports alpha transparency)
+<h3 id="minimize-active-video-tags">Minimize active <code>&lt;video&gt;</code> tags</h3>
+<p>For animations that are always the same, pre-rendering them as webm video (which supports alpha transparency)
 is an option. However, care must be taken to remove these <code>&lt;video&gt;</code> nodes from the DOM when they are not in use.
 Even if a <code>&lt;video&gt;</code> tag is not currently playing, simply having it in the DOM can impact performance.</p>
-<h3>Use sprite sheets when appropriate</h3><p>For short pre-rendered animations, a sprite sheet might be the best solution.
+<h3 id="use-sprite-sheets-when-appropriate">Use sprite sheets when appropriate</h3>
+<p>For short pre-rendered animations, a sprite sheet might be the best solution.
 If done right, they can be smaller in size and perform better than their <code>&lt;video&gt;</code> counterpart.
 There are many libraries and tools out there for sprite sheet creation, but
 <a href="http://www.createjs.com/#!/EaselJS">EaselJS</a> (javascript Canvas2D library) and
 <a href="https://www.codeandweb.com/texturepacker">TexturePacker</a> (sprite sheet creation program) are a good place to start.</p>
-<h3>A <code>&lt;div&gt;</code> is (generally) faster than a picture or video</h3><p>Videos and sprite sheets can be nice shortcuts to speed up production time, but if your graphic is
+<h3 id="a-div-is-generally-faster-than-a-picture-or-video">A <code>&lt;div&gt;</code> is (generally) faster than a picture or video</h3>
+<p>Videos and sprite sheets can be nice shortcuts to speed up production time, but if your graphic is
 struggling to maintain a solid framerate then you may need to consider breaking it down into smaller parts.
 A handful of <code>&lt;div&gt;</code>s will generally perform better than a video or sprite sheet, as long as you aren't
 applying too many performance-intensive CSS styles. Use <a href="http://csstriggers.com/">CSS Triggers</a> as a reference to 
 know how expensive it is to animate various CSS properties.</p>
-<h3>Minimize alpha pixels</h3><p>Alpha (transparency) is expensive to render. Try to keep your images and videos with alpha cropped as much as possible.</p>
-<h3>Avoid multiple CSS masks</h3><p><a href="http://www.html5rocks.com/en/tutorials/masking/adobe/">CSS masks</a> have their uses, but layering
+<h3 id="minimize-alpha-pixels">Minimize alpha pixels</h3>
+<p>Alpha (transparency) is expensive to render. Try to keep your images and videos with alpha cropped as much as possible.</p>
+<h3 id="avoid-multiple-css-masks">Avoid multiple CSS masks</h3>
+<p><a href="http://www.html5rocks.com/en/tutorials/masking/adobe/">CSS masks</a> have their uses, but layering
 multiple masks in a scene can lead to significant performance reductions.
 When possible, use a culling <code>div</code> with <code>overflow: hidden</code> instead.</p>
-<h3>Compress your images</h3><p>Compressed images won't help framerate, but they will improve load times.
+<h3 id="compress-your-images">Compress your images</h3>
+<p>Compressed images won't help framerate, but they will improve load times.
 Compressing your PNGs with a service such as <a href="https://tinypng.com/">TinyPNG</a> can result in dramatically
 reduced filesizes. Be careful when compressing images with subtle gradients, as some detail may be lost.</p>
-<h3>Keep <code>&lt;canvas&gt;</code> tags above 256x257 total pixels</h3><p>In Chrome, <code>&lt;canvas&gt;</code> tags are only hardware accelerated when their total size is at least 256x257 pixels.
+<h3 id="keep-canvas-tags-above-256x257-total-pixels">Keep <code>&lt;canvas&gt;</code> tags above 256x257 total pixels</h3>
+<p>In Chrome, <code>&lt;canvas&gt;</code> tags are only hardware accelerated when their total size is at least 256x257 pixels.
 Below this size, canvases are software rasterized and can severely reduce the framerate and performance of a graphic.</p>
 <p>Sources:
 <a href="https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/NPSQdiXSK4w">1</a> 
@@ -78,7 +86,7 @@ Below this size, canvases are software rasterized and can severely reduce the fr
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Tue Aug 29 2017 10:20:11 GMT-0500 (Central Daylight Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Tue Aug 29 2017 10:30:18 GMT-0500 (Central Daylight Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
