@@ -1,10 +1,11 @@
-Any npm dependencies defined in your bundle's `package.json` will be automatically installed by NodeCG on startup.
-Extensions can then access these dependencies directly, via normal `require` statements:
+> ❗ As of NodeCG v0.9, per-bundle `bower` and `npm` dependencies are no longer automatically installed. It is up to the user to run whatever installation commands are necessary in each bundle.
+
+Install `npm` dependencies as you would in any other Node.js project. Extensions can then access these dependencies directly, via normal `require` statements:
 
 `bundles/my-bundle/package.json`
 ```json
 {
-    "name": "my-bundle"
+    "name": "my-bundle",
     ...
     "dependencies": {
         "some-dep": "^1.0.0"
@@ -14,9 +15,9 @@ Extensions can then access these dependencies directly, via normal `require` sta
 
 `bundles/my-bundle/extension.js`
 ```js
-var someDep = require('some-dep');
+const someDep = require('some-dep');
 
-module.exports = function(nodecg) {
+module.exports = function (nodecg) {
     // I can use someDep whenever I want!
 }
 ```
