@@ -3,50 +3,57 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
 ### Schema
 - `host` _String_ The IP address or hostname that NodeCG should bind to.
 - `port` _Integer_ The port that NodeCG should listen on.
-- `baseURL` _String_ The URL NodeCG will be accessed via in advanced server setups. Defaults to `host:port`.
-- `login` _Object_ Contains other configuration properties.
-    - `enabled` _Boolean_ Whether to enable login security.
-    - `sessionSecret` _String_ The secret used to salt sessions.
-    - `steam` _Object_ Contains steam login configuration properties.
-        - `enabled` _Boolean_ Whether to enable Steam authentication.
-        - `apiKey` _String_ A Steam API Key. Obtained from [http://steamcommunity.com/dev/apikey](http://steamcommunity.com/dev/apikey)
-        - `allowedIds` _Array of strings_ Which 64 bit Steam IDs to allow. Can be obtained from [https://steamid.io/](https://steamid.io/)
-    - `twitch` _Object_ Contains twitch login configuration properties.
-        - `enabled` _Boolean_ Whether to enable Twitch authentication.
-        - `clientID` _String_ A Twitch application ClientID [http://twitch.tv/kraken/oauth2/clients/new](http://twitch.tv/kraken/oauth2/clients/new)
-        - `clientSecret` _String_ A Twitch application ClientSecret [http://twitch.tv/kraken/oauth2/clients/new](http://twitch.tv/kraken/oauth2/clients/new)
-          - _Note:_ Configure your Twitch OAuth credentials with a Redirect URI to `{baseURL}/login/auth/twitch`
-        - `scope` _String_ A space-separated string of Twitch application [permissions](https://dev.twitch.tv/docs/v5/guides/authentication/#scopes).
-        - `allowedUsernames` _Array of strings_ Which Twitch usernames to allow.
+- `baseURL` _String_ The URL of this instance. Used for things like cookies. Defaults to HOST:PORT. If you use a reverse proxy, you\'ll likely need to set this value.
+- `developer` _Boolean_ Whether to enable features that speed up development. Not suitable for production.
+- `exitOnUncaught` _Boolean_ Whether or not to exit on uncaught exceptions.
 - `logging` _Object_ Contains other configuration properties.
-    - `replicants` _Boolean_ Whether to enable logging of the Replicants subsystem. Very spammy.
-    - `console` _Object_ Contains properties for console logging.
-        - `enabled` _Boolean_ Whether to enable console logging.
-        - `level` _String_ Lowest importance of messages which should be logged. Must be `"trace"`, `"debug"`, `"info"`, `"warn"` or `"error"`
-    - `file` _Object_ Contains properties for file logging.
-        - `enabled` _Boolean_ Whether to enable file logging.
-        - `path` _String_ The filepath to log to.
-        - `level` _String_ Lowest importance of messages which should be logged. Must be `"trace"`, `"debug"`, `"info"`, `"warn"` or `"error"`
+  - `replicants` _Boolean_ Whether to enable logging of the Replicants subsystem. Very spammy.
+  - `console` _Object_ Contains properties for console logging.
+    - `enabled` _Boolean_ Whether to enable console logging.
+    - `level` _String_ Lowest importance of messages which should be logged. Must be `"trace"`, `"debug"`, `"info"`, `"warn"` or `"error"`
+  - `file` _Object_ Contains properties for file logging.
+    - `enabled` _Boolean_ Whether to enable file logging.
+    - `path` _String_ The filepath to log to.
+    - `level` _String_ Lowest importance of messages which should be logged. Must be `"trace"`, `"debug"`, `"info"`, `"warn"` or `"error"`
+- `bundles` _Object_ Contains configuration for bundles.
+  - `enabled` _Array of strings_ A whitelist array of bundle names that will be the only ones loaded at startup. Cannot be used with `bundles.disabled`.
+  - `disabled` _Array of strings_ A blacklist array of bundle names that will not be loaded at startup. Cannot be used with `bundles.enabled`.
+- `login` _Object_ Contains other configuration properties.
+  - `enabled` _Boolean_ Whether to enable login security.
+  - `sessionSecret` _String_ The secret used to salt sessions.
+  - `forceHttpsReturn` _Boolean_ orces Steam & Twitch login return URLs to use HTTPS instead of HTTP. Useful in reverse proxy setups.
+  - `steam` _Object_ Contains steam login configuration properties.
+    - `enabled` _Boolean_ Whether to enable Steam authentication.
+    - `apiKey` _String_ A Steam API Key. Obtained from [http://steamcommunity.com/dev/apikey](http://steamcommunity.com/dev/apikey)
+    - `allowedIds` _Array of strings_ Which 64 bit Steam IDs to allow. Can be obtained from [https://steamid.io/](https://steamid.io/)
+  - `twitch` _Object_ Contains twitch login configuration properties.
+    - `enabled` _Boolean_ Whether to enable Twitch authentication.
+    - `clientID` _String_ A Twitch application ClientID [http://twitch.tv/kraken/oauth2/clients/new](http://twitch.tv/kraken/oauth2/clients/new)
+    - `clientSecret` _String_ A Twitch application ClientSecret [http://twitch.tv/kraken/oauth2/clients/new](http://twitch.tv/kraken/oauth2/clients/new)
+    - _Note:_ Configure your Twitch OAuth credentials with a Redirect URI to `{baseURL}/login/auth/twitch`
+    - `scope` _String_ A space-separated string of Twitch application [permissions](https://dev.twitch.tv/docs/v5/guides/authentication/#scopes).
+    - `allowedUsernames` _Array of strings_ Which Twitch usernames to allow.
 - `ssl` _Object_ Contains HTTPS/SSL configuration properties.
     - `enabled` _Boolean_ Whether to enable SSL/HTTPS encryption.
     - `allowHTTP` _Boolean_ Whether to allow insecure HTTP connections while SSL is active.
     - `keyPath` _String_ The path to an SSL key file.
     - `certificatePath` _String_ The path to an SSL certificate file.
-- `developer` _Boolean_ Whether to enable features that speed up development. Not suitable for production.
-- `rollbar` _Object_ Contains [Rollbar](https://rollbar.com/) configuration properties.
-	- `enabled` _Boolean_ Whether to enable Rollbar error tracking.
-	- `environment` _String_ An arbitrary name you choose for this environment. Something like `production`, `development`, `staging`, etc.
-	- `postServerItem` _String_ Your Rollbar project's POST_SERVER_ITEM_ACCESS_TOKEN
-	- `postClientItem` _String_ Your Rollbar project's POST_CLIENT_ITEM_ACCESS_TOKEN
-- `bundles` _Object_ Contains configuration for bundles.
-	- `enabled` _Array of strings_ A whitelist array of bundle names that will be the only ones loaded at startup. Cannot be used with `bundles.disabled`.
-	- `disabled` _Array of strings_ A blacklist array of bundle names that will not be loaded at startup. Cannot be used with `bundles.enabled`.
+- `sentry` _Object_ Contains [Sentry](https://sentry.io/support-class/) configuration properties.
+	- `enabled` _Boolean_ Whether to enable Sentry error reporting.
+	- `dsn` _String_ Your private DSN, for server-side error reporting.
+	- `publicDsn` _String_ Your public sentry DSN, for browser error reporting.
 
 ### Example Config
 ```json
 {
     "host": "0.0.0.0",
     "port": 9090,
+    "developer": false,
+    "bundles": {
+        "enabled": [
+            "bundle-name"
+        ]
+    },
     "login": {
         "enabled": true,
         "sessionSecret": "supersecret",
@@ -85,17 +92,10 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
         "keyPath": "",
         "certificatePath": ""
     },
-    "developer": false,
-    "rollbar": {
+    "sentry": {
         "enabled": true,
-        "environment": "production",
-        "postServerItem": "YOUR_POST_SERVER_ITEM_ACCESS_TOKEN",
-        "postClientItem": "YOUR_POST_CLIENT_ITEM_ACCESS_TOKEN"
-    },
-    "bundles": {
-        "disabled": [
-            "bundle-name"
-        ]
+        "dsn": "https://xxx:yyy@sentry.io/zzz",
+        "publicDsn": "https://xxx@sentry.io/zzz"
     }
 }
 ```
