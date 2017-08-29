@@ -8,7 +8,6 @@ Then, add the following to your instance's `cfg/nodecg.json`:
 {
   "sentry": {
     "enabled": true,
-    "environment": "production",
     "dsn": "your project's DSN, used to report server-side errors",
     "publicDsn": "your project's public DSN, used to report client-side errors"
   }
