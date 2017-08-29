@@ -15,3 +15,5 @@ Then, add the following to your instance's `cfg/nodecg.json`:
 ```
 
 Once Sentry is configured, any uncaught exceptions or unhandled promise rejections either on the server or on the client will be reported automatically.
+
+In addition, any use of `nodecg.log.error` will also be reported to Sentry.
