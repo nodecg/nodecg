@@ -74,3 +74,9 @@ test('validation - when the schema file isn\'t valid JSON, throw an error', t =>
 	const error = t.throws(fn);
 	t.true(error.message.includes('configschema.json for bundle '));
 });
+
+test('validation - should not reject a config if it doesn\'t an optional object that has some properties with defaults and other required properties that do not have defaults', t => {
+	const parsedBundle = parseBundle('./test/fixtures/bundle-parser/optional-object-with-required-props-and-defaults',
+		'./test/fixtures/bundle-parser/optional-object-with-required-props-and-defaults/bundleConfig.json');
+	t.deepEqual(parsedBundle.config, {});
+});
