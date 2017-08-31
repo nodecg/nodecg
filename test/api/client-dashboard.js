@@ -7,7 +7,7 @@ const test = require('ava');
 require('../helpers/nodecg-and-webdriver')(test, ['dashboard']); // Must be first.
 const e = require('../helpers/test-environment');
 
-test('should ensure that duplicate bundleName-messageName pairs are ignored', t => {
+test.serial('should ensure that duplicate bundleName-messageName pairs are ignored', t => {
 	const error = t.throws(() => {
 		const cb = function () {};
 		e.apis.extension.listenFor('testMessageName', 'testBundleName', cb);
@@ -18,7 +18,7 @@ test('should ensure that duplicate bundleName-messageName pairs are ignored', t 
 		'test-bundle attempted to declare a duplicate "listenFor" handler: testBundleName:testMessageName');
 });
 
-test('should produce an error if a callback isn\'t given', t => {
+test.serial('should produce an error if a callback isn\'t given', t => {
 	const error = t.throws(() => {
 		e.apis.extension.listenFor('testMessageName', 'test');
 	}, Error);
@@ -27,7 +27,7 @@ test('should produce an error if a callback isn\'t given', t => {
 });
 
 // Check for basic connectivity. The rest of the tests are run from the dashboard as well.
-test('should receive messages', async t => {
+test.serial('should receive messages', async t => {
 	await e.browser.client.execute(() => {
 		window.serverToDashboardReceived = false;
 		window.dashboardApi.listenFor('serverToDashboard', () => {
@@ -52,7 +52,7 @@ test('should receive messages', async t => {
 	t.pass();
 });
 
-test.cb('should send messages', t => {
+test.cb.serial('should send messages', t => {
 	e.apis.extension.listenFor('dashboardToServer', t.end);
 	e.browser.client.execute(() => window.dashboardApi.sendMessage('dashboardToServer'));
 });

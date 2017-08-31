@@ -9,7 +9,7 @@ const e = require('../helpers/test-environment');
 
 // The graphic and dashboard APIs use the same file
 // If dashboard API passes all its tests, we just need to make sure that the socket works
-test('should receive messages', async t => {
+test.serial('should receive messages', async t => {
 	await e.browser.client.execute(() => {
 		window.serverToGraphicReceived = false;
 		window.graphicApi.listenFor('serverToGraphic', () => {
@@ -34,7 +34,7 @@ test('should receive messages', async t => {
 	t.pass();
 });
 
-test.cb('should send messages', t => {
+test.cb.serial('should send messages', t => {
 	e.apis.extension.listenFor('graphicToServer', t.end);
 	e.browser.client.execute(() => window.graphicApi.sendMessage('graphicToServer'));
 });

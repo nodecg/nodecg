@@ -7,7 +7,7 @@ const test = require('ava');
 require('../helpers/nodecg-and-webdriver')(test, ['dashboard']); // Must be first.
 const e = require('../helpers/test-environment');
 
-test('should receive messages and fire acknowledgements', async t => {
+test.serial('should receive messages and fire acknowledgements', async t => {
 	e.apis.extension.listenFor('clientToServer', (data, cb) => cb());
 	await e.browser.client.executeAsync(done => {
 		return window.dashboardApi.sendMessage('clientToServer', null, done);
@@ -15,7 +15,7 @@ test('should receive messages and fire acknowledgements', async t => {
 	t.pass();
 });
 
-test('should serialize errors sent to acknowledgements', async t => {
+test.serial('should serialize errors sent to acknowledgements', async t => {
 	e.apis.extension.listenFor('ackErrors', (data, cb) => cb(new Error('boom')));
 	const res = await e.browser.client.executeAsync(done => {
 		window.dashboardApi.sendMessage('ackErrors', null, err => {
@@ -25,7 +25,7 @@ test('should serialize errors sent to acknowledgements', async t => {
 	t.is(res.value, 'boom');
 });
 
-test('should resolve acknowledgement promises', async t => {
+test.serial('should resolve acknowledgement promises', async t => {
 	e.apis.extension.listenFor('ackPromiseResolve', (data, cb) => cb());
 	const res = await e.browser.client.executeAsync(done => {
 		window.dashboardApi.sendMessage('ackPromiseResolve').then(() => {
@@ -35,7 +35,7 @@ test('should resolve acknowledgement promises', async t => {
 	t.is(res.value, null);
 });
 
-test('should reject acknowledgement promises if there was an error', async t => {
+test.serial('should reject acknowledgement promises if there was an error', async t => {
 	e.apis.extension.listenFor('ackPromiseReject', (data, cb) => cb(new Error('boom')));
 	const res = await e.browser.client.executeAsync(done => {
 		window.dashboardApi.sendMessage('ackPromiseReject').then(() => {
@@ -47,7 +47,7 @@ test('should reject acknowledgement promises if there was an error', async t => 
 	t.is(res.value, 'boom');
 });
 
-test('should not return a promise if the user provided a callback ', async t => {
+test.serial('should not return a promise if the user provided a callback ', async t => {
 	e.apis.extension.listenFor('ackPromiseCallback', (data, cb) => cb());
 	const res = await e.browser.client.executeAsync(done => {
 		const returnVal = window.dashboardApi.sendMessage('ackPromiseCallback', () => {
