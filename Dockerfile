@@ -12,7 +12,7 @@ RUN groupadd -r -g ${gid} ${group}  &&\
     mkdir /home/${user} && chown -R ${user}:${group} /home/${user}
 
 # Install bower cli
-RUN yarn global add bower
+RUN npm install -g bower
 
 # Set workdir
 WORKDIR /opt/nodecg/
@@ -31,7 +31,7 @@ USER ${user}
 RUN mkdir cfg && mkdir bundles && mkdir logs && mkdir db
 
 # Install dependencies
-RUN yarn install --prod
+RUN npm install --production
 RUN bower install
 
 # Expose volumes
