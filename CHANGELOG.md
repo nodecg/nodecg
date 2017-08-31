@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.4"></a>
+## [0.9.4](https://github.com/nodecg/nodecg/compare/v0.9.3...v0.9.4) (2017-08-31)
+
+
+### Bug Fixes
+
+* **config:** reduce the number of cases where a bundle's config is rejected when it shouldn't be ([e62de24](https://github.com/nodecg/nodecg/commit/e62de24))
+* **replicants:** improve parsing of schema $refs ([6364396](https://github.com/nodecg/nodecg/commit/6364396))
+
+
+
 <a name="0.9.3"></a>
 ## [0.9.3](https://github.com/nodecg/nodecg/compare/v0.9.2...v0.9.3) (2017-08-29)
 
