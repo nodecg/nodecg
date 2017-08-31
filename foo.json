@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "string": {
+      "type": "string",
+      "default": ""
+    },
+    "object": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "numA": {
+          "type": "number",
+          "default": 0
+        },
+        "hasDeepRef": {
+          "type": "object",
+          "properties": {
+            "numA": {
+              "type": "number",
+              "default": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}

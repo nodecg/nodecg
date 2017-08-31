@@ -164,3 +164,38 @@ test('should properly load schemas provided with an absolute path', t => {
 		}
 	});
 });
+
+test('supports local file $refs', t => {
+	const rep = e.apis.extension.Replicant('schemaWithRef');
+	const fs = require('fs');
+	fs.writeFileSync('foo.json', JSON.stringify(rep.schema, null, 2));
+	t.deepEqual(rep.schema, {
+		$schema: 'http://json-schema.org/draft-04/schema#',
+		type: 'object',
+		properties: {
+			string: {
+				type: 'string',
+				default: ''
+			},
+			object: {
+				type: 'object',
+				additionalProperties: false,
+				properties: {
+					numA: {
+						type: 'number',
+						default: 0
+					},
+					hasDeepRef: {
+						type: 'object',
+						properties: {
+							numA: {
+								type: 'number',
+								default: 0
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+});
