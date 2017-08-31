@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="https://raw.githubusercontent.com/nodecg/nodecg/master/src/favicon.ico">
-    <title>Replicant Validation - Documentation</title>
+    <title>Global - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -30,69 +30,419 @@
 
 <div id="main">
     
-    <h1 class="page-title">Replicant Validation</h1>
+    <h1 class="page-title">Global</h1>
     
 
-    <section>
+    
+
+
+
+
+<section>
 
 <header>
+    
+        <h2>
+        
+        </h2>
+        
     
 </header>
 
 <article>
-    <p>As of 0.8.4, bundle authors may define an optional schema for the <a href="NodeCG.html#Replicant"><code>Replicants</code></a> in their bundle.
-If present, NodeCG will validate every change made to the Replicant against this schema. 
-If any change fails validation, either on the server or on the client, an error will be synchronously thrown.</p>
-<p>All schemas are in the <a href="http://json-schema.org/">JSON Schema</a> format. To add a schema to a Replicant, 
-create a <code>.json</code> file with the same name as your Replicant in your bundle's <code>schemas</code> folder. For example, 
-if <code>my-bundle</code> has a Replicant called <code>foo</code>, the schema would be located at <code>nodecg/bundles/my-bundle/schemas/foo.json</code>. 
-NodeCG will automatically see and load this schema on startup. Changes to the schema require restarting NodeCG.</p>
-<p>If a Replicant's schema has defaults defined, NodeCG will use those defaults to automatically build a <code>defaultValue</code>
-for the Replicant. This auto-generated <code>defaultValue</code> is overridden by any <code>defaultValue</code> that is provided during Replicant
-declaration.</p>
-<p>If for any reason a Replicant's persisted value becomes invalid, NodeCG will discard this value on startup.</p>
-<h2 id="example">Example</h2>
-<p><code>nodecg/bundles/my-bundle/schemas/foo.json</code></p>
-<pre class="prettyprint source"><code>{
-    &quot;$schema&quot;: &quot;http://json-schema.org/draft-04/schema#&quot;,
-    &quot;type&quot;: &quot;object&quot;,
-    &quot;additionalProperties&quot;: false,
-    &quot;properties&quot;: {
-        &quot;bar&quot;: {
-            &quot;type&quot;: &quot;string&quot;,
-            &quot;description&quot;: &quot;The value of bar, which is a String.&quot;,
-            &quot;default&quot;: &quot;hello world&quot;
-        },
-        &quot;baz&quot;: {
-            &quot;type&quot;: &quot;number&quot;,
-            &quot;description&quot;: &quot;The value of baz, which is a Number.&quot;,
-            &quot;default&quot;: &quot;0&quot;
-        }
-    },
-    &quot;required&quot;: [&quot;bar&quot;, &quot;baz&quot;]
-}</code></pre><p><code>nodecg/bundles/my-bundle/extension.js</code></p>
-<pre class="prettyprint source"><code>module.exports = function (nodecg) {
-    // We don't need to specify a `defaultValue` here, it will be automatically generated from the defaults
-    // in the schema.
-    const foo = nodecg.Replicant('foo');
+    <div class="container-overview">
+    
+        
 
-    /* You can override this by specifying your own `defaultValue` when declaring the Replicant.
-    const foo = nodecg.Replicant('foo', {
-        defaultValue: {
-            bar: &quot;hi&quot;,
-            baz: 5
-        }
-    }); */
+        
 
-    console.log(foo.value.bar); //=> &quot;hello world&quot;
-    console.log(foo.value.baz); //=> 0
 
-    foo.value.bar = &quot;greetings planet&quot;; // Valid change, no error will be thrown.
-    foo.value.baz = &quot;this should be a number!&quot;; // Invalid change, an error will be thrown.
-};</code></pre>
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="isFileReference"><span class="type-signature"></span>isFileReference<span class="signature">(value)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Determines whether the given value is a JSON Reference that points to a file
+(as opposed to an internal reference, which points to a location within its own file).</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="replicant_schema-hacks.js.html">replicant/schema-hacks.js</a>, <a href="replicant_schema-hacks.js.html#line59">line 59</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>*</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>The value to inspect</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>boolean</code></span>
+
+
+    </dd>
+</dl>
+
+
+    
+</div>
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="resolveFileReference"><span class="type-signature"></span>resolveFileReference<span class="signature">(url, file)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Resolves the given JSON Reference URL against the specified file, and adds a new <code>File</code>
+object to the schema if necessary.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="replicant_schema-hacks.js.html">replicant/schema-hacks.js</a>, <a href="replicant_schema-hacks.js.html#line70">line 70</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>string</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>The JSON Reference URL (may be absolute or relative)</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>file</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>File</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>The file that the JSON Reference is in</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+        
+    
+
+    
+
+    
 </article>
 
 </section>
+
+
+
 
 </div>
 
