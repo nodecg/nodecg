@@ -1,17 +1,8 @@
 {
 	"source": {
 		"include": [
-			"./lib",
+			"./lib/api.js",
 			"./README.md"
-		],
-		"exclude": [
-			"./lib/browser/dist",
-			"./lib/browser/shims",
-			"./lib/browser/replicant",
-			"./lib/replicant/shared",
-			"./lib/replicator",
-			"./lib/bundle-manager",
-			"./lib/logger"
 		]
 	},
 	"tags": {
