@@ -23,22 +23,7 @@ html(lang='en')
 		if privateConfig.sentry && privateConfig.sentry.enabled
 			script(src='/bower_components/raven-js/dist/raven.min.js')
 			script(type='text/javascript').
-				Raven.config('#{privateConfig.sentry.publicDsn}', {
-					release: '#{nodecgVersion}',
-					tags: {
-						nodecgHost: '#{privateConfig.host}',
-						nodecgBaseURL: `#{privateConfig.baseURL}`
-					},
-					extra: {
-						bundles: window.__renderData__.bundles.map(function (bundle) {
-							return {
-								name: bundle.name,
-								git: bundle.git,
-								version: bundle.version
-							};
-						})
-					}
-				}).install();
+				Raven.config('#{privateConfig.sentry.publicDsn}', !{JSON.stringify(ravenConfig)}).install();
 				window.addEventListener('unhandledrejection', function (err) {
 					Raven.captureException(err.reason);
 				});
