@@ -8,6 +8,18 @@ html(lang='en')
 
 		title NodeCG Dashboard
 
+		script(type='text/javascript').
+			// Allow child iframes to reliably find this parent frame
+			window.__nodecg__ = true;
+
+			// Make the global config (and other render-time data) available during runtime.
+			window.ncgConfig = !{JSON.stringify(publicConfig)};
+			window.__renderData__ = {
+				bundles: !{JSON.stringify(bundles)},
+				workspaces: !{JSON.stringify(workspaces)}
+			};
+			Object.freeze(window.__renderData__);
+
 		if privateConfig.sentry && privateConfig.sentry.enabled
 			script(src='/bower_components/raven-js/dist/raven.min.js')
 			script(type='text/javascript').
@@ -16,6 +28,15 @@ html(lang='en')
 					tags: {
 						nodecgHost: '#{privateConfig.host}',
 						nodecgBaseURL: `#{privateConfig.baseURL}`
+					},
+					extra: {
+						bundles: window.__renderData__.bundles.map(function (bundle) {
+							return {
+								name: bundle.name,
+								git: bundle.git,
+								version: bundle.version
+							};
+						})
 					}
 				}).install();
 				window.addEventListener('unhandledrejection', function (err) {
@@ -40,18 +61,6 @@ html(lang='en')
 		script(src='/bower_components/packery/dist/packery.pkgd.min.js')
 		script(src='/bower_components/clipboard/dist/clipboard.min.js')
 		script(src='/bower_components/webcomponentsjs/webcomponents-loader.js')
-
-		script(type='text/javascript').
-			// Allow child iframes to reliably find this parent frame
-			window.__nodecg__ = true;
-
-			// Make the global config (and other render-time data) available during runtime.
-			window.ncgConfig = !{JSON.stringify(publicConfig)};
-			window.__renderData__ = {
-				bundles: !{JSON.stringify(bundles)},
-				workspaces: !{JSON.stringify(workspaces)}
-			};
-			Object.freeze(window.__renderData__);
 
 		link(rel='import', href='../bower_components/shadycss/apply-shim.html')
 
