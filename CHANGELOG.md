@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.5"></a>
+## [0.9.5](https://github.com/nodecg/nodecg/compare/v0.9.4...v0.9.5) (2017-09-07)
+
+
+### Bug Fixes
+
+* **dashboard:** fix Sign Out button being visible when login security is disabled ([aa12c54](https://github.com/nodecg/nodecg/commit/aa12c54))
+
+
+### Features
+
+* **sentry:** include git information about all loaded bundles when reporting errors to sentry ([431274b](https://github.com/nodecg/nodecg/commit/431274b))
+
+
+
 <a name="0.9.4"></a>
 ## [0.9.4](https://github.com/nodecg/nodecg/compare/v0.9.3...v0.9.4) (2017-08-31)
 
