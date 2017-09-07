@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.6"></a>
+## [0.9.6](https://github.com/nodecg/nodecg/compare/v0.9.5...v0.9.6) (2017-09-07)
+
+
+### Bug Fixes
+
+* remove debug print ([22e957b](https://github.com/nodecg/nodecg/commit/22e957b))
+* **sentry:** fix git information not being updated during runtime ([1d34d4b](https://github.com/nodecg/nodecg/commit/1d34d4b))
+
+
+
 <a name="0.9.5"></a>
 ## [0.9.5](https://github.com/nodecg/nodecg/compare/v0.9.4...v0.9.5) (2017-09-07)
 
