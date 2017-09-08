@@ -76,6 +76,13 @@ test.cb('should react to changes in nested properties of objects', t => {
 	rep.value.a.b.c = 'nestedChangeOK';
 });
 
+test('memoization', t => {
+	t.is(
+		e.apis.extension.Replicant('memoizationTest'),
+		e.apis.extension.Replicant('memoizationTest')
+	);
+});
+
 test.cb('should only apply array splices from the client once', t => {
 	t.plan(1);
 
@@ -87,7 +94,6 @@ test.cb('should only apply array splices from the client once', t => {
 	e.browser.client
 		.executeAsync(done => {
 			window.clientDoubleApplyTest = window.dashboardApi.Replicant('clientDoubleApplyTest');
-
 			window.clientDoubleApplyTest.on('declared', () => {
 				window.clientDoubleApplyTest.on('change', () => done());
 			});
@@ -161,6 +167,21 @@ test.cb('arrays - should react to changes', t => {
 	});
 
 	rep.value.push('arrPushOK');
+});
+
+test('objects - throw an error when an object is owned by multiple Replicants', t => {
+	const rep1 = e.apis.extension.Replicant('multiOwner1');
+	const rep2 = e.apis.extension.Replicant('multiOwner2');
+	const bar = {bar: 'bar'};
+	rep1.value = {};
+	rep2.value = {};
+	rep1.value.foo = bar;
+
+	const error = t.throws(() => {
+		rep2.value.foo = bar;
+	});
+
+	t.true(error.message.startsWith('This object belongs to another Replicant'));
 });
 
 test.serial('persistent - should load persisted values when they exist', t => {
