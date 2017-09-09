@@ -355,9 +355,7 @@
 					panel="[[dialog.name]]"
 					width="[[dialog.width]]"
 					with-backdrop>
-					<template is="dom-if" if="[[dialog.title]]">
-						<h2>[[dialog.title]]</h2>
-					</template>
+					<h2 hidden="[[_falsey(dialog.title)]]">[[dialog.title]]</h2>
 
 					<paper-dialog-scrollable>
 						<iframe
@@ -368,17 +366,15 @@
 						</iframe>
 					</paper-dialog-scrollable>
 
-					<template is="dom-if" if="[[dialog.dialogButtons]]">
-						<div class="buttons">
-							<template is="dom-repeat" items="[[dialog.dialogButtons]]" as="button">
-								<paper-button
-									dialog-confirm$="[[_equal(button.type, 'confirm')]]"
-									dialog-dismiss$="[[_equal(button.type, 'dismiss')]]">
-									[[button.name]]
-								</paper-button>
-							</template>
-						</div>
-					</template>
+					<div class="buttons" hidden="[[_falsey(dialog.dialogButtons)]]">
+						<template is="dom-repeat" items="[[dialog.dialogButtons]]" as="button">
+							<paper-button
+								dialog-confirm$="[[_equal(button.type, 'confirm')]]"
+								dialog-dismiss$="[[_equal(button.type, 'dismiss')]]">
+								[[button.name]]
+							</paper-button>
+						</template>
+					</div>
 				</ncg-dialog>
 			</template>
 		</div>

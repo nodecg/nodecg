@@ -224,6 +224,10 @@
 			});
 			return dialogs;
 		}
+
+		_falsey(value) {
+			return !value;
+		}
 	}
 
 	function getImageDataURI(url, cb) {
