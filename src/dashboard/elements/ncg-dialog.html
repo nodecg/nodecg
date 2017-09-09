@@ -71,6 +71,10 @@ Lange - 1/28/2016
 			:host > ::slotted(*:last-child) {
 				margin-bottom: 0;
 			}
+
+			:host > ::slotted(*:not(:first-child)) {
+				margin-top: 0;
+			}
 		</style>
 
 		<slot id="slot"></slot>
