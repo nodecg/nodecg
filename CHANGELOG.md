@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.7"></a>
+## [0.9.7](https://github.com/nodecg/nodecg/compare/v0.9.6...v0.9.7) (2017-09-12)
+
+
+### Bug Fixes
+
+* **api:** detect and throw when an object is assigned to multiple Replicants ([2fbaee3](https://github.com/nodecg/nodecg/commit/2fbaee3))
+* **dashboard:** remove extra margins that could appear in bundle dialogs ([7bb2f9f](https://github.com/nodecg/nodecg/commit/7bb2f9f))
+
+
+
 <a name="0.9.6"></a>
 ## [0.9.6](https://github.com/nodecg/nodecg/compare/v0.9.5...v0.9.6) (2017-09-07)
 
