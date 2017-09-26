@@ -130,7 +130,7 @@
     "remark": "^8.0.0",
     "remark-toc": "^4.0.1",
     "rimraf": "^2.6.1",
-    "sinon": "^3.2.1",
+    "sinon": "^4.0.0",
     "standard-version": "^4.2.0",
     "taffydb": "^2.7.3",
     "vinyl-buffer": "^1.0.0",
