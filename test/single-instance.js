@@ -11,8 +11,7 @@ test.beforeEach(async () => {
 	await e.browser.client.switchTab(e.browser.tabs.singleInstance);
 });
 
-test.cb('single-instance graphics shouldn\'t enter an infinite redirect loop when including a polymer element ' +
-	'that loads an external stylesheet', t => {
+test.cb('single-instance graphics shouldn\'t enter an infinite redirect loop when including a polymer element that loads an external stylesheet', t => {
 	const singleInstance = require('../lib/graphics/single_instance');
 
 	function cb(url) {
