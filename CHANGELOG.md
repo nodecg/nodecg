@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.8"></a>
+## [0.9.8](https://github.com/nodecg/nodecg/compare/v0.9.7...v0.9.8) (2017-10-19)
+
+
+### Bug Fixes
+
+* **bundle-manager:** don't attempt watch *.lock files for changes ([269f3d0](https://github.com/nodecg/nodecg/commit/269f3d0))
+* **package:** update JSDoc ([a1a81c5](https://github.com/nodecg/nodecg/commit/a1a81c5))
+* **package:** update nyc ([13256a8](https://github.com/nodecg/nodecg/commit/13256a8))
+* **replicants:** support schemas with internal $refs ([ee1c394](https://github.com/nodecg/nodecg/commit/ee1c394))
+
+
+
 <a name="0.9.7"></a>
 ## [0.9.7](https://github.com/nodecg/nodecg/compare/v0.9.6...v0.9.7) (2017-09-12)
 
