@@ -1,0 +1,38 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+
+	"definitions": {
+		"numA": {
+			"type": "number",
+			"default": 0
+		},
+		"hasDeepRef": {
+			"type": "object",
+			"properties": {
+				"numA": {
+					"$ref": "#/definitions/numA"
+				}
+			}
+		}
+	},
+
+	"type": "object",
+	"properties": {
+		"string": {
+			"type": "string",
+			"default": ""
+		},
+		"object": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"numA": {
+					"$ref": "#/definitions/numA"
+				},
+				"hasDeepRef": {
+					"$ref": "#/definitions/hasDeepRef"
+				}
+			}
+		}
+	}
+}
