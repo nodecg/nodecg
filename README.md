@@ -21,7 +21,7 @@ can render HTML, including:
 -   [vMix](http://www.vmix.com/)
 -   [XSplit](https://www.xsplit.com/)
 
-> Don't see your preferred streaming software on this list? NodeCG graphics require Chrome 49 or newer. If your streaming software's implementation of browser source uses a build of CEF that is based on at least Chrome 49, chances are that NodeCG graphics will work in it. You can check what version of Chrome your streaming software uses for its browser sources by opening <http://www.whatversion.net/chrome/> as a browser source.
+> Don't see your preferred streaming software on this list? NodeCG graphics require Chrome 49 or newer. If your streaming software's implementation of browser source uses a build of CEF that is based on at least Chrome 49, chances are that NodeCG graphics will work in it. You can check what version of Chrome your streaming software uses for its browser sources by opening [whatversion.net/chrome](http://www.whatversion.net/chrome) as a browser source.
 
 Looking for a list of NodeCG bundles and resources? Check out [awesome-nodecg](https://github.com/nodecg/awesome-nodecg/blob/master/README.md).
 
