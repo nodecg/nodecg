@@ -152,6 +152,8 @@ test('Sentry - should log errors to Sentry when global.sentryEnabled is true', t
 
 test('Sentry - should prettyprint objects', t => {
 	t.context.ravenLogger.error('error message:', {foo: {bar: 'baz'}});
-	t.is(t.context.RavenMock.captureException.firstCall.args[0].message,
-		'[sentryServer] error message: { foo: { bar: \'baz\' } }');
+	t.is(
+		t.context.RavenMock.captureException.firstCall.args[0].message,
+		'[sentryServer] error message: { foo: { bar: \'baz\' } }'
+	);
 });

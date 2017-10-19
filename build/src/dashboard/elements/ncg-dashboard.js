@@ -188,8 +188,11 @@
 
 		_routeChanged() {
 			this._fixTabs();
-			this._fixPathDebounce = Polymer.Debouncer.debounce(this._fixPathDebounce,
-				Polymer.Async.timeOut.after(100), this._fixPath.bind(this));
+			this._fixPathDebounce = Polymer.Debouncer.debounce(
+				this._fixPathDebounce,
+				Polymer.Async.timeOut.after(100),
+				this._fixPath.bind(this)
+			);
 		}
 
 		_fixTabs() {

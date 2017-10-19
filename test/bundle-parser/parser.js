@@ -115,25 +115,45 @@ test('should return the expected data when "nodecg" property does exist', t => {
 });
 
 test('should error when "nodecg.compatibleRange" is not a valid semver range', t => {
-	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/no-compatible-range'),
-		/does not have a valid "nodecg.compatibleRange"/);
+	const error = t.throws(
+		parseBundle.bind(
+			parseBundle,
+			'./test/fixtures/bundle-parser/no-compatible-range'
+		),
+		/does not have a valid "nodecg.compatibleRange"/
+	);
 	t.true(error.message.includes(''));
 });
 
 test('should error when both "extension.js" and a directory named "extension" exist', t => {
-	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/double-extension'),
-		/has both "extension.js" and a folder named "extension"/);
+	const error = t.throws(
+		parseBundle.bind(
+			parseBundle,
+			'./test/fixtures/bundle-parser/double-extension'
+		),
+		/has both "extension.js" and a folder named "extension"/
+	);
 	t.true(error.message.includes(''));
 });
 
 test('should error when "extension" exists and it is not a directory', t => {
-	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/illegal-extension'),
-		/has an illegal file named "extension"/);
+	const error = t.throws(
+		parseBundle.bind(
+			parseBundle,
+			'./test/fixtures/bundle-parser/illegal-extension'
+		),
+		/has an illegal file named "extension"/
+	);
 	t.true(error.message.includes(''));
 });
 
 test('should error when the bundle\'s folder name doesn\'t match its manifest name', t => {
-	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/bad-folder-name'),
-		/Please rename it to "/);
+	const error = t.throws(
+		parseBundle.bind(
+			parseBundle,
+			'./test/fixtures/bundle-parser/bad-folder-name'
+		),
+		/Please rename it to "/
+	);
 	t.true(error.message.includes(''));
 });

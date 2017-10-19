@@ -90,8 +90,11 @@
 
 				// Create a MutationObserver which will watch for changes to the DOM and re-apply masonry
 				this._panelMutationObserver = new MutationObserver(() => {
-					this._handleMutationDebounce = Polymer.Debouncer.debounce(this._handleMutationDebounce,
-						Polymer.Async.timeOut.after(150), this._debouncedMutationHandler.bind(this));
+					this._handleMutationDebounce = Polymer.Debouncer.debounce(
+						this._handleMutationDebounce,
+						Polymer.Async.timeOut.after(150),
+						this._debouncedMutationHandler.bind(this)
+					);
 				});
 
 				// Define what element should be observed by the observer
@@ -202,12 +205,14 @@
 		}
 
 		applyPackery() {
-			this._applyPackeryDebounce = Polymer.Debouncer.debounce(this._applyPackeryDebounce,
+			this._applyPackeryDebounce = Polymer.Debouncer.debounce(
+				this._applyPackeryDebounce,
 				Polymer.Async.timeOut.after(10), () => {
 					if (this._packeryInitialized) {
 						this._packery.layout();
 					}
-				});
+				}
+			);
 		}
 
 		shiftPackery() {
@@ -222,13 +227,15 @@
 			// caused by clicks are caught, because those mutations might
 			// have changed the vertical size of the panel.
 
-			this._shiftPackeryDebounce = Polymer.Debouncer.debounce(this._shiftPackeryDebounce,
+			this._shiftPackeryDebounce = Polymer.Debouncer.debounce(
+				this._shiftPackeryDebounce,
 				Polymer.Async.timeOut.after(100), () => {
 					if (this._packeryInitialized) {
 						// See http://packery.metafizzy.co/methods.html#shiftlayout for more details
 						this._packery.shiftLayout();
 					}
-				});
+				}
+			);
 		}
 
 		_fixPackery() {
@@ -274,8 +281,11 @@
 				// This is a hack to fix packery when the viewport size is changed
 				// when the workspace is not visible.
 				if (route.path === this.parentNode.route) {
-					this._fixPackeryDebounce = Polymer.Debouncer.debounce(this._fixPackeryDebounce,
-						Polymer.Async.timeOut.after(10), this._fixPackery.bind(this));
+					this._fixPackeryDebounce = Polymer.Debouncer.debounce(
+						this._fixPackeryDebounce,
+						Polymer.Async.timeOut.after(10),
+						this._fixPackery.bind(this)
+					);
 				}
 			}
 		}

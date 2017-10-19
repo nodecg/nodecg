@@ -84,8 +84,10 @@ test.cb.serial('watcher - should remove the bundle when the manifest file is ren
 		t.end();
 	});
 
-	fs.renameSync(`${tempFolder}/bundles/rename-manifest/package.json`,
-		`${tempFolder}/bundles/rename-manifest/package.json.renamed`);
+	fs.renameSync(
+		`${tempFolder}/bundles/rename-manifest/package.json`,
+		`${tempFolder}/bundles/rename-manifest/package.json.renamed`
+	);
 });
 
 test.cb.serial('watcher - should emit a removed event when the manifest file is removed', t => {

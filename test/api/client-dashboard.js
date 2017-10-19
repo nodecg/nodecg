@@ -14,8 +14,10 @@ test.serial('should ensure that duplicate bundleName-messageName pairs are ignor
 		e.apis.extension.listenFor('testMessageName', 'testBundleName', cb);
 	}, Error);
 
-	t.is(error.message,
-		'test-bundle attempted to declare a duplicate "listenFor" handler: testBundleName:testMessageName');
+	t.is(
+		error.message,
+		'test-bundle attempted to declare a duplicate "listenFor" handler: testBundleName:testMessageName'
+	);
 });
 
 test.serial('should produce an error if a callback isn\'t given', t => {
