@@ -121,7 +121,7 @@
     "gulp-sourcemaps": "^2.6.1",
     "gulp-util": "^3.0.8",
     "is-windows": "^1.0.1",
-    "jsdoc": "^3.5.4",
+    "jsdoc": "^3.5.5",
     "merge-stream": "^1.0.1",
     "minami": "github:nodecg/minami",
     "mocha": "^3.5.0",
