@@ -76,6 +76,10 @@
         "height": 720,
         "singleInstance": true
       }
-    ]
+    ],
+    "mount": [{
+      "directory": "custom-mount-folder",
+      "endpoint": "custom-mount"
+    }]
   }
 }
