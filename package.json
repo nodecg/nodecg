@@ -124,8 +124,6 @@
     "jsdoc": "^3.5.5",
     "merge-stream": "^1.0.1",
     "minami": "github:nodecg/minami",
-    "mocha": "^4.0.0",
-    "mocha-lcov-reporter": "1.3.0",
     "nyc": "^11.2.1",
     "polymer-build": "^2.0.0",
     "remark": "^8.0.0",
