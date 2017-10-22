@@ -48,7 +48,7 @@ Now, if the first argument to a {@link NodeCG#sendMessage}  acknowledgement is a
 
 In addition, client-side {@link NodeCG#sendMessage}  now also returns a `Promise`, so that you may use `.then`/`.catch` instead of a callback function. See the updated {@link NodeCG#sendMessage} documentation for more information.
 
-Please note that if you do not specify a callback to your `sendMessage`, then it will always return a Promise. Additionally, the first argument send back in your acknowledgement is always assumed to be either an `Error` or `null`. If this value is truthy, then it will be used to `reject` the Promise. For this reason, it is strongly encouraged that all `sendMessage` acknowledgements strictly adhere to the error-first style of callbacks.
+Please note that if you do not specify a callback to your `sendMessage`, then it will always return a Promise. Additionally, the first argument sent back in your acknowledgement is always assumed to be either an `Error` or `null`. If this value is truthy, then it will be used to `reject` the Promise. For this reason, it is strongly encouraged that all `sendMessage` acknowledgements strictly adhere to the error-first style of callbacks.
 
 <h3 id="no-auto-deps">No Auto-Installation of Dependencies</h3>
 
@@ -58,6 +58,6 @@ The main rationale for the removal of this feature is that there's a lot more pa
 
 Going forward, users will always need to manually run whatever dependency installation steps are required by the bundle in question. For most bundles, this still means just running `npm install --production && bower install`, but this will not always be the case. Each bundle will need to add their dependency installation steps to their READMEs, and make sure that users are educated in the fact that pulling down new updates to a bundle means that they may need to also install updated dependencies. 
 
-<h3 id="removed-rollbar-added-sentry">Removed Default Styles</h3>
+<h3 id="removed-rollbar-added-sentry">Removed Rollbar integration, replaced it with Sentry</h3>
 
 In NodeCG v0.8, we introduced a first-class integration with the Rollbar error tracking service. This was very helpful and made NodeCG safer to use in production, but we were unhappy with the level of service and features that Rollbar provided. In NodeCG v0.9, we have removed the Rollbar integration and replaced it with a Sentry integration. See the [Sentry tutorial]{@tutorial sentry} for more info on how to set up Sentry in your NodeCG deployment.
