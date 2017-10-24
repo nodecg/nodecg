@@ -101,7 +101,7 @@
     "babel-plugin-istanbul": "^4.1.5",
     "babel-preset-es2015-nostrict": "^6.6.2",
     "babel-preset-minify": "^0.2.0",
-    "babelify": "^7.3.0",
+    "babelify": "^8.0.0",
     "brfs": "^1.4.3",
     "browserify": "^14.4.0",
     "chai": "^4.1.1",
