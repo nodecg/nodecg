@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="https://raw.githubusercontent.com/nodecg/nodecg/master/src/favicon.ico">
-    <title>Bundle Configuration - Documentation</title>
+    <title>Mount folders as endpoints - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -30,7 +30,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Bundle Configuration</h1>
+    <h1 class="page-title">Mount folders as endpoints</h1>
     
 
     <section>
@@ -40,18 +40,21 @@
 </header>
 
 <article>
-    <p>Bundles can be configured via *.json config files in the <code>cfg</code> directory of NodeCG.</p>
-<h2 id="example">Example</h2>
-<p>Say we have a bundle named <code>test-bundle</code>. If we create<code>./cfg/test-bundle.json</code> with the following contents:</p>
-<pre class="prettyprint source lang-json"><code>{ 
-    &quot;myData&quot;: &quot;hello&quot;
-}</code></pre><p>... that data can be accessed from via <a href="NodeCG.html#bundleConfig"><code>NodeCG#bundleConfig</code></a>:</p>
-<pre class="prettyprint source lang-js"><code>console.log(nodecg.bundleConfig.myData); // prints &quot;hello&quot;</code></pre><h2 id="json-schema">JSON Schema</h2>
-<p>If your bundle has a <code>configschema.json</code> file in its root, NodeCG will validate the config file (if any) for your bundle
-against this JSON Schema, and will throw errors on startup if the config file fails to pass validation. This is often
-the most efficient way to enforce a specific structure for your bundle's config.</p>
-<p>See <a href="http://spacetelescope.github.io/understanding-json-schema/"><em>Understanding JSON Schema</em></a> 
-for more information on what a JSON Schema is and how to use one.</p>
+    <p>As of v0.9.9, NodeCG supports a <code>nodecg.mount</code> array in your bundle's <code>package.json</code>. These <code>mount</code> declarations are simple objects with two keys: <code>directory</code> and <code>endpoint</code>.</p>
+<p><code>directory</code> is a relative path from the root of your bundle which tells NodeCG which folder you'd like to mount as a custom endpoint.</p>
+<p><code>endpoint</code> is a URL relative to <code>http://localhost:9090/bundles/${bundle.name}/</code> which tells NodeCG what URL you'd like to serve your <code>directory</code> from (Of course, substitute <code>localhost</code> and <code>9090</code> with whatever <code>host</code> and <code>port</code> your NodeCG instance is configured to use).</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;name&quot;: &quot;test-bundle&quot;,
+  &quot;nodecg&quot;: {
+    &quot;mount&quot;: [
+      {
+        &quot;directory&quot;: &quot;custom-dir&quot;,
+        &quot;endpoint&quot;: &quot;my-mount-endpoint&quot;
+      }
+    ]
+  }
+}</code></pre><p>The above example will make the contents of <code>nodecg/bundles/test-bundle/custom-dir</code> accessible via <code>http://localhost:9090/bundles/test-bundle/my-mount-endpoint</code>. These endpoints behave similarly to how <a href="https://expressjs.com/en/starter/static-files.html">Express' <code>static</code> method</a> serves static files from folders.</p>
+<p>For example, if <code>custom-dir</code> contains a file called <code>hello-world.html</code>, that file can be accessed via the URL <code>http://localhost:9090/bundles/test-bundle/my-mount-endpoint/hello-world.html</code>.</p>
 </article>
 
 </section>
