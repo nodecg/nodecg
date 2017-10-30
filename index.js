@@ -4,8 +4,8 @@ process.title = 'NodeCG';
 global.exitOnUncaught = true;
 
 const cwd = process.cwd();
-const runningInZeitPkg = __dirname.startsWith('/snapshot/') || __dirname.startsWith('C:\\snapshot\\');
-if (!runningInZeitPkg && cwd !== __dirname) {
+global.isZeitPkg = __dirname.startsWith('/snapshot/') || __dirname.startsWith('C:\\snapshot\\');
+if (!global.isZeitPkg && cwd !== __dirname) {
 	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, __dirname);
 	process.chdir(__dirname);
 	console.info('[nodecg] Changed process.cwd to %s', __dirname);
