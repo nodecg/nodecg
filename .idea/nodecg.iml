@@ -5,6 +5,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/bundles" />
       <excludeFolder url="file://$MODULE_DIR$/bundles_off" />
+      <excludeFolder url="file://$MODULE_DIR$/instrumented" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
     </content>
