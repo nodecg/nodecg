@@ -30,6 +30,10 @@ module.exports = {
 		return `${testBundleRoot()}/bower_components`;
 	},
 
+	get BUNDLE_NODE_MODULES_URL() {
+		return `${testBundleRoot()}/node_modules`;
+	},
+
 	get GRAPHIC_URL() {
 		return `${testBundleRoot()}/graphics`;
 	},
