@@ -66,7 +66,7 @@
   "scripts": {
     "start": "node index.js",
     "pretest": "npm run build && npm run instrument",
-    "test": "nyc ava --reporter=html",
+    "test": "nyc ava test --reporter=html",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "static": "eslint index.js lib/**/*.js src/**/*.js test/**/*.js",
     "build": "npm run static && npm run docs:build && gulp",
@@ -96,6 +96,14 @@
     "index.js",
     "lib/"
   ],
+  "pkg": {
+    "assets": [
+      "bower_components/**/*",
+      "src/**/*",
+      "build/**/*",
+      "bundles/**/*"
+    ]
+  },
   "devDependencies": {
     "aliasify": "^2.1.0",
     "ava": "^0.24.0",
