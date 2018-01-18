@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.9"></a>
+## [0.9.9](https://github.com/nodecg/nodecg/compare/v0.9.8...v0.9.9) (2018-01-18)
+
+
+### Bug Fixes
+
+* **extensions:** improve logging when an extension fails to mount ([e7f2a90](https://github.com/nodecg/nodecg/commit/e7f2a90))
+* **login:** Redirect to /login after destroying session ([#355](https://github.com/nodecg/nodecg/issues/355)) ([30aa4ba](https://github.com/nodecg/nodecg/commit/30aa4ba))
+* **package:** update fs-extra to version 5.0.0 ([#352](https://github.com/nodecg/nodecg/issues/352)) ([629cc45](https://github.com/nodecg/nodecg/commit/629cc45))
+* **replicator:** don't crash when a an error occurs while updating the persisted value of a replicant ([54baa0e](https://github.com/nodecg/nodecg/commit/54baa0e))
+* **replicator:** use mkdirp when ensuring that the db/replicants folder exists ([7b952f4](https://github.com/nodecg/nodecg/commit/7b952f4))
+
+
+### Features
+
+* add mounting feature ([07210b0](https://github.com/nodecg/nodecg/commit/07210b0))
+* **bundles:** support loading assets from node_modules ([#358](https://github.com/nodecg/nodecg/issues/358)) ([74915d7](https://github.com/nodecg/nodecg/commit/74915d7))
+* **config:** always create cfg dir if it does not exist ([49a9255](https://github.com/nodecg/nodecg/commit/49a9255))
+* **package:** add "bin" prop to package.json ([0c8d0b6](https://github.com/nodecg/nodecg/commit/0c8d0b6))
+* **package:** add nsp compliance ([1b0da9b](https://github.com/nodecg/nodecg/commit/1b0da9b))
+* add support for zeit pkg builds ([#362](https://github.com/nodecg/nodecg/issues/362)) ([acb168c](https://github.com/nodecg/nodecg/commit/acb168c))
+
+
+
 <a name="0.9.8"></a>
 ## [0.9.8](https://github.com/nodecg/nodecg/compare/v0.9.7...v0.9.8) (2017-10-19)
 
