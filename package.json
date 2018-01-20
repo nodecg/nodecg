@@ -135,7 +135,7 @@
     "minami": "github:nodecg/minami",
     "nyc": "^11.3.0",
     "polymer-build": "^2.1.1",
-    "remark": "^8.0.0",
+    "remark": "^9.0.0",
     "remark-toc": "^5.0.0",
     "rimraf": "^2.6.2",
     "sinon": "^4.1.2",
