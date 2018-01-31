@@ -38,7 +38,13 @@ test.cb.before(t => {
 	};
 
 	bundleManager = require('../lib/bundle-manager');
-	bundleManager.init(tempFolder, '0.7.0', nodecgConfig, Logger);
+	bundleManager.init(
+		path.join(tempFolder, 'bundles'),
+		path.join(tempFolder, 'cfg'),
+		'0.7.0',
+		nodecgConfig,
+		Logger
+	);
 
 	// Needs a little extra wait time for some reason.
 	// Without this, tests randomly fail.
