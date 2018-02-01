@@ -14,7 +14,7 @@ test.beforeEach(() => {
 	return e.browser.client.switchTab(e.browser.tabs.dashboard);
 });
 
-test('should return a reference to any already-declared replicant', async t => {
+test.serial('should return a reference to any already-declared replicant', async t => {
 	const ret = await e.browser.client.execute(() => {
 		const rep1 = window.dashboardApi.Replicant('clientDupRef');
 		const rep2 = window.dashboardApi.Replicant('clientDupRef');
@@ -24,7 +24,7 @@ test('should return a reference to any already-declared replicant', async t => {
 	t.true(ret.value);
 });
 
-test('should only apply defaultValue when first declared', async t => {
+test.serial('should only apply defaultValue when first declared', async t => {
 	e.apis.extension.Replicant('clientTest', {
 		defaultValue: 'foo',
 		persistent: false
@@ -38,7 +38,7 @@ test('should only apply defaultValue when first declared', async t => {
 	t.is(ret.value, 'foo');
 });
 
-test('should be readable without subscription, via readReplicant', async t => {
+test.serial('should be readable without subscription, via readReplicant', async t => {
 	e.apis.extension.Replicant('clientReadReplicentTest', {
 		defaultValue: 'foo',
 		persistent: false
@@ -51,7 +51,7 @@ test('should be readable without subscription, via readReplicant', async t => {
 	t.is(ret.value, 'foo');
 });
 
-test('should throw an error when no name is provided', async t => {
+test.serial('should throw an error when no name is provided', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		try {
 			window.dashboardApi.Replicant();
@@ -63,7 +63,7 @@ test('should throw an error when no name is provided', async t => {
 	t.is(ret.value, 'Must supply a name when instantiating a Replicant');
 });
 
-test('should be assignable via the ".value" property', async t => {
+test.serial('should be assignable via the ".value" property', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('clientAssignmentTest', {persistent: false});
 		rep.on('change', newVal => {
@@ -81,7 +81,7 @@ test('should be assignable via the ".value" property', async t => {
 	t.is(ret.value.revision, 1);
 });
 
-test('should emit a "change" event after successful declaration when the value is undefined', async t => {
+test.serial('should emit a "change" event after successful declaration when the value is undefined', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('clientUndefinedChangeTest', {persistent: false});
 		rep.on('change', () => {
@@ -97,7 +97,7 @@ test('should emit a "change" event after successful declaration when the value i
 	t.is(ret.value.revision, 0);
 });
 
-test('should log a warning when attempting to access .value before the Replicant has finished declaring', async t => {
+test.serial('should log a warning when attempting to access .value before the Replicant has finished declaring', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('clientEarlyValueAccess', {persistent: false});
 
@@ -115,7 +115,7 @@ test('should log a warning when attempting to access .value before the Replicant
 		'This will always return undefined.');
 });
 
-test('should remove .once listeners when quickfired', async t => {
+test.serial('should remove .once listeners when quickfired', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('clientRemoveOnceListener', {
 			persistent: false
@@ -130,7 +130,7 @@ test('should remove .once listeners when quickfired', async t => {
 	t.is(ret.value, 0);
 });
 
-test('when an array - should react to changes', async t => {
+test.serial('when an array - should react to changes', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('clientArrTest', {
 			persistent: false,
@@ -162,7 +162,7 @@ test('when an array - should react to changes', async t => {
 	}]);
 });
 
-test('when an array - should support the "delete" operator', async t => {
+test.serial('when an array - should support the "delete" operator', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('clientArrayDelete', {
 			defaultValue: ['foo', 'bar'],
@@ -194,7 +194,7 @@ test('when an array - should support the "delete" operator', async t => {
 	}]);
 });
 
-test.cb('when an array - should proxy objects added to arrays via array insertion methods', t => {
+test.serial.cb('when an array - should proxy objects added to arrays via array insertion methods', t => {
 	const rep = e.apis.extension.Replicant('serverArrInsertObj', {defaultValue: []});
 	rep.value.push({foo: 'foo'});
 	rep.on('change', newVal => {
@@ -209,7 +209,7 @@ test.cb('when an array - should proxy objects added to arrays via array insertio
 	});
 });
 
-test.cb('when an object - should not cause server-side replicants to lose observation', t => {
+test.serial.cb('when an object - should not cause server-side replicants to lose observation', t => {
 	t.plan(2);
 
 	const rep = e.apis.extension.Replicant('clientServerObservation', {
@@ -242,7 +242,7 @@ test.cb('when an object - should not cause server-side replicants to lose observ
 	}).catch(t.fail);
 });
 
-test('when an object - should react to changes in nested properties', async t => {
+test.serial('when an object - should react to changes in nested properties', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('clientObjTest', {
 			persistent: false,
@@ -282,7 +282,7 @@ test('when an object - should react to changes in nested properties', async t =>
 // the server should detect that change event, emit it to all clients,
 // and the clients should then digest that change and emit a "change" event.
 // This test is to address a very specific bug reported by Love Olsson.
-test('when an object - should react to server-side changes of array properties', async t => {
+test.serial('when an object - should react to server-side changes of array properties', async t => {
 	const serverRep = e.apis.extension.Replicant('s2c_nestedArrTest', {
 		persistent: false,
 		defaultValue: {
@@ -330,7 +330,7 @@ test('when an object - should react to server-side changes of array properties',
 	}]);
 });
 
-test('when an object - should support the "delete" operator', async t => {
+test.serial('when an object - should support the "delete" operator', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('clientObjectDelete', {
 			defaultValue: {
@@ -366,7 +366,7 @@ test('when an object - should support the "delete" operator', async t => {
 	}]);
 });
 
-test.cb('when an object - should properly proxy new objects assigned to properties', t => {
+test.serial.cb('when an object - should properly proxy new objects assigned to properties', t => {
 	t.plan(1);
 
 	const rep = e.apis.extension.Replicant('serverObjProp', {
@@ -446,7 +446,7 @@ test.cb('persistent - should persist changes to disk', t => {
 	}).catch(t.fail);
 });
 
-test.cb('persistent - should persist falsey values to disk', t => {
+test.serial.cb('persistent - should persist falsey values to disk', t => {
 	t.plan(1);
 
 	e.browser.client.executeAsync(done => {
@@ -470,7 +470,7 @@ test.cb('persistent - should persist falsey values to disk', t => {
 	}).catch(t.fail);
 });
 
-test('persistent - should read falsey values from disk', async t => {
+test.serial('persistent - should read falsey values from disk', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('clientFalseyRead');
 		rep.on('declared', () => done(rep.value));
@@ -479,7 +479,7 @@ test('persistent - should read falsey values from disk', async t => {
 	t.is(ret.value, 0);
 });
 
-test.cb('transient - should not write their value to disk', t => {
+test.serial.cb('transient - should not write their value to disk', t => {
 	t.plan(2);
 
 	const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/clientTransience.rep');
