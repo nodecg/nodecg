@@ -184,6 +184,21 @@ test('objects - throw an error when an object is owned by multiple Replicants', 
 	t.true(error.message.startsWith('This object belongs to another Replicant'));
 });
 
+test.cb('dates - should support them', t => {
+	const value = new Date();
+	const rep = e.apis.extension.Replicant('extensionDateTest', {
+		persistent: false
+	});
+
+	rep.on('change', newVal => {
+		t.true(newVal instanceof Date);
+		t.is(newVal, value);
+		t.end();
+	});
+
+	rep.value = value;
+});
+
 test.serial('persistent - should load persisted values when they exist', t => {
 	const rep = e.apis.extension.Replicant('extensionPersistence');
 	t.is(rep.value, 'it work good!');
