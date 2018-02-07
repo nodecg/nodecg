@@ -387,19 +387,20 @@ test.serial.cb('when an object - should properly proxy new objects assigned to p
 	});
 });
 
-test.serial.cb('when a date - should support them', t => {
-	const value = new Date();
-	const rep = e.apis.extension.Replicant('serverDateProp');
+test.serial('when a date - should support them', async t => {
+	const date = new Date();
 
-	rep.on('change', newVal => {
-		t.true(newVal instanceof Date);
-		t.is(newVal, value);
-		t.end();
+	e.apis.extension.Replicant('clientDateTest', {
+		defaultValue: date,
+		persistent: false
 	});
 
-	process.nextTick(() => {
-		rep.value = value;
+	const ret = await e.browser.client.executeAsync(done => {
+		window.dashboardApi.readReplicant('clientDateTest', done);
 	});
+
+	t.true(ret.value instanceof Date);
+	t.is(ret.value, date);
 });
 
 test.serial('persistent - should load persisted values when they exist', async t => {
