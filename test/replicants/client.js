@@ -387,6 +387,21 @@ test.serial.cb('when an object - should properly proxy new objects assigned to p
 	});
 });
 
+test.serial('when a date - should emit the JSON value to clients', async t => {
+	const date = new Date();
+
+	e.apis.extension.Replicant('clientDateTest', {
+		defaultValue: date,
+		persistent: false
+	});
+
+	const ret = await e.browser.client.executeAsync(done => {
+		window.dashboardApi.readReplicant('clientDateTest', done);
+	});
+
+	t.is(ret.value, date.toJSON());
+});
+
 test.serial('persistent - should load persisted values when they exist', async t => {
 	const ret = await e.browser.client.executeAsync(done => {
 		const rep = window.dashboardApi.Replicant('clientPersistence');
