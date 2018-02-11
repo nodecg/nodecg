@@ -173,3 +173,12 @@ test.cb.serial('watcher - should produce an unhandled exception when a panel HTM
 
 	fs.unlinkSync(`${tempFolder}/bundles/remove-panel/dashboard/panel.html`);
 });
+
+test.cb.serial('watcher - should not throw en error when the bundle becomes invalid', t => {
+	bundleManager.once('invalidBundle', bundle => {
+		t.is(bundle.name, 'invalid-manifest');
+		t.end();
+	});
+
+	fs.writeFileSync(`${tempFolder}/bundles/invalid-manifest/package.json`, 'invalid-manifest');
+});

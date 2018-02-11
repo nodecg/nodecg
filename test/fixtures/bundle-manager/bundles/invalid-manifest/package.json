@@ -1,0 +1,11 @@
+{
+  "name": "invalid-manifest",
+  "version": "1.0.0",
+  "homepage": "http://github.com/nodecg",
+  "author": "Seldszar <contact@seldszar.fr>",
+  "description": "A test bundle that shouldn't throw en error when the bundle becomes invalid",
+  "license": "MIT",
+  "nodecg": {
+    "compatibleRange": "~0.7.0"
+  }
+}
