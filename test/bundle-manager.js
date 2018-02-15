@@ -153,30 +153,20 @@ test.cb.serial('watcher - should reload the bundle\'s config when the bundle is 
 	fs.writeFileSync(`${tempFolder}/cfg/change-config.json`, JSON.stringify(config));
 });
 
-// This has to be the last test.
-test.cb.serial('watcher - should produce an unhandled exception when a panel HTML file is removed', t => {
-	// Remove Mocha's error listener
-	const originalUncaughtExceptionListeners = process.listeners('uncaughtException');
-	process.removeAllListeners('uncaughtException');
-
-	// Add our own error listener to check for unhandled exceptions
-	process.on('uncaughtException', err => {
-		// Add the original error listeners again
-		process.removeAllListeners('uncaughtException');
-		for (let i = 0; i < originalUncaughtExceptionListeners.length; i += 1) {
-			process.on('uncaughtException', originalUncaughtExceptionListeners[i]);
-		}
-
-		t.is(err.message, 'Panel file "panel.html" in bundle "remove-panel" does not exist.');
+test.cb.serial('watcher - should emit an `invalidBundle` error when a panel HTML file is removed', t => {
+	bundleManager.once('invalidBundle', (bundle, error) => {
+		t.is(bundle.name, 'remove-panel');
+		t.is(error.message, 'Panel file "panel.html" in bundle "remove-panel" does not exist.');
 		t.end();
 	});
 
 	fs.unlinkSync(`${tempFolder}/bundles/remove-panel/dashboard/panel.html`);
 });
 
-test.cb.serial('watcher - should not throw en error when the bundle becomes invalid', t => {
-	bundleManager.once('invalidBundle', bundle => {
+test.cb.serial('watcher - should emit an `invalidBundle` error when the manifest becomes invalid', t => {
+	bundleManager.once('invalidBundle', (bundle, error) => {
 		t.is(bundle.name, 'invalid-manifest');
+		t.is(error.message, `${path.join(tempFolder, 'bundles/invalid-manifest/package.json')} is not valid JSON, please check it against a validator such as jsonlint.com`);
 		t.end();
 	});
 
