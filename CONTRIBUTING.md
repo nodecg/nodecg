@@ -8,6 +8,8 @@ Please contribute! This is an open source project. If you would like to report a
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
+Note: Make sure you run `npm install` in the root directory without the `--production` flag to ensure all `devDependencies` are installed.
+
 **Before creating your pull request:**
 
 1. Ensure your code matches our existing style using our provided [EditorConfig](http://editorconfig.org/) options.
@@ -22,3 +24,5 @@ Check which branch you should PR to. NodeCG is still in an unstable state, so we
 1. Install selenium-standalone (`npm install --global selenium-standalone`), then run the installer (`selenium-standalone install`)
 2. Open one terminal and start Selenium: `selenium-standalone start`
 3. Open a second terminal, navigate to the NodeCG root and run `npm test`
+
+Note: Selenium requires [Java](https://www.java.com/en/download/help/download_options.xml).
