@@ -236,6 +236,8 @@ Once you've made your changes, follow the steps above in the [Contribute](#contr
 2.  Open one terminal and start Selenium: `selenium-standalone start`
 3.  Open a second terminal, navigate to the NodeCG root and run `npm test`
 
+Note: Selenium requires [Java](https://www.java.com/en/download/help/download_options.xml).
+
 ### Code of Conduct
 
 Note that all contributions and discussions around NodeCG take place under our [Code of Conduct](CODE_OF_CONDUCT.md).
