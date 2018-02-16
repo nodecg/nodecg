@@ -8,6 +8,8 @@ Please contribute! This is an open source project. If you would like to report a
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
+Note: Make sure you run `npm install` in the root directory without the `--production` flag to ensure all `devDependencies` are installed.
+
 **Before creating your pull request:**
 
 1. Ensure your code matches our existing style using our provided [EditorConfig](http://editorconfig.org/) options.
