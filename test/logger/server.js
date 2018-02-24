@@ -10,6 +10,7 @@ const test = require('ava');
 
 // Ours
 const loggerFactory = require('../../lib/logger/server');
+const {serializeObject} = require('../../lib/util');
 
 // Start up the logger lib with defaults only
 const Logger = loggerFactory();
@@ -138,6 +139,33 @@ test('logging methods should generate any output when of an adequate level', t =
 	t.context.logger.trace('info');
 	t.true(process.stdout.write.getCall(0).args[0].startsWith('\u001b[32mtrace\u001b[39m: [testServer] info'));
 	process.stdout.write.restore();
+});
+
+test('should not output an empty object', t => {
+	sinon.spy(Logger._winston, 'info');
+	t.context.logger.info('info', {});
+	t.deepEqual(Logger._winston.info.getCall(0).args, [`[testServer] info`]);
+	Logger._winston.info.restore();
+});
+
+test('should output a message with a serialized object', t => {
+	const input = {foo: 'bar'};
+	const expected = JSON.stringify(serializeObject(input), null, 2);
+
+	sinon.spy(Logger._winston, 'info');
+	t.context.logger.info('info', input);
+	t.deepEqual(Logger._winston.info.getCall(0).args, [`[testServer] info ${expected}`]);
+	Logger._winston.info.restore();
+});
+
+test('should output a message with a serialized object containing an error', t => {
+	const input = {error: new Error('test error')};
+	const expected = JSON.stringify(serializeObject(input), null, 2);
+
+	sinon.spy(Logger._winston, 'info');
+	t.context.logger.info('info', input);
+	t.deepEqual(Logger._winston.info.getCall(0).args, [`[testServer] info ${expected}`]);
+	Logger._winston.info.restore();
 });
 
 test('Sentry - should log errors to Sentry when global.sentryEnabled is true', t => {
