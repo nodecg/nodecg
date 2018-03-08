@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.10"></a>
+## [0.9.10](https://github.com/nodecg/nodecg/compare/v0.9.9...v0.9.10) (2018-03-08)
+
+
+### Bug Fixes
+
+* **package:** synchronize package-lock.json ([82a6e0b](https://github.com/nodecg/nodecg/commit/82a6e0b))
+* **package:** update SoundJS to v1.0.0 ([ba26fc8](https://github.com/nodecg/nodecg/commit/ba26fc8)), closes [#371](https://github.com/nodecg/nodecg/issues/371)
+* **replicants:** bind methods on objects when returning them via the proxy ([1987ce4](https://github.com/nodecg/nodecg/commit/1987ce4))
+
+
+### Features
+
+* **bundles:** avoid crash when a bundle becomes invalid after a change ([#374](https://github.com/nodecg/nodecg/issues/374)) ([4d42335](https://github.com/nodecg/nodecg/commit/4d42335))
+
+
+
 <a name="0.9.9"></a>
 ## [0.9.9](https://github.com/nodecg/nodecg/compare/v0.9.8...v0.9.9) (2018-01-18)
 
