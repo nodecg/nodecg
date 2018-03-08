@@ -37,7 +37,7 @@
     "paper-toolbar": "PolymerElements/paper-toolbar#^2.0.0",
     "polymer": "Polymer/polymer#2.0.0",
     "raven-js": "^3.17.0",
-    "SoundJS": "^0.6.2",
+    "SoundJS": "^1.0.2",
     "vaadin-upload": "vaadin/vaadin-upload#^2.0.0"
   },
   "license": "MIT",
@@ -78,7 +78,8 @@
     "paper-toast": "^2.0.0",
     "paper-toolbar": "^2.0.0",
     "polymer": "2.0.0",
-    "webcomponentsjs": "^v1.0.0"
+    "webcomponentsjs": "^v1.0.0",
+    "SoundJS": "^1.0.2"
   },
   "version": "0.9.9"
 }
