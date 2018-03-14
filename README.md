@@ -2,7 +2,8 @@
 
 [![NodeCG](https://raw.githubusercontent.com/nodecg/nodecg/master/media/splash.png)](http://nodecg.com/)
 
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/nodecg/nodecg)
+
+[![Discord](https://img.shields.io/discord/423233465643827211.svg?logo=discord)](https://discord.gg/NNmVz4x)
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
 [![Coverage Status](https://coveralls.io/repos/nodecg/nodecg/badge.svg?branch=master&service=github)](https://coveralls.io/github/nodecg/nodecg?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/nodecg/nodecg.svg)](https://greenkeeper.io/)
@@ -27,7 +28,7 @@ can render HTML, including:
 
 Looking for a list of NodeCG bundles and resources? Check out [awesome-nodecg](https://github.com/nodecg/awesome-nodecg/blob/master/README.md).
 
-Have questions about NodeCG, or just want to say 'hi'? [Join our Gitter chatroom](https://gitter.im/nodecg/nodecg)!
+Have questions about NodeCG, or just want to say 'hi'? [Join our Discord server](https://discord.gg/NNmVz4x)!
 
 **Who should use NodeCG?**
 
