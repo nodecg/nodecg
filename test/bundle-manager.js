@@ -73,7 +73,7 @@ test.serial('loader - should not load a bundle that has been disabled', t => {
 });
 
 test.serial('loader - should not crash or load an invalid bundle', t => {
-	const bundle = bundleManager.find('invalid-bundle');
+	const bundle = bundleManager.find('node_modules');
 	t.is(bundle, undefined);
 });
 
