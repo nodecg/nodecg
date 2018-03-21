@@ -138,7 +138,7 @@
     "remark": "^8.0.0",
     "remark-toc": "^5.0.0",
     "rimraf": "^2.6.2",
-    "sinon": "^4.1.2",
+    "sinon": "^5.0.0",
     "standard-version": "^4.2.0",
     "taffydb": "^2.7.3",
     "vinyl-buffer": "^1.0.0",
