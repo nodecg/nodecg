@@ -109,7 +109,7 @@ class NcgDialog extends Polymer.mixinBehaviors([
 
 	_onIronOverlayClosed(e) {
 		const iframeDocument = this.querySelector('iframe').contentDocument;
-		if (e.detail.confirmed) {
+		if (e.detail.confirmed && !e.detail.canceled) {
 			iframeDocument.dispatchEvent(new CustomEvent('dialog-confirmed'));
 		} else {
 			iframeDocument.dispatchEvent(new CustomEvent('dialog-dismissed'));

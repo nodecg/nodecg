@@ -2,7 +2,7 @@
 document.addEventListener('click', e => {
 	'use strict';
 
-	const elWithDialogAttr = e.target.closest('[nodecg-dialog]');
+	const elWithDialogAttr = e.composedPath()[0].closest('[nodecg-dialog]');
 	if (elWithDialogAttr) {
 		const dialogName = elWithDialogAttr.getAttribute('nodecg-dialog');
 		const dialogIg = nodecg.bundleName + '_' + dialogName;
