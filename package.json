@@ -49,7 +49,7 @@
     "object-path": "^0.11.4",
     "parse-authors": "^0.2.4",
     "passport": "^0.4.0",
-    "passport-steam": "^1.0.8",
+    "passport-steam": "^1.0.9",
     "passport-twitch": "^1.0.3",
     "pug": "^2.0.0-rc.4",
     "raven": "^2.2.1",
