@@ -24,6 +24,7 @@ npm-debug.log
 /.idea/copyright/profiles_settings.xml
 /.idea/workspace.xml
 /.idea/shelf/
+/.idea/codeStyles/codeStyleConfig.xml
 
 # Code coverage results
 /coverage
