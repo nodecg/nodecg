@@ -36,13 +36,11 @@ before_install:
   - export CHROME_BIN=/usr/bin/google-chrome
   - export DISPLAY=:99.0
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./test/helpers/travis_pr_setup.sh; fi'
+  - npm i -g npm@5.7.1
+  - npm install -g bower
 
 install:
   - npm install
-
-before_script:
-  - npm install -g bower
-  - npm install -g grunt-cli
   - bower install
 
 after_success: npm run coveralls
