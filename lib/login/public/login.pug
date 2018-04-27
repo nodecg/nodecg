@@ -5,7 +5,7 @@ html(lang="en")
 		meta(name="viewport", content="width=device-width", initial-scale=1)
 
 		title NodeCG login
-
+		
 		link(rel='import', href='/bower_components/paper-styles/typography.html')
 
 		style(is='custom-style' include='iron-flex iron-flex-alignment').
@@ -21,6 +21,14 @@ html(lang="en")
 				@apply(--paper-font-headline);
 			}
 
+			label {
+				display: block;
+				}
+
+			button {
+				margin-top:2px;
+			}
+
 	body
 		h2 Please sign in
 
@@ -31,3 +39,13 @@ html(lang="en")
 		if config.login.twitch && config.login.twitch.enabled
 			a(href='/login/twitch')
 				img(src='/login/signin_twitch.png')
+
+		if config.login.local && config.login.local.enabled
+			form(method='POST' action='/login/local')
+				div.form-group
+					label(for='username') Username:
+					input#username.form-control(type='text' name='username')
+				div.form-group
+					label(for='password') Password:
+					input#password.form-control(type='password' name='password')
+				button.btn.btn-primary(type='submit') Login
