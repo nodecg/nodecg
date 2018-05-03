@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.11"></a>
+## [0.9.11](https://github.com/nodecg/nodecg/compare/v0.9.10...v0.9.11) (2018-05-03)
+
+
+### Bug Fixes
+
+* **dashboard:** always send 'dialog-dismissed' when clicking outside the dialog ([#385](https://github.com/nodecg/nodecg/issues/385)) ([da30fe1](https://github.com/nodecg/nodecg/commit/da30fe1))
+* **dashboard:** support the nodecg-dialog attribute within shadow roots ([#384](https://github.com/nodecg/nodecg/issues/384)) ([fc62adf](https://github.com/nodecg/nodecg/commit/fc62adf))
+* **logger:** improve formatting of errors reported to Sentry via the .error method ([cb6426e](https://github.com/nodecg/nodecg/commit/cb6426e))
+* **package:** fix Steam auth not working ([59627a9](https://github.com/nodecg/nodecg/commit/59627a9))
+* **package:** update make-fetch-happen to version 4.0.1 ([#389](https://github.com/nodecg/nodecg/issues/389)) ([7a44ca1](https://github.com/nodecg/nodecg/commit/7a44ca1)), closes [#382](https://github.com/nodecg/nodecg/issues/382)
+* **server:** prevent 'can't set headers after they are sent' error spam ([#387](https://github.com/nodecg/nodecg/issues/387)) ([58357bf](https://github.com/nodecg/nodecg/commit/58357bf))
+
+
+
 <a name="0.9.10"></a>
 ## [0.9.10](https://github.com/nodecg/nodecg/compare/v0.9.9...v0.9.10) (2018-03-08)
 
