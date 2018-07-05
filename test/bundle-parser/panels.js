@@ -37,6 +37,11 @@ test('when a panel\'s file has no <!DOCTYPE>, throw an error', t => {
 	t.true(error.message.includes('has no DOCTYPE'));
 });
 
+test('when a panel\'s file has a BOM before it\'s <!DOCTYPE>, continue to parse it', t => {
+	const parsedBundle = parseBundle('./test/fixtures/bundle-parser/bom-doctype');
+	t.true(Array.isArray(parsedBundle.dashboard.panels));
+});
+
 test('when a panel\'s file does not exist, throw an error', t => {
 	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/non-existant-panel'));
 	t.true(error.message.includes(' does not exist'));

@@ -1,0 +1,21 @@
+{
+  "name": "bom-doctype",
+  "version": "0.0.1",
+  "homepage": "http://github.com/nodecg",
+  "author": [
+    "Karen West <atribecalledkwest.97@gmail.com>"
+  ],
+  "description": "A test bundle",
+  "license": "MIT",
+  "nodecg": {
+    "compatibleRange": "~0.7.0",
+    "dashboardPanels": [
+      {
+        "name": "test",
+        "title": "Test Panel",
+        "width": 1,
+        "file": "panel.html"
+      }
+    ]
+  }
+}
