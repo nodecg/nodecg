@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.9.12"></a>
+## [0.9.12](https://github.com/nodecg/nodecg/compare/v0.9.11...v0.9.12) (2018-07-05)
+
+
+### Bug Fixes
+
+* **bundles:** avoid throwing exception on Unicode BOM ([#401](https://github.com/nodecg/nodecg/issues/401)) ([84a4555](https://github.com/nodecg/nodecg/commit/84a4555))
+* **package:** use npm audit to fix a lot of vulnerability warnings ([1b9dc96](https://github.com/nodecg/nodecg/commit/1b9dc96))
+
+
+### Features
+
+* **api:** add NodeCG.waitForReplicants method ([b8d3ed1](https://github.com/nodecg/nodecg/commit/b8d3ed1))
+* **auth:** add basic local authentication ([#390](https://github.com/nodecg/nodecg/issues/390)) ([54bbcf6](https://github.com/nodecg/nodecg/commit/54bbcf6))
+
+
+
 <a name="0.9.11"></a>
 ## [0.9.11](https://github.com/nodecg/nodecg/compare/v0.9.10...v0.9.11) (2018-05-03)
 
