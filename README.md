@@ -6,7 +6,6 @@
 [![Discord](https://img.shields.io/discord/423233465643827211.svg?logo=discord)](https://discord.gg/NNmVz4x)
 [![Build Status](https://travis-ci.org/nodecg/nodecg.svg?branch=master)](https://travis-ci.org/nodecg/nodecg)
 [![Coverage Status](https://coveralls.io/repos/nodecg/nodecg/badge.svg?branch=master&service=github)](https://coveralls.io/github/nodecg/nodecg?branch=master)
-[![Greenkeeper badge](https://badges.greenkeeper.io/nodecg/nodecg.svg)](https://greenkeeper.io/)
 [![NSP Status](https://nodesecurity.io/orgs/nodecg/projects/4b34d59a-9ba1-47fb-a1fe-c4d04be91bdc/badge)](https://nodesecurity.io/orgs/nodecg/projects/4b34d59a-9ba1-47fb-a1fe-c4d04be91bdc)
 [![Docker Build Status](https://img.shields.io/docker/build/nodecg/nodecg.svg)](https://hub.docker.com/r/nodecg/nodecg/tags/)
 [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/fold_left.svg?style=social&label=Follow%20%40NodeCG)](https://twitter.com/NodeCG)
