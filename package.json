@@ -38,7 +38,7 @@
     "is-error": "^2.2.1",
     "is-my-json-valid": "^2.16.1",
     "json-ptr": "^1.0.1",
-    "json-schema-defaults": "^0.3.0",
+    "json-schema-defaults": "^0.4.0",
     "json-schema-lib": "github:Lange/json-schema-lib#ac59fe29fad5c54647e4c483c7255a923cc430dd",
     "lodash.debounce": "^4.0.8",
     "make-fetch-happen": "^4.0.1",
