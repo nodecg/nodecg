@@ -22,6 +22,9 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
   - `enabled` _Boolean_ Whether to enable login security.
   - `sessionSecret` _String_ The secret used to salt sessions.
   - `forceHttpsReturn` _Boolean_ orces Steam & Twitch login return URLs to use HTTPS instead of HTTP. Useful in reverse proxy setups.
+  - `local` _Object_ Contains local username & password login configuration properties.
+    - `enabled` _Boolean_ Whether to enable Local authentication.
+    - `allowedUsers` _Array of objects_ Which usernames and passwords to allow. Example: `{"username": "admin", "password": "foo123"}`
   - `steam` _Object_ Contains steam login configuration properties.
     - `enabled` _Boolean_ Whether to enable Steam authentication.
     - `apiKey` _String_ A Steam API Key. Obtained from [http://steamcommunity.com/dev/apikey](http://steamcommunity.com/dev/apikey)
