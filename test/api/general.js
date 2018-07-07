@@ -72,7 +72,6 @@ test('should mount custom routes via nodecg.mount', async t => {
 	t.is(response.data, 'custom route confirmed');
 });
 
-
 test.serial.cb('should support multiple listenFor handlers', t => {
 	t.plan(2);
 	let callbacksInvoked = 0;
