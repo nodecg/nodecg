@@ -72,6 +72,11 @@ test.serial('loader - should not load a bundle that has been disabled', t => {
 	t.is(bundle, undefined);
 });
 
+test.serial('loader - should not crash or load an invalid bundle', t => {
+	const bundle = bundleManager.find('node_modules');
+	t.is(bundle, undefined);
+});
+
 test.cb.serial('watcher - hould emit a change event when the manifest file changes', t => {
 	const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-manifest/package.json`));
 	bundleManager.once('bundleChanged', bundle => {
