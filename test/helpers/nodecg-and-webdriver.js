@@ -8,6 +8,7 @@ const path = require('path');
 // Packages
 const fse = require('fs-extra');
 const temp = require('temp');
+const uuid = require('uuid').v4;
 
 const tempFolder = temp.mkdirSync();
 temp.track(); // Automatically track and cleanup files at exit.
@@ -230,7 +231,7 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 					newCoverageObj[absKey] = coverageObj[key];
 				}
 
-				fs.writeFileSync(`.nyc_output/browser-${tabName}.json`, JSON.stringify(newCoverageObj), 'utf-8');
+				fs.writeFileSync(`.nyc_output/browser-${tabName}-${uuid()}.json`, JSON.stringify(newCoverageObj), 'utf-8');
 			}
 			/* eslint-enable no-await-in-loop */
 
