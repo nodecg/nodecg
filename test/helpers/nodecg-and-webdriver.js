@@ -8,8 +8,8 @@ const path = require('path');
 // Packages
 const fse = require('fs-extra');
 const temp = require('temp');
-const uuid = require('uuid').v4;
 
+const tabIdsSet = new Set();
 const tempFolder = temp.mkdirSync();
 temp.track(); // Automatically track and cleanup files at exit.
 
@@ -49,7 +49,6 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 		if (process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER) {
 			const isPR = process.env.TRAVIS_PULL_REQUEST !== 'false';
 			if (isPR) {
-				console.log('Pull request detected, running WebDriver.io with local capabilities');
 				e.browser.client = webdriverio.remote({
 					desiredCapabilities: {
 						browserName: 'chrome',
@@ -62,7 +61,6 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 					}
 				});
 			} else {
-				console.log('Travis environment detected, running WebDriver.io with Travis capabilities');
 				const desiredCapabilities = {
 					name: `Travis job ${process.env.TRAVIS_JOB_NUMBER}`,
 					build: process.env.TRAVIS_BUILD_NUMBER,
@@ -100,7 +98,6 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 				});
 			}
 		} else {
-			console.log('Running WebDriver.io with local capabilities');
 			e.browser.client = webdriverio.remote({
 				desiredCapabilities: {
 					browserName: 'chrome',
@@ -111,6 +108,15 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 			});
 		}
 
+		const originalNewWindow = e.browser.client.newWindow.bind(e.browser.client);
+		e.browser.client.newWindow = async (...args) => {
+			const returnValue = await originalNewWindow(...args);
+			await e.browser.client.getCurrentTabId().then(tabId => {
+				tabIdsSet.add(tabId);
+			});
+			return returnValue;
+		};
+
 		// Attach our custom methods to this browser instance.
 		addCustomBrowserCommands(e.browser.client);
 
@@ -118,84 +124,64 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 		await e.browser.client.timeouts('script', 30000);
 
 		if (tabs.includes('dashboard')) {
-			await e.browser.client
-				.newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '')
-				.getCurrentTabId()
-				.then(tabId => {
-					e.browser.tabs.dashboard = tabId;
-				})
-				.executeAsync(done => {
-					/* eslint-disable no-undef */
-					const checkForApi = setInterval(() => {
-						if (typeof window.dashboardApi !== 'undefined' && typeof Polymer !== 'undefined') {
-							clearInterval(checkForApi);
-							Polymer.RenderStatus.afterNextRender(this, () => {
-								done();
-							});
-						}
-					}, 50);
-					/* eslint-enable no-undef */
-				});
+			await e.browser.client.newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '');
+			e.browser.tabs.dashboard = await e.browser.client.getCurrentTabId();
+			await e.browser.client.executeAsync(done => {
+				/* eslint-disable no-undef */
+				const checkForApi = setInterval(() => {
+					if (typeof window.dashboardApi !== 'undefined' && typeof Polymer !== 'undefined') {
+						clearInterval(checkForApi);
+						Polymer.RenderStatus.afterNextRender(this, () => {
+							done();
+						});
+					}
+				}, 50);
+				/* eslint-enable no-undef */
+			});
 		}
 
 		if (tabs.includes('standalone')) {
-			await e.browser.client
-				.newWindow(`${C.TEST_PANEL_URL}?standalone=true`, 'NodeCG test bundle standalone panel', '')
-				.getCurrentTabId()
-				.then(tabId => {
-					e.browser.tabs.panelStandalone = tabId;
-				})
-				.executeAsync(done => {
-					const checkForApi = setInterval(() => {
-						if (typeof window.dashboardApi !== 'undefined') {
-							clearInterval(checkForApi);
-							done();
-						}
-					}, 50);
-				});
+			await e.browser.client.newWindow(`${C.TEST_PANEL_URL}?standalone=true`, 'NodeCG test bundle standalone panel', '');
+			e.browser.tabs.panelStandalone = await e.browser.client.getCurrentTabId();
+			await e.browser.client.executeAsync(done => {
+				const checkForApi = setInterval(() => {
+					if (typeof window.dashboardApi !== 'undefined') {
+						clearInterval(checkForApi);
+						done();
+					}
+				}, 50);
+			});
 		}
 
 		if (tabs.includes('graphic')) {
-			await e.browser.client
-				.newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '')
-				.getCurrentTabId()
-				.then(tabId => {
-					e.browser.tabs.graphic = tabId;
-				})
-				.executeAsync(done => {
-					const checkForApi = setInterval(() => {
-						if (typeof window.graphicApi !== 'undefined') {
-							clearInterval(checkForApi);
-							done();
-						}
-					}, 50);
-				});
+			await e.browser.client.newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '');
+			e.browser.tabs.graphic = await e.browser.client.getCurrentTabId();
+			e.browser.client.executeAsync(done => {
+				const checkForApi = setInterval(() => {
+					if (typeof window.graphicApi !== 'undefined') {
+						clearInterval(checkForApi);
+						done();
+					}
+				}, 50);
+			});
 		}
 
 		if (tabs.includes('single-instance')) {
-			await e.browser.client
-				.newWindow(C.SINGLE_INSTANCE_URL, 'NodeCG test single instance graphic', '')
-				.getCurrentTabId()
-				.then(tabId => {
-					e.browser.tabs.singleInstance = tabId;
-				})
-				.executeAsync(done => {
-					const checkForApi = setInterval(() => {
-						if (typeof window.singleInstanceApi !== 'undefined') {
-							clearInterval(checkForApi);
-							done();
-						}
-					}, 50);
-				});
+			await e.browser.client.newWindow(C.SINGLE_INSTANCE_URL, 'NodeCG test single instance graphic', '');
+			e.browser.tabs.singleInstance = await e.browser.client.getCurrentTabId();
+			e.browser.client.executeAsync(done => {
+				const checkForApi = setInterval(() => {
+					if (typeof window.singleInstanceApi !== 'undefined') {
+						clearInterval(checkForApi);
+						done();
+					}
+				}, 50);
+			});
 		}
 
 		if (tabs.includes('login')) {
-			await e.browser.client
-				.newWindow(C.LOGIN_URL, 'NodeCG login page', '')
-				.getCurrentTabId()
-				.then(tabId => {
-					e.browser.tabs.login = tabId;
-				});
+			await e.browser.client.newWindow(C.LOGIN_URL, 'NodeCG login page', '');
+			e.browser.tabs.login = await e.browser.client.getCurrentTabId();
 		}
 
 		await e.browser.client.timeouts('script', 5000);
@@ -212,17 +198,15 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 			}
 
 			/* eslint-disable no-await-in-loop */
-			for (const tabName in e.browser.tabs) {
-				if (!{}.hasOwnProperty.call(e.browser.tabs, tabName)) {
-					continue;
-				}
-
-				await e.browser.client.switchTab(e.browser.tabs[tabName]);
+			const tabIds = Array.from(tabIdsSet);
+			for (let i = 0; i < tabIds.length; i++) {
+				const tabId = tabIds[i];
+				await e.browser.client.switchTab(tabId);
 				const {value: coverageObj} = await e.browser.client.execute('return window.__coverage__;');
 
 				const newCoverageObj = {};
 				for (const key in coverageObj) {
-					if (!{}.hasOwnProperty.call(e.browser.tabs, tabName)) {
+					if (!{}.hasOwnProperty.call(coverageObj, key)) {
 						continue;
 					}
 
@@ -231,7 +215,7 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 					newCoverageObj[absKey] = coverageObj[key];
 				}
 
-				fs.writeFileSync(`.nyc_output/browser-${tabName}-${uuid()}.json`, JSON.stringify(newCoverageObj), 'utf-8');
+				fs.writeFileSync(`.nyc_output/browser-${tabId}}.json`, JSON.stringify(newCoverageObj), 'utf8');
 			}
 			/* eslint-enable no-await-in-loop */
 
