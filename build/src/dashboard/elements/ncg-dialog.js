@@ -51,12 +51,6 @@ class NcgDialog extends Polymer.mixinBehaviors([
 					this._attachIframeResize(iframe);
 				});
 			}
-
-			// Sometimes, we just need to know when a dang click event occurred. No matter where it happened.
-			// This adds a `panelClick` event to all panels.
-			iframe.contentDocument.addEventListener('click', e => {
-				document.dispatchEvent(new CustomEvent('panelClick', e.target));
-			});
 		});
 	}
 
