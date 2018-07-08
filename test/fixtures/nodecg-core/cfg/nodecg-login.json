@@ -1,0 +1,13 @@
+{
+	"login": {
+		"enabled": true,
+		"sessionSecret": "supersecret",
+		"local": {
+			"enabled": true,
+			"allowedUsers": [{
+				"username": "admin",
+				"password": "password"
+			}]
+		}
+	}
+}
