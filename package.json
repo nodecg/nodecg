@@ -84,6 +84,9 @@
       "lib/**",
       "index.js"
     ],
+    "exclude": [
+      "index.js"
+    ],
     "all": true
   },
   "engines": {
