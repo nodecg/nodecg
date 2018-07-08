@@ -26,7 +26,7 @@ const addCustomBrowserCommands = require('./custom-webdriver-commands');
 const C = require('./test-constants');
 const e = require('./test-environment');
 
-module.exports = function (test, tabs) {
+module.exports = function (test, {tabs} = {}) {
 	test.before(async () => {
 		if (C.CONFIG.login && C.CONFIG.login.enabled) {
 			throw new Error('Login security is enabled! ' +

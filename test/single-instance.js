@@ -4,7 +4,7 @@
 const test = require('ava');
 
 // Ours
-require('./helpers/nodecg-and-webdriver')(test, ['single-insatnce']); // Must be first.
+require('./helpers/nodecg-and-webdriver')(test, {tabs: ['single-insatnce']}); // Must be first.
 const e = require('./helpers/test-environment');
 
 test.beforeEach(async () => {
