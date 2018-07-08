@@ -2,9 +2,12 @@
 
 // Packages
 const test = require('ava');
+const express = require('express');
+const axios = require('axios');
 
 // Ours
 require('../helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard']}); // Must be first.
+const C = require('../helpers/test-constants');
 const e = require('../helpers/test-environment');
 
 test.serial('should receive messages and fire acknowledgements', async t => {
@@ -56,3 +59,16 @@ test.serial('should not return a promise if the user provided a callback ', asyn
 	});
 	t.true(res.value);
 });
+
+test('should mount custom routes via nodecg.mount', async t => {
+	const app = express();
+	app.get('/test-bundle/test-route', (req, res) => {
+		res.send('custom route confirmed');
+	});
+	e.apis.extension.mount(app);
+
+	const response = await axios.get(`${C.ROOT_URL}test-bundle/test-route`);
+	t.is(response.status, 200);
+	t.is(response.data, 'custom route confirmed');
+});
+
