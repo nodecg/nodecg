@@ -12,32 +12,24 @@ const temp = require('temp');
 const tempFolder = temp.mkdirSync();
 temp.track(); // Automatically track and cleanup files at exit.
 
-fse.copySync('test/fixtures/nodecg-core/assets', path.join(tempFolder, 'assets'));
-fse.copySync('test/fixtures/nodecg-core/bundles', path.join(tempFolder, 'bundles'));
-fse.copySync('test/fixtures/nodecg-core/cfg', path.join(tempFolder, 'cfg'));
-fse.copySync('test/fixtures/nodecg-core/db', path.join(tempFolder, 'db'));
-
 // Tell NodeCG to look in our new temp folder for bundles, cfg, db, and assets, rather than whatever ones the user
 // may have. We don't want to touch any existing user data!
 process.env.NODECG_ROOT = tempFolder;
 
-// Ours (must be after the above setup steps)
+// Ours
 const addCustomBrowserCommands = require('./custom-webdriver-commands');
-const C = require('./test-constants');
-const e = require('./test-environment');
 
-module.exports = function (test, {tabs} = {}) {
+module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) {
+	fse.copySync('test/fixtures/nodecg-core/assets', path.join(tempFolder, 'assets'));
+	fse.copySync('test/fixtures/nodecg-core/bundles', path.join(tempFolder, 'bundles'));
+	fse.copySync('test/fixtures/nodecg-core/cfg', path.join(tempFolder, 'cfg'));
+	fse.copySync(`test/fixtures/nodecg-core/cfg/${nodecgConfigName}`, path.join(tempFolder, 'cfg/nodecg.json'));
+	fse.copySync('test/fixtures/nodecg-core/db', path.join(tempFolder, 'db'));
+
+	const C = require('./test-constants');
+	const e = require('./test-environment');
+
 	test.before(async () => {
-		if (C.CONFIG.login && C.CONFIG.login.enabled) {
-			throw new Error('Login security is enabled! ' +
-				'Please disable login security in cfg/nodecg.json before running tests');
-		}
-
-		if (C.CONFIG.ssl && C.CONFIG.ssl.enabled) {
-			throw new Error('SSL is enabled! Please disable SSL in cfg/nodecg.json before running tests');
-		}
-
-		process.env.NODECG_ROOT = tempFolder;
 		await new Promise((resolve, reject) => {
 			e.server.on('started', resolve);
 			e.server.on('error', reject);
@@ -193,6 +185,15 @@ module.exports = function (test, {tabs} = {}) {
 							done();
 						}
 					}, 50);
+				});
+		}
+
+		if (tabs.includes('login')) {
+			await e.browser.client
+				.newWindow(C.LOGIN_URL, 'NodeCG login page', '')
+				.getCurrentTabId()
+				.then(tabId => {
+					e.browser.tabs.login = tabId;
 				});
 		}
 
