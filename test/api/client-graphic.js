@@ -4,7 +4,7 @@
 const test = require('ava');
 
 // Ours
-require('../helpers/nodecg-and-webdriver')(test, ['graphic']); // Must be first.
+require('../helpers/nodecg-and-webdriver')(test, {tabs: ['graphic']}); // Must be first.
 const e = require('../helpers/test-environment');
 
 // The graphic and dashboard APIs use the same file

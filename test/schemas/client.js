@@ -4,7 +4,7 @@
 const test = require('ava');
 
 // Ours
-require('../helpers/nodecg-and-webdriver')(test, ['dashboard']); // Must be first.
+require('../helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard']}); // Must be first.
 const e = require('../helpers/test-environment');
 test.beforeEach(() => {
 	return e.browser.client.switchTab(e.browser.tabs.dashboard);
