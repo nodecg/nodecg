@@ -108,7 +108,7 @@ test.serial('mixer - assignable cues - should list new sound Assets as they are 
 	 3. Check the list of options in the dropdown select for all assignable cues
 	 */
 	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-	await e.browser.client.then(() => new Promise((resolve, reject) => {
+	await new Promise((resolve, reject) => {
 		const oggPath = path.join(C.ASSETS_ROOT, 'test-bundle/sounds/success.ogg');
 		fs.copy('test/fixtures/nodecg-core/assets/test-bundle/sounds/success.ogg', oggPath, {replace: true}, err => {
 			if (err) {
@@ -118,7 +118,7 @@ test.serial('mixer - assignable cues - should list new sound Assets as they are 
 
 			resolve();
 		});
-	}));
+	});
 
 	const ret = await e.browser.client.executeAsync(done => {
 		const el = document.querySelector('ncg-dashboard').shadowRoot
