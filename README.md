@@ -126,58 +126,9 @@ A bundle can have multiple graphics and dashboard panels, and an extension can b
 
 If you wish to quickly start a new bundle from a template, try [generator-nodecg](https://github.com/nodecg/generator-nodecg).
 
-### Graphics
+## Internal concepts
 
-Graphics are, as the name implies, the actual graphics intended for broadcast. 
-They are standard HTML webpages, and there are no restrictions on their content. 
-When serving a graphic, NodeCG injects an instance of the API into the global scope.
-
-### Dashboard Panels
-
-Dashboard panels are the interface used to control and manage a bundle. They too are standard HTML webpages. 
-Each panel is served as an iframe on the dashboard. This is done to ensure full code and style encapsulation. 
-Because dashboard panels are iframes, they cannot render any content outside of their bounding box. 
-For example, it is not possible to have a tooltip in a panel that extends beyond the bounding box of the panel itself.
-
-When serving panels, NodeCG injects an instance of the API into the global scope, as well as a few default styles.
-
-It is strongly recommended to use Polymer elements to build panels, though it is not required. 
-Google's [official Polymer elements](https://www.webcomponents.org/collection/Polymer/elements), specifically their 
-[Paper elements](https://www.webcomponents.org/collection/PolymerElements/paper-elements), are a great place to start.
-The official [nodecg-dashboard-elements](https://www.webcomponents.org/collection/NodeCGElements/nodecg-dashboard-elements) 
-collection also has a selection of Polymer elements that are integrated with NodeCG's API.
-
-### Extensions
-
-Extensions are server-side code. They are standard Node.js JavaScript files. An extension must export a function
-that accepts a single argument. That argument will be an instance of the NodeCG API:
-
-```js
-// bundles/my-bundle/extension.js
-module.exports = nodecg => {
-    nodecg.listenFor('foo', () => {
-        console.log('bar');
-    });
-};
-```
-
-NodeCG automatically attempts to load the following files as extensions:
-
--   `your-bundle/extension.js`
--   `your-bundle/extension/index.js`
-
-Bundles may have one of, but not both of the above files. If your extension is simple enough to fit in one file,
-use the former approach. If your extension is broken up into multiple files, you may want to use the latter structure
-and keep all those files in a single `extension` folder. If using an `extension` folder, **NodeCG will only load
-`your-bundle/extension/index.js`**. It is up to you to load any other files that your extension needs via `require`.
-
-### `package.json` manifest
-
-Every bundle must have a [`package.json`](https://docs.npmjs.com/files/package.json). In addition to the required fields
-like `name` and `version` outlined in that link, NodeCG bundles must also have a `nodecg` object in their `package.json`
-with some additional properties that tell NodeCG about the bundle and how to load it.
-
-See the [manifest tutorial](http://nodecg.com/tutorial-manifest.html) for more information on creating a valid `package.json` for a bundle.
+If you need a breakdown of the terminology or concepts used inside NodeCG, we have written a guide at the (NodeCG website)[https://nodecg.com/tutorial-2_understanding-nodecg-internals.html].
 
 ## Maintainers
 
