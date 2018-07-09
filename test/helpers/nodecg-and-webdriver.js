@@ -201,8 +201,16 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 			const tabIds = Array.from(tabIdsSet);
 			for (let i = 0; i < tabIds.length; i++) {
 				const tabId = tabIds[i];
-				await e.browser.client.switchTab(tabId);
-				const {value: coverageObj} = await e.browser.client.execute('return window.__coverage__;');
+
+				let coverageObj;
+
+				try {
+					await e.browser.client.switchTab(tabId);
+					const response = await e.browser.client.execute('return window.__coverage__;');
+					coverageObj = response.value;
+				} catch (e) {
+					continue;
+				}
 
 				const newCoverageObj = {};
 				for (const key in coverageObj) {
