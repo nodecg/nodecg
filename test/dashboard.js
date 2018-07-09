@@ -23,14 +23,6 @@ test.serial('panels - should show up standalone', async t => {
 	t.true(isExisting);
 });
 
-test.serial('shared sources - should serve files', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.panelStandalone);
-	const res = await e.browser.client.execute(() => {
-		return window.SharedUtility;
-	});
-	t.true(Object.keys(res.value).length > 0);
-});
-
 test.serial('ncg-dialog - should have the buttons defined in dialogButtons', async t => {
 	await e.browser.client.switchTab(e.browser.tabs.dashboard);
 

@@ -62,3 +62,31 @@ test('should redirect /login/ to /dashboard/ when login security is disabled', a
 	t.is(response.status, 200);
 	t.is(response.request.res.responseUrl, C.DASHBOARD_URL);
 });
+
+test.serial('shared sources - 200', async t => {
+	const response = await axios.get(`${C.ROOT_URL}bundles/test-bundle/shared/util.js`);
+	t.is(response.status, 200);
+	t.is(
+		response.data,
+		'// eslint-disable-next-line no-undef\n' +
+		'window.SharedUtility = {\n' +
+		'\tsomeFunc() {}\n' +
+		'};\n'
+	);
+});
+
+test('shared sources - 404', async t => {
+	try {
+		await axios.get(`${C.ROOT_URL}bundles/test-bundle/shared/404.js`);
+	} catch (error) {
+		t.is(error.response.status, 404);
+	}
+});
+
+test('shared sources - no bundle 404', async t => {
+	try {
+		await axios.get(`${C.ROOT_URL}bundles/false-bundle/shared/404.js`);
+	} catch (error) {
+		t.is(error.response.status, 404);
+	}
+});
