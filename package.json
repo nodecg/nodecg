@@ -72,6 +72,7 @@
     "static": "eslint index.js lib/**/*.js src/**/*.js test/**/*.js",
     "build": "npm run static && npm run docs:build && gulp",
     "instrument": "nyc instrument ./src ./instrumented",
+    "postinstrument": "node test/helpers/retarget-browser-coverage.js",
     "docs": "npm run docs:build && npm run docs:publish",
     "docs:build": "rimraf docs && jsdoc -c .jsdoc.json && node scripts/readme-toc.js",
     "docs:publish": "npm run docs:build && echo nodecg.com >> docs/CNAME && gh-pages -d docs -s **",
@@ -82,6 +83,7 @@
   "nyc": {
     "include": [
       "lib/**",
+      "src/**",
       "index.js"
     ],
     "exclude": [
@@ -142,6 +144,7 @@
     "polymer-build": "^3.0.4",
     "remark": "^8.0.0",
     "remark-toc": "^5.0.0",
+    "replace-in-file": "^3.4.0",
     "rimraf": "^2.6.2",
     "sinon": "^4.1.2",
     "standard-version": "^4.4.0",
