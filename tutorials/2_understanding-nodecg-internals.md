@@ -21,7 +21,7 @@ The dashboard is where all your controls for your graphics end up. Each panel is
   - `headerColor`, an optional property, that will change the color of the panel's header to a provided hexadecimal color value.
   - `workspace`, an optional property, that when set will place the panel into a new workspace with the name provided. These workspaces can be shared between bundles.
   - `fullbleed`, an optional property, that when set to true will place the panel in it's own workplace at the maximum possible width and height with no margins.
-  - `dialog`, an optional property, that will turn the panel into a dialog that other panels are able to open. 
+  - `dialog`, an optional property, that will turn the panel into a dialog that other panels are able to open.
   - `dialogButtons`, an optional property, that will show a `confirm`, `dismiss`, or both options on the dialog.
 
 ## Extensions ##
@@ -32,7 +32,9 @@ Not all bundles might require an extension to back them up, but you should consi
 ## Messages ##
 Messages are the way NodeCG lets extensions, dashboard panels, and the graphics communicate with each other seamlessly. A message can be anything, from an array to an object to a string, as long as it can be represented in Javascript, you can send it. All you have to do is call `nodecg.sendMessage` on one end and `nodecg.listenFor` on another!
 
+There is a limitation to this, however; a Message cannot be sent from server extension to server extension. In these cases, you will want to look into NodeJS's built in [EventEmitters](https://nodejs.org/dist/latest-v10.x/docs/api/events.html#events_class_eventemitter).
+
 ## Replicants ##
-Replicants are how NodeCG stores and replicates data between extensions, dashboard panels, and graphics. Rather than being events like [messages](#messages) are, Replicants (optionally) persistent.
+Replicants are how NodeCG stores and replicates data between extensions, dashboard panels, and graphics. Rather than being events like [messages](#messages) are, Replicants are (optionally) persistent.
 
 Replicants on server-side extensions are able to be read synchronously, as NodeCG has immediate access to the database of replicants, but in dashboard panels and graphics you should read Replicants asynchronously by listening for the `change` event.
