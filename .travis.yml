@@ -43,7 +43,7 @@ install:
   - npm install
   - bower install
 
-after_success: npm run coveralls
+after_success: npm run report-coverage
 
 matrix:
   fast_finish: true
