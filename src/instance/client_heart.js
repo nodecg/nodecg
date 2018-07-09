@@ -3,6 +3,8 @@
 (function () {
 	'use strict';
 
+	console.log('hm ok');
+
 	let path = window.location.pathname;
 
 	// If the pathname ends with /bundleName/ then we must be on index.html.
