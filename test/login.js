@@ -47,6 +47,33 @@ test.serial('logging in should work', async t => {
 	t.is(url, C.DASHBOARD_URL);
 });
 
+test.serial('regenerating a token should send the user back to /login', async t => {
+	await e.browser.client.switchTab(e.browser.tabs.login);
+
+	t.is(await e.browser.client.getUrl(), C.DASHBOARD_URL);
+
+	// We need to preserve the coverage from this test, because it will be lost
+	// when the page is redirected to /login.
+	const {value: coverage} = await e.browser.client.executeAsync(async done => {
+		const ncgSettings = document.querySelector('ncg-dashboard').shadowRoot
+			.querySelector('ncg-settings');
+		await ncgSettings.resetKey();
+		done(window.__coverage__);
+	});
+
+	await e.browser.client.waitUntil(async () => {
+		const url = await e.browser.client.getUrl();
+		return url === C.LOGIN_URL;
+	}, 5000);
+
+	// Put our preserved coverage back on the page for later extraction.
+	await e.browser.client.execute(injectedCoverage => {
+		window.__coverage__ = injectedCoverage;
+	}, coverage);
+
+	t.pass();
+});
+
 test.serial('logging out should work', async t => {
 	await e.browser.client.newWindow(`${C.ROOT_URL}logout`);
 	const url = await e.browser.client.getUrl();
