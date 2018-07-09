@@ -2,9 +2,11 @@
 
 // Packages
 const test = require('ava');
+const axios = require('axios');
 
 // Ours
 require('./helpers/nodecg-and-webdriver')(test, {tabs: ['single-instance']}); // Must be first.
+const C = require('./helpers/test-constants');
 const e = require('./helpers/test-environment');
 
 test.beforeEach(async () => {
@@ -28,4 +30,11 @@ test.cb('single-instance graphics shouldn\'t enter an infinite redirect loop whe
 		singleInstance.removeListener('graphicAvailable', cb);
 		t.end();
 	}, 5000);
+});
+
+test('scripts get injected into /instance/*.html routes', async t => {
+	const response = await axios.get(`${C.ROOT_URL}instance/killed.html`);
+	t.is(response.status, 200);
+	t.true(response.data.includes('<script src="/nodecg-api.min.js">'));
+	t.true(response.data.includes('<script src="/socket.io/socket.io.js"></script>'));
 });
