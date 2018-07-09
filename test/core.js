@@ -56,3 +56,9 @@ test('should 404 on non-existent bundle node_modules/bower_components', async t 
 		t.is(error.response.status, 404);
 	}
 });
+
+test('should redirect /login/ to /dashboard/ when login security is disabled', async t => {
+	const response = await axios.get(C.LOGIN_URL);
+	t.is(response.status, 200);
+	t.is(response.request.res.responseUrl, C.DASHBOARD_URL);
+});
