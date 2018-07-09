@@ -37,7 +37,7 @@ before_install:
   - export DISPLAY=:99.0
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash ./test/helpers/travis_pr_setup.sh; fi'
   - npm i -g npm@5.7.1
-  - npm install -g bower
+  - npm install -g codecov bower
 
 install:
   - npm install
