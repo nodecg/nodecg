@@ -87,7 +87,8 @@
       "index.js"
     ],
     "exclude": [
-      "index.js"
+      "index.js",
+      "lib/login/public/QueryString.js"
     ],
     "all": true
   },
