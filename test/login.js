@@ -54,11 +54,13 @@ test.serial('regenerating a token should send the user back to /login', async t 
 
 	// We need to preserve the coverage from this test, because it will be lost
 	// when the page is redirected to /login.
-	const {value: coverage} = await e.browser.client.executeAsync(async done => {
+	const {value: coverage} = await e.browser.client.execute(() => {
 		const ncgSettings = document.querySelector('ncg-dashboard').shadowRoot
 			.querySelector('ncg-settings');
-		await ncgSettings.resetKey();
-		done(window.__coverage__);
+		setTimeout(() => {
+			ncgSettings.resetKey();
+		});
+		return window.__coverage__;
 	});
 
 	await e.browser.client.waitUntil(async () => {
