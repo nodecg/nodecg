@@ -35,7 +35,8 @@
 		<nodecg-replicant
 			replicant-name="collections"
 			replicant-bundle="_assets"
-			value="{{collections}}"></nodecg-replicant>
+			value="{{collections}}">
+		</nodecg-replicant>
 
 		<template is="dom-repeat" items="[[collections]]" as="collection">
 			<paper-card>
@@ -45,7 +46,8 @@
 					<template is="dom-repeat" items="[[collection.categories]]" as="category" mutable-data>
 						<ncg-asset-category
 							collection-name="[[collection.name]]"
-							category="[[category]]"></ncg-asset-category>
+							category="[[category]]">
+						</ncg-asset-category>
 						<div class="assets-divider"></div>
 					</template>
 				</div>

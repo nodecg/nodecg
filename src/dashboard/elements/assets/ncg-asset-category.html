@@ -69,7 +69,8 @@
 			id="replicant"
 			replicant-name="assets:[[category.name]]"
 			replicant-bundle="[[collectionName]]"
-			value="{{files}}"></nodecg-replicant>
+			value="{{files}}">
+		</nodecg-replicant>
 
 		<paper-toast id="toast"></paper-toast>
 
@@ -86,7 +87,8 @@
 				<ncg-asset-file
 					file="[[file]]"
 					on-deleted="_handleDeleted"
-					on-deletion-failed="_handleDeletionFailed"></ncg-asset-file>
+					on-deletion-failed="_handleDeletionFailed">
+				</ncg-asset-file>
 			</template>
 		</util-scrollable>
 
@@ -102,7 +104,8 @@
 					target="/assets/[[collectionName]]/[[category.name]]"
 					on-upload-start="refitUploadDialog"
 					on-upload-before="_onUploadBefore"
-					on-file-reject="_onFileReject">
+					on-file-reject="_onFileReject"
+					on-upload-success="_onUploadSuccess">
 					<template is="dom-if" if="[[category.allowedTypes.length]]">
 						<div id="acceptsMsg">[[acceptsMsg]]</div>
 					</template>

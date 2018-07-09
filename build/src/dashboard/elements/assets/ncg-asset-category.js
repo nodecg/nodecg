@@ -6,11 +6,23 @@ class NcgAssetCategory extends Polymer.MutableData(Polymer.Element) {
 	static get properties() {
 		return {
 			files: Array,
-			collectionName: String,
+			collectionName: {
+				type: String,
+				reflectToAttribute: true
+			},
 			category: Object,
+			categoryName: {
+				type: String,
+				reflectToAttribute: true,
+				computed: '_computeCategoryName(category.name)'
+			},
 			acceptsMsg: {
 				type: String,
 				computed: '_computeAcceptsMsg(category.allowedTypes)'
+			},
+			_successfulUploads: {
+				type: Number,
+				value: 0
 			}
 		};
 	}
@@ -92,6 +104,14 @@ class NcgAssetCategory extends Polymer.MutableData(Polymer.Element) {
 		this.refitUploadDialog();
 		this.$.toast.text = `${event.detail.file.name} error: ${event.detail.error}`;
 		this.$.toast.open();
+	}
+
+	_onUploadSuccess() {
+		this._successfulUploads++;
+	}
+
+	_computeCategoryName(categoryName) {
+		return categoryName;
 	}
 }
 
