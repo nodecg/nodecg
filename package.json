@@ -47,7 +47,6 @@
     "nedb": "^1.8.0",
     "node-localstorage": "^1.3.0",
     "object-path": "^0.11.4",
-    "parse-authors": "^0.2.4",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "passport-steam": "^1.0.10",

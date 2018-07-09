@@ -45,14 +45,6 @@ class NcgDashboardPanel extends Polymer.Element {
 
 	ready() {
 		super.ready();
-		const infoDialog = document.createElement('ncg-dashboard-panel-info-dialog');
-		infoDialog.withBackdrop = true;
-		infoDialog.bundle = this.bundle;
-		document.body.appendChild(infoDialog);
-
-		this.$.infoBtn.addEventListener('click', () => {
-			infoDialog.open();
-		});
 
 		Polymer.RenderStatus.afterNextRender(this, () => {
 			const distributedNodes = this.$.slot.assignedNodes({flatten: true});
