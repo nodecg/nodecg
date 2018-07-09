@@ -43,15 +43,15 @@ module.exports = {
 	},
 
 	get BUNDLE_BOWER_COMPONENTS_URL() {
-		return `${testBundleRoot()}bower_components`;
+		return `${testBundleRoot()}bower_components/`;
 	},
 
 	get BUNDLE_NODE_MODULES_URL() {
-		return `${testBundleRoot()}node_modules`;
+		return `${testBundleRoot()}node_modules/`;
 	},
 
 	get GRAPHIC_URL() {
-		return `${testBundleRoot()}graphics`;
+		return `${testBundleRoot()}graphics/`;
 	},
 
 	get SINGLE_INSTANCE_URL() {
