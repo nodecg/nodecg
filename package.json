@@ -88,7 +88,8 @@
     ],
     "exclude": [
       "index.js",
-      "lib/login/public/QueryString.js"
+      "lib/login/public/QueryString.js",
+      "src/service-worker.js"
     ],
     "all": true
   },
