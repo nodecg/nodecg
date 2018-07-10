@@ -81,6 +81,7 @@ use the former approach. If your extension is broken up into multiple files, you
 and keep all those files in a single `extension` folder. If using an `extension` folder, **NodeCG will only load `your-bundle/extension/index.js`**. It is up to you to load any other files that your extension needs via `require`.
 
 ### Related Docs
+- {@link NodeCG#extensions}
 - {@tutorial manifest}
 - {@tutorial using-npm}
 - {@tutorial bundle-configuration}
