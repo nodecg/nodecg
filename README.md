@@ -242,7 +242,3 @@ Note: Selenium requires [Java](https://www.java.com/en/download/help/download_op
 ### Code of Conduct
 
 Note that all contributions and discussions around NodeCG take place under our [Code of Conduct](CODE_OF_CONDUCT.md).
-
-## License
-
-[MIT Liencese](https://github.com/nodecg/nodecg/blob/master/LICENSE) © 2017 Alex Van Camp, Matthew McNamara, and contributors
