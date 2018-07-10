@@ -14,7 +14,7 @@
 				},
 				smallScreen: {
 					type: Boolean,
-					observer: '_smallSreenChanged'
+					observer: '_smallScreenChanged'
 				},
 				loginDisabled: {
 					type: Boolean,
@@ -74,6 +74,7 @@
 			let notified = false;
 
 			getImageDataURI('img/notifications/standard/fail.png', (err, result) => {
+				/* istanbul ignore if: hard-to-hit error */
 				if (err) {
 					console.error(err);
 				} else {
@@ -82,6 +83,7 @@
 			});
 
 			getImageDataURI('img/notifications/standard/success.png', (err, result) => {
+				/* istanbul ignore if: hard-to-hit error */
 				if (err) {
 					console.error(err);
 				} else {
@@ -90,6 +92,7 @@
 			});
 
 			window.socket.on('error', err => {
+				/* istanbul ignore next: coverage is buggy here */
 				if (err.type === 'UnauthorizedError') {
 					window.location.href = '/authError?code=' + err.code + '&message=' + err.message;
 				} else {
@@ -164,6 +167,7 @@
 			this._fixTabs();
 		}
 
+		/* istanbul ignore next: can't cover since it navigates the page */
 		logout() {
 			window.location.href = '/logout';
 		}
@@ -172,7 +176,7 @@
 			this.$.drawer.close();
 		}
 
-		_smallSreenChanged(newVal) {
+		_smallScreenChanged(newVal) {
 			if (!newVal) {
 				this.closeDrawer();
 			}
@@ -254,6 +258,7 @@
 					data
 				});
 			} catch (e) {
+				/* istanbul ignore next: hard-to-test error */
 				cb(e);
 			}
 			canvas.remove();
@@ -262,6 +267,7 @@
 		try {
 			img.src = url;
 		} catch (e) {
+			/* istanbul ignore next: hard-to-test error */
 			cb(e);
 		}
 	}
