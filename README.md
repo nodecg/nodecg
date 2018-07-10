@@ -52,7 +52,6 @@ without writing any code may be disappointed.
     -   [Building and viewing the docs locally](#building-and-viewing-the-docs-locally)
     -   [Running tests locally](#running-tests-locally)
     -   [Code of Conduct](#code-of-conduct)
--   [License](#license)
 
 ## Install
 

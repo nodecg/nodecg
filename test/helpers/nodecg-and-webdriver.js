@@ -167,6 +167,10 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 					continue;
 				}
 
+				if (!coverageObj || typeof coverageObj !== 'object' || Object.keys(coverageObj).length <= 0) {
+					continue;
+				}
+
 				const newCoverageObj = {};
 				for (const key in coverageObj) {
 					if (!{}.hasOwnProperty.call(coverageObj, key)) {
