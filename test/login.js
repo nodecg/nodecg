@@ -85,11 +85,7 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 		window.socket.emit('regenerateToken', window.token);
 	});
 
-	await new Promise(resolve => {
-		setTimeout(() => {
-			resolve();
-		}, 1000);
-	});
+	await e.sleep(1000);
 
 	const url = await e.browser.client.getUrl();
 	t.true(url.startsWith(`${C.ROOT_URL}authError?code=token_invalidated`));

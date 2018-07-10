@@ -7,8 +7,11 @@ const test = require('ava');
 require('./helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard', 'standalone']}); // Must be first.
 const e = require('./helpers/test-environment');
 
-test.serial('panels - should show up on the dashboard', async t => {
+test.beforeEach(async () => {
 	await e.browser.client.switchTab(e.browser.tabs.dashboard);
+});
+
+test.serial('panels - should show up on the dashboard', async t => {
 	const res = await e.browser.client.shadowDomElement([
 		'ncg-dashboard',
 		'ncg-workspace',
@@ -24,8 +27,6 @@ test.serial('panels - should show up standalone', async t => {
 });
 
 test.serial('ncg-dialog - should have the buttons defined in dialogButtons', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-
 	const res = await e.browser.client.execute(() => {
 		const dialog = window.dashboardApi.getDialog('test-dialog');
 
@@ -53,8 +54,6 @@ test.serial('ncg-dialog - should have the buttons defined in dialogButtons', asy
 });
 
 test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog attribute is clicked', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-
 	const res = await e.browser.client.executeAsync(done => {
 		const openDialogButton = document.querySelector('ncg-dashboard').shadowRoot
 			.querySelector('ncg-workspace').shadowRoot
@@ -87,8 +86,6 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 });
 
 test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is clicked', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-
 	const res = await e.browser.client.executeAsync(done => {
 		const dialog = window.dashboardApi.getDialog('test-dialog');
 		const dialogDocument = window.dashboardApi.getDialogDocument('test-dialog');
@@ -108,8 +105,6 @@ test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is 
 });
 
 test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-
 	const res = await e.browser.client.executeAsync(done => {
 		const dialog = window.dashboardApi.getDialog('test-dialog');
 		const dialogDocument = window.dashboardApi.getDialogDocument('test-dialog');
@@ -126,4 +121,62 @@ test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is 
 	});
 
 	t.true(res.value);
+});
+
+test.serial('connection toasts', async t => {
+	let ret = await e.browser.client.execute(() => {
+		const dashboard = document.getElementById('dashboard');
+		window.socket.emit('disconnect');
+		return {
+			toastText: dashboard.$.mainToast.text,
+			toastOpened: dashboard.$.mainToast.opened,
+			disconnected: dashboard.disconnected
+		};
+	});
+	t.deepEqual(ret.value, {
+		toastText: 'Lost connection to NodeCG server!',
+		toastOpened: true,
+		disconnected: true
+	});
+
+	ret = await e.browser.client.execute(() => {
+		const dashboard = document.getElementById('dashboard');
+		window.socket.emit('reconnecting', 3);
+		return {
+			reconnectToastOpened: dashboard.$.reconnectToast.opened
+		};
+	});
+	t.deepEqual(ret.value, {
+		reconnectToastOpened: true
+	});
+
+	ret = await e.browser.client.execute(() => {
+		const dashboard = document.getElementById('dashboard');
+		window.socket.emit('reconnect_failed');
+		return {
+			toastText: dashboard.$.mainToast.text,
+			toastOpened: dashboard.$.mainToast.opened
+		};
+	});
+	t.deepEqual(ret.value, {
+		toastText: 'Failed to reconnect to NodeCG server!',
+		toastOpened: true
+	});
+
+	ret = await e.browser.client.execute(() => {
+		const dashboard = document.getElementById('dashboard');
+		window.socket.emit('reconnect', 3);
+		return {
+			toastText: dashboard.$.mainToast.text,
+			toastOpened: dashboard.$.mainToast.opened,
+			reconnectToastOpened: dashboard.$.reconnectToast.opened,
+			disconnected: dashboard.disconnected
+		};
+	});
+	t.deepEqual(ret.value, {
+		toastText: 'Reconnected to NodeCG server!',
+		toastOpened: true,
+		reconnectToastOpened: false,
+		disconnected: false
+	});
 });
