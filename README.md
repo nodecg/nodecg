@@ -42,10 +42,7 @@ without writing any code may be disappointed.
 -   [Usage](#usage)
     -   [Configuration](#configuration)
 -   [Bundles](#bundles)
-    -   [Graphics](#graphics)
-    -   [Dashboard Panels](#dashboard-panels)
-    -   [Extensions](#extensions)
-    -   [package.json manifest](#packagejson-manifest)
+-   [Concepts and Terminology](#concepts-and-terminology)
 -   [Maintainers](#maintainers)
     -   [Special Thanks](#special-thanks)
 -   [Contribute](#contribute)
@@ -126,9 +123,9 @@ A bundle can have multiple graphics and dashboard panels, and an extension can b
 
 If you wish to quickly start a new bundle from a template, try [generator-nodecg](https://github.com/nodecg/generator-nodecg).
 
-## Internal concepts
+## Concepts and Terminology
 
-If you need a breakdown of the terminology or concepts used inside NodeCG, we have written a guide at the (NodeCG website)[https://nodecg.com/tutorial-2_understanding-nodecg-internals.html].
+A breakdown of the terminology and concepts used inside NodeCG can be found [here, on the NodeCG website](https://nodecg.com/tutorial-2_understanding-nodecg-internals.html).
 
 ## Maintainers
 
