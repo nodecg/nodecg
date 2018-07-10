@@ -41,7 +41,7 @@ test.serial.cb('shouldn\'t enter an infinite redirect loop when including a poly
 
 test.serial('should redirect to busy.html when the instance is already taken', async t => {
 	await e.browser.client.newWindow(C.SINGLE_INSTANCE_URL);
-	await e.sleep(250);
+	await e.sleep(1000);
 	t.is(
 		await e.browser.client.getUrl(),
 		`${C.ROOT_URL}instance/busy.html?path=/bundles/test-bundle/graphics/single_instance.html`
