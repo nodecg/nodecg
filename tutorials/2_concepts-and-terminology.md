@@ -71,6 +71,15 @@ module.exports = nodecg => {
 };
 ```
 
+NodeCG automatically attempts to load the following files as extensions:	
+	
+- `nodecg/bundles/your-bundle/extension.js`
+- `nodecg/bundles/your-bundle/extension/index.js`
+	
+Your bundle may have one of, but not both of the above files. If your extension is simple enough to fit in one file,
+use the former approach. If your extension is broken up into multiple files, you may want to use the latter structure
+and keep all those files in a single `extension` folder. If using an `extension` folder, **NodeCG will only load `your-bundle/extension/index.js`**. It is up to you to load any other files that your extension needs via `require`.
+
 ### Related Docs
 - {@tutorial manifest}
 - {@tutorial using-npm}
