@@ -125,3 +125,59 @@ test.serial.cb('should prevent acknowledgements from being called more than once
 		}
 	}
 });
+
+test.serial('server - should support intra-context messaging', async t => {
+	t.plan(2);
+
+	// This is what we're actually testing.
+	e.apis.extension.listenFor('serverToServer', data => {
+		t.deepEqual(data, {foo: 'bar'});
+	});
+
+	// But, we also make sure that the client (browser) is still getting these messages as normal.
+	await e.browser.client.execute(() => {
+		window.dashboardApi.listenFor('serverToServer', data => {
+			window._serverToServerData = data;
+		});
+	});
+
+	// Send the message only after both listeners have been set up.
+	e.apis.extension.sendMessage('serverToServer', {foo: 'bar'});
+
+	// Wait until the browser has received the message.
+	await e.browser.client.waitUntil(async () => {
+		const response = await e.browser.client.execute(() => {
+			return window._serverToServerData;
+		});
+
+		return response && response.value &&
+			typeof response.value === 'object' &&
+			Object.keys(response.value).length > 0;
+	});
+
+	// Verify that the browser got the right data along with the message.
+	const response = await e.browser.client.execute(() => {
+		return window._serverToServerData;
+	});
+	t.deepEqual(response.value, {foo: 'bar'});
+});
+
+test.serial('client - should support intra-context messaging', async t => {
+	t.plan(2);
+
+	// But, we also want to make sure that the server (extension) is still getting these messages as normal.
+	e.apis.extension.listenFor('clientToClient', data => {
+		t.deepEqual(data, {baz: 'qux'});
+	});
+
+	// But, we also make sure that the client (browser) is still getting these messages as normal.
+	const response = await e.browser.client.executeAsync(done => {
+		window.dashboardApi.listenFor('clientToClient', data => {
+			done(data);
+		});
+
+		// Send the message only after both listeners have been set up.
+		window.dashboardApi.sendMessage('clientToClient', {baz: 'qux'});
+	});
+	t.deepEqual(response.value, {baz: 'qux'});
+});
