@@ -72,3 +72,56 @@ test('should mount custom routes via nodecg.mount', async t => {
 	t.is(response.data, 'custom route confirmed');
 });
 
+test.serial.cb('should support multiple listenFor handlers', t => {
+	t.plan(2);
+	let callbacksInvoked = 0;
+
+	e.apis.extension.listenFor('multipleListenFor', () => {
+		t.pass();
+		checkDone();
+	});
+
+	e.apis.extension.listenFor('multipleListenFor', () => {
+		t.pass();
+		checkDone();
+	});
+
+	e.browser.client.execute(() => {
+		return window.dashboardApi.sendMessage('multipleListenFor');
+	});
+
+	function checkDone() {
+		callbacksInvoked++;
+		if (callbacksInvoked === 2) {
+			t.end();
+		}
+	}
+});
+
+test.serial.cb('should prevent acknowledgements from being called more than once', t => {
+	t.plan(4);
+	let callbacksInvoked = 0;
+
+	e.apis.extension.listenFor('singleAckEnforcement', (data, cb) => {
+		t.false(cb.handled);
+		t.notThrows(cb);
+		checkDone();
+	});
+
+	e.apis.extension.listenFor('singleAckEnforcement', (data, cb) => {
+		t.true(cb.handled);
+		t.throws(cb);
+		checkDone();
+	});
+
+	e.browser.client.executeAsync(done => {
+		return window.dashboardApi.sendMessage('singleAckEnforcement', null, done);
+	});
+
+	function checkDone() {
+		callbacksInvoked++;
+		if (callbacksInvoked === 2) {
+			t.end();
+		}
+	}
+});
