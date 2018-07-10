@@ -147,6 +147,7 @@
     "replace-in-file": "^3.4.0",
     "rimraf": "^2.6.2",
     "sinon": "^4.1.2",
+    "socket.io-client": "^2.1.1",
     "standard-version": "^4.4.0",
     "taffydb": "^2.7.3",
     "vinyl-buffer": "^1.0.0",

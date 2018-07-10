@@ -2,6 +2,7 @@
 
 // Packages
 const test = require('ava');
+const socketIoClient = require('socket.io-client');
 
 // Ours
 require('./helpers/nodecg-and-webdriver')(test, { // Must be first.
@@ -21,7 +22,7 @@ test.serial('redirects unauthorized users to /login', async t => {
 	t.is(url, C.LOGIN_URL);
 });
 
-test.serial('should deny access to bad credentials', async t => {
+test.serial('login should deny access to bad credentials', async t => {
 	await e.browser.client.waitForVisible('#username');
 	await e.browser.client.waitForVisible('#localForm');
 	await e.browser.client.waitForVisible('#password');
@@ -89,6 +90,26 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 
 	const url = await e.browser.client.getUrl();
 	t.true(url.startsWith(`${C.ROOT_URL}authError?code=token_invalidated`));
+});
+
+test.serial.cb('socket should deny access to bad credentials', t => {
+	t.plan(1);
+
+	const socket = socketIoClient(`${C.ROOT_URL}?key=bad_credentials`);
+	socket.on('connect', () => {
+		t.fail();
+	});
+	socket.on('event', () => {
+		t.fail();
+	});
+	socket.on('error', error => {
+		t.deepEqual(error, {
+			message: 'No authorization token was found',
+			code: 'credentials_required',
+			type: 'UnauthorizedError'
+		});
+		t.end();
+	});
 });
 
 async function logIn(t) {
