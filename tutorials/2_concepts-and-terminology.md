@@ -91,8 +91,6 @@ and keep all those files in a single `extension` folder. If using an `extension`
 ## Messages
 Messages are the way NodeCG lets extensions, dashboard panels, and the graphics communicate with each other seamlessly. A message can be anything, from an array to an object to a string, as long as it can be represented in Javascript, you can send it. All you have to do is call `nodecg.sendMessage` on one end and `nodecg.listenFor` on another!
 
-There is a limitation to this, however; a Message cannot be sent from server extension to server extension. In these cases, you will want to look into NodeJS's built in [EventEmitters](https://nodejs.org/dist/latest-v10.x/docs/api/events.html#events_class_eventemitter).
-
 ### Related Docs
 - {@link NodeCG#sendMessage}
 - {@link NodeCG#listenFor}
