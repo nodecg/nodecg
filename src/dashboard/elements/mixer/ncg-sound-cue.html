@@ -11,17 +11,6 @@
 				align-items: center;
 			}
 
-			#delete {
-				min-width: 0;
-				padding: 0;
-				width: 20px;
-				margin-left: 0;
-				--paper-button: {
-					background-color: var(--nodecg-danger-color);
-					color: white;
-				}
-			}
-
 			#leftWrapper {
 				min-width: 0;
 				padding-right: 8px;
@@ -60,19 +49,8 @@
 			}
 		</style>
 
-		<paper-button
-			id="delete"
-			hidden="[[!custom]]"
-			on-tap="emitDelete"
-			raised>
-			X
-		</paper-button>
-
 		<div id="leftWrapper">
 			<span id="name">[[name]]</span>
-			<template is="dom-if" if="[[custom]]">
-				<span id="timestamp">Created on [[parseTimestamp(createdTimestamp)]]</span>
-			</template>
 		</div>
 
 		<select id="select" on-change="_retargetFile"></select>

@@ -13,7 +13,8 @@
 				max-width: 600px;
 				white-space: nowrap;
 				@apply --layout-vertical;
-				@apply --layout-stretch;
+				@apply --layout-self-stretch;
+				@apply --layout-flex-none;
 			}
 
 			#bundleFaderContainer {
@@ -48,16 +49,6 @@
 				};
 			}
 
-			#addCustomCue {
-				width: 100%;
-				margin-left: 0;
-				margin-right: 0;
-				--paper-button: {
-					background-color: var(--nodecg-configure-color);
-					color: white;
-				}
-			}
-
 			paper-card {
 				margin-bottom: 12px;
 			}
@@ -74,29 +65,8 @@
 				</div>
 
 				<div id="cues"></div>
-
-				<div id="customCues"></div>
-				<template is="dom-if" if="[[enableCustomCues]]">
-					<paper-button
-						id="addCustomCue"
-						on-tap="openAddCustomCueDialog"
-						raised>
-						Add A Custom Cue
-					</paper-button>
-				</template>
 			</div>
 		</paper-card>
-
-		<paper-toast id="addCustomCueToast"></paper-toast>
-
-		<paper-dialog id="addCustomCueDialog" with-backdrop>
-			<h2>Add A Custom Cue</h2>
-			<paper-input label="Cue Name" value="{{newCustomCueName}}"></paper-input>
-			<div class="buttons">
-				<paper-button dialog-dismiss>Cancel</paper-button>
-				<paper-button dialog-confirm autofocus on-tap="addCustomCueDialogAccepted">Accept</paper-button>
-			</div>
-		</paper-dialog>
 	</template>
 
 	<script src="ncg-sounds.js"></script>

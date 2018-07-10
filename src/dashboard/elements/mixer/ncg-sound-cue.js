@@ -25,24 +25,10 @@ class NcgSoundCue extends Polymer.Element {
 			},
 			_cueRef: Object,
 			soundFiles: Array,
-			custom: {
-				type: Boolean,
-				reflectToAttribute: true,
-				value: false
-			},
 			createdTimestamp: {
 				type: Number
 			}
 		};
-	}
-
-	parseTimestamp(timestamp) {
-		const date = new Date(timestamp);
-		return date.toISOString().slice(0, 10);
-	}
-
-	emitDelete() {
-		this.dispatchEvent(new CustomEvent('delete', {bubbles: true, composed: true}));
 	}
 
 	_bundleNameChanged(bundleName) {
