@@ -83,5 +83,5 @@ test.serial('deletion', async t => {
 		assetCategoryFiles.$.delete.click();
 	});
 
-	t.true(!fs.existsSync(TWITTER_BANNER_PATH));
+	t.false(fs.existsSync(TWITTER_BANNER_PATH));
 });
