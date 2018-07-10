@@ -51,12 +51,8 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 			desiredCapabilities: {
 				browserName: 'chrome',
 				chromeOptions: {
-					args: IS_TRAVIS ? ['--no-sandbox'] : [],
-					mobileEmulation: {
-						deviceName: 'Laptop with touch'
-					}
+					args: IS_TRAVIS ? ['--no-sandbox'] : []
 				},
-				networkConnectionEnabled: true,
 				loggingPrefs: {
 					browser: 'ALL'
 				}
