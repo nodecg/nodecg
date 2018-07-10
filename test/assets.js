@@ -69,17 +69,19 @@ test.serial('retrieval - 404', async t => {
 	}
 });
 
-test.serial('deletion - 200', async t => {
-	const response = await axios.delete(`${C.ROOT_URL}assets/test-bundle/assets/twitter_banner.png`);
-	t.is(response.status, 200);
-	t.false(fs.existsSync(TWITTER_BANNER_PATH));
-});
+test.serial('deletion', async t => {
+	await e.browser.client.switchTab(e.browser.tabs.dashboard);
 
-test.serial('deletion - 410', async t => {
-	try {
-		await axios.delete(`${C.ROOT_URL}assets/test-bundle/assets/bad.png`);
-	} catch (error) {
-		t.is(error.response.status, 410);
-	}
-});
+	await e.browser.client.execute(() => {
+		const assetCategoryFiles = document.querySelector('ncg-dashboard').shadowRoot
+			.querySelector('ncg-assets').shadowRoot
+			.querySelector('ncg-asset-category[collection-name="test-bundle"][category-name="assets"]').shadowRoot
+			.querySelector('util-scrollable > ncg-asset-file');
+		console.log('assetCategoryFiles:', assetCategoryFiles);
+		window._assetCategoryFiles = assetCategoryFiles;
 
+		assetCategoryFiles.$.delete.click();
+	});
+
+	t.true(!fs.existsSync(TWITTER_BANNER_PATH));
+});
