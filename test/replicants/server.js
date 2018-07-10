@@ -1,8 +1,10 @@
 'use strict';
 
-// Packages
+// Native
 const fs = require('fs');
 const path = require('path');
+
+// Packages
 const test = require('ava');
 
 // Ours
@@ -39,6 +41,22 @@ test('should throw an error when no name is provided', t => {
 	});
 
 	t.true(error.message.includes('Must supply a name when instantiating a Replicant'));
+});
+
+test('should throw an error when no namespace is provided', t => {
+	const originalName = e.apis.extension.bundleName;
+	e.apis.extension.bundleName = undefined;
+	const error = t.throws(() => {
+		e.apis.extension.Replicant('name');
+	});
+	e.apis.extension.bundleName = originalName;
+	t.true(error.message.includes('Must supply a namespace when instantiating a Replicant'));
+});
+
+test('should not explode when schema is invalid', t => {
+	t.notThrows(() => {
+		e.apis.extension.Replicant('badSchema');
+	});
 });
 
 test('should be assignable via the ".value" property', t => {
@@ -117,6 +135,17 @@ test('should remove .once listeners when quickfired', t => {
 
 	rep.once('change', () => {});
 	t.is(rep.listenerCount('change'), 0);
+});
+
+test('should not override/quickfire .once for events other than "change"', t => {
+	const rep = e.apis.extension.Replicant('serverNotOverrideOtherOnceListeners', {
+		persistent: false
+	});
+
+	rep.once('declared', () => {
+		t.fail();
+	});
+	t.pass();
 });
 
 test.cb('arrays - should support the "delete" operator', t => {
@@ -274,4 +303,15 @@ test.cb('transient - should not write their value to disk', t => {
 			t.end();
 		});
 	});
+});
+
+test('should return true when deleting a non-existing property', t => {
+	const rep = e.apis.extension.Replicant('serverDeleteNonExistent', {defaultValue: {}});
+	t.true(delete rep.value.nonExistent);
+});
+
+test('test that one else path that\'s hard to hit', t => {
+	const rep = e.apis.extension.Replicant('arrayWithoutSchemaSetHandler', {defaultValue: []});
+	rep.value[0] = true;
+	t.pass();
 });
