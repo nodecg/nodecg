@@ -85,3 +85,12 @@ test.serial('deletion', async t => {
 
 	t.false(fs.existsSync(TWITTER_BANNER_PATH));
 });
+
+test.serial('deletion - 410', async t => {
+	try {
+		await axios.delete(`${C.ROOT_URL}assets/test-bundle/assets/bad.png`);
+	} catch (error) {
+		t.is(error.response.status, 410);
+	}
+});
+
