@@ -46,67 +46,18 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 		}
 
 		const webdriverio = require('webdriverio');
-		if (process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER) {
-			const isPR = process.env.TRAVIS_PULL_REQUEST !== 'false';
-			if (isPR) {
-				e.browser.client = webdriverio.remote({
-					desiredCapabilities: {
-						browserName: 'chrome',
-						chromeOptions: {
-							args: ['--no-sandbox']
-						},
-						loggingPrefs: {
-							browser: 'ALL'
-						}
-					}
-				});
-			} else {
-				const desiredCapabilities = {
-					name: `Travis job ${process.env.TRAVIS_JOB_NUMBER}`,
-					build: process.env.TRAVIS_BUILD_NUMBER,
-					tags: [process.env.TRAVIS_BRANCH, process.env.TRAVIS_COMMIT, process.env.TRAVIS_COMMIT_RANGE],
-					browserName: 'chrome',
-					chromeOptions: {
-						args: ['--disable-popup-blocking']
-					},
-					tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-					loggingPrefs: {
-						browser: 'ALL'
-					}
-				};
-
-				if (process.env.TRAVIS_TAG) {
-					desiredCapabilities.tags.push(process.env.TRAVIS_TAG);
+		const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
+		e.browser.client = webdriverio.remote({
+			desiredCapabilities: {
+				browserName: 'chrome',
+				chromeOptions: {
+					args: IS_TRAVIS ? ['--no-sandbox'] : []
+				},
+				loggingPrefs: {
+					browser: 'ALL'
 				}
-
-				if (process.env.TRAVIS_OS_NAME === 'linux') {
-					// Disabled for now: desiredCapabilities.platform = 'Linux';
-
-					// Use Windows until Sauce Labs has at least Chrome 49 on Linux
-					// https://saucelabs.com/platforms/#linux
-					desiredCapabilities.platform = 'Windows 10';
-				} else if (process.env.TRAVIS_OS_NAME === 'osx') {
-					desiredCapabilities.platform = 'OS X 10.10';
-				}
-
-				e.browser.client = webdriverio.remote({
-					desiredCapabilities,
-					host: 'ondemand.saucelabs.com',
-					port: 80,
-					user: process.env.SAUCE_USERNAME,
-					key: process.env.SAUCE_ACCESS_KEY
-				});
 			}
-		} else {
-			e.browser.client = webdriverio.remote({
-				desiredCapabilities: {
-					browserName: 'chrome',
-					loggingPrefs: {
-						browser: 'ALL'
-					}
-				}
-			});
-		}
+		});
 
 		const originalNewWindow = e.browser.client.newWindow.bind(e.browser.client);
 		e.browser.client.newWindow = async (...args) => {
