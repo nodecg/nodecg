@@ -130,8 +130,7 @@ A breakdown of the terminology and concepts used inside NodeCG can be found [her
 ## Maintainers
 
 -   [Matt "Bluee" McNamara](http://mattmcn.com/)  
--   [Alex "Lange" Van Camp](http://alexvan.camp)  
--   ["tsc"](http://fwdcp.net)  
+-   [Alex "Lange" Van Camp](http://alexvan.camp)   
 -   [Chris Hanel](http://www.chrishanel.com)
 
 ### Special Thanks
