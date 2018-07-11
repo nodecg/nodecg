@@ -121,11 +121,11 @@ Each NodeCG graphic is called a _bundle_. A bundle has one or more of the follow
 
 A bundle can have multiple graphics and dashboard panels, and an extension can be split up into multiple files.
 
-If you wish to quickly start a new bundle from a template, try [generator-nodecg](https://github.com/nodecg/generator-nodecg).
+If you wish to quickly start a new bundle from a template, check out the [Quick Start tutorial](https://nodecg.com/tutorial-3_quick-start.html).
 
 ## Concepts and Terminology
 
-A breakdown of the terminology and concepts used inside NodeCG can be found [here, on the NodeCG website](https://nodecg.com/tutorial-2_understanding-nodecg-internals.html).
+A breakdown of the terminology and concepts used inside NodeCG can be found [here, on the NodeCG website](https://nodecg.com/tutorial-2_concepts-and-terminology.html).
 
 ## Maintainers
 
