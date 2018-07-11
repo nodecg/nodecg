@@ -139,7 +139,7 @@
     "is-windows": "^1.0.1",
     "jsdoc": "^3.5.5",
     "merge-stream": "^1.0.1",
-    "minami": "github:nodecg/minami",
+    "minami": "github:nodecg/minami#6efac1a7ff5c74fac91d78330dd53bb6eb274ff8",
     "nyc": "^13.0.0",
     "polymer-build": "^3.0.4",
     "remark": "^8.0.0",

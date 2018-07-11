@@ -42,12 +42,9 @@ without writing any code may be disappointed.
 -   [Usage](#usage)
     -   [Configuration](#configuration)
 -   [Bundles](#bundles)
-    -   [Graphics](#graphics)
-    -   [Dashboard Panels](#dashboard-panels)
-    -   [Extensions](#extensions)
-    -   [package.json manifest](#packagejson-manifest)
+-   [Concepts and Terminology](#concepts-and-terminology)
 -   [Maintainers](#maintainers)
-    -   [Special Thanks](#special-thanks)
+    -   [Acknowledgements](#acknowledgements)
 -   [Contribute](#contribute)
     -   [Building and viewing the docs locally](#building-and-viewing-the-docs-locally)
     -   [Running tests locally](#running-tests-locally)
@@ -124,72 +121,22 @@ Each NodeCG graphic is called a _bundle_. A bundle has one or more of the follow
 
 A bundle can have multiple graphics and dashboard panels, and an extension can be split up into multiple files.
 
-If you wish to quickly start a new bundle from a template, try [generator-nodecg](https://github.com/nodecg/generator-nodecg).
+If you wish to quickly start a new bundle from a template, check out the [Quick Start tutorial](https://nodecg.com/tutorial-3_quick-start.html).
 
-### Graphics
+## Concepts and Terminology
 
-Graphics are, as the name implies, the actual graphics intended for broadcast. 
-They are standard HTML webpages, and there are no restrictions on their content. 
-When serving a graphic, NodeCG injects an instance of the API into the global scope.
-
-### Dashboard Panels
-
-Dashboard panels are the interface used to control and manage a bundle. They too are standard HTML webpages. 
-Each panel is served as an iframe on the dashboard. This is done to ensure full code and style encapsulation. 
-Because dashboard panels are iframes, they cannot render any content outside of their bounding box. 
-For example, it is not possible to have a tooltip in a panel that extends beyond the bounding box of the panel itself.
-
-When serving panels, NodeCG injects an instance of the API into the global scope, as well as a few default styles.
-
-It is strongly recommended to use Polymer elements to build panels, though it is not required. 
-Google's [official Polymer elements](https://www.webcomponents.org/collection/Polymer/elements), specifically their 
-[Paper elements](https://www.webcomponents.org/collection/PolymerElements/paper-elements), are a great place to start.
-The official [nodecg-dashboard-elements](https://www.webcomponents.org/collection/NodeCGElements/nodecg-dashboard-elements) 
-collection also has a selection of Polymer elements that are integrated with NodeCG's API.
-
-### Extensions
-
-Extensions are server-side code. They are standard Node.js JavaScript files. An extension must export a function
-that accepts a single argument. That argument will be an instance of the NodeCG API:
-
-```js
-// bundles/my-bundle/extension.js
-module.exports = nodecg => {
-    nodecg.listenFor('foo', () => {
-        console.log('bar');
-    });
-};
-```
-
-NodeCG automatically attempts to load the following files as extensions:
-
--   `your-bundle/extension.js`
--   `your-bundle/extension/index.js`
-
-Bundles may have one of, but not both of the above files. If your extension is simple enough to fit in one file,
-use the former approach. If your extension is broken up into multiple files, you may want to use the latter structure
-and keep all those files in a single `extension` folder. If using an `extension` folder, **NodeCG will only load
-`your-bundle/extension/index.js`**. It is up to you to load any other files that your extension needs via `require`.
-
-### `package.json` manifest
-
-Every bundle must have a [`package.json`](https://docs.npmjs.com/files/package.json). In addition to the required fields
-like `name` and `version` outlined in that link, NodeCG bundles must also have a `nodecg` object in their `package.json`
-with some additional properties that tell NodeCG about the bundle and how to load it.
-
-See the [manifest tutorial](http://nodecg.com/tutorial-manifest.html) for more information on creating a valid `package.json` for a bundle.
+A breakdown of the terminology and concepts used inside NodeCG can be found [here, on the NodeCG website](https://nodecg.com/tutorial-2_concepts-and-terminology.html).
 
 ## Maintainers
 
 -   [Matt "Bluee" McNamara](http://mattmcn.com/)  
--   [Alex "Lange" Van Camp](http://alexvan.camp)  
--   ["tsc"](http://fwdcp.net)  
+-   [Alex "Lange" Van Camp](http://alexvan.camp)   
 -   [Chris Hanel](http://www.chrishanel.com)
 
-### Special Thanks
+### Acknowledgements
 
--   [Atmo](https://github.com/atmosfar), original dashboard concept and code  
--   [Alex "Lange" Van Camp](http://alexvan.camp), designer & developer of [toth-overlay](https://github.com/TipoftheHats/toth-overlay)  
+-   [Atmo](https://github.com/atmosfar), original dashboard concept and code, the inspiration for toth-overlay  
+-   [Alex "Lange" Van Camp](http://alexvan.camp), designer & developer of [toth-overlay](https://github.com/TipoftheHats/toth-overlay), the base on which NodeCG was built
 
 ## Contribute
 
@@ -208,11 +155,6 @@ Note: Make sure you run `npm install` in the root directory without the `--produ
 1.  Ensure your code matches our existing style using our provided [EditorConfig](http://editorconfig.org/) options.
 2.  Ensure the existing tests pass, or are updated appropriately, with `npm test`.
 3.  For new features, you should add new tests.
-
-Check which branch you should PR to. NodeCG is still in an unstable state, so we follow these [semver](http://semver.org/) guidelines:
-
--   Bug fixes and new features go to the next 'patch' branch (`0.current.x`)
--   Breaking changes go to the next 'minor' branch (`0.next.0`)
 
 ### Building and viewing the docs locally
 

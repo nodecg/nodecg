@@ -4,7 +4,7 @@ However, because every panel is an iframe, it is not possible for a panel to dra
 This limitation made having dialogs and modals impossible, among other things. To address this, we created a dedicated
 system for displaying dialogs.
 
-A dialog is defined the same as any other dashboard panel would be in [package.json]{@tutorial manifest}, with an
+A dialog is defined the same as any other dashboard panel would be in [package.json]{@tutorial 5_manifest}, with an
 additional `dialog: true` property.
 
 ## Opening dialogs
@@ -16,7 +16,7 @@ To open a dialog, add a `nodecg-dialog` attribute to any clickable element on on
 
 ## Closing dialogs
 By default, a dialog can only be closed by clicking outside of it. Optional confirmation and dismissal buttons can be
-added via `package.json`. See the [package.json tutorial]{@tutorial manifest} for information on the `dialogButtons`
+added via `package.json`. See the [package.json tutorial]{@tutorial 5_manifest} for information on the `dialogButtons`
 property.
 
 When a `confirm` or `dismiss` button is pressed, NodeCG will emit a `dialog-confirmed` or `dialog-dismissed` event
