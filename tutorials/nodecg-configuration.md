@@ -34,7 +34,7 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
     - `clientID` _String_ A Twitch application ClientID [http://twitch.tv/kraken/oauth2/clients/new](http://twitch.tv/kraken/oauth2/clients/new)
     - `clientSecret` _String_ A Twitch application ClientSecret [http://twitch.tv/kraken/oauth2/clients/new](http://twitch.tv/kraken/oauth2/clients/new)
     - _Note:_ Configure your Twitch OAuth credentials with a Redirect URI to `{baseURL}/login/auth/twitch`
-    - `scope` _String_ A space-separated string of Twitch application [permissions](https://dev.twitch.tv/docs/v5/guides/authentication/#scopes).
+    - `scope` _String_ A space-separated string of Twitch application [permissions](https://dev.twitch.tv/docs/authentication/#scopes).
     - `allowedUsernames` _Array of strings_ Which Twitch usernames to allow.
 - `ssl` _Object_ Contains HTTPS/SSL configuration properties.
     - `enabled` _Boolean_ Whether to enable SSL/HTTPS encryption.
