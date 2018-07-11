@@ -156,11 +156,6 @@ Note: Make sure you run `npm install` in the root directory without the `--produ
 2.  Ensure the existing tests pass, or are updated appropriately, with `npm test`.
 3.  For new features, you should add new tests.
 
-Check which branch you should PR to. NodeCG is still in an unstable state, so we follow these [semver](http://semver.org/) guidelines:
-
--   Bug fixes and new features go to the next 'patch' branch (`0.current.x`)
--   Breaking changes go to the next 'minor' branch (`0.next.0`)
-
 ### Building and viewing the docs locally
 
 Documentation contributions are always welcome and very appreciated!
