@@ -2,6 +2,53 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/nodecg/nodecg/compare/v0.9.12...v1.0.0) (2018-07-11)
+
+
+### Bug Fixes
+
+* remove undocumented and non-functional panelClick event ([1c20d58](https://github.com/nodecg/nodecg/commit/1c20d58))
+* remove undocumented dialog-confirm and dialog-dismiss attribute click handlers ([cab06b6](https://github.com/nodecg/nodecg/commit/cab06b6))
+* **assets:** fix "can't set headers..." error ([#411](https://github.com/nodecg/nodecg/issues/411)) ([518cf21](https://github.com/nodecg/nodecg/commit/518cf21))
+* **dashboard:** remove useless and busted-looking "info" dialog from panels ([22499bd](https://github.com/nodecg/nodecg/commit/22499bd))
+* **login:** use the New Twitch API ([#413](https://github.com/nodecg/nodecg/issues/413)) ([6696231](https://github.com/nodecg/nodecg/commit/6696231))
+* **mounts:** put mount routes behind an auth check ([c99fa85](https://github.com/nodecg/nodecg/commit/c99fa85))
+* **sounds:** remove undocumented customCues system ([efe877e](https://github.com/nodecg/nodecg/commit/efe877e))
+
+
+### Features
+
+* **api:** add support for intra-context messaging ([#410](https://github.com/nodecg/nodecg/issues/410)) ([3a3acf7](https://github.com/nodecg/nodecg/commit/3a3acf7))
+* **api:** support multiple listenFor handlers ([#403](https://github.com/nodecg/nodecg/issues/403)) ([f19c79b](https://github.com/nodecg/nodecg/commit/f19c79b)), closes [#298](https://github.com/nodecg/nodecg/issues/298)
+* **bundle-manager:** blacklisted bundle directory names ([#357](https://github.com/nodecg/nodecg/issues/357)) ([68e7add](https://github.com/nodecg/nodecg/commit/68e7add))
+
+
+### BREAKING CHANGES
+
+* **dashboard**: The undocumented `[dialog-confirm]` and `[dialog-dismiss]` attribute click handlers have been removed.
+* **dashboard**: The undocumented (and broken) `panelClick` event has been removed.
+* **api:** sendMessage can now trigger listenFor handlers in the same context (extension, webpage, etc).
+* **login:** The format of Twitch auth scopes has changed. Please see https://dev.twitch.tv/docs/authentication/#scopes for documentation on this new format.
+* **login:** Twitch auth now uses the "New Twitch API", instead of the deprecated "v5" API.
+* **api:** A given context (server, client) can now declare multiple listenFor handlers for a given message. Handlers are called in the order they were registered.
+
+However, a server-side listenFor handler must be careful to only call an acknowledgement once. Attempting to call an acknowledgement more than once will throw an error.
+
+Your server-side code can check if an acknowledgement has already been called/handled by checking its `.handled` property.
+
+Example:
+```js
+nodecg.listenFor('example', (data, ack) => {
+	if (ack && !ack.handled) {
+		ack();
+	}
+});
+```
+* **sounds:** The undocumented customCues system has been removed.
+
+
+
 <a name="0.9.12"></a>
 ## [0.9.12](https://github.com/nodecg/nodecg/compare/v0.9.11...v0.9.12) (2018-07-05)
 
