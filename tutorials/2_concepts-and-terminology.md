@@ -11,7 +11,7 @@ NodeCG has a few main concepts to understand in order to get the most out of it 
 Every bundle needs a [`package.json`](https://docs.npmjs.com/files/package.json) manifest file in its root directory. In addition to the required fields like `name` and `version`, NodeCG bundles must also have a `nodecg` object in their `package.json` with some additional properties that tell NodeCG how to load your bundle.
 
 ### Related Docs
-- {@tutorial manifest}
+- {@tutorial 5_manifest}
 
 ## Graphics
 Graphics are the end result that your viewers will see. NodeCG itself doesn't provide any libraries for drawing pixels, it instead lets the user decide how they want to create their graphics in the open framework of HTML5, CSS3, and JS (with ES6 being fully supported). NodeCG will also helpfully inject an API instance into the global scope of your graphics, accessible as `window.nodecg` (or just `nodecg`) from your graphic's code.
@@ -26,9 +26,9 @@ Graphics are defined in your bundle's `package.json` file, in the `nodecg.graphi
     - Ideally, you'd never need to use `singleInstance`. However, it is sometimes hard to avoid, and can be the fastest route to shipping a complex graphic.
     
 ### Related Docs
-- {@tutorial manifest}
-- {@tutorial using-npm}
-- {@tutorial using-bower}
+- {@tutorial 5_manifest}
+- {@tutorial 7_using-npm}
+- {@tutorial 8_using-bower}
 - {@tutorial performance-tips}
 - {@tutorial screenshot-testing}
 
@@ -49,10 +49,10 @@ The dashboard is where all your controls for your graphics end up. Each panel is
   - `dialogButtons`, an optional property, that will show buttons for `confirm`, `dismiss`, or both on the dialog.
   
 ### Related Docs
-- {@tutorial manifest}
+- {@tutorial 5_manifest}
 - {@tutorial making-dialogs}
-- {@tutorial using-npm}
-- {@tutorial using-bower}
+- {@tutorial 7_using-npm}
+- {@tutorial 8_using-bower}
 - {@tutorial sounds}
 - {@tutorial assets}
 
@@ -82,9 +82,9 @@ and keep all those files in a single `extension` folder. If using an `extension`
 
 ### Related Docs
 - {@link NodeCG#extensions}
-- {@tutorial manifest}
-- {@tutorial using-npm}
-- {@tutorial bundle-configuration}
+- {@tutorial 5_manifest}
+- {@tutorial 7_using-npm}
+- {@tutorial 9_bundle-configuration}
 - {@tutorial custom-routes}
 - {@tutorial mounts}
 
@@ -93,6 +93,7 @@ Messages are the way NodeCG lets extensions, dashboard panels, and the graphics 
 
 ### Related Docs
 - {@link NodeCG#sendMessage}
+- {@link NodeCG#sendMessageToBundle}
 - {@link NodeCG#listenFor}
 
 ## Replicants
