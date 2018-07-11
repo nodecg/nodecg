@@ -26,7 +26,7 @@ Before continuing, you may find it helpful to look over our [collection of simpl
     npm install --global yo generator-nodecg
     cd bundles
     mkdir my-first-bundle
-    cd my-first
+    cd my-first-bundle
     yo nodecg
     ```
     
