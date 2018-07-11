@@ -104,12 +104,12 @@ Avoid installing or uninstalling bundles while NodeCG is running.
 -   Start NodeCG (`node index.js` or `nodecg start` if you have [nodecg-cli](https://www.npmjs.com/package/nodecg-cli) installed).
 -   Open the dashboard (`http://localhost:9090` by default).
 -   Open a graphic from the "Graphics" menu.
--   You can configure NodeCG by creating and editing [cfg/nodecg.json](http://nodecg.com/tutorial-nodecg-configuration.html).
+-   You can configure NodeCG by creating and editing [cfg/nodecg.json](http://nodecg.com/6_tutorial-nodecg-configuration.html).
 
 ### Configuration
 
 `./cfg/nodecg.json` is an optional file that you can create to configure NodeCG.
-See the [NodeCG Configuration tutorial](http://nodecg.com/tutorial-nodecg-configuration.html) for more information on configuring NodeCG.
+See the [NodeCG Configuration tutorial](http://nodecg.com/6_tutorial-nodecg-configuration.html) for more information on configuring NodeCG.
 
 ## Bundles
 
