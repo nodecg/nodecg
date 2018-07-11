@@ -44,7 +44,7 @@ without writing any code may be disappointed.
 -   [Bundles](#bundles)
 -   [Concepts and Terminology](#concepts-and-terminology)
 -   [Maintainers](#maintainers)
-    -   [Special Thanks](#special-thanks)
+    -   [Acknowledgements](#acknowledgements)
 -   [Contribute](#contribute)
     -   [Building and viewing the docs locally](#building-and-viewing-the-docs-locally)
     -   [Running tests locally](#running-tests-locally)
@@ -133,10 +133,10 @@ A breakdown of the terminology and concepts used inside NodeCG can be found [her
 -   [Alex "Lange" Van Camp](http://alexvan.camp)   
 -   [Chris Hanel](http://www.chrishanel.com)
 
-### Special Thanks
+### Acknowledgements
 
--   [Atmo](https://github.com/atmosfar), original dashboard concept and code  
--   [Alex "Lange" Van Camp](http://alexvan.camp), designer & developer of [toth-overlay](https://github.com/TipoftheHats/toth-overlay)  
+-   [Atmo](https://github.com/atmosfar), original dashboard concept and code, the inspiration for toth-overlay  
+-   [Alex "Lange" Van Camp](http://alexvan.camp), designer & developer of [toth-overlay](https://github.com/TipoftheHats/toth-overlay), the base on which NodeCG was built
 
 ## Contribute
 
