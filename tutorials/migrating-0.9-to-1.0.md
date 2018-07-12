@@ -14,7 +14,7 @@ This undocumented feature has been removed. If your bundle relied on it, you wil
 
 ### <a name="panel-click"></a> Undocumented (and broken) `panelClick` event has been removed
 
-Previously, NodeCG had an undocumented feature where any click even on any panel (or dialog) would emit a `panelClick` event on that panel's `document`.
+Previously, NodeCG had an undocumented feature where any click event on any panel (or dialog) would emit a `panelClick` event on that panel's `document`.
 
 This undocumented feature has been removed, and never really worked properly to begin with. If your bundle relied on it, you will need to re-implement similar functionality in your bundle's code.
 
