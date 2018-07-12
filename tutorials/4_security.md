@@ -6,6 +6,7 @@
   - [Local Auth](#local-auth)
   - [Twitch Auth](#twitch-auth)
   - [Steam Auth](#steam-auth)
+- [How do I enable HTTPS/SSL encryption?](#enabling-https)
 
 ## <a name="insecure-by-default"></a> Is NodeCG secure by default?
 **No.** By default, NodeCG has no authorization or authentication of any kind. To enable basic authentication, see the [How do I enable login security?](#enabling-login-security) section.
@@ -131,5 +132,21 @@ Configure your `nodecg/cfg/nodecg.json` as such:
       ]
     }
   }
+}
+```
+
+## <a name="enabling-https"></a> How do I enable HTTPS/SSL encryption?
+1. Create an SSL certificate if you don't already have one.
+  - Creating an SSL cert is out of the scope of this tutorial. You may need to do some Googling if you are unfamiliar with this process.
+2. Configure your `nodecg/cfg/nodecg.json` as such:
+3. Restart NodeCG, and confirm that your instance is accessible via HTTPS.
+
+```json
+{
+    "ssl": {
+        "enabled": true,
+        "keyPath": "C:\\example\\path\\your-cert-key.key",
+        "certificatePath": "C:\\example\\path\\your-cert.crt"
+	}
 }
 ```
