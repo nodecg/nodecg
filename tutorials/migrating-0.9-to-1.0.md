@@ -46,7 +46,7 @@ module.exports = function (nodecg) {
 ```
 
 ```html
-// nodecg/bundles/your-bundle/graphics/example.html
+<!-- nodecg/bundles/your-bundle/graphics/example.html -->
 <script>
 nodecg.sendMessage('example', 'hello', (error, response) => {
     console.log(response); // => Will log "foo".

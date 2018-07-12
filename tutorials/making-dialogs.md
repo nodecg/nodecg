@@ -23,7 +23,7 @@ When a `confirm` or `dismiss` button is pressed, NodeCG will emit a `dialog-conf
 on your dialog's `document`. For example:
 
 ```html
-// bundles/my-bundle/dashboard/my-dialog.html
+<!-- bundles/my-bundle/dashboard/my-dialog.html -->
 <script>
     document.addEventListener('dialog-confirmed', function() {
         // The user pressed the confirm button.
