@@ -165,12 +165,11 @@ test.serial('server - should support intra-context messaging', async t => {
 test.serial('client - should support intra-context messaging', async t => {
 	t.plan(2);
 
-	// But, we also want to make sure that the server (extension) is still getting these messages as normal.
+	// We also want to make sure that the server (extension) is still getting these messages as normal.
 	e.apis.extension.listenFor('clientToClient', data => {
 		t.deepEqual(data, {baz: 'qux'});
 	});
 
-	// But, we also make sure that the client (browser) is still getting these messages as normal.
 	const response = await e.browser.client.executeAsync(done => {
 		window.dashboardApi.listenFor('clientToClient', data => {
 			done(data);
