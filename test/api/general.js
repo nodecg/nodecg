@@ -181,3 +181,13 @@ test.serial('client - should support intra-context messaging', async t => {
 	});
 	t.deepEqual(response.value, {baz: 'qux'});
 });
+
+test.serial('server - #bundleGit', t => {
+	t.deepEqual(e.apis.extension.bundleGit, {
+		branch: 'master',
+		date: new Date('2018-07-13T17:09:29.000Z'),
+		hash: '6262681c7f35eccd7293d57a50bdd25e4cd90684',
+		message: 'Initial commit',
+		shortHash: '6262681'
+	});
+});
