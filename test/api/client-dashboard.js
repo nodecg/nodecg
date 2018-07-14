@@ -7,6 +7,10 @@ const test = require('ava');
 require('../helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard']}); // Must be first.
 const e = require('../helpers/test-environment');
 
+test.beforeEach(async () => {
+	await e.browser.client.switchTab(e.browser.tabs.dashboard);
+});
+
 test.serial('should produce an error if a callback isn\'t given', t => {
 	const error = t.throws(() => {
 		e.apis.extension.listenFor('testMessageName', 'test');
@@ -72,4 +76,17 @@ test.serial('should support multiple listenFor handlers', async t => {
 		return window.__serverToDashboardMultipleDone__;
 	});
 	t.true(res.value);
+});
+
+test.serial('#bundleGit', async t => {
+	const res = await e.browser.client.execute(() => {
+		return window.dashboardApi.bundleGit;
+	});
+	t.deepEqual(res.value, {
+		branch: 'master',
+		date: '2018-07-13T17:09:29.000Z',
+		hash: '6262681c7f35eccd7293d57a50bdd25e4cd90684',
+		message: 'Initial commit',
+		shortHash: '6262681'
+	});
 });

@@ -23,6 +23,7 @@ const addCustomBrowserCommands = require('./custom-webdriver-commands');
 module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) {
 	fse.copySync('test/fixtures/nodecg-core/assets', path.join(tempFolder, 'assets'));
 	fse.copySync('test/fixtures/nodecg-core/bundles', path.join(tempFolder, 'bundles'));
+	fse.moveSync(path.join(tempFolder, 'bundles/test-bundle/git'), path.join(tempFolder, 'bundles/test-bundle/.git'));
 	fse.copySync('test/fixtures/nodecg-core/cfg', path.join(tempFolder, 'cfg'));
 	fse.copySync(`test/fixtures/nodecg-core/cfg/${nodecgConfigName}`, path.join(tempFolder, 'cfg/nodecg.json'));
 	fse.copySync('test/fixtures/nodecg-core/db', path.join(tempFolder, 'db'));
