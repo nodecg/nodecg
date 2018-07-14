@@ -43,6 +43,13 @@ test.cb.serial('should send messages', t => {
 	e.browser.client.execute(() => window.graphicApi.sendMessage('graphicToServer'));
 });
 
+test.serial('#bundleVersion', async t => {
+	const res = await e.browser.client.execute(() => {
+		return window.graphicApi.bundleVersion;
+	});
+	t.is(res.value, '0.0.1');
+});
+
 test.serial('#bundleGit', async t => {
 	const res = await e.browser.client.execute(() => {
 		return window.graphicApi.bundleGit;

@@ -181,6 +181,10 @@ test.serial('client - should support intra-context messaging', async t => {
 	t.deepEqual(response.value, {baz: 'qux'});
 });
 
+test.serial('server - #bundleVersion', t => {
+	t.is(e.apis.extension.bundleVersion, '0.0.1');
+});
+
 test.serial('server - #bundleGit', t => {
 	t.deepEqual(e.apis.extension.bundleGit, {
 		branch: 'master',

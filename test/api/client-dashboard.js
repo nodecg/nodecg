@@ -78,6 +78,13 @@ test.serial('should support multiple listenFor handlers', async t => {
 	t.true(res.value);
 });
 
+test.serial('#bundleVersion', async t => {
+	const res = await e.browser.client.execute(() => {
+		return window.dashboardApi.bundleVersion;
+	});
+	t.is(res.value, '0.0.1');
+});
+
 test.serial('#bundleGit', async t => {
 	const res = await e.browser.client.execute(() => {
 		return window.dashboardApi.bundleGit;
