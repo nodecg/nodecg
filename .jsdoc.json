@@ -16,7 +16,10 @@
 	],
 	"templates": {
 		"cleverLinks": false,
-		"monospaceLinks": true
+		"monospaceLinks": true,
+		"github": {
+			"url": "https://github.com/nodecg/nodecg"
+		}
 	},
 	"opts": {
 		"encoding": "utf8",
