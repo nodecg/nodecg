@@ -129,8 +129,11 @@ A breakdown of the terminology and concepts used inside NodeCG can be found [her
 
 ## Maintainers
 
+-   [Alex "Lange" Van Camp](http://alexvan.camp) 
 -   [Matt "Bluee" McNamara](http://mattmcn.com/)  
--   [Alex "Lange" Van Camp](http://alexvan.camp)   
+
+## Designers
+
 -   [Chris Hanel](http://www.chrishanel.com)
 
 ### Acknowledgements
