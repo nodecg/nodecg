@@ -16,3 +16,5 @@
 *.png binary
 *.webm binary
 *.woff binary
+
+test/fixtures/nodecg-core/bundles/test-bundle/git/* text eol=lf
