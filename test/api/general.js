@@ -197,6 +197,5 @@ test('server - #bundleGit', t => {
 
 test('bundles replicant', t => {
 	const bundlesRep = e.apis.extension.Replicant('bundles', 'nodecg');
-	bundlesRep.on('change', newVal => console.log(newVal));
 	t.is(bundlesRep.value.length, 5);
 });
