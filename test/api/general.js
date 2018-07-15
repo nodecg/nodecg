@@ -181,11 +181,11 @@ test.serial('client - should support intra-context messaging', async t => {
 	t.deepEqual(response.value, {baz: 'qux'});
 });
 
-test.serial('server - #bundleVersion', t => {
+test('server - #bundleVersion', t => {
 	t.is(e.apis.extension.bundleVersion, '0.0.1');
 });
 
-test.serial('server - #bundleGit', t => {
+test('server - #bundleGit', t => {
 	t.deepEqual(e.apis.extension.bundleGit, {
 		branch: 'master',
 		date: new Date('2018-07-13T17:09:29.000Z'),
@@ -193,4 +193,10 @@ test.serial('server - #bundleGit', t => {
 		message: 'Initial commit',
 		shortHash: '6262681'
 	});
+});
+
+test('bundles replicant', t => {
+	const bundlesRep = e.apis.extension.Replicant('bundles', 'nodecg');
+	bundlesRep.on('change', newVal => console.log(newVal));
+	t.is(bundlesRep.value.length, 5);
 });
