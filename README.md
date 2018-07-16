@@ -53,7 +53,7 @@ without writing any code may be disappointed.
 
 ## Install
 
-Install [Node.js (version 6 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
+Install [Node.js (version 8 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
 
 Then, run the following commands from a terminal (command prompt):
 
@@ -65,6 +65,8 @@ npm install --production
 bower install
 node index.js
 ```
+
+Looking to get started developing bundles? Check out the [Quick Start tutorial](https://nodecg.com/tutorial-3_quick-start.html).
 
 To run NodeCG in production, [pm2](https://github.com/Unitech/pm2) is recommended.
 
