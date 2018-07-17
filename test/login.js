@@ -115,9 +115,9 @@ test.serial.cb('socket should deny access to bad credentials', t => {
 async function logIn(t) {
 	t.is(await e.browser.client.getUrl(), C.LOGIN_URL);
 
-	await e.browser.client.waitForVisible('#username');
-	await e.browser.client.waitForVisible('#localForm');
-	await e.browser.client.waitForVisible('#password');
+	await e.browser.client.waitForVisible('#username', 2500);
+	await e.browser.client.waitForVisible('#localForm', 2500);
+	await e.browser.client.waitForVisible('#password', 2500);
 
 	await e.browser.client.setValue('#username', 'admin');
 	await e.browser.client.setValue('#password', 'password');
