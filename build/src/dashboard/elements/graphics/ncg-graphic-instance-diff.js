@@ -61,6 +61,10 @@
 		}
 
 		_formatCommitMessage(message) {
+			if (!message) {
+				return '[No commit message.]';
+			}
+
 			if (message.length > 50) {
 				message = message.slice(0, 50);
 				message += '…';
