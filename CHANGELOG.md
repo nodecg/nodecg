@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.1.1"></a>
+## [1.1.1](https://github.com/nodecg/nodecg/compare/v1.1.0...v1.1.1) (2018-07-19)
+
+
+### Bug Fixes
+
+* **dashboard:** fix missing background color on graphics collapse toggle button ([9e6bc4d](https://github.com/nodecg/nodecg/commit/9e6bc4d))
+* **package:** include schemas folder in zeit pkg builds ([c38e463](https://github.com/nodecg/nodecg/commit/c38e463))
+
+
+
 <a name="1.1.0"></a>
 # [1.1.0](https://github.com/nodecg/nodecg/compare/v1.0.0...v1.1.0) (2018-07-19)
 
