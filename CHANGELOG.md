@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/nodecg/nodecg/compare/v1.0.0...v1.1.0) (2018-07-19)
+
+
+### Features
+
+* **api:** add nodecg.bundleGit object ([#418](https://github.com/nodecg/nodecg/issues/418)) ([dfe0b95](https://github.com/nodecg/nodecg/commit/dfe0b95))
+* **api:** add nodecg.bundleVersion to api ([#459](https://github.com/nodecg/nodecg/issues/459)) ([170142b](https://github.com/nodecg/nodecg/commit/170142b))
+* **api:** introduce bundles replicant ([#421](https://github.com/nodecg/nodecg/issues/421)) ([94d0b1d](https://github.com/nodecg/nodecg/commit/94d0b1d))
+* **dashboard:** implement dark theme ([#425](https://github.com/nodecg/nodecg/issues/425)) ([0dafe4e](https://github.com/nodecg/nodecg/commit/0dafe4e))
+* **dashboard:** implement redesigned graphics tab with refresh buttons ([#420](https://github.com/nodecg/nodecg/issues/420)) ([215f489](https://github.com/nodecg/nodecg/commit/215f489))
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/nodecg/nodecg/compare/v0.9.12...v1.0.0) (2018-07-11)
 
