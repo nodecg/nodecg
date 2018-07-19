@@ -2,10 +2,11 @@
 <link rel="import" href="../../../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../../../bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="../../../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../ui/ui-select.html">
 
 <dom-module id="ncg-sound-cue">
 	<template>
-		<style>
+		<style include="nodecg-theme">
 			:host {
 				@apply --layout-horizontal;
 				align-items: center;
@@ -53,7 +54,7 @@
 			<span id="name">[[name]]</span>
 		</div>
 
-		<select id="select" on-change="_retargetFile"></select>
+		<ui-select id="select" on-change="_retargetFile"></ui-select>
 		<paper-slider id="slider" min="0" max="100" step="1" on-change="_onSliderChange" editable></paper-slider>
 	</template>
 

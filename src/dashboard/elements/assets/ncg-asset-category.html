@@ -12,7 +12,7 @@
 
 <dom-module id="ncg-asset-category">
 	<template>
-		<style>
+		<style include="nodecg-theme">
 			:host {
 				display: block;
 				width: 100%;
@@ -29,10 +29,15 @@
 			}
 
 			#header {
+				@apply --layout-vertical;
+				background-color: #525F78;
+				padding: 12px 0;
+			}
+
+			#header-main {
+				@apply --layout-center;
 				@apply --layout-horizontal;
 				@apply --layout-justified;
-				@apply --layout-center;
-				margin-bottom: 6px;
 			}
 
 			#title {
@@ -40,7 +45,10 @@
 			}
 
 			#files {
+				background-color: #2F3A4F;
 				max-height: 400px;
+				margin: 0 -16px;
+				padding-left: 16px;
 				--util-scrollable: {
 					padding: 0;
 				};
@@ -58,10 +66,12 @@
 			}
 
 			#add {
-				--paper-button: {
-					background-color: var(--nodecg-configure-color);
-					color: white;
-				}
+				--nodecg-background-color: #00A651;
+			}
+
+			#add iron-icon {
+				position: relative;
+				top: -1px;
 			}
 		</style>
 
@@ -75,11 +85,18 @@
 		<paper-toast id="toast"></paper-toast>
 
 		<div id="header">
-			<span id="title">[[category.title]]</span>
-			<paper-button id="add" raised on-click="openUploadDialog">
-				<iron-icon icon="add"></iron-icon>
-				Add File(s)
-			</paper-button>
+			<div id="header-main">
+				<span id="title">[[category.title]]</span>
+				<paper-button id="add" on-click="openUploadDialog">
+					<iron-icon icon="add"></iron-icon>
+					Add File(s)
+				</paper-button>
+			</div>
+
+
+			<div id="empty">
+				There are no assets in this category.
+			</div>
 		</div>
 
 		<util-scrollable id="files">
@@ -91,10 +108,6 @@
 				</ncg-asset-file>
 			</template>
 		</util-scrollable>
-
-		<div id="empty">
-			There are no assets in this category.
-		</div>
 
 		<!-- 2017/03/18: Had to remove with-backdrop during the dashboard re-write -->
 		<paper-dialog id="uploadDialog">

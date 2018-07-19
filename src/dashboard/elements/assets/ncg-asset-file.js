@@ -15,7 +15,7 @@ class NcgAssetFile extends Polymer.Element {
 
 	_deletingChanged(newVal) {
 		this.$.spinner.style.display = newVal ? 'block' : 'none';
-		this.$.delete.style.display = newVal ? 'none' : 'flex';
+		this.$.delete.style.visibility = newVal ? 'hidden' : 'visible';
 	}
 
 	_handleDeleteClick() {

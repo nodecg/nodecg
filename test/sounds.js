@@ -124,8 +124,7 @@ test.serial('mixer - assignable cues - should list new sound Assets as they are 
 		const el = document.querySelector('ncg-dashboard').shadowRoot
 			.querySelector('ncg-mixer').shadowRoot
 			.querySelector('ncg-sounds[bundle-name="test-bundle"]').shadowRoot
-			.querySelector('ncg-sound-cue:nth-child(1)').shadowRoot
-			.querySelector('#select');
+			.querySelector('ncg-sound-cue:nth-child(1)').$.select.$.select;
 
 		if (!el) {
 			return done('NoSuchElement');

@@ -45,7 +45,7 @@ test('should return the expected data when "nodecg" property does exist', t => {
 			name: 'test',
 			title: 'Test Panel',
 			width: 1,
-			headerColor: '#9f9bbd',
+			headerColor: '#525F78',
 			path: path.resolve(__dirname, '../fixtures/bundle-parser/good-bundle/dashboard/panel.html'),
 			file: 'panel.html',
 			html: '<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test panel!</p>\n<script>' +
@@ -73,7 +73,7 @@ test('should return the expected data when "nodecg" property does exist', t => {
 			name: 'test-fullbleed-panel',
 			title: 'Test Fullbleed Panel',
 			width: 1,
-			headerColor: '#9f9bbd',
+			headerColor: '#525F78',
 			path: path.resolve(__dirname, '../fixtures/bundle-parser/good-bundle/dashboard/fullbleed-panel.html'),
 			file: 'fullbleed-panel.html',
 			html: '<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test fullbleed panel!</p>\n</body></html>',

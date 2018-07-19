@@ -7,38 +7,19 @@
 
 <dom-module id="ncg-settings">
 	<template>
-		<style>
+		<style include="nodecg-theme">
 			:host {
-				width: 100%;
-				max-width: 600px;
 				@apply --layout-vertical;
-				@apply --layout-stretch;
-			}
-
-			#copyKey {
-				color: white;
-				background-color: var(--nodecg-brand-blue);
-			}
-
-			#showKey {
-				--paper-button: {
-					background-color: var(--nodecg-configure-color);
-					color: white;
-				}
-			}
-
-			#resetKey {
-				--paper-button: {
-					background-color: var(--nodecg-danger-color);
-					color: white;
-				}
+				max-width: 600px;
+				width: 100%;
 			}
 
 			.card-actions {
 				padding: 0;
 				padding-top: 8px;
 				@apply --layout-horizontal;
-				@apply --layout-center-center;
+				@apply --layout-center;
+				@apply --layout-end-justified;
 			}
 
 			paper-button {
@@ -62,10 +43,6 @@
 				margin-right: 0;
 			}
 
-			.text-warning {
-				color: #c53929;
-			}
-
 			@media (max-width: 400px) {
 				paper-button iron-icon {
 					display: none;
@@ -75,20 +52,20 @@
 
 		<paper-card heading="Your Key">
 			<div class="card-content">
-				<p class="text-warning paper-font-body1">
+				<p class="paper-font-body1" style="margin-top: 0; padding: 0">
 					Resetting your key will disrupt all current sessions using it.<br/>
 					When you reset your key, the dashboard will be refreshed so that a new key can be obtained.
 				</p>
 				<div class="card-actions">
-					<paper-button raised  id="copyKey">
+					<paper-button raised id="copyKey" class="nodecg-benign">
 						<iron-icon icon="icons:content-copy"></iron-icon>
 						<span>Copy Key</span>
 					</paper-button>
-					<paper-button raised id="showKey" title="Show Key" on-tap="openShowKeyDialog">
+					<paper-button raised id="showKey" class="nodecg-configure" title="Show Key" on-tap="openShowKeyDialog">
 						<iron-icon icon="communication:vpn-key"></iron-icon>
 						<span>Show Key</span>
 					</paper-button>
-					<paper-button raised id="resetKey" on-tap="openResetKeyDialog">
+					<paper-button raised id="resetKey" class="nodecg-reject" on-tap="openResetKeyDialog">
 						<iron-icon icon="icons:refresh"></iron-icon>
 						<span>Reset Key</span>
 					</paper-button>

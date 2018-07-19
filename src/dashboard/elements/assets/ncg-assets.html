@@ -3,32 +3,25 @@
 
 <dom-module id="ncg-assets">
 	<template>
-		<style>
+		<style include="nodecg-theme">
 			:host {
-				width: 100%;
-				max-width: 600px;
 				@apply --layout-vertical;
-				@apply --layout-stretch;
+				max-width: 600px;
+				width: 100%;
 			}
 
 			.assets-divider {
+				border-bottom: 1px solid #2F3A4F;
 				box-sizing: border-box;
-				margin: 12px 10px;
-				border-top: 1px solid #bdbdbd;
 			}
 
 			.assets-divider:last-of-type {
 				display: none;
 			}
 
-			.collectionName {
-				display: block;
-				font-size: 2em;
-				font-weight: bold;
-			}
-
-			paper-card {
-				margin-bottom: 12px;
+			.card-content {
+				padding: 0;
+				background-color: #525F78;
 			}
 		</style>
 
@@ -39,10 +32,8 @@
 		</nodecg-replicant>
 
 		<template is="dom-repeat" items="[[collections]]" as="collection">
-			<paper-card>
+			<paper-card heading$="[[collection.name]]">
 				<div class="card-content">
-					<div class="collectionName">[[collection.name]]</div>
-
 					<template is="dom-repeat" items="[[collection.categories]]" as="category" mutable-data>
 						<ncg-asset-category
 							collection-name="[[collection.name]]"

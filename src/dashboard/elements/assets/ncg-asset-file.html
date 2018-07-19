@@ -6,40 +6,39 @@
 
 <dom-module id="ncg-asset-file">
 	<template>
-		<style>
+		<style include="nodecg-theme">
 			:host {
+				@apply --layout-center;
 				@apply --layout-horizontal;
 				@apply --layout-justified;
-				@apply --layout-center;
+				margin: 4px 0;
 			}
 
 			#name {
-				color: #5C5CCE;
-				font-size: 14px;
-				font-weight: 500;
-				letter-spacing: 0.018em;
 				line-height: 24px;
 				overflow: hidden;
-				text-decoration: none;
 				text-overflow: ellipsis;
 				text-transform: none;
 			}
 
 			#delete {
-				display: flex;
 				align-items: center;
-				color: var(--nodecg-danger-color);
+				display: flex;
 				flex-shrink: 0;
+				margin-right: 21px;
 			}
 
 			#spinner {
-				--paper-spinner-color: var(--nodecg-danger-color);
+				--paper-spinner-color: var(--nodecg-reject-color);
+				pointer-events: none;
+				position: absolute;
+				right: 78px;
 			}
 		</style>
 
 		<a id="name" href="[[file.url]]" target="_blank">[[file.base]]</a>
 		<paper-spinner-lite id="spinner" alt="Deleting" active></paper-spinner-lite>
-		<paper-button id="delete" on-click="_handleDeleteClick">
+		<paper-button id="delete" class="nodecg-reject" on-click="_handleDeleteClick">
 			<iron-icon icon="delete"></iron-icon>
 			&ensp;Delete
 		</paper-button>
