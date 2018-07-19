@@ -109,7 +109,8 @@
       "bower_components/**/*",
       "src/**/*",
       "build/**/*",
-      "bundles/**/*"
+      "bundles/**/*",
+      "schemas/**/*"
     ]
   },
   "devDependencies": {
