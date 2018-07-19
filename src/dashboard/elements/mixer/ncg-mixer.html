@@ -2,7 +2,7 @@
 
 <dom-module id="ncg-mixer">
 	<template>
-		<style>
+		<style include="nodecg-theme">
 			:host {
 				white-space: nowrap;
 				width: 100%;
@@ -12,8 +12,8 @@
 			}
 
 			#mixer-masterCard {
-				background-color: rgb(0, 112, 112);
-				color: white;
+				background-color: #525F78;
+				border-bottom: 5px solid var(--nodecg-brand-blue);
 				margin-bottom: 16px;
 			}
 
@@ -32,13 +32,10 @@
 			}
 
 			#masterFader {
-				width: 250px;
+				background-color: #525F78;
+				color: white;
 				flex-shrink: 1;
-				--paper-slider-active-color: white;
-				--paper-slider-knob-color: white;
-				--paper-input-container-focus-color: var(--google-blue-700);
-				--paper-input-container-color: white;
-				--paper-input-container-input-color: white;
+				width: 250px;
 				--paper-slider-input: {
 					width: 80px;
 				};

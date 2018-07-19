@@ -19,6 +19,7 @@
 <link rel="import" href="../../../bower_components/polymer/lib/elements/custom-style.html">
 <link rel="import" href="../../../bower_components/polymer/lib/utils/debounce.html">
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../css/nodecg-theme.html">
 <link rel="import" href="assets/ncg-assets.html">
 <link rel="import" href="graphics/ncg-graphics.html">
 <link rel="import" href="mixer/ncg-mixer.html">
@@ -28,11 +29,11 @@
 
 <dom-module id="ncg-dashboard">
 	<template>
-		<style>
+		<style include="nodecg-theme">
 			:host {
 				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-				overflow: hidden;
 				@apply --layout-fullbleed;
+				overflow: hidden;
 			}
 
 			app-drawer-layout,
@@ -41,7 +42,7 @@
 			}
 
 			app-header {
-				background-color: rgb(255, 255, 255);
+				background-color: #2F3A4F;
 				--app-header-shadow: {
 					box-shadow: inset 0 5px 6px -3px rgba(0, 0, 0, 0.2);
 					height: 10px;
@@ -51,20 +52,20 @@
 
 			app-drawer {
 				--app-drawer-content-container: {
-					background-color: #f3f3f3;
+					background-color: #2F3A4F;
 				};
 			}
 
 			.spacer {
-				@apply --layout;
-				@apply --layout-flex-auto;
 				@apply --layout-center-center;
+				@apply --layout-flex-auto;
+				@apply --layout;
 			}
 
 			paper-tabs {
-				height: 100%;
-				@apply --layout-horizontal;
 				@apply --layout-center;
+				@apply --layout-horizontal;
+				height: 100%;
 				--paper-tabs-selection-bar-color: var(--nodecg-brand-blue);
 				--paper-tabs-selection-bar: {
 					border-bottom-width: 5px;
@@ -72,12 +73,10 @@
 			}
 
 			paper-tab {
+				@apply --layout-flex-none;
 				font-size: 12px;
 				text-transform: uppercase;
 				user-select: none;
-
-				@apply --layout-flex-none;
-
 				--paper-tab-ink: var(--nodecg-brand-blue);
 				--paper-tab-content: {
 					font-weight: 500!important; /* don't bold when focused */
@@ -86,7 +85,7 @@
 					@apply --layout-center-center;
 				};
 				--paper-tab-content-unselected: {
-					color: black;
+					color: white;
 				};
 			}
 
@@ -95,13 +94,13 @@
 			}
 
 			paper-icon-button {
-				color: #000;
 				--paper-icon-button-ink-color: var(--nodecg-brand-blue);
+				color: white;
 			}
 
 			#mainLogo {
-				width: 48px;
 				height: 48px;
+				width: 48px;
 			}
 
 			#drawerToolbar {
@@ -110,15 +109,15 @@
 			}
 
 			#drawerLogo {
-				width: 83px;
 				height: 28px;
 				padding-left: 16px;
+				width: 83px;
 			}
 
 			.button-label {
-				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
+				white-space: nowrap;
 			}
 
 			paper-icon-item {
@@ -133,15 +132,15 @@
 			}
 
 			.list a {
+				color: white;
 				display: block;
 				line-height: 40px;
 				text-decoration: none;
 				text-transform: uppercase;
-				color: #7c7c7c;
 			}
 
 			.list a.iron-selected {
-				color: var(--nodecg-brand-blue);
+				background-color: #525F78;
 			}
 
 			.list a.iron-selected paper-icon-item {
@@ -155,14 +154,14 @@
 			}
 
 			section {
-				box-sizing: border-box;
 				@apply --layout-flex;
+				box-sizing: border-box;
 			}
 
 			section:not(.section-workspace) {
-				padding: 32px;
-				@apply --layout-vertical;
 				@apply --layout-center;
+				@apply --layout-vertical;
+				padding: 32px;
 			}
 
 			section.section-workspace {
@@ -170,16 +169,16 @@
 			}
 
 			#pages {
+				@apply --layout-flex-auto;
+				@apply --layout-vertical;
+				box-sizing: border-box;
 				height: 1px; /* just need to specify *any* height, the rest is then taken care of somehow? */
 				overflow: auto;
-				box-sizing: border-box;
-				@apply --layout-vertical;
-				@apply --layout-flex-auto;
 			}
 
 			#reconnectToast {
-				@apply --layout-horizontal;
 				@apply --layout-center;
+				@apply --layout-horizontal;
 			}
 
 			#reconnectToast paper-spinner {
@@ -187,11 +186,11 @@
 			}
 
 			paper-spinner {
-				--paper-spinner-stroke-width: 5px;
 				--paper-spinner-layer-1-color: #645BA6;
 				--paper-spinner-layer-2-color: #A50074;
 				--paper-spinner-layer-3-color: #5BA664;
 				--paper-spinner-layer-4-color: #C9513E;
+				--paper-spinner-stroke-width: 5px;
 			}
 
 			[hidden] {
@@ -200,9 +199,9 @@
 
 			#dialogs iframe {
 				box-sizing: border-box;
-				width: 100%;
 				margin: 0 !important;
 				padding: 0 !important;
+				width: 100%;
 			}
 
 			/**

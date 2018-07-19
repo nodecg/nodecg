@@ -2,9 +2,11 @@
 
 // Packages
 const test = require('ava');
+const axios = require('axios');
 
 // Ours
 require('./helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard', 'standalone']}); // Must be first.
+const C = require('./helpers/test-constants');
 const e = require('./helpers/test-environment');
 
 test.beforeEach(async () => {
@@ -24,6 +26,12 @@ test.serial('panels - should show up standalone', async t => {
 	await e.browser.client.switchTab(e.browser.tabs.panelStandalone);
 	const isExisting = await e.browser.client.isExisting('#test-bundle-paragraph');
 	t.true(isExisting);
+});
+
+test('panels - get default styles injected', async t => {
+	const response = await axios.get(C.TEST_PANEL_URL);
+	t.is(response.status, 200);
+	t.true(response.data.includes('panel-defaults.css'));
 });
 
 test.serial('ncg-dialog - should have the buttons defined in dialogButtons', async t => {
