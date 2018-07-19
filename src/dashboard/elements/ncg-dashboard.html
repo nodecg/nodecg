@@ -294,6 +294,7 @@
 								<template is="dom-repeat" items="[[workspaces]]" as="workspace">
 									<paper-tab
 										class="workspaceTab"
+										data-route$="[[workspace.route]]"
 										route="[[workspace.route]]"
 										aria-label="[[workspace.name]]"
 										on-tap="_selectRoute">
@@ -304,7 +305,11 @@
 
 							<paper-tabs selected="[[routeData.page]]" attr-for-selected="route">
 								<template is="dom-repeat" items="[[pages]]" as="page" initial-count="1">
-									<paper-tab route="[[page.route]]" aria-label="[[page.name]]" on-tap="_selectRoute">
+									<paper-tab
+										data-route$="[[page.route]]"
+										route="[[page.route]]"
+										aria-label="[[page.name]]"
+										on-tap="_selectRoute">
 										<iron-icon icon="[[page.icon]]"></iron-icon>
 										[[page.name]]
 									</paper-tab>

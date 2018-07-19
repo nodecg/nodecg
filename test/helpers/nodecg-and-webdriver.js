@@ -17,9 +17,6 @@ temp.track(); // Automatically track and cleanup files at exit.
 // may have. We don't want to touch any existing user data!
 process.env.NODECG_ROOT = tempFolder;
 
-// Ours
-const addCustomBrowserCommands = require('./custom-webdriver-commands');
-
 module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) {
 	fse.copySync('test/fixtures/nodecg-core/assets', path.join(tempFolder, 'assets'));
 	fse.copySync('test/fixtures/nodecg-core/bundles', path.join(tempFolder, 'bundles'));
@@ -47,6 +44,7 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 		}
 
 		const webdriverio = require('webdriverio');
+		const wdioWebcomponents = require('wdio-webcomponents');
 		const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
 		e.browser.client = webdriverio.remote({
 			desiredCapabilities: {
@@ -60,6 +58,8 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 			}
 		});
 
+		wdioWebcomponents.init(e.browser.client);
+
 		const originalNewWindow = e.browser.client.newWindow.bind(e.browser.client);
 		e.browser.client.newWindow = async (...args) => {
 			const returnValue = await originalNewWindow(...args);
@@ -68,9 +68,6 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 			});
 			return returnValue;
 		};
-
-		// Attach our custom methods to this browser instance.
-		addCustomBrowserCommands(e.browser.client);
 
 		await e.browser.client.init();
 		await e.browser.client.timeouts('script', 30000);
