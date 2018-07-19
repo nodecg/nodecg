@@ -14,12 +14,12 @@ test.beforeEach(async () => {
 });
 
 test.serial('panels - should show up on the dashboard', async t => {
-	const res = await e.browser.client.shadowDomElement([
+	const isExisting = await e.browser.client.isExisting([
 		'ncg-dashboard',
 		'ncg-workspace',
 		'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]'
-	]);
-	t.true(Boolean(res.value));
+	].join(' '));
+	t.true(isExisting);
 });
 
 test.serial('panels - should show up standalone', async t => {

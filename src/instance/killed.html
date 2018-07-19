@@ -35,10 +35,10 @@
 			return b;
 		})(window.location.search.substr(1).split('&'));
 
-		document.getElementById('graphicPath').textContent = qs['path'];
-		document.getElementById('graphicLink').setAttribute('href', qs['path']);
+		document.getElementById('graphicPath').textContent = qs['pathname'];
+		document.getElementById('graphicLink').setAttribute('href', qs['pathname']);
 
-		// TODO: show error if qs['path'] is undefined
+		// TODO: show error if qs['pathname'] is undefined
 	</script>
 </body>
 </html>

@@ -11,12 +11,5 @@ module.exports = {
 	browser: {
 		client: {},
 		tabs: {}
-	},
-	sleep(milliseconds) {
-		return new Promise(resolve => {
-			setTimeout(() => {
-				resolve();
-			}, milliseconds);
-		});
 	}
 };

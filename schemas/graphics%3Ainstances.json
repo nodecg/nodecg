@@ -1,0 +1,52 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "array",
+	"default": [],
+	"items": {
+		"type": "object",
+		"additionalProperties": false,
+		"properties": {
+			"ipv4": {
+				"type": "string"
+			},
+			"timestamp": {
+				"type": "number"
+			},
+			"bundleName": {
+				"type": "string"
+			},
+			"bundleVersion": {
+				"type": "string"
+			},
+			"bundleGit": {
+				"type": "object"
+			},
+			"pathName": {
+				"type": "string"
+			},
+			"singleInstance": {
+				"type": "boolean"
+			},
+			"socketId": {
+				"type": "string"
+			},
+			"open": {
+				"type": "boolean"
+			},
+			"potentiallyOutOfDate": {
+				"type": "boolean"
+			}
+		},
+		"required": [
+			"ipv4",
+			"timestamp",
+			"bundleName",
+			"bundleVersion",
+			"pathName",
+			"singleInstance",
+			"socketId",
+			"open",
+			"potentiallyOutOfDate"
+		]
+	}
+}

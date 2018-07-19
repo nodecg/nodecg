@@ -11,6 +11,7 @@ require('./helpers/nodecg-and-webdriver')(test, { // Must be first.
 });
 const C = require('./helpers/test-constants');
 const e = require('./helpers/test-environment');
+const util = require('./helpers/utilities');
 
 test.beforeEach(async () => {
 	await e.browser.client.switchTab(e.browser.tabs.login);
@@ -86,7 +87,7 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 		window.socket.emit('regenerateToken', window.token);
 	});
 
-	await e.sleep(2000);
+	await util.sleep(2000);
 
 	const url = await e.browser.client.getUrl();
 	t.true(url.startsWith(`${C.ROOT_URL}authError?code=token_invalidated`));

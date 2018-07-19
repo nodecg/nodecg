@@ -12,6 +12,7 @@ const axios = require('axios');
 require('./helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard']}); // Must be first.
 const C = require('./helpers/test-constants');
 const e = require('./helpers/test-environment');
+const util = require('./helpers/utilities');
 
 const TWITTER_BANNER_PATH = path.join(C.ASSETS_ROOT, 'test-bundle/assets/twitter_banner.png');
 
@@ -81,7 +82,7 @@ test.serial('deletion - 200', async t => {
 		assetCategoryFile.$.delete.click();
 	});
 
-	await e.sleep(500);
+	await util.sleep(500);
 
 	t.false(fs.existsSync(TWITTER_BANNER_PATH));
 });
