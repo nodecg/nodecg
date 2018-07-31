@@ -51,7 +51,7 @@ interface NodeCGCommon<P extends Platform, M = SendMessageReturnType<P>> {
 /**
  * NodeCG instance in extensions
  */
-export interface NodeCGServer extends NodeCGCommon<'server'> {
+interface NodeCGServer extends NodeCGCommon<'server'> {
 	getSocketIOServer(): SocketIO.Server;
 	mount: IRouter['use'];
 	util: {
@@ -65,7 +65,7 @@ export interface NodeCGServer extends NodeCGCommon<'server'> {
 /**
  * NodeCG instance in browser
  */
-export interface NodeCGBrowser extends NodeCGCommon<'browser'> {
+interface NodeCGBrowser extends NodeCGCommon<'browser'> {
 	socket: SocketIOClient.Socket;
 	soundReady?: boolean;
 	getDialog(
@@ -228,7 +228,7 @@ interface ReplicantStaticBrowser<V, S extends boolean = true> {
 /**
  * Replicant constructor combined
  */
-type ReplicantStatic<V, P extends Platform> = P extends 'server'
+export type ReplicantStatic<V, P extends Platform> = P extends 'server'
 	? ReplicantStaticServer<V>
 	: ReplicantStaticBrowser<V>;
 
@@ -306,7 +306,7 @@ export interface ReplicantOptions<V, S extends boolean = true> {
 /**
  * Used to select types for browser API or extensions API
  */
-type Platform = 'server' | 'browser';
+export type Platform = 'server' | 'browser';
 
 /**
  * sendMessage returns Promise in browser, void in extensions
@@ -338,12 +338,7 @@ interface SendMessageToBundle<
 /**
  * NodeCG logger level enum
  */
-type LoggerLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';
-
-/**
- * Bundle enable/disable options in NodeCG config
- */
-type BundlesOptions = {enabled: string[]} | {disabled: string[]};
+export type LoggerLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';
 
 /**
  * Replicant queue object
