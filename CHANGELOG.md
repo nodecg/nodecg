@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.1.3"></a>
+## [1.1.3](https://github.com/nodecg/nodecg/compare/v1.1.2...v1.1.3) (2018-08-05)
+
+
+### Bug Fixes
+
+* **dashboard:** also target root html for theme import ([0948f5f](https://github.com/nodecg/nodecg/commit/0948f5f))
+* **dashboard:** fix text and icon colors of Asset upload dialog ([d1d3a45](https://github.com/nodecg/nodecg/commit/d1d3a45))
+* **dashboard:** implement missing dark theme for bundle dialogs ([d14158f](https://github.com/nodecg/nodecg/commit/d14158f))
+* **package:** roll node-localstorage to v1.3.1 ([56d8bb7](https://github.com/nodecg/nodecg/commit/56d8bb7))
+
+
+
 <a name="1.1.2"></a>
 ## [1.1.2](https://github.com/nodecg/nodecg/compare/v1.1.1...v1.1.2) (2018-07-19)
 
