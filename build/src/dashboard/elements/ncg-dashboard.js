@@ -235,6 +235,10 @@
 		_falsey(value) {
 			return !value;
 		}
+
+		_calcButtonClass(buttonType) {
+			return buttonType === 'confirm' ? 'nodecg-accept' : 'nodecg-reject';
+		}
 	}
 
 	function getImageDataURI(url, cb) {
