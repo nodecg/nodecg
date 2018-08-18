@@ -82,7 +82,7 @@
     "prerelease": "npm t",
     "release": "standard-version",
     "postrelease": "npm publish && git push --follow-tags && npm run docs:publish",
-    "typetest": "tsc --project ./test/types"
+    "typetest": "tsc --project ./test/types/server && tsc --project ./test/types/browser"
   },
   "nyc": {
     "include": [
@@ -164,6 +164,5 @@
     "vinyl-transform": "^1.0.0",
     "wdio-webcomponents": "^1.1.0",
     "webdriverio": "^4.13.1"
-  },
-  "types": "./types.d.ts"
+  }
 }

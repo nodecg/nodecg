@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"target": "es2015",
+		"module": "commonjs",
+		"lib": ["esnext", "dom"],
+		"noEmit": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"strict": true
+	},
+	"include": ["./**/*.ts", "../../../types/**/*.ts"]
+}
