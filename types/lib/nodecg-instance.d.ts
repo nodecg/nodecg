@@ -61,6 +61,15 @@ export interface NodeCGServer extends NodeCGCommon<'server'> {
 	extensions: {
 		[bundleName: string]: (nodecg: NodeCGServer) => void;
 	};
+	listenFor(
+		messageName: string,
+		handlerFunc: (message: any, cb?: ListenForCb) => void
+	): void;
+	listenFor(
+		messageName: string,
+		bundleName: string,
+		handlerFunc: (message: any, cb?: ListenForCb) => void
+	): void;
 }
 
 /**
@@ -103,4 +112,15 @@ interface Cue {
 	name: string;
 	assignable: boolean;
 	defaultFile: string;
+}
+
+export type ListenForCb = HandledListenForCb | UnhandledListenForCb;
+
+interface HandledListenForCb {
+	handled: true;
+}
+
+interface UnhandledListenForCb {
+	(...args: any[]): void;
+	handled: false;
 }
