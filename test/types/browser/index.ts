@@ -13,3 +13,6 @@ nodecg.log.trace('some verbose logs here');
 nodecg.sendMessage('hello!').then(() => {
 	console.log('done');
 });
+
+const sound = nodecg.playSound('playRocknRoll')
+console.log(sound.duration)
