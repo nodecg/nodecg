@@ -16,7 +16,7 @@ interface NodeCGCommon<P extends Platform, M = SendMessageReturnType<P>> {
 		date?: Date;
 		message?: string;
 	};
-	Logger(name: string): typeof Logger;
+	Logger: typeof Logger;
 	log: Logger;
 	readonly config: NodeCGConfig;
 	sendMessage(
@@ -268,6 +268,7 @@ export interface NodeCGConfig {
  * NodeCG Logger class
  */
 export class Logger {
+	constructor(name: string);
 	trace(...args: any[]): void;
 	debug(...args: any[]): void;
 	info(...args: any[]): void;
