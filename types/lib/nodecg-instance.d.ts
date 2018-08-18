@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 /// <reference types="node" />
 /// <reference types="socket.io" />
-/// <reference types="createjs-lib" />
+/// <reference types="soundjs" />
 
 import {IRouter, RequestHandler} from 'express-serve-static-core';
 
