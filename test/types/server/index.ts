@@ -1,6 +1,6 @@
-import {NodeCGServer} from '../../../types/lib/nodecg-instance';
+import {NodeCG} from '../../../types/server';
 
-export = (nodecg: NodeCGServer) => {
+export = (nodecg: NodeCG) => {
 	new nodecg.Logger('foo');
 	nodecg.Replicant<string>('stringRep').value;
 	nodecg.listenFor('execSomethin', data => {
