@@ -1,3 +1,8 @@
+/// <reference lib="dom" />
+/// <reference types="node" />
+/// <reference types="socket.io" />
+/// <reference types="createjs-lib" />
+
 import {IRouter, RequestHandler} from 'express-serve-static-core';
 
 import {Logger} from './logger';
