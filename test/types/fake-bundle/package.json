@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "name": "fake-bundle",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^3.0.1"
+  },
+  "scripts": {
+    "build": "tsc --project ./src/dashboard; tsc --project ./src/extension"
+  }
+}

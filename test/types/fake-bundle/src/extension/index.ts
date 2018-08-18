@@ -1,4 +1,4 @@
-import {NodeCG} from '../../../types/server';
+import {NodeCG} from '../../../../../types/server';
 
 export = (nodecg: NodeCG) => {
 	new nodecg.Logger('foo');

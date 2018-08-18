@@ -1,4 +1,4 @@
-import {nodecg, NodeCG} from '../../../types/browser';
+import {nodecg, NodeCG} from '../../../../../types/browser';
 
 console.log(nodecg);
 console.log(NodeCG);

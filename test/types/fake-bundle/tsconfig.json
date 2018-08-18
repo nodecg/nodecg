@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		// Generally-used configs
+		"target": "es2015",
+		"module": "commonjs",
+		"lib": ["es6"],
+		"strict": true,
+
+		// Don't have to emit in tests
+		"noEmit": true,
+
+		// Required to simulate bundle directory, excluding parent typedef packages
+		"types": [],
+		"baseUrl": "./",
+		"typeRoots": ["./"]
+	}
+}
