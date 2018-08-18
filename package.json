@@ -82,7 +82,7 @@
     "prerelease": "npm t",
     "release": "standard-version",
     "postrelease": "npm publish && git push --follow-tags && npm run docs:publish",
-    "typetest": "tsc --project ./test/types/server && tsc --project ./test/types/browser"
+    "typetest": "tsc --project ./test/types/server; tsc --project ./test/types/browser"
   },
   "nyc": {
     "include": [
