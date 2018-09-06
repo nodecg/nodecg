@@ -53,7 +53,7 @@ without writing any code may be disappointed.
 
 ## Install
 
-Install [Node.js (version 8 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
+Install [Node.js (version 8.3 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
 
 Then, run the following commands from a terminal (command prompt):
 
