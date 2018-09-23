@@ -91,8 +91,8 @@ run the bundler.
 
 ### Make an entrypoint
 
-When building front-end, HTML file is usually used as entrypoint. It would look
-like this.
+When building front-end, HTML file is usually used as entrypoint. You can just
+use your HTML file with your scripts and stylesheets imported.
 
 ```html
 <!DOCTYPE html>
@@ -110,9 +110,9 @@ like this.
 </html>
 ```
 
-This HTML file will also be compiled in the bundler. So you can many kind of
-files in the `script` tag. Parcel will automatically detect file format and use
-appropriate library/compiler to bundle the file.
+The entrypoint HTML file will also be compiled in the bundler. So you can many
+kind of files in the `script` tag. Parcel will automatically detect file format
+and use appropriate library/compiler to bundle the file.
 
 ```html
 <script src="./main.coffee"></script>
@@ -122,7 +122,7 @@ appropriate library/compiler to bundle the file.
 <script src="./app.tsx"></script>
 ```
 
-Or the entrypoint isn't even have to be an HTML file. For example, you can use
+Or the entrypoint doesn't even have to be an HTML file. For example, you can use
 Pug to have common parts of HTML file into one file.
 
 ```pug
@@ -137,8 +137,6 @@ html
 ```
 
 ### Run the command
-
-That's it! Now all you have to do is run the magic command.
 
 For development, with file change detection and hot-reloading:
 
