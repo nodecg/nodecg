@@ -138,7 +138,7 @@ Configure your `nodecg/cfg/nodecg.json` as such:
 ## <a name="enabling-https"></a> How do I enable HTTPS/SSL encryption?
 1. Create an SSL certificate if you don't already have one.
   - Creating an SSL cert is out of the scope of this tutorial. You may need to do some Googling if you are unfamiliar with this process.
-2. Configure your `nodecg/cfg/nodecg.json` as such:
+2. Configure your `nodecg/cfg/nodecg.json` as such (passphrase is only required if you created your key with one):
 3. Restart NodeCG, and confirm that your instance is accessible via HTTPS.
 
 ```json
@@ -146,7 +146,8 @@ Configure your `nodecg/cfg/nodecg.json` as such:
     "ssl": {
         "enabled": true,
         "keyPath": "C:\\example\\path\\your-cert-key.key",
-        "certificatePath": "C:\\example\\path\\your-cert.crt"
+        "certificatePath": "C:\\example\\path\\your-cert.crt",
+        "passphrase": "this is my example passphrase"
 	}
 }
 ```
