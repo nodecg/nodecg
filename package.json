@@ -94,7 +94,7 @@
     "all": true
   },
   "engines": {
-    "node": ">= 4.1.2"
+    "node": ">=8.3.0"
   },
   "files": [
     "AUTHORS",
