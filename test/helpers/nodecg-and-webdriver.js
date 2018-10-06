@@ -20,7 +20,7 @@ process.env.NODECG_ROOT = tempFolder;
 
 let browser;
 const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
-const launchBrowserPromise = puppeteer.launch({headless: !IS_TRAVIS}).then(b => {
+const launchBrowserPromise = puppeteer.launch({headless: IS_TRAVIS}).then(b => {
 	browser = b;
 });
 
