@@ -8,6 +8,7 @@ const path = require('path');
 // Packages
 const fse = require('fs-extra');
 const temp = require('temp');
+const puppeteer = require('puppeteer');
 
 const tabIdsSet = new Set();
 const tempFolder = temp.mkdirSync();
@@ -16,6 +17,12 @@ temp.track(); // Automatically track and cleanup files at exit.
 // Tell NodeCG to look in our new temp folder for bundles, cfg, db, and assets, rather than whatever ones the user
 // may have. We don't want to touch any existing user data!
 process.env.NODECG_ROOT = tempFolder;
+
+let browser;
+const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
+const launchBrowserPromise = puppeteer.launch({headless: !IS_TRAVIS}).then(b => {
+	browser = b;
+});
 
 module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) {
 	fse.copySync('test/fixtures/nodecg-core/assets', path.join(tempFolder, 'assets'));
@@ -43,97 +50,72 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 			return;
 		}
 
-		const webdriverio = require('webdriverio');
-		const wdioWebcomponents = require('wdio-webcomponents');
-		const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
-		e.browser.client = webdriverio.remote({
-			desiredCapabilities: {
-				browserName: 'chrome',
-				chromeOptions: {
-					args: IS_TRAVIS ? ['--no-sandbox'] : []
-				},
-				loggingPrefs: {
-					browser: 'ALL'
-				}
-			}
-		});
-
-		wdioWebcomponents.init(e.browser.client);
-
-		const originalNewWindow = e.browser.client.newWindow.bind(e.browser.client);
-		e.browser.client.newWindow = async (...args) => {
-			const returnValue = await originalNewWindow(...args);
-			await e.browser.client.getCurrentTabId().then(tabId => {
-				tabIdsSet.add(tabId);
-			});
-			return returnValue;
-		};
-
-		await e.browser.client.init();
-		await e.browser.client.timeouts('script', 30000);
+		await launchBrowserPromise;
+		e.browser.client = browser;
 
 		if (tabs.includes('dashboard')) {
-			await e.browser.client.newWindow(C.DASHBOARD_URL, 'NodeCG dashboard', '');
-			e.browser.tabs.dashboard = await e.browser.client.getCurrentTabId();
-			await e.browser.client.executeAsync(done => {
-				/* eslint-disable no-undef */
+			const page = await browser.newPage();
+			await page.goto(C.DASHBOARD_URL);
+			e.browser.tabs.dashboard = page;
+			await page.evaluate(() => new Promise(resolve => {
 				const checkForApi = setInterval(() => {
-					if (typeof window.dashboardApi !== 'undefined' && typeof Polymer !== 'undefined') {
+					if (
+						typeof window.dashboardApi !== 'undefined' &&
+						typeof window.Polymer !== 'undefined'
+					) {
 						clearInterval(checkForApi);
-						Polymer.RenderStatus.afterNextRender(this, () => {
-							done();
-						});
+						window.Polymer.RenderStatus.afterNextRender(this, resolve);
 					}
 				}, 50);
-				/* eslint-enable no-undef */
-			});
+			}));
 		}
 
 		if (tabs.includes('standalone')) {
-			await e.browser.client.newWindow(`${C.TEST_PANEL_URL}?standalone=true`, 'NodeCG test bundle standalone panel', '');
-			e.browser.tabs.panelStandalone = await e.browser.client.getCurrentTabId();
-			await e.browser.client.executeAsync(done => {
+			const page = await browser.newPage();
+			await page.goto(`${C.TEST_PANEL_URL}?standalone=true`);
+			e.browser.tabs.panelStandalone = page;
+			await page.evaluate(() => new Promise(resolve => {
 				const checkForApi = setInterval(() => {
 					if (typeof window.dashboardApi !== 'undefined') {
 						clearInterval(checkForApi);
-						done();
+						resolve();
 					}
 				}, 50);
-			});
+			}));
 		}
 
 		if (tabs.includes('graphic')) {
-			await e.browser.client.newWindow(C.GRAPHIC_URL, 'NodeCG test bundle graphic', '');
-			e.browser.tabs.graphic = await e.browser.client.getCurrentTabId();
-			e.browser.client.executeAsync(done => {
+			const page = await browser.newPage();
+			await page.goto(C.GRAPHIC_URL);
+			e.browser.tabs.graphic = page;
+			page.evaluate(() => new Promise(resolve => {
 				const checkForApi = setInterval(() => {
 					if (typeof window.graphicApi !== 'undefined') {
 						clearInterval(checkForApi);
-						done();
+						resolve();
 					}
 				}, 50);
-			});
+			}));
 		}
 
 		if (tabs.includes('single-instance')) {
-			await e.browser.client.newWindow(C.SINGLE_INSTANCE_URL, 'NodeCG test single instance graphic', '');
-			e.browser.tabs.singleInstance = await e.browser.client.getCurrentTabId();
-			e.browser.client.executeAsync(done => {
+			const page = await browser.newPage();
+			await page.goto(C.SINGLE_INSTANCE_URL);
+			e.browser.tabs.singleInstance = page;
+			page.evaluate(() => new Promise(resolve => {
 				const checkForApi = setInterval(() => {
 					if (typeof window.singleInstanceApi !== 'undefined') {
 						clearInterval(checkForApi);
-						done();
+						resolve();
 					}
 				}, 50);
-			});
+			}));
 		}
 
 		if (tabs.includes('login')) {
-			await e.browser.client.newWindow(C.LOGIN_URL, 'NodeCG login page', '');
-			e.browser.tabs.login = await e.browser.client.getCurrentTabId();
+			e.browser.tabs.login = await e.browser.client.newPage();
+			await e.browser.tabs.login.goto(C.LOGIN_URL);
 		}
-
-		await e.browser.client.timeouts('script', 5000);
 	});
 
 	test.after.always(async () => {
@@ -141,16 +123,13 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 			e.server.stop();
 		}
 
-		if (e.browser && e.browser.client && typeof e.browser.client.end === 'function') {
+		if (browser) {
 			if (!fs.existsSync('.nyc_output')) {
 				fs.mkdirSync('.nyc_output');
 			}
 
 			/* eslint-disable no-await-in-loop */
-			const tabIds = Array.from(tabIdsSet);
-			for (let i = 0; i < tabIds.length; i++) {
-				const tabId = tabIds[i];
-
+			for (const tabId of tabIdsSet) {
 				let coverageObj;
 
 				try {
@@ -161,26 +140,29 @@ module.exports = function (test, {tabs, nodecgConfigName = 'nodecg.json'} = {}) 
 					continue;
 				}
 
-				if (!coverageObj || typeof coverageObj !== 'object' || Object.keys(coverageObj).length <= 0) {
+				if (
+					!coverageObj ||
+					typeof coverageObj !== 'object' ||
+					Object.keys(coverageObj).length <= 0
+				) {
 					continue;
 				}
 
 				const newCoverageObj = {};
-				for (const key in coverageObj) {
-					if (!{}.hasOwnProperty.call(coverageObj, key)) {
-						continue;
-					}
-
+				for (const key of Object.keys(coverageObj)) {
 					const absKey = path.resolve('src', key);
 					coverageObj[key].path = absKey;
 					newCoverageObj[absKey] = coverageObj[key];
 				}
-
-				fs.writeFileSync(`.nyc_output/browser-${tabId}}.json`, JSON.stringify(newCoverageObj), 'utf8');
+				fs.writeFileSync(
+					`.nyc_output/browser-${tabId}}.json`,
+					JSON.stringify(newCoverageObj),
+					'utf8'
+				);
 			}
 			/* eslint-enable no-await-in-loop */
 
-			return e.browser.client.end();
+			return browser.close();
 		}
 	});
 };
