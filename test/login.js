@@ -8,12 +8,12 @@ const socketIoClient = require('socket.io-client');
 import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 server.setup('nodecg-login.json');
-browser.setup();
+const {initLogin} = browser.setup();
 
 import * as C from './helpers/test-constants';
 
 test.beforeEach(async t => {
-	t.context.loginPage = await browser.initLogin();
+	t.context.loginPage = await initLogin();
 });
 
 test.serial('redirects unauthorized users to /login', async t => {

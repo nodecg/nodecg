@@ -12,15 +12,11 @@ import * as C from './test-constants';
 
 const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
 
-let browser;
-const launchBrowser = () =>
-	puppeteer.launch({headless: Boolean(IS_TRAVIS), args: IS_TRAVIS ? ['--no-sandbox'] : undefined}).then(newBrowser => {
-		browser = newBrowser;
-	});
-
 export const setup = () => {
+	let browser;
+
 	test.before(async () => {
-		await launchBrowser();
+		browser = await puppeteer.launch({headless: Boolean(IS_TRAVIS), args: IS_TRAVIS ? ['--no-sandbox'] : undefined});
 	});
 	test.beforeEach(t => {
 		t.context.browser = browser;
@@ -68,42 +64,50 @@ export const setup = () => {
 
 		await browser.close();
 	});
-};
 
-export const initDashboard = async () => {
-	const page = await browser.newPage();
-	await page.goto(C.dashboardUrl());
-	await page.waitForFunction(() =>
-		typeof window.dashboardApi !== 'undefined' && typeof window.Polymer !== 'undefined');
-	await page.evaluate(() => new Promise(resolve => {
-		window.Polymer.RenderStatus.afterNextRender(this, resolve);
-	}));
-	return page;
-};
+	const initDashboard = async () => {
+		const page = await browser.newPage();
+		await page.goto(C.dashboardUrl());
+		await page.waitForFunction(() =>
+			typeof window.dashboardApi !== 'undefined' && typeof window.Polymer !== 'undefined');
+		await page.evaluate(() => new Promise(resolve => {
+			window.Polymer.RenderStatus.afterNextRender(this, resolve);
+		}));
+		return page;
+	};
 
-export const initStandalone = async () => {
-	const page = await browser.newPage();
-	await page.goto(`${C.testPanelUrl()}?standalone=true`);
-	await page.waitForFunction(() => typeof window.dashboardApi !== 'undefined');
-	return page;
-};
+	const initStandalone = async () => {
+		const page = await browser.newPage();
+		await page.goto(`${C.testPanelUrl()}?standalone=true`);
+		await page.waitForFunction(() => typeof window.dashboardApi !== 'undefined');
+		return page;
+	};
 
-export const initGraphic = async () => {
-	const page = await browser.newPage();
-	await page.goto(C.graphicUrl());
-	await page.waitForFunction(() => typeof window.graphicApi !== 'undefined');
-	return page;
-};
+	const initGraphic = async () => {
+		const page = await browser.newPage();
+		await page.goto(C.graphicUrl());
+		await page.waitForFunction(() => typeof window.graphicApi !== 'undefined');
+		return page;
+	};
 
-export const initSingleInstance = async () => {
-	const page = await browser.newPage();
-	await page.goto(C.singleInstanceUrl());
-	await page.evaluate(() => typeof window.singleInstanceApi !== 'undefined');
-	return page;
-};
+	const initSingleInstance = async () => {
+		const page = await browser.newPage();
+		await page.goto(C.singleInstanceUrl());
+		await page.evaluate(() => typeof window.singleInstanceApi !== 'undefined');
+		return page;
+	};
 
-export const initLogin = async () => {
-	const page = await browser.newPage();
-	await page.goto(C.loginUrl());
-	return page;
+	const initLogin = async () => {
+		const page = await browser.newPage();
+		await page.goto(C.loginUrl());
+		return page;
+	};
+
+	return {
+		initDashboard,
+		initStandalone,
+		initGraphic,
+		initSingleInstance,
+		initLogin
+	};
 };

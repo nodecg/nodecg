@@ -12,13 +12,13 @@ import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 
 server.setup();
-browser.setup();
+const {initDashboard} = browser.setup();
 
 import * as C from '../helpers/test-constants';
 
 let dashboard;
 test.before(async () => {
-	dashboard = await browser.initDashboard();
+	dashboard = await initDashboard();
 });
 
 test.serial('should return a reference to any already-declared replicant', async t => {

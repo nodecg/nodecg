@@ -11,15 +11,15 @@ import * as test from 'ava';
 import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 server.setup();
-browser.setup();
+const {initDashboard, initGraphic} = browser.setup();
 
 import * as C from './helpers/test-constants';
 
 let dashboard;
 let graphic;
 test.before(async () => {
-	dashboard = await browser.initDashboard();
-	graphic = await browser.initGraphic();
+	dashboard = await initDashboard();
+	graphic = await initGraphic();
 });
 
 test.serial('soundCues replicant - should generate the correct defaultValue', t => {

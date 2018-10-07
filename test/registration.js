@@ -14,15 +14,15 @@ const replace = require('replace-in-file');
 import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 server.setup();
-browser.setup();
+const {initSingleInstance, initDashboard, initGraphic} = browser.setup();
 import * as C from './helpers/test-constants';
 import * as util from './helpers/utilities';
 
 let singleInstance;
 let dashboard;
 test.before(async () => {
-	singleInstance = await browser.initSingleInstance();
-	dashboard = await browser.initDashboard();
+	singleInstance = await initSingleInstance();
+	dashboard = await initDashboard();
 
 	const graphicButton = await util.shadowSelector(
 		dashboard,
@@ -70,7 +70,7 @@ test.cb('singleInstance - shouldn\'t enter an infinite redirect loop when includ
 
 test.serial('singleInstance - should redirect to busy.html when the instance is already taken', async t => {
 	t.plan(0)
-	const page = await browser.initSingleInstance();
+	const page = await initSingleInstance();
 	await page.waitForFunction(rootUrl =>
 		location.href === `${rootUrl}instance/busy.html?pathname=/bundles/test-bundle/graphics/single_instance.html`, {}, C.rootUrl());
 });
@@ -99,12 +99,12 @@ test.serial('singleInstance - should redirect to killed.html when the instance i
 });
 
 test.serial('singleInstance - should allow the graphic to be taken after being killed', async t => {
-	const page = await browser.initSingleInstance();
+	const page = await initSingleInstance();
 	t.is(page.url(), C.singleInstanceUrl());
 });
 
 test.serial('refresh all instances in a bundle', async t => {
-	const graphic = await browser.initGraphic();
+	const graphic = await initGraphic();
 	await util.waitForRegistration(graphic);
 
 	const graphicBundle = await util.shadowSelector(
@@ -125,7 +125,7 @@ test.serial('refresh all instances in a bundle', async t => {
 });
 
 test.serial('refresh all instances of a graphic', async t => {
-	const graphic = await browser.initGraphic();
+	const graphic = await initGraphic();
 	await util.waitForRegistration(graphic);
 
 	await dashboard.bringToFront();
@@ -144,7 +144,7 @@ test.serial('refresh all instances of a graphic', async t => {
 });
 
 test.serial('refresh individual instance', async t => {
-	const graphic = await browser.initGraphic();
+	const graphic = await initGraphic();
 	await util.waitForRegistration(graphic);
 
 	await dashboard.bringToFront()

@@ -13,14 +13,14 @@ import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 
 server.setup();
-browser.setup();
+const {initDashboard} = browser.setup();
 
 import * as C from './helpers/test-constants';
 import * as util from './helpers/utilities';
 
 let dashboard;
 test.before(async () => {
-	dashboard = await browser.initDashboard();
+	dashboard = await initDashboard();
 });
 
 const TWITTER_BANNER_PATH = path.join(C.ASSETS_ROOT, 'test-bundle/assets/twitter_banner.png');

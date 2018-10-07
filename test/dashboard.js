@@ -8,15 +8,15 @@ import * as axios from 'axios';
 import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 server.setup();
-browser.setup();
+const {initDashboard, initStandalone} =browser.setup();
 
 import * as C from './helpers/test-constants';
 
 let dashboard;
 let standalone;
 test.before(async () => {
-	dashboard = await browser.initDashboard();
-	standalone = await browser.initStandalone();
+	dashboard = await initDashboard();
+	standalone = await initStandalone();
 });
 
 test.serial('panels - should show up on the dashboard', async t => {

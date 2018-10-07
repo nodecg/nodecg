@@ -8,11 +8,11 @@ import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 
 server.setup();
-browser.setup();
+const {initGraphic} = browser.setup();
 
 let graphic;
 test.before(async () => {
-	graphic = await browser.initGraphic();
+	graphic = await initGraphic();
 });
 
 // The graphic and dashboard APIs use the same file

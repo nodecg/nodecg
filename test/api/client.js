@@ -8,11 +8,11 @@ import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 
 server.setup();
-browser.setup();
+const {initDashboard} = browser.setup();
 
 let dashboard;
 test.before(async () => {
-	dashboard = await browser.initDashboard();
+	dashboard = await initDashboard();
 });
 
 test.serial('#config - should exist and have length', async t => {
