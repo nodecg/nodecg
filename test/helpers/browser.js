@@ -35,7 +35,7 @@ export const setup = () => {
 		for (const page of await browser.pages()) {
 			let coverageObj;
 			try {
-				coverageObj = await browser.evaluate(() => window.__coverate__);
+				coverageObj = await browser.evaluate(() => window.__coverage__);
 			} catch (e) {
 				continue;
 			}
