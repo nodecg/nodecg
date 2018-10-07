@@ -1,61 +1,59 @@
 'use strict';
 
 // Native
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Packages
-const test = require('ava');
-const axios = require('axios');
+import test from 'ava';
+import * as axios from 'axios';
 
 // Ours
-require('./helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard']}); // Must be first.
-const C = require('./helpers/test-constants');
-const e = require('./helpers/test-environment');
-const util = require('./helpers/utilities');
+import * as server from './helpers/server';
+import * as browser from './helpers/browser';
+
+server.setup();
+browser.setup();
+
+import * as C from './helpers/test-constants';
+import * as util from './helpers/utilities';
+
+let dashboard;
+test.before(async () => {
+	dashboard = await browser.initDashboard();
+});
 
 const TWITTER_BANNER_PATH = path.join(C.ASSETS_ROOT, 'test-bundle/assets/twitter_banner.png');
 
 test.serial('uploading', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-
-	await e.browser.client.execute(() => {
-		const assetCategoryEl = document.querySelector('ncg-dashboard').shadowRoot
-			.querySelector('ncg-assets').shadowRoot
+	const assetTab = await dashboard.evaluateHandle(() => document.querySelector('ncg-dashboard').shadowRoot.querySelector('paper-tab[data-route="assets"]'));
+	await assetTab.click();
+	const assetCategoryEl = await dashboard.evaluateHandle(() => {
+		return document
+			.querySelector('ncg-dashboard')
+			.shadowRoot
+			.querySelector('ncg-assets')
+			.shadowRoot
 			.querySelector('ncg-asset-category[collection-name="test-bundle"][category-name="assets"]');
-		console.log('assetCategoryEl:', assetCategoryEl);
-		window._assetCategoryEl = assetCategoryEl;
-
-		assetCategoryEl.$.add.click();
-
-		// WebdriverIO can't pierce shadow roots.
-		// So, to use the .chooseFile() method, we have to move our
-		// input outside of any shadow roots.
-		const fileInput = assetCategoryEl.$.uploader.$.fileInput;
-		document.body.appendChild(fileInput);
 	});
+	const addEl = await dashboard.evaluateHandle(el => el.$.add, assetCategoryEl);
+	await addEl.click();
+	const fileInputEl = await dashboard.evaluateHandle(el => el.$.uploader.$.fileInput, assetCategoryEl);
+	fileInputEl.uploadFile(path.resolve(__dirname, 'fixtures/assets-to-upload/twitter_banner.png'));
 
-	await e.browser.client.chooseFile(
-		'#fileInput',
-		path.resolve(__dirname, 'fixtures/assets-to-upload/twitter_banner.png')
-	);
-
-	await e.browser.client.executeAsync(done => {
-		const assetCategoryEl = window._assetCategoryEl;
+	await dashboard.evaluate(assetCategoryEl => new Promise(resolve => {
 		if (assetCategoryEl._successfulUploads === 1) {
-			done();
+			resolve();
 		} else {
-			assetCategoryEl.$.uploader.addEventListener('upload-success', () => {
-				done();
-			}, {once: true, passive: true});
+			assetCategoryEl.$.uploader.addEventListener('upload-success', resolve, {once: true, passive: true});
 		}
-	});
+	}), assetCategoryEl);
 
 	t.true(fs.existsSync(TWITTER_BANNER_PATH));
 });
 
 test.serial('retrieval - 200', async t => {
-	const response = await axios.get(`${C.ROOT_URL}assets/test-bundle/assets/twitter_banner.png`, {
+	const response = await axios.get(`${C.rootUrl()}assets/test-bundle/assets/twitter_banner.png`, {
 		responseType: 'arraybuffer'
 	});
 	t.is(response.status, 200);
@@ -64,23 +62,22 @@ test.serial('retrieval - 200', async t => {
 
 test.serial('retrieval - 404', async t => {
 	try {
-		await axios.get(`${C.ROOT_URL}assets/test-bundle/assets/bad.png`);
+		await axios.get(`${C.rootUrl()}assets/test-bundle/assets/bad.png`);
 	} catch (error) {
 		t.is(error.response.status, 404);
 	}
 });
 
 test.serial('deletion - 200', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-
-	await e.browser.client.execute(() => {
-		const assetCategoryFile = document.querySelector('ncg-dashboard').shadowRoot
-			.querySelector('ncg-assets').shadowRoot
-			.querySelector('ncg-asset-category[collection-name="test-bundle"][category-name="assets"]').shadowRoot
-			.querySelector('util-scrollable > ncg-asset-file');
-
-		assetCategoryFile.$.delete.click();
+	const deleteButton = await dashboard.waitForFunction(() => {
+		const file = document.querySelector('ncg-dashboard')
+			.shadowRoot.querySelector('ncg-assets')
+			.shadowRoot.querySelector('ncg-asset-category[collection-name="test-bundle"][category-name="assets"]')
+			.shadowRoot.querySelector('util-scrollable > ncg-asset-file')
+		return file && file.$.delete;
 	});
+
+	await deleteButton.click();
 
 	await util.sleep(500);
 
@@ -89,7 +86,7 @@ test.serial('deletion - 200', async t => {
 
 test.serial('deletion - 410', async t => {
 	try {
-		await axios.delete(`${C.ROOT_URL}assets/test-bundle/assets/bad.png`);
+		await axios.delete(`${C.rootUrl()}assets/test-bundle/assets/bad.png`);
 	} catch (error) {
 		t.is(error.response.status, 410);
 	}

@@ -1,74 +1,83 @@
 'use strict';
 
 // Native
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Packages
-const test = require('ava');
+import test from 'ava';
 
 // Ours
-require('../helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard']}); // Must be first.
-const e = require('../helpers/test-environment');
-const C = require('../helpers/test-constants');
+import * as server from '../helpers/server';
+import * as browser from '../helpers/browser';
 
-test('should return a reference to any already-declared replicant', t => {
-	const rep1 = e.apis.extension.Replicant('dupRef');
-	const rep2 = e.apis.extension.Replicant('dupRef');
+server.setup();
+browser.setup();
+
+import * as C from '../helpers/test-constants';
+
+let dashboard;
+test.before(async () => {
+	dashboard = await browser.initDashboard();
+});
+
+test.serial('should return a reference to any already-declared replicant', t => {
+	const rep1 = t.context.apis.extension.Replicant('dupRef');
+	const rep2 = t.context.apis.extension.Replicant('dupRef');
 	t.is(rep1, rep2);
 });
 
 test.serial('should only apply defaultValue when first declared', async t => {
-	await e.browser.client.executeAsync(done => {
+	await dashboard.evaluate(() => new Promise(done => {
 		const rep = window.dashboardApi.Replicant('extensionTest', {
 			defaultValue: 'foo',
 			persistent: false
 		});
-		rep.on('declared', () => done());
-	});
+		rep.on('declared', done);
+	}));
 
-	const rep = e.apis.extension.Replicant('extensionTest', {defaultValue: 'bar'});
+	const rep = t.context.apis.extension.Replicant('extensionTest', {defaultValue: 'bar'});
 	t.is(rep.value, 'foo');
 });
 
 test.serial('should be readable without subscription, via readReplicant', t => {
-	t.is(e.apis.extension.readReplicant('extensionTest'), 'foo');
+	t.is(t.context.apis.extension.readReplicant('extensionTest'), 'foo');
 });
 
-test('should throw an error when no name is provided', t => {
+test.serial('should throw an error when no name is provided', t => {
 	const error = t.throws(() => {
-		e.apis.extension.Replicant();
+		t.context.apis.extension.Replicant();
 	});
 
 	t.true(error.message.includes('Must supply a name when instantiating a Replicant'));
 });
 
-test('should throw an error when no namespace is provided', t => {
-	const originalName = e.apis.extension.bundleName;
-	e.apis.extension.bundleName = undefined;
+test.serial('should throw an error when no namespace is provided', t => {
+	const originalName = t.context.apis.extension.bundleName;
+	t.context.apis.extension.bundleName = undefined;
 	const error = t.throws(() => {
-		e.apis.extension.Replicant('name');
+		t.context.apis.extension.Replicant('name');
 	});
-	e.apis.extension.bundleName = originalName;
+	t.context.apis.extension.bundleName = originalName;
 	t.true(error.message.includes('Must supply a namespace when instantiating a Replicant'));
 });
 
-test('should not explode when schema is invalid', t => {
+test.serial('should not explode when schema is invalid', t => {
 	t.notThrows(() => {
-		e.apis.extension.Replicant('badSchema');
+		t.context.apis.extension.Replicant('badSchema');
 	});
 });
 
-test('should be assignable via the ".value" property', t => {
-	const rep = e.apis.extension.Replicant('extensionAssignmentTest', {persistent: false});
+test.serial('should be assignable via the ".value" property', t => {
+	const rep = t.context.apis.extension.Replicant('extensionAssignmentTest', {persistent: false});
 	rep.value = 'assignmentOK';
 	t.is(rep.value, 'assignmentOK');
 });
 
-test.cb('should react to changes in nested properties of objects', t => {
+test.cb.serial('should react to changes in nested properties of objects', t => {
 	t.plan(3);
 
-	const rep = e.apis.extension.Replicant('extensionObjTest', {
+	const rep = t.context.apis.extension.Replicant('extensionObjTest', {
 		persistent: false,
 		defaultValue: {a: {b: {c: 'c'}}}
 	});
@@ -94,28 +103,28 @@ test.cb('should react to changes in nested properties of objects', t => {
 	rep.value.a.b.c = 'nestedChangeOK';
 });
 
-test('memoization', t => {
+test.serial('memoization', t => {
 	t.is(
-		e.apis.extension.Replicant('memoizationTest'),
-		e.apis.extension.Replicant('memoizationTest')
+		t.context.apis.extension.Replicant('memoizationTest'),
+		t.context.apis.extension.Replicant('memoizationTest')
 	);
 });
 
-test.cb('should only apply array splices from the client once', t => {
+test.cb.serial('should only apply array splices from the client once', t => {
 	t.plan(1);
 
-	const serverRep = e.apis.extension.Replicant('clientDoubleApplyTest', {
+	const serverRep = t.context.apis.extension.Replicant('clientDoubleApplyTest', {
 		persistent: false,
 		defaultValue: []
 	});
 
-	e.browser.client
-		.executeAsync(done => {
+	dashboard
+		.evaluate(() => new Promise(resolve => {
 			window.clientDoubleApplyTest = window.dashboardApi.Replicant('clientDoubleApplyTest');
 			window.clientDoubleApplyTest.on('declared', () => {
-				window.clientDoubleApplyTest.on('change', () => done());
+				window.clientDoubleApplyTest.on('change', resolve);
 			});
-		})
+		}))
 		.then(() => {
 			serverRep.on('change', newVal => {
 				if (Array.isArray(newVal) && newVal[0] === 'test') {
@@ -123,13 +132,12 @@ test.cb('should only apply array splices from the client once', t => {
 					t.end();
 				}
 			});
-		})
-		.execute(() => window.clientDoubleApplyTest.value.push('test'))
-		.catch(t.fail);
+			dashboard.evaluate(() => window.clientDoubleApplyTest.value.push('test'));
+		});
 });
 
-test('should remove .once listeners when quickfired', t => {
-	const rep = e.apis.extension.Replicant('serverRemoveOnceListener', {
+test.serial('should remove .once listeners when quickfired', t => {
+	const rep = t.context.apis.extension.Replicant('serverRemoveOnceListener', {
 		persistent: false
 	});
 
@@ -137,8 +145,8 @@ test('should remove .once listeners when quickfired', t => {
 	t.is(rep.listenerCount('change'), 0);
 });
 
-test('should not override/quickfire .once for events other than "change"', t => {
-	const rep = e.apis.extension.Replicant('serverNotOverrideOtherOnceListeners', {
+test.serial('should not override/quickfire .once for events other than "change"', t => {
+	const rep = t.context.apis.extension.Replicant('serverNotOverrideOtherOnceListeners', {
 		persistent: false
 	});
 
@@ -148,10 +156,10 @@ test('should not override/quickfire .once for events other than "change"', t => 
 	t.pass();
 });
 
-test.cb('arrays - should support the "delete" operator', t => {
+test.cb.serial('arrays - should support the "delete" operator', t => {
 	t.plan(3);
 
-	const rep = e.apis.extension.Replicant('serverArrayDelete', {
+	const rep = t.context.apis.extension.Replicant('serverArrayDelete', {
 		persistent: false,
 		defaultValue: ['foo', 'bar']
 	});
@@ -172,10 +180,10 @@ test.cb('arrays - should support the "delete" operator', t => {
 	delete rep.value[0];
 });
 
-test.cb('arrays - should react to changes', t => {
+test.cb.serial('arrays - should react to changes', t => {
 	t.plan(3);
 
-	const rep = e.apis.extension.Replicant('extensionArrTest', {
+	const rep = t.context.apis.extension.Replicant('extensionArrTest', {
 		persistent: false,
 		defaultValue: ['starting']
 	});
@@ -198,9 +206,9 @@ test.cb('arrays - should react to changes', t => {
 	rep.value.push('arrPushOK');
 });
 
-test('objects - throw an error when an object is owned by multiple Replicants', t => {
-	const rep1 = e.apis.extension.Replicant('multiOwner1');
-	const rep2 = e.apis.extension.Replicant('multiOwner2');
+test.serial('objects - throw an error when an object is owned by multiple Replicants', t => {
+	const rep1 = t.context.apis.extension.Replicant('multiOwner1');
+	const rep2 = t.context.apis.extension.Replicant('multiOwner2');
 	const bar = {bar: 'bar'};
 	rep1.value = {};
 	rep2.value = {};
@@ -213,23 +221,23 @@ test('objects - throw an error when an object is owned by multiple Replicants', 
 	t.true(error.message.startsWith('This object belongs to another Replicant'));
 });
 
-test('dates - should not throw an error', t => {
+test.serial('dates - should not throw an error', t => {
 	t.notThrows(() => {
-		e.apis.extension.Replicant('extensionDateTest', {
+		t.context.apis.extension.Replicant('extensionDateTest', {
 			defaultValue: new Date()
 		});
 	});
 });
 
 test.serial('persistent - should load persisted values when they exist', t => {
-	const rep = e.apis.extension.Replicant('extensionPersistence');
+	const rep = t.context.apis.extension.Replicant('extensionPersistence');
 	t.is(rep.value, 'it work good!');
 });
 
 test.cb.serial('persistent - should persist assignment to disk', t => {
 	t.plan(1);
 
-	const rep = e.apis.extension.Replicant('extensionPersistence');
+	const rep = t.context.apis.extension.Replicant('extensionPersistence');
 	rep.value = {nested: 'hey we assigned!'};
 	setTimeout(() => {
 		const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionPersistence.rep');
@@ -247,7 +255,7 @@ test.cb.serial('persistent - should persist assignment to disk', t => {
 test.cb.serial('persistent - should persist changes to disk', t => {
 	t.plan(1);
 
-	const rep = e.apis.extension.Replicant('extensionPersistence');
+	const rep = t.context.apis.extension.Replicant('extensionPersistence');
 	rep.value.nested = 'hey we changed!';
 	setTimeout(() => {
 		const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionPersistence.rep');
@@ -262,10 +270,10 @@ test.cb.serial('persistent - should persist changes to disk', t => {
 	}, 10);
 });
 
-test.cb('persistent - should persist falsey values to disk', t => {
+test.cb.serial('persistent - should persist falsey values to disk', t => {
 	t.plan(1);
 
-	const rep = e.apis.extension.Replicant('extensionFalseyWrite');
+	const rep = t.context.apis.extension.Replicant('extensionFalseyWrite');
 	rep.value = 0;
 	setTimeout(() => {
 		const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionFalseyWrite.rep');
@@ -280,12 +288,12 @@ test.cb('persistent - should persist falsey values to disk', t => {
 	}, 10);
 });
 
-test('persistent - should read falsey values from disk', t => {
-	const rep = e.apis.extension.Replicant('extensionFalseyRead');
+test.serial('persistent - should read falsey values from disk', t => {
+	const rep = t.context.apis.extension.Replicant('extensionFalseyRead');
 	t.is(rep.value, 0);
 });
 
-test.cb('transient - should not write their value to disk', t => {
+test.cb.serial('transient - should not write their value to disk', t => {
 	t.plan(2);
 
 	// Remove the file if it exists for some reason
@@ -295,7 +303,7 @@ test.cb('transient - should not write their value to disk', t => {
 			throw err;
 		}
 
-		const rep = e.apis.extension.Replicant('extensionTransience', {persistent: false});
+		const rep = t.context.apis.extension.Replicant('extensionTransience', {persistent: false});
 		rep.value = 'o no';
 		fs.readFile(replicantPath, err => {
 			t.truthy(err);
@@ -305,13 +313,13 @@ test.cb('transient - should not write their value to disk', t => {
 	});
 });
 
-test('should return true when deleting a non-existing property', t => {
-	const rep = e.apis.extension.Replicant('serverDeleteNonExistent', {defaultValue: {}});
+test.serial('should return true when deleting a non-existing property', t => {
+	const rep = t.context.apis.extension.Replicant('serverDeleteNonExistent', {defaultValue: {}});
 	t.true(delete rep.value.nonExistent);
 });
 
-test('test that one else path that\'s hard to hit', t => {
-	const rep = e.apis.extension.Replicant('arrayWithoutSchemaSetHandler', {defaultValue: []});
+test.serial('test that one else path that\'s hard to hit', t => {
+	const rep = t.context.apis.extension.Replicant('arrayWithoutSchemaSetHandler', {defaultValue: []});
 	rep.value[0] = true;
 	t.pass();
 });

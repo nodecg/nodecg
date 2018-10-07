@@ -1,75 +1,63 @@
 'use strict';
 
 // Packages
-const test = require('ava');
+import * as test from 'ava';
 const socketIoClient = require('socket.io-client');
 
 // Ours
-require('./helpers/nodecg-and-webdriver')(test, { // Must be first.
-	tabs: ['login'],
-	nodecgConfigName: 'nodecg-login.json'
-});
-const C = require('./helpers/test-constants');
-const e = require('./helpers/test-environment');
-const util = require('./helpers/utilities');
+import * as server from './helpers/server';
+import * as browser from './helpers/browser';
+server.setup('nodecg-login.json');
+browser.setup();
 
-test.beforeEach(async () => {
-	await e.browser.client.switchTab(e.browser.tabs.login);
+import * as C from './helpers/test-constants';
+
+test.beforeEach(async t => {
+	t.context.loginPage = await browser.initLogin();
 });
 
 test.serial('redirects unauthorized users to /login', async t => {
-	await e.browser.client.newWindow(C.DASHBOARD_URL);
-	const url = await e.browser.client.getUrl();
-	t.is(url, C.LOGIN_URL);
+	const page = t.context.loginPage;
+	await page.goto(C.dashboardUrl());
+	const url = page.url();
+	t.is(url, C.loginUrl());
 });
 
 test.serial('login should deny access to bad credentials', async t => {
-	await e.browser.client.waitForVisible('#username');
-	await e.browser.client.waitForVisible('#localForm');
-	await e.browser.client.waitForVisible('#password');
+	const page = t.context.loginPage;
+	await page.type('#username', 'admin');
+	await page.type('#password', 'wrong_password');
+	await page.click('#localSubmit');
 
-	await e.browser.client.setValue('#username', 'admin');
-	await e.browser.client.setValue('#password', 'wrong_password');
-	await e.browser.client.click('#localSubmit');
-
-	const url = await e.browser.client.getUrl();
-	t.is(url, C.LOGIN_URL);
+	const url = page.url();
+	t.is(url, C.loginUrl());
 });
 
-test.serial('logging in should work', async t => {
-	await logIn(t);
-	const url = await e.browser.client.getUrl();
-	t.is(url, C.DASHBOARD_URL);
-});
-
-test.serial('logging out should work', async t => {
-	t.is(await e.browser.client.getUrl(), C.DASHBOARD_URL);
-	await logOut();
-	await e.browser.client.refresh();
-	t.is(await e.browser.client.getUrl(), C.LOGIN_URL);
+test.serial('logging in and out should work', async t => {
+	const page = await logIn(t);
+	t.is(page.url(), C.dashboardUrl());
+	await logOut(t);
+	await page.reload();
+	t.is(page.url(), C.loginUrl());
 });
 
 test.serial('regenerating a token should send the user back to /login', async t => {
 	await logIn(t);
-	await e.browser.client.newWindow(C.DASHBOARD_URL);
-	t.is(await e.browser.client.getUrl(), C.DASHBOARD_URL);
+	const page = t.context.loginPage;
 
 	// We need to preserve the coverage from this test, because it will be lost
 	// when the page is redirected to /login.
-	const {value: coverage} = await e.browser.client.execute(() => {
+	const coverage = await page.evaluate(() => {
 		const ncgSettings = document.querySelector('ncg-dashboard').shadowRoot
 			.querySelector('ncg-settings');
 		ncgSettings.resetKey();
 		return window.__coverage__;
 	});
 
-	await e.browser.client.waitUntil(async () => {
-		const url = await e.browser.client.getUrl();
-		return url === C.LOGIN_URL;
-	}, 5000);
+	await page.waitForFunction(loginUrl => location.href === loginUrl, {}, C.loginUrl());
 
 	// Put our preserved coverage back on the page for later extraction.
-	await e.browser.client.execute(injectedCoverage => {
+	await page.evaluate(injectedCoverage => {
 		window.__coverage__ = injectedCoverage;
 	}, coverage);
 
@@ -77,26 +65,26 @@ test.serial('regenerating a token should send the user back to /login', async t 
 });
 
 test.serial('token invalidation should show an UnauthorizedError on open pages', async t => {
-	await e.browser.client.newWindow(C.DASHBOARD_URL);
 	await logIn(t);
-	t.is(await e.browser.client.getUrl(), C.DASHBOARD_URL);
 
-	await e.browser.client.newWindow(C.GRAPHIC_URL);
-	t.is(await e.browser.client.getUrl(), C.GRAPHIC_URL);
-	await e.browser.client.execute(() => {
+	const page = t.context.loginPage;
+	await page.goto(C.graphicUrl());
+	t.is(page.url(), C.graphicUrl());
+	await page.evaluate(() => {
 		window.socket.emit('regenerateToken', window.token);
 	});
-
-	await util.sleep(2000);
-
-	const url = await e.browser.client.getUrl();
-	t.true(url.startsWith(`${C.ROOT_URL}authError?code=token_invalidated`));
+	await page.waitForFunction(
+		validUrl => location.href.startsWith(validUrl),
+		{},
+		`${C.rootUrl()}authError?code=token_invalidated`
+	);
+	t.pass();
 });
 
 test.serial.cb('socket should deny access to bad credentials', t => {
 	t.plan(1);
 
-	const socket = socketIoClient(`${C.ROOT_URL}?key=bad_credentials`);
+	const socket = socketIoClient(`${C.rootUrl()}?key=bad_credentials`);
 	socket.on('connect', () => {
 		t.fail();
 	});
@@ -114,20 +102,20 @@ test.serial.cb('socket should deny access to bad credentials', t => {
 });
 
 async function logIn(t) {
-	t.is(await e.browser.client.getUrl(), C.LOGIN_URL);
+	const page = t.context.loginPage;
+	await page.goto(C.loginUrl());
+	if (page.url() !== C.loginUrl()) {
+		return page;
+	}
 
-	await e.browser.client.waitForVisible('#username', 2500);
-	await e.browser.client.waitForVisible('#localForm', 2500);
-	await e.browser.client.waitForVisible('#password', 2500);
-
-	await e.browser.client.setValue('#username', 'admin');
-	await e.browser.client.setValue('#password', 'password');
-	await e.browser.client.click('#localSubmit');
+	await page.type('#username', 'admin');
+	await page.type('#password', 'password');
+	await page.click('#localSubmit');
+	await page.waitForNavigation();
+	return page;
 }
 
-async function logOut() {
-	const currentTabId = await e.browser.client.getCurrentTabId();
-	await e.browser.client.newWindow(`${C.ROOT_URL}logout`);
-	await e.browser.client.close();
-	await e.browser.client.switchTab(currentTabId);
+async function logOut(t) {
+	const page = await t.context.browser.newPage();
+	await page.goto(`${C.rootUrl()}logout`);
 }

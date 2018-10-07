@@ -1,60 +1,43 @@
-'use strict';
-
 const path = require('path');
-const config = require(path.resolve(__dirname, '../../lib/config')).config;
-const bundleName = 'test-bundle';
 
-function rootUrl() {
+export const BUNDLE_NAME = 'test-bundle';
+
+export const REPLICANTS_ROOT = path.join(process.env.NODECG_ROOT, 'db/replicants');
+
+export const ASSETS_ROOT = path.join(process.env.NODECG_ROOT, 'assets');
+
+export function rootUrl() {
 	return `http://localhost:${process.env.NODECG_TEST_PORT}/`;
 }
 
-function loginUrl() {
+export function loginUrl() {
 	return `${rootUrl()}login/`;
 }
 
-function dashboardUrl() {
+export function dashboardUrl() {
 	return `${rootUrl()}dashboard/`;
 }
 
 function testBundleRoot() {
-	return `${rootUrl()}bundles/${bundleName}/`;
+	return `${rootUrl()}bundles/${BUNDLE_NAME}/`;
 }
 
-module.exports = {
-	BUNDLE_NAME: bundleName,
-	CONFIG: config,
-	REPLICANTS_ROOT: path.join(process.env.NODECG_ROOT, 'db/replicants'),
-	ASSETS_ROOT: path.join(process.env.NODECG_ROOT, 'assets'),
+export function testPanelUrl() {
+	return `${testBundleRoot()}dashboard/panel.html`
+}
 
-	get ROOT_URL() {
-		return rootUrl();
-	},
+export function bundleBowerComponentsUrl() {
+	return `${testBundleRoot()}bower_components/`;
+}
 
-	get LOGIN_URL() {
-		return loginUrl();
-	},
+export function bundleNodeModulesUrl() {
+	return `${testBundleRoot()}node_modules/`;
+}
 
-	get DASHBOARD_URL() {
-		return dashboardUrl();
-	},
+export function graphicUrl() {
+	return `${testBundleRoot()}graphics/`;
+}
 
-	get TEST_PANEL_URL() {
-		return `${testBundleRoot()}dashboard/panel.html`;
-	},
-
-	get BUNDLE_BOWER_COMPONENTS_URL() {
-		return `${testBundleRoot()}bower_components/`;
-	},
-
-	get BUNDLE_NODE_MODULES_URL() {
-		return `${testBundleRoot()}node_modules/`;
-	},
-
-	get GRAPHIC_URL() {
-		return `${testBundleRoot()}graphics/`;
-	},
-
-	get SINGLE_INSTANCE_URL() {
-		return `${testBundleRoot()}graphics/single_instance.html`;
-	}
-};
+export function singleInstanceUrl() {
+	return `${testBundleRoot()}graphics/single_instance.html`;
+}

@@ -1,15 +1,23 @@
 'use strict';
 
 // Packages
-const test = require('ava');
+import test from 'ava';
 
 // Ours
-require('../helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard']}); // Must be first.
-const e = require('../helpers/test-environment');
+import * as server from '../helpers/server';
+import * as browser from '../helpers/browser';
+
+server.setup();
+browser.setup();
+
+let dashboard;
+test.before(async () => {
+	dashboard = await browser.initDashboard();
+});
 
 test.serial('should produce an error if a callback isn\'t given', t => {
 	const error = t.throws(() => {
-		e.apis.extension.listenFor('testMessageName', 'test');
+		t.context.apis.extension.listenFor('testMessageName', 'test');
 	}, Error);
 
 	t.is(error.message, 'argument "handler" must be a function, but you provided a(n) string');
@@ -17,7 +25,7 @@ test.serial('should produce an error if a callback isn\'t given', t => {
 
 // Check for basic connectivity. The rest of the tests are run from the dashboard as well.
 test.serial('should receive messages', async t => {
-	await e.browser.tabs.dashboard.evaluate(() => {
+	await dashboard.evaluate(() => {
 		window.serverToDashboardReceived = false;
 		window.dashboardApi.listenFor('serverToDashboard', () => {
 			window.serverToDashboardReceived = true;
@@ -25,32 +33,29 @@ test.serial('should receive messages', async t => {
 	});
 
 	const sendMessageInterval = setInterval(() => {
-		e.apis.extension.sendMessage('serverToDashboard');
+		t.context.apis.extension.sendMessage('serverToDashboard');
 	}, 500);
 
-	await e.browser.tabs.dashboard.evaluate(() => new Promise(resolve => {
-		const checkMessageReceived = setInterval(() => {
-			if (window.serverToDashboardReceived) {
-				clearInterval(checkMessageReceived);
-				resolve();
-			}
-		}, 50);
-	}));
+	await dashboard.waitForFunction(() => window.serverToDashboardReceived);
 
 	clearInterval(sendMessageInterval);
 	t.pass();
 });
 
-test.cb.serial('should send messages', t => {
-	e.apis.extension.listenFor('dashboardToServer', t.end);
-	e.browser.tabs.dashboard.evaluate(() => {
-		window.dashboardApi.sendMessage('dashboardToServer')
+test.serial.cb('should send messages', t => {
+	setTimeout(() => {
+		t.end('Timeout');
+	}, 1000);
+	t.context.apis.extension.listenFor('dashboardToServer', () => {
+		t.end();
+	});
+	dashboard.evaluate(() => {
+		window.dashboardApi.sendMessage('dashboardToServer');
 	});
 });
 
 test.serial('should support multiple listenFor handlers', async t => {
-	// Set up the listenFor handlers.
-	await e.browser.tabs.dashboard.evaluate(() => {
+	await dashboard.evaluate(() => {
 		let callbacksInvoked = 0;
 		window.dashboardApi.listenFor('serverToDashboardMultiple', () => {
 			checkDone();
@@ -67,24 +72,22 @@ test.serial('should support multiple listenFor handlers', async t => {
 	});
 
 	// Send the message from the server to the clients.
-	e.apis.extension.sendMessage('serverToDashboardMultiple');
+	t.context.apis.extension.sendMessage('serverToDashboardMultiple');
 
 	// Verify that our handlers both ran.
-	const res = await e.browser.tabs.dashboard.evaluate(() => {
-		return window.__serverToDashboardMultipleDone__;
-	});
+	const res = await dashboard.evaluate(() => window.__serverToDashboardMultipleDone__);
 	t.true(res);
 });
 
 test.serial('#bundleVersion', async t => {
-	const res = await e.browser.tabs.dashboard.evaluate(() => {
+	const res = await dashboard.evaluate(() => {
 		return window.dashboardApi.bundleVersion;
 	});
 	t.is(res, '0.0.1');
 });
 
 test.serial('#bundleGit', async t => {
-	const res = await e.browser.tabs.dashboard.evaluate(() => {
+	const res = await dashboard.evaluate(() => {
 		return window.dashboardApi.bundleGit;
 	});
 	t.deepEqual(res, {

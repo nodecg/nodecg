@@ -1,17 +1,29 @@
 'use strict';
 
+// Native
+import * as path from 'path';
+
 // Packages
-const fs = require('fs-extra');
-const path = require('path');
-const test = require('ava');
+import * as fs from 'fs-extra';
+import * as test from 'ava';
 
 // Ours
-require('./helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard', 'graphic']}); // Must be first.
-const e = require('./helpers/test-environment');
-const C = require('./helpers/test-constants');
+import * as server from './helpers/server';
+import * as browser from './helpers/browser';
+server.setup();
+browser.setup();
+
+import * as C from './helpers/test-constants';
+
+let dashboard;
+let graphic;
+test.before(async () => {
+	dashboard = await browser.initDashboard();
+	graphic = await browser.initGraphic();
+});
 
 test.serial('soundCues replicant - should generate the correct defaultValue', t => {
-	const rep = e.apis.extension.Replicant('soundCues', 'test-bundle');
+	const rep = t.context.apis.extension.Replicant('soundCues', 'test-bundle');
 	t.deepEqual(rep.value, [{
 		name: 'name-only',
 		assignable: true,
@@ -52,7 +64,7 @@ test.serial('soundCues replicant - should generate the correct defaultValue', t 
 });
 
 test.serial('soundCues replicant - should remove any persisted cues that are no longer in the bundle manifest', t => {
-	const rep = e.apis.extension.Replicant('soundCues', 'remove-persisted-cues');
+	const rep = t.context.apis.extension.Replicant('soundCues', 'remove-persisted-cues');
 	t.deepEqual(rep.value, [{
 		name: 'persisted-cue-1',
 		assignable: true,
@@ -62,7 +74,7 @@ test.serial('soundCues replicant - should remove any persisted cues that are no 
 });
 
 test.serial('soundCues replicant - should add any cues in the bundle manifest that aren\'t in the persisted replicant.', t => {
-	const rep = e.apis.extension.Replicant('soundCues', 'add-manifest-cues');
+	const rep = t.context.apis.extension.Replicant('soundCues', 'add-manifest-cues');
 	t.deepEqual(rep.value, [{
 		name: 'persisted-cue-1',
 		assignable: true,
@@ -77,7 +89,7 @@ test.serial('soundCues replicant - should add any cues in the bundle manifest th
 });
 
 test.serial('soundCues replicant - should update any cues in that are in both in the persisted replicant and the bundle manifest.', t => {
-	const rep = e.apis.extension.Replicant('soundCues', 'update-cues');
+	const rep = t.context.apis.extension.Replicant('soundCues', 'update-cues');
 	t.deepEqual(rep.value, [{
 		name: 'updated-cue',
 		defaultFile: {
@@ -107,7 +119,6 @@ test.serial('mixer - assignable cues - should list new sound Assets as they are 
 	 2. Add a sound file directly to nodecg/assets/test-bundle/sounds
 	 3. Check the list of options in the dropdown select for all assignable cues
 	 */
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
 	await new Promise((resolve, reject) => {
 		const oggPath = path.join(C.ASSETS_ROOT, 'test-bundle/sounds/success.ogg');
 		fs.copy('test/fixtures/nodecg-core/assets/test-bundle/sounds/success.ogg', oggPath, {replace: true}, err => {
@@ -120,70 +131,66 @@ test.serial('mixer - assignable cues - should list new sound Assets as they are 
 		});
 	});
 
-	const ret = await e.browser.client.executeAsync(done => {
+	const ret = await dashboard.evaluate(() => new Promise(resolve => {
 		const el = document.querySelector('ncg-dashboard').shadowRoot
 			.querySelector('ncg-mixer').shadowRoot
 			.querySelector('ncg-sounds[bundle-name="test-bundle"]').shadowRoot
 			.querySelector('ncg-sound-cue:nth-child(1)').$.select.$.select;
 
 		if (!el) {
-			return done('NoSuchElement');
+			return resolve('NoSuchElement');
 		}
 
 		const interval = setInterval(() => {
 			const options = el.options;
 			if (options.length === 2 && options[1].value === 'success.ogg') {
 				clearInterval(interval);
-				done();
+				resolve();
 			}
 		}, 50);
-	});
+	}));
 
-	t.true(ret.value !== 'NoSuchElement');
+	t.true(ret !== 'NoSuchElement');
 });
 
 test.serial('client api - should emit "ncgSoundsReady" once all the sounds have loaded', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.graphic);
-	await e.browser.client.executeAsync(done => {
+	await graphic.evaluate(() => new Promise(resolve => {
 		if (window.graphicApi.soundsReady) {
-			done();
+			resolve();
 		} else {
-			window.addEventListener('ncgSoundsReady', () => done());
+			window.addEventListener('ncgSoundsReady', () => resolve());
 		}
-	});
+	}));
 
 	t.pass();
 });
 
 test.serial('client api - #playSound should return a playing AbstractAudioInstance', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.graphic);
-	const ret = await e.browser.client.execute(() => {
+	const ret = await graphic.evaluate(() => {
 		return window.graphicApi.playSound('default-file').playState;
 	});
 
-	t.is(ret.value, 'playSucceeded');
+	t.is(ret, 'playSucceeded');
 });
 
 test.serial('client api - #stopSound should stop all instances of a cue', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.graphic);
-	const ret = await e.browser.client.execute(() => {
+	const ret = await graphic.evaluate(() => {
 		window.graphicApi.playSound('default-file');
 		window.graphicApi.playSound('default-file');
 		window.graphicApi.stopSound('default-file');
 		return createjs.Sound._instances.length; // eslint-disable-line no-undef
 	});
 
-	t.is(ret.value, 0);
+	t.is(ret, 0);
 });
 
 test.serial('client api - #stopAllSounds should stop all instances', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.graphic);
-	const ret = await e.browser.client.execute(() => {
+	const ret = await graphic.evaluate(() => {
 		window.graphicApi.playSound('default-file');
 		window.graphicApi.playSound('default-file');
 		window.graphicApi.stopAllSounds();
 		return createjs.Sound._instances.length; // eslint-disable-line no-undef
 	});
 
-	t.is(ret.value, 0);
+	t.is(ret, 0);
 });

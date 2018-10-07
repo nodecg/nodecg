@@ -1,33 +1,42 @@
 'use strict';
 
 // Native
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Packages
-const axios = require('axios');
+import test from 'ava';
+import * as axios from 'axios';
 const simpleGit = require('simple-git/promise');
 const replace = require('replace-in-file');
-const test = require('ava');
 
 // Ours
-require('./helpers/nodecg-and-webdriver')(test, {tabs: ['dashboard', 'single-instance']}); // Must be first.
-const C = require('./helpers/test-constants');
-const e = require('./helpers/test-environment');
-const util = require('./helpers/utilities');
+import * as server from './helpers/server';
+import * as browser from './helpers/browser';
+server.setup();
+browser.setup();
+import * as C from './helpers/test-constants';
+import * as util from './helpers/utilities';
 
+let dashboard;
+let singleInstance;
 test.before(async () => {
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-	await e.browser.client.click('ncg-dashboard paper-tab[data-route="graphics"]');
-	await e.browser.client.click('ncg-dashboard ncg-graphics ncg-graphics-bundle ncg-graphic #collapseButton');
-});
-
-test.beforeEach(async () => {
-	await e.browser.client.switchTab(e.browser.tabs.singleInstance);
+	singleInstance = await browser.initSingleInstance();
+	dashboard = await browser.initDashboard();
+	const graphicButton = await dashboard.evaluateHandle(() =>
+		document.querySelector('ncg-dashboard').shadowRoot.querySelector('paper-tab[data-route="graphics"]'));
+	await graphicButton.click();
+	const collapseButton = await dashboard.evaluateHandle(() =>
+		document.querySelector('ncg-dashboard')
+			.shadowRoot.querySelector('ncg-graphics')
+			.shadowRoot.querySelector('ncg-graphics-bundle')
+			.shadowRoot.querySelector('ncg-graphic')
+			.shadowRoot.querySelector('#collapseButton'));
+	await collapseButton.click();
 });
 
 test('singleInstance - scripts get injected into /instance/*.html routes', async t => {
-	const response = await axios.get(`${C.ROOT_URL}instance/killed.html`);
+	const response = await axios.get(`${C.rootUrl()}instance/killed.html`);
 	t.is(response.status, 200);
 	t.true(response.data.includes('<script src="/nodecg-api.min.js">'));
 	t.true(response.data.includes('<script src="/socket.io/socket.io.js"></script>'));
@@ -53,45 +62,31 @@ test.serial.cb('singleInstance - shouldn\'t enter an infinite redirect loop when
 });
 
 test.serial('singleInstance - should redirect to busy.html when the instance is already taken', async t => {
-	await e.browser.client.newWindow(C.SINGLE_INSTANCE_URL);
-	await util.sleep(1000);
-	t.is(
-		await e.browser.client.getUrl(),
-		`${C.ROOT_URL}instance/busy.html?pathname=/bundles/test-bundle/graphics/single_instance.html`
-	);
+	const page = await browser.initSingleInstance();
+	await page.waitForFunction(() => location.href === `${C.rootUrl()}instance/busy.html?pathname=/bundles/test-bundle/graphics/single_instance.html`)
 });
 
 test.serial('singleInstance - should redirect to killed.html when the instance is killed', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-	await e.browser.client.execute(() => {
+	const button = await dashboard.evaluateHandle(() =>
 		document.querySelector('ncg-dashboard').shadowRoot
 			.querySelector('ncg-graphics').shadowRoot
 			.querySelector('ncg-graphics-bundle').shadowRoot
 			.querySelectorAll('ncg-graphic')[1].shadowRoot
-			.querySelector('ncg-graphic-instance').$.killButton.click();
-	});
-
-	await e.browser.client.switchTab(e.browser.tabs.singleInstance);
-	t.is(
-		await e.browser.client.getUrl(),
-		`${C.ROOT_URL}instance/killed.html?pathname=/bundles/test-bundle/graphics/single_instance.html`
-	);
+			.querySelector('ncg-graphic-instance').$.killButton);
+	await button.click();
+	await dashboard.waitForFunction(() => location.href === `${C.rootUrl()}instance/killed.html?pathname=/bundles/test-bundle/graphics/single_instance.html`)
 });
 
 test.serial('singleInstance - should allow the graphic to be taken after being killed', async t => {
-	await e.browser.client.newWindow(C.SINGLE_INSTANCE_URL);
-	await util.sleep(500);
-	t.is(await e.browser.client.getUrl(), C.SINGLE_INSTANCE_URL);
+	const page = await browser.initSingleInstance();
+	t.is(page.url(), C.singleInstanceUrl());
 });
 
 test.serial('refresh all instances in a bundle', async t => {
-	await e.browser.client.newWindow(C.GRAPHIC_URL);
-	const graphicTabId = await e.browser.client.getCurrentTabId();
-	await util.waitForRegistration();
+	const graphic = await browser.initGraphic();
+	await util.waitForRegistration(graphic);
 
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-	await util.sleep(50);
-	await e.browser.client.execute(() => {
+	await dashboard.evaluate(() => {
 		const graphicsBundleEl = document.querySelector('ncg-dashboard').shadowRoot
 			.querySelector('ncg-graphics').shadowRoot
 			.querySelector('ncg-graphics-bundle');
@@ -99,37 +94,32 @@ test.serial('refresh all instances in a bundle', async t => {
 		graphicsBundleEl.shadowRoot.querySelector('paper-button[dialog-confirm]').click();
 	});
 
-	await e.browser.client.switchTab(graphicTabId);
-	await util.sleep(500);
-	const refreshMarker = await util.waitForRegistration();
-	t.is(refreshMarker, null);
+	const refreshMarker = await util.waitForRegistration(graphic);
+	t.is(refreshMarker, undefined);
 });
 
 test.serial('refresh all instances of a graphic', async t => {
-	await e.browser.client.newWindow(C.GRAPHIC_URL);
-	const graphicTabId = await e.browser.client.getCurrentTabId();
-	await util.waitForRegistration();
+	const graphic = await browser.initGraphic();
+	await util.waitForRegistration(graphic);
 
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-	await util.sleep(50);
-	await e.browser.client.click('ncg-dashboard ncg-graphics ncg-graphics-bundle' +
-		' ncg-graphic #reloadButton');
+	await dashboard.bringToFront();
+	await dashboard.evaluate(() => {
+		document.querySelector('ncg-dashboard').shadowRoot
+			.querySelector('ncg-graphics').shadowRoot
+			.querySelector('ncg-graphics-bundle').shadowRoot
+			.querySelector('ncg-graphic')[0].shadowRoot
+			.querySelector('ncg-graphic-instance:last-of-type').$.reloadButton.click();
+	});
 
-	await e.browser.client.switchTab(graphicTabId);
-	await util.sleep(500);
-	const refreshMarker = await util.waitForRegistration();
-	await e.browser.client.close(); // We don't need the coverage data from this tab.
-	t.is(refreshMarker, null);
+	const refreshMarker = await util.waitForRegistration(graphic);
+	t.is(refreshMarker, undefined);
 });
 
 test.serial('refresh individual instance', async t => {
-	await e.browser.client.newWindow(C.GRAPHIC_URL);
-	const graphicTabId = await e.browser.client.getCurrentTabId();
-	await util.waitForRegistration();
+	const graphic = await browser.initGraphic();
+	await util.waitForRegistration(graphic);
 
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-	await util.sleep(50);
-	await e.browser.client.execute(() => {
+	await dashboard.evaluate(() => {
 		document.querySelector('ncg-dashboard').shadowRoot
 			.querySelector('ncg-graphics').shadowRoot
 			.querySelector('ncg-graphics-bundle').shadowRoot
@@ -137,12 +127,16 @@ test.serial('refresh individual instance', async t => {
 			.querySelector('ncg-graphic-instance:last-of-type').$.reloadButton.click();
 	});
 
-	await e.browser.client.switchTab(graphicTabId);
-	await util.sleep(1000);
-	const refreshMarker = await util.waitForRegistration();
-	await e.browser.client.close(); // We don't need the coverage data from this tab.
-	t.is(refreshMarker, null);
+	const refreshMarker = await util.waitForRegistration(graphic);
+	t.is(refreshMarker, undefined);
 });
+
+const statusText = () => document.querySelector('ncg-dashboard')
+	.shadowRoot.querySelector('ncg-graphics')
+	.shadowRoot.querySelector('ncg-graphics-bundle')
+	.shadowRoot.querySelector('ncg-graphic')
+	.shadowRoot.querySelector('ncg-graphic-instance:last-of-type')
+	.$.status.textContent;
 
 test.serial('version out of date', async t => {
 	replace.sync({
@@ -152,9 +146,7 @@ test.serial('version out of date', async t => {
 	});
 	await util.sleep(1500);
 
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-	let text = await e.browser.client.getText('ncg-dashboard ncg-graphics ncg-graphics-bundle ' +
-		'ncg-graphic ncg-graphic-instance:last-of-type #status');
+	let text = await dashboard.evaluate(statusText);
 	t.is(text, 'Potentially Out of Date');
 
 	replace.sync({
@@ -164,9 +156,7 @@ test.serial('version out of date', async t => {
 	});
 	await util.sleep(1500);
 
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-	text = await e.browser.client.getText('ncg-dashboard ncg-graphics ncg-graphics-bundle ' +
-		'ncg-graphic ncg-graphic-instance:last-of-type #status');
+	text = await dashboard.evaluate(statusText);
 	t.is(text, 'Latest');
 });
 
@@ -180,21 +170,24 @@ test.serial('git out of date', async t => {
 	await git.commit('new commit');
 	await util.sleep(1500);
 
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-	const text = await e.browser.client.getText('ncg-dashboard ncg-graphics ncg-graphics-bundle ' +
-		'ncg-graphic ncg-graphic-instance:last-of-type #status');
+	const text = await dashboard.evaluate(statusText);
 	t.is(text, 'Potentially Out of Date');
 });
 
 test.serial('shows a diff when hovering over "potentially out of date" status', async t => {
-	await e.browser.client.switchTab(e.browser.tabs.dashboard);
-	await e.browser.client.moveToObject('ncg-dashboard ncg-graphics ncg-graphics-bundle ' +
-		'ncg-graphic ncg-graphic-instance[status="out-of-date"] #status');
+	await dashboard.bringToFront();
+	const graphicInstance = await dashboard.waitForFunction(() =>
+		document.querySelector('ncg-dashboard')
+			.shadowRoot.querySelector('ncg-graphics')
+			.shadowRoot.querySelector('ncg-graphics-bundle')
+			.shadowRoot.querySelector('ncg-graphic')
+			.shadowRoot.querySelector('ncg-graphic-instance[status="out-of-date"]'));
 
-	const diffSelector = 'ncg-dashboard ncg-graphics ncg-graphics-bundle ' +
-		'ncg-graphic ncg-graphic-instance[status="out-of-date"] #diff';
-	await e.browser.client.isVisible(diffSelector);
-	const diffText = await e.browser.client.getText(diffSelector);
-
-	t.true(/Current: 0\.0\.1 - 6262681 \[Initial commit]\nLatest: {2}0\.0\.1 - .{7} \[new commit]/.test(diffText));
+	await graphicInstance.hover('#status');
+	await dashboard.waitForFunction(el => getComputedStyle(el).display !== 'none', {}, graphicInstance);
+	const diffText = await dashboard.evaluate(el => el.$.diff.$.body.textContent, graphicInstance);
+	t.true(diffText.includes('Current:'));
+	t.true(diffText.includes('Latest:'));
+	t.true(/0\.0\.1 - \w{7} \[Initial commit\]/.test(diffText));
+	t.true(/0\.0\.1 - \w{7} \[new commit\]/.test(diffText));
 });

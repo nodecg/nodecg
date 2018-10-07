@@ -1,22 +1,23 @@
 'use strict';
 
 // Packages
-const test = require('ava');
-const axios = require('axios');
+import test from 'ava';
+import * as axios from 'axios';
 
 // Ours
-require('./helpers/nodecg-and-webdriver')(test); // Must be first.
-const C = require('./helpers/test-constants');
+import * as server from './helpers/server';
+server.setup();
+import * as C from './helpers/test-constants';
 
 test('should redirect /graphics to /graphics/', async t => {
-	const response = await axios.get(C.GRAPHIC_URL.slice(0, -1));
+	const response = await axios.get(C.graphicUrl().slice(0, -1));
 	t.is(response.status, 200);
-	t.is(response.request.res.responseUrl, C.GRAPHIC_URL);
+	t.is(response.request.res.responseUrl, C.graphicUrl());
 });
 
 test('should 404 on non-existent file', async t => {
 	try {
-		await axios.get(`${C.GRAPHIC_URL}confirmation_404.js`);
+		await axios.get(`${C.graphicUrl()}confirmation_404.js`);
 	} catch (error) {
 		t.is(error.response.status, 404);
 	}
@@ -24,7 +25,7 @@ test('should 404 on non-existent file', async t => {
 
 test('should 404 on non-existent bundle', async t => {
 	try {
-		await axios.get(`${C.ROOT_URL}bundles/false-bundle/graphics/confirmation_404.js`);
+		await axios.get(`${C.rootUrl()}bundles/false-bundle/graphics/confirmation_404.js`);
 	} catch (error) {
 		t.is(error.response.status, 404);
 	}
