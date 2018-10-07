@@ -23,7 +23,7 @@ function testBundleRoot() {
 }
 
 export function testPanelUrl() {
-	return `${testBundleRoot()}dashboard/panel.html`
+	return `${testBundleRoot()}dashboard/panel.html`;
 }
 
 export function bundleBowerComponentsUrl() {
