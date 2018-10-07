@@ -14,7 +14,7 @@ const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
 
 let browser;
 const launchBrowser = () =>
-	puppeteer.launch({headless: Boolean(IS_TRAVIS)}).then(newBrowser => {
+	puppeteer.launch({headless: Boolean(IS_TRAVIS), args: IS_TRAVIS ? ['--no-sandbox'] : undefined}).then(newBrowser => {
 		browser = newBrowser;
 	});
 
