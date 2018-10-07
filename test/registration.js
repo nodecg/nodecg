@@ -69,7 +69,7 @@ test.cb('singleInstance - shouldn\'t enter an infinite redirect loop when includ
 });
 
 test.serial('singleInstance - should redirect to busy.html when the instance is already taken', async t => {
-	t.plan(0)
+	t.plan(0);
 	const page = await initSingleInstance();
 	await page.waitForFunction(rootUrl =>
 		location.href === `${rootUrl}instance/busy.html?pathname=/bundles/test-bundle/graphics/single_instance.html`, {}, C.rootUrl());
@@ -86,7 +86,7 @@ test.serial('singleInstance - should redirect to killed.html when the instance i
 		'ncg-graphic:nth-of-type(2)',
 	);
 
-	await dashboard.bringToFront()
+	await dashboard.bringToFront();
 	const expandButton = await dashboard.evaluateHandle(el => el.shadowRoot.querySelector('paper-button#collapseButton'), graphicBoard);
 	await expandButton.click();
 
@@ -95,7 +95,7 @@ test.serial('singleInstance - should redirect to killed.html when the instance i
 	await button.click();
 
 	await singleInstance.waitForFunction(rootUrl =>
-		location.href === `${rootUrl}instance/killed.html?pathname=/bundles/test-bundle/graphics/single_instance.html`, {}, C.rootUrl())
+		location.href === `${rootUrl}instance/killed.html?pathname=/bundles/test-bundle/graphics/single_instance.html`, {}, C.rootUrl());
 });
 
 test.serial('singleInstance - should allow the graphic to be taken after being killed', async t => {
@@ -112,14 +112,15 @@ test.serial('refresh all instances in a bundle', async t => {
 		'ncg-dashboard',
 		'ncg-graphics',
 		'ncg-graphics-bundle',
-	)
+	);
 
-	await dashboard.bringToFront()
+	await dashboard.bringToFront();
 	const reload = await dashboard.evaluateHandle(el => el.$.reloadButton, graphicBundle);
-	await reload.click()
-	const confirm = await dashboard.evaluateHandle(el => el.shadowRoot.querySelector('paper-button[dialog-confirm]'), graphicBundle)
-	await confirm.click()
+	await reload.click();
+	const confirm = await dashboard.evaluateHandle(el => el.shadowRoot.querySelector('paper-button[dialog-confirm]'), graphicBundle);
+	await confirm.click();
 
+	await graphic.waitFor(500);
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -139,6 +140,7 @@ test.serial('refresh all instances of a graphic', async t => {
 	);
 	await reload.click();
 
+	await graphic.waitFor(500);
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -147,7 +149,7 @@ test.serial('refresh individual instance', async t => {
 	const graphic = await initGraphic();
 	await util.waitForRegistration(graphic);
 
-	await dashboard.bringToFront()
+	await dashboard.bringToFront();
 	const reload = await util.shadowSelector(
 		dashboard,
 		'ncg-dashboard',
@@ -156,9 +158,10 @@ test.serial('refresh individual instance', async t => {
 		'ncg-graphic',
 		'ncg-graphic-instance:last-of-type',
 		'#reloadButton',
-	)
-	await reload.click()
+	);
+	await reload.click();
 
+	await graphic.waitFor(500);
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -179,7 +182,7 @@ test.serial('version out of date', async t => {
 		from: '"version": "0.0.1"',
 		to: '"version": "0.0.2"'
 	});
-	await util.sleep(1500);
+	await dashboard.waitFor(1500);
 
 	let text = await dashboard.evaluate(el => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
@@ -189,7 +192,7 @@ test.serial('version out of date', async t => {
 		from: '"version": "0.0.2"',
 		to: '"version": "0.0.1"'
 	});
-	await util.sleep(1500);
+	await dashboard.waitFor(1500);
 
 	text = await dashboard.evaluate(el => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Latest');
@@ -203,7 +206,7 @@ test.serial('git out of date', async t => {
 	const git = simpleGit(path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle'));
 	await git.add('./new_file.txt');
 	await git.commit('new commit');
-	await util.sleep(1500);
+	await dashboard.waitFor(1500);
 
 	const text = await dashboard.evaluate(el => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');

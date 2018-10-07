@@ -1,7 +1,7 @@
 'use strict';
 
 // Packages
-import test from 'ava'
+import test from 'ava';
 
 // Ours
 const loadConfig = require('../lib/config/loader');

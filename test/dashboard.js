@@ -8,7 +8,7 @@ import * as axios from 'axios';
 import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 server.setup();
-const {initDashboard, initStandalone} =browser.setup();
+const {initDashboard, initStandalone} = browser.setup();
 
 import * as C from './helpers/test-constants';
 

@@ -240,7 +240,7 @@ test.cb.serial('persistent - should persist assignment to disk', t => {
 	const rep = t.context.apis.extension.Replicant('extensionPersistence');
 	rep.value = {nested: 'hey we assigned!'};
 	setTimeout(() => {
-		const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionPersistence.rep');
+		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
 		fs.readFile(replicantPath, 'utf-8', (err, data) => {
 			if (err) {
 				throw err;
@@ -258,7 +258,7 @@ test.cb.serial('persistent - should persist changes to disk', t => {
 	const rep = t.context.apis.extension.Replicant('extensionPersistence');
 	rep.value.nested = 'hey we changed!';
 	setTimeout(() => {
-		const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionPersistence.rep');
+		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
 		fs.readFile(replicantPath, 'utf-8', (err, data) => {
 			if (err) {
 				throw err;
@@ -276,7 +276,7 @@ test.cb.serial('persistent - should persist falsey values to disk', t => {
 	const rep = t.context.apis.extension.Replicant('extensionFalseyWrite');
 	rep.value = 0;
 	setTimeout(() => {
-		const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionFalseyWrite.rep');
+		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionFalseyWrite.rep');
 		fs.readFile(replicantPath, 'utf-8', (err, data) => {
 			if (err) {
 				throw err;
@@ -297,7 +297,7 @@ test.cb.serial('transient - should not write their value to disk', t => {
 	t.plan(2);
 
 	// Remove the file if it exists for some reason
-	const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/extensionTransience.rep');
+	const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionTransience.rep');
 	fs.unlink(replicantPath, err => {
 		if (err && err.code !== 'ENOENT') {
 			throw err;

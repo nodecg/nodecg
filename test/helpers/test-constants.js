@@ -1,10 +1,10 @@
 const path = require('path');
 
-export const BUNDLE_NAME = 'test-bundle';
+export const bundleName = () => 'test-bundle';
 
-export const REPLICANTS_ROOT = path.join(process.env.NODECG_ROOT, 'db/replicants');
+export const replicantsRoot = () => path.join(process.env.NODECG_ROOT, 'db/replicants');
 
-export const ASSETS_ROOT = path.join(process.env.NODECG_ROOT, 'assets');
+export const assetsRoot = () => path.join(process.env.NODECG_ROOT, 'assets');
 
 export function rootUrl() {
 	return `http://localhost:${process.env.NODECG_TEST_PORT}/`;
@@ -19,7 +19,7 @@ export function dashboardUrl() {
 }
 
 function testBundleRoot() {
-	return `${rootUrl()}bundles/${BUNDLE_NAME}/`;
+	return `${rootUrl()}bundles/${bundleName()}/`;
 }
 
 export function testPanelUrl() {

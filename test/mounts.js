@@ -6,11 +6,11 @@ import * as path from 'path';
 
 // Packages
 import test from 'ava';
-const fetch = require('make-fetch-happen')
+const fetch = require('make-fetch-happen');
 
 // Ours
-import * as server from './helpers/server'
-server.setup()
+import * as server from './helpers/server';
+server.setup();
 import * as C from './helpers/test-constants';
 
 test('serves files from custom mountpoints', async t => {

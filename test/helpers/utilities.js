@@ -16,7 +16,7 @@ export const waitForRegistration = async page => {
 			window.__refreshMarker__ = '__refreshMarker__';
 		}
 	}));
-	return response && response.value;
+	return response;
 };
 
 export const shadowSelector = async (page, ...selectors) => {

@@ -23,7 +23,7 @@ test.before(async () => {
 	dashboard = await initDashboard();
 });
 
-const TWITTER_BANNER_PATH = path.join(C.ASSETS_ROOT, 'test-bundle/assets/twitter_banner.png');
+const TWITTER_BANNER_PATH = path.join(C.assetsRoot(), 'test-bundle/assets/twitter_banner.png');
 
 test.serial('uploading', async t => {
 	const assetTab = await dashboard.evaluateHandle(() => document.querySelector('ncg-dashboard').shadowRoot.querySelector('paper-tab[data-route="assets"]'));
@@ -73,7 +73,7 @@ test.serial('deletion - 200', async t => {
 		const file = document.querySelector('ncg-dashboard')
 			.shadowRoot.querySelector('ncg-assets')
 			.shadowRoot.querySelector('ncg-asset-category[collection-name="test-bundle"][category-name="assets"]')
-			.shadowRoot.querySelector('util-scrollable > ncg-asset-file')
+			.shadowRoot.querySelector('util-scrollable > ncg-asset-file');
 		return file && file.$.delete;
 	});
 

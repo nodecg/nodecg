@@ -429,7 +429,7 @@ test.serial.cb('persistent - should persist assignment to disk', t => {
 			}
 		});
 	})).then(() => {
-		const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/clientPersistence.rep');
+		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientPersistence.rep');
 		fs.readFile(replicantPath, 'utf-8', (err, data) => {
 			if (err) {
 				throw err;
@@ -457,7 +457,7 @@ test.cb('persistent - should persist changes to disk', t => {
 
 			// On a short timeout to give the Replicator time to write the new value to disk
 			setTimeout(() => {
-				const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/clientChangePersistence.rep');
+				const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientChangePersistence.rep');
 				const data = fs.readFileSync(replicantPath, 'utf-8');
 				t.is(data, '{"nested":"hey we changed!"}');
 				t.end();
@@ -481,7 +481,7 @@ test.serial.cb('persistent - should persist falsey values to disk', t => {
 			}
 		});
 	})).then(() => {
-		const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/clientFalseyWrite.rep');
+		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientFalseyWrite.rep');
 		fs.readFile(replicantPath, 'utf-8', (err, data) => {
 			if (err) {
 				throw err;
@@ -505,7 +505,7 @@ test.serial('persistent - should read falsey values from disk', async t => {
 test.serial.cb('transient - should not write their value to disk', t => {
 	t.plan(2);
 
-	const replicantPath = path.join(C.REPLICANTS_ROOT, 'test-bundle/clientTransience.rep');
+	const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientTransience.rep');
 	fs.unlink(replicantPath, err => {
 		if (err && err.code !== 'ENOENT') {
 			throw err;
