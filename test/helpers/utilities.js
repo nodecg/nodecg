@@ -1,5 +1,3 @@
-import {strict as assert} from 'assert';
-
 export const sleep = milliseconds =>
 	new Promise(resolve => {
 		setTimeout(resolve, milliseconds);
@@ -22,8 +20,6 @@ export const waitForRegistration = async page => {
 };
 
 export const shadowSelector = async (page, ...selectors) => {
-	assert(selectors.every(selector => typeof selector === 'string'));
-
 	return page.evaluateHandle(selectors => {
 		let foundDom = document.querySelector(selectors[0]);
 		for (const selector of selectors.slice(1)) {
