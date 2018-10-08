@@ -3,6 +3,7 @@
 // Native
 import * as fs from 'fs';
 import * as path from 'path';
+import {v4 as uuid} from 'uuid';
 
 // Packages
 import test from 'ava';
@@ -35,8 +36,8 @@ export const setup = () => {
 		for (const page of await browser.pages()) {
 			let coverageObj;
 			try {
-				coverageObj = await browser.evaluate(() => window.__coverage__);
-			} catch (e) {
+				coverageObj = await page.evaluate(() => window.__coverage__);
+			} catch (err) {
 				continue;
 			}
 
@@ -55,7 +56,7 @@ export const setup = () => {
 				newCoverageObj[absKey] = coverageObj[key];
 			}
 			fs.writeFileSync(
-				`.nyc_output/browser-${page}}.json`,
+				`.nyc_output/browser-${uuid()}}.json`,
 				JSON.stringify(newCoverageObj),
 				'utf8'
 			);

@@ -64,7 +64,7 @@
   "scripts": {
     "start": "node index.js",
     "pretest": "npm run build && npm run instrument",
-    "test": "nyc --reporter=none ava --timeout=5s test && nyc report --reporter=html --reporter=text",
+    "test": "nyc --reporter=none ava --timeout=2m test && nyc report --reporter=html --reporter=text",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "static": "eslint index.js lib src test",
     "build": "npm run static && npm run docs:build && gulp",
