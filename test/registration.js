@@ -234,4 +234,9 @@ test.serial('shows a diff when hovering over "potentially out of date" status', 
 	t.true(diffText.includes('Latest:'));
 	t.true(/0\.0\.1 - \w{7} \[Initial commit\]/.test(diffText));
 	t.true(/0\.0\.1 - \w{7} \[new commit\]/.test(diffText));
+
+	const closeButton = await dashboard.evaluateHandle(el =>
+		el.$.diff.shadowRoot.querySelector('paper-icon-button'), graphicInstance);
+	await closeButton.click();
+	await dashboard.waitForFunction(el => getComputedStyle(el.$.diff).opacity === '0', {timeout: 100000}, graphicInstance);
 });

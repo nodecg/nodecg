@@ -99,6 +99,49 @@ test.cb('socket should deny access to bad credentials', t => {
 	});
 });
 
+test.cb('socket should deny access with bad auth header format', t => {
+	t.plan(1);
+	const socket = socketIoClient(C.rootUrl(), {
+		extraHeaders: {
+			Authorization: 'Fooooooo'
+		}});
+	socket.on('connect', () => {
+		t.fail('Socket connected with bad auth header');
+	});
+	socket.on('connect', () => {
+		t.fail('Socket working with bad auth header');
+	});
+	socket.on('error', error => {
+		t.deepEqual(error, {
+			message: 'Format is Authorization: Bearer [token]',
+			code: 'credentials_bad_format',
+			type: 'UnauthorizedError'
+		});
+		t.end();
+	});
+});
+
+test.cb('socket should deny access with bad auth token in header', t => {
+	t.plan(1);
+	const socket = socketIoClient(C.rootUrl(), {
+		extraHeaders: {
+			Authorization: 'Bearer hogehoge'
+		}});
+	socket.on('connect', () => {
+		t.fail('Socket connected with bad auth header');
+	});
+	socket.on('connect', () => {
+		t.fail('Socket working with bad auth header');
+	});
+	socket.on('error', error => {
+		t.deepEqual(error, {
+			code: 'invalid_token',
+			type: 'UnauthorizedError'
+		});
+		t.end();
+	});
+});
+
 async function logIn() {
 	await loginPage.bringToFront();
 	await loginPage.goto(C.loginUrl());
