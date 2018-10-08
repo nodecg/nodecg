@@ -1,32 +1,33 @@
-sudo: false
-dist: trusty
-
 language: node_js
-node_js:
-  - '8'
-  - '10'
-
-os:
-  - linux
-
-cache:
-  directories:
-    - bower_components
-    - '$HOME/.npm'
-    - $(npm config get prefix)
 
 before_install:
-  - npm i -g npm@5.7.1
+  - npm install -g npm@6
   - npm install -g codecov bower
 
 install:
-  - npm install
+  - npm ci
   - bower install
 
 after_success: npm run report-coverage
 
 matrix:
-  fast_finish: true
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      node_js: '8'
+    - os: linux
+      dist: trusty
+      sudo: required
+      node_js: '10'
+    - os: linux
+      dist: trusty
+      sudo: false
+      node_js: '8'
+    - os: linux
+      dist: trusty
+      sudo: false
+      node_js: '10'
 
 notifications:
   webhooks:
