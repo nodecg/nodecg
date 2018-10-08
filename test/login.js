@@ -24,10 +24,8 @@ test.serial('redirects unauthorized users to /login', async t => {
 });
 
 test.serial('login should deny access to bad credentials', async t => {
-	await Promise.all([
-		loginPage.type('#username', 'admin'),
-		loginPage.type('#password', 'wrong_password')
-	]);
+	await loginPage.type('#username', 'admin');
+	await loginPage.type('#password', 'wrong_password');
 	await loginPage.click('#localSubmit');
 	t.is(loginPage.url(), C.loginUrl());
 });

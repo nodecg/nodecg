@@ -169,23 +169,32 @@ test.cb.serial('server - should support intra-context messaging', t => {
 	})();
 });
 
-test.serial('client - should support intra-context messaging', async t => {
+test.cb.serial('client - should support intra-context messaging', t => {
 	t.plan(2);
 
-	// We also want to make sure that the server (extension) is still getting these messages as normal.
-	t.context.apis.extension.listenFor('clientToClient', data => {
-		t.deepEqual(data, {baz: 'qux'});
-	});
-
-	const response = await dashboard.evaluate(() => new Promise(resolve => {
-		window.dashboardApi.listenFor('clientToClient', data => {
-			resolve(data);
+	let asserCount = 0;
+	(async () => {
+		// We also want to make sure that the server (extension) is still getting these messages as normal.
+		t.context.apis.extension.listenFor('clientToClient', data => {
+			t.deepEqual(data, {baz: 'qux'});
+			if (++asserCount === 2) {
+				t.end();
+			}
 		});
 
-		// Send the message only after both listeners have been set up.
-		window.dashboardApi.sendMessage('clientToClient', {baz: 'qux'});
-	}));
-	t.deepEqual(response, {baz: 'qux'});
+		const response = await dashboard.evaluate(() => new Promise(resolve => {
+			window.dashboardApi.listenFor('clientToClient', data => {
+				resolve(data);
+			});
+
+			// Send the message only after both listeners have been set up.
+			window.dashboardApi.sendMessage('clientToClient', {baz: 'qux'});
+		}));
+		t.deepEqual(response, {baz: 'qux'});
+		if (++asserCount === 2) {
+			t.end();
+		}
+	})();
 });
 
 test('server - #bundleVersion', t => {
