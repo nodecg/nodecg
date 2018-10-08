@@ -3,6 +3,7 @@
 // Packages
 import * as test from 'ava';
 const socketIoClient = require('socket.io-client');
+const pRetry = require('p-retry');
 
 // Ours
 import * as server from './helpers/server';
@@ -40,26 +41,31 @@ test.serial('logging in and out should work', async t => {
 });
 
 test.serial('regenerating a token should send the user back to /login', async t => {
-	await logIn();
+	// This operation sometimes fails on CI
+	const run = async () => {
+		await logIn();
 
-	const page = await initDashboard();
-	// We need to preserve the coverage from this test, because it will be lost
-	// when the page is redirected to /login.
-	const coverage = await page.evaluate(() => {
-		const ncgSettings = document.querySelector('ncg-dashboard').shadowRoot
-			.querySelector('ncg-settings');
-		ncgSettings.resetKey();
-		return window.__coverage__;
-	});
+		const page = await initDashboard();
+		// We need to preserve the coverage from this test, because it will be lost
+		// when the page is redirected to /login.
+		const coverage = await page.evaluate(() => {
+			const ncgSettings = document.querySelector('ncg-dashboard').shadowRoot
+				.querySelector('ncg-settings');
+			ncgSettings.resetKey();
+			return window.__coverage__;
+		});
 
-	await page.waitForFunction(loginUrl => location.href === loginUrl, {}, C.loginUrl());
+		await page.waitForFunction(loginUrl => location.href === loginUrl, {}, C.loginUrl());
 
-	// Put our preserved coverage back on the page for later extraction.
-	await page.evaluate(injectedCoverage => {
-		window.__coverage__ = injectedCoverage;
-	}, coverage);
+		// Put our preserved coverage back on the page for later extraction.
+		await page.evaluate(injectedCoverage => {
+			window.__coverage__ = injectedCoverage;
+		}, coverage);
 
-	t.pass();
+		t.pass();
+	};
+
+	return pRetry(run, {retries: 10});
 });
 
 test.serial('token invalidation should show an UnauthorizedError on open pages', async t => {

@@ -1,4 +1,13 @@
+os:
+  - linux
+sudo: false
+dist: trusty
+
 language: node_js
+
+node_js:
+  - '8'
+  - '10'
 
 before_install:
   - npm install -g npm@6
@@ -11,23 +20,7 @@ install:
 after_success: npm run report-coverage
 
 matrix:
-  include:
-    - os: linux
-      dist: trusty
-      sudo: required
-      node_js: '8'
-    - os: linux
-      dist: trusty
-      sudo: required
-      node_js: '10'
-    - os: linux
-      dist: trusty
-      sudo: false
-      node_js: '8'
-    - os: linux
-      dist: trusty
-      sudo: false
-      node_js: '10'
+  fast_finish: true
 
 notifications:
   webhooks:

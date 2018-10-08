@@ -142,6 +142,7 @@
     "merge-stream": "^1.0.1",
     "minami": "github:nodecg/minami#a674ded7782ed7c60e8d5c1638aace339cbdbb4c",
     "nyc": "^13.0.0",
+    "p-retry": "^2.0.0",
     "polymer-build": "^3.0.4",
     "puppeteer": "^1.9.0",
     "remark": "^8.0.0",
