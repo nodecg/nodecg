@@ -7,7 +7,6 @@ import * as path from 'path';
 // Packages
 import test from 'ava';
 import * as axios from 'axios';
-import * as fse from 'fs-extra';
 
 // Ours
 import * as server from './helpers/server';
@@ -24,7 +23,7 @@ test.before(async () => {
 	dashboard = await initDashboard();
 });
 
-const UPLOAD_SOURCE_PATH = path.resolve(__dirname, 'fixtures/assets-to-upload/twitter_banner.png')
+const UPLOAD_SOURCE_PATH = path.resolve(__dirname, 'fixtures/assets-to-upload/twitter_banner.png');
 const TWITTER_BANNER_PATH = path.join(C.assetsRoot(), 'test-bundle/assets/twitter_banner.png');
 
 // Doing twice to assert file 'change' event
