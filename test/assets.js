@@ -7,6 +7,7 @@ import * as path from 'path';
 // Packages
 import test from 'ava';
 import * as axios from 'axios';
+import * as fse from 'fs-extra';
 
 // Ours
 import * as server from './helpers/server';
@@ -23,34 +24,49 @@ test.before(async () => {
 	dashboard = await initDashboard();
 });
 
+const UPLOAD_SOURCE_PATH = path.resolve(__dirname, 'fixtures/assets-to-upload/twitter_banner.png')
 const TWITTER_BANNER_PATH = path.join(C.assetsRoot(), 'test-bundle/assets/twitter_banner.png');
 
-test.serial('uploading', async t => {
-	const assetTab = await dashboard.evaluateHandle(() => document.querySelector('ncg-dashboard').shadowRoot.querySelector('paper-tab[data-route="assets"]'));
-	await assetTab.click();
-	const assetCategoryEl = await dashboard.evaluateHandle(() => {
-		return document
-			.querySelector('ncg-dashboard')
-			.shadowRoot
-			.querySelector('ncg-assets')
-			.shadowRoot
-			.querySelector('ncg-asset-category[collection-name="test-bundle"][category-name="assets"]');
-	});
-	const addEl = await dashboard.evaluateHandle(el => el.$.add, assetCategoryEl);
-	await addEl.click();
-	const fileInputEl = await dashboard.evaluateHandle(el => el.$.uploader.$.fileInput, assetCategoryEl);
-	fileInputEl.uploadFile(path.resolve(__dirname, 'fixtures/assets-to-upload/twitter_banner.png'));
+// Doing twice to assert file 'change' event
+for (let i = 0; i < 2; i++) {
+	test.serial('uploading', async t => {
+		const assetRep = t.context.apis.extension.Replicant('assets:assets');
 
-	await dashboard.evaluate(assetCategoryEl => new Promise(resolve => {
-		if (assetCategoryEl._successfulUploads === 1) {
-			resolve();
-		} else {
-			assetCategoryEl.$.uploader.addEventListener('upload-success', resolve, {once: true, passive: true});
+		// Make sure the file to upload does not exist first
+		if (i === 0) {
+			t.false(fs.existsSync(TWITTER_BANNER_PATH));
 		}
-	}), assetCategoryEl);
 
-	t.true(fs.existsSync(TWITTER_BANNER_PATH));
-});
+		const assetTab = await dashboard.evaluateHandle(() => document.querySelector('ncg-dashboard').shadowRoot.querySelector('paper-tab[data-route="assets"]'));
+		await assetTab.click();
+		const assetCategoryEl = await dashboard.evaluateHandle(() => {
+			return document
+				.querySelector('ncg-dashboard')
+				.shadowRoot
+				.querySelector('ncg-assets')
+				.shadowRoot
+				.querySelector('ncg-asset-category[collection-name="test-bundle"][category-name="assets"]');
+		});
+		const addEl = await dashboard.evaluateHandle(el => el.$.add, assetCategoryEl);
+		await addEl.click();
+		const fileInputEl = await dashboard.evaluateHandle(el => el.$.uploader.$.fileInput, assetCategoryEl);
+		fileInputEl.uploadFile(UPLOAD_SOURCE_PATH);
+
+		await new Promise(resolve => {
+			assetRep.on('change', resolve);
+		});
+
+		await dashboard.evaluate(assetCategoryEl => new Promise(resolve => {
+			if (assetCategoryEl._successfulUploads === 1) {
+				resolve();
+			} else {
+				assetCategoryEl.$.uploader.addEventListener('upload-success', resolve, {once: true, passive: true});
+			}
+		}), assetCategoryEl);
+
+		t.true(fs.existsSync(TWITTER_BANNER_PATH));
+	});
+}
 
 test.serial('retrieval - 200', async t => {
 	const response = await axios.get(`${C.rootUrl()}assets/test-bundle/assets/twitter_banner.png`, {
