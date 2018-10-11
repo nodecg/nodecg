@@ -2,7 +2,7 @@
 	"entrypoint": "src/dashboard/elements/ncg-dashboard.html",
 	"sources": [
 		"src/**/*",
-		"!**/*.pug"
+		"!**/*.tmpl"
 	],
 	"lint": {
 		"rules": ["polymer-2"]
