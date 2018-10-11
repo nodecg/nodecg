@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge; charset=UTF-8">
+		<meta name="viewport" content="width=device-width" initial-scale="1">
+
+		<title>NodeCG Login</title>
+
+		<link rel="import" href="/bower_components/paper-styles/typography.html">
+		<style is="custom-style" include="iron-flex iron-flex-alignment">
+			body {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 40px;
+				background-color: #eee;
+			}
+
+			h2 {
+				@apply(--paper-font-headline);
+			}
+
+			label {
+				display: block;
+			}
+
+			button {
+				margin-top: 2px;
+			}
+		</style>
+	</head>
+	<body>
+		<h2>Please sign in</h2>
+
+		<% if (config.login.steam && config.login.steam.enabled) { %>
+			<a href="/login/steam">
+				<img src="/login/signin_steam.png">
+			</a>
+		<% } %>
+
+		<% if (config.login.twitch && config.login.twitch.enabled) { %>
+			<a href="/login/twitch">
+				<img src="/login/signin_twitch.png">
+			</a>
+		<% } %>
+
+		<% if (config.login.local && config.login.local.enabled) { %>
+			<form method="post" action="/login/local">
+				<div class="form-group">
+					<label for="username">Username:</label>
+					<input class="form-control" type="text" name="username" />
+				</div>
+				<div class="form-group">
+					<label for="password">Password:</label>
+					<input class="form-control" type="password" name="password" />
+				</div>
+				<button class="btn btn-primary" type="submit">Login</button>
+			</form>
+		<% } %>
+	</body>
+</html>
