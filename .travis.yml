@@ -1,6 +1,13 @@
+sudo: false
+dist: trusty
+
 language: node_js
 node_js:
   - '8'
+
+os:
+  - linux
+  - windows
 
 env:
   global:
@@ -36,10 +43,7 @@ install:
 after_success: npm run report-coverage
 
 matrix:
-  - os: linux
-    sudo: false
-    dist: trusty
-  - os: windows
+  fast_finish: true
 
 notifications:
   webhooks:
