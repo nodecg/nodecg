@@ -158,6 +158,8 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.4.3",
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
     "aliasify": "^2.1.0",
     "ava": "^2.2.0",
     "axios": "^0.18.1",
@@ -174,6 +176,7 @@
     "fs-extra": "^7.0.1",
     "gulp": "^4.0.0",
     "gulp-util": "^3.0.8",
+    "husky": "^4.2.3",
     "is-windows": "^1.0.2",
     "jsdoc": "^3.6.2",
     "minami": "github:nodecg/minami#75b4bbfc7e9d834f840be2358f4ddedf738cbfa8",
@@ -184,8 +187,8 @@
     "remark-toc": "^5.1.1",
     "replace-in-file": "^3.4.4",
     "rimraf": "^2.6.3",
-    "sinon": "^7.3.1",
     "simple-git": "^1.110.0",
+    "sinon": "^7.3.1",
     "socket.io-client": "^2.2.0",
     "standard-version": "^6.0.1",
     "taffydb": "^2.7.3",
@@ -200,5 +203,10 @@
     "last 2 firefox versions",
     "last 2 safari versions",
     "last 2 edge versions"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
 }
