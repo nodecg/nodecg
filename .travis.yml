@@ -21,6 +21,9 @@ cache:
      - '$HOME/.npm'
      - $(npm config get prefix)
 
+addons:
+  chrome: stable
+
 before_install:
   - npm install -g codecov bower
 
