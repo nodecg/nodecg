@@ -1,14 +1,14 @@
 'use strict';
 
 // Native
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Packages
-const fse = require('fs-extra');
+import * as fse from 'fs-extra';
+import * as temp from 'temp';
+import * as test from 'ava';
 const isWindows = require('is-windows');
-const temp = require('temp');
-const test = require('ava');
 
 // Ours
 const Logger = require('../lib/logger/server')({console: {enabled: true}});

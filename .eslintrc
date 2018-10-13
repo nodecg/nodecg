@@ -15,7 +15,7 @@
 					"Polymer.MutableData",
 					"nodecg.Replicant",
 					"NodeCG.Replicant",
-					"e.apis.extension.Replicant",
+					"t.context.apis.extension.Replicant",
 					"window.dashboardApi.Replicant"
 				]
 			}
