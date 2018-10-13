@@ -2,37 +2,21 @@ sudo: false
 dist: trusty
 
 language: node_js
+
 node_js:
   - '8'
+  - '10'
 
 os:
   - linux
 
-env:
-  global:
-    - CXX=g++-4.8
-
 cache:
-  apt: true
-  directories:
-    - bower_components
-    - '$HOME/.npm'
-    - $(npm config get prefix)
-
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - google-chrome
-    packages:
-      - g++-4.8
-      - google-chrome-stable
+   directories:
+     - bower_components
+     - '$HOME/.npm'
+     - $(npm config get prefix)
 
 before_install:
-  - export CHROME_BIN=/usr/bin/google-chrome
-  - export DISPLAY=:99.0
-  - npm i -g npm@5.7.1
-  - bash ./selenium-setup.sh
   - npm install -g codecov bower
 
 install:
@@ -40,9 +24,6 @@ install:
   - bower install
 
 after_success: npm run report-coverage
-
-matrix:
-  fast_finish: true
 
 notifications:
   webhooks:

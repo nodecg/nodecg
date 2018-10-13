@@ -180,11 +180,10 @@ Once you've made your changes, follow the steps above in the [Contribute](#contr
 
 ### Running tests locally
 
-1.  Install selenium-standalone (`npm install --global selenium-standalone`), then run the installer (`selenium-standalone install`)
-2.  Open one terminal and start Selenium: `selenium-standalone start`
-3.  Open a second terminal, navigate to the NodeCG root and run `npm test`
+You no longer need Selenium to run browser integration tests. Chromium is installed with
+`npm install`/`npm ci`, and that's all required for tests.
 
-Note: Selenium requires [Java](https://www.java.com/en/download/help/download_options.xml).
+Then just run `npm test`
 
 ### Code of Conduct
 
