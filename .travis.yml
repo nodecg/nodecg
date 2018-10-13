@@ -1,26 +1,22 @@
-os:
-  - linux
-sudo: false
-dist: trusty
-
 language: node_js
 
 node_js:
   - '8'
   - '10'
 
+os:
+  - linux
+sudo: false
+dist: trusty
+
 before_install:
-  - npm install -g npm@6
   - npm install -g codecov bower
 
 install:
-  - npm ci
+  - npm install
   - bower install
 
 after_success: npm run report-coverage
-
-matrix:
-  fast_finish: true
 
 notifications:
   webhooks:
