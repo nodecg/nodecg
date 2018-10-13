@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge; charset=UTF-8">
+		<meta name="viewport" content="width=device-width" initial-scale="1">
+		<meta name="theme-color" content="#ffffff">
+		<link rel="manifest" href="/manifest.json">
+
+		<title>NodeCG Dashboard</title>
+
+		<script type="text/javascript">
+			// Allow child iframes to reliably find this parent frame
+			window.__nodecg__ = true;
+
+			// Make the global config (and other render-time data) available during runtime.
+			window.ncgConfig = <%= JSON.stringify(publicConfig) %>;
+			window.__renderData__ = {
+				bundles: <%= JSON.stringify(bundles) %>,
+				workspaces: <%= JSON.stringify(workspaces) %>
+			};
+			Object.freeze(window.__renderData__);
+		</script>
+
+		<% if (privateConfig.sentry && privateConfig.sentry.enabled) { %>
+			<script src="/bower_components/raven-js/dist/raven.min.js"></script>
+			<script type="text/javascript">
+				Raven.config('<%- privateConfig.sentry.publicDsn %>', <%= JSON.stringify(ravenConfig) %>).install();
+				window.addEventListener('unhandledrejection', function (err) {
+					Raven.captureException(err.reason);
+				});
+			</script>
+		<% } %>
+
+		<!-- Register service worker -->
+		<script type="text/javascript">
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.register('/service-worker.js')
+					.then(function(registration) {
+						// Service worker successfully installed.
+					}).catch(function(err) {
+						console.error('Error installing service worker!');
+						console.error(err);
+					});
+			}
+		</script>
+
+		<!-- other dashboard scripts -->
+		<script src="/bower_components/draggabilly/dist/draggabilly.pkgd.min.js" async></script>
+		<script src="/bower_components/iframe-resizer/js/iframeResizer.min.js" async></script>
+		<script src="/bower_components/packery/dist/packery.pkgd.min.js"></script>
+		<script src="/bower_components/clipboard/dist/clipboard.min.js"></script>
+		<script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+		<link rel="import" href="../bower_components/shadycss/apply-shim.html" />
+
+		<!-- our custom dashboard elements -->
+		<link rel="import" href="elements/ncg-dashboard.html" />
+
+		<!-- make the API available -->
+		<script src="/nodecg-api.min.js"></script>
+
+		<!-- initialize the socket -->
+		<script src="/bower_components/cookies-js/dist/cookies.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+			const params = new URLSearchParams(location.search);
+			window.token = params.key || Cookies.get('socketToken');
+			if (window.token) {
+				window.socket = io(undefined, {
+					query: {
+						token: window.token
+					}
+				});
+			} else {
+				window.socket = io();
+			}
+		</script>
+		<custom-style>
+			<style>
+				body {
+					overflow: hidden;
+					background-color: #232C3D;
+					@apply(--layout-vertical);
+					@apply(--layout-fullbleed);
+				}
+			</style>
+		</custom-style>
+	</head>
+	<body>
+		<ncg-dashboard id="dashboard"></ncg-dashboard>
+	</body>
+</html>
