@@ -1,15 +1,15 @@
-sudo: false
-dist: trusty
+matrix:
+  include:
+    - os: linux
+      sudo: false
+      dist: trusty
+    - os: windows
 
 language: node_js
 
 node_js:
   - '8'
   - '10'
-
-os:
-  - linux
-  - windows
 
 cache:
    directories:
