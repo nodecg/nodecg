@@ -6,38 +6,42 @@ export const replicantsRoot = () => path.join(process.env.NODECG_ROOT, 'db/repli
 
 export const assetsRoot = () => path.join(process.env.NODECG_ROOT, 'assets');
 
-export function rootUrl() {
-	return `http://localhost:${process.env.NODECG_TEST_PORT}/`;
-}
+export const rootUrl = () => {
+	const {NODECG_TEST_PORT} = process.env;
+	if (!NODECG_TEST_PORT) {
+		throw new Error('NODECG_TEST_PORT is missing. Is NodeCG initialized yet?');
+	}
+	return `http://localhost:${NODECG_TEST_PORT}/`;
+};
 
-export function loginUrl() {
+export const loginUrl = () => {
 	return `${rootUrl()}login/`;
-}
+};
 
-export function dashboardUrl() {
+export const dashboardUrl = () => {
 	return `${rootUrl()}dashboard/`;
-}
+};
 
-function testBundleRoot() {
+export const testBundleRoot = () => {
 	return `${rootUrl()}bundles/${bundleName()}/`;
-}
+};
 
-export function testPanelUrl() {
+export const testPanelUrl = () => {
 	return `${testBundleRoot()}dashboard/panel.html`;
-}
+};
 
-export function bundleBowerComponentsUrl() {
+export const bundleBowerComponentsUrl = () => {
 	return `${testBundleRoot()}bower_components/`;
-}
+};
 
-export function bundleNodeModulesUrl() {
+export const bundleNodeModulesUrl = () => {
 	return `${testBundleRoot()}node_modules/`;
-}
+};
 
-export function graphicUrl() {
+export const graphicUrl = () => {
 	return `${testBundleRoot()}graphics/`;
-}
+};
 
-export function singleInstanceUrl() {
+export const singleInstanceUrl = () => {
 	return `${testBundleRoot()}graphics/single_instance.html`;
-}
+};

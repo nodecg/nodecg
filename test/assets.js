@@ -36,16 +36,14 @@ for (let i = 0; i < 2; i++) {
 			t.false(fs.existsSync(TWITTER_BANNER_PATH));
 		}
 
-		const assetTab = await dashboard.evaluateHandle(() => document.querySelector('ncg-dashboard').shadowRoot.querySelector('paper-tab[data-route="assets"]'));
+		const assetTab = await util.shadowSelector(dashboard, 'ncg-dashboard', 'paper-tab[data-route="assets"]');
 		await assetTab.click();
-		const assetCategoryEl = await dashboard.evaluateHandle(() => {
-			return document
-				.querySelector('ncg-dashboard')
-				.shadowRoot
-				.querySelector('ncg-assets')
-				.shadowRoot
-				.querySelector('ncg-asset-category[collection-name="test-bundle"][category-name="assets"]');
-		});
+		const assetCategoryEl = await util.shadowSelector(
+			dashboard,
+			'ncg-dashboard',
+			'ncg-assets',
+			'ncg-asset-category[collection-name="test-bundle"][category-name="assets"]'
+		);
 		const addEl = await dashboard.evaluateHandle(el => el.$.add, assetCategoryEl);
 		await addEl.click();
 		const fileInputEl = await dashboard.evaluateHandle(el => el.$.uploader.$.fileInput, assetCategoryEl);

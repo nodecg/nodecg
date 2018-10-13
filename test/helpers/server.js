@@ -11,6 +11,9 @@ import test from 'ava';
 import * as fse from 'fs-extra';
 import * as temp from 'temp';
 
+// Ours
+import * as C from './test-constants';
+
 export const setup = (nodecgConfigName = 'nodecg.json') => {
 	const tempFolder = temp.mkdirSync();
 	temp.track(); // Automatically track and cleanup files at exit.
@@ -26,7 +29,6 @@ export const setup = (nodecgConfigName = 'nodecg.json') => {
 	fse.copySync(`test/fixtures/nodecg-core/cfg/${nodecgConfigName}`, path.join(tempFolder, 'cfg/nodecg.json'));
 	fse.copySync('test/fixtures/nodecg-core/db', path.join(tempFolder, 'db'));
 
-	const C = require('./test-constants');
 	const server = require(path.resolve(__dirname, '../../lib/server'));
 
 	test.before(async () => {

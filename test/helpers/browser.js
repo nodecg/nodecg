@@ -9,22 +9,27 @@ import {v4 as uuid} from 'uuid';
 import test from 'ava';
 import puppeteer from 'puppeteer';
 
+// Ours
 import * as C from './test-constants';
 
 const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
 
 export const setup = () => {
 	let browser;
-
 	test.before(async () => {
-		browser = await puppeteer.launch({headless: Boolean(IS_TRAVIS), args: IS_TRAVIS ? ['--no-sandbox'] : undefined});
+		// Use Chromium's headless mode if in CI environment
+		const headless = Boolean(IS_TRAVIS);
+		// The --no-sandbox flag is required to run Headless Chrome on Travis
+		const args = IS_TRAVIS ? ['--no-sandbox'] : undefined;
+		browser = await puppeteer.launch({headless, args});
 	});
+
 	test.beforeEach(t => {
 		t.context.browser = browser;
 	});
 
 	test.after.always(async () => {
-		if (!browser || typeof browser.page === 'function') {
+		if (!browser) {
 			return;
 		}
 
@@ -56,7 +61,7 @@ export const setup = () => {
 				newCoverageObj[absKey] = coverageObj[key];
 			}
 			fs.writeFileSync(
-				`.nyc_output/browser-${uuid()}}.json`,
+				`.nyc_output/browser-${uuid()}.json`,
 				JSON.stringify(newCoverageObj),
 				'utf8'
 			);
