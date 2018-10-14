@@ -1,29 +1,34 @@
-'use strict';
+export const sleep = milliseconds =>
+	new Promise(resolve => {
+		setTimeout(resolve, milliseconds);
+	});
 
-const e = require('./test-environment');
+export const waitForRegistration = async page => {
+	const response = await page.evaluate(() => new Promise(resolve => {
+		if (window.__nodecgRegistrationAccepted__) {
+			finish();
+		} else {
+			window.addEventListener('nodecg-registration-accepted', finish);
+		}
 
-module.exports = {
-	sleep(milliseconds) {
-		return new Promise(resolve => {
-			setTimeout(() => {
-				resolve();
-			}, milliseconds);
-		});
-	},
+		function finish() {
+			resolve(window.__refreshMarker__);
+			window.__refreshMarker__ = '__refreshMarker__';
+		}
+	}));
+	return response;
+};
 
-	waitForRegistration: async () => {
-		const response = await e.browser.client.executeAsync(done => {
-			if (window.__nodecgRegistrationAccepted__) {
-				finish();
+export const shadowSelector = async (page, ...selectors) => {
+	return page.evaluateHandle(selectors => {
+		let foundDom = document.querySelector(selectors[0]);
+		for (const selector of selectors.slice(1)) {
+			if (foundDom.shadowRoot) {
+				foundDom = foundDom.shadowRoot.querySelector(selector);
 			} else {
-				window.addEventListener('nodecg-registration-accepted', finish);
+				foundDom = foundDom.querySelector(selector);
 			}
-
-			function finish() {
-				done(window.__refreshMarker__);
-				window.__refreshMarker__ = '__refreshMarker__';
-			}
-		});
-		return response && response.value;
-	}
+		}
+		return foundDom;
+	}, selectors);
 };

@@ -19,8 +19,8 @@ if (!process.env.NODECG_ROOT) {
 
 const semver = require('semver');
 const nodeVersion = process.versions.node;
-if (!semver.satisfies(nodeVersion, '>=6')) {
-	console.error('ERROR: NodeCG requires Node.js >=6 and npm >=2');
+if (!semver.satisfies(nodeVersion, '>=8.3')) {
+	console.error('ERROR: NodeCG requires Node.js >=8.3 and npm >=2');
 	console.error(`       Your Node.js version: v${nodeVersion}`);
 	process.exit(1);
 }

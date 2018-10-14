@@ -41,6 +41,7 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
     - `allowHTTP` _Boolean_ Whether to allow insecure HTTP connections while SSL is active.
     - `keyPath` _String_ The path to an SSL key file.
     - `certificatePath` _String_ The path to an SSL certificate file.
+    - `passphrase` _String_ The passphrase for the provided key file.
 - `sentry` _Object_ Contains [Sentry](https://sentry.io/support-class/) configuration properties.
 	- `enabled` _Boolean_ Whether to enable Sentry error reporting.
 	- `dsn` _String_ Your private DSN, for server-side error reporting.

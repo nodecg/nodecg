@@ -53,7 +53,7 @@ without writing any code may be disappointed.
 
 ## Install
 
-Install [Node.js (version 8 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
+Install [Node.js (version 8.3 or greater) & npm (version 2 or greater)](http://nodejs.org/).  
 
 Then, run the following commands from a terminal (command prompt):
 
@@ -107,12 +107,12 @@ Avoid installing or uninstalling bundles while NodeCG is running.
 -   Start NodeCG (`node index.js` or `nodecg start` if you have [nodecg-cli](https://www.npmjs.com/package/nodecg-cli) installed).
 -   Open the dashboard (`http://localhost:9090` by default).
 -   Open a graphic from the "Graphics" menu.
--   You can configure NodeCG by creating and editing [cfg/nodecg.json](http://nodecg.com/6_tutorial-nodecg-configuration.html).
+-   You can configure NodeCG by creating and editing [cfg/nodecg.json](http://nodecg.com/tutorial-6_nodecg-configuration.html).
 
 ### Configuration
 
 `./cfg/nodecg.json` is an optional file that you can create to configure NodeCG.
-See the [NodeCG Configuration tutorial](http://nodecg.com/6_tutorial-nodecg-configuration.html) for more information on configuring NodeCG.
+See the [NodeCG Configuration tutorial](http://nodecg.com/tutorial-6_nodecg-configuration.html) for more information on configuring NodeCG.
 
 ## Bundles
 
@@ -180,11 +180,10 @@ Once you've made your changes, follow the steps above in the [Contribute](#contr
 
 ### Running tests locally
 
-1.  Install selenium-standalone (`npm install --global selenium-standalone`), then run the installer (`selenium-standalone install`)
-2.  Open one terminal and start Selenium: `selenium-standalone start`
-3.  Open a second terminal, navigate to the NodeCG root and run `npm test`
+You no longer need Selenium to run browser integration tests. Chromium is installed with
+`npm install`/`npm ci`, and that's all required for tests.
 
-Note: Selenium requires [Java](https://www.java.com/en/download/help/download_options.xml).
+Then just run `npm test`
 
 ### Code of Conduct
 

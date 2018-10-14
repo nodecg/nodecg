@@ -373,6 +373,7 @@
 					<div class="buttons" hidden="[[_falsey(dialog.dialogButtons)]]">
 						<template is="dom-repeat" items="[[dialog.dialogButtons]]" as="button">
 							<paper-button
+								class$="[[_calcButtonClass(button.type)]]"
 								dialog-confirm$="[[_equal(button.type, 'confirm')]]"
 								dialog-dismiss$="[[_equal(button.type, 'dismiss')]]">
 								[[button.name]]
