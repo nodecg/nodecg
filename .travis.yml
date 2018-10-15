@@ -22,16 +22,16 @@ cache:
      - $(npm config get prefix)
 
 before_install:
-  - |-
-    # Windows: Install Chrome with Chocolatey
-    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-      choco install googlechrome
-    fi
   - npm install -g codecov bower
 
 install:
   - npm install
   - bower install
+  - |-
+    # Windows: Manually install puppeteer@1.7.0
+    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      npm install puppeteer@1.7.0
+    fi
 
 after_success: npm run report-coverage
 
