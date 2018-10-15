@@ -1,14 +1,19 @@
-sudo: false
-dist: trusty
+matrix:
+  include:
+    - os: linux
+      sudo: false
+      dist: trusty
+      node_js: '8'
+    - os: linux
+      sudo: false
+      dist: trusty
+      node_js: '10'
+    - os: windows
+      node_js: '8'
+    - os: windows
+      node_js: '10'
 
 language: node_js
-
-node_js:
-  - '8'
-  - '10'
-
-os:
-  - linux
 
 cache:
    directories:
@@ -22,6 +27,11 @@ before_install:
 install:
   - npm install
   - bower install
+  - |-
+    # Windows: Manually install puppeteer@1.7.0
+    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      npm install puppeteer@1.7.0
+    fi
 
 after_success: npm run report-coverage
 
