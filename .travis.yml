@@ -21,10 +21,13 @@ cache:
      - '$HOME/.npm'
      - $(npm config get prefix)
 
-addons:
-  chrome: stable
-
 before_install:
+  - |-
+    # Windows: Install Chrome with Chocolatey
+    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      choco install googlechrome
+      choco install chromium
+    fi
   - npm install -g codecov bower
 
 install:
