@@ -81,6 +81,34 @@ Configure your `nodecg/cfg/nodecg.json` as such:
 }
 ```
 
+Local authentication also support password hashing. In order to enable, fill the `password` property with `<algorithm>:<hash>`.
+
+Currently, only native Node.js algorithms are supported.
+
+Example:
+
+```json
+{
+  "login": {
+    "enabled": true,
+    "sessionSecret": "Make this a random string, like one from https://randomkeygen.com/",
+    "local": {
+      "enabled": true,
+      "allowedUsers": [
+        {
+          "username": "admin",
+          "password": "sha1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8"
+        },
+        {
+          "username": "other_admin",
+          "password": "md5:5f4dcc3b5aa765d61d8327deb882cf99"
+        }
+      ]
+    }
+  }
+}
+```
+
 ### <a name="twitch-auth"></a> Twitch Auth
 1. [Create a new application on your Twitch Developer Dashboard](https://glass.twitch.tv/console/apps/create)
 2. Give it whatever values you want for Name, Category, and Other Details

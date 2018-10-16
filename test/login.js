@@ -38,6 +38,13 @@ test.serial('logging in and out should work', async t => {
 	t.is(loginPage.url(), C.loginUrl());
 });
 
+test.serial('should logging in with hashed password', async t => {
+	await logIn('other_admin');
+	await loginPage.waitForFunction(url => location.href === url, {}, C.dashboardUrl());
+
+	t.pass();
+});
+
 test.serial('regenerating a token should send the user back to /login', async t => {
 	// This operation sometimes fails on CI
 	const run = async () => {
@@ -142,15 +149,15 @@ test.cb('socket should deny access with bad auth token in header', t => {
 	});
 });
 
-async function logIn() {
+async function logIn(username = 'admin', password = 'password') {
 	await loginPage.bringToFront();
 	await loginPage.goto(C.loginUrl());
 	if (loginPage.url() !== C.loginUrl()) {
 		return loginPage;
 	}
 
-	await loginPage.type('#username', 'admin');
-	await loginPage.type('#password', 'password');
+	await loginPage.type('#username', username);
+	await loginPage.type('#password', password);
 	await loginPage.click('#localSubmit');
 }
 

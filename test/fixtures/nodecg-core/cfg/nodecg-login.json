@@ -4,10 +4,16 @@
 		"sessionSecret": "supersecret",
 		"local": {
 			"enabled": true,
-			"allowedUsers": [{
-				"username": "admin",
-				"password": "password"
-			}]
+			"allowedUsers": [
+				{
+					"username": "admin",
+					"password": "password"
+				},
+				{
+					"username": "other_admin",
+					"password": "sha1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8"
+				}
+			]
 		}
 	}
 }
