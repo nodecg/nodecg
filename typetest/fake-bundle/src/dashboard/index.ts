@@ -1,4 +1,6 @@
-import {nodecg, NodeCG} from '../../../../../types/browser';
+/// <reference path="../../../../types/browser.d.ts" />
+
+import {NodeCGConfig} from '../../../../types/browser';
 
 console.log(nodecg);
 console.log(NodeCG);
@@ -14,5 +16,7 @@ nodecg.sendMessage('hello!').then(() => {
 	console.log('done');
 });
 
-const sound = nodecg.playSound('playRocknRoll')
-console.log(sound.duration)
+const sound = nodecg.playSound('playRocknRoll');
+console.log(sound.duration);
+
+export const config: NodeCGConfig = nodecg.config;

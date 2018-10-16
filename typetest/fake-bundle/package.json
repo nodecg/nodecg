@@ -6,6 +6,6 @@
     "typescript": "^3.0.1"
   },
   "scripts": {
-    "build": "tsc --project ./src/dashboard; tsc --project ./src/extension"
+    "build": "tsc --build src/dashboard src/extension"
   }
 }

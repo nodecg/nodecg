@@ -19,10 +19,6 @@
     "broadcast"
   ],
   "dependencies": {
-    "@types/express": "^4.16.0",
-    "@types/socket.io": "^1.4.37",
-    "@types/socket.io-client": "^1.4.32",
-    "@types/soundjs": "^0.6.27",
     "body-parser": "^1.18.2",
     "cheerio": "^1.0.0-rc.2",
     "chokidar": "^1.7.0",
@@ -69,7 +65,7 @@
   "scripts": {
     "start": "node index.js",
     "pretest": "npm run build && npm run instrument",
-    "test": "nyc --reporter=none ava --timeout=2m test && nyc report --reporter=html --reporter=text",
+    "test": "npm run typetest && nyc --reporter=none ava --timeout=2m test && nyc report --reporter=html --reporter=text",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "static": "eslint index.js lib src test",
     "build": "npm run static && npm run docs:build && gulp",
@@ -81,7 +77,7 @@
     "prerelease": "npm t",
     "release": "standard-version",
     "postrelease": "npm publish && git push --follow-tags && npm run docs:publish",
-    "typetest": "cd test/types/fake-bundle && npm i && npm run build"
+    "typetest": "cd typetest/fake-bundle && npm i && npm run build"
   },
   "nyc": {
     "include": [

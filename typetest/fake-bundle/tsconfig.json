@@ -4,10 +4,13 @@
 		"target": "es2015",
 		"module": "commonjs",
 		"lib": ["es6"],
-		"strict": true,
 
-		// Don't have to emit in tests
-		"noEmit": true,
+		// Most strict type checking
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
 
 		// Required to simulate bundle directory, excluding parent typedef packages
 		"types": [],
