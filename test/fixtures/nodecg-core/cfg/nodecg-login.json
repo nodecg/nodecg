@@ -11,7 +11,7 @@
 				},
 				{
 					"username": "other_admin",
-					"password": "sha1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8"
+					"password": "sha256:1bf78745ca8a9c558bc7a20b0f6f063c01c686f9d44c0e2b24fa720c83e7def4"
 				}
 			]
 		}
