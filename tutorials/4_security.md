@@ -82,6 +82,7 @@ Configure your `nodecg/cfg/nodecg.json` as such:
 ```
 
 Local authentication also support password hashing. In order to enable, fill the `password` property with `<algorithm>:<hash>`.
+For generating a valid password hash, you must use `sessionSecret` as secret key.
 
 Currently, only native Node.js algorithms are supported.
 
@@ -97,11 +98,11 @@ Example:
       "allowedUsers": [
         {
           "username": "admin",
-          "password": "sha1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8"
+          "password": "sha256:ac679e332d4eee340b74eb0581225686f2736d58df7ea30c87a0d2cd5bfd1329"
         },
         {
           "username": "other_admin",
-          "password": "md5:5f4dcc3b5aa765d61d8327deb882cf99"
+          "password": "ripemd:6f00f0c4c18fb563921b689876e98b61"
         }
       ]
     }
