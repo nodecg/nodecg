@@ -2,12 +2,12 @@ NodeCG includes TypeScript type definitions for NodeCG APIs.
 
 ## Setup
 
-Install TypeScript and required type definitions.
+Install TypeScript as your bundle's dev dependency.
 
 ```sh
-npm install -D typescript @types/node @types/express @types/socket.io @types/socket.io-client @types/soundjs
+npm install -D typescript
 # or
-yarn add -D typescript @types/node @types/express @types/socket.io @types/socket.io-client @types/soundjs
+yarn add -D typescript
 ```
 
 ## Typing Replicants
