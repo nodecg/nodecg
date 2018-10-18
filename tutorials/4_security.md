@@ -81,8 +81,10 @@ Configure your `nodecg/cfg/nodecg.json` as such:
 }
 ```
 
-Local authentication also support password hashing. In order to enable, fill the `password` property with `<algorithm>:<hash>`.
+Local authentication also support password hashing by using HMAC. In order to use a password hash, fill the `password` property with the format `<type>:<hash>` where `<type>` is the type (SHA-256, RIPEMD, Whirlpool, ...) and `<hash>` a valid password hash.
+
 For generating a valid password hash, you must use `sessionSecret` as secret key.
+If you're looking for a HMAC hash generator, you can use tools like [wtools.io](https://wtools.io/generate-hmac-hash) for example.
 
 Currently, only native Node.js algorithms are supported.
 
