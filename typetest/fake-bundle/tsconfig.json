@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		// Generally-used configs
+		"target": "es2015",
+		"module": "commonjs",
+		"lib": ["es6"],
+
+		// Most strict type checking
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+
+		// Required to simulate bundle directory, excluding parent typedef packages
+		"types": [],
+		"baseUrl": "./",
+		"typeRoots": ["./"]
+	}
+}
