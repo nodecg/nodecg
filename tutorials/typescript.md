@@ -1,5 +1,7 @@
 NodeCG includes TypeScript type definitions for NodeCG APIs.
 
+**The type definition is experimental.**
+
 ## Setup
 
 Install TypeScript as your bundle's dev dependency.
