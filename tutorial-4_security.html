@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="https://raw.githubusercontent.com/nodecg/nodecg/master/src/favicon.ico">
+    <title>Security & Authentication - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    
+    <link type="text/css" rel="stylesheet" href="styles/github-corner.css">
+    
+</head>
+<body>
+
+<a href="https://github.com/nodecg/nodecg" class="github-corner" aria-label="View source on Github">
+    <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff;" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Tutorials</li><li class="nav-item"><a href="tutorial-1_what-is-nodecg.html">What is NodeCG?</a></li><li class="nav-item"><a href="tutorial-2_concepts-and-terminology.html">Concepts and Terminology</a></li><li class="nav-item"><a href="tutorial-3_quick-start.html">Quick Start</a></li><li class="nav-item"><a href="tutorial-4_security.html">Security & Authentication</a></li><li class="nav-item"><a href="tutorial-5_manifest.html">package.json Manifest</a></li><li class="nav-item"><a href="tutorial-6_nodecg-configuration.html">NodeCG Configuration</a></li><li class="nav-item"><a href="tutorial-7_using-npm.html">Using npm Dependencies</a></li><li class="nav-item"><a href="tutorial-8_using-bower.html">Using Bower Dependencies</a></li><li class="nav-item"><a href="tutorial-9_bundle-configuration.html">Bundle Configuration</a></li><li class="nav-item"><a href="tutorial-assets.html">Assets</a></li><li class="nav-item"><a href="tutorial-custom-routes.html">Custom Routes</a></li><li class="nav-item"><a href="tutorial-making-dialogs.html">Making Dashboard Dialogs</a></li><li class="nav-item"><a href="tutorial-migrating-0.7-to-0.8.html">Migrating from 0.7 to 0.8</a></li><li class="nav-item"><a href="tutorial-migrating-0.8-to-0.9.html">Migrating from 0.8 to 0.9</a></li><li class="nav-item"><a href="tutorial-migrating-0.9-to-1.0.html">Migrating from 0.9 to 1.0</a></li><li class="nav-item"><a href="tutorial-mounts.html">Mount folders as endpoints</a></li><li class="nav-item"><a href="tutorial-performance-tips.html">Performance Tips</a></li><li class="nav-item"><a href="tutorial-portable-nodecg.html">Portable NodeCG</a></li><li class="nav-item"><a href="tutorial-replicant-schemas.html">Replicant Validation</a></li><li class="nav-item"><a href="tutorial-screenshot-testing.html">Screenshot Testing Graphics</a></li><li class="nav-item"><a href="tutorial-sentry.html">Error Reporting with Sentry.io</a></li><li class="nav-item"><a href="tutorial-sounds.html">Sounds</a></li><li class="nav-item"><a href="tutorial-typescript.html">TypeScript</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="NodeCG.html">NodeCG</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#.waitForReplicants">waitForReplicants</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#findCue">findCue</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#getDialog">getDialog</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#getDialogDocument">getDialogDocument</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#getSocketIOServer">getSocketIOServer</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#listenFor">listenFor</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#log">log</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#mount">mount</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#playSound">playSound</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#readReplicant">readReplicant</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#Replicant">Replicant</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#sendMessage">sendMessage</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#sendMessageToBundle">sendMessageToBundle</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#stopAllSounds">stopAllSounds</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#stopSound">stopSound</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="NodeCG.html#unlisten">unlisten</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Security & Authentication</h1>
+    
+
+    <section>
+
+<header>
+    
+</header>
+
+<article>
+    <ul>
+<li><a href="#insecure-by-default">Is NodeCG secure by default?</a></li>
+<li><a href="#auth-levels">What levels of authorization does NodeCG have?</a></li>
+<li><a href="#auth-mechanics">How are users authorized?</a></li>
+<li><a href="#leak-response">What do I do if one of my keys got leaked?</a></li>
+<li><a href="#enabling-login-security">How do I enable login security?</a><ul>
+<li><a href="#local-auth">Local Auth</a></li>
+<li><a href="#twitch-auth">Twitch Auth</a></li>
+<li><a href="#steam-auth">Steam Auth</a></li>
+</ul>
+</li>
+<li><a href="#enabling-https">How do I enable HTTPS/SSL encryption?</a></li>
+</ul>
+<h2 id="-a-name-insecure-by-default-a-is-nodecg-secure-by-default-"><a name="insecure-by-default"></a> Is NodeCG secure by default?</h2>
+<p><strong>No.</strong> By default, NodeCG has no authorization or authentication of any kind. To enable basic authentication, see the <a href="#enabling-login-security">How do I enable login security?</a> section.</p>
+<p><strong>Do not</strong> put an unsecured NodeCG instance on the internet or a public network. Unsecured instances should only be used for local development and on trusted LANs.</p>
+<h2 id="-a-name-auth-levels-a-what-levels-of-authorization-does-nodecg-have-"><a name="auth-levels"></a> What levels of authorization does NodeCG have?</h2>
+<p>NodeCG has a fairly naive permissions model. There are only two permission levels:</p>
+<ol>
+<li>Completely unauthorized, with no access to anything</li>
+<li>Completely authorized, with full access to everything</li>
+</ol>
+<p>This is something we want to improve in the future, but right now this is how things are in NodeCG.</p>
+<p>&quot;Full access to everything&quot; includes:</p>
+<ul>
+<li>Read/write access to every Replicant in every bundle</li>
+<li>Read/write access to every message in every bundle</li>
+<li>Read access to the full config of every bundle<ul>
+<li>Your bundle configs may include sensitive API keys and passwords. Every user of your NodeCG deployment will have full access to these config values.</li>
+</ul>
+</li>
+</ul>
+<p>Therefore, untrusted users must never be given any degree of authorization in your NodeCG instance. They must never be allowed to successfully authenticate with the socket server. If they do, they will have full control over your entire NodeCG instance.</p>
+<h2 id="-a-name-auth-mechanics-a-how-are-users-authorized-"><a name="auth-mechanics"></a> How are users authorized?</h2>
+<p>NodeCG has two ways of authorizing a user:</p>
+<ol>
+<li>Reading the value of their <code>socketToken</code> cookie.</li>
+<li>Reading the value of their <code>key</code> URL query parameter.<ul>
+<li>This is why the &quot;COPY URL&quot; buttons on the &quot;Graphics&quot; tab of the dashboard include a <code>?key=YOUR_KEY</code> at the end of them. It is necessary for the pages to load successfully in OBS.</li>
+</ul>
+</li>
+</ol>
+<p>Anyone who gets sent a link which includes a <code>key</code> will have full authorization and access to your NodeCG instance. Treat these links with the same secrecy as you would a password, because that's essentially what they are.</p>
+<h2 id="-a-name-leak-response-a-what-do-i-do-if-one-of-my-keys-got-leaked-"><a name="leak-response"></a> What do I do if one of my keys got leaked?</h2>
+<ol>
+<li>Have the owner of the leaked key navigate to the &quot;Settings&quot; tab on the Dashboard.</li>
+<li>Click &quot;RESET KEY&quot;, and accept the confirmation dialog.</li>
+</ol>
+<p>If you are unable to reach the owner of the leaked key:</p>
+<ol>
+<li>Shutdown your NodeCG instance.</li>
+<li>Locate the <code>nodecg/db/tokens.db</code> file.</li>
+<li>Either completely delete this file (which will log out every user and reset their keys), or edit out the specific line containing the key which was leaked.</li>
+<li>Restart NodeCG.</li>
+</ol>
+<h2 id="-a-name-enabling-login-security-a-how-do-i-enable-login-security-"><a name="enabling-login-security"></a> How do I enable login security?</h2>
+<p>NodeCG has support for three authentication providers:</p>
+<ul>
+<li><a href="#local-auth">Local Username/Password Auth</a></li>
+<li><a href="#twitch-auth">Twitch Auth</a></li>
+<li><a href="#steam-auth">Steam Auth</a></li>
+</ul>
+<p>You may have multiple authentication providers enabled simultaneously.</p>
+<h3 id="-a-name-local-auth-a-local-auth"><a name="local-auth"></a> Local Auth</h3>
+<p>Configure your <code>nodecg/cfg/nodecg.json</code> as such:</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;login&quot;: {
+    &quot;enabled&quot;: true,
+    &quot;sessionSecret&quot;: &quot;Make this a random string, like one from https://randomkeygen.com/&quot;,
+    &quot;local&quot;: {
+      &quot;enabled&quot;: true,
+      &quot;allowedUsers&quot;: [
+        {
+          &quot;username&quot;: &quot;example1&quot;,
+          &quot;password&quot;: &quot;password_example&quot;
+        },
+        {
+          &quot;username&quot;: &quot;example2&quot;,
+          &quot;password&quot;: &quot;anotherExample-password1234&quot;
+        }
+      ]
+    }
+  }
+}</code></pre><h3 id="-a-name-twitch-auth-a-twitch-auth"><a name="twitch-auth"></a> Twitch Auth</h3>
+<ol>
+<li><a href="https://glass.twitch.tv/console/apps/create">Create a new application on your Twitch Developer Dashboard</a></li>
+<li>Give it whatever values you want for Name, Category, and Other Details</li>
+<li>Set the OAuth Redirect URL to <code>https://YOUR_DEPLOYMENT_URL/login/auth/twitch</code>.<ul>
+<li>If you're testing locally, use <code>http://localhost:9090/login/auth/twitch</code></li>
+</ul>
+</li>
+<li>Save your Client ID for the next step</li>
+<li>Click &quot;New Secret&quot;, and save your client secret for the next step</li>
+<li>Configure your <code>nodecg/cfg/nodecg.json</code> as such:<ul>
+<li>See the <a href="https://dev.twitch.tv/docs/authentication/#scopes">Twitch Dev docs for the list of available scopes</a>.</li>
+</ul>
+</li>
+</ol>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;login&quot;: {
+    &quot;enabled&quot;: true,
+    &quot;sessionSecret&quot;: &quot;Make this a random string, like one from https://randomkeygen.com/&quot;,
+    &quot;twitch&quot;: {
+      &quot;enabled&quot;: true,
+      &quot;clientID&quot;: &quot;YOUR_TWITCH_APP_CLIENT_ID&quot;,
+      &quot;clientSecret&quot;: &quot;YOUR_TWITCH_APP_CLIENT_SECRET&quot;,
+      &quot;scope&quot;: &quot;user:read:email&quot;,
+      &quot;allowedUsernames&quot;: [
+        &quot;your_twitch_username&quot;,
+        &quot;other_twitch_username&quot;,
+        &quot;can_have_as_many_as_you_want&quot;
+      ]
+    }
+  }
+}</code></pre><h3 id="-a-name-steam-auth-a-steam-auth"><a name="steam-auth"></a> Steam Auth</h3>
+<ol>
+<li><a href="https://steamcommunity.com/dev/apikey">Create/copy your Steam Web API Key</a></li>
+<li>Obtain the SteamID64 string for each of the accounts you wish to allow.<ul>
+<li>https://steamid.io/ is one tool for looking these up.</li>
+</ul>
+</li>
+<li>Configure your <code>nodecg/cfg/nodecg.json</code> as such:</li>
+</ol>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;login&quot;: {
+    &quot;enabled&quot;: true,
+    &quot;sessionSecret&quot;: &quot;Make this a random string, like one from https://randomkeygen.com/&quot;,
+    &quot;steam&quot;: {
+      &quot;enabled&quot;: true,
+      &quot;apiKey&quot;: &quot;YOUR_STEAM_WEB_API_KEY&quot;,
+      &quot;allowedIds&quot;: [
+        &quot;paste the SteamId64s you want to allow here&quot;,
+        &quot;they look like this&quot;,
+        &quot;76561197974943998&quot;
+      ]
+    }
+  }
+}</code></pre><h2 id="-a-name-enabling-https-a-how-do-i-enable-https-ssl-encryption-"><a name="enabling-https"></a> How do I enable HTTPS/SSL encryption?</h2>
+<ol>
+<li>Create an SSL certificate if you don't already have one.<ul>
+<li>Creating an SSL cert is out of the scope of this tutorial. You may need to do some Googling if you are unfamiliar with this process.</li>
+</ul>
+</li>
+<li>Configure your <code>nodecg/cfg/nodecg.json</code> as such (passphrase is only required if you created your key with one):</li>
+<li>Restart NodeCG, and confirm that your instance is accessible via HTTPS.</li>
+</ol>
+<pre class="prettyprint source lang-json"><code>{
+    &quot;ssl&quot;: {
+        &quot;enabled&quot;: true,
+        &quot;keyPath&quot;: &quot;C:\\example\\path\\your-cert-key.key&quot;,
+        &quot;certificatePath&quot;: &quot;C:\\example\\path\\your-cert.crt&quot;,
+        &quot;passphrase&quot;: &quot;this is my example passphrase&quot;
+    }
+}</code></pre>
+</article>
+
+</section>
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Oct 22 2018 00:17:00 GMT+0900 (Japan Standard Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

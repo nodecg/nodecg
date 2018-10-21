@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="https://raw.githubusercontent.com/nodecg/nodecg/master/src/favicon.ico">
-    <title>Performance Tips - Documentation</title>
+    <title>Bundle Configuration - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -42,7 +42,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Performance Tips</h1>
+    <h1 class="page-title">Bundle Configuration</h1>
     
 
     <section>
@@ -52,43 +52,18 @@
 </header>
 
 <article>
-    <h3 id="be-careful-which-css-properties-you-animate">Be careful which CSS properties you animate</h3>
-<p>Many CSS properties trigger <code>layout</code> events when changed. That means that changing one property can sometimes cause
-the entire page to be re-rendered, which imposes a significant performance hit. <a href="http://csstriggers.com/">CSS Triggers</a> is a website
-that lets you quickly check which CSS properties are expensive to animate. (Spoilers: <code>transform</code> and <code>opacity</code> are just about the only
-CSS properties that can be freely maniuplated with little overhead).</p>
-<h3 id="minimize-active-video-tags">Minimize active <code>&lt;video&gt;</code> tags</h3>
-<p>For animations that are always the same, pre-rendering them as webm video (which supports alpha transparency)
-is an option. However, care must be taken to remove these <code>&lt;video&gt;</code> nodes from the DOM when they are not in use.
-Even if a <code>&lt;video&gt;</code> tag is not currently playing, simply having it in the DOM can impact performance.</p>
-<h3 id="use-sprite-sheets-when-appropriate">Use sprite sheets when appropriate</h3>
-<p>For short pre-rendered animations, a sprite sheet might be the best solution.
-If done right, they can be smaller in size and perform better than their <code>&lt;video&gt;</code> counterpart.
-There are many libraries and tools out there for sprite sheet creation, but
-<a href="http://www.createjs.com/#!/EaselJS">EaselJS</a> (javascript Canvas2D library) and
-<a href="https://www.codeandweb.com/texturepacker">TexturePacker</a> (sprite sheet creation program) are a good place to start.</p>
-<h3 id="a-div-is-generally-faster-than-a-picture-or-video">A <code>&lt;div&gt;</code> is (generally) faster than a picture or video</h3>
-<p>Videos and sprite sheets can be nice shortcuts to speed up production time, but if your graphic is
-struggling to maintain a solid framerate then you may need to consider breaking it down into smaller parts.
-A handful of <code>&lt;div&gt;</code>s will generally perform better than a video or sprite sheet, as long as you aren't
-applying too many performance-intensive CSS styles. Use <a href="http://csstriggers.com/">CSS Triggers</a> as a reference to 
-know how expensive it is to animate various CSS properties.</p>
-<h3 id="minimize-alpha-pixels">Minimize alpha pixels</h3>
-<p>Alpha (transparency) is expensive to render. Try to keep your images and videos with alpha cropped as much as possible.</p>
-<h3 id="avoid-multiple-css-masks">Avoid multiple CSS masks</h3>
-<p><a href="http://www.html5rocks.com/en/tutorials/masking/adobe/">CSS masks</a> have their uses, but layering
-multiple masks in a scene can lead to significant performance reductions.
-When possible, use a culling <code>div</code> with <code>overflow: hidden</code> instead.</p>
-<h3 id="compress-your-images">Compress your images</h3>
-<p>Compressed images won't help framerate, but they will improve load times.
-Compressing your PNGs with a service such as <a href="https://tinypng.com/">TinyPNG</a> can result in dramatically
-reduced filesizes. Be careful when compressing images with subtle gradients, as some detail may be lost.</p>
-<h3 id="keep-canvas-tags-above-256x257-total-pixels">Keep <code>&lt;canvas&gt;</code> tags above 256x257 total pixels</h3>
-<p>In Chrome, <code>&lt;canvas&gt;</code> tags are only hardware accelerated when their total size is at least 256x257 pixels.
-Below this size, canvases are software rasterized and can severely reduce the framerate and performance of a graphic.</p>
-<p>Sources:
-<a href="https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/NPSQdiXSK4w">1</a> 
-<a href="https://chromium.googlesource.com/external/Webkit/+/f10c2d38aefd143134545e397bc49c8e305d3ba8/Source/WebCore/page/Settings.cpp#133">2</a></p>
+    <p>Bundles can be configured via *.json config files in the <code>cfg</code> directory of NodeCG.</p>
+<h2 id="example">Example</h2>
+<p>Say we have a bundle named <code>test-bundle</code>. If we create<code>./cfg/test-bundle.json</code> with the following contents:</p>
+<pre class="prettyprint source lang-json"><code>{ 
+    &quot;myData&quot;: &quot;hello&quot;
+}</code></pre><p>... that data can be accessed from via <a href="NodeCG.html#bundleConfig"><code>NodeCG#bundleConfig</code></a>:</p>
+<pre class="prettyprint source lang-js"><code>console.log(nodecg.bundleConfig.myData); // prints &quot;hello&quot;</code></pre><h2 id="json-schema">JSON Schema</h2>
+<p>If your bundle has a <code>configschema.json</code> file in its root, NodeCG will validate the config file (if any) for your bundle
+against this JSON Schema, and will throw errors on startup if the config file fails to pass validation. This is often
+the most efficient way to enforce a specific structure for your bundle's config.</p>
+<p>See <a href="http://spacetelescope.github.io/understanding-json-schema/"><em>Understanding JSON Schema</em></a> 
+for more information on what a JSON Schema is and how to use one.</p>
 </article>
 
 </section>

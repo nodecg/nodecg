@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="https://raw.githubusercontent.com/nodecg/nodecg/master/src/favicon.ico">
-    <title>Performance Tips - Documentation</title>
+    <title>Migrating from 0.9 to 1.0 - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -42,7 +42,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Performance Tips</h1>
+    <h1 class="page-title">Migrating from 0.9 to 1.0</h1>
     
 
     <section>
@@ -52,43 +52,64 @@
 </header>
 
 <article>
-    <h3 id="be-careful-which-css-properties-you-animate">Be careful which CSS properties you animate</h3>
-<p>Many CSS properties trigger <code>layout</code> events when changed. That means that changing one property can sometimes cause
-the entire page to be re-rendered, which imposes a significant performance hit. <a href="http://csstriggers.com/">CSS Triggers</a> is a website
-that lets you quickly check which CSS properties are expensive to animate. (Spoilers: <code>transform</code> and <code>opacity</code> are just about the only
-CSS properties that can be freely maniuplated with little overhead).</p>
-<h3 id="minimize-active-video-tags">Minimize active <code>&lt;video&gt;</code> tags</h3>
-<p>For animations that are always the same, pre-rendering them as webm video (which supports alpha transparency)
-is an option. However, care must be taken to remove these <code>&lt;video&gt;</code> nodes from the DOM when they are not in use.
-Even if a <code>&lt;video&gt;</code> tag is not currently playing, simply having it in the DOM can impact performance.</p>
-<h3 id="use-sprite-sheets-when-appropriate">Use sprite sheets when appropriate</h3>
-<p>For short pre-rendered animations, a sprite sheet might be the best solution.
-If done right, they can be smaller in size and perform better than their <code>&lt;video&gt;</code> counterpart.
-There are many libraries and tools out there for sprite sheet creation, but
-<a href="http://www.createjs.com/#!/EaselJS">EaselJS</a> (javascript Canvas2D library) and
-<a href="https://www.codeandweb.com/texturepacker">TexturePacker</a> (sprite sheet creation program) are a good place to start.</p>
-<h3 id="a-div-is-generally-faster-than-a-picture-or-video">A <code>&lt;div&gt;</code> is (generally) faster than a picture or video</h3>
-<p>Videos and sprite sheets can be nice shortcuts to speed up production time, but if your graphic is
-struggling to maintain a solid framerate then you may need to consider breaking it down into smaller parts.
-A handful of <code>&lt;div&gt;</code>s will generally perform better than a video or sprite sheet, as long as you aren't
-applying too many performance-intensive CSS styles. Use <a href="http://csstriggers.com/">CSS Triggers</a> as a reference to 
-know how expensive it is to animate various CSS properties.</p>
-<h3 id="minimize-alpha-pixels">Minimize alpha pixels</h3>
-<p>Alpha (transparency) is expensive to render. Try to keep your images and videos with alpha cropped as much as possible.</p>
-<h3 id="avoid-multiple-css-masks">Avoid multiple CSS masks</h3>
-<p><a href="http://www.html5rocks.com/en/tutorials/masking/adobe/">CSS masks</a> have their uses, but layering
-multiple masks in a scene can lead to significant performance reductions.
-When possible, use a culling <code>div</code> with <code>overflow: hidden</code> instead.</p>
-<h3 id="compress-your-images">Compress your images</h3>
-<p>Compressed images won't help framerate, but they will improve load times.
-Compressing your PNGs with a service such as <a href="https://tinypng.com/">TinyPNG</a> can result in dramatically
-reduced filesizes. Be careful when compressing images with subtle gradients, as some detail may be lost.</p>
-<h3 id="keep-canvas-tags-above-256x257-total-pixels">Keep <code>&lt;canvas&gt;</code> tags above 256x257 total pixels</h3>
-<p>In Chrome, <code>&lt;canvas&gt;</code> tags are only hardware accelerated when their total size is at least 256x257 pixels.
-Below this size, canvases are software rasterized and can severely reduce the framerate and performance of a graphic.</p>
-<p>Sources:
-<a href="https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/NPSQdiXSK4w">1</a> 
-<a href="https://chromium.googlesource.com/external/Webkit/+/f10c2d38aefd143134545e397bc49c8e305d3ba8/Source/WebCore/page/Settings.cpp#133">2</a></p>
+    <h2 id="breaking-changes">Breaking Changes</h2>
+<ul>
+<li><a href="#dialog-handlers"><strong>dashboard</strong>: The undocumented <code>[dialog-confirm]</code> and <code>[dialog-dismiss]</code> attribute click handlers have been removed.</a></li>
+<li><a href="#panel-click"><strong>dashboard</strong>: The undocumented (and broken) <code>panelClick</code> event has been removed.</a></li>
+<li><a href="#custom-cues"><strong>sounds:</strong> The undocumented customCues system has been removed.</a></li>
+<li><a href="#multiple-listeners"><strong>api:</strong> A given context (server, client) can now declare multiple listenFor handlers for a given message. Handlers are called in the order they were registered.</a></li>
+<li><a href="#intra-context-messaging"><strong>api:</strong> sendMessage can now trigger listenFor handlers in the same context (extension, webpage, etc).</a></li>
+<li><a href="#twitch-api"><strong>login:</strong> Twitch auth now uses the &quot;New Twitch API&quot;, instead of the deprecated &quot;v5&quot; API.</a></li>
+</ul>
+<h3 id="-a-name-dialog-handlers-a-undocumented-dialog-confirm-and-dialog-dismiss-attribute-click-handlers-have-been-removed"><a name="dialog-handlers"></a> Undocumented <code>[dialog-confirm]</code> and <code>[dialog-dismiss]</code> attribute click handlers have been removed</h3>
+<p>Previously, NodeCG had an undocumented feature where <em>any</em> element in a Dialog with a <code>[dialog-confirm]</code> or <code>[dialog-dismiss]</code> attribute would close the panel (with an appropriate <code>confirmed</code> or <code>dismissed</code> event) when clicked.</p>
+<p>This undocumented feature has been removed. If your bundle relied on it, you will need to re-implement similar functionality in your bundle's code.</p>
+<h3 id="-a-name-panel-click-a-undocumented-and-broken-panelclick-event-has-been-removed"><a name="panel-click"></a> Undocumented (and broken) <code>panelClick</code> event has been removed</h3>
+<p>Previously, NodeCG had an undocumented feature where any click event on any panel (or dialog) would emit a <code>panelClick</code> event on that panel's <code>document</code>.</p>
+<p>This undocumented feature has been removed, and never really worked properly to begin with. If your bundle relied on it, you will need to re-implement similar functionality in your bundle's code.</p>
+<h3 id="-a-name-custom-cues-a-undocumented-customcues-system-has-been-removed"><a name="custom-cues"></a> Undocumented customCues system has been removed</h3>
+<p>Previously, NodeCG had an undocumented and extremely complex feature for defining and editing Sound Cues during runtime.</p>
+<p>This undocumented feature has been removed. If your bundle relied on it, you will need to re-implement similar functionality in your bundle's code.</p>
+<h3 id="-a-name-multiple-listeners-a-multiple-listenfor-handlers-for-a-given-message"><a name="multiple-listeners"></a> Multiple listenFor handlers for a given message</h3>
+<p>Previously, NodeCG only allowed your bundle to specify one <code>listenFor</code> handler, per message, per context.</p>
+<p>Now, NodeCG lets you define as many <code>listenFor</code> handlers as you want, for any message, in any location.</p>
+<p>However, server-side <code>listenFor</code> handlers must be careful to not call an <code>acknowledgement</code> more than once:</p>
+<pre class="prettyprint source lang-js"><code>// nodecg/bundles/your-bundle
+module.exports = function (nodecg) {
+    nodecg.listenFor('example', (data, ack) => {
+        if (ack && !ack.handled) {
+            ack('foo');
+        }
+    });
+};</code></pre><pre class="prettyprint source lang-html"><code>&lt;!-- nodecg/bundles/your-bundle/graphics/example.html -->
+&lt;script>
+nodecg.sendMessage('example', 'hello', (error, response) => {
+    console.log(response); // => Will log &quot;foo&quot;.
+});
+&lt;/script></code></pre><p>Calling an <code>acknowledgement</code> more than once will throw an error.</p>
+<p>In short: <strong>most bundles won't need to change any of their code</strong> to be compatible with this change, but you should give everything a once-over to make sure things aren't behaving unexpectedly due to this new behavior.</p>
+<h3 id="-a-name-intra-context-messaging-a-sendmessage-can-now-trigger-listenfor-handlers-in-the-same-context"><a name="intra-context-messaging"></a> sendMessage can now trigger listenFor handlers in the same context</h3>
+<p>Previously, NodeCG messages were inter-context only. That meant that they were <em>only</em> sent out over the network, and were not sent to other listeners in the same process context (extension, graphic, panel, etc).</p>
+<p>Now, NodeCG sends messages to every listener, regardless of location. This means that code like the following will now work as expected:</p>
+<pre class="prettyprint source lang-js"><code>// nodecg/bundles/your-bundle/extension.js
+module.exports = function (nodecg) {
+    nodecg.sendMessage('hello', 'Hi there!');
+};</code></pre><pre class="prettyprint source lang-js"><code>// nodecg/bundles/my-bundle/extension.js
+module.exports = function (nodecg) {
+    nodecg.listenFor('hello', 'your-bundle', data => {
+        console.log(data); // => Will print &quot;Hi there!&quot;
+    });
+}</code></pre><p>A side-effect of this change is that it is no longer guaranteed that a server-side <code>listenFor</code> handler will receive an <code>acknowledgement</code> callback as its second argument. You should always check for the presence of an <code>acknowledgement</code> before attempting to call it:</p>
+<pre class="prettyprint source lang-js"><code>// nodecg/bundles/your-bundle
+module.exports = function (nodecg) {
+    nodecg.listenFor('example', (data, ack) => {
+        if (ack && !ack.handled) {
+            ack('foo');
+        }
+    });
+};</code></pre><h3 id="-a-name-twitch-api-a-twitch-auth-now-uses-the-new-twitch-api-instead-of-the-deprecated-v5-api"><a name="twitch-api"></a> Twitch auth now uses the &quot;New Twitch API&quot;, instead of the deprecated &quot;v5&quot; API</h3>
+<p>Previously, NodeCG used the deprecated &quot;v5&quot; Twitch API.</p>
+<p>Now, NodeCG uses the &quot;New Twitch API&quot;. The only tangible result of this change for NodeCG is that the format of the <code>login.twitch.scope</code> config parameter has changed. Please see <a href="https://dev.twitch.tv/docs/authentication/#scopes">https://dev.twitch.tv/docs/authentication/#scopes</a> for documentation on this new format.</p>
 </article>
 
 </section>
