@@ -14,6 +14,16 @@ To open a dialog, add a `nodecg-dialog` attribute to any clickable element on on
 <paper-button id="edit" class="nodecg-configure" nodecg-dialog="edit-total">Edit...</paper-button>
 ```
 
+When a dialog is opened, NodeCG will emit a `dialog-opened` even on your dialog's `document`. For example:
+```html
+<!-- bundles/my-bundle/dashboard/my-dialog.html -->
+<script>
+    document.addEventListener('dialog-opened', function() {
+        // The user opened the dialog.
+    });
+</script>
+```
+
 ## Closing dialogs
 By default, a dialog can only be closed by clicking outside of it. Optional confirmation and dismissal buttons can be
 added via `package.json`. See the [package.json tutorial]{@tutorial 5_manifest} for information on the `dialogButtons`
