@@ -42,7 +42,7 @@ export class ReplicantBrowser<V> extends ReplicantCommon<V> {
 	on(event: 'declared' | 'fullUpdate', listener: (data: V) => void): this;
 	on(
 		event: 'change',
-		listener: (newValue?: V, oldValue?: V, dataOperations?: any[]) => void
+		listener: (newValue: V, oldValue: V, dataOperations: any[]) => void
 	): this;
 	on(
 		event:
