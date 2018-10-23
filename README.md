@@ -132,8 +132,9 @@ A breakdown of the terminology and concepts used inside NodeCG can be found [her
 
 ## Maintainers
 
--   [Alex "Lange" Van Camp](http://alexvan.camp) 
--   [Matt "Bluee" McNamara](http://mattmcn.com/)  
+-   [Alex "Lange" Van Camp](https://alexvan.camp) 
+-   [Matt "Bluee" McNamara](https://mattmcn.com/)  
+-   [Keiichiro "Hoishin" Amemiya](https://hoish.in/)  
 
 ## Designers
 
