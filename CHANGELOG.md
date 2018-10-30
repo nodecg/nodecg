@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.2.0"></a>
+# [1.2.0](https://github.com/nodecg/nodecg/compare/v1.1.3...v1.2.0) (2018-10-30)
+
+
+### Bug Fixes
+
+* update Node.js version check ([#438](https://github.com/nodecg/nodecg/issues/438)) ([086621d](https://github.com/nodecg/nodecg/commit/086621d))
+* **types:** remove optional parameters in callback ([81b0a11](https://github.com/nodecg/nodecg/commit/81b0a11))
+
+
+### Features
+
+* **security:** add support for passphrase for SSL key ([#437](https://github.com/nodecg/nodecg/issues/437)) ([c444d9b](https://github.com/nodecg/nodecg/commit/c444d9b))
+* replace Pug by Lodash with cache ([83404d1](https://github.com/nodecg/nodecg/commit/83404d1))
+* **TypeScript:** Add NodeCG API TypeScript Type Definition ([#432](https://github.com/nodecg/nodecg/issues/432)) ([9372ca4](https://github.com/nodecg/nodecg/commit/9372ca4))
+
+
+
 <a name="1.1.3"></a>
 ## [1.1.3](https://github.com/nodecg/nodecg/compare/v1.1.2...v1.1.3) (2018-08-05)
 
