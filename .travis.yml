@@ -21,10 +21,7 @@ jobs:
   include:
   - stage: "NPM Release @next"
     if: type = push # add master later
-    before_install: skip
-    install: skip
     script: skip
-    after_success: skip
     deploy:
       provider: npm
       tag: next
@@ -37,10 +34,7 @@ jobs:
         all_branches: true
   - stage: "GitHub Release"
     if: type = push AND tag IS present
-    before_install: skip
-    install: skip
     script: skip
-    after_success: skip
     before_deploy:
     - mv $(npm pack 2>/dev/null) "nodecg-${TRAVIS_TAG}.tgz"
     deploy:
