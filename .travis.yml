@@ -22,6 +22,8 @@ jobs:
   - stage: "NPM Release @next"
     if: type = push # add master later
     script: skip
+    before_deploy:
+    - npm version $(npm view nodecg version)-master.$(git rev-parse --short HEAD)
     deploy:
       provider: npm
       tag: next
@@ -43,6 +45,8 @@ jobs:
         secure: ph/2keCTbmoaCIFhBZE65Tj1DcRHf3U+Dk3KSVZOOR29NbI3tkwpoLjl0OQpeLtHqgu76L/W+B1ZFGQbegjHRCYOz6bvzLxe37c0p0FNmt+rWnyHAtri9O4iPObgsGX7t2+A2Qehq0NgM6KkjSQRRYpfF+Vx1S5+grTXY/lm/cI=
       file: "nodecg-${TRAVIS_TAG}.tgz"
       skip_cleanup: true
+      on:
+        tags: true
 notifications:
   webhooks:
     urls:
