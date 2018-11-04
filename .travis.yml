@@ -30,6 +30,8 @@ jobs:
       api_key:
         secure: MwR9W8ositdbBKRVg+oV7vUK43Gcs8eCZNSJejVAAk+rLZuwkpr9DPR6I5Crh6/8IblHD87xI90DPN5BGf0BJRzwVxeJWCuLaOwO5eUmqlXSrJt3VAoGDkxYzh2nm92CLnek6PxdeoZwqap2wDKUBoPh+Je7uZucgtRU27x7sUc=
       skip_cleanup: true
+      on:
+        all_branches: true
   - stage: "GitHub Release"
     if: type = push AND tag IS present
     script: skip
