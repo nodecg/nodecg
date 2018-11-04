@@ -19,8 +19,8 @@ install:
 after_success: npm run report-coverage
 jobs:
   include:
-  - stage: "NPM Release @next"
-    if: type = push # add master later
+  - stage: "NPM Release next"
+    if: type = push AND branch = master
     script: skip
     before_deploy:
     - git reset --hard
@@ -34,7 +34,7 @@ jobs:
         secure: MwR9W8ositdbBKRVg+oV7vUK43Gcs8eCZNSJejVAAk+rLZuwkpr9DPR6I5Crh6/8IblHD87xI90DPN5BGf0BJRzwVxeJWCuLaOwO5eUmqlXSrJt3VAoGDkxYzh2nm92CLnek6PxdeoZwqap2wDKUBoPh+Je7uZucgtRU27x7sUc=
       skip_cleanup: true
       on:
-        all_branches: true
+        branch: master
   - stage: "GitHub Release"
     if: type = push AND tag IS present
     script: skip
