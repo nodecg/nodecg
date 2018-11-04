@@ -23,6 +23,7 @@ jobs:
     if: type = push # add master later
     script: skip
     before_deploy:
+    - git reset --hard
     - npm version $(npm view nodecg version)-master.$(git rev-parse --short HEAD)
     deploy:
       provider: npm
