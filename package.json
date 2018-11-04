@@ -102,12 +102,16 @@
     "node": ">=8.3.0"
   },
   "files": [
+    "build",
+    "bundles",
+    "db",
+    "lib",
+    "schemas",
+    "src",
+    "types",
     "AUTHORS",
-    "LICENSE",
-    "README.md",
     "bower.json",
-    "index.js",
-    "lib/"
+    "package-lock.json"
   ],
   "pkg": {
     "assets": [
