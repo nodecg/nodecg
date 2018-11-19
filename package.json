@@ -108,8 +108,8 @@
   },
   "files": [
     "build",
-    "bundles",
-    "db",
+    "bundles/.empty_directory",
+    "db/.empty_directory",
     "lib",
     "schemas",
     "src",
