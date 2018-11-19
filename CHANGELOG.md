@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/nodecg/nodecg/compare/v1.2.2...v1.3.0) (2018-11-19)
+
+
+### Bug Fixes
+
+* **dashboard:** Sort all dashboard workspaces alphabetically ([#450](https://github.com/nodecg/nodecg/issues/450)) ([786f23f](https://github.com/nodecg/nodecg/commit/786f23f))
+
+
+### Features
+
+* **login:** add password hashing support for local auth ([#446](https://github.com/nodecg/nodecg/issues/446)) ([cf6192b](https://github.com/nodecg/nodecg/commit/cf6192b))
+* rewrite bare module specifiers ([#454](https://github.com/nodecg/nodecg/issues/454)) ([4500ccd](https://github.com/nodecg/nodecg/commit/4500ccd))
+
+
+
 <a name="1.2.2"></a>
 ## [1.2.2](https://github.com/nodecg/nodecg/compare/v1.1.3...v1.2.2) (2018-10-30)
 
