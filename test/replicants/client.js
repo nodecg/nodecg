@@ -528,15 +528,26 @@ test.serial.cb('transient - should not write their value to disk', t => {
 	});
 });
 
+test.serial('#waitForReplicant', async t => {
+	await dashboard.evaluate(() => {
+		const rep1 = window.dashboardApi.Replicant('wfp1');
+
+		// eslint-disable-next-line no-undef
+		return NodeCG.waitForReplicant(rep1);
+	});
+
+	t.pass();
+});
+
 test.serial('#waitForReplicants', async t => {
-	await dashboard.evaluate(() => new Promise(resolve => {
+	await dashboard.evaluate(() => {
 		const rep1 = window.dashboardApi.Replicant('wfp1');
 		const rep2 = window.dashboardApi.Replicant('wfp2');
 		const rep3 = window.dashboardApi.Replicant('wfp3');
-		/* eslint-disable no-undef */
-		NodeCG.waitForReplicants(rep1, rep2, rep3).then(resolve);
-		/* eslint-enable no-undef */
-	}));
+
+		// eslint-disable-next-line no-undef
+		return NodeCG.waitForReplicants(rep1, [rep2, rep3]);
+	});
 
 	t.pass();
 });
