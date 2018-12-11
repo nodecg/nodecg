@@ -551,3 +551,27 @@ test.serial('#waitForReplicants', async t => {
 
 	t.pass();
 });
+
+test.serial('.waitForReplicant', async t => {
+	await dashboard.evaluate(() => {
+		const rep1 = window.dashboardApi.Replicant('wfp1');
+
+		// eslint-disable-next-line no-undef
+		return window.dashboardApi.waitForReplicant(rep1);
+	});
+
+	t.pass();
+});
+
+test.serial('.waitForReplicants', async t => {
+	await dashboard.evaluate(() => {
+		const rep1 = window.dashboardApi.Replicant('wfp1');
+		const rep2 = window.dashboardApi.Replicant('wfp2');
+		const rep3 = window.dashboardApi.Replicant('wfp3');
+
+		// eslint-disable-next-line no-undef
+		return window.dashboardApi.waitForReplicants(rep1, [rep2, rep3]);
+	});
+
+	t.pass();
+});
