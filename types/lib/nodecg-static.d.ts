@@ -40,7 +40,8 @@ export interface NodeCGStaticBrowser extends NodeCGStaticCommon<'browser'> {
 		namespace: string,
 		cb: (value: V) => void
 	): void;
-	waitForReplicants(...replicants: ReplicantBrowser<any>[]): Promise<void>;
+	waitForReplicant(replicant: ReplicantBrowser<any>): Promise<ReplicantBrowser<any>>;
+	waitForReplicants(...replicants: Array<Iterable<ReplicantBrowser<any>> | ReplicantBrowser<any>>): Promise<Array<ReplicantBrowser<any>>>;
 }
 
 /**

@@ -7,7 +7,7 @@
 import {IRouter, RequestHandler} from 'express-serve-static-core';
 
 import {Logger} from './logger';
-import {ReplicantOptions, Replicant} from './replicant';
+import {ReplicantOptions, Replicant, ReplicantBrowser} from './replicant';
 import {NodeCGConfig} from './config';
 import {SendMessageReturnType} from './nodecg-static';
 import {Platform} from './platform';
@@ -102,6 +102,8 @@ export interface NodeCGBrowser extends NodeCGCommon<'browser'> {
 		namespace: string,
 		cb: (value: V) => void
 	): void;
+	waitForReplicant(replicant: ReplicantBrowser<any>): Promise<ReplicantBrowser<any>>;
+	waitForReplicants(...replicants: Array<Iterable<ReplicantBrowser<any>> | ReplicantBrowser<any>>): Promise<Array<ReplicantBrowser<any>>>;
 }
 
 /**
