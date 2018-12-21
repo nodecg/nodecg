@@ -124,7 +124,8 @@
       "src/**/*",
       "build/**/*",
       "bundles/**/*",
-      "schemas/**/*"
+      "schemas/**/*",
+      "node_modules/babel-plugin-bare-import-rewrite/**"
     ]
   },
   "devDependencies": {
