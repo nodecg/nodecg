@@ -15,6 +15,9 @@
 				},
 				"hasDeepRef": {
 					"$ref": "deepRef1.json"
+				},
+				"hasFileRefThenDefRef": {
+					"$ref": "schemaRefTargetWithDef.json#/definitions/exampleDef"
 				}
 			}
 		}

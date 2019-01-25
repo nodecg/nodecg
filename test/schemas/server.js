@@ -194,6 +194,10 @@ test('supports local file $refs', t => {
 								default: 0
 							}
 						}
+					},
+					hasFileRefThenDefRef: {
+						type: 'string',
+						enum: ['foo', 'bar']
 					}
 				}
 			}

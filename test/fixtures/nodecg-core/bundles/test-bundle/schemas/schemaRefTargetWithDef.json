@@ -1,0 +1,13 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+
+	"definitions": {
+		"exampleDef": {
+			"type": "string",
+			"enum": ["foo", "bar"]
+		}
+	},
+
+	"type": "number",
+	"default": 0
+}
