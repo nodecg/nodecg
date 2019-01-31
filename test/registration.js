@@ -159,7 +159,6 @@ test.serial('refresh individual instance', async t => {
 		'ncg-graphic-instance:last-of-type',
 		'#reloadButton',
 	);
-	await reload.hover();
 	await reload.click();
 
 	await graphic.waitFor(500);
