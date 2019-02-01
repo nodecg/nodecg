@@ -158,7 +158,10 @@ async function logIn(username = 'admin', password = 'password') {
 
 	await loginPage.type('#username', username);
 	await loginPage.type('#password', password);
+
+	const navWait = loginPage.waitForNavigation();
 	await loginPage.click('#localSubmit');
+	await navWait;
 }
 
 async function logOut(t) {
