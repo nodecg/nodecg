@@ -198,3 +198,19 @@ test.serial('connection toasts', async t => {
 		disconnected: false
 	});
 });
+
+test.serial('retrieval - 404', async t => {
+	try {
+		await axios.get(`${C.rootUrl()}bundles/test-bundle/dashboard/bad.png`);
+	} catch (error) {
+		t.is(error.response.status, 404);
+	}
+});
+
+test.serial('retrieval - wrong bundle is 404', async t => {
+	try {
+		await axios.get(`${C.rootUrl()}bundles/fake-bundle/dashboard/panel.html`);
+	} catch (error) {
+		t.is(error.response.status, 404);
+	}
+});

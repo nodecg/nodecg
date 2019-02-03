@@ -99,7 +99,6 @@ export const setup = () => {
 	const initSingleInstance = async () => {
 		const page = await browser.newPage();
 		await page.goto(C.singleInstanceUrl());
-		await page.evaluate(() => typeof window.singleInstanceApi !== 'undefined');
 		return page;
 	};
 
