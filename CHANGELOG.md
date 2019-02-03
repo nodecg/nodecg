@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.3.1"></a>
+## [1.3.1](https://github.com/nodecg/nodecg/compare/v1.3.0...v1.3.1) (2019-02-03)
+
+
+### Bug Fixes
+
+* **dashboard:** ensure the default workspace is first ([#458](https://github.com/nodecg/nodecg/issues/458)) ([18fdbe6](https://github.com/nodecg/nodecg/commit/18fdbe6))
+* **dashboard:** inject default styles before user styles ([#464](https://github.com/nodecg/nodecg/issues/464)) ([5981d9e](https://github.com/nodecg/nodecg/commit/5981d9e))
+* **injectscripts:** don't inject client_registration into busy.html or killed.html ([0a63202](https://github.com/nodecg/nodecg/commit/0a63202))
+* **package:** fix error when running in a zeit pkg ([38b01e2](https://github.com/nodecg/nodecg/commit/38b01e2))
+* **package:** include babel-plugin-bare-import-rewrite in zeit packages ([9813da3](https://github.com/nodecg/nodecg/commit/9813da3))
+* **replicant-schemas:** fix local refs not being resolved when appended to a file ref ([0cd1673](https://github.com/nodecg/nodecg/commit/0cd1673))
+* **router:** delay 404 resolution ([#463](https://github.com/nodecg/nodecg/issues/463)) ([23e5772](https://github.com/nodecg/nodecg/commit/23e5772))
+
+
+
 <a name="1.3.0"></a>
 # [1.3.0](https://github.com/nodecg/nodecg/compare/v1.2.2...v1.3.0) (2018-11-19)
 
