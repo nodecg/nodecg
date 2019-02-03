@@ -99,6 +99,17 @@ export const setup = () => {
 	const initSingleInstance = async () => {
 		const page = await browser.newPage();
 		await page.goto(C.singleInstanceUrl());
+		await page.waitForFunction(() => {
+			if (window.location.pathname.endsWith('busy.html')) {
+				return true;
+			}
+
+			if (window.location.pathname.endsWith('killed.html')) {
+				return true;
+			}
+
+			return typeof window.singleInstanceApi !== 'undefined';
+		});
 		return page;
 	};
 
