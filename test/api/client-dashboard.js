@@ -75,8 +75,8 @@ test.serial('should support multiple listenFor handlers', async t => {
 	t.context.apis.extension.sendMessage('serverToDashboardMultiple');
 
 	// Verify that our handlers both ran.
-	const res = await dashboard.evaluate(() => window.__serverToDashboardMultipleDone__);
-	t.true(res);
+	await dashboard.waitForFunction(() => window.__serverToDashboardMultipleDone__);
+	t.pass();
 });
 
 test.serial('#bundleVersion', async t => {
