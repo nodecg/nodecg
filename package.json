@@ -159,7 +159,7 @@
     "nyc": "^13.0.0",
     "p-retry": "^2.0.0",
     "polymer-build": "^3.0.4",
-    "puppeteer": "^1.11.0",
+    "puppeteer": "^1.12.1",
     "remark": "^8.0.0",
     "remark-toc": "^5.0.0",
     "replace-in-file": "^3.4.0",
