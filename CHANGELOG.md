@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.3.2"></a>
+## [1.3.2](https://github.com/nodecg/nodecg/compare/v1.3.1...v1.3.2) (2019-03-06)
+
+
+### Bug Fixes
+
+* **replicants:** ensure opts.defaultValue always get populated ([#467](https://github.com/nodecg/nodecg/issues/467)) ([73fd909](https://github.com/nodecg/nodecg/commit/73fd909))
+
+
+### Features
+
+* **typedef:** Export more types in browser.d.ts ([#465](https://github.com/nodecg/nodecg/issues/465)) ([0455036](https://github.com/nodecg/nodecg/commit/0455036))
+
+
+
 <a name="1.3.1"></a>
 ## [1.3.1](https://github.com/nodecg/nodecg/compare/v1.3.0...v1.3.1) (2019-02-03)
 
