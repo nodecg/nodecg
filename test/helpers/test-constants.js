@@ -11,6 +11,7 @@ export const rootUrl = () => {
 	if (!NODECG_TEST_PORT) {
 		throw new Error('NODECG_TEST_PORT is missing. Is NodeCG initialized yet?');
 	}
+
 	return `http://localhost:${NODECG_TEST_PORT}/`;
 };
 

@@ -85,7 +85,7 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 
 		dialog.addEventListener('neon-animation-finish', () => {
 			const afterClickDisplay = window.getComputedStyle(dialog).display;
-			const opened = dialog.opened;
+			const {opened} = dialog;
 			dialog.close(); // Clean up for the next test.
 			resolve({
 				beforeClickDisplay,

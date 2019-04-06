@@ -61,6 +61,7 @@ export const setup = () => {
 				coverageObj[key].path = absKey;
 				newCoverageObj[absKey] = coverageObj[key];
 			}
+
 			fs.writeFileSync(
 				`.nyc_output/browser-${uuid()}.json`,
 				JSON.stringify(newCoverageObj),

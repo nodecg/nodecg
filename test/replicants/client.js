@@ -110,9 +110,9 @@ test.serial('should log a warning when attempting to access .value before the Re
 
 		// TODO: Replace this with sinon.
 		const originalWarn = rep.log.warn;
-		rep.log.warn = function () {
+		rep.log.warn = (...args) => {
 			rep.log.warn = originalWarn;
-			resolve(arguments);
+			resolve(args);
 		};
 
 		const val = rep.value; // eslint-disable-line no-unused-vars

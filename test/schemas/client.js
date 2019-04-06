@@ -342,8 +342,14 @@ test.serial('shouldn\'t fuck up', async t => {
 		const rep = window.dashboardApi.Replicant('schedule:state');
 		rep.once('declared', () => {
 			rep.value.matchMap = [
-				false, false, false, false,
-				false, false, false, false
+				false,
+				false,
+				false,
+				false,
+				false,
+				false,
+				false,
+				false
 			];
 
 			rep.on('change', newVal => {
