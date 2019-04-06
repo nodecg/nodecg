@@ -92,7 +92,7 @@
 		connectedCallback() {
 			super.connectedCallback();
 
-			const src =	this.querySelector('iframe').src;
+			const {src} = this.querySelector('iframe');
 			this.standaloneUrl = `${src}?standalone=true`;
 		}
 

@@ -80,6 +80,7 @@ class NcgSoundCue extends Polymer.Element {
 		if (!this.file) {
 			noneOption.setAttribute('selected', 'true');
 		}
+
 		this.$.select.add(noneOption);
 
 		// Create "default" option, if applicable.
@@ -90,6 +91,7 @@ class NcgSoundCue extends Polymer.Element {
 			if (this.file && this.file.default) {
 				defaultOption.setAttribute('selected', 'true');
 			}
+
 			this.$.select.add(defaultOption);
 		}
 
@@ -103,6 +105,7 @@ class NcgSoundCue extends Polymer.Element {
 				if (this.file && f.base === this.file.base) {
 					option.setAttribute('selected', 'true');
 				}
+
 				this.$.select.add(option);
 			});
 		}
