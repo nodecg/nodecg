@@ -30,21 +30,21 @@ function waitFor(stream) {
 	});
 }
 
-gulp.task('clean', () => {
+function clean() {
 	return del([
 		buildDirectory,
 		'.nyc_output',
 		'coverage',
 		'instrumented'
 	]);
-});
+}
 
-gulp.task('browser-api', ['clean'], () => {
+function browserApi() {
 	return Promise.all([
 		waitFor(buh()),
 		waitFor(buh({instrument: true}))
 	]);
-});
+}
 
 function buh({instrument} = {}) {
 	// Set up the browserify instance on a task basis
@@ -96,7 +96,7 @@ function buh({instrument} = {}) {
 		.pipe(gulp.dest(instrument ? 'instrumented' : 'build/src'));
 }
 
-gulp.task('polymer-build', ['clean'], async () => {
+async function build() {
 	// Lets create some inline code splitters in case you need them later in your build.
 	const buildStreamSplitter = new polymerBuild.HtmlSplitter();
 
@@ -135,10 +135,16 @@ gulp.task('polymer-build', ['clean'], async () => {
 
 	// You did it!
 	console.log('Build complete!');
-});
+}
+
+exports.clean = clean;
+exports['browser-api'] = gulp.series(
+	clean,
+	browserApi
+);
+exports['polymer-build'] = gulp.series(clean, build);
+exports.default = gulp.series(browserApi, build);
 
 process.on('unhandledRejection', r => {
 	console.error('UNHANDLED PROMISE REJECTION:\n', r.stack ? r.stack : r);
 });
-
-gulp.task('default', ['browser-api', 'polymer-build']);
