@@ -138,7 +138,7 @@ exports['browser-api'] = gulp.series(
 	browserApi
 );
 exports['polymer-build'] = gulp.series(clean, build);
-exports.default = gulp.series(browserApi, build);
+exports.default = gulp.series(clean, browserApi, build);
 
 process.on('unhandledRejection', r => {
 	console.error('UNHANDLED PROMISE REJECTION:\n', r.stack ? r.stack : r);
