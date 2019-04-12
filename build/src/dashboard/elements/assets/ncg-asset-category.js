@@ -96,7 +96,7 @@ class NcgAssetCategory extends Polymer.MutableData(Polymer.Element) {
 
 	_onUploadBefore(event) {
 		// Custom upload request url for file
-		const file = event.detail.file;
+		const {file} = event.detail;
 		file.uploadTarget = `${event.target.target}/${file.name}`;
 	}
 

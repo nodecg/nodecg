@@ -4,7 +4,7 @@
 	'use strict';
 
 	const timestamp = Date.now();
-	let pathname = window.location.pathname;
+	let {pathname} = window.location;
 
 	// If the pathname ends with /bundleName/ then we must be on index.html.
 	if (pathname.endsWith(`/${nodecg.bundleName}/graphics/`)) {

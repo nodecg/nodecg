@@ -142,7 +142,7 @@ test.serial('mixer - assignable cues - should list new sound Assets as they are 
 		}
 
 		const interval = setInterval(() => {
-			const options = el.options;
+			const {options} = el;
 			if (options.length === 2 && options[1].value === 'success.ogg') {
 				clearInterval(interval);
 				resolve();
