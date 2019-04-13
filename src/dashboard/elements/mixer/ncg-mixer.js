@@ -17,7 +17,7 @@ class NcgMixer extends Polymer.Element {
 	ready() {
 		super.ready();
 
-		const masterFader = this.$.masterFader;
+		const {masterFader} = this.$;
 		const masterVolume = NodeCG.Replicant('volume:master', '_sounds');
 
 		masterFader.addEventListener('change', e => {

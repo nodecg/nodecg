@@ -29,6 +29,7 @@ export const shadowSelector = async (page, ...selectors) => {
 				foundDom = foundDom.querySelector(selector);
 			}
 		}
+
 		return foundDom;
 	}, selectors);
 };

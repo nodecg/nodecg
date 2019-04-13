@@ -78,6 +78,7 @@ class NcgDialog extends Polymer.mixinBehaviors([
 		if (this.withBackdrop) {
 			this.backdropElement.open();
 		}
+
 		this.playAnimation('entry');
 	}
 
@@ -85,6 +86,7 @@ class NcgDialog extends Polymer.mixinBehaviors([
 		if (this.withBackdrop) {
 			this.backdropElement.close();
 		}
+
 		this.playAnimation('exit');
 	}
 

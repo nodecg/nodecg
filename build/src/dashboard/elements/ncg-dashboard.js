@@ -265,8 +265,10 @@
 				/* istanbul ignore next: hard-to-test error */
 				cb(e);
 			}
+
 			canvas.remove();
 		};
+
 		// Load image URL.
 		try {
 			img.src = url;

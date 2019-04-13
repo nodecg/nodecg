@@ -244,7 +244,7 @@
 
 		_computePanels(workspace) {
 			const workspaceName = workspace.route === '' ? 'default' : workspace.name;
-			const bundles = window.__renderData__.bundles;
+			const {bundles} = window.__renderData__;
 			const panels = [];
 			bundles.forEach(bundle => {
 				bundle.dashboard.panels.forEach(panel => {
@@ -323,6 +323,7 @@
 				}
 			}
 		}
+
 		return a;
 	}
 })();
