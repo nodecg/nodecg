@@ -35,6 +35,17 @@ interface NodeCGCommon<P extends Platform, M = SendMessageReturnType<P>> {
 		data: any,
 		cb?: (error: any, ...args: any[]) => void
 	): M;
+	sendMessageToBundle(
+		messageName: string,
+		bundleName: string,
+		cb?: (error: any, ...args: any[]) => void
+	): M;
+	sendMessageToBundle(
+		messageName: string,
+		bundleName: string,
+		data: any,
+		cb?: (error: any, ...args: any[]) => void
+	): M;
 	listenFor(messageName: string, handlerFunc: (message: any) => void): void;
 	listenFor(
 		messageName: string,
