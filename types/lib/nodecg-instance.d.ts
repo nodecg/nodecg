@@ -9,7 +9,7 @@ import {IRouter, RequestHandler} from 'express-serve-static-core';
 import {Logger} from './logger';
 import {ReplicantOptions, Replicant} from './replicant';
 import {NodeCGConfig} from './config';
-import {SendMessageReturnType} from './nodecg-static';
+import {SendMessageToBundle, SendMessageReturnType} from './nodecg-static';
 import {Platform} from './platform';
 
 interface NodeCGCommon<P extends Platform, M = SendMessageReturnType<P>> {
@@ -35,17 +35,7 @@ interface NodeCGCommon<P extends Platform, M = SendMessageReturnType<P>> {
 		data: any,
 		cb?: (error: any, ...args: any[]) => void
 	): M;
-	sendMessageToBundle(
-		messageName: string,
-		bundleName: string,
-		cb?: (error: any, ...args: any[]) => void
-	): M;
-	sendMessageToBundle(
-		messageName: string,
-		bundleName: string,
-		data: any,
-		cb?: (error: any, ...args: any[]) => void
-	): M;
+	sendMessageToBundle: SendMessageToBundle<P, M>;
 	listenFor(messageName: string, handlerFunc: (message: any) => void): void;
 	listenFor(
 		messageName: string,
