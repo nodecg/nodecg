@@ -323,3 +323,13 @@ test.serial('test that one else path that\'s hard to hit', t => {
 	rep.value[0] = true;
 	t.pass();
 });
+
+test.serial('should call and return the result of the default factory', t => {
+	const rep = t.context.apis.extension.Replicant('defaultFactory', {
+		defaultValue: () => ({
+			lorem: 'ipsum'
+		})
+	});
+
+	t.deepEqual(rep.value, {lorem: 'ipsum'});
+});
