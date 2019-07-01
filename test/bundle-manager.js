@@ -39,7 +39,7 @@ test.cb.before(t => {
 
 	bundleManager = require('../lib/bundle-manager');
 	bundleManager.init(
-		[path.join(tempFolder, 'bundles')],
+		[path.join(tempFolder, 'bundles'), path.join(tempFolder, 'custom-bundles')],
 		path.join(tempFolder, 'cfg'),
 		'0.7.0',
 		nodecgConfig,
@@ -75,6 +75,11 @@ test.serial('loader - should not load a bundle that has been disabled', t => {
 test.serial('loader - should not crash or load an invalid bundle', t => {
 	const bundle = bundleManager.find('node_modules');
 	t.is(bundle, undefined);
+});
+
+test.serial('loader - should detect and load bundle located in custom bundle paths', t => {
+	const bundle = bundleManager.find('another-test-bundle');
+	t.is(bundle.name, 'another-test-bundle');
 });
 
 test.cb.serial('watcher - hould emit a change event when the manifest file changes', t => {
