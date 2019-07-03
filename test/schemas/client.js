@@ -303,7 +303,7 @@ test.serial('should reject assignment if it was validated against a different ve
 			}
 		});
 
-		rep.once('assignmentRejected', reason => {
+		rep.once('operationsRejected', reason => {
 			resolve(reason);
 		});
 	}));
@@ -311,7 +311,7 @@ test.serial('should reject assignment if it was validated against a different ve
 	t.true(res.startsWith('Mismatched schema version, assignment rejected'));
 });
 
-test.serial('should reject operations if they were validated against a different version of the schema', async t => {
+test.serial('should reject mutations if they were validated against a different version of the schema', async t => {
 	const res = await dashboard.evaluate(() => new Promise(resolve => {
 		const rep = window.dashboardApi.Replicant('client_schemaOperationMismatch');
 		rep.once('declared', () => {
