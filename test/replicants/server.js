@@ -91,6 +91,12 @@ test.cb.serial('should react to changes in nested properties of objects', t => {
 		t.deepEqual(newVal, {a: {b: {c: 'nestedChangeOK'}}});
 		t.deepEqual(operations, [{
 			args: {
+				newValue: {a: {b: {c: 'c'}}}
+			},
+			method: 'overwrite',
+			path: '/'
+		}, {
+			args: {
 				newValue: 'nestedChangeOK',
 				prop: 'c'
 			},
@@ -165,10 +171,16 @@ test.cb.serial('arrays - should support the "delete" operator', t => {
 	});
 
 	rep.on('change', (newVal, oldVal, operations) => {
-		if (operations && operations[0].method === 'delete') {
+		if (operations && operations[1].method === 'delete') {
 			t.deepEqual(newVal, [, 'bar']); // eslint-disable-line no-sparse-arrays
 			t.deepEqual(oldVal, ['foo', 'bar']);
 			t.deepEqual(operations, [{
+				path: '/',
+				method: 'overwrite',
+				args: {
+					newValue: ['foo', 'bar']
+				}
+			}, {
 				args: {prop: '0'},
 				path: '/',
 				method: 'delete'
@@ -196,6 +208,12 @@ test.cb.serial('arrays - should react to changes', t => {
 		t.deepEqual(oldVal, ['starting']);
 		t.deepEqual(newVal, ['starting', 'arrPushOK']);
 		t.deepEqual(operations, [{
+			args: {
+				newValue: ['starting']
+			},
+			path: '/',
+			method: 'overwrite'
+		}, {
 			args: ['arrPushOK'],
 			method: 'push',
 			path: '/'
