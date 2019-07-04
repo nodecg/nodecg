@@ -544,3 +544,37 @@ test.serial('#waitForReplicants', async t => {
 
 	t.pass();
 });
+
+test.serial('emits assignment in the correct order', async t => {
+	const extRep = t.context.apis.extension.Replicant('assignment_order', {defaultValue: []});
+
+	await dashboard.evaluate(() => new Promise(resolve => {
+		window.clientRep = window.dashboardApi.Replicant('assignment_order');
+		window.clientRep.once('declared', () => {
+			resolve();
+		});
+	}));
+
+	extRep.value.push('foo');
+	extRep.value = ['bar'];
+
+	const ret = await dashboard.evaluate(() => new Promise(resolve => {
+		window.clientRep.on('change', newVal => {
+			if (window.clientRep.revision === 2) {
+				resolve({
+					// Without this JSON.parse hack,
+					// newVal gets serialized as an empty object.
+					// Possibly a bug in the DevTools protocol used by Puppeteer?
+					newVal: JSON.parse(JSON.stringify(newVal)),
+					revision: window.clientRep.revision
+				});
+			}
+		});
+	}));
+
+	// If the ordering is wrong, `ret` will be `['bar', 'foo']`.
+	t.deepEqual(ret, {
+		newVal: ['bar'],
+		revision: 2
+	});
+});
