@@ -33,6 +33,7 @@ if (!process.env.NODECG_ROOT) {
 }
 
 const semver = require('semver');
+const exitHook = require('exit-hook');
 const {engines} = require('./package.json');
 const nodeVersion = process.versions.node;
 
@@ -68,5 +69,9 @@ process.on('unhandledRejection', err => {
 const server = require('./lib/server')
 	.on('error', () => process.exit(1))
 	.on('stopped', () => process.exit(0));
+
+exitHook(() => {
+	server.stop();
+});
 
 server.start();
