@@ -4,7 +4,7 @@ process.title = 'NodeCG';
 global.exitOnUncaught = true;
 
 const cwd = process.cwd();
-global.isZeitPkg = __dirname.startsWith('/snapshot/') || __dirname.toLowerCase().startsWith('c:\\snapshot\\');
+global.isZeitPkg = __dirname.startsWith('/snapshot/') || /^(.:\\snapshot\\)/i.test(__dirname);
 if (global.isZeitPkg) {
 	console.info('[nodecg] Detected that NodeCG is running inside a ZEIT pkg (https://github.com/zeit/pkg)');
 } else if (cwd !== __dirname) {
