@@ -47,7 +47,6 @@ export class ReplicantBrowser<V> extends ReplicantCommon<V> {
 	on(
 		event:
 			| 'operationsRejected'
-			| 'assignmentRejected'
 			| 'declarationRejected',
 		listener: (rejectReason: any) => void
 	): this;

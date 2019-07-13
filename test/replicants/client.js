@@ -146,7 +146,7 @@ test.serial('when an array - should react to changes', async t => {
 
 		rep.on('declared', () => {
 			rep.on('change', (newVal, oldVal, operations) => {
-				if (newVal && oldVal && operations) {
+				if (newVal && oldVal && operations && operations[0].method === 'push') {
 					const res = {
 						newVal: JSON.parse(JSON.stringify(newVal)),
 						oldVal,
@@ -177,9 +177,11 @@ test.serial('when an array - should support the "delete" operator', async t => {
 			persistent: false
 		});
 
+		let deleted = false;
 		rep.on('change', (newVal, oldVal, operations) => {
-			if (newVal[0] === 'foo') {
+			if (newVal[0] === 'foo' && !deleted) {
 				delete rep.value[0];
+				deleted = true;
 			} else if (newVal[0] === undefined) {
 				const res = {
 					newVal,
@@ -263,7 +265,7 @@ test.serial('when an object - should react to changes in nested properties', asy
 
 		rep.on('declared', () => {
 			rep.on('change', (newVal, oldVal, operations) => {
-				if (newVal && oldVal && operations) {
+				if (newVal && oldVal && operations && operations[0].method === 'update') {
 					resolve({
 						newVal: JSON.parse(JSON.stringify(newVal)),
 						oldVal,
@@ -346,10 +348,12 @@ test.serial('when an object - should support the "delete" operator', async t => 
 			persistent: false
 		});
 
+		let deleted = false;
 		rep.on('change', (newVal, oldVal, operations) => {
-			if (newVal.foo) {
+			if (newVal.foo && !deleted) {
 				delete rep.value.foo;
-			} else if (newVal.bar) {
+				deleted = true;
+			} else if (newVal.bar && !newVal.foo) {
 				resolve(JSON.parse(JSON.stringify({
 					newVal,
 					oldVal,
@@ -539,4 +543,38 @@ test.serial('#waitForReplicants', async t => {
 	}));
 
 	t.pass();
+});
+
+test.serial('emits assignment in the correct order', async t => {
+	const extRep = t.context.apis.extension.Replicant('assignment_order', {defaultValue: []});
+
+	await dashboard.evaluate(() => new Promise(resolve => {
+		window.clientRep = window.dashboardApi.Replicant('assignment_order');
+		window.clientRep.once('declared', () => {
+			resolve();
+		});
+	}));
+
+	extRep.value.push('foo');
+	extRep.value = ['bar'];
+
+	const ret = await dashboard.evaluate(() => new Promise(resolve => {
+		window.clientRep.on('change', newVal => {
+			if (window.clientRep.revision === 2) {
+				resolve({
+					// Without this JSON.parse hack,
+					// newVal gets serialized as an empty object.
+					// Possibly a bug in the DevTools protocol used by Puppeteer?
+					newVal: JSON.parse(JSON.stringify(newVal)),
+					revision: window.clientRep.revision
+				});
+			}
+		});
+	}));
+
+	// If the ordering is wrong, `ret` will be `['bar', 'foo']`.
+	t.deepEqual(ret, {
+		newVal: ['bar'],
+		revision: 2
+	});
 });
