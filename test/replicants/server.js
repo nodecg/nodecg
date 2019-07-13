@@ -90,16 +90,18 @@ test.serial.cb('should react to changes in nested properties of objects', t => {
 			return;
 		}
 
-		t.deepEqual(oldVal, { a: { b: { c: 'c' } } });
-		t.deepEqual(newVal, { a: { b: { c: 'nestedChangeOK' } } });
-		t.deepEqual(operations, [
-			{
-				args: {
-					newValue: 'nestedChangeOK',
-					prop: 'c',
-				},
-				method: 'update',
-				path: '/a/b',
+		t.deepEqual(oldVal, {a: {b: {c: 'c'}}});
+		t.deepEqual(newVal, {a: {b: {c: 'nestedChangeOK'}}});
+		t.deepEqual(operations, [{
+			args: {
+				newValue: {a: {b: {c: 'c'}}}
+			},
+			method: 'overwrite',
+			path: '/'
+		}, {
+			args: {
+				newValue: 'nestedChangeOK',
+				prop: 'c'
 			},
 		]);
 		t.end();
@@ -170,16 +172,20 @@ test.serial.cb('arrays - should support the "delete" operator', t => {
 	});
 
 	rep.on('change', (newVal, oldVal, operations) => {
-		if (operations && operations[0].method === 'delete') {
+		if (operations && operations[1].method === 'delete') {
 			t.deepEqual(newVal, [, 'bar']); // eslint-disable-line no-sparse-arrays
 			t.deepEqual(oldVal, ['foo', 'bar']);
-			t.deepEqual(operations, [
-				{
-					args: { prop: '0' },
-					path: '/',
-					method: 'delete',
-				},
-			]);
+			t.deepEqual(operations, [{
+				path: '/',
+				method: 'overwrite',
+				args: {
+					newValue: ['foo', 'bar']
+				}
+			}, {
+				args: {prop: '0'},
+				path: '/',
+				method: 'delete'
+			}]);
 			t.end();
 		}
 	});
@@ -202,13 +208,17 @@ test.serial.cb('arrays - should react to changes', t => {
 
 		t.deepEqual(oldVal, ['starting']);
 		t.deepEqual(newVal, ['starting', 'arrPushOK']);
-		t.deepEqual(operations, [
-			{
-				args: ['arrPushOK'],
-				method: 'push',
-				path: '/',
+		t.deepEqual(operations, [{
+			args: {
+				newValue: ['starting']
 			},
-		]);
+			path: '/',
+			method: 'overwrite'
+		}, {
+			args: ['arrPushOK'],
+			method: 'push',
+			path: '/'
+		}]);
 		t.end();
 	});
 
@@ -276,7 +286,7 @@ test.serial.cb('persistent - should persist changes to disk', t => {
 			t.is(data, '{"nested":"hey we changed!"}');
 			t.end();
 		});
-	}, 10);
+	}, 250); // Delay needs to be longer than the persistence interval.
 });
 
 test.serial.cb('persistent - should persist falsey values to disk', t => {
