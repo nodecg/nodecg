@@ -1,6 +1,22 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [1.4.1](https://github.com/nodecg/nodecg/compare/v1.4.0...v1.4.1) (2019-07-16)
+
+
+### Bug Fixes
+
+* **instance-errors:** Update help text & design ([#494](https://github.com/nodecg/nodecg/issues/494)) ([7fcf6ee](https://github.com/nodecg/nodecg/commit/7fcf6ee))
+* **types:** Add sendMessageToBundle instance method to type definitions ([#480](https://github.com/nodecg/nodecg/issues/480)) ([a15fe3b](https://github.com/nodecg/nodecg/commit/a15fe3b))
+* **zeit_pkg:** fix pkg'd executables not working when compiled on a drive other than C: ([#498](https://github.com/nodecg/nodecg/issues/498)) ([3ae9b75](https://github.com/nodecg/nodecg/commit/3ae9b75))
+
+
+### Build System
+
+* **docker:** don't ignore types folder ([4c0e65c](https://github.com/nodecg/nodecg/commit/4c0e65c))
+
+
 
 # [1.4.0](https://github.com/nodecg/nodecg/compare/v1.3.2...v1.4.0) (2019-04-19)
 
