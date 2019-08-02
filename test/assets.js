@@ -28,7 +28,7 @@ const TWITTER_BANNER_PATH = path.join(C.assetsRoot(), 'test-bundle/assets/twitte
 
 // Doing twice to assert file 'change' event
 for (let i = 0; i < 2; i++) {
-	test.serial('uploading', async t => {
+	test.serial(`uploading #${i}`, async t => {
 		const assetRep = t.context.apis.extension.Replicant('assets:assets');
 
 		// Make sure the file to upload does not exist first

@@ -1,9 +1,34 @@
+import '@polymer/paper-toast/paper-toast.js';
+import './ncg-graphics-bundle.js';
+import * as Polymer from '@polymer/polymer';
+import {MutableData} from '@polymer/polymer/lib/mixins/mutable-data';
+
 /**
  * @customElement
  * @polymer
- * @appliesMixin Polymer.MutableData
+ * @appliesMixin MutableData
  */
-class NcgGraphics extends Polymer.MutableData(Polymer.Element) {
+class NcgGraphics extends MutableData(Polymer.PolymerElement) {
+	static get template() {
+		return Polymer.html`
+		<style include="nodecg-theme">
+			:host {
+				@apply --layout-vertical;
+				font-family: Roboto, Noto, sans-serif;
+				max-width: 800px;
+				width: 100%;
+			}
+		</style>
+
+		<template is="dom-repeat" items="[[bundlesWithGraphics]]" as="bundle" mutable-data="">
+			<ncg-graphics-bundle bundle="[[bundle]]" instances="[[_graphicInstances]]">
+			</ncg-graphics-bundle>
+		</template>
+
+		<paper-toast id="copyToast"></paper-toast>
+`;
+	}
+
 	static get is() {
 		return 'ncg-graphics';
 	}

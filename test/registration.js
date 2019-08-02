@@ -232,8 +232,8 @@ test.serial('shows a diff when hovering over "potentially out of date" status', 
 	const diffText = await dashboard.evaluate(el => el.$.diff.$.body.textContent, graphicInstance);
 	t.true(diffText.includes('Current:'));
 	t.true(diffText.includes('Latest:'));
-	t.true(/0\.0\.1 - \w{7} \[Initial commit\]/.test(diffText));
-	t.true(/0\.0\.1 - \w{7} \[new commit\]/.test(diffText));
+	t.regex(diffText, /0\.0\.1 - \w{7} \[Initial commit\]/);
+	t.regex(diffText, /0\.0\.1 - \w{7} \[new commit\]/);
 
 	const closeButton = await dashboard.evaluateHandle(el =>
 		el.$.diff.shadowRoot.querySelector('paper-icon-button'), graphicInstance);

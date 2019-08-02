@@ -129,7 +129,7 @@ test.serial.cb('should prevent acknowledgements from being called more than once
 	}
 });
 
-test.cb.serial('server - should support intra-context messaging', t => {
+test.serial.cb('server - should support intra-context messaging', t => {
 	t.plan(2);
 
 	let assertCount = 0;
@@ -169,7 +169,7 @@ test.cb.serial('server - should support intra-context messaging', t => {
 	})();
 });
 
-test.cb.serial('client - should support intra-context messaging', t => {
+test.serial.cb('client - should support intra-context messaging', t => {
 	t.plan(2);
 
 	let asserCount = 0;

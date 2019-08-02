@@ -1,4 +1,64 @@
-class NcgSoundCue extends Polymer.Element {
+import '@polymer/iron-flex-layout/iron-flex-layout.js';
+import '@polymer/paper-slider/paper-slider.js';
+import '@polymer/paper-styles/typography.js';
+import '../ui/ui-select.js';
+import * as Polymer from '@polymer/polymer';
+class NcgSoundCue extends Polymer.PolymerElement {
+	static get template() {
+		return Polymer.html`
+		<style include="nodecg-theme">
+			:host {
+				@apply --layout-horizontal;
+				align-items: center;
+			}
+
+			#leftWrapper {
+				min-width: 0;
+				padding-right: 8px;
+				@apply --layout-vertical;
+				@apply --layout-flex;
+				@apply --layout-center-justified;
+			}
+
+			#name {
+				@apply --paper-font-title;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			#select {
+				display: none;
+				width: 150px;
+				@apply --layout-flex-none;
+			}
+
+			paper-slider {
+				@apply --layout-flex-none;
+				--paper-slider-input: {
+					width: 80px;
+				}
+			}
+
+			@media (max-width: 500px) {
+				#select {
+					width: 120px;
+				}
+
+				paper-slider {
+					width: 150px;
+				}
+			}
+		</style>
+
+		<div id="leftWrapper">
+			<span id="name">[[name]]</span>
+		</div>
+
+		<ui-select id="select" on-change="_retargetFile"></ui-select>
+		<paper-slider id="slider" min="0" max="100" step="1" on-change="_onSliderChange" editable=""></paper-slider>
+`;
+	}
+
 	static get is() {
 		return 'ncg-sound-cue';
 	}

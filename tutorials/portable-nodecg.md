@@ -1,7 +1,7 @@
 By bundling the main Node.js executable (`node.exe`) with a NodeCG instance, NodeCG can run from any folder without
 requiring an installation process.
 
-1. To start, your NodeCG instance must be fully installed and configured. This means that all `npm` and `bower` dependencies
+1. To start, your NodeCG instance must be fully installed and configured. This means that all dependencies
 for both NodeCG and all bundles should be installed. Run the instance once and make sure everything works before continuing.
 2. Once you have verified that the instance works and that all dependencies are installed, copy `node.exe` from your Node.js
 installation into the root of your NodeCG instance.

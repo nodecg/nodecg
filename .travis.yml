@@ -8,14 +8,12 @@ os:
 - linux
 cache:
   directories:
-  - bower_components
   - "$HOME/.npm"
   - "$(npm config get prefix)"
 before_install:
-- npm install -g codecov bower
+- npm install -g codecov
 install:
 - npm install
-- bower install
 after_success: npm run report-coverage
 jobs:
   include:

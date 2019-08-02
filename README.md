@@ -44,6 +44,9 @@ without writing any code may be disappointed.
 -   [Bundles](#bundles)
 -   [Concepts and Terminology](#concepts-and-terminology)
 -   [Goals](#goals)
+    -   [> Make broadcast graphics (also known as "character generation" or "CG") more accessible.](#-make-broadcast-graphics-also-known-as-character-generation-or-cg-more-accessible)
+    -   [> Remain as close to the web platform as possible.](#-remain-as-close-to-the-web-platform-as-possible)
+    -   [> Support broadcasts of any size and ambition.](#-support-broadcasts-of-any-size-and-ambition)
 -   [Maintainers](#maintainers)
 -   [Designers](#designers)
 -   [Acknowledgements](#acknowledgements)
@@ -59,11 +62,9 @@ Install [Node.js (version 8.3 or greater) & npm (version 2 or greater)](http://n
 Then, run the following commands from a terminal (command prompt):
 
 ```sh
-npm install -g bower
 git clone https://github.com/nodecg/nodecg.git
 cd nodecg
 npm install --production
-bower install
 node index.js
 ```
 
@@ -134,23 +135,27 @@ A breakdown of the terminology and concepts used inside NodeCG can be found [her
 ## Goals
 
 The NodeCG project exists to accomplish the following goals:
-- Make broadcast graphics (also known as "character generation" or "CG") more accessible.
-- Remain as close to the web platform as possible.
-- Support broadcasts of any size and ambition.
+
+-   Make broadcast graphics (also known as "character generation" or "CG") more accessible.
+-   Remain as close to the web platform as possible.
+-   Support broadcasts of any size and ambition.
 
 Let's unpack what these statements mean:
 
 ### > Make broadcast graphics (also known as "character generation" or "CG") more accessible.
+
 Historically, broadcast graphics have been expensive. They either required expensive hardware, expensive software, or both. NodeCG was originally created to provide real-time broadcast graphics for Tip of the Hats, which is an all-volunteer charity fundraiser that had a budget of $0 for its first several years. 
 
 Now, it is possible to create an ambitious broadcast using entirely free software and consumer hardware. The NodeCG project embraces this democratization of broadcast technology.
 
 ### > Remain as close to the web platform as possible.
+
 NodeCG graphics are just webpages. There is absolutely nothing special or unique about them. This is their greatest strength.
 
 By building on the web platform, and not building too many abstractions on top of it, people developing broadcast graphics with NodeCG have access to the raw potential of the web. New APIs and capabilities are continually being added to the web platform, and NodeCG developers should have access to the entirety of what the web can offer.
 
 ### > Support broadcasts of any size and ambition.
+
 NodeCG's roots are in small broadcasts with no budget. More recently, NodeCG has begun seeing use in increasingly elaborate productions. We believe that one set of tools can and should be able to scale up from the smallest show all the way to the biggest fathomable show. Whether you're using OBS for everything, or a hardware switcher with a traditional key/fill workflow, NodeCG can be a part of any broadcast graphics system.
 
 ## Maintainers

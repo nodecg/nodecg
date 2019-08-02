@@ -17,7 +17,7 @@ const tempFolder = temp.mkdirSync();
 temp.track(); // Automatically track and cleanup files at exit.
 
 let bundleManager;
-test.cb.before(t => {
+test.before.cb(t => {
 	fse.copySync('test/fixtures/bundle-manager', tempFolder);
 
 	// The symlink test can't run on Windows unless run with admin privs.
@@ -82,7 +82,7 @@ test.serial('loader - should detect and load bundle located in custom bundle pat
 	t.is(bundle.name, 'another-test-bundle');
 });
 
-test.cb.serial('watcher - hould emit a change event when the manifest file changes', t => {
+test.serial.cb('watcher - hould emit a change event when the manifest file changes', t => {
 	const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-manifest/package.json`));
 	bundleManager.once('bundleChanged', bundle => {
 		t.is(bundle.name, 'change-manifest');
@@ -93,7 +93,7 @@ test.cb.serial('watcher - hould emit a change event when the manifest file chang
 	fs.writeFileSync(`${tempFolder}/bundles/change-manifest/package.json`, JSON.stringify(manifest));
 });
 
-test.cb.serial('watcher - should remove the bundle when the manifest file is renamed', t => {
+test.serial.cb('watcher - should remove the bundle when the manifest file is renamed', t => {
 	bundleManager.once('bundleRemoved', () => {
 		const result = bundleManager.find('rename-manifest');
 		t.is(result, undefined);
@@ -106,7 +106,7 @@ test.cb.serial('watcher - should remove the bundle when the manifest file is ren
 	);
 });
 
-test.cb.serial('watcher - should emit a removed event when the manifest file is removed', t => {
+test.serial.cb('watcher - should emit a removed event when the manifest file is removed', t => {
 	bundleManager.once('bundleRemoved', () => {
 		const result = bundleManager.find('remove-manifest');
 		t.is(result, undefined);
@@ -116,7 +116,7 @@ test.cb.serial('watcher - should emit a removed event when the manifest file is 
 	fs.unlinkSync(`${tempFolder}/bundles/remove-manifest/package.json`);
 });
 
-test.cb.serial('watcher - should emit a change event when a panel HTML file changes', t => {
+test.serial.cb('watcher - should emit a change event when a panel HTML file changes', t => {
 	bundleManager.once('bundleChanged', bundle => {
 		t.is(bundle.name, 'change-panel');
 		t.end();
@@ -131,7 +131,7 @@ test.cb.serial('watcher - should emit a change event when a panel HTML file chan
 if (!isWindows()) {
 	// This can't be tested on Windows unless run with admin privs.
 	// For some reason, creating symlinks on Windows requires admin.
-	test.cb.serial('watcher - should detect panel HTML file changes when the bundle is symlinked', t => {
+	test.serial.cb('watcher - should detect panel HTML file changes when the bundle is symlinked', t => {
 		bundleManager.once('bundleChanged', bundle => {
 			t.is(bundle.name, 'change-panel-symlink');
 			t.end();
@@ -144,7 +144,7 @@ if (!isWindows()) {
 	});
 }
 
-test.cb.serial('watcher - should reload the bundle\'s config when the bundle is reloaded due to a change', t => {
+test.serial.cb('watcher - should reload the bundle\'s config when the bundle is reloaded due to a change', t => {
 	const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-config/package.json`));
 	const config = JSON.parse(fs.readFileSync(`${tempFolder}/cfg/change-config.json`));
 
@@ -163,7 +163,7 @@ test.cb.serial('watcher - should reload the bundle\'s config when the bundle is 
 	fs.writeFileSync(`${tempFolder}/cfg/change-config.json`, JSON.stringify(config));
 });
 
-test.cb.serial('watcher - should emit an `invalidBundle` error when a panel HTML file is removed', t => {
+test.serial.cb('watcher - should emit an `invalidBundle` error when a panel HTML file is removed', t => {
 	bundleManager.once('invalidBundle', (bundle, error) => {
 		t.is(bundle.name, 'remove-panel');
 		t.is(error.message, 'Panel file "panel.html" in bundle "remove-panel" does not exist.');
@@ -173,7 +173,7 @@ test.cb.serial('watcher - should emit an `invalidBundle` error when a panel HTML
 	fs.unlinkSync(`${tempFolder}/bundles/remove-panel/dashboard/panel.html`);
 });
 
-test.cb.serial('watcher - should emit an `invalidBundle` error when the manifest becomes invalid', t => {
+test.serial.cb('watcher - should emit an `invalidBundle` error when the manifest becomes invalid', t => {
 	bundleManager.once('invalidBundle', (bundle, error) => {
 		t.is(bundle.name, 'invalid-manifest');
 		t.is(error.message, `${path.join(tempFolder, 'bundles/invalid-manifest/package.json')} is not valid JSON, please check it against a validator such as jsonlint.com`);

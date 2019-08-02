@@ -142,7 +142,7 @@ test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is 
 
 test.serial('connection toasts', async t => {
 	let ret = await dashboard.evaluate(() => {
-		const dashboard = document.getElementById('dashboard');
+		const dashboard = document.getElementById('nodecg_dashboard');
 		// TODO: use actual disconnection (setOfflineMode)
 		window.socket.emit('disconnect');
 		return {
@@ -158,7 +158,7 @@ test.serial('connection toasts', async t => {
 	});
 
 	ret = await dashboard.evaluate(() => {
-		const dashboard = document.getElementById('dashboard');
+		const dashboard = document.getElementById('nodecg_dashboard');
 		window.socket.emit('reconnecting', 3);
 		return {
 			reconnectToastOpened: dashboard.$.reconnectToast.opened
@@ -169,7 +169,7 @@ test.serial('connection toasts', async t => {
 	});
 
 	ret = await dashboard.evaluate(() => {
-		const dashboard = document.getElementById('dashboard');
+		const dashboard = document.getElementById('nodecg_dashboard');
 		window.socket.emit('reconnect_failed');
 		return {
 			toastText: dashboard.$.mainToast.text,
@@ -182,7 +182,7 @@ test.serial('connection toasts', async t => {
 	});
 
 	ret = await dashboard.evaluate(() => {
-		const dashboard = document.getElementById('dashboard');
+		const dashboard = document.getElementById('nodecg_dashboard');
 		window.socket.emit('reconnect', 3);
 		return {
 			toastText: dashboard.$.mainToast.text,
