@@ -18,6 +18,7 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
 - `bundles` _Object_ Contains configuration for bundles.
   - `enabled` _Array of strings_ A whitelist array of bundle names that will be the only ones loaded at startup. Cannot be used with `bundles.disabled`.
   - `disabled` _Array of strings_ A blacklist array of bundle names that will not be loaded at startup. Cannot be used with `bundles.enabled`.
+  - `paths` _Array of strings_ An array of additional paths where bundles are located.
 - `login` _Object_ Contains other configuration properties.
   - `enabled` _Boolean_ Whether to enable login security.
   - `sessionSecret` _String_ The secret used to salt sessions.
@@ -56,6 +57,9 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
     "bundles": {
         "enabled": [
             "bundle-name"
+        ],
+        "paths": [
+            "C:\\nodecg\\experimental-bundles"
         ]
     },
     "login": {

@@ -1,0 +1,7 @@
+{
+  "name": "another-test-bundle",
+  "version": "0.0.1",
+  "nodecg": {
+    "compatibleRange": "~0.7.0"
+  }
+}
