@@ -4,7 +4,6 @@
 		"browser": true
 	},
 	"globals": {
-		"Polymer": true,
 		"NodeCG": true,
 		"Clipboard": true,
 		"Packery": true,

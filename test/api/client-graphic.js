@@ -42,7 +42,7 @@ test.serial('should receive messages', async t => {
 	t.pass();
 });
 
-test.cb.serial('should send messages', t => {
+test.serial.cb('should send messages', t => {
 	t.context.apis.extension.listenFor('graphicToServer', t.end);
 	graphic.evaluate(() => {
 		window.graphicApi.sendMessage('graphicToServer');

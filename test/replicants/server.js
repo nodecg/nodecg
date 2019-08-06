@@ -74,7 +74,7 @@ test.serial('should be assignable via the ".value" property', t => {
 	t.is(rep.value, 'assignmentOK');
 });
 
-test.cb.serial('should react to changes in nested properties of objects', t => {
+test.serial.cb('should react to changes in nested properties of objects', t => {
 	t.plan(3);
 
 	const rep = t.context.apis.extension.Replicant('extensionObjTest', {
@@ -110,7 +110,7 @@ test.serial('memoization', t => {
 	);
 });
 
-test.cb.serial('should only apply array splices from the client once', t => {
+test.serial.cb('should only apply array splices from the client once', t => {
 	t.plan(1);
 
 	const serverRep = t.context.apis.extension.Replicant('clientDoubleApplyTest', {
@@ -156,7 +156,7 @@ test.serial('should not override/quickfire .once for events other than "change"'
 	t.pass();
 });
 
-test.cb.serial('arrays - should support the "delete" operator', t => {
+test.serial.cb('arrays - should support the "delete" operator', t => {
 	t.plan(3);
 
 	const rep = t.context.apis.extension.Replicant('serverArrayDelete', {
@@ -180,7 +180,7 @@ test.cb.serial('arrays - should support the "delete" operator', t => {
 	delete rep.value[0];
 });
 
-test.cb.serial('arrays - should react to changes', t => {
+test.serial.cb('arrays - should react to changes', t => {
 	t.plan(3);
 
 	const rep = t.context.apis.extension.Replicant('extensionArrTest', {
@@ -234,7 +234,7 @@ test.serial('persistent - should load persisted values when they exist', t => {
 	t.is(rep.value, 'it work good!');
 });
 
-test.cb.serial('persistent - should persist assignment to disk', t => {
+test.serial.cb('persistent - should persist assignment to disk', t => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence');
@@ -252,7 +252,7 @@ test.cb.serial('persistent - should persist assignment to disk', t => {
 	}, 10);
 });
 
-test.cb.serial('persistent - should persist changes to disk', t => {
+test.serial.cb('persistent - should persist changes to disk', t => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence');
@@ -270,7 +270,7 @@ test.cb.serial('persistent - should persist changes to disk', t => {
 	}, 10);
 });
 
-test.cb.serial('persistent - should persist falsey values to disk', t => {
+test.serial.cb('persistent - should persist falsey values to disk', t => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant('extensionFalseyWrite');
@@ -293,7 +293,7 @@ test.serial('persistent - should read falsey values from disk', t => {
 	t.is(rep.value, 0);
 });
 
-test.cb.serial('transient - should not write their value to disk', t => {
+test.serial.cb('transient - should not write their value to disk', t => {
 	t.plan(2);
 
 	// Remove the file if it exists for some reason

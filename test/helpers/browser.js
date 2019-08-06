@@ -11,12 +11,13 @@ import puppeteer from 'puppeteer';
 
 // Ours
 import * as C from './test-constants';
+import {sleep} from './utilities';
 
 const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
 
 export const setup = () => {
 	let browser;
-	test.before(async () => {
+	test.serial.before(async () => {
 		// The --no-sandbox flag is required to run Headless Chrome on Travis
 		const args = IS_TRAVIS ? ['--no-sandbox'] : undefined;
 		browser = await puppeteer.launch({
@@ -76,11 +77,7 @@ export const setup = () => {
 	const initDashboard = async () => {
 		const page = await browser.newPage();
 		await page.goto(C.dashboardUrl());
-		await page.waitForFunction(() =>
-			typeof window.dashboardApi !== 'undefined' && typeof window.Polymer !== 'undefined');
-		await page.evaluate(() => new Promise(resolve => {
-			window.Polymer.RenderStatus.afterNextRender(this, resolve);
-		}));
+		await page.waitForFunction(() => typeof window.dashboardApi !== 'undefined');
 		return page;
 	};
 
@@ -112,6 +109,7 @@ export const setup = () => {
 
 			return typeof window.singleInstanceApi !== 'undefined';
 		});
+		await sleep(500);
 		return page;
 	};
 

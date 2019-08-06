@@ -3,3 +3,4 @@ node_modules
 bower_components
 nodecg-api.min.js
 /typetest
+/test/fixtures/bundle-parser/invalid-manifest-json/package.json

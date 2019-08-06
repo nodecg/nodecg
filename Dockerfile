@@ -7,9 +7,7 @@ RUN mkdir cfg && mkdir bundles && mkdir logs && mkdir db
 COPY . /usr/src/app/
 
 # Install dependencies
-RUN npm install -g bower
 RUN npm install --production
-RUN bower install --allow-root
 
 # The command to run
 EXPOSE 9090

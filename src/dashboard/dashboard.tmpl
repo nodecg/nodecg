@@ -22,7 +22,7 @@
 		</script>
 
 		<% if (privateConfig.sentry && privateConfig.sentry.enabled) { %>
-			<script src="/bower_components/raven-js/dist/raven.min.js"></script>
+			<script src="/node_modules/raven-js/dist/raven.min.js"></script>
 			<script type="text/javascript">
 				Raven.config('<%- privateConfig.sentry.publicDsn %>', <%= JSON.stringify(ravenConfig) %>).install();
 				window.addEventListener('unhandledrejection', function (err) {
@@ -45,21 +45,21 @@
 		</script>
 
 		<!-- other dashboard scripts -->
-		<script src="/bower_components/draggabilly/dist/draggabilly.pkgd.min.js" async></script>
-		<script src="/bower_components/iframe-resizer/js/iframeResizer.min.js" async></script>
-		<script src="/bower_components/packery/dist/packery.pkgd.min.js"></script>
-		<script src="/bower_components/clipboard/dist/clipboard.min.js"></script>
-		<script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
-		<link rel="import" href="../bower_components/shadycss/apply-shim.html" />
+		<script src="/node_modules/draggabilly/dist/draggabilly.pkgd.min.js" async></script>
+		<script src="/node_modules/iframe-resizer/js/iframeResizer.min.js" async></script>
+		<script src="/node_modules/packery/dist/packery.pkgd.min.js"></script>
+		<script src="/node_modules/clipboard/dist/clipboard.min.js"></script>
+		<script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+		<script src="/node_modules/@webcomponents/shadycss/apply-shim.min.js"></script>
 
 		<!-- our custom dashboard elements -->
-		<link rel="import" href="elements/ncg-dashboard.html" />
+		<script type="module" src="elements/ncg-dashboard.js"></script>
 
 		<!-- make the API available -->
 		<script src="/nodecg-api.min.js"></script>
 
 		<!-- initialize the socket -->
-		<script src="/bower_components/cookies-js/dist/cookies.min.js"></script>
+		<script src="/node_modules/cookies-js/dist/cookies.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
 		<script type="text/javascript">
 			const params = new URLSearchParams(location.search);
@@ -86,6 +86,6 @@
 		</custom-style>
 	</head>
 	<body>
-		<ncg-dashboard id="dashboard"></ncg-dashboard>
+		<ncg-dashboard id="nodecg_dashboard"></ncg-dashboard>
 	</body>
 </html>
