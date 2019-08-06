@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/nodecg/nodecg/compare/v1.4.1...v1.5.0) (2019-08-06)
+
+
+### Features
+
+* **login:** expose refresh token from Twitch login authentication ([#504](https://github.com/nodecg/nodecg/issues/504)) ([b710314](https://github.com/nodecg/nodecg/commit/b710314))
+* add bundle paths customization ([#483](https://github.com/nodecg/nodecg/issues/483)) ([56ef32a](https://github.com/nodecg/nodecg/commit/56ef32a))
+* **replicants:** update persistence process ([#497](https://github.com/nodecg/nodecg/issues/497)) ([16fcefd](https://github.com/nodecg/nodecg/commit/16fcefd)), closes [#493](https://github.com/nodecg/nodecg/issues/493) [#488](https://github.com/nodecg/nodecg/issues/488)
+
+
+
 ### [1.4.1](https://github.com/nodecg/nodecg/compare/v1.4.0...v1.4.1) (2019-07-16)
 
 
