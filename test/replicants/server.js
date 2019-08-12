@@ -288,6 +288,46 @@ test.serial.cb('persistent - should persist changes to disk', t => {
 	}, 250); // Delay needs to be longer than the persistence interval.
 });
 
+test.serial.cb('persistent - should persist top-level string', t => {
+	t.plan(1);
+
+	const rep = t.context.apis.extension.Replicant('extensionPersistence');
+	rep.value = 'lorem';
+
+	setTimeout(() => {
+		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
+
+		fs.readFile(replicantPath, 'utf-8', (err, data) => {
+			if (err) {
+				throw err;
+			}
+
+			t.is(data, '"lorem"');
+			t.end();
+		});
+	}, 10);
+});
+
+test.serial.cb('persistent - should persist top-level undefined', t => {
+	t.plan(1);
+
+	const rep = t.context.apis.extension.Replicant('extensionPersistence');
+	rep.value = undefined;
+
+	setTimeout(() => {
+		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
+
+		fs.readFile(replicantPath, 'utf-8', (err, data) => {
+			if (err) {
+				throw err;
+			}
+
+			t.is(data, '');
+			t.end();
+		});
+	}, 10);
+});
+
 test.serial.cb('persistent - should persist falsey values to disk', t => {
 	t.plan(1);
 
