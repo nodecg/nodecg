@@ -157,3 +157,14 @@ test('should error when the bundle\'s folder name doesn\'t match its manifest na
 	);
 	t.true(error.message.includes(''));
 });
+
+test('should error when "version" is not present', t => {
+	const error = t.throws(
+		parseBundle.bind(
+			parseBundle,
+			'./test/fixtures/bundle-parser/no-manifest-version'
+		),
+		/must specify a valid version/
+	);
+	t.true(error.message.includes(''));
+});
