@@ -1,5 +1,6 @@
 {
   "name": "unsatisfied-bundle-deps",
+  "version": "0.0.0",
   "nodecg": {
     "compatibleRange": "^1.0.0",
     "bundleDependencies": {
