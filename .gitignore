@@ -37,7 +37,8 @@ npm-debug.log
 /bundles_off
 /_workingTest
 
-# Compiled docs
+# Docs
+checkout
 docs
 .grunt
 
