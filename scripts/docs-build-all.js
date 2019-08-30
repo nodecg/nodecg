@@ -244,18 +244,18 @@ async function run() {
 
 		await delCheckoutDirectory();
 
+		startSpinner('Creating versions file...');
+		await createVersionsFile(versionsToBuild);
+		stopSpinner('Created Versions File');
+
 		redirectVersion = versionsToBuild[versionsToBuild.length - 1].versionName;
 	} else {
-		console.log('No versions found to build');
+		console.log('No tags found to build, only master built');
 	}
 
 	startSpinner('Creating index file...');
 	await createIndexFile(redirectVersion);
 	stopSpinner('Created Index File');
-
-	startSpinner('Creating versions file...');
-	await createVersionsFile(versionsToBuild);
-	stopSpinner('Created Versions File');
 
 	await git.raw(['reset']);
 
@@ -268,6 +268,7 @@ async function run() {
 			stopSpinner('Successfully Published');
 		} catch (err) {
 			stopSpinner('FAILED TO PUBLISH', true);
+			process.exit(1);
 		}
 	} else {
 		console.log('\x1b[33m%s\x1b[0m', 'Skipping Publish');
