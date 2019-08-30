@@ -137,7 +137,7 @@
     "all": true
   },
   "engines": {
-    "node": ">=8.3.0"
+    "node": ">=10.16.3"
   },
   "files": [
     "build",
