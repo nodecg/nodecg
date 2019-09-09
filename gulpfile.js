@@ -65,6 +65,7 @@ function buh({instrument} = {}) {
 
 	// Ignore some files that we don't want in the browser bundle.
 	[
+		'express',
 		'./lib/server/index.js',
 		'./lib/replicator.js',
 		'./lib/util/index.js'

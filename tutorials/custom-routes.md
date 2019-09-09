@@ -30,3 +30,19 @@ module.exports = function (nodecg) {
     nodecg.mount('/my-bundle', app); // The route '/my-bundle/customroute` is now available
 };
 ```
+
+NodeCG exposes an helper for creating routers without having to import express:
+
+```javascript
+// bundles/my-bundle/extension.js
+
+module.exports = function (nodecg) {
+    const router = nodecg.Router();
+
+    router.get('/customroute', (req, res) => {
+        res.send('OK!');
+    });
+
+    nodecg.mount('/my-bundle', router); // The route '/my-bundle/customroute` is now available
+};
+```
