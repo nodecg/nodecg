@@ -20,13 +20,9 @@ npm-debug.log
 # OS specific
 .DS_Store
 
-# JetBrains IDEs (IntelliJ/WebStorm)
-/.idea/compiler.xml
-/.idea/encodings.xml
-/.idea/copyright/profiles_settings.xml
-/.idea/workspace.xml
-/.idea/shelf/
-/.idea/codeStyles/codeStyleConfig.xml
+# IDE files
+/.idea
+/.vscode
 
 # Code coverage results
 /coverage
