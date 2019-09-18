@@ -3,26 +3,9 @@
 process.title = 'NodeCG';
 global.exitOnUncaught = true;
 
-const path = require('path');
 const cwd = process.cwd();
-global.isZeitPkg = isZeitPkg();
 
-/**
- * Lange: As of July 2019, the only way I know to programmatically
- * determine if code is running inside a Zeit pkg is to check if
- * the first directory in the __dirname is called `snapshot`.
- *
- * There's definitely a possibility for false positives here,
- * but I have yet to find a better alternative.
- */
-function isZeitPkg() {
-	const parts = __dirname.split(path.sep);
-	return parts[1].toLowerCase() === 'snapshot';
-}
-
-if (global.isZeitPkg) {
-	console.info('[nodecg] Detected that NodeCG is running inside a ZEIT pkg (https://github.com/zeit/pkg)');
-} else if (cwd !== __dirname) {
+if (cwd !== __dirname) {
 	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, __dirname);
 	process.chdir(__dirname);
 	console.info('[nodecg] Changed process.cwd to %s', __dirname);
