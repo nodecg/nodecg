@@ -323,3 +323,11 @@ test.serial('test that one else path that\'s hard to hit', t => {
 	rep.value[0] = true;
 	t.pass();
 });
+
+test.serial('should leave the default value intact', t => {
+	const defaultValue = {lorem: 'ipsum'};
+	const rep = t.context.apis.extension.Replicant('defaultValueIntact', {defaultValue});
+
+	t.is(rep.opts.defaultValue, defaultValue);
+	t.not(rep.value, defaultValue);
+});
