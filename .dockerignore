@@ -6,4 +6,5 @@
 !bower.json
 !index.js
 !package.json
+!package-lock.json
 !types
