@@ -246,14 +246,14 @@ test.serial('dates - should not throw an error', t => {
 });
 
 test.serial('persistent - should load persisted values when they exist', t => {
-	const rep = t.context.apis.extension.Replicant('extensionPersistence');
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {persistenceInterval: 0});
 	t.is(rep.value, 'it work good!');
 });
 
 test.serial.cb('persistent - should persist assignment to disk', t => {
 	t.plan(1);
 
-	const rep = t.context.apis.extension.Replicant('extensionPersistence');
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {persistenceInterval: 0});
 	rep.value = {nested: 'hey we assigned!'};
 	setTimeout(() => {
 		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
@@ -271,7 +271,7 @@ test.serial.cb('persistent - should persist assignment to disk', t => {
 test.serial.cb('persistent - should persist changes to disk', t => {
 	t.plan(1);
 
-	const rep = t.context.apis.extension.Replicant('extensionPersistence');
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {persistenceInterval: 0});
 	rep.value.nested = 'hey we changed!';
 	setTimeout(() => {
 		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
@@ -286,10 +286,50 @@ test.serial.cb('persistent - should persist changes to disk', t => {
 	}, 250); // Delay needs to be longer than the persistence interval.
 });
 
+test.serial.cb('persistent - should persist top-level string', t => {
+	t.plan(1);
+
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {persistenceInterval: 0});
+	rep.value = 'lorem';
+
+	setTimeout(() => {
+		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
+
+		fs.readFile(replicantPath, 'utf-8', (err, data) => {
+			if (err) {
+				throw err;
+			}
+
+			t.is(data, '"lorem"');
+			t.end();
+		});
+	}, 10);
+});
+
+test.serial.cb('persistent - should persist top-level undefined', t => {
+	t.plan(1);
+
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {persistenceInterval: 0});
+	rep.value = undefined;
+
+	setTimeout(() => {
+		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
+
+		fs.readFile(replicantPath, 'utf-8', (err, data) => {
+			if (err) {
+				throw err;
+			}
+
+			t.is(data, '');
+			t.end();
+		});
+	}, 10);
+});
+
 test.serial.cb('persistent - should persist falsey values to disk', t => {
 	t.plan(1);
 
-	const rep = t.context.apis.extension.Replicant('extensionFalseyWrite');
+	const rep = t.context.apis.extension.Replicant('extensionFalseyWrite', {persistenceInterval: 0});
 	rep.value = 0;
 	setTimeout(() => {
 		const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionFalseyWrite.rep');
@@ -305,7 +345,7 @@ test.serial.cb('persistent - should persist falsey values to disk', t => {
 });
 
 test.serial('persistent - should read falsey values from disk', t => {
-	const rep = t.context.apis.extension.Replicant('extensionFalseyRead');
+	const rep = t.context.apis.extension.Replicant('extensionFalseyRead', {persistenceInterval: 0});
 	t.is(rep.value, 0);
 });
 
