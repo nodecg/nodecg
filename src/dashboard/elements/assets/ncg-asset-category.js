@@ -102,7 +102,7 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 		<!-- 2017/03/18: Had to remove with-backdrop during the dashboard re-write -->
 		<paper-dialog id="uploadDialog">
 			<paper-dialog-scrollable>
-				<vaadin-upload id="uploader" target="/assets/[[collectionName]]/[[category.name]]" on-upload-start="refitUploadDialog" on-upload-before="_onUploadBefore" on-file-reject="_onFileReject" on-upload-success="_onUploadSuccess">
+				<vaadin-upload id="uploader" target="/assets/[[collectionName]]/[[category.name]]" on-upload-start="refitUploadDialog" on-file-reject="_onFileReject" on-upload-success="_onUploadSuccess">
 					<template is="dom-if" if="[[category.allowedTypes.length]]">
 						<div id="acceptsMsg">[[acceptsMsg]]</div>
 					</template>
@@ -201,12 +201,6 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 	openUploadDialog() {
 		this.$.uploadDialog.open();
 		this.refitUploadDialog();
-	}
-
-	_onUploadBefore(event) {
-		// Custom upload request url for file
-		const {file} = event.detail;
-		file.uploadTarget = `${event.target.target}/${file.name}`;
 	}
 
 	_onFileReject(event) {

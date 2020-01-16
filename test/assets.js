@@ -23,8 +23,8 @@ test.before(async () => {
 	dashboard = await initDashboard();
 });
 
-const UPLOAD_SOURCE_PATH = path.resolve(__dirname, 'fixtures/assets-to-upload/twitter_banner.png');
-const TWITTER_BANNER_PATH = path.join(C.assetsRoot(), 'test-bundle/assets/twitter_banner.png');
+const UPLOAD_SOURCE_PATH = path.resolve(__dirname, 'fixtures/assets-to-upload/#twitter_banner.png');
+const TWITTER_BANNER_PATH = path.join(C.assetsRoot(), 'test-bundle/assets/#twitter_banner.png');
 
 // Doing twice to assert file 'change' event
 for (let i = 0; i < 2; i++) {
@@ -66,7 +66,7 @@ for (let i = 0; i < 2; i++) {
 }
 
 test.serial('retrieval - 200', async t => {
-	const response = await axios.get(`${C.rootUrl()}assets/test-bundle/assets/twitter_banner.png`, {
+	const response = await axios.get(`${C.rootUrl()}assets/test-bundle/assets/%23twitter_banner.png`, {
 		responseType: 'arraybuffer'
 	});
 	t.is(response.status, 200);
