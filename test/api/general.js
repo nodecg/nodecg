@@ -87,6 +87,18 @@ test('should mount prefixed custom routes via nodecg.mount', async t => {
 	t.is(response.data, 'custom route confirmed');
 });
 
+test('should mount custom routes via the built-in router and nodecg.mount', async t => {
+	const app = t.context.apis.extension.Router(); // eslint-disable-line new-cap
+	app.get('/test-bundle/test-route', (req, res) => {
+		res.send('custom route confirmed');
+	});
+	t.context.apis.extension.mount(app);
+
+	const response = await axios.get(`${C.rootUrl()}test-bundle/test-route`);
+	t.is(response.status, 200);
+	t.is(response.data, 'custom route confirmed');
+});
+
 test.serial.cb('should support multiple listenFor handlers', t => {
 	t.plan(2);
 	let callbacksInvoked = 0;
