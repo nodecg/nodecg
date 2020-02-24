@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/nodecg/nodecg/compare/v1.5.0...v1.6.0) (2020-02-24)
+
+
+### Bug Fixes
+
+* **bundle-parser:** check version when parsing ([#510](https://github.com/nodecg/nodecg/issues/510)) ([484d839](https://github.com/nodecg/nodecg/commit/484d839))
+* **replicants:** clone default value ([#527](https://github.com/nodecg/nodecg/issues/527)) ([5ed1ed5](https://github.com/nodecg/nodecg/commit/5ed1ed5))
+
+
+### Features
+
+* **deps:** update chokidar to v3 ([#515](https://github.com/nodecg/nodecg/issues/515)) ([f468825](https://github.com/nodecg/nodecg/commit/f468825))
+* **docker:** bump node to 10 ([#533](https://github.com/nodecg/nodecg/issues/533)) ([6fafeea](https://github.com/nodecg/nodecg/commit/6fafeea))
+* **extension:** add router helper ([#535](https://github.com/nodecg/nodecg/issues/535)) ([2a69423](https://github.com/nodecg/nodecg/commit/2a69423))
+* **extension:** flexible mount ([#519](https://github.com/nodecg/nodecg/issues/519)) ([3ff1603](https://github.com/nodecg/nodecg/commit/3ff1603))
+
+
+
 ## [1.5.0](https://github.com/nodecg/nodecg/compare/v1.4.1...v1.5.0) (2019-08-06)
 
 
