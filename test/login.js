@@ -81,7 +81,8 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 	});
 	await page.waitForFunction(
 		validUrl => location.href.startsWith(validUrl),
-		{}, `${C.rootUrl()}authError?code=token_invalidated`
+		{},
+		`${C.rootUrl()}authError?code=token_invalidated`
 	);
 	t.pass();
 });

@@ -174,7 +174,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 				attributeOldValue: false,
 				characterDataOldValue: false
 			});
-		} catch (e) {
+		} catch (_) {
 			console.warn('MutationObserver not supported, dashboard panels may be less responsive to DOM changes');
 		}
 	}
@@ -274,7 +274,8 @@ class NcgWorkspace extends Polymer.PolymerElement {
 	applyPackery() {
 		this._applyPackeryDebounce = Debouncer.debounce(
 			this._applyPackeryDebounce,
-			timeOut.after(10), () => {
+			timeOut.after(10),
+			() => {
 				if (this._packeryInitialized) {
 					this._packery.layout();
 				}
@@ -296,7 +297,8 @@ class NcgWorkspace extends Polymer.PolymerElement {
 
 		this._shiftPackeryDebounce = Debouncer.debounce(
 			this._shiftPackeryDebounce,
-			timeOut.after(100), () => {
+			timeOut.after(100),
+			() => {
 				if (this._packeryInitialized) {
 					// See http://packery.metafizzy.co/methods.html#shiftlayout for more details
 					this._packery.shiftLayout();

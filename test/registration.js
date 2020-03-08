@@ -83,7 +83,7 @@ test.serial('singleInstance - should redirect to killed.html when the instance i
 		'ncg-dashboard',
 		'ncg-graphics',
 		'ncg-graphics-bundle',
-		'ncg-graphic:nth-of-type(2)',
+		'ncg-graphic:nth-of-type(2)'
 	);
 
 	await dashboard.bringToFront();
@@ -111,7 +111,7 @@ test.serial('refresh all instances in a bundle', async t => {
 		dashboard,
 		'ncg-dashboard',
 		'ncg-graphics',
-		'ncg-graphics-bundle',
+		'ncg-graphics-bundle'
 	);
 
 	await dashboard.bringToFront();
@@ -136,7 +136,7 @@ test.serial('refresh all instances of a graphic', async t => {
 		'ncg-graphics',
 		'ncg-graphics-bundle',
 		'ncg-graphic',
-		'#reloadButton',
+		'#reloadButton'
 	);
 	await reload.click();
 
@@ -157,7 +157,7 @@ test.serial('refresh individual instance', async t => {
 		'ncg-graphics-bundle',
 		'ncg-graphic',
 		'ncg-graphic-instance:last-of-type',
-		'#reloadButton',
+		'#reloadButton'
 	);
 	await reload.click();
 
