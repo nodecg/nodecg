@@ -174,8 +174,10 @@
     "fs-extra": "^7.0.1",
     "gulp": "^4.0.0",
     "gulp-util": "^3.0.8",
+    "husky": "^4.2.3",
     "is-windows": "^1.0.2",
     "jsdoc": "^3.6.2",
+    "lint-staged": "^10.0.8",
     "minami": "github:nodecg/minami#75b4bbfc7e9d834f840be2358f4ddedf738cbfa8",
     "nyc": "^14.1.1",
     "p-retry": "^4.1.0",
@@ -184,8 +186,8 @@
     "remark-toc": "^5.1.1",
     "replace-in-file": "^3.4.4",
     "rimraf": "^2.6.3",
-    "sinon": "^7.3.1",
     "simple-git": "^1.110.0",
+    "sinon": "^7.3.1",
     "socket.io-client": "^2.2.0",
     "standard-version": "^6.0.1",
     "taffydb": "^2.7.3",
@@ -200,5 +202,15 @@
     "last 2 firefox versions",
     "last 2 safari versions",
     "last 2 edge versions"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix"
+    ]
+  }
 }
