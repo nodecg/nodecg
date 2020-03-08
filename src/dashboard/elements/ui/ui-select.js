@@ -98,6 +98,7 @@ class UiSelect extends Polymer.PolymerElement {
 		}
 
 		this.value = this.$.select.value;
+		this.selectedOptions = this.$.select.selectedOptions;
 		this.dispatchEvent(new CustomEvent('change', {bubbles: true, composed: true}));
 	}
 }
