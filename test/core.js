@@ -70,7 +70,6 @@ test.serial('shared sources - 200', async t => {
 	t.is(response.status, 200);
 	t.is(
 		response.data,
-		'// eslint-disable-next-line no-undef\n' +
 		'window.SharedUtility = {\n' +
 		'\tsomeFunc() {}\n' +
 		'};\n'
