@@ -274,7 +274,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 
 						<template is="dom-if" if="[[!smallScreen]]">
 							<paper-tabs class="spacer" scrollable="" selected="[[routeData.page]]" attr-for-selected="route">
-								<template is="dom-repeat" items="[[workspaces]]" as="workspace">
+								<template is="dom-repeat" items="[[workspaces]]" as="workspace" on-dom-change="_fixTabs">
 									<paper-tab class="workspaceTab" data-route\$="[[workspace.route]]" route="[[workspace.route]]" aria-label="[[workspace.name]]" on-tap="_selectRoute">
 										[[workspace.label]]
 									</paper-tab>
