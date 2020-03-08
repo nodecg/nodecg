@@ -39,14 +39,13 @@ export const setup = (nodecgConfigName = 'nodecg.json') => {
 		});
 	});
 
+	test.after.always(() => {
+		server.stop();
+	});
 	test.beforeEach(t => {
 		t.context.server = server;
 		t.context.apis = {
 			extension: server.getExtensions()[C.bundleName()]
 		};
-	});
-
-	test.after.always(() => {
-		server.stop();
 	});
 };
