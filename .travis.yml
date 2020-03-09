@@ -48,13 +48,6 @@ jobs:
         skip_cleanup: true
         on:
           tags: true
-    - stage: 'Build Docs'
-      if: type = push AND branch = master
-      script: skip
-      deploy:
-        skip_cleanup: true
-        provider: script
-        script: npm run docs:publish
 notifications:
   webhooks:
     urls:
