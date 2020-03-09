@@ -19,19 +19,22 @@
         "title": "Test Panel",
         "width": 1,
         "file": "panel.html"
-      },{
+      },
+      {
         "name": "test-workspace-panel",
         "title": "Test Workspace Panel",
         "width": 1,
         "file": "workspace-panel.html",
         "workspace": "foo",
         "headerColor": "#ffffff"
-      },{
+      },
+      {
         "name": "test-fullbleed-panel",
         "title": "Test Fullbleed Panel",
         "file": "fullbleed-panel.html",
         "fullbleed": true
-      },{
+      },
+      {
         "name": "test-dialog",
         "title": "Test Dialog",
         "width": 3,

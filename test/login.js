@@ -9,7 +9,7 @@ const pRetry = require('p-retry');
 import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 server.setup('nodecg-login.json');
-const {initLogin, initDashboard, initGraphic} = browser.setup();
+const { initLogin, initDashboard, initGraphic } = browser.setup();
 
 import * as C from './helpers/test-constants';
 
@@ -54,8 +54,7 @@ test.serial('regenerating a token should send the user back to /login', async t 
 		// We need to preserve the coverage from this test, because it will be lost
 		// when the page is redirected to /login.
 		const coverage = await page.evaluate(() => {
-			const ncgSettings = document.querySelector('ncg-dashboard').shadowRoot
-				.querySelector('ncg-settings');
+			const ncgSettings = document.querySelector('ncg-dashboard').shadowRoot.querySelector('ncg-settings');
 			ncgSettings.resetKey();
 			return window.__coverage__;
 		});
@@ -70,7 +69,7 @@ test.serial('regenerating a token should send the user back to /login', async t 
 		t.pass();
 	};
 
-	return pRetry(run, {retries: 10});
+	return pRetry(run, { retries: 10 });
 });
 
 test.serial('token invalidation should show an UnauthorizedError on open pages', async t => {
@@ -82,7 +81,7 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 	await page.waitForFunction(
 		validUrl => location.href.startsWith(validUrl),
 		{},
-		`${C.rootUrl()}authError?code=token_invalidated`
+		`${C.rootUrl()}authError?code=token_invalidated`,
 	);
 	t.pass();
 });
@@ -101,7 +100,7 @@ test.cb('socket should deny access to bad credentials', t => {
 		t.deepEqual(error, {
 			message: 'No authorization token was found',
 			code: 'credentials_required',
-			type: 'UnauthorizedError'
+			type: 'UnauthorizedError',
 		});
 		t.end();
 	});
@@ -111,8 +110,9 @@ test.cb('socket should deny access with bad auth header format', t => {
 	t.plan(1);
 	const socket = socketIoClient(C.rootUrl(), {
 		extraHeaders: {
-			Authorization: 'Fooooooo'
-		}});
+			Authorization: 'Fooooooo',
+		},
+	});
 	socket.on('connect', () => {
 		t.fail('Socket connected with bad auth header');
 	});
@@ -123,7 +123,7 @@ test.cb('socket should deny access with bad auth header format', t => {
 		t.deepEqual(error, {
 			message: 'Format is Authorization: Bearer [token]',
 			code: 'credentials_bad_format',
-			type: 'UnauthorizedError'
+			type: 'UnauthorizedError',
 		});
 		t.end();
 	});
@@ -133,8 +133,9 @@ test.cb('socket should deny access with bad auth token in header', t => {
 	t.plan(1);
 	const socket = socketIoClient(C.rootUrl(), {
 		extraHeaders: {
-			Authorization: 'Bearer hogehoge'
-		}});
+			Authorization: 'Bearer hogehoge',
+		},
+	});
 	socket.on('connect', () => {
 		t.fail('Socket connected with bad auth header');
 	});
@@ -144,7 +145,7 @@ test.cb('socket should deny access with bad auth token in header', t => {
 	socket.on('error', error => {
 		t.deepEqual(error, {
 			code: 'invalid_token',
-			type: 'UnauthorizedError'
+			type: 'UnauthorizedError',
 		});
 		t.end();
 	});

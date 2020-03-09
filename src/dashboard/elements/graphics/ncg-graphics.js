@@ -1,7 +1,7 @@
 import '@polymer/paper-toast/paper-toast.js';
 import './ncg-graphics-bundle.js';
 import * as Polymer from '@polymer/polymer';
-import {MutableData} from '@polymer/polymer/lib/mixins/mutable-data';
+import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 
 /**
  * @customElement
@@ -39,9 +39,9 @@ class NcgGraphics extends MutableData(Polymer.PolymerElement) {
 				type: Array,
 				value: window.__renderData__.bundles.filter(bundle => {
 					return bundle.graphics && bundle.graphics.length > 0;
-				})
+				}),
 			},
-			_graphicInstances: Array
+			_graphicInstances: Array,
 		};
 	}
 

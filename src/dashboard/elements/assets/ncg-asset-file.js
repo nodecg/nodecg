@@ -54,8 +54,8 @@ class NcgAssetFile extends Polymer.PolymerElement {
 			deleting: {
 				type: Boolean,
 				observer: '_deletingChanged',
-				value: false
-			}
+				value: false,
+			},
 		};
 	}
 
@@ -69,12 +69,12 @@ class NcgAssetFile extends Polymer.PolymerElement {
 
 		fetch(this.file.url, {
 			method: 'DELETE',
-			credentials: 'include'
+			credentials: 'include',
 		}).then(response => {
 			if (response.status === 410 || response.status === 200) {
-				this.dispatchEvent(new CustomEvent('deleted', {bubbles: true, composed: true}));
+				this.dispatchEvent(new CustomEvent('deleted', { bubbles: true, composed: true }));
 			} else {
-				this.dispatchEvent(new CustomEvent('deletion-failed', {bubbles: true, composed: true}));
+				this.dispatchEvent(new CustomEvent('deletion-failed', { bubbles: true, composed: true }));
 			}
 
 			this.deleting = false;

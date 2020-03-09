@@ -38,7 +38,7 @@ test('should return the expected data when "nodecg" property does exist', t => {
 	t.is(parsedBundle.bundleDependencies, undefined);
 	t.is(typeof parsedBundle.rawManifest, 'string');
 	t.is(typeof parsedBundle.dir, 'string');
-	t.deepEqual(parsedBundle.dependencies, {commander: '^2.6.0'});
+	t.deepEqual(parsedBundle.dependencies, { commander: '^2.6.0' });
 	t.is(typeof parsedBundle.dashboard.dir, 'string');
 	t.deepEqual(parsedBundle.dashboard.panels, [
 		{
@@ -48,12 +48,13 @@ test('should return the expected data when "nodecg" property does exist', t => {
 			headerColor: '#525F78',
 			path: path.resolve(__dirname, '../fixtures/bundle-parser/good-bundle/dashboard/panel.html'),
 			file: 'panel.html',
-			html: '<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test panel!</p>\n<script>' +
-			'\n    window.parent.dashboardApi = window.nodecg;\n</script>\n</body></html>',
+			html:
+				'<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test panel!</p>\n<script>' +
+				'\n    window.parent.dashboardApi = window.nodecg;\n</script>\n</body></html>',
 			dialog: false,
 			bundleName: 'good-bundle',
 			workspace: 'default',
-			fullbleed: false
+			fullbleed: false,
 		},
 		{
 			name: 'test-workspace-panel',
@@ -62,12 +63,13 @@ test('should return the expected data when "nodecg" property does exist', t => {
 			headerColor: '#ffffff',
 			path: path.resolve(__dirname, '../fixtures/bundle-parser/good-bundle/dashboard/workspace-panel.html'),
 			file: 'workspace-panel.html',
-			html: '<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test panel that goes into a test ' +
-			'workspace!</p>\n</body></html>',
+			html:
+				'<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test panel that goes into a test ' +
+				'workspace!</p>\n</body></html>',
 			dialog: false,
 			bundleName: 'good-bundle',
 			workspace: 'foo',
-			fullbleed: false
+			fullbleed: false,
 		},
 		{
 			name: 'test-fullbleed-panel',
@@ -80,7 +82,7 @@ test('should return the expected data when "nodecg" property does exist', t => {
 			dialog: false,
 			bundleName: 'good-bundle',
 			fullbleed: true,
-			workspace: 'default'
+			workspace: 'default',
 		},
 		{
 			name: 'test-dialog',
@@ -92,79 +94,69 @@ test('should return the expected data when "nodecg" property does exist', t => {
 			html: '<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test dialog!</p>\n</body></html>',
 			dialog: true,
 			bundleName: 'good-bundle',
-			fullbleed: false
-		}
+			fullbleed: false,
+		},
 	]);
 	t.true(Array.isArray(parsedBundle.graphics));
 	t.true(parsedBundle.hasExtension);
-	t.deepEqual(parsedBundle.soundCues, [{
-		name: 'name-only',
-		assignable: true
-	}, {
-		name: 'default-volume',
-		defaultVolume: 80,
-		assignable: true
-	}, {
-		name: 'non-assignable',
-		assignable: false
-	}, {
-		name: 'default-file',
-		defaultFile: '../default-file.ogg',
-		assignable: true
-	}]);
+	t.deepEqual(parsedBundle.soundCues, [
+		{
+			name: 'name-only',
+			assignable: true,
+		},
+		{
+			name: 'default-volume',
+			defaultVolume: 80,
+			assignable: true,
+		},
+		{
+			name: 'non-assignable',
+			assignable: false,
+		},
+		{
+			name: 'default-file',
+			defaultFile: '../default-file.ogg',
+			assignable: true,
+		},
+	]);
 });
 
 test('should error when "nodecg.compatibleRange" is not a valid semver range', t => {
 	const error = t.throws(
-		parseBundle.bind(
-			parseBundle,
-			'./test/fixtures/bundle-parser/no-compatible-range'
-		),
-		/does not have a valid "nodecg.compatibleRange"/
+		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/no-compatible-range'),
+		/does not have a valid "nodecg.compatibleRange"/,
 	);
 	t.true(error.message.includes(''));
 });
 
 test('should error when both "extension.js" and a directory named "extension" exist', t => {
 	const error = t.throws(
-		parseBundle.bind(
-			parseBundle,
-			'./test/fixtures/bundle-parser/double-extension'
-		),
-		/has both "extension.js" and a folder named "extension"/
+		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/double-extension'),
+		/has both "extension.js" and a folder named "extension"/,
 	);
 	t.true(error.message.includes(''));
 });
 
 test('should error when "extension" exists and it is not a directory', t => {
 	const error = t.throws(
-		parseBundle.bind(
-			parseBundle,
-			'./test/fixtures/bundle-parser/illegal-extension'
-		),
-		/has an illegal file named "extension"/
+		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/illegal-extension'),
+		/has an illegal file named "extension"/,
 	);
 	t.true(error.message.includes(''));
 });
 
-test('should error when the bundle\'s folder name doesn\'t match its manifest name', t => {
+test("should error when the bundle's folder name doesn't match its manifest name", t => {
 	const error = t.throws(
-		parseBundle.bind(
-			parseBundle,
-			'./test/fixtures/bundle-parser/bad-folder-name'
-		),
-		/Please rename it to "/
+		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/bad-folder-name'),
+		/Please rename it to "/,
 	);
 	t.true(error.message.includes(''));
 });
 
 test('should error when "version" is not present', t => {
 	const error = t.throws(
-		parseBundle.bind(
-			parseBundle,
-			'./test/fixtures/bundle-parser/no-manifest-version'
-		),
-		/must specify a valid version/
+		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/no-manifest-version'),
+		/must specify a valid version/,
 	);
 	t.true(error.message.includes(''));
 });

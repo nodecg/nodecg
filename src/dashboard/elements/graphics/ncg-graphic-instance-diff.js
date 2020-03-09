@@ -2,7 +2,7 @@ import '@polymer/iron-icons/device-icons.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import * as Polymer from '@polymer/polymer';
-import {MutableData} from '@polymer/polymer/lib/mixins/mutable-data';
+import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 let bundlesRep;
 
 /**
@@ -67,14 +67,12 @@ class NcgGraphicInstanceDiff extends MutableData(Polymer.PolymerElement) {
 
 	static get properties() {
 		return {
-			instance: Object
+			instance: Object,
 		};
 	}
 
 	static get observers() {
-		return [
-			'_updateBundleInfo(instance.bundleName)'
-		];
+		return ['_updateBundleInfo(instance.bundleName)'];
 	}
 
 	ready() {

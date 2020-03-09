@@ -8,14 +8,14 @@ import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 
 server.setup();
-const {initDashboard} = browser.setup();
+const { initDashboard } = browser.setup();
 
 let dashboard;
 test.before(async () => {
 	dashboard = await initDashboard();
 });
 
-test.serial('should produce an error if a callback isn\'t given', t => {
+test.serial("should produce an error if a callback isn't given", t => {
 	const error = t.throws(() => {
 		t.context.apis.extension.listenFor('testMessageName', 'test');
 	}, Error);
@@ -95,6 +95,6 @@ test.serial('#bundleGit', async t => {
 		date: '2018-07-13T17:09:29.000Z',
 		hash: '6262681c7f35eccd7293d57a50bdd25e4cd90684',
 		message: 'Initial commit',
-		shortHash: '6262681'
+		shortHash: '6262681',
 	});
 });

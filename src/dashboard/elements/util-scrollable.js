@@ -60,8 +60,10 @@ class UtilScrollable extends Polymer.PolymerElement {
 	updateScrollState() {
 		this.classList.toggle('is-scrolled', this.scrollTarget.scrollTop > 0);
 		this.classList.toggle('can-scroll', this.scrollTarget.offsetHeight < this.scrollTarget.scrollHeight);
-		this.classList.toggle('scrolled-to-bottom',
-			this.scrollTarget.scrollTop + this.scrollTarget.offsetHeight >= this.scrollTarget.scrollHeight);
+		this.classList.toggle(
+			'scrolled-to-bottom',
+			this.scrollTarget.scrollTop + this.scrollTarget.offsetHeight >= this.scrollTarget.scrollHeight,
+		);
 	}
 }
 

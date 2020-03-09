@@ -8,7 +8,7 @@ import * as axios from 'axios';
 import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 server.setup();
-const {initDashboard, initStandalone} = browser.setup();
+const { initDashboard, initStandalone } = browser.setup();
 
 import * as C from './helpers/test-constants';
 
@@ -22,9 +22,10 @@ test.before(async () => {
 test.serial('panels - should show up on the dashboard', async t => {
 	setTimeout(t.fail, 1000);
 	await dashboard.waitForFunction(() => {
-		const found = document.querySelector('ncg-dashboard').shadowRoot
-			.querySelector('ncg-workspace').shadowRoot
-			.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]');
+		const found = document
+			.querySelector('ncg-dashboard')
+			.shadowRoot.querySelector('ncg-workspace')
+			.shadowRoot.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]');
 		return Boolean(found);
 	});
 	t.pass();
@@ -50,92 +51,124 @@ test.serial('ncg-dialog - should have the buttons defined in dialogButtons', asy
 			return {
 				confirm: buttonEl.hasAttribute('dialog-confirm'),
 				dismiss: buttonEl.hasAttribute('dialog-dismiss'),
-				text: buttonEl.textContent.trim()
+				text: buttonEl.textContent.trim(),
 			};
 		}
 
-		return Array.from(dialog.querySelector('.buttons').querySelectorAll('paper-button'))
-			.map(gatherButtonStats);
+		return Array.from(dialog.querySelector('.buttons').querySelectorAll('paper-button')).map(gatherButtonStats);
 	});
 
-	t.deepEqual(res, [{
-		confirm: false,
-		dismiss: true,
-		text: 'close'
-	}, {
-		confirm: true,
-		dismiss: false,
-		text: 'accept'
-	}]);
+	t.deepEqual(res, [
+		{
+			confirm: false,
+			dismiss: true,
+			text: 'close',
+		},
+		{
+			confirm: true,
+			dismiss: false,
+			text: 'accept',
+		},
+	]);
 });
 
 test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog attribute is clicked', async t => {
 	await dashboard.bringToFront();
-	const res = await dashboard.evaluate(() => new Promise(resolve => {
-		const openDialogButton = document.querySelector('ncg-dashboard').shadowRoot
-			.querySelector('ncg-workspace').shadowRoot
-			.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')
-			.querySelector('iframe').contentWindow.document
-			.querySelector('#openDialog');
+	const res = await dashboard.evaluate(
+		() =>
+			new Promise(resolve => {
+				const openDialogButton = document
+					.querySelector('ncg-dashboard')
+					.shadowRoot.querySelector('ncg-workspace')
+					.shadowRoot.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')
+					.querySelector('iframe')
+					.contentWindow.document.querySelector('#openDialog');
 
-		const dialog = window.dashboardApi.getDialog('test-dialog');
-		const beforeClickDisplay = window.getComputedStyle(dialog).display;
+				const dialog = window.dashboardApi.getDialog('test-dialog');
+				const beforeClickDisplay = window.getComputedStyle(dialog).display;
 
-		openDialogButton.click();
+				openDialogButton.click();
 
-		dialog.addEventListener('neon-animation-finish', () => {
-			const afterClickDisplay = window.getComputedStyle(dialog).display;
-			const {opened} = dialog;
-			dialog.close(); // Clean up for the next test.
-			resolve({
-				beforeClickDisplay,
-				afterClickDisplay,
-				opened
-			});
-		}, {once: true, passive: true});
-	}));
+				dialog.addEventListener(
+					'neon-animation-finish',
+					() => {
+						const afterClickDisplay = window.getComputedStyle(dialog).display;
+						const { opened } = dialog;
+						dialog.close(); // Clean up for the next test.
+						resolve({
+							beforeClickDisplay,
+							afterClickDisplay,
+							opened,
+						});
+					},
+					{ once: true, passive: true },
+				);
+			}),
+	);
 
 	t.deepEqual(res, {
 		beforeClickDisplay: 'none',
 		afterClickDisplay: 'flex',
-		opened: true
+		opened: true,
 	});
 });
 
 test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is clicked', async t => {
-	const res = await dashboard.evaluate(() => new Promise(resolve => {
-		const dialog = window.dashboardApi.getDialog('test-dialog');
-		const dialogDocument = window.dashboardApi.getDialogDocument('test-dialog');
-		const confirmButton = dialog.querySelector('paper-button[dialog-confirm]');
+	const res = await dashboard.evaluate(
+		() =>
+			new Promise(resolve => {
+				const dialog = window.dashboardApi.getDialog('test-dialog');
+				const dialogDocument = window.dashboardApi.getDialogDocument('test-dialog');
+				const confirmButton = dialog.querySelector('paper-button[dialog-confirm]');
 
-		dialog.addEventListener('neon-animation-finish', () => {
-			dialogDocument.addEventListener('dialog-confirmed', () => {
-				resolve(true);
-			}, {once: true, passive: true});
-			confirmButton.click();
-		}, {once: true, passive: true});
+				dialog.addEventListener(
+					'neon-animation-finish',
+					() => {
+						dialogDocument.addEventListener(
+							'dialog-confirmed',
+							() => {
+								resolve(true);
+							},
+							{ once: true, passive: true },
+						);
+						confirmButton.click();
+					},
+					{ once: true, passive: true },
+				);
 
-		dialog.open();
-	}));
+				dialog.open();
+			}),
+	);
 
 	t.true(res);
 });
 
 test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async t => {
-	const res = await dashboard.evaluate(() => new Promise(done => {
-		const dialog = window.dashboardApi.getDialog('test-dialog');
-		const dialogDocument = window.dashboardApi.getDialogDocument('test-dialog');
-		const dismissButton = dialog.querySelector('paper-button[dialog-dismiss]');
+	const res = await dashboard.evaluate(
+		() =>
+			new Promise(done => {
+				const dialog = window.dashboardApi.getDialog('test-dialog');
+				const dialogDocument = window.dashboardApi.getDialogDocument('test-dialog');
+				const dismissButton = dialog.querySelector('paper-button[dialog-dismiss]');
 
-		dialog.addEventListener('neon-animation-finish', () => {
-			dialogDocument.addEventListener('dialog-dismissed', () => {
-				done(true);
-			}, {once: true, passive: true});
-			dismissButton.click();
-		}, {once: true, passive: true});
+				dialog.addEventListener(
+					'neon-animation-finish',
+					() => {
+						dialogDocument.addEventListener(
+							'dialog-dismissed',
+							() => {
+								done(true);
+							},
+							{ once: true, passive: true },
+						);
+						dismissButton.click();
+					},
+					{ once: true, passive: true },
+				);
 
-		dialog.open();
-	}));
+				dialog.open();
+			}),
+	);
 
 	t.true(res);
 });
@@ -148,24 +181,24 @@ test.serial('connection toasts', async t => {
 		return {
 			toastText: dashboard.$.mainToast.text,
 			toastOpened: dashboard.$.mainToast.opened,
-			disconnected: dashboard.disconnected
+			disconnected: dashboard.disconnected,
 		};
 	});
 	t.deepEqual(ret, {
 		toastText: 'Lost connection to NodeCG server!',
 		toastOpened: true,
-		disconnected: true
+		disconnected: true,
 	});
 
 	ret = await dashboard.evaluate(() => {
 		const dashboard = document.getElementById('nodecg_dashboard');
 		window.socket.emit('reconnecting', 3);
 		return {
-			reconnectToastOpened: dashboard.$.reconnectToast.opened
+			reconnectToastOpened: dashboard.$.reconnectToast.opened,
 		};
 	});
 	t.deepEqual(ret, {
-		reconnectToastOpened: true
+		reconnectToastOpened: true,
 	});
 
 	ret = await dashboard.evaluate(() => {
@@ -173,12 +206,12 @@ test.serial('connection toasts', async t => {
 		window.socket.emit('reconnect_failed');
 		return {
 			toastText: dashboard.$.mainToast.text,
-			toastOpened: dashboard.$.mainToast.opened
+			toastOpened: dashboard.$.mainToast.opened,
 		};
 	});
 	t.deepEqual(ret, {
 		toastText: 'Failed to reconnect to NodeCG server!',
-		toastOpened: true
+		toastOpened: true,
 	});
 
 	ret = await dashboard.evaluate(() => {
@@ -188,14 +221,14 @@ test.serial('connection toasts', async t => {
 			toastText: dashboard.$.mainToast.text,
 			toastOpened: dashboard.$.mainToast.opened,
 			reconnectToastOpened: dashboard.$.reconnectToast.opened,
-			disconnected: dashboard.disconnected
+			disconnected: dashboard.disconnected,
 		};
 	});
 	t.deepEqual(ret, {
 		toastText: 'Reconnected to NodeCG server!',
 		toastOpened: true,
 		reconnectToastOpened: false,
-		disconnected: false
+		disconnected: false,
 	});
 });
 

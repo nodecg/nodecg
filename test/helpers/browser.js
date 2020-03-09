@@ -3,7 +3,7 @@
 // Native
 import * as fs from 'fs';
 import * as path from 'path';
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 // Packages
 import test from 'ava';
@@ -11,7 +11,7 @@ import puppeteer from 'puppeteer';
 
 // Ours
 import * as C from './test-constants';
-import {sleep} from './utilities';
+import { sleep } from './utilities';
 
 const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
 
@@ -22,7 +22,7 @@ export const setup = () => {
 		const args = IS_TRAVIS ? ['--no-sandbox'] : undefined;
 		browser = await puppeteer.launch({
 			headless: true,
-			args
+			args,
 		});
 	});
 
@@ -44,11 +44,7 @@ export const setup = () => {
 				continue;
 			}
 
-			if (
-				!coverageObj ||
-				typeof coverageObj !== 'object' ||
-				Object.keys(coverageObj).length === 0
-			) {
+			if (!coverageObj || typeof coverageObj !== 'object' || Object.keys(coverageObj).length === 0) {
 				continue;
 			}
 
@@ -59,11 +55,7 @@ export const setup = () => {
 				newCoverageObj[absKey] = coverageObj[key];
 			}
 
-			fs.writeFileSync(
-				`.nyc_output/browser-${uuid()}.json`,
-				JSON.stringify(newCoverageObj),
-				'utf8'
-			);
+			fs.writeFileSync(`.nyc_output/browser-${uuid()}.json`, JSON.stringify(newCoverageObj), 'utf8');
 		}
 		/* eslint-enable no-await-in-loop */
 
@@ -123,6 +115,6 @@ export const setup = () => {
 		initStandalone,
 		initGraphic,
 		initSingleInstance,
-		initLogin
+		initLogin,
 	};
 };

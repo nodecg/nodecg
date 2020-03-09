@@ -1,0 +1,3 @@
+{
+	"extends": "typetest/fake-bundle/tsconfig.json"
+}

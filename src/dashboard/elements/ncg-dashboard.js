@@ -17,7 +17,7 @@ import '@polymer/paper-item/paper-icon-item.js';
 import '@polymer/paper-tabs/paper-tabs.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@polymer/polymer/lib/elements/custom-style.js';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce.js';
+import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
 import * as Polymer from '@polymer/polymer';
 import '../css/nodecg-theme.js';
 import './assets/ncg-assets.js';
@@ -26,7 +26,7 @@ import './mixer/ncg-mixer.js';
 import './ncg-dialog.js';
 import './ncg-workspace.js';
 import './settings/ncg-settings.js';
-import {timeOut} from '@polymer/polymer/lib/utils/async.js';
+import { timeOut } from '@polymer/polymer/lib/utils/async.js';
 class NcgDashboard extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`
@@ -361,44 +361,48 @@ class NcgDashboard extends Polymer.PolymerElement {
 		return {
 			route: {
 				type: Object,
-				observer: '_routeChanged'
+				observer: '_routeChanged',
 			},
 			smallScreen: {
 				type: Boolean,
-				observer: '_smallScreenChanged'
+				observer: '_smallScreenChanged',
 			},
 			loginDisabled: {
 				type: Boolean,
-				value: !window.ncgConfig.login.enabled
+				value: !window.ncgConfig.login.enabled,
 			},
 			bundles: {
 				type: Array,
-				value: window.__renderData__.bundles
+				value: window.__renderData__.bundles,
 			},
 			workspaces: {
 				type: Array,
-				value: window.__renderData__.workspaces
+				value: window.__renderData__.workspaces,
 			},
 			dialogs: {
 				type: Array,
-				computed: '_computeDialogs(bundles)'
+				computed: '_computeDialogs(bundles)',
 			},
 			pages: {
 				type: Array,
 				value() {
-					const pages = [{
-						name: 'Graphics',
-						route: 'graphics',
-						icon: 'visibility'
-					}, {
-						name: 'Mixer',
-						route: 'mixer',
-						icon: 'av:volume-up'
-					}, {
-						name: 'Assets',
-						route: 'assets',
-						icon: 'file-upload'
-					}];
+					const pages = [
+						{
+							name: 'Graphics',
+							route: 'graphics',
+							icon: 'visibility',
+						},
+						{
+							name: 'Mixer',
+							route: 'mixer',
+							icon: 'av:volume-up',
+						},
+						{
+							name: 'Assets',
+							route: 'assets',
+							icon: 'file-upload',
+						},
+					];
 
 					// For the time being, the "Settings" button is only relevant
 					// when login security is enabled.
@@ -406,13 +410,13 @@ class NcgDashboard extends Polymer.PolymerElement {
 						pages.push({
 							name: 'Settings',
 							route: 'settings',
-							icon: 'settings'
+							icon: 'settings',
 						});
 					}
 
 					return pages;
-				}
-			}
+				},
+			},
 		};
 	}
 
@@ -468,7 +472,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 				notify('Disconnected', {
 					body: 'The dashboard has lost connection with NodeCG.',
 					icon: FAIL_URI,
-					tag: 'disconnect'
+					tag: 'disconnect',
 				});
 			}
 		});
@@ -482,7 +486,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 				notify('Reconnected', {
 					body: 'Successfully reconnected on attempt #' + attempts,
 					icon: SUCCESS_URI,
-					tag: 'reconnect'
+					tag: 'reconnect',
 				});
 			}
 		});
@@ -493,7 +497,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 			notify('Reconnection Failed', {
 				body: 'Could not reconnect to NodeCG after the maximum number of attempts.',
 				icon: FAIL_URI,
-				tag: 'reconnect_failed'
+				tag: 'reconnect_failed',
 			});
 		});
 	}
@@ -543,11 +547,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 
 	_routeChanged() {
 		this._fixTabs();
-		this._fixPathDebounce = Debouncer.debounce(
-			this._fixPathDebounce,
-			timeOut.after(100),
-			this._fixPath.bind(this)
-		);
+		this._fixPathDebounce = Debouncer.debounce(this._fixPathDebounce, timeOut.after(100), this._fixPath.bind(this));
 	}
 
 	_fixTabs() {
@@ -597,7 +597,7 @@ function getImageDataURI(url, cb) {
 	let canvas;
 	let ctx;
 	const img = new Image();
-	img.onload = function () {
+	img.onload = function() {
 		// Create the canvas element.
 		canvas = document.createElement('canvas');
 		canvas.width = img.width;
@@ -610,7 +610,7 @@ function getImageDataURI(url, cb) {
 			data = canvas.toDataURL();
 			cb(null, {
 				image: img,
-				data
+				data,
 			});
 		} catch (e) {
 			/* istanbul ignore next: hard-to-test error */
@@ -652,9 +652,13 @@ function notify(title, options) {
 			// If the user is okay, let's create a notification
 			if (permission === 'granted') {
 				const notification = new window.Notification(title, options);
-				setTimeout(n => {
-					n.close();
-				}, 5000, notification);
+				setTimeout(
+					n => {
+						n.close();
+					},
+					5000,
+					notification,
+				);
 			}
 		});
 	}

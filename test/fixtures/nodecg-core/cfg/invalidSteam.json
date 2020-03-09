@@ -1,9 +1,9 @@
 {
-  "login": {
-    "enabled": true,
-    "sessionSecret": "secret",
-    "steam": {
-      "enabled": true
-    }
-  }
+	"login": {
+		"enabled": true,
+		"sessionSecret": "secret",
+		"steam": {
+			"enabled": true
+		}
+	}
 }

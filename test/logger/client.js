@@ -14,13 +14,16 @@ test.beforeEach(t => {
 	t.context.logger = new Logger('testClient');
 
 	const RavenMock = {
-		captureException: sinon.stub()
+		captureException: sinon.stub(),
 	};
-	const RavenLogger = loggerFactory({
-		console: {
-			enabled: true
-		}
-	}, RavenMock);
+	const RavenLogger = loggerFactory(
+		{
+			console: {
+				enabled: true,
+			},
+		},
+		RavenMock,
+	);
 	t.context.RavenMock = RavenMock;
 	t.context.ravenLogger = new RavenLogger('sentryClient');
 });
@@ -37,8 +40,8 @@ test('console - should change settings when reconfigured', t => {
 	Logger.globalReconfigure({
 		console: {
 			enabled: true,
-			level: 'debug'
-		}
+			level: 'debug',
+		},
 	});
 
 	t.is(Logger._silent, false);
@@ -58,7 +61,7 @@ test('replicant - should do nothing when Logger._shouldLogReplicants is false', 
 
 test('replicant - should change settings when reconfigured', t => {
 	Logger.globalReconfigure({
-		replicants: true
+		replicants: true,
 	});
 
 	t.is(Logger._shouldLogReplicants, true);
@@ -187,14 +190,14 @@ test('Sentry - should log errors to Sentry when global.sentryEnabled is true', t
 	t.true(t.context.RavenMock.captureException.firstCall.args[0] instanceof Error, 'first arg is Error');
 	t.is(t.context.RavenMock.captureException.firstCall.args[0].message, '[sentryClient] error message');
 	t.deepEqual(t.context.RavenMock.captureException.firstCall.args[1], {
-		logger: 'client @nodecg/logger'
+		logger: 'client @nodecg/logger',
 	});
 });
 
 test('Sentry - should prettyprint objects', t => {
-	t.context.ravenLogger.error('error message:', {foo: {bar: 'baz'}});
+	t.context.ravenLogger.error('error message:', { foo: { bar: 'baz' } });
 	t.is(
 		t.context.RavenMock.captureException.firstCall.args[0].message,
-		'[sentryClient] error message: { foo: { bar: \'baz\' } }'
+		"[sentryClient] error message: { foo: { bar: 'baz' } }",
 	);
 });

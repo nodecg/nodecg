@@ -11,7 +11,7 @@ import * as test from 'ava';
 const isWindows = require('is-windows');
 
 // Ours
-const Logger = require('../lib/logger/server')({console: {enabled: true}});
+const Logger = require('../lib/logger/server')({ console: { enabled: true } });
 
 const tempFolder = temp.mkdirSync();
 temp.track(); // Automatically track and cleanup files at exit.
@@ -25,16 +25,14 @@ test.before.cb(t => {
 	if (!isWindows()) {
 		fs.symlinkSync(
 			path.join(tempFolder, 'change-panel-symlink-target'),
-			path.join(tempFolder, 'bundles/change-panel-symlink')
+			path.join(tempFolder, 'bundles/change-panel-symlink'),
 		);
 	}
 
 	const nodecgConfig = {
 		bundles: {
-			disabled: [
-				'test-disabled-bundle'
-			]
-		}
+			disabled: ['test-disabled-bundle'],
+		},
 	};
 
 	bundleManager = require('../lib/bundle-manager');
@@ -43,7 +41,7 @@ test.before.cb(t => {
 		path.join(tempFolder, 'cfg'),
 		'0.7.0',
 		nodecgConfig,
-		Logger
+		Logger,
 	);
 
 	// Needs a little extra wait time for some reason.
@@ -59,7 +57,7 @@ test.after(() => {
 
 test.serial('loader - should detect and load bundle configuration files', t => {
 	const bundle = bundleManager.find('config-test');
-	t.deepEqual(bundle.config, {bundleConfig: true});
+	t.deepEqual(bundle.config, { bundleConfig: true });
 });
 
 test.serial('loader - should not load bundles with a non-satisfactory nodecg.compatibleRange', t => {
@@ -102,7 +100,7 @@ test.serial.cb('watcher - should remove the bundle when the manifest file is ren
 
 	fs.renameSync(
 		`${tempFolder}/bundles/rename-manifest/package.json`,
-		`${tempFolder}/bundles/rename-manifest/package.json.renamed`
+		`${tempFolder}/bundles/rename-manifest/package.json.renamed`,
 	);
 });
 
@@ -144,7 +142,7 @@ if (!isWindows()) {
 	});
 }
 
-test.serial.cb('watcher - should reload the bundle\'s config when the bundle is reloaded due to a change', t => {
+test.serial.cb("watcher - should reload the bundle's config when the bundle is reloaded due to a change", t => {
 	const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-config/package.json`));
 	const config = JSON.parse(fs.readFileSync(`${tempFolder}/cfg/change-config.json`));
 
@@ -152,7 +150,7 @@ test.serial.cb('watcher - should reload the bundle\'s config when the bundle is 
 		t.is(bundle.name, 'change-config');
 		t.deepEqual(bundle.config, {
 			bundleConfig: true,
-			_changed: true
+			_changed: true,
 		});
 		t.end();
 	});
@@ -176,7 +174,13 @@ test.serial.cb('watcher - should emit an `invalidBundle` error when a panel HTML
 test.serial.cb('watcher - should emit an `invalidBundle` error when the manifest becomes invalid', t => {
 	bundleManager.once('invalidBundle', (bundle, error) => {
 		t.is(bundle.name, 'invalid-manifest');
-		t.is(error.message, `${path.join(tempFolder, 'bundles/invalid-manifest/package.json')} is not valid JSON, please check it against a validator such as jsonlint.com`);
+		t.is(
+			error.message,
+			`${path.join(
+				tempFolder,
+				'bundles/invalid-manifest/package.json',
+			)} is not valid JSON, please check it against a validator such as jsonlint.com`,
+		);
 		t.end();
 	});
 

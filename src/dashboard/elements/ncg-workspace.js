@@ -1,8 +1,8 @@
 import '@polymer/paper-spinner/paper-spinner.js';
 import './ncg-dashboard-panel.js';
-import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
-import {Debouncer} from '@polymer/polymer/lib/utils/debounce.js';
-import {timeOut} from '@polymer/polymer/lib/utils/async.js';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
+import { timeOut } from '@polymer/polymer/lib/utils/async.js';
 import * as Polymer from '@polymer/polymer';
 class NcgWorkspace extends Polymer.PolymerElement {
 	static get template() {
@@ -78,26 +78,26 @@ class NcgWorkspace extends Polymer.PolymerElement {
 			workspace: Object,
 			panels: {
 				type: Array,
-				computed: '_computePanels(workspace)'
+				computed: '_computePanels(workspace)',
 			},
 			fullbleed: {
 				type: Boolean,
 				computed: '_computeFullbleed(workspace)',
 				reflectToAttribute: true,
-				value: false
+				value: false,
 			},
 			usePackery: {
 				type: Boolean,
-				computed: '_computeUsePackery(fullbleed)'
+				computed: '_computeUsePackery(fullbleed)',
 			},
 			route: {
 				type: Object,
-				observer: '_routeChanged'
+				observer: '_routeChanged',
 			},
 			PANEL_SORT_ORDER_STORAGE_KEY: {
 				type: String,
-				computed: '_computePanelSortOrderStorageKey(workspace)'
-			}
+				computed: '_computePanelSortOrderStorageKey(workspace)',
+			},
 		};
 	}
 
@@ -160,7 +160,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 				this._handleMutationDebounce = Debouncer.debounce(
 					this._handleMutationDebounce,
 					timeOut.after(150),
-					this._debouncedMutationHandler.bind(this)
+					this._debouncedMutationHandler.bind(this),
 				);
 			});
 
@@ -172,7 +172,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 				childList: true,
 				characterData: true,
 				attributeOldValue: false,
-				characterDataOldValue: false
+				characterDataOldValue: false,
 			});
 		} catch (_) {
 			console.warn('MutationObserver not supported, dashboard panels may be less responsive to DOM changes');
@@ -185,7 +185,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 			columnWidth: 128,
 			gutter: 16,
 			isInitLayout: false,
-			containerStyle: {position: 'relative'}
+			containerStyle: { position: 'relative' },
 		});
 
 		this._packery = packery;
@@ -272,15 +272,11 @@ class NcgWorkspace extends Polymer.PolymerElement {
 	}
 
 	applyPackery() {
-		this._applyPackeryDebounce = Debouncer.debounce(
-			this._applyPackeryDebounce,
-			timeOut.after(10),
-			() => {
-				if (this._packeryInitialized) {
-					this._packery.layout();
-				}
+		this._applyPackeryDebounce = Debouncer.debounce(this._applyPackeryDebounce, timeOut.after(10), () => {
+			if (this._packeryInitialized) {
+				this._packery.layout();
 			}
-		);
+		});
 	}
 
 	shiftPackery() {
@@ -295,16 +291,12 @@ class NcgWorkspace extends Polymer.PolymerElement {
 		// caused by clicks are caught, because those mutations might
 		// have changed the vertical size of the panel.
 
-		this._shiftPackeryDebounce = Debouncer.debounce(
-			this._shiftPackeryDebounce,
-			timeOut.after(100),
-			() => {
-				if (this._packeryInitialized) {
-					// See http://packery.metafizzy.co/methods.html#shiftlayout for more details
-					this._packery.shiftLayout();
-				}
+		this._shiftPackeryDebounce = Debouncer.debounce(this._shiftPackeryDebounce, timeOut.after(100), () => {
+			if (this._packeryInitialized) {
+				// See http://packery.metafizzy.co/methods.html#shiftlayout for more details
+				this._packery.shiftLayout();
 			}
-		);
+		});
 	}
 
 	_fixPackery() {
@@ -313,7 +305,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 
 	_computePanels(workspace) {
 		const workspaceName = workspace.route === '' ? 'default' : workspace.name;
-		const {bundles} = window.__renderData__;
+		const { bundles } = window.__renderData__;
 		const panels = [];
 		bundles.forEach(bundle => {
 			bundle.dashboard.panels.forEach(panel => {
@@ -353,7 +345,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 				this._fixPackeryDebounce = Debouncer.debounce(
 					this._fixPackeryDebounce,
 					timeOut.after(10),
-					this._fixPackery.bind(this)
+					this._fixPackery.bind(this),
 				);
 			}
 		}

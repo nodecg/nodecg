@@ -5,7 +5,7 @@ import '@polymer/iron-media-query/iron-media-query.js';
 import '@polymer/paper-button/paper-button.js';
 import './ncg-graphic-instance.js';
 import * as Polymer from '@polymer/polymer';
-import {MutableData} from '@polymer/polymer/lib/mixins/mutable-data';
+import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 
 /**
  * @customElement
@@ -237,33 +237,33 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 	static get properties() {
 		return {
 			graphic: {
-				type: Object
+				type: Object,
 			},
 			instances: {
-				type: Array
+				type: Array,
 			},
 			worstStatus: {
 				type: String,
 				reflectToAttribute: true,
-				computed: '_computeWorstStatus(instances)'
+				computed: '_computeWorstStatus(instances)',
 			},
 			responsiveMode: {
 				type: String,
 				reflectToAttribute: true,
-				computed: '_computeResponsiveMode(_wide, _medium, _narrow)'
+				computed: '_computeResponsiveMode(_wide, _medium, _narrow)',
 			},
 			_collapseOpened: {
-				type: Boolean
+				type: Boolean,
 			},
 			_wide: {
-				type: Boolean
+				type: Boolean,
 			},
 			_medium: {
-				type: Boolean
+				type: Boolean,
 			},
 			_narrow: {
-				type: Boolean
-			}
+				type: Boolean,
+			},
 		};
 	}
 
@@ -303,17 +303,20 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 	_initClipboard(clipboard) {
 		/* istanbul ignore next: cant figure out how to test these */
 		clipboard.on('success', () => {
-			this.dispatchEvent(new CustomEvent('url-copy-success', {bubbles: true, composed: true}));
+			this.dispatchEvent(new CustomEvent('url-copy-success', { bubbles: true, composed: true }));
 		});
 		/* istanbul ignore next: cant figure out how to test these */
 		clipboard.on('error', e => {
-			this.dispatchEvent(new CustomEvent('url-copy-error', {bubbles: true, composed: true}));
+			this.dispatchEvent(new CustomEvent('url-copy-error', { bubbles: true, composed: true }));
 			console.error(e);
 		});
 	}
 
 	_calcShortUrl(graphicUrl) {
-		return graphicUrl.split('/').slice(4).join('/');
+		return graphicUrl
+			.split('/')
+			.slice(4)
+			.join('/');
 	}
 
 	_computeFullGraphicUrl(url) {

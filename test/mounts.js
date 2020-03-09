@@ -19,7 +19,7 @@ test('serves files from custom mountpoints', async t => {
 
 	const filePath = path.resolve(
 		__dirname,
-		'fixtures/nodecg-core/bundles/test-bundle/custom-mount-folder/hello-world.html'
+		'fixtures/nodecg-core/bundles/test-bundle/custom-mount-folder/hello-world.html',
 	);
 	t.is(bodyText, fs.readFileSync(filePath, 'utf-8'));
 });

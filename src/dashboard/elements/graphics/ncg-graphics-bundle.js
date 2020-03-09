@@ -2,7 +2,7 @@ import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-dialog/paper-dialog.js';
 import './ncg-graphic.js';
 import * as Polymer from '@polymer/polymer';
-import {MutableData} from '@polymer/polymer/lib/mixins/mutable-data';
+import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 
 /**
  * @customElement
@@ -115,7 +115,7 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 	static get properties() {
 		return {
 			bundle: Object,
-			instances: Array
+			instances: Array,
 		};
 	}
 
@@ -129,8 +129,7 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 		}
 
 		return instances.filter(instance => {
-			return instance.bundleName === bundle.name &&
-              instance.pathName === graphic.url;
+			return instance.bundleName === bundle.name && instance.pathName === graphic.url;
 		});
 	}
 

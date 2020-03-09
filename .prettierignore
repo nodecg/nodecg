@@ -1,0 +1,18 @@
+/.nyc_output
+/assets
+/bower_components
+/build
+/bundles
+/cfg
+/db
+/instrumented
+/logs
+/media
+/node_modules
+/typetest
+.env
+
+# Intentionally broken as part of tests
+/test/fixtures/bundle-parser/bad-json/bundleConfig.json
+/test/fixtures/bundle-parser/bad-schema/configschema.json
+/test/fixtures/bundle-parser/invalid-manifest-json/package.json

@@ -3,7 +3,7 @@ const remark = require('remark');
 const toc = require('remark-toc');
 
 remark()
-	.use(toc, {tight: true})
+	.use(toc, { tight: true })
 	.process(fs.readFileSync('README.md'), (err, file) => {
 		if (err) {
 			throw err;

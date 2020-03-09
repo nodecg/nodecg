@@ -1,4 +1,4 @@
-import {LoggerOptions} from './logger';
+import { LoggerOptions } from './logger';
 
 /**
  * NodeCG config exposed in extensions and browser
