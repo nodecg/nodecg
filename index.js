@@ -51,7 +51,11 @@ process.on('unhandledRejection', err => {
 
 const server = require('./lib/server')
 	.on('error', () => process.exit(1))
-	.on('stopped', () => process.exit(0));
+	.on('stopped', () => {
+		if (!process.exitCode) {
+			process.exit(0);
+		}
+	});
 
 exitHook(() => {
 	server.stop();
