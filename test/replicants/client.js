@@ -172,17 +172,17 @@ test.serial('when an array - should react to changes', async t => {
 					defaultValue: ['starting'],
 				});
 
-		rep.on('declared', () => {
-			rep.on('change', (newVal, oldVal, operations) => {
-				if (newVal && oldVal && operations && operations[0].method === 'push') {
-					const res = {
-						newVal: JSON.parse(JSON.stringify(newVal)),
-						oldVal,
-						operations
-					};
-					resolve(res);
-				}
-			});
+				rep.on('declared', () => {
+					rep.on('change', (newVal, oldVal, operations) => {
+						if (newVal && oldVal && operations && operations[0].method === 'push') {
+							const res = {
+								newVal: JSON.parse(JSON.stringify(newVal)),
+								oldVal,
+								operations,
+							};
+							resolve(res);
+						}
+					});
 
 					rep.value.push('arrPushOK');
 				});
@@ -210,21 +210,22 @@ test.serial('when an array - should support the "delete" operator', async t => {
 					persistent: false,
 				});
 
-		let deleted = false;
-		rep.on('change', (newVal, oldVal, operations) => {
-			if (newVal[0] === 'foo' && !deleted) {
-				delete rep.value[0];
-				deleted = true;
-			} else if (newVal[0] === undefined) {
-				const res = {
-					newVal,
-					oldVal,
-					operations
-				};
-				resolve(JSON.parse(JSON.stringify(res)));
-			}
-		});
-	}));
+				let deleted = false;
+				rep.on('change', (newVal, oldVal, operations) => {
+					if (newVal[0] === 'foo' && !deleted) {
+						delete rep.value[0];
+						deleted = true;
+					} else if (newVal[0] === undefined) {
+						const res = {
+							newVal,
+							oldVal,
+							operations,
+						};
+						resolve(JSON.parse(JSON.stringify(res)));
+					}
+				});
+			}),
+	);
 
 	// This ends up being "null" rather than a sparse array, because JSON doesn't handle sparse arrays.
 	// If we really need it to, we can convert the array to an object before stringification, then convert back to an array.
@@ -306,13 +307,15 @@ test.serial('when an object - should react to changes in nested properties', asy
 					defaultValue: { a: { b: { c: 'c' } } },
 				});
 
-		rep.on('declared', () => {
-			rep.on('change', (newVal, oldVal, operations) => {
-				if (newVal && oldVal && operations && operations[0].method === 'update') {
-					resolve({
-						newVal: JSON.parse(JSON.stringify(newVal)),
-						oldVal,
-						operations
+				rep.on('declared', () => {
+					rep.on('change', (newVal, oldVal, operations) => {
+						if (newVal && oldVal && operations && operations[0].method === 'update') {
+							resolve({
+								newVal: JSON.parse(JSON.stringify(newVal)),
+								oldVal,
+								operations,
+							});
+						}
 					});
 
 					rep.value.a.b.c = 'nestedChangeOK';
@@ -401,20 +404,25 @@ test.serial('when an object - should support the "delete" operator', async t => 
 					persistent: false,
 				});
 
-		let deleted = false;
-		rep.on('change', (newVal, oldVal, operations) => {
-			if (newVal.foo && !deleted) {
-				delete rep.value.foo;
-				deleted = true;
-			} else if (newVal.bar && !newVal.foo) {
-				resolve(JSON.parse(JSON.stringify({
-					newVal,
-					oldVal,
-					operations
-				})));
-			}
-		});
-	}));
+				let deleted = false;
+				rep.on('change', (newVal, oldVal, operations) => {
+					if (newVal.foo && !deleted) {
+						delete rep.value.foo;
+						deleted = true;
+					} else if (newVal.bar && !newVal.foo) {
+						resolve(
+							JSON.parse(
+								JSON.stringify({
+									newVal,
+									oldVal,
+									operations,
+								}),
+							),
+						);
+					}
+				});
+			}),
+	);
 
 	t.deepEqual(ret.newVal, { bar: 'bar' });
 	t.deepEqual(ret.oldVal, {
@@ -636,35 +644,41 @@ test.serial('#waitForReplicants', async t => {
 });
 
 test.serial('emits assignment in the correct order', async t => {
-	const extRep = t.context.apis.extension.Replicant('assignment_order', {defaultValue: []});
+	const extRep = t.context.apis.extension.Replicant('assignment_order', { defaultValue: [] });
 
-	await dashboard.evaluate(() => new Promise(resolve => {
-		window.clientRep = window.dashboardApi.Replicant('assignment_order');
-		window.clientRep.once('declared', () => {
-			resolve();
-		});
-	}));
+	await dashboard.evaluate(
+		() =>
+			new Promise(resolve => {
+				window.clientRep = window.dashboardApi.Replicant('assignment_order');
+				window.clientRep.once('declared', () => {
+					resolve();
+				});
+			}),
+	);
 
 	extRep.value.push('foo');
 	extRep.value = ['bar'];
 
-	const ret = await dashboard.evaluate(() => new Promise(resolve => {
-		window.clientRep.on('change', newVal => {
-			if (window.clientRep.revision === 2) {
-				resolve({
-					// Without this JSON.parse hack,
-					// newVal gets serialized as an empty object.
-					// Possibly a bug in the DevTools protocol used by Puppeteer?
-					newVal: JSON.parse(JSON.stringify(newVal)),
-					revision: window.clientRep.revision
+	const ret = await dashboard.evaluate(
+		() =>
+			new Promise(resolve => {
+				window.clientRep.on('change', newVal => {
+					if (window.clientRep.revision === 2) {
+						resolve({
+							// Without this JSON.parse hack,
+							// newVal gets serialized as an empty object.
+							// Possibly a bug in the DevTools protocol used by Puppeteer?
+							newVal: JSON.parse(JSON.stringify(newVal)),
+							revision: window.clientRep.revision,
+						});
+					}
 				});
-			}
-		});
-	}));
+			}),
+	);
 
 	// If the ordering is wrong, `ret` will be `['bar', 'foo']`.
 	t.deepEqual(ret, {
 		newVal: ['bar'],
-		revision: 2
+		revision: 2,
 	});
 });

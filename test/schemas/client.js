@@ -357,17 +357,17 @@ test.serial('should reject assignment if it was validated against a different ve
 
 test.serial('should reject mutations if they were validated against a different version of the schema', async t => {
 	const res = await dashboard.evaluate(
-        () => 
-            new Promise(resolve => {
-		        const rep = window.dashboardApi.Replicant('client_schemaOperationMismatch');
-		        rep.once('declared', () => {
-      	    		rep.schemaSum = 'baz';
-	        		try {
-		        		rep.value.object.numA = 1;
-    		    	} catch (e) {
-    	    			resolve(e.message);
-	    	    	}
-                });
+		() =>
+			new Promise(resolve => {
+				const rep = window.dashboardApi.Replicant('client_schemaOperationMismatch');
+				rep.once('declared', () => {
+					rep.schemaSum = 'baz';
+					try {
+						rep.value.object.numA = 1;
+					} catch (e) {
+						resolve(e.message);
+					}
+				});
 
 				rep.once('operationsRejected', reason => {
 					resolve(reason);
