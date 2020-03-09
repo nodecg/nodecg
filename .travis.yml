@@ -2,63 +2,63 @@ sudo: false
 dist: trusty
 language: node_js
 node_js:
-- '8'
-- '10'
+  - '8'
+  - '10'
 os:
-- linux
+  - linux
 git:
   depth: false
 cache:
   directories:
-  - "$HOME/.npm"
-  - "$(npm config get prefix)"
+    - '$HOME/.npm'
+    - '$(npm config get prefix)'
 before_install:
-- npm install -g codecov
+  - npm install -g codecov
 install:
-- npm install
+  - npm install
 after_success: npm run report-coverage
 jobs:
   include:
-  - stage: "NPM Release next"
-    if: type = push AND branch = master
-    script: skip
-    before_deploy:
-    - git reset --hard
-    - npm version $(npm view nodecg version)-master.$(git rev-parse --short HEAD)
-    deploy:
-      provider: npm
-      tag: next
-      email:
-        secure: VAevo66XIzgA9mbhQhnouv101W7HVhHGvohxmJtGadGL/kwVuMZcYp5nG3IwuetYDpjCmRTY0My13HRBG7ciVg7CW+Wx/raLmST09QokEtvIcvLwGBmxBjR37UnU/SD65XjgAqM+sNPoCTe6vxaJVoInR8uNxdi6IsYiOE9wlmE=
-      api_key:
-        secure: MwR9W8ositdbBKRVg+oV7vUK43Gcs8eCZNSJejVAAk+rLZuwkpr9DPR6I5Crh6/8IblHD87xI90DPN5BGf0BJRzwVxeJWCuLaOwO5eUmqlXSrJt3VAoGDkxYzh2nm92CLnek6PxdeoZwqap2wDKUBoPh+Je7uZucgtRU27x7sUc=
-      skip_cleanup: true
-      on:
-        branch: master
-  - stage: "GitHub Release"
-    if: type = push AND tag IS present
-    script: skip
-    before_deploy:
-    - mv $(npm pack 2>/dev/null) "nodecg-${TRAVIS_TAG}.tgz"
-    deploy:
-      provider: releases
-      api_key:
-        secure: ph/2keCTbmoaCIFhBZE65Tj1DcRHf3U+Dk3KSVZOOR29NbI3tkwpoLjl0OQpeLtHqgu76L/W+B1ZFGQbegjHRCYOz6bvzLxe37c0p0FNmt+rWnyHAtri9O4iPObgsGX7t2+A2Qehq0NgM6KkjSQRRYpfF+Vx1S5+grTXY/lm/cI=
-      file: "nodecg-${TRAVIS_TAG}.tgz"
-      skip_cleanup: true
-      on:
-        tags: true
-  - stage: "Build Docs"
-    if: type = push AND branch = master
-    script: skip
-    deploy:
-      skip_cleanup: true
-      provider: script
-      script: npm run docs:publish
+    - stage: 'NPM Release next'
+      if: type = push AND branch = master
+      script: skip
+      before_deploy:
+        - git reset --hard
+        - npm version $(npm view nodecg version)-master.$(git rev-parse --short HEAD)
+      deploy:
+        provider: npm
+        tag: next
+        email:
+          secure: VAevo66XIzgA9mbhQhnouv101W7HVhHGvohxmJtGadGL/kwVuMZcYp5nG3IwuetYDpjCmRTY0My13HRBG7ciVg7CW+Wx/raLmST09QokEtvIcvLwGBmxBjR37UnU/SD65XjgAqM+sNPoCTe6vxaJVoInR8uNxdi6IsYiOE9wlmE=
+        api_key:
+          secure: MwR9W8ositdbBKRVg+oV7vUK43Gcs8eCZNSJejVAAk+rLZuwkpr9DPR6I5Crh6/8IblHD87xI90DPN5BGf0BJRzwVxeJWCuLaOwO5eUmqlXSrJt3VAoGDkxYzh2nm92CLnek6PxdeoZwqap2wDKUBoPh+Je7uZucgtRU27x7sUc=
+        skip_cleanup: true
+        on:
+          branch: master
+    - stage: 'GitHub Release'
+      if: type = push AND tag IS present
+      script: skip
+      before_deploy:
+        - mv $(npm pack 2>/dev/null) "nodecg-${TRAVIS_TAG}.tgz"
+      deploy:
+        provider: releases
+        api_key:
+          secure: ph/2keCTbmoaCIFhBZE65Tj1DcRHf3U+Dk3KSVZOOR29NbI3tkwpoLjl0OQpeLtHqgu76L/W+B1ZFGQbegjHRCYOz6bvzLxe37c0p0FNmt+rWnyHAtri9O4iPObgsGX7t2+A2Qehq0NgM6KkjSQRRYpfF+Vx1S5+grTXY/lm/cI=
+        file: 'nodecg-${TRAVIS_TAG}.tgz'
+        skip_cleanup: true
+        on:
+          tags: true
+    - stage: 'Build Docs'
+      if: type = push AND branch = master
+      script: skip
+      deploy:
+        skip_cleanup: true
+        provider: script
+        script: npm run docs:publish
 notifications:
   webhooks:
     urls:
-    - https://webhooks.gitter.im/e/8c1769bff63cbd033bf7
+      - https://webhooks.gitter.im/e/8c1769bff63cbd033bf7
     on_success: always
     on_failure: always
     on_start: never

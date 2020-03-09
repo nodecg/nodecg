@@ -68,26 +68,26 @@ class NcgSoundCue extends Polymer.PolymerElement {
 			name: String,
 			bundleName: {
 				type: String,
-				observer: '_bundleNameChanged'
+				observer: '_bundleNameChanged',
 			},
 			assignable: {
 				type: Boolean,
-				observer: '_assignableChanged'
+				observer: '_assignableChanged',
 			},
 			file: {
 				type: Object,
-				observer: '_fileChanged'
+				observer: '_fileChanged',
 			},
 			defaultFile: Object,
 			volume: {
 				type: Number,
-				observer: '_volumeChanged'
+				observer: '_volumeChanged',
 			},
 			_cueRef: Object,
 			soundFiles: Array,
 			createdTimestamp: {
-				type: Number
-			}
+				type: Number,
+			},
 		};
 	}
 

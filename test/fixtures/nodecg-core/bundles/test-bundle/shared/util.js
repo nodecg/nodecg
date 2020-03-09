@@ -1,3 +1,3 @@
 window.SharedUtility = {
-	someFunc() {}
+	someFunc() {},
 };

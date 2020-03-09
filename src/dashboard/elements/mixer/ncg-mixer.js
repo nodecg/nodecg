@@ -71,15 +71,15 @@ class NcgMixer extends Polymer.PolymerElement {
 				type: Array,
 				value: window.__renderData__.bundles.filter(bundle => {
 					return bundle.soundCues && bundle.soundCues.length > 0;
-				})
-			}
+				}),
+			},
 		};
 	}
 
 	ready() {
 		super.ready();
 
-		const {masterFader} = this.$;
+		const { masterFader } = this.$;
 		const masterVolume = NodeCG.Replicant('volume:master', '_sounds');
 
 		masterFader.addEventListener('change', e => {

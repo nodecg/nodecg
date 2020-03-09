@@ -3,7 +3,7 @@ import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/iron-localstorage/iron-localstorage.js';
 import '@polymer/paper-styles/element-styles/paper-material-styles.js';
 import '@polymer/paper-styles/typography.js';
-import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 import * as Polymer from '@polymer/polymer';
 /* global Raven */
 
@@ -192,38 +192,38 @@ class NcgDashboardPanel extends Polymer.PolymerElement {
 		return {
 			displayTitle: {
 				type: String,
-				reflectToAttribute: true
+				reflectToAttribute: true,
 			},
 			bundle: {
 				type: String,
-				reflectToAttribute: true
+				reflectToAttribute: true,
 			},
 			panel: {
 				type: String,
-				reflectToAttribute: true
+				reflectToAttribute: true,
 			},
 			opened: {
 				type: Boolean,
 				reflectToAttribute: true,
-				observer: '_openedChanged'
+				observer: '_openedChanged',
 			},
 			headerColor: {
 				type: String,
 				reflectToAttribute: true,
-				observer: '_headerColorChanged'
+				observer: '_headerColorChanged',
 			},
 			width: {
 				type: Number,
-				reflectToAttribute: true
+				reflectToAttribute: true,
 			},
 			transitioning: {
 				type: Boolean,
-				notify: true
+				notify: true,
 			},
 			fullbleed: {
 				type: Boolean,
-				reflectToAttribute: true
-			}
+				reflectToAttribute: true,
+			},
 		};
 	}
 
@@ -231,7 +231,7 @@ class NcgDashboardPanel extends Polymer.PolymerElement {
 		super.ready();
 
 		afterNextRender(this, () => {
-			const distributedNodes = this.$.slot.assignedNodes({flatten: true});
+			const distributedNodes = this.$.slot.assignedNodes({ flatten: true });
 			const iframe = distributedNodes.find(el => el.tagName === 'IFRAME');
 
 			// If Raven is loaded, use it to report errors in panels to Sentry.io.
@@ -257,21 +257,24 @@ class NcgDashboardPanel extends Polymer.PolymerElement {
 	}
 
 	_attachIframeResize(iframe) {
-		window.iFrameResize({
-			log: false,
-			resizeFrom: 'child',
-			heightCalculationMethod: 'documentElementOffset',
-			onResized: data => {
-				this.$.collapse.updateSize('auto', false);
-				data.iframe.dispatchEvent(new CustomEvent('iframe-resized'));
-			}
-		}, iframe);
+		window.iFrameResize(
+			{
+				log: false,
+				resizeFrom: 'child',
+				heightCalculationMethod: 'documentElementOffset',
+				onResized: data => {
+					this.$.collapse.updateSize('auto', false);
+					data.iframe.dispatchEvent(new CustomEvent('iframe-resized'));
+				},
+			},
+			iframe,
+		);
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
 
-		const {src} = this.querySelector('iframe');
+		const { src } = this.querySelector('iframe');
 		this.standaloneUrl = `${src}?standalone=true`;
 	}
 
@@ -309,11 +312,13 @@ class NcgDashboardPanel extends Polymer.PolymerElement {
 		});
 
 		const result = HEX_PARSE_REGEX.exec(hex);
-		return result ? {
-			r: parseInt(result[1], 16),
-			g: parseInt(result[2], 16),
-			b: parseInt(result[3], 16)
-		} : null;
+		return result
+			? {
+					r: parseInt(result[1], 16),
+					g: parseInt(result[2], 16),
+					b: parseInt(result[3], 16),
+			  }
+			: null;
 	}
 }
 

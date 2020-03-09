@@ -10,7 +10,7 @@ import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 
 server.setup();
-const {initDashboard} = browser.setup();
+const { initDashboard } = browser.setup();
 
 import * as C from '../helpers/test-constants';
 
@@ -21,45 +21,55 @@ test.before(async () => {
 
 test.serial('should receive messages and fire acknowledgements', async t => {
 	t.context.apis.extension.listenFor('clientToServer', (data, cb) => cb());
-	await dashboard.evaluate(() => new Promise(resolve => {
-		window.dashboardApi.sendMessage('clientToServer', null, resolve);
-	}));
+	await dashboard.evaluate(
+		() =>
+			new Promise(resolve => {
+				window.dashboardApi.sendMessage('clientToServer', null, resolve);
+			}),
+	);
 	t.pass();
 });
 
 test.serial('should serialize errors sent to acknowledgements', async t => {
 	t.context.apis.extension.listenFor('ackErrors', (data, cb) => cb(new Error('boom')));
-	const res = await dashboard.evaluate(() => new Promise(resolve => {
-		window.dashboardApi.sendMessage('ackErrors', null, err => {
-			resolve(err.message);
-		});
-	}));
+	const res = await dashboard.evaluate(
+		() =>
+			new Promise(resolve => {
+				window.dashboardApi.sendMessage('ackErrors', null, err => {
+					resolve(err.message);
+				});
+			}),
+	);
 	t.is(res, 'boom');
 });
 
 test.serial('should resolve acknowledgement promises', async t => {
 	t.context.apis.extension.listenFor('ackPromiseResolve', (data, cb) => cb());
-	const res = await dashboard.evaluate(() =>
-		window.dashboardApi.sendMessage('ackPromiseResolve').catch());
+	const res = await dashboard.evaluate(() => window.dashboardApi.sendMessage('ackPromiseResolve').catch());
 	t.is(res, undefined);
 });
 
 test.serial('should reject acknowledgement promises if there was an error', async t => {
 	t.context.apis.extension.listenFor('ackPromiseReject', (data, cb) => cb(new Error('boom')));
 	const res = await dashboard.evaluate(() =>
-		window.dashboardApi.sendMessage('ackPromiseReject')
+		window.dashboardApi
+			.sendMessage('ackPromiseReject')
 			.then(() => new Error('Promise resolved when it should have rejected.'))
-			.catch(err => err.message));
+			.catch(err => err.message),
+	);
 	t.is(res, 'boom');
 });
 
 test.serial('should not return a promise if the user provided a callback ', async t => {
 	t.context.apis.extension.listenFor('ackPromiseCallback', (data, cb) => cb());
-	const res = await dashboard.evaluate(() => new Promise(resolve => {
-		const returnVal = window.dashboardApi.sendMessage('ackPromiseCallback', () => {
-			resolve(returnVal === undefined);
-		});
-	}));
+	const res = await dashboard.evaluate(
+		() =>
+			new Promise(resolve => {
+				const returnVal = window.dashboardApi.sendMessage('ackPromiseCallback', () => {
+					resolve(returnVal === undefined);
+				});
+			}),
+	);
 	t.true(res);
 });
 
@@ -141,9 +151,12 @@ test.serial.cb('should prevent acknowledgements from being called more than once
 		checkDone();
 	});
 
-	dashboard.evaluate(() => new Promise(resolve => {
-		return window.dashboardApi.sendMessage('singleAckEnforcement', null, resolve);
-	}));
+	dashboard.evaluate(
+		() =>
+			new Promise(resolve => {
+				return window.dashboardApi.sendMessage('singleAckEnforcement', null, resolve);
+			}),
+	);
 
 	function checkDone() {
 		callbacksInvoked++;
@@ -160,7 +173,7 @@ test.serial.cb('server - should support intra-context messaging', t => {
 	(async () => {
 		// This is what we're actually testing.
 		t.context.apis.extension.listenFor('serverToServer', data => {
-			t.deepEqual(data, {foo: 'bar'});
+			t.deepEqual(data, { foo: 'bar' });
 			if (++assertCount === 2) {
 				t.end();
 			}
@@ -174,7 +187,7 @@ test.serial.cb('server - should support intra-context messaging', t => {
 		});
 
 		// Send the message only after both listeners have been set up.
-		t.context.apis.extension.sendMessage('serverToServer', {foo: 'bar'});
+		t.context.apis.extension.sendMessage('serverToServer', { foo: 'bar' });
 
 		// Wait until the browser has received the message.
 		await dashboard.waitForFunction(async () => {
@@ -186,7 +199,7 @@ test.serial.cb('server - should support intra-context messaging', t => {
 		const response = await dashboard.evaluate(() => {
 			return window._serverToServerData;
 		});
-		t.deepEqual(response, {foo: 'bar'});
+		t.deepEqual(response, { foo: 'bar' });
 		if (++assertCount === 2) {
 			t.end();
 		}
@@ -200,21 +213,24 @@ test.serial.cb('client - should support intra-context messaging', t => {
 	(async () => {
 		// We also want to make sure that the server (extension) is still getting these messages as normal.
 		t.context.apis.extension.listenFor('clientToClient', data => {
-			t.deepEqual(data, {baz: 'qux'});
+			t.deepEqual(data, { baz: 'qux' });
 			if (++asserCount === 2) {
 				t.end();
 			}
 		});
 
-		const response = await dashboard.evaluate(() => new Promise(resolve => {
-			window.dashboardApi.listenFor('clientToClient', data => {
-				resolve(data);
-			});
+		const response = await dashboard.evaluate(
+			() =>
+				new Promise(resolve => {
+					window.dashboardApi.listenFor('clientToClient', data => {
+						resolve(data);
+					});
 
-			// Send the message only after both listeners have been set up.
-			window.dashboardApi.sendMessage('clientToClient', {baz: 'qux'});
-		}));
-		t.deepEqual(response, {baz: 'qux'});
+					// Send the message only after both listeners have been set up.
+					window.dashboardApi.sendMessage('clientToClient', { baz: 'qux' });
+				}),
+		);
+		t.deepEqual(response, { baz: 'qux' });
 		if (++asserCount === 2) {
 			t.end();
 		}
@@ -231,7 +247,7 @@ test('server - #bundleGit', t => {
 		date: new Date('2018-07-13T17:09:29.000Z'),
 		hash: '6262681c7f35eccd7293d57a50bdd25e4cd90684',
 		message: 'Initial commit',
-		shortHash: '6262681'
+		shortHash: '6262681',
 	});
 });
 

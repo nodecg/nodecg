@@ -16,8 +16,8 @@ test('should create a default value based on the schema, if none is provided', t
 	t.deepEqual(rep.value, {
 		string: '',
 		object: {
-			numA: 0
-		}
+			numA: 0,
+		},
 	});
 });
 
@@ -27,9 +27,9 @@ test('should accept the defaultValue when it passes validation', t => {
 			defaultValue: {
 				string: 'foo',
 				object: {
-					numA: 1
-				}
-			}
+					numA: 1,
+				},
+			},
 		});
 	});
 });
@@ -38,8 +38,8 @@ test('should throw when defaultValue fails validation', t => {
 	const error = t.throws(() => {
 		t.context.apis.extension.Replicant('schema3', {
 			defaultValue: {
-				string: 0
-			}
+				string: 0,
+			},
 		});
 	});
 
@@ -52,8 +52,8 @@ test('should accept the persisted value when it passes validation', t => {
 	t.deepEqual(rep.value, {
 		string: 'foo',
 		object: {
-			numA: 1
-		}
+			numA: 1,
+		},
 	});
 });
 
@@ -63,8 +63,8 @@ test('should reject the persisted value when it fails validation, replacing with
 	t.deepEqual(rep.value, {
 		string: '',
 		object: {
-			numA: 0
-		}
+			numA: 0,
+		},
 	});
 });
 
@@ -74,8 +74,8 @@ test('should accept valid assignment', t => {
 		rep.value = {
 			string: 'foo',
 			object: {
-				numA: 1
-			}
+				numA: 1,
+			},
 		};
 	});
 });
@@ -84,7 +84,7 @@ test('should throw on invalid assignment', t => {
 	const error = t.throws(() => {
 		const rep = t.context.apis.extension.Replicant('schemaAssignFail');
 		rep.value = {
-			string: 0
+			string: 0,
 		};
 	});
 
@@ -157,14 +157,14 @@ test('should throw on invalid property changes to objects', t => {
 
 test('should properly load schemas provided with an absolute path', t => {
 	const rep = t.context.apis.extension.Replicant('schemaAbsolutePath', {
-		schemaPath: path.resolve(__dirname, '../fixtures/nodecg-core/absolute-path-schemas/schemaAbsolutePath.json')
+		schemaPath: path.resolve(__dirname, '../fixtures/nodecg-core/absolute-path-schemas/schemaAbsolutePath.json'),
 	});
 
 	t.deepEqual(rep.value, {
 		string: '',
 		object: {
-			numA: 0
-		}
+			numA: 0,
+		},
 	});
 });
 
@@ -176,7 +176,7 @@ test('supports local file $refs', t => {
 		properties: {
 			string: {
 				type: 'string',
-				default: ''
+				default: '',
 			},
 			object: {
 				type: 'object',
@@ -184,24 +184,24 @@ test('supports local file $refs', t => {
 				properties: {
 					numA: {
 						type: 'number',
-						default: 0
+						default: 0,
 					},
 					hasDeepRef: {
 						type: 'object',
 						properties: {
 							numA: {
 								type: 'number',
-								default: 0
-							}
-						}
+								default: 0,
+							},
+						},
 					},
 					hasFileRefThenDefRef: {
 						type: 'string',
-						enum: ['foo', 'bar']
-					}
-				}
-			}
-		}
+						enum: ['foo', 'bar'],
+					},
+				},
+			},
+		},
 	});
 });
 
@@ -212,23 +212,23 @@ test('supports internal $refs', t => {
 		definitions: {
 			numA: {
 				type: 'number',
-				default: 0
+				default: 0,
 			},
 			hasDeepRef: {
 				type: 'object',
 				properties: {
 					numA: {
 						type: 'number',
-						default: 0
-					}
-				}
-			}
+						default: 0,
+					},
+				},
+			},
 		},
 		type: 'object',
 		properties: {
 			string: {
 				type: 'string',
-				default: ''
+				default: '',
 			},
 			object: {
 				type: 'object',
@@ -236,19 +236,19 @@ test('supports internal $refs', t => {
 				properties: {
 					numA: {
 						type: 'number',
-						default: 0
+						default: 0,
 					},
 					hasDeepRef: {
 						type: 'object',
 						properties: {
 							numA: {
 								type: 'number',
-								default: 0
-							}
-						}
-					}
-				}
-			}
-		}
+								default: 0,
+							},
+						},
+					},
+				},
+			},
+		},
 	});
 });

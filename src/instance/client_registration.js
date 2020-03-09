@@ -1,10 +1,10 @@
 /* eslint-env browser */
 /* global nodecg */
-(function () {
+(function() {
 	'use strict';
 
 	const timestamp = Date.now();
-	let {pathname} = window.location;
+	let { pathname } = window.location;
 
 	// If the pathname ends with /bundleName/ then we must be on index.html.
 	if (pathname.endsWith(`/${nodecg.bundleName}/graphics/`)) {
@@ -68,21 +68,25 @@
 	});
 
 	function register() {
-		window.socket.emit('graphic:registerSocket', {
-			timestamp,
-			pathName: pathname,
-			bundleName: nodecg.bundleName,
-			bundleVersion: nodecg.bundleVersion,
-			bundleGit: nodecg.bundleGit
-		}, accepted => {
-			/* istanbul ignore if: cant cover navigates page */
-			if (accepted) {
-				window.dispatchEvent(new CustomEvent('nodecg-registration-accepted'));
-				window.__nodecgRegistrationAccepted__ = true;
-			} else {
-				/* istanbul ignore next: cant cover navigates page */
-				window.location.href = '/instance/busy.html?pathname=' + pathname;
-			}
-		});
+		window.socket.emit(
+			'graphic:registerSocket',
+			{
+				timestamp,
+				pathName: pathname,
+				bundleName: nodecg.bundleName,
+				bundleVersion: nodecg.bundleVersion,
+				bundleGit: nodecg.bundleGit,
+			},
+			accepted => {
+				/* istanbul ignore if: cant cover navigates page */
+				if (accepted) {
+					window.dispatchEvent(new CustomEvent('nodecg-registration-accepted'));
+					window.__nodecgRegistrationAccepted__ = true;
+				} else {
+					/* istanbul ignore next: cant cover navigates page */
+					window.location.href = '/instance/busy.html?pathname=' + pathname;
+				}
+			},
+		);
 	}
 })();

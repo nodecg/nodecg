@@ -1,13 +1,13 @@
 /// <reference path="../../../../types/browser.d.ts" />
 
-import {NodeCGConfig} from '../../../../types/browser';
+import { NodeCGConfig } from '../../../../types/browser';
 
 console.log(nodecg);
 console.log(NodeCG);
 
 const logger = new nodecg.Logger('foo');
 nodecg.Logger.globalReconfigure({
-	file: {enabled: false, level: 'trace', path: './foobar'},
+	file: { enabled: false, level: 'trace', path: './foobar' },
 });
 logger.error('shaking my smh');
 nodecg.log.trace('some verbose logs here');

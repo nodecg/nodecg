@@ -8,7 +8,7 @@ import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 
 server.setup();
-const {initDashboard} = browser.setup();
+const { initDashboard } = browser.setup();
 
 let dashboard;
 test.before(async () => {
@@ -22,14 +22,14 @@ test.serial('#config - should exist and have length', async t => {
 	t.true(Object.keys(res).length > 0);
 });
 
-test.serial('#config - shouldn\'t reveal sensitive information', async t => {
+test.serial("#config - shouldn't reveal sensitive information", async t => {
 	const res = await dashboard.evaluate(() => {
 		return window.dashboardApi.config;
 	});
 	t.false(res.login.hasOwnProperty('sessionSecret')); // eslint-disable-line no-prototype-builtins
 });
 
-test.serial('#config - shouldn\'t be writable', async t => {
+test.serial("#config - shouldn't be writable", async t => {
 	const res = await dashboard.evaluate(() => {
 		return Object.isFrozen(window.dashboardApi.config);
 	});
@@ -68,7 +68,7 @@ test.serial('#getDialogDocument', async t => {
 
 test.serial('#unlisten', async t => {
 	const res = await dashboard.evaluate(() => {
-		const handlerFunc = function () {};
+		const handlerFunc = function() {};
 		window.dashboardApi.listenFor('unlisten', handlerFunc);
 		return window.dashboardApi.unlisten('unlisten', handlerFunc);
 	});

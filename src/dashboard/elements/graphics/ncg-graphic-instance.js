@@ -3,14 +3,16 @@ import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-button/paper-button.js';
 import './ncg-graphic-instance-diff.js';
 import * as Polymer from '@polymer/polymer';
-import {MutableData} from '@polymer/polymer/lib/mixins/mutable-data';
+import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 const pulseElement = document.createElement('div');
 setInterval(() => {
-	pulseElement.dispatchEvent(new CustomEvent('pulse', {
-		detail: {
-			timestamp: Date.now()
-		}
-	}));
+	pulseElement.dispatchEvent(
+		new CustomEvent('pulse', {
+			detail: {
+				timestamp: Date.now(),
+			},
+		}),
+	);
 }, 1000);
 
 /**
@@ -234,20 +236,20 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 		return {
 			responsiveMode: {
 				type: String,
-				reflectToAttribute: true
+				reflectToAttribute: true,
 			},
 			graphic: Object,
 			instance: Object,
 			status: {
 				type: String,
 				reflectToAttribute: true,
-				computed: '_computeStatus(instance)'
+				computed: '_computeStatus(instance)',
 			},
 			statusHover: {
 				type: Boolean,
 				reflectToAttribute: true,
-				value: false
-			}
+				value: false,
+			},
 		};
 	}
 
@@ -354,7 +356,7 @@ customElements.define(NcgGraphicInstance.is, NcgGraphicInstance);
 
 /* istanbul ignore next: not really easy or that important to test */
 function timeSince(date) {
-	const seconds = Math.floor((new Date().getTime() / 1000) - (date / 1000));
+	const seconds = Math.floor(new Date().getTime() / 1000 - date / 1000);
 	let interval = Math.floor(seconds / 31536000);
 
 	if (interval > 1) {

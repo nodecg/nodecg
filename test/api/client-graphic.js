@@ -8,7 +8,7 @@ import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 
 server.setup();
-const {initGraphic} = browser.setup();
+const { initGraphic } = browser.setup();
 
 let graphic;
 test.before(async () => {
@@ -29,14 +29,17 @@ test.serial('should receive messages', async t => {
 		t.context.apis.extension.sendMessage('serverToGraphic');
 	}, 500);
 
-	await graphic.evaluate(() => new Promise(resolve => {
-		const checkMessageReceived = setInterval(() => {
-			if (window.serverToGraphicReceived) {
-				clearInterval(checkMessageReceived);
-				resolve();
-			}
-		}, 50);
-	}));
+	await graphic.evaluate(
+		() =>
+			new Promise(resolve => {
+				const checkMessageReceived = setInterval(() => {
+					if (window.serverToGraphicReceived) {
+						clearInterval(checkMessageReceived);
+						resolve();
+					}
+				}, 50);
+			}),
+	);
 
 	clearInterval(sendMessageInterval);
 	t.pass();
@@ -65,6 +68,6 @@ test.serial('#bundleGit', async t => {
 		date: '2018-07-13T17:09:29.000Z',
 		hash: '6262681c7f35eccd7293d57a50bdd25e4cd90684',
 		message: 'Initial commit',
-		shortHash: '6262681'
+		shortHash: '6262681',
 	});
 });

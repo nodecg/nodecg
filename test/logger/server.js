@@ -25,7 +25,7 @@ test.beforeEach(t => {
 	t.context.logger = new Logger('testServer');
 
 	const RavenMock = {
-		captureException: sinon.stub()
+		captureException: sinon.stub(),
 	};
 	const RavenLogger = loggerFactory({}, RavenMock);
 	t.context.RavenMock = RavenMock;
@@ -44,8 +44,8 @@ test('console - should change settings when reconfigured', t => {
 	Logger.globalReconfigure({
 		console: {
 			enabled: true,
-			level: 'debug'
-		}
+			level: 'debug',
+		},
 	});
 
 	t.is(Logger._winston.transports.nodecgConsole.silent, false);
@@ -65,8 +65,8 @@ test('file - should change settings when reconfigured', t => {
 		file: {
 			path: 'logs/test.log',
 			enabled: true,
-			level: 'debug'
-		}
+			level: 'debug',
+		},
 	});
 
 	t.is(Logger._winston.transports.nodecgFile.filename, 'logs/test.log');
@@ -91,7 +91,7 @@ test('replicant - should do nothing when Logger._shouldLogReplicants is false', 
 
 test('replicant - should change settings when reconfigured', t => {
 	Logger.globalReconfigure({
-		replicants: true
+		replicants: true,
 	});
 
 	t.is(Logger._shouldLogReplicants, true);
@@ -116,8 +116,8 @@ test('logging methods should not generate any output when too low a level', t =>
 	Logger.globalReconfigure({
 		console: {
 			enabled: true,
-			level: 'error'
-		}
+			level: 'error',
+		},
 	});
 
 	sinon.spy(process.stdout, 'write');
@@ -130,8 +130,8 @@ test('logging methods should generate any output when of an adequate level', t =
 	Logger.globalReconfigure({
 		console: {
 			enabled: true,
-			level: 'trace'
-		}
+			level: 'trace',
+		},
 	});
 
 	sinon.spy(process.stdout, 'write');
@@ -146,14 +146,14 @@ test('Sentry - should log errors to Sentry when global.sentryEnabled is true', t
 	t.true(t.context.RavenMock.captureException.firstCall.args[0] instanceof Error, 'first arg is Error');
 	t.is(t.context.RavenMock.captureException.firstCall.args[0].message, '[sentryServer] error message');
 	t.deepEqual(t.context.RavenMock.captureException.firstCall.args[1], {
-		logger: 'server @nodecg/logger'
+		logger: 'server @nodecg/logger',
 	});
 });
 
 test('Sentry - should prettyprint objects', t => {
-	t.context.ravenLogger.error('error message:', {foo: {bar: 'baz'}});
+	t.context.ravenLogger.error('error message:', { foo: { bar: 'baz' } });
 	t.is(
 		t.context.RavenMock.captureException.firstCall.args[0].message,
-		'[sentryServer] error message: { foo: { bar: \'baz\' } }'
+		"[sentryServer] error message: { foo: { bar: 'baz' } }",
 	);
 });

@@ -124,9 +124,12 @@ class NcgSettings extends Polymer.PolymerElement {
 		}
 
 		const clipboard = new window.ClipboardJS(this.$.copyKey);
-		clipboard.on('success', /* istanbul ignore next: hard to test clipboard things */() => {
-			this.$.settingsToast.show('Key copied to clipboard.');
-		});
+		clipboard.on(
+			'success',
+			/* istanbul ignore next: hard to test clipboard things */ () => {
+				this.$.settingsToast.show('Key copied to clipboard.');
+			},
+		);
 	}
 
 	/* istanbul ignore next: trivial */
@@ -140,14 +143,18 @@ class NcgSettings extends Polymer.PolymerElement {
 	}
 
 	resetKey() {
-		window.socket.emit('regenerateToken', window.token, /* istanbul ignore next */err => {
-			if (err) {
-				console.error(err);
-				return;
-			}
+		window.socket.emit(
+			'regenerateToken',
+			window.token,
+			/* istanbul ignore next */ err => {
+				if (err) {
+					console.error(err);
+					return;
+				}
 
-			document.location.reload();
-		});
+				document.location.reload();
+			},
+		);
 	}
 }
 

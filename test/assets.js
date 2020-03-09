@@ -13,7 +13,7 @@ import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 
 server.setup();
-const {initDashboard} = browser.setup();
+const { initDashboard } = browser.setup();
 
 import * as C from './helpers/test-constants';
 import * as util from './helpers/utilities';
@@ -42,7 +42,7 @@ for (let i = 0; i < 2; i++) {
 			dashboard,
 			'ncg-dashboard',
 			'ncg-assets',
-			'ncg-asset-category[collection-name="test-bundle"][category-name="assets"]'
+			'ncg-asset-category[collection-name="test-bundle"][category-name="assets"]',
 		);
 		const addEl = await dashboard.evaluateHandle(el => el.$.add, assetCategoryEl);
 		await addEl.click();
@@ -53,13 +53,20 @@ for (let i = 0; i < 2; i++) {
 			assetRep.on('change', resolve);
 		});
 
-		await dashboard.evaluate(assetCategoryEl => new Promise(resolve => {
-			if (assetCategoryEl._successfulUploads === 1) {
-				resolve();
-			} else {
-				assetCategoryEl.$.uploader.addEventListener('upload-success', resolve, {once: true, passive: true});
-			}
-		}), assetCategoryEl);
+		await dashboard.evaluate(
+			assetCategoryEl =>
+				new Promise(resolve => {
+					if (assetCategoryEl._successfulUploads === 1) {
+						resolve();
+					} else {
+						assetCategoryEl.$.uploader.addEventListener('upload-success', resolve, {
+							once: true,
+							passive: true,
+						});
+					}
+				}),
+			assetCategoryEl,
+		);
 
 		t.true(fs.existsSync(TWITTER_BANNER_PATH));
 	});
@@ -67,7 +74,7 @@ for (let i = 0; i < 2; i++) {
 
 test.serial('retrieval - 200', async t => {
 	const response = await axios.get(`${C.rootUrl()}assets/test-bundle/assets/twitter_banner.png`, {
-		responseType: 'arraybuffer'
+		responseType: 'arraybuffer',
 	});
 	t.is(response.status, 200);
 	t.deepEqual(response.data.length, fs.readFileSync(TWITTER_BANNER_PATH).length);
@@ -83,7 +90,8 @@ test.serial('retrieval - 404', async t => {
 
 test.serial('deletion - 200', async t => {
 	const deleteButton = await dashboard.waitForFunction(() => {
-		const file = document.querySelector('ncg-dashboard')
+		const file = document
+			.querySelector('ncg-dashboard')
 			.shadowRoot.querySelector('ncg-assets')
 			.shadowRoot.querySelector('ncg-asset-category[collection-name="test-bundle"][category-name="assets"]')
 			.shadowRoot.querySelector('util-scrollable > ncg-asset-file');

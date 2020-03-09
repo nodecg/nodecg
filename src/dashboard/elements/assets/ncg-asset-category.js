@@ -8,7 +8,7 @@ import '@vaadin/vaadin-upload/vaadin-upload.js';
 import '../util-scrollable.js';
 import './ncg-asset-file.js';
 import * as Polymer from '@polymer/polymer';
-import {MutableData} from '@polymer/polymer/lib/mixins/mutable-data';
+import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 	static get template() {
 		return Polymer.html`
@@ -125,32 +125,32 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 			files: Array,
 			collectionName: {
 				type: String,
-				reflectToAttribute: true
+				reflectToAttribute: true,
 			},
 			category: Object,
 			categoryName: {
 				type: String,
 				reflectToAttribute: true,
-				computed: '_computeCategoryName(category.name)'
+				computed: '_computeCategoryName(category.name)',
 			},
 			acceptsMsg: {
 				type: String,
-				computed: '_computeAcceptsMsg(category.allowedTypes)'
+				computed: '_computeAcceptsMsg(category.allowedTypes)',
 			},
 			_successfulUploads: {
 				type: Number,
-				value: 0
+				value: 0,
 			},
 			_assetCategoryReplicant: {
-				type: Object
-			}
+				type: Object,
+			},
 		};
 	}
 
 	static get observers() {
 		return [
 			'_onAllowedTypesChanged(category.allowedTypes)',
-			'_computeAssetCategoryReplicant(category.name, collectionName)'
+			'_computeAssetCategoryReplicant(category.name, collectionName)',
 		];
 	}
 
@@ -205,7 +205,7 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 
 	_onUploadBefore(event) {
 		// Custom upload request url for file
-		const {file} = event.detail;
+		const { file } = event.detail;
 		file.uploadTarget = `${event.target.target}/${file.name}`;
 	}
 

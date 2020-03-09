@@ -81,9 +81,11 @@
         "singleInstance": true
       }
     ],
-    "mount": [{
-      "directory": "custom-mount-folder",
-      "endpoint": "custom-mount"
-    }]
+    "mount": [
+      {
+        "directory": "custom-mount-folder",
+        "endpoint": "custom-mount"
+      }
+    ]
   }
 }

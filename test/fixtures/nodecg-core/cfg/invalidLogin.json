@@ -1,5 +1,5 @@
 {
-  "login": {
-    "enabled": true
-  }
+	"login": {
+		"enabled": true
+	}
 }

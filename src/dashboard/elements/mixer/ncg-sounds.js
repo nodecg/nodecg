@@ -71,9 +71,9 @@ class NcgSounds extends Polymer.PolymerElement {
 		return {
 			bundleName: {
 				type: String,
-				reflectToAttribute: true
+				reflectToAttribute: true,
 			},
-			soundCues: Array
+			soundCues: Array,
 		};
 	}
 

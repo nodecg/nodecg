@@ -26,13 +26,13 @@ test('should not load bundles which have unsatisfied bundle dependencies', t => 
 test('should serve bundle-specific bower_components', async t => {
 	const response = await axios.get(`${C.bundleBowerComponentsUrl()}confirmation.js`);
 	t.is(response.status, 200);
-	t.is(response.data, 'const confirmed = \'bower_components_confirmed\';\n');
+	t.is(response.data, "const confirmed = 'bower_components_confirmed';\n");
 });
 
 test('should serve bundle-specific node_modules', async t => {
 	const response = await axios.get(`${C.bundleNodeModulesUrl()}confirmation.js`);
 	t.is(response.status, 200);
-	t.is(response.data, 'const confirmed = \'node_modules_confirmed\';\n');
+	t.is(response.data, "const confirmed = 'node_modules_confirmed';\n");
 });
 
 test('should 404 on non-existent bower_component', async t => {
@@ -68,12 +68,7 @@ test('should redirect /login/ to /dashboard/ when login security is disabled', a
 test.serial('shared sources - 200', async t => {
 	const response = await axios.get(`${C.rootUrl()}bundles/test-bundle/shared/util.js`);
 	t.is(response.status, 200);
-	t.is(
-		response.data,
-		'window.SharedUtility = {\n' +
-		'\tsomeFunc() {}\n' +
-		'};\n'
-	);
+	t.is(response.data, 'window.SharedUtility = {\n\tsomeFunc() {},\n};\n');
 });
 
 test('shared sources - 404', async t => {

@@ -7,7 +7,7 @@ export const replicantsRoot = () => path.join(process.env.NODECG_ROOT, 'db/repli
 export const assetsRoot = () => path.join(process.env.NODECG_ROOT, 'assets');
 
 export const rootUrl = () => {
-	const {NODECG_TEST_PORT} = process.env;
+	const { NODECG_TEST_PORT } = process.env;
 	if (!NODECG_TEST_PORT) {
 		throw new Error('NODECG_TEST_PORT is missing. Is NodeCG initialized yet?');
 	}

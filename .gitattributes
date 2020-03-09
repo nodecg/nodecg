@@ -6,9 +6,12 @@
 *.css text eol=lf
 *.html text eol=lf
 *.js text eol=lf
-*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
 *.json text eol=lf
 *.md text eol=lf
+*.yml text eol=lf
 
 # Denote all files that are truly binary and should not be modified.
 *.jpg binary

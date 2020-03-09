@@ -23,7 +23,10 @@ test('should validate the "login.steam" object when "login.steam.enabled" is "tr
 
 test('should validate the "login.twitch" object when "login.steam.twitch" is "true"', t => {
 	const error = t.throws(loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidTwitch.json'));
-	t.is(error.message, 'login.twitch.clientID: must be of type String\nlogin.twitch.clientSecret: must be of type String');
+	t.is(
+		error.message,
+		'login.twitch.clientID: must be of type String\nlogin.twitch.clientSecret: must be of type String',
+	);
 });
 
 test('should validate the "ssl" object when "ssl.enabled" is "true"', t => {
