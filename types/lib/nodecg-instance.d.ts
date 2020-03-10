@@ -55,6 +55,8 @@ export interface NodeCGServer extends NodeCGCommon<'server'> {
 	};
 	listenFor(messageName: string, handlerFunc: (message: any, cb?: ListenForCb) => void): void;
 	listenFor(messageName: string, bundleName: string, handlerFunc: (message: any, cb?: ListenForCb) => void): void;
+	readReplicant<V>(name: string): V;
+	readReplicant<V>(name: string, namespace: string): V;
 }
 
 /**
