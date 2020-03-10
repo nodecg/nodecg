@@ -36,6 +36,8 @@ interface NodeCGCommon<P extends Platform, M = SendMessageReturnType<P>> {
 	unlisten(messageName: string, bundleName: string, handlerFunc: (message: any) => void): void;
 	Replicant<V>(name: string, opts?: ReplicantOptions<V>): Replicant<V, P>;
 	Replicant<V>(name: string, namespace: string, opts?: ReplicantOptions<V>): Replicant<V, P>;
+	readReplicant<V>(name: string, cb: (value: V) => void): void;
+	readReplicant<V>(name: string, namespace: string, cb: (value: V) => void): void;
 }
 
 /**
@@ -67,8 +69,6 @@ export interface NodeCGBrowser extends NodeCGCommon<'browser'> {
 	playSound(cueName: string, opts?: { updateVolume?: boolean }): createjs.AbstractSoundInstance;
 	stopSound(cueName: string): void;
 	stopAllSounds(): void;
-	readReplicant<V>(name: string, cb: (value: V) => void): void;
-	readReplicant<V>(name: string, namespace: string, cb: (value: V) => void): void;
 }
 
 /**
