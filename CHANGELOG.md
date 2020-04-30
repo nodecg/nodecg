@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.1](https://github.com/nodecg/nodecg/compare/v1.6.0...v1.6.1) (2020-04-30)
+
+
+### Bug Fixes
+
+* **auth:** send Client-ID header on all Twitch API requests ([#550](https://github.com/nodecg/nodecg/issues/550)) ([12d2a5e](https://github.com/nodecg/nodecg/commit/12d2a5e))
+
+
+
 ## [1.6.0](https://github.com/nodecg/nodecg/compare/v1.5.0...v1.6.0) (2020-02-24)
 
 
