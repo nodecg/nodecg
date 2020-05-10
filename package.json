@@ -107,7 +107,6 @@
   },
   "scripts": {
     "start": "node index.js",
-    "pretest": "npm run build && npm run instrument",
     "test": "npm run typetest && nyc --reporter=none ava --config ava.config.js && nyc report --reporter=html --reporter=text",
     "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "lint": "npm-run-all -s lint:*",
