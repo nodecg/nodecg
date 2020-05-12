@@ -70,11 +70,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      # - name: Download build
-      #   uses: actions/download-artifact@v1
-      #   with:
-      #     name: build
-
       # This is actually needed for a test lmao.
       # The "should emit an `invalidBundle`" test.
       - run: |
@@ -82,6 +77,13 @@ jobs:
           git config --global user.name "NodeCG Bot"
 
       - run: npm ci
+
+      # - name: Download build
+      #   uses: actions/download-artifact@v1
+      #   with:
+      #     name: build
+
+      - run: npm run build
       - run: npm t
 
       - run: nyc report --reporter=text-lcov > coverage.lcov
@@ -100,7 +102,7 @@ jobs:
       - name: Use Node.js 12
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 12.x
 
       - name: Download build
         uses: actions/download-artifact@v1
