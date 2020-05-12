@@ -1,3 +1,8 @@
+# You may notice a lot of duplication in this file.
+# This is because GitHub Actions does not yet support YAML Anchors,
+# which is the tool we'd use to create re-usable blocks of YAML.
+# See: https://github.community/t5/GitHub-Actions/Support-for-YAML-anchors/td-p/30336
+
 name: CI
 
 on: [push, pull_request]
@@ -11,6 +16,13 @@ jobs:
         node-version: [10.x, 12.x]
 
     steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
       - name: Get npm cache directory
         id: npm-cache
         run: |
@@ -22,61 +34,61 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
       - run: npm ci
       - run: npm run build
-      - run: npm t
       - name: Upload build
         uses: actions/upload-artifact@v1
         with:
           name: build
           path: ./build
 
-  # test:
-  #   runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
 
-  #   needs: build
+    needs: build
 
-  #   strategy:
-  #     matrix:
-  #       node-version: [10.x, 12.x]
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
 
-  #   steps:
-  #     - name: Get npm cache directory
-  #       id: npm-cache
-  #       run: |
-  #         echo "::set-output name=dir::$(npm config get cache)"
-  #     - uses: actions/cache@v1
-  #       with:
-  #         path: ${{ steps.npm-cache.outputs.dir }}
-  #         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-node-
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - uses: actions/checkout@v2
-  #     - name: Use Node.js ${{ matrix.node-version }}
-  #       uses: actions/setup-node@v1
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
 
-  #     - run: npm ci
+      - name: Get npm cache directory
+        id: npm-cache
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+      - uses: actions/cache@v1
+        with:
+          path: ${{ steps.npm-cache.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-  #     - name: Download build
-  #       uses: actions/download-artifact@v1
-  #       with:
-  #         name: build
-  #     - run: npm test
+      - name: Download build
+        uses: actions/download-artifact@v1
+        with:
+          name: build
 
-  #     - run: nyc report --reporter=text-lcov > coverage.lcov
-  #     - name: Report code coverage to Codecov
-  #       uses: codecov/codecov-action@v1
-  #       with:
-  #         file: ./coverage.lcov
+      # This is actually needed for a test lmao.
+      # The "should emit an `invalidBundle`" test.
+      - run: |
+          git config --global user.email "contact@nodecg.com"
+          git config --global user.name "NodeCG Bot"
+
+      # Runs "npm ci" and "npm test" in a single command.
+      - run: npm cit
+
+      - run: nyc report --reporter=text-lcov > coverage.lcov
+      - name: Report code coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.lcov
 
   release:
     runs-on: ubuntu-latest
