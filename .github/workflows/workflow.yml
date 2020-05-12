@@ -36,7 +36,7 @@ jobs:
 
       - run: npm ci
       - run: npm run build
-      - name: Upload build
+      - name: Upload build-${{ matrix.node-version }}
         uses: actions/upload-artifact@v2
         with:
           name: build-${{ matrix.node-version }}
@@ -78,10 +78,14 @@ jobs:
 
       - run: npm ci
 
-      - name: Download build
+      - run: ls
+
+      - name: Download build-${{ matrix.node-version }}
         uses: actions/download-artifact@v2
         with:
           name: build-${{ matrix.node-version }}
+
+      - run: ls
 
       - run: npm t
 
@@ -107,7 +111,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Download build
+      - name: Download build-${{ matrix.node-version }}
         uses: actions/download-artifact@v2
         with:
           name: build-${{ matrix.node-version }}
