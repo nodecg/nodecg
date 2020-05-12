@@ -22,7 +22,7 @@ function waitFor(stream) {
 }
 
 function clean() {
-	return del([buildDirectory, '.nyc_output', 'coverage', 'instrumented']);
+	return del([buildDirectory, '.nyc_output', 'coverage']);
 }
 
 function browserApi() {
@@ -79,11 +79,13 @@ function buh({ instrument } = {}) {
 		.pipe(buffer())
 		.pipe(
 			transform(() => {
-				return exorcist(instrument ? 'instrumented/nodecg-api.min.js.map' : 'build/src/nodecg-api.min.js.map');
+				return exorcist(
+					instrument ? 'build/instrumented/nodecg-api.min.js.map' : 'build/src/nodecg-api.min.js.map',
+				);
 			}),
 		)
 		.on('error', gutil.log)
-		.pipe(gulp.dest(instrument ? 'instrumented' : 'build/src'));
+		.pipe(gulp.dest(instrument ? 'build/instrumented' : 'build/src'));
 }
 
 exports.clean = clean;

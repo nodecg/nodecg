@@ -41,81 +41,93 @@ jobs:
         with:
           name: build
           path: build
-  # test:
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   strategy:
-  #     matrix:
-  #       node-version: [10.x, 12.x]
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Use Node.js ${{ matrix.node-version }}
-  #       uses: actions/setup-node@v1
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
-  #     - name: Get npm cache directory
-  #       id: npm-cache
-  #       run: |
-  #         echo "::set-output name=dir::$(npm config get cache)"
-  #     - uses: actions/cache@v1
-  #       with:
-  #         path: ${{ steps.npm-cache.outputs.dir }}
-  #         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-node-
-  #     # This is actually needed for a test lmao.
-  #     # The "should emit an `invalidBundle`" test.
-  #     - run: |
-  #         git config --global user.email "contact@nodecg.com"
-  #         git config --global user.name "NodeCG Bot"
-  #     - run: npm ci
-  #     - run: ls build && ls build/src
-  #     - name: Download build
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: build
-  #     - run: ls .
-  #     - run: ls build && ls build/src
-  #     # - run: npm run build
-  #     - run: npm t
-  #     - run: npx nyc report --reporter=text-lcov > coverage.lcov
-  #     - name: Report code coverage to Codecov
-  #       uses: codecov/codecov-action@v1
-  #       with:
-  #         file: ./coverage.lcov
-  # release:
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Use Node.js 12
-  #       uses: actions/setup-node@v1
-  #       with:
-  #         node-version: 12.x
-  #     - name: Download build
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: build
-  #     - name: Semantic Release
-  #       uses: cycjimmy/semantic-release-action@v2.4.1
-  #       with:
-  #         branches: |
-  #           [
-  #             '+([0-9])?(.{+([0-9]),x}).x',
-  #             'master',
-  #             'next',
-  #             'next-major',
-  #             {
-  #               name: 'beta',
-  #               prerelease: true
-  #             },
-  #             {
-  #               name: 'alpha',
-  #               prerelease: true
-  #             }
-  #           ]
-  #         extra_plugins: |
-  #           '@semantic-release/commit-analyzer'
-  #           '@semantic-release/release-notes-generator'
-  #           '@semantic-release/npm'
-  #           '@semantic-release/github'
+
+  test:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Get npm cache directory
+        id: npm-cache
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+      - uses: actions/cache@v1
+        with:
+          path: ${{ steps.npm-cache.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # This is actually needed for a test lmao.
+      # The "should emit an `invalidBundle`" test.
+      - run: |
+          git config --global user.email "contact@nodecg.com"
+          git config --global user.name "NodeCG Bot"
+
+      - run: npm ci
+
+      - name: Download build
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+
+      - run: npm t
+
+      - run: npx nyc report --reporter=text-lcov > coverage.lcov
+      - name: Report code coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.lcov
+
+  release:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Download build
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v2.4.1
+        with:
+          branches: |
+            [
+              '+([0-9])?(.{+([0-9]),x}).x',
+              'master',
+              'next',
+              'next-major',
+              {
+                name: 'beta', 
+                prerelease: true
+              },
+              {
+                name: 'alpha',
+                prerelease: true
+              }
+            ]
+          extra_plugins: |
+            '@semantic-release/commit-analyzer'
+            '@semantic-release/release-notes-generator'
+            '@semantic-release/npm'
+            '@semantic-release/github'

@@ -116,7 +116,7 @@
     "fix:prettier": "prettier --write \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
     "fix:eslint": "npm run lint:eslint -- --fix ",
     "build": "npm run lint && gulp",
-    "instrument": "nyc instrument ./src ./instrumented",
+    "instrument": "nyc instrument ./src ./build/instrumented",
     "postinstrument": "node test/helpers/retarget-browser-coverage.js",
     "prerelease": "npm t",
     "release": "standard-version",
@@ -133,7 +133,7 @@
       "index.js",
       "lib/login/public/QueryString.js",
       "src/service-worker.js",
-      "instrumented/**"
+      "build/instrumented/**"
     ],
     "all": true
   },
