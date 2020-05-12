@@ -78,17 +78,11 @@ jobs:
 
       - run: npm ci
 
-      - run: rm -rf build && ls
-
       - name: Download build-${{ matrix.node-version }}
         uses: actions/download-artifact@v2
         with:
           name: build-${{ matrix.node-version }}
-
-      - run: ls
-      - run: ls build
-      - run: ls build/src
-      - run: ls build/instrumented
+          path: build
 
       - run: npm t
 
@@ -118,6 +112,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: build-${{ matrix.node-version }}
+          path: build
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2.4.1
