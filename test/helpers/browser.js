@@ -17,8 +17,8 @@ import { sleep } from './utilities';
 export const setup = () => {
 	let browser;
 	test.serial.before(async () => {
-		// The --no-sandbox flag is required to run Headless Chrome on Travis
-		const args = isCi ? ['--no-sandbox'] : undefined;
+		// Getting the sandbox to work in CI is too hard for my tiny brain.
+		const args = isCi ? ['--no-sandbox', '--disable-setuid-sandbox'] : undefined;
 		browser = await puppeteer.launch({
 			headless: true,
 			args,
