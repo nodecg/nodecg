@@ -72,7 +72,7 @@ for (let i = 0; i < 2; i++) {
 	});
 }
 
-test.serial.only('retrieval - 200', async t => {
+test.serial('retrieval - 200', async t => {
 	const response = await axios.get(`${C.rootUrl()}assets/test-bundle/assets/twitter_banner.png`, {
 		responseType: 'arraybuffer',
 	});
