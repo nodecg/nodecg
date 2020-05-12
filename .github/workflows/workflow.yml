@@ -78,15 +78,15 @@ jobs:
 
       - run: npm ci
 
-      # - name: Download build
-      #   uses: actions/download-artifact@v1
-      #   with:
-      #     name: build
+      - name: Download build
+        uses: actions/download-artifact@v1
+        with:
+          name: build
 
-      - run: npm run build
+      # - run: npm run build
       - run: npm t
 
-      - run: nyc report --reporter=text-lcov > coverage.lcov
+      - run: npx nyc report --reporter=text-lcov > coverage.lcov
       - name: Report code coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
