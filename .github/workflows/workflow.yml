@@ -78,7 +78,7 @@ jobs:
 
       - run: npm ci
 
-      - run: ls build
+      - run: ls build && ls build/src
 
       - name: Download build
         uses: actions/download-artifact@v2
@@ -87,7 +87,7 @@ jobs:
 
       - run: ls .
 
-      - run: ls build
+      - run: ls build && ls build/src
 
       # - run: npm run build
       - run: npm t
