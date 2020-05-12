@@ -188,7 +188,7 @@
     "nyc": "^14.1.1",
     "p-retry": "^4.1.0",
     "prettier": "^1.19.1",
-    "puppeteer": "^3.0.4",
+    "puppeteer": "^1.19.0",
     "remark": "^10.0.1",
     "remark-toc": "^5.1.1",
     "replace-in-file": "^3.4.4",
