@@ -37,10 +37,10 @@ jobs:
       - run: npm ci
       - run: npm run build
       - name: Upload build
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: build
-          path: ./build
+          path: build
 
   test:
     runs-on: ubuntu-latest
@@ -78,10 +78,16 @@ jobs:
 
       - run: npm ci
 
+      - run: ls build
+
       - name: Download build
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: build
+
+      - run: ls .
+
+      - run: ls build
 
       # - run: npm run build
       - run: npm t
@@ -105,7 +111,7 @@ jobs:
           node-version: 12.x
 
       - name: Download build
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v2
         with:
           name: build
 
