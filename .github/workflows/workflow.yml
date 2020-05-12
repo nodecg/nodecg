@@ -78,7 +78,7 @@ jobs:
 
       - run: npm ci
 
-      - run: ls
+      - run: rm -rf build && ls
 
       - name: Download build-${{ matrix.node-version }}
         uses: actions/download-artifact@v2
@@ -86,6 +86,9 @@ jobs:
           name: build-${{ matrix.node-version }}
 
       - run: ls
+      - run: ls build
+      - run: ls build/src
+      - run: ls build/instrumented
 
       - run: npm t
 
