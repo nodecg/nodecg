@@ -70,10 +70,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Download build
-        uses: actions/download-artifact@v1
-        with:
-          name: build
+      # - name: Download build
+      #   uses: actions/download-artifact@v1
+      #   with:
+      #     name: build
 
       # This is actually needed for a test lmao.
       # The "should emit an `invalidBundle`" test.
