@@ -8,18 +8,17 @@ import { v4 as uuid } from 'uuid';
 // Packages
 import test from 'ava';
 import puppeteer from 'puppeteer';
+import isCi from 'is-ci';
 
 // Ours
 import * as C from './test-constants';
 import { sleep } from './utilities';
 
-const IS_TRAVIS = process.env.TRAVIS_OS_NAME && process.env.TRAVIS_JOB_NUMBER;
-
 export const setup = () => {
 	let browser;
 	test.serial.before(async () => {
 		// The --no-sandbox flag is required to run Headless Chrome on Travis
-		const args = IS_TRAVIS ? ['--no-sandbox'] : undefined;
+		const args = isCi ? ['--no-sandbox'] : undefined;
 		browser = await puppeteer.launch({
 			headless: true,
 			args,
