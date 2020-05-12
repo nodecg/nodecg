@@ -81,8 +81,8 @@ jobs:
           git config --global user.email "contact@nodecg.com"
           git config --global user.name "NodeCG Bot"
 
-      # Runs "npm ci" and "npm test" in a single command.
-      - run: npm cit
+      - run: npm ci
+      - run: npm t
 
       - run: nyc report --reporter=text-lcov > coverage.lcov
       - name: Report code coverage to Codecov
