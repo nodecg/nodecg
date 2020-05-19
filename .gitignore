@@ -40,9 +40,7 @@ docs
 /assets
 
 # Build artifacts
-/instrumented
 /build
-/build/instrumented
 
 # Don't ignore .empty_directory files
 !.empty_directory

@@ -118,7 +118,7 @@
     "build:server": "tsc -b src/server",
     "watch:webpack": "npm run build:webpack -- --watch",
     "watch:server": "npm run build:server -- --watch",
-    "instrument": "nyc instrument ./src/client ./instrumented",
+    "instrument": "nyc instrument ./build/client ./build/instrumented",
     "postinstrument": "node test/helpers/retarget-browser-coverage.js",
     "prerelease": "npm t",
     "release": "standard-version",
@@ -126,14 +126,11 @@
   },
   "nyc": {
     "include": [
-      "src/**",
-      "index.js"
+      "src/**"
     ],
     "exclude": [
       "index.js",
-      "lib/login/public/QueryString.js",
       "src/client/service-worker.js",
-      "instrumented/**",
       "build/instrumented/**"
     ],
     "all": true

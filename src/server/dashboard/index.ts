@@ -26,7 +26,7 @@ type DashboardContext = {
 
 const log = createLogger('nodecg/lib/dashboard');
 const BUILD_PATH = path.join(appRootPath.path, 'build/client');
-const INSTRUMENTED_PATH = BUILD_PATH; // TODO: change this once instrumentation is working again
+const INSTRUMENTED_PATH = path.join(appRootPath.path, 'build/instrumented');
 const VIEWS_PATH = path.join(appRootPath.path, 'src/server/dashboard');
 
 export default class DashboardLib {
