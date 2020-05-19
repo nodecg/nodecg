@@ -2,6 +2,7 @@
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"type": "array",
 	"default": [],
+	"additionalItems": false,
 	"items": {
 		"type": "object",
 		"additionalProperties": false,

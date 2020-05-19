@@ -26,5 +26,6 @@ Check which branch you should PR to. NodeCG is still in an unstable state, so we
 1. Install selenium-standalone (`npm install --global selenium-standalone`), then run the installer (`selenium-standalone install`)
 2. Open one terminal and start Selenium: `selenium-standalone start`
 3. Open a second terminal, navigate to the NodeCG root and run `npm test`
+4. If the tests are giving you trouble, run `npm test -- -- --debugTests`. This will run Chromium in "headful" mode instead of headless, and make debugging browser failures a bit easier.
 
 Note: Selenium requires [Java](https://www.java.com/en/download/help/download_options.xml).

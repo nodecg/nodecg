@@ -1,0 +1,30 @@
+{
+	"compilerOptions": {
+		// Output related
+		"target": "ES6",
+		"emitDecoratorMetadata": true,
+
+		// Module resolution
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+
+		// Type checking
+		"alwaysStrict": true,
+		"forceConsistentCasingInFileNames": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"strictNullChecks": true,
+		"experimentalDecorators": true,
+
+		// Extra output
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"inlineSourceMap": false
+	}
+}

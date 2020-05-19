@@ -1,8 +1,6 @@
 # Node / Bower
 /bower_components
 /node_modules
-/build/bower_components
-/build/node_modules
 npm-debug.log
 
 # Local bundles
@@ -41,7 +39,12 @@ docs
 # Assets
 /assets
 
+# Build artifacts
+/instrumented
+/build
+/build/instrumented
+
 # Don't ignore .empty_directory files
 !.empty_directory
 
-/build/instrumented
+ormconfig.json

@@ -1,0 +1,11 @@
+{
+	"extends": "../../tsconfig_base.json",
+	"compilerOptions": {
+		"outDir": "../../build/server",
+		"rootDir": ".",
+		"module": "commonjs",
+		"composite": true
+	},
+	"include": ["./**/*", "../types/stubs.d.ts", "../../node_modules/joi-extract-type/dist/index.d.ts"],
+	"references": [{ "path": "../shared" }, { "path": "../types" }]
+}

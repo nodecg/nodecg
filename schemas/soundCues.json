@@ -3,7 +3,7 @@
 
 	"definitions": {
 		"cueFile": {
-			"type": ["object", "null"],
+			"type": "object",
 			"properties": {
 				"sum": {
 					"type": "string"
@@ -58,6 +58,6 @@
 				"type": "boolean"
 			}
 		},
-		"required": ["name", "volume", "file", "assignable"]
+		"required": ["name", "volume", "assignable"]
 	}
 }

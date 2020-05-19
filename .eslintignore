@@ -2,9 +2,9 @@
 node_modules
 bower_components
 nodecg-api.min.js
-/typetest
-/test/fixtures/bundle-parser/invalid-manifest-json/package.json
+/build
+/test/fixtures
+/test/helpers/retarget-browser-coverage.js
 
-# Un-ignore this once we switch this codebase over to typescript.
-# Right now it fails because we don't have a tsconfig.json
-/types
+# Just a stub file
+/index.js
