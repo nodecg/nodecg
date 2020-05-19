@@ -90,7 +90,7 @@ export default function(
 					styles.push('<link rel="stylesheet" href="/dashboard/css/panel-defaults.css">');
 				}
 
-				scripts.push('<script async src="/dashboard/js/dialog_opener.js"></script>');
+				scripts.push('<script async src="/dialog_opener.js"></script>');
 			} else if (resourceType === 'dialog') {
 				styles.push('<link rel="stylesheet" href="/dashboard/css/dialog-defaults.css">');
 			}
@@ -132,7 +132,7 @@ export default function(
 
 		// Inject the scripts required for singleInstance behavior, if requested.
 		if (resourceType === 'graphic' && !(pathOrHtml.endsWith('busy.html') || pathOrHtml.endsWith('killed.html'))) {
-			scripts.push('<script src="/instance/client_registration.js"></script>');
+			scripts.push('<script src="/client_registration.js"></script>');
 		}
 
 		const concattedScripts = scripts.join('\n');

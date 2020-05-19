@@ -14,6 +14,8 @@ const config: webpack.Configuration = {
 		dashboard: './src/client/dashboard/elements/ncg-dashboard.ts',
 		socket: './src/client/socket.ts',
 		api: './src/client/api/api.client.ts',
+		client_registration: './src/client/instance/client_registration.ts',
+		dialog_opener: './src/client/dashboard/js/dialog_opener.ts',
 	},
 	output: {
 		path: path.resolve(__dirname, 'build/client'),
@@ -45,7 +47,6 @@ const config: webpack.Configuration = {
 			'src/client/favicon.ico',
 			{ from: 'src/client/dashboard/img/', to: 'dashboard/img', toType: 'dir' },
 			{ from: 'src/client/dashboard/css/', to: 'dashboard/css', toType: 'dir' },
-			{ from: 'src/client/dashboard/js/', to: 'dashboard/js', toType: 'dir' },
 			{ from: 'src/client/instance/', to: 'instance', toType: 'dir' },
 			{ from: 'src/client/login/', to: 'login', toType: 'dir' },
 		]),
