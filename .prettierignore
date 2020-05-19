@@ -15,3 +15,5 @@
 /test/fixtures/bundle-parser/bad-json/bundleConfig.json
 /test/fixtures/bundle-parser/bad-schema/configschema.json
 /test/fixtures/bundle-parser/invalid-manifest-json/package.json
+
+/instrumented
