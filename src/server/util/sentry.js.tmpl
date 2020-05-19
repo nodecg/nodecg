@@ -1,0 +1,10 @@
+(function () {
+	const Sentry = window.Sentry;
+	Sentry.init(<%= JSON.stringify(baseSentryConfig) %>);
+	Sentry.configureScope(scope => {
+		scope.setExtra('bundles', <%= JSON.stringify(bundleMetadata) %>);
+	});
+	window.addEventListener('unhandledrejection', function (err) {
+		Sentry.captureException(err.reason);
+	});
+})();

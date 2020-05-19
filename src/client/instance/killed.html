@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link rel="import" href="/dashboard/style/panel-and-dialog-defaults.css">
+	<link rel="stylesheet" href="instances.css">
+</head>
+<body>
+	<div id="container">
+		<p>The <span class="code">singleInstance</span> graphic located at:</p>
+		<p id="graphicPath"></p>
+		<p>
+			... has been killed, so as to make it available for another user.
+			<a id="graphicLink" href="">Click here</a> to automatically reload this graphic once it becomes available.
+		</p>
+	</div>
+
+	<script>
+		// Copy-pasted from lib/login/public/QueryString.js
+		// I copy-pasted it because the file is only served when login security is enabled,
+		// and singleInstance can be active when login security is not.
+		// Definitely need to make this DRYer.
+		var qs = (function (a) {
+			if (a == "") return {};
+			var b = {};
+			for (var i = 0; i < a.length; ++i) {
+				var p = a[i].split('=', 2);
+				if (p.length == 1)
+					b[p[0]] = "";
+				else
+					b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+			}
+			return b;
+		})(window.location.search.substr(1).split('&'));
+
+		document.getElementById('graphicPath').textContent = qs['pathname'];
+		document.getElementById('graphicLink').setAttribute('href', qs['pathname']);
+
+		// TODO: show error if qs['pathname'] is undefined
+	</script>
+</body>
+</html>

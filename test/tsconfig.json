@@ -1,0 +1,30 @@
+{
+	"extends": "../tsconfig_base.json",
+	"compilerOptions": {
+		"preserveSymlinks": true,
+		/**
+		 * When at a lower target than this,
+		 * the compiled functions being passed to Puppeteer
+		 * are messed up, because they expect a bunch of
+		 * injected helpers that the browser won't have,
+		 * such as __awaiter, for polyfilling the "await"
+		 * keyword on older browsers.
+		 */
+		"target": "ES2017",
+		"noEmit": true,
+		"rootDir": ".",
+		"module": "commonjs"
+	},
+	"references": [{ "path": "../src/types" }, { "path": "../src/client" }, { "path": "../src/server" }],
+	"include": [
+		"./**/*.ts",
+
+		/**
+		 * Project references do not resolve ambient types!
+		 * So, we must manually inlcude them here.
+		 * https://github.com/microsoft/TypeScript/issues/29002
+		 */
+		"../src/types/**/*.d.ts",
+		"../src/server/types/**/*.d.ts"
+	]
+}

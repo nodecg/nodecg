@@ -9,7 +9,6 @@
 /logs
 /media
 /node_modules
-/typetest
 .env
 
 # Intentionally broken as part of tests
