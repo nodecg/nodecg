@@ -111,7 +111,7 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 });
 
 test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is clicked', async t => {
-	const res = await dashboard.evaluate(
+	await dashboard.evaluate(
 		async () =>
 			new Promise(resolve => {
 				const dialog = window.dashboardApi.getDialog('test-dialog') as HTMLElement & {
@@ -120,57 +120,39 @@ test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is 
 				};
 				const dialogDocument: any = window.dashboardApi.getDialogDocument('test-dialog');
 				const confirmButton: any = dialog.querySelector('paper-button[dialog-confirm]');
-
-				dialog.addEventListener(
-					'neon-animation-finish',
+				dialogDocument.addEventListener(
+					'dialog-confirmed',
 					() => {
-						dialogDocument.addEventListener(
-							'dialog-confirmed',
-							() => {
-								resolve(true);
-							},
-							{ once: true, passive: true },
-						);
-						confirmButton.click();
+						resolve();
 					},
 					{ once: true, passive: true },
 				);
-
-				dialog.open();
+				confirmButton.click();
 			}),
 	);
 
-	t.true(res);
+	t.pass();
 });
 
 test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async t => {
-	const res = await dashboard.evaluate(
+	await dashboard.evaluate(
 		async () =>
-			new Promise(done => {
+			new Promise(resolve => {
 				const dialog: any = window.dashboardApi.getDialog('test-dialog');
 				const dialogDocument: any = window.dashboardApi.getDialogDocument('test-dialog');
 				const dismissButton: any = dialog.querySelector('paper-button[dialog-dismiss]');
-
-				dialog.addEventListener(
-					'neon-animation-finish',
+				dialogDocument.addEventListener(
+					'dialog-dismissed',
 					() => {
-						dialogDocument.addEventListener(
-							'dialog-dismissed',
-							() => {
-								done(true);
-							},
-							{ once: true, passive: true },
-						);
-						dismissButton.click();
+						resolve();
 					},
 					{ once: true, passive: true },
 				);
-
-				dialog.open();
+				dismissButton.click();
 			}),
 	);
 
-	t.true(res);
+	t.pass();
 });
 
 test.serial('connection toasts', async t => {
