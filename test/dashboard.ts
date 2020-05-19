@@ -74,6 +74,7 @@ test.serial('ncg-dialog - should have the buttons defined in dialogButtons', asy
 	]);
 });
 
+// TODO: this test is flaky, fix it
 test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog attribute is clicked', async t => {
 	await dashboard.bringToFront();
 	const res = await dashboard.evaluate(

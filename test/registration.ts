@@ -47,6 +47,7 @@ test('singleInstance - scripts get injected into /instance/*.html routes', async
 	t.true(response.data.includes('<script src="/socket.io/socket.io.js"></script>'));
 });
 
+// TODO: this is flaky, fix it
 test.serial('singleInstance - should redirect to busy.html when the instance is already taken', async t => {
 	t.plan(0);
 	const page = await initSingleInstance();
