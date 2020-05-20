@@ -114,10 +114,7 @@ test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is 
 	await dashboard.evaluate(
 		async () =>
 			new Promise(resolve => {
-				const dialog = window.dashboardApi.getDialog('test-dialog') as HTMLElement & {
-					opened: boolean;
-					open: () => void;
-				};
+				const dialog: any = window.dashboardApi.getDialog('test-dialog');
 				const dialogDocument: any = window.dashboardApi.getDialogDocument('test-dialog');
 				const confirmButton: any = dialog.querySelector('paper-button[dialog-confirm]');
 				dialogDocument.addEventListener(
