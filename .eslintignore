@@ -9,3 +9,7 @@ nodecg-api.min.js
 
 # Just a stub file
 /index.js
+
+ava.config.js
+nyc.config.js
+.prettierrc.js
