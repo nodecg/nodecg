@@ -6,7 +6,7 @@ const isDev = process.env.NODE_ENV !== 'production';
 const mode = isDev ? 'development' : 'production';
 const instrument = process.env.NODECG_INSTRUMENT?.toLowerCase() === 'true';
 
-const outDir = instrument ? 'instrumented' : 'client';
+const outDir = instrument ? 'client' : 'client';
 const what: webpack.RuleSetRule = instrument
 	? {
 			test: /\.js$|\.ts$/,
