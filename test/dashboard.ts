@@ -131,6 +131,9 @@ test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is 
 	t.pass();
 });
 
+/**
+ * TODO: fix this flaky test
+ */
 test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async t => {
 	await dashboard.evaluate(
 		async () =>
