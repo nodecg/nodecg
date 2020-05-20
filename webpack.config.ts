@@ -7,7 +7,7 @@ const mode = isDev ? 'development' : 'production';
 const instrument = process.env.NODECG_INSTRUMENT?.toLowerCase() === 'true';
 
 const outDir = instrument ? 'instrumented' : 'client';
-const what = instrument
+const what: webpack.RuleSetRule = instrument
 	? {
 			test: /\.js$|\.ts$/,
 			use: {
@@ -44,7 +44,6 @@ const config: webpack.Configuration = {
 	},
 	module: {
 		rules: [
-			what,
 			{
 				test: /\.ts$/,
 				loaders: [
@@ -58,6 +57,7 @@ const config: webpack.Configuration = {
 				],
 			},
 			{ test: /\.js$/, loader: 'babel-loader' },
+			what,
 		],
 	},
 	plugins: [
