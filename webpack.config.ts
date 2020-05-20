@@ -3,9 +3,11 @@ import webpack from 'webpack';
 import CopyPlugin from 'copy-webpack-plugin';
 
 const isDev = process.env.NODE_ENV !== 'production';
+const mode = isDev ? 'development' : 'production';
+const instrument = process.env.NODECG_INSTRUMENT?.toLowerCase() === 'true';
 
-const outDir = process.env.NODECG_INSTRUMENT ? 'instrumented' : 'client';
-const what = process.env.NODECG_INSTRUMENT
+const outDir = instrument ? 'instrumented' : 'client';
+const what = instrument
 	? {
 			test: /\.js$|\.ts$/,
 			use: {
@@ -17,9 +19,11 @@ const what = process.env.NODECG_INSTRUMENT
 	  }
 	: {};
 
-if (process.env.NODECG_INSTRUMENT) {
+if (instrument) {
 	console.info('Creating instrumented build for code coverage.');
 }
+
+console.info('Mode:', mode);
 
 const config: webpack.Configuration = {
 	mode: isDev ? 'development' : 'production',
@@ -40,6 +44,7 @@ const config: webpack.Configuration = {
 	},
 	module: {
 		rules: [
+			what,
 			{
 				test: /\.ts$/,
 				loaders: [
@@ -53,7 +58,6 @@ const config: webpack.Configuration = {
 				],
 			},
 			{ test: /\.js$/, loader: 'babel-loader' },
-			what,
 		],
 	},
 	plugins: [
