@@ -4,6 +4,23 @@ import CopyPlugin from 'copy-webpack-plugin';
 
 const isDev = process.env.NODE_ENV !== 'production';
 
+const outDir = process.env.NODECG_INSTRUMENT ? 'instrumented' : 'client';
+const what = process.env.NODECG_INSTRUMENT
+	? {
+			test: /\.js$|\.ts$/,
+			use: {
+				loader: 'istanbul-instrumenter-loader',
+				options: { esModules: true },
+			},
+			enforce: 'post' as const,
+			exclude: /node_modules|\.spec\.js$/,
+	  }
+	: {};
+
+if (process.env.NODECG_INSTRUMENT) {
+	console.info('Creating instrumented build for code coverage.');
+}
+
 const config: webpack.Configuration = {
 	mode: isDev ? 'development' : 'production',
 	devtool: 'source-map',
@@ -18,7 +35,7 @@ const config: webpack.Configuration = {
 		dialog_opener: './src/client/dashboard/js/dialog_opener.ts',
 	},
 	output: {
-		path: path.resolve(__dirname, 'build/client'),
+		path: path.resolve(__dirname, `build/${outDir}`),
 		filename: '[name].js',
 	},
 	module: {
@@ -36,6 +53,7 @@ const config: webpack.Configuration = {
 				],
 			},
 			{ test: /\.js$/, loader: 'babel-loader' },
+			what,
 		],
 	},
 	plugins: [
