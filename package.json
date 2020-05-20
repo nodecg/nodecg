@@ -118,22 +118,11 @@
     "build:server": "tsc -b src/server",
     "watch:webpack": "npm run build:webpack -- --watch",
     "watch:server": "npm run build:server -- --watch",
-    "instrument": "nyc instrument ./build/client ./build/instrumented",
+    "instrument": "cross-env NODECG_INSTRUMENT=true npm run build:webpack",
     "postinstrument": "node test/helpers/retarget-browser-coverage.js",
     "prerelease": "npm t",
     "release": "standard-version",
     "postrelease": "npm publish && git push --follow-tags"
-  },
-  "nyc": {
-    "include": [
-      "src/**"
-    ],
-    "exclude": [
-      "index.js",
-      "src/client/service-worker.js",
-      "build/instrumented/**"
-    ],
-    "all": true
   },
   "engines": {
     "node": ">=8.3.0"
@@ -154,6 +143,7 @@
     "@gamesdonequick/prettier-config": "^2.2.0",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@sentry/browser": "^5.13.2",
     "@sentry/node": "^5.13.2",
     "@types/app-root-path": "^1.2.4",
@@ -196,14 +186,16 @@
     "ava": "^2.2.0",
     "axios": "^0.18.1",
     "babel-loader": "^8.0.6",
+    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-plugin-ava": "^10.2.0",
     "husky": "^4.2.3",
     "is-ci": "^2.0.0",
     "is-windows": "^1.0.2",
+    "istanbul-instrumenter-loader": "^3.0.1",
     "lint-staged": "^10.0.8",
     "npm-run-all": "^4.1.5",
-    "nyc": "^14.1.1",
+    "nyc": "^15.0.1",
     "prettier": "^1.19.1",
     "puppeteer": "^1.19.0",
     "replace-in-file": "^3.4.4",
@@ -213,11 +205,12 @@
     "sinon": "^7.3.1",
     "socket.io-client": "^2.2.0",
     "standard-version": "^9.0.0",
+    "source-map-support": "^0.5.19",
     "taffydb": "^2.7.3",
     "temp": "^0.9.0",
     "trash-cli": "^3.0.0",
     "ts-loader": "^6.2.2",
-    "ts-node": "^8.9.0",
+    "ts-node": "^8.10.1",
     "tslib": "^1.11.1",
     "type-fest": "^0.12.0",
     "typed-socket.io": "^0.6.0",
