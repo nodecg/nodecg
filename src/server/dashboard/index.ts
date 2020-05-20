@@ -1,5 +1,4 @@
 // Native
-import fs from 'fs';
 import path from 'path';
 
 // Packages
@@ -9,7 +8,6 @@ import appRootPath from 'app-root-path';
 
 // Ours
 import { config, filteredConfig } from '../config';
-import createLogger from '../logger';
 import * as ncgUtils from '../util';
 import BundleManager from '../bundle-manager';
 import { NodeCG } from '../../types/nodecg';
@@ -24,9 +22,7 @@ type DashboardContext = {
 	sentryEnabled: boolean;
 };
 
-const log = createLogger('nodecg/lib/dashboard');
 const BUILD_PATH = path.join(appRootPath.path, 'build/client');
-const INSTRUMENTED_PATH = path.join(appRootPath.path, 'build/instrumented');
 const VIEWS_PATH = path.join(appRootPath.path, 'src/server/dashboard');
 
 export default class DashboardLib {
@@ -58,29 +54,12 @@ export default class DashboardLib {
 		});
 
 		app.get('/nodecg-api.min.js', (_, res) => {
-			res.sendFile(path.join(process.env.NODECG_TEST ? INSTRUMENTED_PATH : BUILD_PATH, 'api.js'));
+			res.sendFile(path.join(BUILD_PATH, 'api.js'));
 		});
 
 		app.get('/nodecg-api.min.js.map', (_, res) => {
-			res.sendFile(path.join(process.env.NODECG_TEST ? INSTRUMENTED_PATH : BUILD_PATH, 'api.js.map'));
+			res.sendFile(path.join(BUILD_PATH, 'api.js.map'));
 		});
-
-		if (process.env.NODECG_TEST) {
-			log.warn('Serving instrumented files for testing');
-			app.get('/*', (req, res, next) => {
-				const resName = req.params[0];
-				if (!resName.startsWith('dashboard/') && !resName.startsWith('instance/')) {
-					return next();
-				}
-
-				const fp = path.join(INSTRUMENTED_PATH, resName);
-				if (fs.existsSync(fp)) {
-					return ncgUtils.sendFile(fp, res, next);
-				}
-
-				return next();
-			});
-		}
 
 		app.get('/bundles/:bundleName/dashboard/*', ncgUtils.authCheck, (req, res, next) => {
 			const { bundleName } = req.params;
