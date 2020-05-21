@@ -3,8 +3,8 @@ import path from 'path';
 
 // Packages
 import webpack from 'webpack';
-import appRootPath from 'app-root-path';
 import nodeExternals from 'webpack-node-externals';
+import appRootPath from 'app-root-path';
 
 export function createServerConfig({
 	isProduction,
