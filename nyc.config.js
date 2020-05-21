@@ -18,6 +18,9 @@ module.exports = {
 	/**
 	 * When using nyc from the command line, only instrument the server files.
 	 * The client files are instrumented separately during their webpack build.
+	 *
+	 * Note that this will also exclude `src/client` from the coverage _report_ too,
+	 * so our npm scripts sometimes override this setting when running reports.
 	 */
 	include: ['src/server/**'],
 };
