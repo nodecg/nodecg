@@ -114,7 +114,7 @@
     "fix:prettier": "prettier --write \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
     "fix:eslint": "npm run lint:eslint -- --fix ",
     "prebuild": "trash build",
-    "build": "cross-env TS_NODE_PROJECT=build-tools/tsconfig.json NODE_ENV=development webpack --config build-tools/webpack.config.ts",
+    "build": "cross-env TS_NODE_PROJECT=build-tools/tsconfig.json NODE_ENV=development node --max-old-space-size=8192 node_modules/webpack-cli/bin/cli.js --config build-tools/webpack.config.ts",
     "watch": "npm run build -- --watch",
     "instrument": "cross-env NODECG_INSTRUMENT=true npm run build",
     "postinstrument": "node test/helpers/retarget-browser-coverage.js",
