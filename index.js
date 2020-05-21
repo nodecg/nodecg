@@ -1,1 +1,1 @@
-require('./build/server/bootstrap');
+require('./build/server/server.js');
