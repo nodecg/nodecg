@@ -15,7 +15,7 @@ import { NodeCG } from '../../types/nodecg';
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 
-const BUILD_PATH = path.join(__dirname, '../../client/instance');
+const BUILD_PATH = path.join(appRootPath.path, 'build/client/instance');
 
 export default class RegistrationCoordinator {
 	app = express();

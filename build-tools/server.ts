@@ -4,6 +4,7 @@ import path from 'path';
 // Packages
 import webpack from 'webpack';
 import appRootPath from 'app-root-path';
+import nodeExternals from 'webpack-node-externals';
 
 export function createServerConfig({
 	isProduction,
@@ -25,6 +26,7 @@ export function createServerConfig({
 		: {};
 
 	return {
+		target: 'node',
 		mode: isProduction ? 'production' : 'development',
 		devtool: 'source-map',
 		resolve: {
@@ -34,9 +36,14 @@ export function createServerConfig({
 			server: './src/server/bootstrap',
 		},
 		output: {
+			libraryTarget: 'commonjs2',
 			path: path.join(appRootPath.path, 'build/server'),
 			filename: '[name].js',
 		},
+		node: {
+			__dirname: false,
+		},
+		externals: [nodeExternals()],
 		module: {
 			rules: [
 				{
