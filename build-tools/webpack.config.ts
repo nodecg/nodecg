@@ -1,4 +1,4 @@
-import { createBrowserConfig, createServerConfig } from '.';
+import { createBrowserConfig, createServerConfig, createTypeORMConfig } from '.';
 
 const environment = (process.env.NODE_ENV ?? 'development').trim();
 const isProduction = environment === 'production';
@@ -10,4 +10,8 @@ if (instrument) {
 	console.info('Creating instrumented build for code coverage.');
 }
 
-export default [createServerConfig({ isProduction, instrument }), createBrowserConfig({ isProduction, instrument })];
+export default [
+	createServerConfig({ isProduction, instrument }),
+	createBrowserConfig({ isProduction, instrument }),
+	createTypeORMConfig({ isProduction }),
+];
