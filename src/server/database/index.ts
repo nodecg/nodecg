@@ -37,9 +37,9 @@ export async function getConnection(): Promise<Connection> {
 			 */
 			database: testing ? ':memory:' : dbPath,
 			logging: false,
-			entities: [path.join(appRootPath.path, 'build/server/database/entity/**/*.js')],
-			migrations: [path.join(appRootPath.path, 'build/server/database/migration/**/*.js')],
-			subscribers: [path.join(appRootPath.path, 'build/server/database/subscriber/**/*.js')],
+			entities: [path.join(appRootPath.path, 'build/typeorm/entity/**/*.js')],
+			migrations: [path.join(appRootPath.path, 'build/typeorm/migration/**/*.js')],
+			subscribers: [path.join(appRootPath.path, 'build/typeorm/subscriber/**/*.js')],
 			migrationsRun: true,
 
 			/**

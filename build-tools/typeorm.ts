@@ -24,14 +24,22 @@ export function createTypeORMConfig({
 			minimize: false,
 		},
 		// Dynamically generate a `{ [name]: sourceFileName }` map for the `entry` option
-		entry: glob
-			.sync(path.join(appRootPath.path, 'src/server/database/{migration,entity}/*.ts'))
-			.reduce((entries, filename) => {
-				const migrationName = path.basename(filename, '.ts');
+		entry: {
+			...glob.sync(path.join(appRootPath.path, 'src/server/database/entity/*.ts')).reduce((entries, filename) => {
+				const name = path.join('entity', path.basename(filename, '.ts'));
 				return Object.assign({}, entries, {
-					[migrationName]: filename,
+					[name]: filename,
 				});
 			}, {}),
+			...glob
+				.sync(path.join(appRootPath.path, 'src/server/database/migration/*.ts'))
+				.reduce((entries, filename) => {
+					const name = path.join('migration', path.basename(filename, '.ts'));
+					return Object.assign({}, entries, {
+						[name]: filename,
+					});
+				}, {}),
+		},
 		resolve: {
 			// Assuming all your migration files are written in TypeScript
 			extensions: ['.ts'],
