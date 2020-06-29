@@ -10,6 +10,13 @@ export * from './entity';
 
 // Ours
 import createLogger from '../logger';
+import { User } from './entity/User';
+import { Session } from './entity/Session';
+import { Role } from './entity/Role';
+import { Replicant } from './entity/Replicant';
+import { Permission } from './entity/Permission';
+import { Identity } from './entity/Identity';
+import { ApiKey } from './entity/ApiKey';
 
 const log = createLogger('database');
 const dbPath = path.join(appRootPath.path, 'db/nodecg.sqlite3');
@@ -37,7 +44,7 @@ export async function getConnection(): Promise<Connection> {
 			 */
 			database: testing ? ':memory:' : dbPath,
 			logging: false,
-			entities: [path.join(appRootPath.path, 'build/typeorm/entity/**/*.js')],
+			entities: [ApiKey, Identity, Permission, Replicant, Role, Session, User],
 			migrations: [path.join(appRootPath.path, 'build/typeorm/migration/**/*.js')],
 			subscribers: [path.join(appRootPath.path, 'build/typeorm/subscriber/**/*.js')],
 			migrationsRun: true,
