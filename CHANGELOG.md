@@ -378,7 +378,7 @@ nodecg.listenFor('example', (data, ack) => {
 
 ### BREAKING CHANGES
 
-For detailed instructions on how to migrate your v0.8 bundles to v0.9, [check out the tutorial on NodeCG.com](https://nodecg.dev/tutorial-migrating-0.8-to-0.9.html)
+For detailed instructions on how to migrate your v0.8 bundles to v0.9, [check out the tutorial on NodeCG.dev](https://nodecg.dev/tutorial-migrating-0.8-to-0.9.html)
 
 - NodeCG no longer automatically installs the `npm` and `bower` dependencies of installed bundles. Users must do this manually.
 - replicants: Replicants now set their state to `declared` _before_ they emit their post-declare `change` event. This is unlikely to break any existing code, but it is technically a breaking change.
