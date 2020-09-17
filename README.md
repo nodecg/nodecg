@@ -1,8 +1,8 @@
 # NodeCG
 
-[![NodeCG](https://raw.githubusercontent.com/nodecg/nodecg/master/media/splash.png)](http://nodecg.com/)
+[![NodeCG](https://raw.githubusercontent.com/nodecg/nodecg/master/media/splash.png)](https://nodecg.dev/)
 
-[![Discord](https://img.shields.io/discord/754749209722486814.svg?logo=discord)](https://discord.gg/GJ4r8a8)
+[![Discord](https://img.shields.io/discord/754749209722486814.svg?logo=discord)](https://discord.com/invite/GJ4r8a8)
 [![Build Status](https://github.com/nodecg/nodecg/workflows/CI/badge.svg)](https://github.com/nodecg/nodecg/actions?query=workflow%3ACI)
 [![Coverage Status](https://codecov.io/gh/nodecg/nodecg/branch/master/graph/badge.svg)](https://codecov.io/gh/nodecg/nodecg)
 [![Docker Build Status](https://img.shields.io/docker/build/nodecg/nodecg.svg)](https://hub.docker.com/r/nodecg/nodecg/tags/)
@@ -22,11 +22,11 @@ can render HTML, including:
 
 > Don't see your preferred streaming software on this list? NodeCG graphics require Chrome 49 or newer. If your streaming software's implementation of browser source uses a build of CEF that is based on at least Chrome 49, chances are that NodeCG graphics will work in it. You can check what version of Chrome your streaming software uses for its browser sources by opening [whatversion.net/chrome](http://www.whatversion.net/chrome) as a browser source.
 
-Have questions about NodeCG, or just want to say 'hi'? [Join our Discord server](https://discord.gg/GJ4r8a8)!
+Have questions about NodeCG, or just want to say 'hi'? [Join our Discord server](https://discord.com/invite/GJ4r8a8)!
 
 ## Documentation & API Reference
 
-Full docs and API reference are available at https://nodecg.com
+Full docs and API reference are available at https://nodecg.dev
 
 ## Goals
 
