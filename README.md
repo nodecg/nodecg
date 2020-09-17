@@ -26,7 +26,7 @@ Have questions about NodeCG, or just want to say 'hi'? [Join our Discord server]
 
 ## Documentation & API Reference
 
-Full docs and API reference are available at https://nodecg.com
+Full docs and API reference are available at https://nodecg.dev
 
 ## Goals
 
