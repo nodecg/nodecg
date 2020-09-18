@@ -1,5 +1,7 @@
 # NodeCG
 
+**master branch is being developed for future 2.0.0 release. For the current release check [legacy-1.x branch](https://github.com/nodecg/nodecg/tree/legacy-1.x)**
+
 [![NodeCG](https://raw.githubusercontent.com/nodecg/nodecg/master/media/splash.png)](https://nodecg.dev/)
 
 [![Discord](https://img.shields.io/discord/754749209722486814.svg?logo=discord)](https://discord.com/invite/GJ4r8a8)
