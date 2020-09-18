@@ -433,7 +433,7 @@ nodecg.listenFor('example', (data, ack) => {
 * **dashboard:** add "open in standalone window" button to panel headers ([ba077c0](https://github.com/nodecg/nodecg/commit/ba077c0))
 * **dashboard:** add default body background color style to panels ([3433529](https://github.com/nodecg/nodecg/commit/3433529))
 * **dashboard:** add support for "fullbleed" workspaces, which have one single panel that takes up the entire dashboard
-* **dashboard:** add support for multiple tabs of panels, called "workspaces". See the [Manifest tutorial](http://nodecg.com/tutorial-manifest.html) (specifically the `nodecg.dashboardPanels` section) for more info.
+* **dashboard:** add support for multiple tabs of panels, called "workspaces". See the [Manifest tutorial](https://nodecg.dev/tutorial-manifest.html) (specifically the `nodecg.dashboardPanels` section) for more info.
 * **dashboard:** compatability with browsers other than Chrome has been greatly improved
 * **dashboard:** re-design dashboard with tabbed navigation ([8214b43](https://github.com/nodecg/nodecg/commit/8214b43))
 * **dashboard:** show a much shorter and easier to read URL for each graphic on the Graphics page ([5b91af1](https://github.com/nodecg/nodecg/commit/5b91af1))
@@ -453,7 +453,7 @@ nodecg.listenFor('example', (data, ack) => {
 
 ### BREAKING CHANGES
 
-For detailed instructions on how to migrate your v0.8 bundles to v0.9, [check out the tutorial on NodeCG.com](http://nodecg.com/tutorial-migrating-0.8-to-0.9.html)
+For detailed instructions on how to migrate your v0.8 bundles to v0.9, [check out the tutorial on NodeCG.dev](https://nodecg.dev/tutorial-migrating-0.8-to-0.9.html)
 
 * NodeCG no longer automatically installs the `npm` and `bower` dependencies of installed bundles. Users must do this manually.
 * replicants: Replicants now set their state to `declared` *before* they emit their post-declare `change` event. This is unlikely to break any existing code, but it is technically a breaking change.
