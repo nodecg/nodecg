@@ -73,7 +73,7 @@ jobs:
       # This is actually needed for a test lmao.
       # The "should emit an `invalidBundle`" test.
       - run: |
-          git config --global user.email "contact@nodecg.com"
+          git config --global user.email "contact@nodecg.dev"
           git config --global user.name "NodeCG Bot"
 
       - run: npm ci
@@ -124,7 +124,7 @@ jobs:
               'next',
               'next-major',
               {
-                name: 'beta', 
+                name: 'beta',
                 prerelease: true
               },
               {
