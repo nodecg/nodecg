@@ -118,8 +118,7 @@
     "docs:publish": "node scripts/docs-build-all.js publish",
     "docs:serve": "superstatic",
     "prerelease": "npm t",
-    "release": "standard-version",
-    "postrelease": "npm publish && git push --follow-tags",
+    "release": "standard-version && git push --follow-tags",
     "typetest": "cd typetest/fake-bundle && npm i && npm run build"
   },
   "nyc": {
