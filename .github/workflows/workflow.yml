@@ -44,3 +44,5 @@ jobs:
         run: |
           npx standard-version --prerelease next
           npm publish --tag next
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
