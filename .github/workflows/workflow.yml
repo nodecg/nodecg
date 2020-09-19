@@ -56,6 +56,8 @@ jobs:
       - name: Prerelease
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
+          git config --global user.email "nodecg@example.com"
+          git config --global user.name "nodecg"
           npx standard-version --prerelease next
           npm publish --tag next
         env:
