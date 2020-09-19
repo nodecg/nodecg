@@ -88,7 +88,7 @@ export default class ExtensionManager extends EventEmitter {
 							continue;
 						}
 
-						unsatisfiedDeps.push(`${dep}@${bundle.bundleDependencies[dep]}`);
+						unsatisfiedDeps.push(`${dep}@${bundle.bundleDependencies[dep] as string}`);
 					}
 
 					log.error(
@@ -111,16 +111,19 @@ export default class ExtensionManager extends EventEmitter {
 		const ExtensionApi = this._ExtensionApi;
 		const extPath = path.join(bundle.dir, 'extension');
 		try {
-			/* eslint-disable @typescript-eslint/no-var-requires */
-			const extension = require(extPath)(new ExtensionApi(bundle));
-			/* eslint-enable @typescript-eslint/no-var-requires */
+			// @ts-ignore
+			// eslint-disable-next-line no-undef
+			const requireFunc = process.env.NODECG_TEST ? require : __non_webpack_require__;
+
+			const extension = requireFunc(extPath)(new ExtensionApi(bundle));
+
 			log.info('Mounted %s extension', bundle.name);
 			this.extensions[bundle.name] = extension;
 		} catch (err) {
 			this._bundleManager.remove(bundle.name);
 			log.warn('Failed to mount %s extension:\n', err?.stack ?? err);
 			if (global.sentryEnabled) {
-				err.message = `Failed to mount ${bundle.name} extension: ${(err?.message ?? err) as string}`;
+				err.message = `Failed to mount ${bundle.name as string} extension: ${(err?.message ?? err) as string}`;
 				Sentry.captureException(err);
 			}
 		}
