@@ -2,7 +2,7 @@
 import test from 'ava';
 
 // Ours
-import parseBundle from '../../build/server/bundle-parser';
+import parseBundle from '../../src/server/bundle-parser';
 
 test('parsing - when the config file exists, parse the config and add it as bundle.config', t => {
 	const parsedBundle = parseBundle(

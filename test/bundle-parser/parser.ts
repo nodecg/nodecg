@@ -5,7 +5,7 @@ import path from 'path';
 import test from 'ava';
 
 // Ours
-import parseBundle from '../../build/server/bundle-parser';
+import parseBundle from '../../src/server/bundle-parser';
 
 test('should error when package.json does not exist', t => {
 	const error = t.throws(parseBundle.bind(parseBundle, './test'));

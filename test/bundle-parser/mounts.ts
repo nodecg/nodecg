@@ -2,7 +2,7 @@
 import test from 'ava';
 
 // Ours
-import parseMounts from '../../build/server/bundle-parser/mounts';
+import parseMounts from '../../src/server/bundle-parser/mounts';
 
 test('returns an empty array if a bundle has no mounts', t => {
 	t.deepEqual(parseMounts({ name: 'test-bundle' }), []);

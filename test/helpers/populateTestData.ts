@@ -9,7 +9,7 @@ export default async function populateTestData(): Promise<void> {
 	// We need to delay importing this,
 	// so that we have time to set up the temp
 	// process.env.NODECG_ROOT folder.
-	const { getConnection, Replicant } = await import('../../build/server/database');
+	const { getConnection, Replicant } = await import('../../src/server/database');
 
 	const db = await getConnection();
 	const repo = db.getRepository(Replicant);

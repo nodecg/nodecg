@@ -2,7 +2,7 @@
 import test from 'ava';
 
 // Ours
-import parseBundle from '../../build/server/bundle-parser';
+import parseBundle from '../../src/server/bundle-parser';
 
 test('when there is no "graphics" folder, assign an empty array to bundle.graphics', t => {
 	const parsedBundle = parseBundle('./test/fixtures/bundle-parser/no-graphics');

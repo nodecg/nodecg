@@ -11,8 +11,8 @@ import * as C from './test-constants';
 // Doing some tricks here:
 // This import is ONLY for a type.
 // The import for the value is later in this file.
-import NodeCGServer from '../../build/server/server';
-import serverApiFactory from '../../build/server/api.server';
+import NodeCGServer from '../../src/server/server';
+import serverApiFactory from '../../src/server/api.server';
 import populateTestData from './populateTestData';
 
 export type ServerContext = {
@@ -41,7 +41,7 @@ export const setup = (nodecgConfigName = 'nodecg.json'): void => {
 		// We need to delay importing this,
 		// so that we have time to set up the temp
 		// process.env.NODECG_ROOT folder.
-		const { default: NodeCGServer } = await import('../../build/server/server');
+		const { default: NodeCGServer } = await import('../../src/server/server');
 		server = new NodeCGServer();
 
 		await populateTestData();
