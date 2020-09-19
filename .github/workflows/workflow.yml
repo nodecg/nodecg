@@ -39,6 +39,20 @@ jobs:
         with:
           file: ./coverage.lcov
 
+  release:
+    runs-on: ubuntu-latest
+
+    needs: build-test
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+
+      - run: npm ci
+
       - name: Prerelease
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
