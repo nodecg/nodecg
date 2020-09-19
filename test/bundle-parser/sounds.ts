@@ -2,7 +2,7 @@
 import test from 'ava';
 
 // Ours
-import parseSounds from '../../build/server/bundle-parser/sounds';
+import parseSounds from '../../src/server/bundle-parser/sounds';
 
 test('should return the parsed soundCues', t => {
 	const input = [
