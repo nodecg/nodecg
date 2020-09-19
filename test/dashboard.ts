@@ -131,13 +131,19 @@ test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is 
 	t.pass();
 });
 
-/**
- * TODO: fix this flaky test
- */
 test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async t => {
 	await dashboard.evaluate(
 		async () =>
 			new Promise(resolve => {
+				// Open dialog first
+				const openDialogButton = document!
+					.querySelector('ncg-dashboard')!
+					.shadowRoot!.querySelector('ncg-workspace')!
+					.shadowRoot!.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')!
+					.querySelector('iframe')!
+					.contentWindow!.document.querySelector('#openDialog')! as HTMLButtonElement;
+				openDialogButton.click();
+
 				const dialog: any = window.dashboardApi.getDialog('test-dialog');
 				const dialogDocument: any = window.dashboardApi.getDialogDocument('test-dialog');
 				const dismissButton: any = dialog.querySelector('paper-button[dialog-dismiss]');
