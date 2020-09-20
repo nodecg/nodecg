@@ -5,6 +5,7 @@ import path from 'path';
 import webpack from 'webpack';
 import nodeExternals from 'webpack-node-externals';
 import appRootPath from 'app-root-path';
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
 export function createServerConfig({
 	isProduction,
@@ -44,6 +45,7 @@ export function createServerConfig({
 			__dirname: false,
 		},
 		externals: [nodeExternals()],
+		plugins: [new ForkTsCheckerWebpackPlugin()],
 		module: {
 			rules: [
 				{

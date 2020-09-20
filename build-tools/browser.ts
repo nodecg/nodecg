@@ -5,6 +5,7 @@ import path from 'path';
 import webpack from 'webpack';
 import CopyPlugin from 'copy-webpack-plugin';
 import appRootPath from 'app-root-path';
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
 export function createBrowserConfig({
 	isProduction,
@@ -72,6 +73,7 @@ export function createBrowserConfig({
 				{ from: 'src/client/instance/', to: 'instance', toType: 'dir' },
 				{ from: 'src/client/login/', to: 'login', toType: 'dir' },
 			]),
+			new ForkTsCheckerWebpackPlugin(),
 		],
 	};
 }

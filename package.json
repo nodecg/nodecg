@@ -189,6 +189,7 @@
     "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-plugin-ava": "^10.2.0",
+    "fork-ts-checker-webpack-plugin": "^5.2.0",
     "husky": "^4.2.3",
     "is-ci": "^2.0.0",
     "is-windows": "^1.0.2",
