@@ -7,7 +7,7 @@ import test from 'ava';
 import axios from 'axios';
 import simpleGit from 'simple-git/promise';
 // @ts-ignore
-import replace from 'replace-in-file';
+import { replaceInFile } from 'replace-in-file';
 
 // Ours
 import * as server from './helpers/server';
@@ -171,7 +171,7 @@ const statusEl = async (page: Page) =>
 	);
 
 test.serial('version out of date', async t => {
-	replace.sync({
+	replaceInFile.sync({
 		files: path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle/package.json'),
 		from: '"version": "0.0.1"',
 		to: '"version": "0.0.2"',
@@ -181,7 +181,7 @@ test.serial('version out of date', async t => {
 	let text = await dashboard.evaluate(el => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
 
-	replace.sync({
+	replaceInFile.sync({
 		files: path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle/package.json'),
 		from: '"version": "0.0.2"',
 		to: '"version": "0.0.1"',
