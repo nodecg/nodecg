@@ -272,6 +272,7 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 
 		const clipboard = new window.ClipboardJS(this.$.copyButton);
 		this._initClipboard(clipboard);
+		this.$.url.addEventListener('dragstart', this._onDrag.bind(this));
 	}
 
 	reloadAll() {
@@ -356,6 +357,14 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 
 	_calcReloadAllDisabled(instances) {
 		return !instances || instances.length <= 0;
+	}
+
+	_onDrag(event) {
+		const dragged = event.target;
+		const obsURL = `${dragged.href}?layer-name=${this.graphic.file.replace('.html', '')}&layer-height=${
+			this.graphic.height
+		}&layer-width=${this.graphic.width}`;
+		event.dataTransfer.setData('text/uri-list', obsURL);
 	}
 }
 
