@@ -256,7 +256,7 @@ test.serial('dragging the graphic generates the correct url for obs', async t =>
 	await dashboard.evaluateHandle(gl => {
 		gl.addEventListener('dragstart', ev => {
 			ev.preventDefault();
-			var data = ev.dataTransfer.getData('text/uri-list');
+			const data = ev.dataTransfer.getData('text/uri-list');
 			console.log(data);
 		});
 	}, graphicLink);
@@ -266,8 +266,8 @@ test.serial('dragging the graphic generates the correct url for obs', async t =>
 
 	// Move mouse to centre of link and start dragging
 	await dashboard.mouse.move(
-		linkBoundingBox.x + linkBoundingBox.width / 2,
-		linkBoundingBox.y + linkBoundingBox.height / 2,
+		linkBoundingBox.x + (linkBoundingBox.width / 2),
+		linkBoundingBox.y + (linkBoundingBox.height / 2),
 	);
 	await dashboard.mouse.down();
 
@@ -283,7 +283,7 @@ test.serial('dragging the graphic generates the correct url for obs', async t =>
 
 	// Move to top left of screen over 10 ticks
 	// Dragstart event should be called during this
-	await dashboard.mouse.move(0, 0, { steps: 10 });
+	await dashboard.mouse.move(0, 0, {steps: 10});
 
 	await dashboard.waitFor(200);
 });
