@@ -247,14 +247,21 @@ test.serial('dragging the graphic generates the correct url for obs', async t =>
 	);
 
 	await dashboard.evaluateHandle(gl => {
-		gl.addEventListener('dragstart', ev => {
+		gl.addEventListener('dragstart', (ev: DragEvent) => {
 			ev.preventDefault();
-			var data = ev.dataTransfer.getData('text/uri-list');
+
+			if (!ev.dataTransfer) return;
+			const data = ev.dataTransfer.getData('text/uri-list');
 			console.log(data);
 		});
 	}, graphicLink);
 
 	const linkBoundingBox = await graphicLink.boundingBox();
+	if (!linkBoundingBox) {
+		t.fail();
+		return;
+	}
+
 	await dashboard.bringToFront();
 
 	// Move mouse to centre of link and start dragging
