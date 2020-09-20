@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/nodecg/nodecg/compare/v1.6.1...v1.7.0) (2020-09-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependencies through npm audit ([a871f4b](https://github.com/nodecg/nodecg/commit/a871f4b))
+
+
+### Features
+
+* **dashboard:** Add graphic obs drag parameters ([#561](https://github.com/nodecg/nodecg/issues/561)) ([5c5a833](https://github.com/nodecg/nodecg/commit/5c5a833))
+
+
+
 ### [1.6.1](https://github.com/nodecg/nodecg/compare/v1.6.0...v1.6.1) (2020-04-30)
 
 
