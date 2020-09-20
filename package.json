@@ -124,7 +124,7 @@
     "postrelease": "npm publish && git push --follow-tags"
   },
   "engines": {
-    "node": ">=8.3.0"
+    "node": ">=10.22.0"
   },
   "files": [
     "build",
