@@ -4,6 +4,8 @@
 	"rules": {
 		"new-cap": 0,
 		"valid-jsdoc": 0,
-		"@typescript-eslint/camelcase": 0
+		"@typescript-eslint/camelcase": 0,
+		"@typescript-eslint/restrict-template-expressions": 0,
+		"@typescript-eslint/restrict-plus-operands": 0
 	}
 }
