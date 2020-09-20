@@ -8,7 +8,7 @@ const fs = require('fs');
 const rimraf = require('rimraf');
 
 const isCI = process.env.CONTINUOUS_INTEGRATION || false;
-const docsSite = process.env.DOCS_SITE || 'nodecg.com';
+const docsSite = process.env.DOCS_SITE || 'nodecg.dev';
 
 // These can't really be changed without a fair few changes to the code
 const checkoutDir = './checkout';

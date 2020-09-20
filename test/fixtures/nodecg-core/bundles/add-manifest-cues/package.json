@@ -5,7 +5,7 @@
   "homepage": "",
   "author": {
     "name": "NodeCG",
-    "url": "https://nodecg.com"
+    "url": "https://nodecg.dev"
   },
   "nodecg": {
     "compatibleRange": "^1.0.0",
