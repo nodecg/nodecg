@@ -233,3 +233,50 @@ test.serial('shows a diff when hovering over "potentially out of date" status', 
 		graphicInstance,
 	);
 });
+
+test.serial('dragging the graphic generates the correct url for obs', async t => {
+	t.plan(1);
+
+	const graphicLink = await util.shadowSelector(
+		dashboard,
+		'ncg-dashboard',
+		'ncg-graphics',
+		'ncg-graphics-bundle',
+		'ncg-graphic',
+		'#url',
+	);
+
+	await dashboard.evaluateHandle(gl => {
+		gl.addEventListener('dragstart', ev => {
+			ev.preventDefault();
+			var data = ev.dataTransfer.getData('text/uri-list');
+			console.log(data);
+		});
+	}, graphicLink);
+
+	const linkBoundingBox = await graphicLink.boundingBox();
+	await dashboard.bringToFront();
+
+	// Move mouse to centre of link and start dragging
+	await dashboard.mouse.move(
+		linkBoundingBox.x + linkBoundingBox.width / 2,
+		linkBoundingBox.y + linkBoundingBox.height / 2,
+	);
+	await dashboard.mouse.down();
+
+	dashboard.on('console', msg => {
+		// This allows other console messages to come through while the test is running, as long as the required message comes through eventually
+		if (
+			msg.text() ===
+			`${C.rootUrl()}bundles/test-bundle/graphics/index.html?layer-name=index&layer-height=720&layer-width=1280`
+		) {
+			t.pass();
+		}
+	});
+
+	// Move to top left of screen over 10 ticks
+	// Dragstart event should be called during this
+	await dashboard.mouse.move(0, 0, { steps: 10 });
+
+	await dashboard.waitFor(200);
+});
