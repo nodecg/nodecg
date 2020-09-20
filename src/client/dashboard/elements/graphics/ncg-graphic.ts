@@ -7,7 +7,6 @@ import './ncg-graphic-instance';
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 import Clipboard from 'clipboard';
-import { EventEmitter } from 'events';
 import { NodeCG } from '../../../../types/nodecg';
 
 /**
@@ -304,13 +303,13 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 		}
 	}
 
-	_initClipboard(clipboard: EventEmitter) {
+	_initClipboard(clipboard: Clipboard) {
 		/* istanbul ignore next: cant figure out how to test these */
 		clipboard.on('success', () => {
 			this.dispatchEvent(new CustomEvent('url-copy-success', { bubbles: true, composed: true }));
 		});
 		/* istanbul ignore next: cant figure out how to test these */
-		clipboard.on('error', (e: any) => {
+		clipboard.on('error', (e: ClipboardJS.Event) => {
 			this.dispatchEvent(new CustomEvent('url-copy-error', { bubbles: true, composed: true }));
 			console.error(e);
 		});
@@ -365,8 +364,10 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 		return !instances || instances.length <= 0;
 	}
 
-	_onDrag(event) {
-		const dragged = event.target;
+	_onDrag(event: DragEvent) {
+		if (!event.target || !event.dataTransfer) return;
+
+		const dragged = event.target as HTMLAnchorElement;
 		const obsURL = `${dragged.href}?layer-name=${this.graphic.file.replace('.html', '')}&layer-height=${
 			this.graphic.height
 		}&layer-width=${this.graphic.width}`;
