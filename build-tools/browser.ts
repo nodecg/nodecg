@@ -73,7 +73,11 @@ export function createBrowserConfig({
 				{ from: 'src/client/instance/', to: 'instance', toType: 'dir' },
 				{ from: 'src/client/login/', to: 'login', toType: 'dir' },
 			]),
-			new ForkTsCheckerWebpackPlugin(),
+			new ForkTsCheckerWebpackPlugin({
+				typescript: {
+					configFile: 'src/client/tsconfig.json'
+				}
+			}),
 		],
 	};
 }

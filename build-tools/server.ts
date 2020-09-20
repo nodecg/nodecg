@@ -45,7 +45,11 @@ export function createServerConfig({
 			__dirname: false,
 		},
 		externals: [nodeExternals()],
-		plugins: [new ForkTsCheckerWebpackPlugin()],
+		plugins: [new ForkTsCheckerWebpackPlugin({
+			typescript: {
+				configFile: 'src/client/tsconfig.json'
+			}
+		})],
 		module: {
 			rules: [
 				{
