@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/nodecg/nodecg/compare/v1.7.0...v1.7.1) (2020-10-02)
+
+
+### Bug Fixes
+
+* **assets:** filename ([#564](https://github.com/nodecg/nodecg/issues/564)) ([ddf936c](https://github.com/nodecg/nodecg/commit/ddf936c))
+
+
+
 ## [1.7.0](https://github.com/nodecg/nodecg/compare/v1.6.1...v1.7.0) (2020-09-20)
 
 
