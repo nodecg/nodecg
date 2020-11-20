@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.2](https://github.com/nodecg/nodecg/compare/v1.7.1...v1.7.2) (2020-11-20)
+
+
+### Bug Fixes
+
+* **deps:** switch json-schema-lib repo ([7b7c7c1](https://github.com/nodecg/nodecg/commit/7b7c7c1))
+
+
+
 ### [1.7.1](https://github.com/nodecg/nodecg/compare/v1.7.0...v1.7.1) (2020-10-02)
 
 
