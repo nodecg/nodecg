@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.3.3"></a>
+## [1.3.3](https://github.com/nodecg/nodecg/compare/v1.3.2...v1.3.3) (2020-11-20)
+
+
+### Bug Fixes
+
+* **deps:** switch json-schema-libs repo ([ef1658b](https://github.com/nodecg/nodecg/commit/ef1658b))
+
+
+
 <a name="1.3.2"></a>
 ## [1.3.2](https://github.com/nodecg/nodecg/compare/v1.3.1...v1.3.2) (2019-03-06)
 
