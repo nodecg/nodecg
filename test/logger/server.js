@@ -4,6 +4,7 @@
 const fs = require('fs');
 
 // Packages
+const winston = require('winston');
 const rimraf = require('rimraf');
 const sinon = require('sinon');
 const test = require('ava');
@@ -33,11 +34,19 @@ test.beforeEach(t => {
 });
 
 test('console - should default to being silent', t => {
-	t.is(Logger._winston.transports.nodecgConsole.silent, true);
+	const consoleTransport = Logger._winston.transports.find(
+		transport => transport instanceof winston.transports.Console
+	);
+
+	t.is(consoleTransport.silent, true);
 });
 
 test('console - should default to level "info"', t => {
-	t.is(Logger._winston.transports.nodecgConsole.level, 'info');
+	const consoleTransport = Logger._winston.transports.find(
+		transport => transport instanceof winston.transports.Console
+	);
+
+	t.is(consoleTransport.level, 'info');
 });
 
 test('console - should change settings when reconfigured', t => {
@@ -48,16 +57,28 @@ test('console - should change settings when reconfigured', t => {
 		}
 	});
 
-	t.is(Logger._winston.transports.nodecgConsole.silent, false);
-	t.is(Logger._winston.transports.nodecgConsole.level, 'debug');
+	const consoleTransport = Logger._winston.transports.find(
+		transport => transport instanceof winston.transports.Console
+	);
+
+	t.is(consoleTransport.silent, false);
+	t.is(consoleTransport.level, 'debug');
 });
 
 test('file - should default to being silent', t => {
-	t.is(Logger._winston.transports.nodecgFile.silent, true);
+	const fileTransport = Logger._winston.transports.find(
+		transport => transport instanceof winston.transports.File
+	);
+
+	t.is(fileTransport.silent, true);
 });
 
 test('file - should default to level "info"', t => {
-	t.is(Logger._winston.transports.nodecgFile.level, 'info');
+	const fileTransport = Logger._winston.transports.find(
+		transport => transport instanceof winston.transports.File
+	);
+
+	t.is(fileTransport.level, 'info');
 });
 
 test('file - should change settings when reconfigured', t => {
@@ -69,9 +90,13 @@ test('file - should change settings when reconfigured', t => {
 		}
 	});
 
-	t.is(Logger._winston.transports.nodecgFile.filename, 'logs/test.log');
-	t.is(Logger._winston.transports.nodecgFile.silent, false);
-	t.is(Logger._winston.transports.nodecgFile.level, 'debug');
+	const fileTransport = Logger._winston.transports.find(
+		transport => transport instanceof winston.transports.File
+	);
+
+	t.is(fileTransport.filename, 'logs/test.log');
+	t.is(fileTransport.silent, false);
+	t.is(fileTransport.level, 'debug');
 });
 
 test('file - should make the logs folder', t => {
