@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.4](https://github.com/nodecg/nodecg/compare/v1.7.3...v1.7.4) (2020-12-11)
+
+
+### Bug Fixes
+
+* remove node warnings ([#567](https://github.com/nodecg/nodecg/issues/567)) ([5d5c494](https://github.com/nodecg/nodecg/commit/5d5c494))
+
+
+
 ### [1.7.3](https://github.com/nodecg/nodecg/compare/v1.7.2...v1.7.3) (2020-12-11)
 
 
