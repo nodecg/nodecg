@@ -5,6 +5,7 @@
 - [How do I enable login security?](#enabling-login-security)
   - [Local Auth](#local-auth)
   - [Twitch Auth](#twitch-auth)
+  - [Discord Auth](#discord-auth)
   - [Steam Auth](#steam-auth)
 - [How do I enable HTTPS/SSL encryption?](#enabling-https)
 
@@ -49,9 +50,10 @@ If you are unable to reach the owner of the leaked key:
 4. Restart NodeCG.
 
 ## <a name="enabling-login-security"></a> How do I enable login security?
-NodeCG has support for three authentication providers:
+NodeCG has support for four authentication providers:
   - [Local Username/Password Auth](#local-auth)
   - [Twitch Auth](#twitch-auth)
+  - [Discord Auth](#discord-auth)
   - [Steam Auth](#steam-auth)
   
 You may have multiple authentication providers enabled simultaneously.
@@ -141,6 +143,72 @@ Example:
   }
 }
 ```
+
+### <a name="discord-auth"></a> Discord Auth
+1. [Create a new application on your Discord Developer Dashboard](https://discord.com/developers/applications)
+2. Give it whatever value you want for the Name
+3. Click on OAuth2 on the left and Set the OAuth Redirect URL to `https://YOUR_DEPLOYMENT_URL/login/auth/discord`.
+  - If you're testing locally, use `http://localhost:9090/login/auth/discord`
+4. Use the Client ID and Client Secret from general information for your configuration
+5. Configure your `nodecg/cfg/nodecg.json` like below
+  - See the [Discord docs for the list of available scopes](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
+
+You can use two different kinds of authentication, by user or by server.
+You can use one of them or both (in which case matching one of them will grant access).
+#### By user
+To get a Discord user ID, enable Discord developer mode and then right click on a user to copy it.
+```json
+{
+  "login": {
+    "enabled": true,
+    "sessionSecret": "Make this a random string, like one from https://randomkeygen.com/",
+    "discord": {
+      "enabled": true,
+      "clientID": "YOUR_DISCORD_APP_CLIENT_ID",
+      "clientSecret": "YOUR_DISCORD_APP_CLIENT_SECRET",
+      "scope": "identify",
+      "allowedIDs": [
+        "paste discord user ids you want to allow here",
+        "they look like this",
+        "159600065017675778",
+        "54561421005950976"
+      ]
+    }
+  }
+}
+```
+#### By Server (Guild)
+To get a Discord server ID, enable Discord developer mode and then right click on a server to copy it.
+Any user in the server will be allowed to use nodecg.
+
+You can also require users in the server to additionally have certain permissions (for example administrator).
+Get a list of permissions from the [Discord Docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags)
+```json
+{
+  "login": {
+    "enabled": true,
+    "sessionSecret": "Make this a random string, like one from https://randomkeygen.com/",
+    "discord": {
+      "enabled": true,
+      "clientID": "YOUR_DISCORD_APP_CLIENT_ID",
+      "clientSecret": "YOUR_DISCORD_APP_CLIENT_SECRET",
+      "scope": "identify guilds",
+      "allowedGuildIDs": [
+        "paste discord server ids you want to allow here",
+        "754749209722486814"
+      ],
+      "guildRequiredPermissions": [
+        "this is optional",
+        "paste permissions here to require them in the target servers",
+        "permissions look like this",
+        "MANAGE_MESSAGES",
+        "PRIORITY_SPEAKER"
+      ]
+    }
+  }
+}
+```
+
 
 ### <a name="steam-auth"></a> Steam Auth
 1. [Create/copy your Steam Web API Key](https://steamcommunity.com/dev/apikey)

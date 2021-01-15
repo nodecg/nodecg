@@ -37,6 +37,15 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
     - _Note:_ Configure your Twitch OAuth credentials with a Redirect URI to `{baseURL}/login/auth/twitch`
     - `scope` _String_ A space-separated string of Twitch application [permissions](https://dev.twitch.tv/docs/authentication/#scopes).
     - `allowedUsernames` _Array of strings_ Which Twitch usernames to allow.
+  - `discord` _Object_ Contains discord login configuration properties.
+    - `enabled` _Boolean_ Whether to enable Discord authentication.
+    - `clientID` _String_ A Discord application ClientID  [https://discord.com/developers/applications/](https://discord.com/developers/applications/)
+    - `clientSecret` _String_ A Discord application ClientSecret [https://discord.com/developers/applications/](https://discord.com/developers/applications/)
+    - _Note:_ Configure your Discord OAuth credentials with a Redirect URI to `{baseURL}/login/auth/discord`
+    - `scope` _String_ A space-separated string of Discord application [permissions](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
+    - `allowedIDs` _Array of strings_ Which Discord IDs to allow
+    - `allowedGuildIDs` _Array of strings_ Users in these Discord Guilds are allowed to login
+    - `guildRequiredPermissions` _Array of strings_ In addition to being in one of allowedGuildIDs, the user must have these [permissions](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags) in the guild.
 - `ssl` _Object_ Contains HTTPS/SSL configuration properties.
     - `enabled` _Boolean_ Whether to enable SSL/HTTPS encryption.
     - `allowHTTP` _Boolean_ Whether to allow insecure HTTP connections while SSL is active.
@@ -80,6 +89,23 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
             "scope": "user_read",
             "allowedUsernames": [
                 "some_username"
+            ]
+        },
+        "discord": {
+            "enabled": true,
+            "clientID": "your_discord_app_client_id",
+            "clientSecret": "your_discord_app_client_secret",
+            "scope": "identify guilds",
+            "allowedIDs": [
+              "159600065017675778",
+              "54561421005950976"
+            ],
+            "allowedGuildIDs": [
+                "754749209722486814"
+            ],
+            "guildRequiredPermissions": [
+                "MANAGE_MESSAGES",
+                "PRIORITY_SPEAKER"
             ]
         }
     },
