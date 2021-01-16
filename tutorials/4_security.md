@@ -167,7 +167,7 @@ To get a Discord user ID, enable Discord developer mode and then right click on 
       "clientID": "YOUR_DISCORD_APP_CLIENT_ID",
       "clientSecret": "YOUR_DISCORD_APP_CLIENT_SECRET",
       "scope": "identify",
-      "allowedIDs": [
+      "allowedUserIDs": [
         "paste discord user ids you want to allow here",
         "they look like this",
         "159600065017675778",
