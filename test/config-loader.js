@@ -28,7 +28,7 @@ test('should validate the "login.twitch" object when "login.twitch.enabled" is "
 
 test('should validate the "login.discord" object when "login.discord.enabled" is "true"', t => {
 	const error = t.throws(loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidDiscord.json'));
-	t.is(error.message, 'login.discord.clientID: must be of type String\nlogin.discord.clientSecret: must be of type String');
+	t.is(error.message, 'login.discord.clientID: must be of type String\nlogin.discord.clientSecret: must be of type String\nlogin.discord.allowedGuilds: must be of type Array');
 });
 
 test('should validate the "ssl" object when "ssl.enabled" is "true"', t => {

@@ -145,17 +145,18 @@ Example:
 ```
 
 ### <a name="discord-auth"></a> Discord Auth
-1. [Create a new application on your Discord Developer Dashboard](https://discord.com/developers/applications)
-2. Give it whatever value you want for the Name
-3. Click on OAuth2 on the left and Set the OAuth Redirect URL to `https://YOUR_DEPLOYMENT_URL/login/auth/discord`.
-  - If you're testing locally, use `http://localhost:9090/login/auth/discord`
-4. Use the Client ID and Client Secret from general information for your configuration
-5. Configure your `nodecg/cfg/nodecg.json` like below
-  - See the [Discord docs for the list of available scopes](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
 
 You can use two different kinds of authentication, by user or by server.
 You can use one of them or both (in which case matching one of them will grant access).
 #### By user
+1. [Create a new application on your Discord Developer Dashboard](https://discord.com/developers/applications)
+2. Give it whatever value you want for the Name
+3. Click on OAuth2 on the left and Set the OAuth Redirect URL to `https://YOUR_DEPLOYMENT_URL/login/auth/discord`.
+- If you're testing locally, use `http://localhost:9090/login/auth/discord`
+4. Use the Client ID and Client Secret from general information for your configuration
+5. Configure your `nodecg/cfg/nodecg.json` like below
+- See the [Discord docs for the list of available scopes](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
+
 To get a Discord user ID, enable Discord developer mode and then right click on a user to copy it.
 ```json
 {
@@ -178,12 +179,26 @@ To get a Discord user ID, enable Discord developer mode and then right click on 
 }
 ```
 #### By Server (Guild)
-To get a Discord server ID, enable Discord developer mode and then right click on a server to copy it.
+1. [Create a new application on your Discord Developer Dashboard](https://discord.com/developers/applications)
+2. Give it whatever value you want for the Name
+3. Use the Client ID and Client Secret from general information for your configuration
+4. Click on OAuth2 on the left and Set the OAuth Redirect URL to `https://YOUR_DEPLOYMENT_URL/login/auth/discord`.
+- If you're testing locally, use `http://localhost:9090/login/auth/discord`
+5. Configure your `nodecg/cfg/nodecg.json` like below
+- See the [Discord docs for the list of available scopes](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
+
 Any user in the server will be allowed to use nodecg.
 
-You can also require users in the server to additionally have certain permissions (for example administrator).
-Get a list of permissions from the [Discord Docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags)
-```json
+
+If you want to check for roles and not just server membership, you also need to do the following:
+5. Click on Bot on the left, add a bot, then use the token for your configuration
+6. Go to `https://discord.com/oauth2/authorize?client_id={YOUR_CLIENT_ID_HERE}&scope=bot&permissions=0` (insert your Client ID)
+   and invite the Bot to servers that you want to use for authentication (the bot will always display as offline, this is normal)
+
+To get a Discord server ID, enable Discord developer mode and then right click on a server to copy it.
+To get a Discord role ID, enable Discord developer mode and then right click on a role to copy it.
+
+```json5
 {
   "login": {
     "enabled": true,
@@ -197,12 +212,21 @@ Get a list of permissions from the [Discord Docs](https://discord.com/developers
         "paste discord server ids you want to allow here",
         "754749209722486814"
       ],
-      "guildRequiredPermissions": [
-        "this is optional",
-        "paste permissions here to require them in the target servers",
-        "permissions look like this",
-        "MANAGE_MESSAGES",
-        "PRIORITY_SPEAKER"
+      "allowedGuilds": [
+        // Use this to allow all members to log in
+        {
+          "guildID": "paste a server id here to allow all members to log in",
+        },
+        // Use this to restrict log in for certain roles
+        {
+          "guildID": "paste a server id here to allow members with one of the roles to log in",
+          "allowedRoleIDs": [
+            "paste role ids you want to allow here",
+            "754751725457637546",
+            "755012946400378910"
+          ],
+          "guildBotToken": "paste your Discord BOT token here"
+        }
       ]
     }
   }

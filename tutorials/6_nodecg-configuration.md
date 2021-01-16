@@ -44,8 +44,11 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
     - _Note:_ Configure your Discord OAuth credentials with a Redirect URI to `{baseURL}/login/auth/discord`
     - `scope` _String_ A space-separated string of Discord application [permissions](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
     - `allowedUserIDs` _Array of strings_ Which Discord IDs to allow
-    - `allowedGuildIDs` _Array of strings_ Users in these Discord Guilds are allowed to login
-    - `guildRequiredPermissions` _Array of strings_ In addition to being in one of allowedGuildIDs, the user must have these [permissions](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags) in the guild.
+    - `allowedGuilds` _Array of objects_ Which servers to allow users from
+    - Format for `allowedGuilds` objects
+      - `guildID` _String_ Users in this Discord Server are allowed to log in
+      - `allowedRoleIDs` _Array of strings_ Additionally require one of the roles on the server to log in
+      - `guildBotToken` _String_ Discord bot token, needed if allowedRoleIDs is used [https://discord.com/developers/applications/](https://discord.com/developers/applications/)
 - `ssl` _Object_ Contains HTTPS/SSL configuration properties.
     - `enabled` _Boolean_ Whether to enable SSL/HTTPS encryption.
     - `allowHTTP` _Boolean_ Whether to allow insecure HTTP connections while SSL is active.
@@ -100,12 +103,18 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
               "159600065017675778",
               "54561421005950976"
             ],
-            "allowedGuildIDs": [
-                "754749209722486814"
-            ],
-            "guildRequiredPermissions": [
-                "MANAGE_MESSAGES",
-                "PRIORITY_SPEAKER"
+            "allowedGuilds": [
+                {
+                    "guildID": "754749209722486814",
+                    "allowedRoleIDs": [
+                        "754751725457637546",
+                        "755012946400378910"
+                    ],
+                    "guildBotToken": "your_bot_token"
+                },
+                {
+                    "guildID": "754749209722486814"
+                }
             ]
         }
     },
