@@ -7,7 +7,7 @@ console.log(NodeCG);
 
 const logger = new nodecg.Logger('foo');
 nodecg.Logger.globalReconfigure({
-	file: {enabled: false, level: 'trace', path: './foobar'},
+	file: {enabled: false, timestamps: true, level: 'trace', path: './foobar'},
 });
 logger.error('shaking my smh');
 nodecg.log.trace('some verbose logs here');
