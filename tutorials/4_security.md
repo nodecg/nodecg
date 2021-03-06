@@ -208,10 +208,6 @@ To get a Discord role ID, enable Discord developer mode and then right click on 
       "clientID": "YOUR_DISCORD_APP_CLIENT_ID",
       "clientSecret": "YOUR_DISCORD_APP_CLIENT_SECRET",
       "scope": "identify guilds",
-      "allowedGuildIDs": [
-        "paste discord server ids you want to allow here",
-        "754749209722486814"
-      ],
       "allowedGuilds": [
         // Use this to allow all members to log in
         {
