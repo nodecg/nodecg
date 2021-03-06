@@ -80,5 +80,6 @@ export interface DeclaredReplicants<P extends Platform> {
 export interface ReplicantOptions<V> {
 	defaultValue?: V;
 	persistent?: boolean;
+	persistenceInterval?: number;
 	schemaPath?: string;
 }
