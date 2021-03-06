@@ -120,7 +120,7 @@ test.serial('refresh all instances in a bundle', async t => {
 	const confirm = await dashboard.evaluateHandle(el => el.shadowRoot.querySelector('paper-button[dialog-confirm]'), graphicBundle);
 	await confirm.click();
 
-	await graphic.waitFor(500);
+	await graphic.waitForTimeout(500);
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -140,7 +140,7 @@ test.serial('refresh all instances of a graphic', async t => {
 	);
 	await reload.click();
 
-	await graphic.waitFor(500);
+	await graphic.waitForTimeout(500);
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -161,7 +161,7 @@ test.serial('refresh individual instance', async t => {
 	);
 	await reload.click();
 
-	await graphic.waitFor(500);
+	await graphic.waitForTimeout(500);
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -182,7 +182,7 @@ test.serial('version out of date', async t => {
 		from: '"version": "0.0.1"',
 		to: '"version": "0.0.2"'
 	});
-	await dashboard.waitFor(1500);
+	await dashboard.waitForTimeout(1500);
 
 	let text = await dashboard.evaluate(el => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
@@ -192,7 +192,7 @@ test.serial('version out of date', async t => {
 		from: '"version": "0.0.2"',
 		to: '"version": "0.0.1"'
 	});
-	await dashboard.waitFor(1500);
+	await dashboard.waitForTimeout(1500);
 
 	text = await dashboard.evaluate(el => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Latest');
@@ -206,7 +206,7 @@ test.serial('git out of date', async t => {
 	const git = simpleGit(path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle'));
 	await git.add('./new_file.txt');
 	await git.commit('new commit');
-	await dashboard.waitFor(1500);
+	await dashboard.waitForTimeout(1500);
 
 	const text = await dashboard.evaluate(el => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
@@ -285,5 +285,5 @@ test.serial('dragging the graphic generates the correct url for obs', async t =>
 	// Dragstart event should be called during this
 	await dashboard.mouse.move(0, 0, {steps: 10});
 
-	await dashboard.waitFor(200);
+	await dashboard.waitForTimeout(200);
 });
