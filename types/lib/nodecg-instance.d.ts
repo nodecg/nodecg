@@ -4,8 +4,7 @@
 /// <reference types="socket.io-client" />
 /// <reference types="soundjs" />
 
-import {IRouter, RequestHandler} from 'express-serve-static-core';
-import * as express from 'express';
+import {RequestHandler, Router, RouterOptions} from 'express';
 
 import {Logger} from './logger';
 import {ReplicantOptions, Replicant} from './replicant';
@@ -62,8 +61,8 @@ interface NodeCGCommon<P extends Platform, M = SendMessageReturnType<P>> {
  */
 export interface NodeCGServer extends NodeCGCommon<'server'> {
 	getSocketIOServer(): SocketIO.Server;
-	Router: express.Router;
-	mount: IRouter['use'];
+	Router(options?: RouterOptions): Router;
+	mount: Router['use'];
 	util: {
 		authCheck: RequestHandler;
 	};
