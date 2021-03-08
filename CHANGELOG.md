@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/nodecg/nodecg/compare/v1.7.4...v1.8.0) (2021-03-08)
+
+
+### Features
+
+* **replicants:** remove local storage size quota ([#574](https://github.com/nodecg/nodecg/issues/574)) ([10bfd6f](https://github.com/nodecg/nodecg/commit/10bfd6ff87107fde16459140792cbc590f8497a0))
+
+
+### Bug Fixes
+
+* **types:** add persistenceInterval option ([#572](https://github.com/nodecg/nodecg/issues/572)) ([84c3c46](https://github.com/nodecg/nodecg/commit/84c3c463c1ee27fe8cc2e0e3fc8177cdccc91e14))
+
 ### [1.7.4](https://github.com/nodecg/nodecg/compare/v1.7.3...v1.7.4) (2020-12-11)
 
 
