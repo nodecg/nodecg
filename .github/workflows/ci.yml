@@ -37,7 +37,8 @@ jobs:
         run: |
           git config --global user.email "contact@nodecg.dev"
           git config --global user.name "NodeCG Bot"
-          npm t
+          npm run static
+          npm test
 
       - run: npx nyc report --reporter=text-lcov > coverage.lcov
 
