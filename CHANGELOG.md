@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/nodecg/nodecg/compare/v1.8.0...v1.8.1) (2021-03-10)
+
+
+### Bug Fixes
+
+* better log formatting and configurable timestamps ([#575](https://github.com/nodecg/nodecg/issues/575)) ([dd323cd](https://github.com/nodecg/nodecg/commit/dd323cd72dc38343d35a374158e5e1bfde70ddfd))
+* **deps:** fix some vulnerabilities of dependency ([81c9ee2](https://github.com/nodecg/nodecg/commit/81c9ee2edb296e5bef5b8d5df7e0c9ddc9279d5b))
+
+## [1.8.0](https://github.com/nodecg/nodecg/compare/v1.7.4...v1.8.0) (2021-03-08)
+
+
+### Features
+
+* **replicants:** remove local storage size quota ([#574](https://github.com/nodecg/nodecg/issues/574)) ([10bfd6f](https://github.com/nodecg/nodecg/commit/10bfd6ff87107fde16459140792cbc590f8497a0))
+
+
+### Bug Fixes
+
+* **types:** add persistenceInterval option ([#572](https://github.com/nodecg/nodecg/issues/572)) ([84c3c46](https://github.com/nodecg/nodecg/commit/84c3c463c1ee27fe8cc2e0e3fc8177cdccc91e14))
+
 ### [1.7.4](https://github.com/nodecg/nodecg/compare/v1.7.3...v1.7.4) (2020-12-11)
 
 

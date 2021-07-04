@@ -18,10 +18,12 @@ export interface LoggerOptions {
 	replicants?: boolean;
 	console?: {
 		enabled: boolean;
+		timestamps: boolean;
 		level: LoggerLevel;
 	};
 	file?: {
 		enabled: boolean;
+		timestamps: boolean;
 		level: LoggerLevel;
 	};
 }

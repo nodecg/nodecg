@@ -2,7 +2,7 @@
   "name": "nodecg",
   "description": "Dynamic broadcast graphics rendered in a browser",
   "main": "index.js",
-  "version": "1.7.4",
+  "version": "1.8.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/nodecg/nodecg.git"
@@ -88,7 +88,7 @@
     "multer": "^1.4.2",
     "nedb": "^1.8.0",
     "node-localstorage": "^1.3.1",
-    "object-path": "^0.11.4",
+    "object-path": "^0.11.5",
     "packery": "^2.1.2",
     "passport": "^0.4.0",
     "passport-discord": "^0.1.4",
@@ -101,7 +101,7 @@
     "serialize-error": "^4.1.0",
     "sha1": "^1.1.1",
     "sha1-file": "^1.0.4",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.4.1",
     "soundjs": "^1.0.1",
     "tv4": "^1.3.0",
     "uuid": "^3.3.2",
@@ -109,18 +109,11 @@
   },
   "scripts": {
     "start": "node index.js",
-    "pretest": "npm run build && npm run instrument",
-    "test": "npm run typetest && nyc --reporter=none ava --config ava.config.js && nyc report --reporter=html --reporter=text",
-    "report-coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "test": "npm run build && npm run instrument && nyc --reporter=none ava --config ava.config.js && nyc report --reporter=html --reporter=text && npm run typetest",
     "static": "eslint index.js lib src test",
-    "build": "npm run static && gulp",
-    "instrument": "nyc instrument ./src ./instrumented",
-    "postinstrument": "node test/helpers/retarget-browser-coverage.js",
-    "docs:build": "node scripts/docs-build-all.js",
-    "docs:publish": "node scripts/docs-build-all.js publish",
-    "docs:serve": "superstatic",
-    "prerelease": "npm t",
-    "release": "standard-version && git push --follow-tags",
+    "build": "gulp",
+    "instrument": "nyc instrument ./src ./instrumented && node test/helpers/retarget-browser-coverage.js",
+    "release": "npm run build && npm test && standard-version --commit-all",
     "typetest": "cd typetest/fake-bundle && npm i && npm run build"
   },
   "nyc": {
@@ -164,23 +157,21 @@
     "@babel/preset-env": "^7.4.3",
     "aliasify": "^2.1.0",
     "ava": "^2.2.0",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "babel-plugin-istanbul": "^5.1.1",
     "babel-preset-minify": "^0.5.0",
     "babelify": "^10.0.0",
     "brfs": "^2.0.2",
     "browserify": "^16.2.3",
-    "child-process-promise": "^2.2.1",
-    "cli-spinner": "^0.2.10",
     "del": "^4.1.0",
     "eslint": "^6.1.0",
     "eslint-config-xo": "^0.26.0",
     "eslint-plugin-ava": "^7.1.0",
-    "exorcist": "^1.0.1",
+    "exorcist": "^2.0.0",
     "fs-extra": "^7.0.1",
-    "gh-pages": "^2.0.1",
     "gulp": "^4.0.0",
     "gulp-util": "^3.0.8",
+    "husky": "4",
     "is-windows": "^1.0.2",
     "jsdoc": "^3.6.2",
     "minami": "github:nodecg/minami#75b4bbfc7e9d834f840be2358f4ddedf738cbfa8",
@@ -194,19 +185,22 @@
     "simple-git": "^1.110.0",
     "sinon": "^7.3.1",
     "socket.io-client": "^2.2.0",
-    "standard-version": "^6.0.1",
-    "superstatic": "^6.0.4",
+    "standard-version": "^9.1.1",
     "taffydb": "^2.7.3",
     "temp": "^0.9.0",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0",
-    "vinyl-transform": "^1.0.0",
-    "wdio-webcomponents": "^1.1.0"
+    "vinyl-transform": "^1.0.0"
   },
   "browserslist": [
     "last 2 chrome versions",
     "last 2 firefox versions",
     "last 2 safari versions",
     "last 2 edge versions"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run build && git add build"
+    }
+  }
 }
