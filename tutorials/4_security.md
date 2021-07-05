@@ -136,6 +136,11 @@ Example:
         "your_twitch_username",
         "other_twitch_username",
         "can_have_as_many_as_you_want"
+      ],
+      "allowedIds": [
+        "your_twitch_id",
+        "other_twitch_id",
+        "can_have_as_many_as_you_want"
       ]
     }
   }
