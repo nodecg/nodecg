@@ -49,6 +49,7 @@
     "@types/soundjs": "^0.6.27",
     "@vaadin/vaadin-upload": "^4.2.2",
     "@webcomponents/webcomponentsjs": "^2.2.10",
+    "ajv": "^8.6.2",
     "babel-plugin-bare-import-rewrite": "^1.3.2",
     "body-parser": "^1.18.3",
     "cheerio": "^1.0.0-rc.2",
@@ -103,7 +104,6 @@
     "sha1-file": "^1.0.4",
     "socket.io": "^2.4.1",
     "soundjs": "^1.0.1",
-    "tv4": "^1.3.0",
     "uuid": "^3.3.2",
     "winston": "^3.3.3"
   },
@@ -114,7 +114,8 @@
     "build": "gulp",
     "instrument": "nyc instrument ./src ./instrumented && node test/helpers/retarget-browser-coverage.js",
     "release": "npm run build && npm test && standard-version --commit-all",
-    "typetest": "cd typetest/fake-bundle && npm i && npm run build"
+    "typetest": "cd typetest/fake-bundle && npm i && npm run build",
+    "schematest": "node lib/bundle-parser/schemas/schema-tests.js"
   },
   "nyc": {
     "include": [
