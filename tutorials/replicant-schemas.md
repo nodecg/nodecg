@@ -17,7 +17,7 @@ If for any reason a Replicant's persisted value becomes invalid, NodeCG will dis
 `nodecg/bundles/my-bundle/schemas/foo.json`
 ```
 {
-	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$schema": "http://json-schema.org/draft-07/schema",
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
