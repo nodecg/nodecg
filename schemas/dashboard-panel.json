@@ -1,0 +1,68 @@
+{
+	"$schema": "https://json-schema.org/draft/2019-09/schema",
+	"$id": "https://nodecg.dev/dashboard-panel.schema.json",
+	"title": "Dashboard Panel",
+	"description": "A dashboard panel of a bundle",
+	"type": "object",
+	"properties": {
+		"name": {
+			"description": "The internal name of your panel.",
+			"type": "string"
+		},
+		"title": {
+			"description": "The title displayed on the NodeCG workspace.",
+			"type": "string"
+		},
+		"file": {
+			"description": "The relative path (from your bundle's root directory) to the HTML file to be served as a dashboard panel.",
+			"type": "string"
+		},
+		"width": {
+			"description": "An optional property, the amount of space the bundle takes up on the page.",
+			"type": "number",
+			"minimum": 1,
+			"maximum": 8,
+			"default": 1
+		},
+		"headerColor": {
+			"description": "An optional property, that will change the color of the panel's header to a provided hexadecimal color value.",
+			"type": "string",
+			"pattern": "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$"
+		},
+		"workspace": {
+			"description": "An optional property, that when set will place the panel into a new workspace with the name provided. These workspaces can be shared between bundles.",
+			"type": "string"
+		},
+		"fullbleed": {
+			"description": "An optional property, that when set to true will place the panel in it's own workplace at the maximum possible width and height with no margins.",
+			"type": "boolean",
+			"default": false
+		},
+		"dialog": {
+			"description": "An optional property, that will turn the panel into a dialog that other panels are able to open.",
+			"type": "boolean",
+			"default": false
+		},
+		"dialogButtons": {
+			"description": "An optional property, that will show buttons for confirm, dismiss, or both on the dialog.",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"description": "The name of the dialog button.",
+						"type": "string"
+					},
+					"type": {
+						"description": "The type of the dialog button.",
+						"type": "string",
+						"enum": ["confirm", "dismiss"]
+					}
+				},
+				"required": [ "name", "type" ]
+			}
+		}
+	  },
+	  "required": [ "name", "title", "file" ],
+	  "additionalProperties": true
+  }

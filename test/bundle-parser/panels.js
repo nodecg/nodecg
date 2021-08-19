@@ -24,7 +24,9 @@ test('when there is a "dashboardPanels" property but no "dashboard" folder, thro
 
 test('when critical properties are missing from the "dashboardPanels" property, throw an error explaining what is missing', t => {
 	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/missing-panel-props'));
-	t.true(error.message.includes('the following properties: name, title, file'));
+	t.true(error.message.includes('must have required property \'name\''));
+	t.true(error.message.includes('must have required property \'title\''));
+	t.true(error.message.includes('must have required property \'file\''));
 });
 
 test('when two panels have the same name, throw an error', t => {
