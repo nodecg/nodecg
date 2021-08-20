@@ -96,6 +96,10 @@ class UiSelect extends Polymer.PolymerElement {
 		if (!e.target.value) {
 			this.$.select.selectedIndex = -1;
 		}
+
+		this.value = this.$.select.value;
+		this.selectedOptions = this.$.select.selectedOptions;
+		this.dispatchEvent(new CustomEvent('change', {bubbles: true, composed: true}));
 	}
 }
 
