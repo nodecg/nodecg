@@ -26,6 +26,11 @@ export interface NodeCGConfig {
 			clientID: string;
 			scope: string;
 		};
+		discord?: {
+			enabled: boolean;
+			clientID: string;
+			scope: string;
+		};
 	};
 	ssl?: {
 		enabled: boolean;
