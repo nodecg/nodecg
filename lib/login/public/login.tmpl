@@ -44,6 +44,12 @@
 			</a>
 		<% } %>
 
+		<% if (config.login.discord && config.login.discord.enabled) { %>
+			<a href="/login/discord">
+				<img src="/login/signin_discord.png">
+			</a>
+		<% } %>
+
 		<% if (config.login.local && config.login.local.enabled) { %>
 			<form id="localForm" method="post" action="/login/local">
 				<div class="form-group">

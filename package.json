@@ -91,6 +91,7 @@
     "object-path": "^0.11.5",
     "packery": "^2.1.2",
     "passport": "^0.4.0",
+    "passport-discord": "^0.1.4",
     "passport-local": "^1.0.0",
     "passport-steam": "^1.0.10",
     "passport-twitch-helix": "^1.1.0",

@@ -361,9 +361,18 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 
 	_onDrag(event) {
 		const dragged = event.target;
-		const obsURL = `${dragged.href}?layer-name=${this.graphic.file.replace('.html', '')}&layer-height=${
+
+		let obsURL;
+		if (window.ncgConfig.login.enabled && window.token) {
+			obsURL = `${dragged.href}&`;
+		} else {
+			obsURL = `${dragged.href}?`;
+		}
+
+		obsURL += `layer-name=${this.graphic.file.replace('.html', '')}&layer-height=${
 			this.graphic.height
 		}&layer-width=${this.graphic.width}`;
+
 		event.dataTransfer.setData('text/uri-list', obsURL);
 	}
 }
