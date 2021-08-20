@@ -169,7 +169,7 @@
     "eslint-plugin-ava": "^7.1.0",
     "exorcist": "^2.0.0",
     "fs-extra": "^7.0.1",
-    "gulp": "^4.0.0",
+    "gulp": "^4.0.2",
     "gulp-util": "^3.0.8",
     "husky": "4",
     "is-windows": "^1.0.2",
