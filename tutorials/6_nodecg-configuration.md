@@ -37,6 +37,7 @@ NodeCG is configured via a `cfg/nodecg.json` file with the following schema:
     - _Note:_ Configure your Twitch OAuth credentials with a Redirect URI to `{baseURL}/login/auth/twitch`
     - `scope` _String_ A space-separated string of Twitch application [permissions](https://dev.twitch.tv/docs/authentication/#scopes).
     - `allowedUsernames` _Array of strings_ Which Twitch usernames to allow.
+    - `allowedIds` _Array of strings_ Which Twitch IDs to allow. Can be obtained from [https://twitchinsights.net/checkuser](https://twitchinsights.net/checkuser)
   - `discord` _Object_ Contains discord login configuration properties.
     - `enabled` _Boolean_ Whether to enable Discord authentication.
     - `clientID` _String_ A Discord application ClientID  [https://discord.com/developers/applications/](https://discord.com/developers/applications/)
