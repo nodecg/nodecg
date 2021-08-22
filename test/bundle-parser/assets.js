@@ -45,7 +45,7 @@ test('should throw an error when an assetCategory lacks a name', t => {
 		}
 	}));
 
-	t.is(error.message, 'nodecg.assetCategories[0] in bundle test-bundle lacks a "name" property');
+	t.true(error.message.includes('must have required property \'name\''));
 });
 
 test('should throw an error when an assetCategory lacks a title', t => {
@@ -55,8 +55,7 @@ test('should throw an error when an assetCategory lacks a title', t => {
 			assetCategories: [{name: 'category'}]
 		}
 	}));
-
-	t.is(error.message, 'nodecg.assetCategories[0] in bundle test-bundle lacks a "title" property');
+	t.true(error.message.includes('must have required property \'title\''));
 });
 
 test('should throw an error when an assetCategory\'s allowedTypes isn\'t an array', t => {
@@ -71,14 +70,14 @@ test('should throw an error when an assetCategory\'s allowedTypes isn\'t an arra
 		}
 	}));
 
-	t.is(error.message, 'nodecg.assetCategories[0].allowedTypes in bundle test-bundle is not an Array');
+	t.true(error.message.includes('allowedTypes must be array'));
 });
 
 test('should throw an error when an assetCategory is named "sounds"', t => {
 	const error = t.throws(parseAssets.bind(null, {
 		name: 'test-bundle',
 		nodecg: {
-			assetCategories: [{name: 'Sounds'}]
+			assetCategories: [{name: 'Sounds', title: 'Sounds'}]
 		}
 	}));
 
