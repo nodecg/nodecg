@@ -24,7 +24,9 @@ test('when there is a "graphics" property but no "graphics" folder, throw an err
 
 test('when critical properties are missing from the "graphics" property, throw an error explaining what is missing', t => {
 	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/missing-graphic-props'));
-	t.true(error.message.includes('the following properties: file, width, height'));
+	t.true(error.message.includes('must have required property \'file\''));
+	t.true(error.message.includes('must have required property \'width\''));
+	t.true(error.message.includes('must have required property \'height\''));
 });
 
 test('when two graphics have the same file, throw an error', t => {
