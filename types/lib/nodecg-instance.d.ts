@@ -82,8 +82,8 @@ export interface NodeCGBrowser extends NodeCGCommon<'browser'> {
 	getDialog(
 		name: string,
 		bundle?: string
-	): ReturnType<ParentNode['querySelector']>;
-	getDialogDocument(name: string, bundle?: string): Document;
+	): ReturnType<ParentNode['querySelector']> | null;
+	getDialogDocument(name: string, bundle?: string): Document | null;
 	findCue(cueName: string): Cue | undefined;
 	playSound(
 		cueName: string,
