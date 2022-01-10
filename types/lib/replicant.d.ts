@@ -82,5 +82,4 @@ export interface ReplicantOptions<V> {
 	persistent?: boolean;
 	persistenceInterval?: number;
 	schemaPath?: string;
-	persistenceInterval?: number;
 }

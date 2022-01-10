@@ -29,7 +29,7 @@ test.before.cb(t => {
 		);
 	}
 
-	const nodecgConfig = {
+	const config = {
 		bundles: {
 			disabled: [
 				'test-disabled-bundle'
@@ -38,13 +38,13 @@ test.before.cb(t => {
 	};
 
 	bundleManager = require('../lib/bundle-manager');
-	bundleManager.init(
-		[path.join(tempFolder, 'bundles'), path.join(tempFolder, 'custom-bundles')],
-		path.join(tempFolder, 'cfg'),
-		'0.7.0',
-		nodecgConfig,
+	bundleManager.init({
+		bundleRootPaths: [path.join(tempFolder, 'bundles'), path.join(tempFolder, 'custom-bundles')],
+		cfgPath: path.join(tempFolder, 'cfg'),
+		nodecgVersion: '0.7.0',
+		config,
 		Logger
-	);
+	});
 
 	// Needs a little extra wait time for some reason.
 	// Without this, tests randomly fail.

@@ -116,6 +116,9 @@
     "release": "npm run build && npm test && standard-version --commit-all",
     "typetest": "cd typetest/fake-bundle && npm i && npm run build"
   },
+  "bin": {
+    "nodecg": "./index.js"
+  },
   "nyc": {
     "include": [
       "lib/**",
