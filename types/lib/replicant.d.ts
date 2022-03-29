@@ -71,7 +71,7 @@ export interface OperationQueueItem {
  * Declared replicant store object
  */
 export interface DeclaredReplicants<P extends Platform> {
-	[bundleName: string]: {[replicantName: string]: P};
+	[bundleName: string]: {[replicantName: string]: Replicant<unknown, P>};
 }
 
 /**
@@ -82,5 +82,4 @@ export interface ReplicantOptions<V> {
 	persistent?: boolean;
 	persistenceInterval?: number;
 	schemaPath?: string;
-	persistenceInterval?: number;
 }
