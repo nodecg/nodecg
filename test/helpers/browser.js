@@ -76,6 +76,7 @@ export const setup = () => {
 
 	const initDashboard = async () => {
 		const page = await browser.newPage();
+		page.setDefaultNavigationTimeout(60 * 1000);
 		await page.goto(C.dashboardUrl());
 		await page.waitForFunction(() => typeof window.dashboardApi !== 'undefined');
 		return page;
@@ -83,6 +84,7 @@ export const setup = () => {
 
 	const initStandalone = async () => {
 		const page = await browser.newPage();
+		page.setDefaultNavigationTimeout(60 * 1000);
 		await page.goto(`${C.testPanelUrl()}?standalone=true`);
 		await page.waitForFunction(() => typeof window.dashboardApi !== 'undefined');
 		return page;
@@ -90,6 +92,7 @@ export const setup = () => {
 
 	const initGraphic = async () => {
 		const page = await browser.newPage();
+		page.setDefaultNavigationTimeout(60 * 1000);
 		await page.goto(C.graphicUrl());
 		await page.waitForFunction(() => typeof window.graphicApi !== 'undefined');
 		return page;
@@ -97,6 +100,7 @@ export const setup = () => {
 
 	const initSingleInstance = async () => {
 		const page = await browser.newPage();
+		page.setDefaultNavigationTimeout(60 * 1000);
 		await page.goto(C.singleInstanceUrl());
 		await page.waitForFunction(() => {
 			if (window.location.pathname.endsWith('busy.html')) {
@@ -115,6 +119,7 @@ export const setup = () => {
 
 	const initLogin = async () => {
 		const page = await browser.newPage();
+		page.setDefaultNavigationTimeout(60 * 1000);
 		await page.goto(C.loginUrl());
 		return page;
 	};
