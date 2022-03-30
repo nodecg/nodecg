@@ -29,7 +29,7 @@ export class ReplicantServer<V> extends ReplicantCommon<V> {
 }
 
 export class ReplicantBrowser<V> extends ReplicantCommon<V> {
-	static declareReplicants(): DeclaredReplicants<'browser'>;
+	static declaredReplicants(): DeclaredReplicants
 	constructor(
 		name: string,
 		namespace: string,
@@ -70,8 +70,8 @@ export interface OperationQueueItem {
 /**
  * Declared replicant store object
  */
-export interface DeclaredReplicants<P extends Platform> {
-	[bundleName: string]: {[replicantName: string]: Replicant<unknown, P>};
+export interface DeclaredReplicants {
+	[bundleName: string]: {[replicantName: string]: ReplicantBrowser<unknown>};
 }
 
 /**
