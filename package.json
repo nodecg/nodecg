@@ -2,7 +2,7 @@
   "name": "nodecg",
   "description": "Dynamic broadcast graphics rendered in a browser",
   "main": "index.js",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/nodecg/nodecg.git"

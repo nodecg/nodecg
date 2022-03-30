@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/nodecg/nodecg/compare/v1.8.1...v1.9.0) (2022-03-30)
+
+
+### Features
+
+* **auth:** discord login option ([#571](https://github.com/nodecg/nodecg/issues/571)) ([3df008e](https://github.com/nodecg/nodecg/commit/3df008e158bee2a9ba50627df9c1a90c86ceac3d))
+* **extension:** allow extensions to export esmodule ([#587](https://github.com/nodecg/nodecg/issues/587)) ([8e3304a](https://github.com/nodecg/nodecg/commit/8e3304a164e74afdfb5464c870fba5c55dd663de))
+* **login:** add twitch id whitelisting ([#583](https://github.com/nodecg/nodecg/issues/583)) ([e83933f](https://github.com/nodecg/nodecg/commit/e83933f1515bb282bc0d98a926302b8c460ddfc7))
+
+
+### Bug Fixes
+
+* **dashboard:** correct URL for obs drag when login is enabled ([#585](https://github.com/nodecg/nodecg/issues/585)) ([9046287](https://github.com/nodecg/nodecg/commit/904628737efdd0c239119757c0b55efe4cf4a761))
+* **dashboard:** fix the currently selected workspace not being highlighted on first page load ([#538](https://github.com/nodecg/nodecg/issues/538)) ([3442d76](https://github.com/nodecg/nodecg/commit/3442d760585ee23f5fec568b6a194b734dac5be5))
+* **socket:** correct maxListeners setting to prevent memory leak ([#579](https://github.com/nodecg/nodecg/issues/579)) ([1b0611b](https://github.com/nodecg/nodecg/commit/1b0611bfdfa07d57c604b4e7bd5e1cf22d36b142))
+* **soundcue:** fix soundcue files not persisting ([#584](https://github.com/nodecg/nodecg/issues/584)) ([eeac8c4](https://github.com/nodecg/nodecg/commit/eeac8c43ace1fd1dbba9fe5ebed4301ed721cdaf))
+* **types:** add/tweak types for replicant/readReplicant ([#545](https://github.com/nodecg/nodecg/issues/545)) ([f391281](https://github.com/nodecg/nodecg/commit/f391281463044cffca2e1b614ea3a0a163a99fce))
+* **types:** correct typing for declared replicants ([#596](https://github.com/nodecg/nodecg/issues/596)) ([dea9c15](https://github.com/nodecg/nodecg/commit/dea9c154d161069e2c14c6ad3def5d6373a5b7b9))
+
 ### [1.8.1](https://github.com/nodecg/nodecg/compare/v1.8.0...v1.8.1) (2021-03-10)
 
 
