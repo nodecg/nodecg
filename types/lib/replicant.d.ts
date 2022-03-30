@@ -29,7 +29,7 @@ export class ReplicantServer<V> extends ReplicantCommon<V> {
 }
 
 export class ReplicantBrowser<V> extends ReplicantCommon<V> {
-	static declareReplicants(): DeclaredReplicants<'browser'>;
+	static declaredReplicants(): DeclaredReplicants<'browser'>;
 	constructor(
 		name: string,
 		namespace: string,
