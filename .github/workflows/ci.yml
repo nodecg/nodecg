@@ -9,61 +9,39 @@ on:
       - master
 
 jobs:
-  build-test-ubuntu:
+  build-test:
     strategy:
       matrix:
         node-version: [12.x, 14.x]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{matrix.node-version}}
-      - name: Install dependencies
-        run: npm ci
-      - name: Check if build result is different from current branch
-        run: |
-          npm run build
-          git diff --name-only --exit-code
-      - name: Test
-        run: |
-          git config --global user.email "contact@nodecg.dev"
-          git config --global user.name "NodeCG Bot"
-          npm run static
-          npm test
-      - run: npx nyc report --reporter=text-lcov > coverage.lcov
-      - name: Report code coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          file: ./coverage.lcov
+        os: [ubuntu-latest, windows-latest]
 
-  build-test-windows:
-    needs:
-      - build-test-ubuntu
-    strategy:
-      matrix:
-        node-version: [12.x, 14.x]
-    runs-on: windows-latest
+    runs-on: ${{matrix.os}}
+
     steps:
       - uses: actions/checkout@v2
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{matrix.node-version}}
+
       - name: Install dependencies
         run: npm ci
+
       - name: Check if build result is different from current branch
         run: |
           npm run build
           git diff --name-only --exit-code
+
       - name: Test
         run: |
           git config --global user.email "contact@nodecg.dev"
           git config --global user.name "NodeCG Bot"
           npm run static
           npm test
+
       - run: npx nyc report --reporter=text-lcov > coverage.lcov
+
       - name: Report code coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
