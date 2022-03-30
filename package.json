@@ -177,7 +177,7 @@
     "minami": "github:nodecg/minami#75b4bbfc7e9d834f840be2358f4ddedf738cbfa8",
     "nyc": "^14.1.1",
     "p-retry": "^4.1.0",
-    "puppeteer": "^8.0.0",
+    "puppeteer": "^13.5.1",
     "remark": "^10.0.1",
     "remark-toc": "^5.1.1",
     "replace-in-file": "^3.4.4",
