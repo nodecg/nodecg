@@ -5,32 +5,17 @@
 /build/node_modules
 npm-debug.log
 
-# Local bundles
-/bundles/**
-
-# Datastores
-/db/**
-
 # Logs
 /logs/**
 
-# Configs
-/cfg
-
 # OS specific
 .DS_Store
-
-# IDE files
-/.idea
-/.vscode
 
 # Code coverage results
 /coverage
 .nyc_output
 
 # Test folders
-/bundles2
-/bundles_off
 /_workingTest
 
 # Docs
@@ -38,10 +23,4 @@ checkout
 docs
 .grunt
 
-# Assets
-/assets
 
-/instrumented
-
-# Don't ignore .empty_directory files
-!.empty_directory
