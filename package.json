@@ -63,7 +63,7 @@
     "deep-equal": "^1.0.1",
     "draggabilly": "^2.2.0",
     "exit-hook": "^2.2.0",
-    "express": "^4.16.4",
+    "express": "^4.18.1",
     "express-nedb-session": "^0.1.1",
     "express-session": "^1.16.1",
     "express-transform-bare-module-specifiers": "^1.0.4",
