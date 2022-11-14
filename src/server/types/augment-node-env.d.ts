@@ -1,5 +1,5 @@
 declare namespace NodeJS {
-	export type ProcessEnv = {
+	interface ProcessEnv {
 		/**
 		 * Setting this is one of the first thing NodeCG does on startup.
 		 */
@@ -9,5 +9,10 @@ declare namespace NodeJS {
 		 * This is set by our test suite.
 		 */
 		NODECG_TEST?: string;
-	};
+
+		/**
+		 * This is set by the server core when under test.
+		 */
+		NODECG_TEST_PORT?: string;
+	}
 }

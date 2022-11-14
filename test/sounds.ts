@@ -3,14 +3,14 @@ import path from 'path';
 
 // Packages
 import fs from 'fs-extra';
-import type { TestInterface } from 'ava';
+import type { TestFn } from 'ava';
 import anyTest from 'ava';
 
 // Ours
 import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 
-const test = anyTest as TestInterface<browser.BrowserContext & server.ServerContext>;
+const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard, initGraphic } = browser.setup();
 

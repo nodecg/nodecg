@@ -1,5 +1,5 @@
 // Packages
-import type { TestInterface } from 'ava';
+import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import type puppeteer from 'puppeteer';
 
@@ -9,7 +9,7 @@ import * as browser from '../helpers/browser';
 
 server.setup();
 const { initGraphic } = browser.setup();
-const test = anyTest as TestInterface<browser.BrowserContext & server.ServerContext>;
+const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 
 let graphic: puppeteer.Page;
 test.before(async () => {
@@ -46,11 +46,18 @@ test.serial('should receive messages', async (t) => {
 	t.pass();
 });
 
-test.serial.cb('should send messages', (t) => {
-	t.context.apis.extension.listenFor('graphicToServer', t.end);
+test.serial('should send messages', async (t) => {
+	t.plan(1);
+	const promise = new Promise<void>((resolve) => {
+		t.context.apis.extension.listenFor('graphicToServer', () => {
+			t.pass();
+			resolve();
+		});
+	});
 	void graphic.evaluate(() => {
 		window.graphicApi.sendMessage('graphicToServer');
 	});
+	return promise;
 });
 
 test.serial('#bundleVersion', async (t) => {

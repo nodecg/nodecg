@@ -128,18 +128,18 @@ export default async function (socket: TypedServerSocket, next: SocketIO.NextFun
 				} catch (error: unknown) {
 					log.error(error);
 					if (cb) {
-						cb(error);
+						cb(error as string);
 					}
 				}
 			});
 		}
 
 		if (allowed) {
-			next(null);
+			next(undefined);
 		} else {
 			next(new UnauthorizedError(UnAuthErrCode.InvalidToken, 'user is not allowed'));
 		}
 	} catch (error: unknown) {
-		next(error);
+		next(error as any);
 	}
 }

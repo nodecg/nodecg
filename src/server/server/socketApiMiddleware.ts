@@ -46,6 +46,6 @@ export default async function (socket: TypedServerSocket, next: SocketIO.NextFun
 
 		next();
 	} catch (error: unknown) {
-		next(error);
+		next(error as any);
 	}
 }

@@ -70,7 +70,8 @@ test('should throw an error when pkg.nodecg.soundCues is not an Array', (t) => {
 		}),
 	);
 
-	t.is(error.message, "test-bundle's nodecg.soundCues is not an Array");
+	if (!error) return t.fail();
+	return t.is(error.message, "test-bundle's nodecg.soundCues is not an Array");
 });
 
 test('should throw an error when a soundCue lacks a name', (t) => {
@@ -82,7 +83,8 @@ test('should throw an error when a soundCue lacks a name', (t) => {
 		}),
 	);
 
-	t.is(error.message, 'nodecg.soundCues[0] in bundle test-bundle lacks a "name" property');
+	if (!error) return t.fail();
+	return t.is(error.message, 'nodecg.soundCues[0] in bundle test-bundle lacks a "name" property');
 });
 
 test('should clamp default volume to a max of 100', (t) => {
@@ -124,5 +126,6 @@ test("should throw an error when a soundCue's default file doesn't exist", (t) =
 		}),
 	);
 
-	t.is(error.message, 'nodecg.soundCues[0].defaultFile in bundle test-bundle does not exist');
+	if (!error) return t.fail();
+	return t.is(error.message, 'nodecg.soundCues[0].defaultFile in bundle test-bundle does not exist');
 });

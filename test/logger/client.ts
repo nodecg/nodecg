@@ -1,6 +1,6 @@
 // Packages
 import sinon from 'sinon';
-import type { TestInterface } from 'ava';
+import type { TestFn } from 'ava';
 import anyTest from 'ava';
 
 // Ours
@@ -16,7 +16,7 @@ type TestContext = {
 	sentryLogger: InstanceType<typeof Logger>;
 };
 
-const test = anyTest as TestInterface<TestContext>;
+const test = anyTest as TestFn<TestContext>;
 
 test.beforeEach((t) => {
 	t.context.logger = new Logger('testClient');
@@ -41,7 +41,7 @@ test('console - should default to being silent', (t) => {
 });
 
 test('console - should default to level "info"', (t) => {
-	t.is(Logger._level, 'info');
+	t.is(Logger._level, LogLevel.Info);
 });
 
 test('replicant - should default to false', (t) => {

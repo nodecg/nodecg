@@ -8,4 +8,5 @@ declare global {
 	 */
 	var exitOnUncaught: boolean;
 	var sentryEnabled: boolean;
+	var __non_webpack_require__: any;
 }

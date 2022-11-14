@@ -28,7 +28,7 @@ const VIEWS_PATH = path.join(appRootPath.path, 'src/server/dashboard');
 export default class DashboardLib {
 	app = express();
 
-	dashboardContext: DashboardContext | undefined = null;
+	dashboardContext: DashboardContext | undefined = undefined;
 
 	constructor(bundleManager: BundleManager) {
 		const { app } = this;
@@ -96,7 +96,7 @@ export default class DashboardLib {
 
 		// When a bundle changes, delete the cached dashboard context
 		bundleManager.on('bundleChanged', () => {
-			this.dashboardContext = null;
+			this.dashboardContext = undefined;
 		});
 	}
 }

@@ -277,7 +277,7 @@ if (config.login.local?.enabled) {
 			async (username: string, password: string, done: StrategyDoneCb) => {
 				try {
 					const roles: Role[] = [];
-					const foundUser = allowedUsers?.find((u) => u.username === username);
+					const foundUser = allowedUsers?.find((u) => u.username === username) as any;
 					let allowed = false;
 
 					if (foundUser) {

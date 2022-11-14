@@ -1,5 +1,5 @@
 // Packages
-import type { TestInterface } from 'ava';
+import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import axios from 'axios';
 import express from 'express';
@@ -10,7 +10,7 @@ import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 import { invokeAck } from '../helpers/utilities';
 
-const test = anyTest as TestInterface<browser.BrowserContext & server.ServerContext>;
+const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
@@ -122,33 +122,34 @@ test('should mount custom routes via the built-in router and nodecg.mount', asyn
 	t.is(response.data, 'custom route confirmed');
 });
 
-test.serial.cb('should support multiple listenFor handlers', (t) => {
+test.serial('should support multiple listenFor handlers', async (t) => {
 	t.plan(2);
 	let callbacksInvoked = 0;
 
 	t.context.apis.extension.listenFor('multipleListenFor', () => {
 		t.pass();
-		checkDone();
+		callbacksInvoked++;
 	});
 
 	t.context.apis.extension.listenFor('multipleListenFor', () => {
 		t.pass();
-		checkDone();
+		callbacksInvoked++;
 	});
 
 	void dashboard.evaluate(() => {
 		window.dashboardApi.sendMessage('multipleListenFor');
 	});
 
-	function checkDone(): void {
-		callbacksInvoked++;
-		if (callbacksInvoked === 2) {
-			t.end();
-		}
-	}
+	return new Promise<void>((resolve) => {
+		setInterval(() => {
+			if (callbacksInvoked === 2) {
+				resolve();
+			}
+		}, 100);
+	});
 });
 
-test.serial.cb('should prevent acknowledgements from being called more than once', (t) => {
+test.serial('should prevent acknowledgements from being called more than once', async (t) => {
 	t.plan(3);
 	let callbacksInvoked = 0;
 
@@ -164,7 +165,7 @@ test.serial.cb('should prevent acknowledgements from being called more than once
 		}
 
 		t.notThrows(cb);
-		checkDone();
+		callbacksInvoked++;
 	});
 
 	t.context.apis.extension.listenFor('singleAckEnforcement', (_, cb) => {
@@ -176,7 +177,7 @@ test.serial.cb('should prevent acknowledgements from being called more than once
 		t.true(cb.handled);
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 		t.throws(cb as any);
-		checkDone();
+		callbacksInvoked++;
 	});
 
 	void dashboard.evaluate(
@@ -186,12 +187,13 @@ test.serial.cb('should prevent acknowledgements from being called more than once
 			}),
 	);
 
-	function checkDone(): void {
-		callbacksInvoked++;
-		if (callbacksInvoked === 2) {
-			t.end();
-		}
-	}
+	return new Promise<void>((resolve) => {
+		setInterval(() => {
+			if (callbacksInvoked === 2) {
+				resolve();
+			}
+		}, 100);
+	});
 });
 
 test.serial('server - should support intra-context messaging', async (t) => {
@@ -233,35 +235,38 @@ test.serial('server - should support intra-context messaging', async (t) => {
 	incrementAssert();
 });
 
-test.serial.cb('client - should support intra-context messaging', (t) => {
+test.serial('client - should support intra-context messaging', async (t) => {
 	t.plan(2);
 
-	let asserCount = 0;
-	(async () => {
-		// We also want to make sure that the server (extension) is still getting these messages as normal.
-		t.context.apis.extension.listenFor('clientToClient', (data) => {
-			t.deepEqual(data, { baz: 'qux' });
-			if (++asserCount === 2) {
-				t.end();
+	let assertCount = 0;
+
+	// We also want to make sure that the server (extension) is still getting these messages as normal.
+	t.context.apis.extension.listenFor('clientToClient', (data) => {
+		t.deepEqual(data, { baz: 'qux' });
+		assertCount++;
+	});
+
+	const response = await dashboard.evaluate(
+		async () =>
+			new Promise((resolve) => {
+				window.dashboardApi.listenFor('clientToClient', (data) => {
+					resolve(data);
+				});
+
+				// Send the message only after both listeners have been set up.
+				window.dashboardApi.sendMessage('clientToClient', { baz: 'qux' });
+			}),
+	);
+	t.deepEqual(response, { baz: 'qux' });
+	assertCount++;
+
+	return new Promise<void>((resolve) => {
+		setInterval(() => {
+			if (assertCount === 2) {
+				resolve();
 			}
-		});
-
-		const response = await dashboard.evaluate(
-			async () =>
-				new Promise((resolve) => {
-					window.dashboardApi.listenFor('clientToClient', (data) => {
-						resolve(data);
-					});
-
-					// Send the message only after both listeners have been set up.
-					window.dashboardApi.sendMessage('clientToClient', { baz: 'qux' });
-				}),
-		);
-		t.deepEqual(response, { baz: 'qux' });
-		if (++asserCount === 2) {
-			t.end();
-		}
-	})();
+		}, 100);
+	});
 });
 
 test('server - #bundleVersion', (t) => {

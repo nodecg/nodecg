@@ -16,5 +16,7 @@ export default (fileLocation: string, res: express.Response, next: express.NextF
 				next(err);
 			}
 		}
+
+		return undefined;
 	});
 };

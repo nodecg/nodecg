@@ -126,7 +126,7 @@ export default class AssetManager {
 		const deferredFiles = new Map<string, AssetFile | undefined>();
 		watcher.on('add', (filepath) => {
 			if (!ready) {
-				deferredFiles.set(filepath, null);
+				deferredFiles.set(filepath, undefined);
 			}
 
 			sha1File(filepath, (err, sum) => {

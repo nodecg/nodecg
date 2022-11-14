@@ -1,5 +1,5 @@
 // Packages
-import type { TestInterface, ExecutionContext } from 'ava';
+import type { TestFn, ExecutionContext } from 'ava';
 import anyTest from 'ava';
 import socketIoClient from 'socket.io-client';
 
@@ -8,7 +8,7 @@ import * as server from './helpers/server';
 import * as browser from './helpers/browser';
 import type { Page } from 'puppeteer';
 
-const test = anyTest as TestInterface<browser.BrowserContext & server.ServerContext>;
+const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup('nodecg-login.json');
 const { initLogin, initDashboard, initGraphic } = browser.setup();
 
@@ -86,7 +86,7 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 	t.pass();
 });
 
-test.cb('socket should deny access to bad credentials', (t) => {
+test('socket should deny access to bad credentials', async (t) => {
 	t.plan(1);
 
 	const socket = socketIoClient(`${C.rootUrl()}?key=bad_credentials`);
@@ -96,9 +96,12 @@ test.cb('socket should deny access to bad credentials', (t) => {
 	socket.on('event', () => {
 		t.fail();
 	});
-	socket.on('error', (error: unknown) => {
-		t.is(error, 'no credentials found');
-		t.end();
+
+	await new Promise<void>((resolve) => {
+		socket.on('error', (error: unknown) => {
+			t.is(error, 'no credentials found');
+			resolve();
+		});
 	});
 });
 

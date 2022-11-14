@@ -79,7 +79,8 @@ export default class RegistrationCoordinator {
 				} else {
 					this._addRegistration({
 						...regRequest,
-						ipv4: socket.request.connection.remoteAddress,
+						// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+						ipv4: (socket as any).request.connection.remoteAddress,
 						socketId: socket.id,
 						singleInstance: Boolean(graphicManifest.singleInstance),
 						potentiallyOutOfDate:
@@ -223,12 +224,16 @@ export default class RegistrationCoordinator {
 }
 
 function calcBundleGitMismatch(bundle: NodeCG.Bundle, regRequest: GraphicRegRequest): boolean {
-	if (regRequest.bundleGit && (!bundle.git || bundle.git === null)) {
+	if (regRequest.bundleGit && !bundle.git) {
 		return true;
 	}
 
 	if (!regRequest.bundleGit && bundle.git) {
 		return true;
+	}
+
+	if (!regRequest.bundleGit && !bundle.git) {
+		return false;
 	}
 
 	return regRequest.bundleGit!.hash !== bundle.git!.hash;

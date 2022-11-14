@@ -2,13 +2,13 @@
 import path from 'path';
 
 // Packages
-import type { TestInterface } from 'ava';
+import type { TestFn } from 'ava';
 import anyTest from 'ava';
 
 // Ours
 import * as server from '../helpers/server';
 
-const test = anyTest as TestInterface<server.ServerContext>;
+const test = anyTest as TestFn<server.ServerContext>;
 server.setup();
 
 test('should create a default value based on the schema, if none is provided', (t) => {
@@ -43,7 +43,8 @@ test('should throw when defaultValue fails validation', (t) => {
 		});
 	});
 
-	t.true(error.message.includes('Invalid value rejected for replicant'));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
 test('should accept the persisted value when it passes validation', (t) => {
@@ -88,7 +89,8 @@ test('should throw on invalid assignment', (t) => {
 		};
 	});
 
-	t.true(error.message.includes('Invalid value rejected for replicant'));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
 test('should accept valid property deletion', (t) => {
@@ -104,7 +106,8 @@ test('should throw on invalid property deletion', (t) => {
 		delete rep.value.object.numA;
 	});
 
-	t.true(error.message.includes('Invalid value rejected for replicant'));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
 test('should accept valid array mutation via array mutator methods', (t) => {
@@ -120,7 +123,8 @@ test('should throw on invalid array mutation via array mutator methods', (t) => 
 		rep.value.array.push(0);
 	});
 
-	t.true(error.message.includes('Invalid value rejected for replicant'));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
 test('should accept valid property changes to arrays', (t) => {
@@ -136,7 +140,8 @@ test('should throw on invalid property changes to arrays', (t) => {
 		rep.value.array[0] = 0;
 	});
 
-	t.true(error.message.includes('Invalid value rejected for replicant'));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
 test('should accept valid property changes to objects', (t) => {
@@ -152,7 +157,8 @@ test('should throw on invalid property changes to objects', (t) => {
 		rep.value.object.numA = 'foo';
 	});
 
-	t.true(error.message.includes('Invalid value rejected for replicant'));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
 test('should properly load schemas provided with an absolute path', (t) => {

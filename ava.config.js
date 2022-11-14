@@ -1,7 +1,7 @@
-export default {
+module.exports = {
 	files: ['test/**', '!test/helpers/**', '!test/fixtures/**', '!test/types/**'],
 	concurrency: 1,
-	timeout: '30s',
+	timeout: '5m',
 	verbose: true,
 	environmentVariables: {
 		test: 'true',
@@ -9,10 +9,7 @@ export default {
 		TS_NODE_PROJECT: 'test/tsconfig.json',
 		TS_NODE_FILES: 'true',
 	},
-	babel: {
-		compileAsTests: ['test/fixtures/**', 'test/helpers/**', 'test/types/**'],
-		compileEnhancements: false,
-	},
 	extensions: ['ts'],
-	require: ['ts-node/register'],
+	require: ['@babel/register', 'ts-node/register'],
+	workerThreads: false, // turning this on causes intermittent node.js crashes
 };

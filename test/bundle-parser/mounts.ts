@@ -14,7 +14,11 @@ test("throws if a bundle's `nodecg.mount` property is defined, not an array", (t
 		// @ts-expect-error
 		parseMounts({ name: 'test-bundle', mount: 'foo' });
 	});
-	t.is(error.message, 'test-bundle has an invalid "nodecg.mount" property in its package.json, it must be an array');
+	if (!error) return t.fail();
+	return t.is(
+		error.message,
+		'test-bundle has an invalid "nodecg.mount" property in its package.json, it must be an array',
+	);
 });
 
 test('throws when required properties are missing from a mount declaration', (t) => {
@@ -22,7 +26,8 @@ test('throws when required properties are missing from a mount declaration', (t)
 		// @ts-expect-error
 		parseMounts({ name: 'test-bundle', mount: [{}] });
 	});
-	t.true(error.message.includes('the following properties: directory, endpoint'));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('the following properties: directory, endpoint'));
 });
 
 test('removes trailing slashes from endpoints', (t) => {

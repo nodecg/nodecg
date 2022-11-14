@@ -79,12 +79,13 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 		async () =>
 			new Promise<void>((resolve, reject) => {
 				try {
+					// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 					const openDialogButton = document!
 						.querySelector('ncg-dashboard')!
 						.shadowRoot!.querySelector('ncg-workspace')!
 						.shadowRoot!.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')!
 						.querySelector('iframe')!
-						.contentWindow!.document.querySelector('#openDialog')!;
+						.contentWindow!.document.querySelector('#openDialog')! as HTMLElement;
 
 					const dialog = window.dashboardApi.getDialog('test-dialog') as HTMLElement & {
 						opened: boolean;
@@ -135,12 +136,13 @@ test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is 
 		async () =>
 			new Promise<void>((resolve) => {
 				// Open dialog first
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 				const openDialogButton = document!
 					.querySelector('ncg-dashboard')!
 					.shadowRoot!.querySelector('ncg-workspace')!
 					.shadowRoot!.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')!
 					.querySelector('iframe')!
-					.contentWindow!.document.querySelector('#openDialog')!;
+					.contentWindow!.document.querySelector('#openDialog')! as HTMLElement;
 				openDialogButton.click();
 
 				const dialog: any = window.dashboardApi.getDialog('test-dialog');

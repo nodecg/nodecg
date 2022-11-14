@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Packages
-import type { TestInterface } from 'ava';
+import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import type puppeteer from 'puppeteer';
 
@@ -11,7 +11,7 @@ import type puppeteer from 'puppeteer';
 import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 
-const test = anyTest as TestInterface<browser.BrowserContext & server.ServerContext>;
+const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
@@ -263,32 +263,37 @@ test.serial('when an array - should support the "delete" operator', async (t) =>
 	]);
 });
 
-test.serial.cb('when an array - should proxy objects added to arrays via array insertion methods', (t) => {
+test.serial('when an array - should proxy objects added to arrays via array insertion methods', async (t) => {
 	const rep = t.context.apis.extension.Replicant<Array<Record<string, string>>>('serverArrInsertObj', {
 		defaultValue: [],
 	});
 	rep.value!.push({ foo: 'foo' });
-	rep.on('change', (newVal) => {
-		if (!newVal) {
-			t.fail('no value');
-			return;
-		}
 
-		if (newVal[0].foo === 'bar') {
-			t.deepEqual(newVal, [{ foo: 'bar' }]);
-			t.end();
-		}
+	const promise = new Promise<void>((resolve) => {
+		rep.on('change', (newVal) => {
+			if (!newVal) {
+				t.fail('no value');
+				return;
+			}
+
+			if (newVal[0].foo === 'bar') {
+				t.deepEqual(newVal, [{ foo: 'bar' }]);
+				resolve();
+			}
+		});
 	});
 
 	process.nextTick(() => {
 		rep.value![0].foo = 'bar';
 	});
+
+	await promise;
 });
 
-test.serial.cb('when an object - should not cause server-side replicants to lose observation', (t) => {
+test.serial('when an object - should not cause server-side replicants to lose observation', async (t) => {
 	t.plan(2);
 	setTimeout(() => {
-		t.end('Timeout');
+		t.fail('Timeout');
 	}, 1000);
 
 	const rep = t.context.apis.extension.Replicant<Record<string, string>>('clientServerObservation', {
@@ -296,7 +301,7 @@ test.serial.cb('when an object - should not cause server-side replicants to lose
 		persistent: false,
 	});
 
-	dashboard
+	return dashboard
 		.evaluate(
 			async () =>
 				new Promise((resolve, reject) => {
@@ -317,22 +322,25 @@ test.serial.cb('when an object - should not cause server-side replicants to lose
 					});
 				}),
 		)
-		.then((ret) => {
+		.then(async (ret) => {
 			t.deepEqual(ret, { foo: 'bar' });
 
-			rep.on('change', (newVal) => {
-				if (!newVal) {
-					t.fail('no value');
-					return;
-				}
+			const promise = new Promise<void>((resolve) => {
+				rep.on('change', (newVal) => {
+					if (!newVal) {
+						t.fail('no value');
+						return;
+					}
 
-				if (newVal.foo === 'baz') {
-					t.pass();
-					t.end();
-				}
+					if (newVal.foo === 'baz') {
+						t.pass();
+						resolve();
+					}
+				});
 			});
 
 			rep.value!.foo = 'baz';
+			return promise;
 		})
 		.catch(t.fail);
 });
@@ -512,7 +520,7 @@ test.serial('when an object - should support the "delete" operator', async (t) =
 	]);
 });
 
-test.serial.cb('when an object - should properly proxy new objects assigned to properties', (t) => {
+test.serial('when an object - should properly proxy new objects assigned to properties', async (t) => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant<Record<string, any>>('serverObjProp', {
@@ -521,21 +529,25 @@ test.serial.cb('when an object - should properly proxy new objects assigned to p
 
 	rep.value!.foo = { baz: 'baz' };
 
-	rep.on('change', (newVal) => {
-		if (!newVal) {
-			t.fail('no value');
-			return;
-		}
+	const promise = new Promise<void>((resolve) => {
+		rep.on('change', (newVal) => {
+			if (!newVal) {
+				t.fail('no value');
+				return;
+			}
 
-		if (newVal.foo.baz === 'bax') {
-			t.is(newVal.foo.baz, 'bax');
-			t.end();
-		}
+			if (newVal.foo.baz === 'bax') {
+				t.is(newVal.foo.baz, 'bax');
+				resolve();
+			}
+		});
 	});
 
 	process.nextTick(() => {
 		rep.value!.foo.baz = 'bax';
 	});
+
+	await promise;
 });
 
 test.serial('when a date - should emit the JSON value to clients', async (t) => {
@@ -576,7 +588,7 @@ test.serial('persistent - should load persisted values when they exist', async (
  * I can't think of a good way to make this test less awful,
  * so it is being skipped for now.
  */
-test.serial.cb.skip('persistent - should persist assignment to disk', (t) => {
+test.serial.skip('persistent - should persist assignment to disk', async (t) => {
 	t.plan(1);
 
 	dashboard
@@ -597,7 +609,7 @@ test.serial.cb.skip('persistent - should persist assignment to disk', (t) => {
 					});
 				}),
 		)
-		.then(() => {
+		.then(async () => {
 			/**
 			 * This is from 1.0, when we used files on disk
 			 * instead of a database.
@@ -606,13 +618,15 @@ test.serial.cb.skip('persistent - should persist assignment to disk', (t) => {
 			 * with something else.
 			 */
 			const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientPersistence.rep');
-			fs.readFile(replicantPath, 'utf-8', (err, data) => {
-				if (err) {
-					throw err;
-				}
+			return new Promise<void>((resolve) => {
+				fs.readFile(replicantPath, 'utf-8', (err, data) => {
+					if (err) {
+						throw err;
+					}
 
-				t.is(data, '{"nested":"hey we assigned!"}');
-				t.end();
+					t.is(data, '{"nested":"hey we assigned!"}');
+					resolve();
+				});
 			});
 		})
 		.catch(t.fail);
@@ -624,18 +638,20 @@ test.serial.cb.skip('persistent - should persist assignment to disk', (t) => {
  * I can't think of a good way to make this test less awful,
  * so it is being skipped for now.
  */
-test.cb.skip('persistent - should persist changes to disk', (t) => {
+test.skip('persistent - should persist changes to disk', async (t) => {
 	t.plan(1);
 
 	const serverRep = t.context.apis.extension.Replicant('clientChangePersistence', { defaultValue: { nested: '' } });
-	(async () => {
-		await dashboard.evaluate(
-			async () =>
-				new Promise((resolve) => {
-					(window as any).clientChangePersistence = window.dashboardApi.Replicant('clientChangePersistence');
-					(window as any).clientChangePersistence.once('change', resolve);
-				}),
-		);
+
+	await dashboard.evaluate(
+		async () =>
+			new Promise((resolve) => {
+				(window as any).clientChangePersistence = window.dashboardApi.Replicant('clientChangePersistence');
+				(window as any).clientChangePersistence.once('change', resolve);
+			}),
+	);
+
+	const promise = new Promise<void>((resolve) => {
 		serverRep.on('change', (newVal) => {
 			if (!newVal) {
 				t.fail('no value');
@@ -658,15 +674,16 @@ test.cb.skip('persistent - should persist changes to disk', (t) => {
 				const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientChangePersistence.rep');
 				const data = fs.readFileSync(replicantPath, 'utf-8');
 				t.is(data, '{"nested":"hey we changed!"}');
-				t.end();
+				resolve();
 			}, 10);
 		});
-		dashboard
-			.evaluate(() => {
-				(window as any).clientChangePersistence.value.nested = 'hey we changed!';
-			})
-			.catch(t.fail);
-	})();
+	});
+
+	await dashboard.evaluate(() => {
+		(window as any).clientChangePersistence.value.nested = 'hey we changed!';
+	});
+
+	return promise;
 });
 
 /**
@@ -675,7 +692,7 @@ test.cb.skip('persistent - should persist changes to disk', (t) => {
  * I can't think of a good way to make this test less awful,
  * so it is being skipped for now.
  */
-test.serial.cb.skip('persistent - should persist falsey values to disk', (t) => {
+test.serial.skip('persistent - should persist falsey values to disk', async (t) => {
 	t.plan(1);
 
 	dashboard
@@ -691,7 +708,7 @@ test.serial.cb.skip('persistent - should persist falsey values to disk', (t) => 
 					});
 				}),
 		)
-		.then(() => {
+		.then(async () => {
 			/**
 			 * This is from 1.0, when we used files on disk
 			 * instead of a database.
@@ -700,13 +717,15 @@ test.serial.cb.skip('persistent - should persist falsey values to disk', (t) => 
 			 * with something else.
 			 */
 			const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientFalseyWrite.rep');
-			fs.readFile(replicantPath, 'utf-8', (err, data) => {
-				if (err) {
-					throw err;
-				}
+			return new Promise<void>((resolve) => {
+				fs.readFile(replicantPath, 'utf-8', (err, data) => {
+					if (err) {
+						throw err;
+					}
 
-				t.is(data, '0');
-				t.end();
+					t.is(data, '0');
+					resolve();
+				});
 			});
 		})
 		.catch(t.fail);
@@ -732,7 +751,7 @@ test.serial('persistent - should read falsey values from disk', async (t) => {
  * I can't think of a good way to make this test less awful,
  * so it is being skipped for now.
  */
-test.serial.cb.skip('transient - should not write their value to disk', (t) => {
+test.serial.skip('transient - should not write their value to disk', async (t) => {
 	t.plan(2);
 
 	const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientTransience.rep');
@@ -755,20 +774,23 @@ test.serial.cb.skip('transient - should not write their value to disk', (t) => {
 						});
 					}),
 			)
-			.then(() => {
-				/**
-				 * This is from 1.0, when we used files on disk
-				 * instead of a database.
-				 *
-				 * To whomeever rewrites this test: you will need to replace this
-				 * with something else.
-				 */
-				fs.readFile(replicantPath, (err) => {
-					t.truthy(err);
-					t.is(err?.code, 'ENOENT');
-					t.end();
-				});
-			})
+			.then(
+				async () =>
+					/**
+					 * This is from 1.0, when we used files on disk
+					 * instead of a database.
+					 *
+					 * To whomeever rewrites this test: you will need to replace this
+					 * with something else.
+					 */
+					new Promise<void>((resolve) => {
+						fs.readFile(replicantPath, (err) => {
+							t.truthy(err);
+							t.is(err?.code, 'ENOENT');
+							resolve();
+						});
+					}),
+			)
 			.catch(t.fail);
 	});
 });

@@ -6,7 +6,6 @@ import path from 'path';
 import test from 'ava';
 import axios from 'axios';
 import simpleGit from 'simple-git/promise';
-// @ts-expect-error
 import { replaceInFile } from 'replace-in-file';
 
 // Ours

@@ -1,7 +1,7 @@
 // Packages
 import fs from 'fs-extra';
 import sinon from 'sinon';
-import type { TestInterface } from 'ava';
+import type { TestFn } from 'ava';
 import anyTest from 'ava';
 
 // Ours
@@ -16,7 +16,7 @@ type TestContext = {
 	sentryLogger: InstanceType<typeof Logger>;
 };
 
-const test = anyTest as TestInterface<TestContext>;
+const test = anyTest as TestFn<TestContext>;
 
 test.before(() => {
 	// Remove the "logs" folder

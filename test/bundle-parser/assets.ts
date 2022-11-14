@@ -33,7 +33,8 @@ test('should throw an error when pkg.nodecg.assetCategories is not an Array', (t
 		}),
 	);
 
-	t.is(error.message, "test-bundle's nodecg.assetCategories is not an Array");
+	if (!error) return t.fail();
+	return t.is(error.message, "test-bundle's nodecg.assetCategories is not an Array");
 });
 
 test('should throw an error when an assetCategory lacks a name', (t) => {
@@ -45,7 +46,8 @@ test('should throw an error when an assetCategory lacks a name', (t) => {
 		}),
 	);
 
-	t.is(error.message, 'nodecg.assetCategories[0] in bundle test-bundle lacks a "name" property');
+	if (!error) return t.fail();
+	return t.is(error.message, 'nodecg.assetCategories[0] in bundle test-bundle lacks a "name" property');
 });
 
 test('should throw an error when an assetCategory lacks a title', (t) => {
@@ -57,7 +59,8 @@ test('should throw an error when an assetCategory lacks a title', (t) => {
 		}),
 	);
 
-	t.is(error.message, 'nodecg.assetCategories[0] in bundle test-bundle lacks a "title" property');
+	if (!error) return t.fail();
+	return t.is(error.message, 'nodecg.assetCategories[0] in bundle test-bundle lacks a "title" property');
 });
 
 test("should throw an error when an assetCategory's allowedTypes isn't an array", (t) => {
@@ -75,7 +78,8 @@ test("should throw an error when an assetCategory's allowedTypes isn't an array"
 		}),
 	);
 
-	t.is(error.message, 'nodecg.assetCategories[0].allowedTypes in bundle test-bundle is not an Array');
+	if (!error) return t.fail();
+	return t.is(error.message, 'nodecg.assetCategories[0].allowedTypes in bundle test-bundle is not an Array');
 });
 
 test('should throw an error when an assetCategory is named "sounds"', (t) => {
@@ -87,7 +91,8 @@ test('should throw an error when an assetCategory is named "sounds"', (t) => {
 		}),
 	);
 
-	t.is(
+	if (!error) return t.fail();
+	return t.is(
 		error.message,
 		'"sounds" is a reserved assetCategory name. ' +
 			'Please change nodecg.assetCategories[0].name in bundle test-bundle',

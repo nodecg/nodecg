@@ -29,7 +29,8 @@ test('parsing - when the config file does not exist, throw an error', (t) => {
 	const error = t.throws(
 		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/good-bundle', './made/up/path.json'),
 	);
-	t.true(error.message.includes('does not exist'));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('does not exist'));
 });
 
 test("parsing when the config file isn't valid JSON, throw an error", (t) => {
@@ -39,7 +40,8 @@ test("parsing when the config file isn't valid JSON, throw an error", (t) => {
 		'./test/fixtures/bundle-parser/bad-json/bundleConfig.json',
 	);
 	const error = t.throws(fn);
-	t.true(error.message.includes('Ensure that it is valid JSON'));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('Ensure that it is valid JSON'));
 });
 
 test('validation - when the schema file exists, should not throw when the config passes validation', (t) => {
@@ -58,7 +60,8 @@ test('validation - when the schema file exists, should throw when the config fai
 		'./test/fixtures/bundle-parser/config-validation/invalidConfig.json',
 	);
 	const error = t.throws(fn);
-	t.true(error.message.includes('is invalid:'));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('is invalid:'));
 });
 
 // Smoke test for https://github.com/chute/json-schema-defaults/issues/10
@@ -93,7 +96,8 @@ test("validation - when the schema file isn't valid JSON, throw an error", (t) =
 		'./test/fixtures/bundle-parser/bad-schema/bundleConfig.json',
 	);
 	const error = t.throws(fn);
-	t.true(error.message.includes('configschema.json for bundle '));
+	if (!error) return t.fail();
+	return t.true(error.message.includes('configschema.json for bundle '));
 });
 
 test("validation - should not reject a config if it doesn't an optional object that has some properties with defaults and other required properties that do not have defaults", (t) => {

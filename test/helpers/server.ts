@@ -2,7 +2,7 @@
 import path from 'path';
 
 // Packages
-import type { TestInterface } from 'ava';
+import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import fse from 'fs-extra';
 import temp from 'temp';
@@ -21,7 +21,7 @@ export type ServerContext = {
 	apis: { extension: InstanceType<ReturnType<typeof serverApiFactory>> };
 };
 
-const test = anyTest as TestInterface<ServerContext>;
+const test = anyTest as TestFn<ServerContext>;
 
 export const setup = (nodecgConfigName = 'nodecg.json'): void => {
 	const tempFolder = temp.mkdirSync();
@@ -51,7 +51,7 @@ export const setup = (nodecgConfigName = 'nodecg.json'): void => {
 
 	test.after.always(() => {
 		if (server) {
-			server.stop();
+			void server.stop();
 		}
 	});
 

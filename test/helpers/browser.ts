@@ -4,7 +4,7 @@ import * as path from 'path';
 import { v4 as uuid } from 'uuid';
 
 // Packages
-import type { TestInterface } from 'ava';
+import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import puppeteer from 'puppeteer';
 import { argv } from 'yargs';
@@ -17,7 +17,7 @@ import { sleep } from './utilities';
 export type BrowserContext = {
 	browser: puppeteer.Browser;
 };
-const test = anyTest as TestInterface<BrowserContext>;
+const test = anyTest as TestFn<BrowserContext>;
 
 export const setup = () => {
 	let browser: puppeteer.Browser;

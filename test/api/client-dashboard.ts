@@ -1,5 +1,5 @@
 // Packages
-import type { TestInterface } from 'ava';
+import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import type puppeteer from 'puppeteer';
 
@@ -9,7 +9,7 @@ import * as browser from '../helpers/browser';
 
 server.setup();
 const { initDashboard } = browser.setup();
-const test = anyTest as TestInterface<browser.BrowserContext & server.ServerContext>;
+const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 
 let dashboard: puppeteer.Page;
 test.before(async () => {
@@ -25,7 +25,8 @@ test.serial("should produce an error if a callback isn't given", (t) => {
 		);
 	});
 
-	t.is(error.message, 'argument "handler" must be a function, but you provided a(n) undefined');
+	if (!error) return t.fail();
+	return t.is(error.message, 'argument "handler" must be a function, but you provided a(n) undefined');
 });
 
 // Check for basic connectivity. The rest of the tests are run from the dashboard as well.
@@ -47,16 +48,22 @@ test.serial('should receive messages', async (t) => {
 	t.pass();
 });
 
-test.serial.cb('should send messages', (t) => {
-	setTimeout(() => {
-		t.end('Timeout');
+test.serial('should send messages', async (t) => {
+	t.plan(1);
+	const timeout = setTimeout(() => {
+		t.fail('Timeout');
 	}, 1000);
-	t.context.apis.extension.listenFor('dashboardToServer', () => {
-		t.end();
+	const promise = new Promise<void>((resolve) => {
+		t.context.apis.extension.listenFor('dashboardToServer', () => {
+			clearTimeout(timeout);
+			t.pass();
+			resolve();
+		});
 	});
 	void dashboard.evaluate(() => {
 		window.dashboardApi.sendMessage('dashboardToServer');
 	});
+	return promise;
 });
 
 test.serial('should support multiple listenFor handlers', async (t) => {
