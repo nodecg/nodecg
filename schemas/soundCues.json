@@ -4,6 +4,7 @@
 	"definitions": {
 		"cueFile": {
 			"type": "object",
+			"additionalProperties": false,
 			"properties": {
 				"sum": {
 					"type": "string"
