@@ -55,7 +55,7 @@ test.serial('should resolve acknowledgement promises', async (t) => {
 		invokeAck(t, cb);
 	});
 	const res = await dashboard.evaluate(() => window.dashboardApi.sendMessage('ackPromiseResolve').catch());
-	t.is(res, undefined);
+	t.is(res, process.platform === 'linux' ? [] : '');
 });
 
 test.serial('should reject acknowledgement promises if there was an error', async (t) => {
