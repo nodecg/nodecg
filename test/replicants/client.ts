@@ -445,7 +445,7 @@ test.serial('when an object - should react to server-side changes of array prope
 		newVal: RepType;
 		oldVal: RepType;
 		operations: Array<NodeCG.Replicant.Operation<RepType>>;
-	} = (await ret.jsonValue()) as any;
+	} = await ret.jsonValue();
 
 	t.deepEqual(retJson.newVal, { arr: ['test'] });
 	t.deepEqual(retJson.oldVal, { arr: [] });
