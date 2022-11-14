@@ -29,6 +29,11 @@ jobs:
         if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@v1.1
 
+      - name: Ensure that bundle git parsing functionality works
+        run: |
+          git config --global user.email "ci@nodecg.dev"
+          git config --global user.name "NodeCG Bot"
+
       - name: Restore node_modules
         uses: actions/cache@v3
         with:
