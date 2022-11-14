@@ -61,12 +61,12 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 					messageName,
 					content: data,
 				},
-				(err: any, ...args: any[]) => {
-					cb!(err, ...args);
+				(err: any, response: any) => {
+					cb!(err, response);
 				},
 			);
 		} else {
-			return new Promise((resolve, reject) => {
+			return new Promise<any[]>((resolve, reject) => {
 				window.socket.emit(
 					'message',
 					{
@@ -74,11 +74,11 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 						messageName,
 						content: data,
 					},
-					(err: any, ...args: any[]) => {
+					(err: any, response: any) => {
 						if (err) {
 							reject(err);
 						} else {
-							resolve(args);
+							resolve(response);
 						}
 					},
 				);
