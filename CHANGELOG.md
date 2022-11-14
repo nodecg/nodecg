@@ -2,6 +2,80 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/nodecg/nodecg/compare/v1.8.1...v1.9.0) (2022-03-30)
+
+### Features
+
+- **auth:** discord login option ([#571](https://github.com/nodecg/nodecg/issues/571)) ([3df008e](https://github.com/nodecg/nodecg/commit/3df008e158bee2a9ba50627df9c1a90c86ceac3d))
+- **extension:** allow extensions to export esmodule ([#587](https://github.com/nodecg/nodecg/issues/587)) ([8e3304a](https://github.com/nodecg/nodecg/commit/8e3304a164e74afdfb5464c870fba5c55dd663de))
+- **login:** add twitch id whitelisting ([#583](https://github.com/nodecg/nodecg/issues/583)) ([e83933f](https://github.com/nodecg/nodecg/commit/e83933f1515bb282bc0d98a926302b8c460ddfc7))
+
+### Bug Fixes
+
+- **dashboard:** correct URL for obs drag when login is enabled ([#585](https://github.com/nodecg/nodecg/issues/585)) ([9046287](https://github.com/nodecg/nodecg/commit/904628737efdd0c239119757c0b55efe4cf4a761))
+- **dashboard:** fix the currently selected workspace not being highlighted on first page load ([#538](https://github.com/nodecg/nodecg/issues/538)) ([3442d76](https://github.com/nodecg/nodecg/commit/3442d760585ee23f5fec568b6a194b734dac5be5))
+- **socket:** correct maxListeners setting to prevent memory leak ([#579](https://github.com/nodecg/nodecg/issues/579)) ([1b0611b](https://github.com/nodecg/nodecg/commit/1b0611bfdfa07d57c604b4e7bd5e1cf22d36b142))
+- **soundcue:** fix soundcue files not persisting ([#584](https://github.com/nodecg/nodecg/issues/584)) ([eeac8c4](https://github.com/nodecg/nodecg/commit/eeac8c43ace1fd1dbba9fe5ebed4301ed721cdaf))
+- **types:** add/tweak types for replicant/readReplicant ([#545](https://github.com/nodecg/nodecg/issues/545)) ([f391281](https://github.com/nodecg/nodecg/commit/f391281463044cffca2e1b614ea3a0a163a99fce))
+- **types:** correct typing for declared replicants ([#596](https://github.com/nodecg/nodecg/issues/596)) ([dea9c15](https://github.com/nodecg/nodecg/commit/dea9c154d161069e2c14c6ad3def5d6373a5b7b9))
+
+### [1.8.1](https://github.com/nodecg/nodecg/compare/v1.8.0...v1.8.1) (2021-03-10)
+
+### Bug Fixes
+
+- better log formatting and configurable timestamps ([#575](https://github.com/nodecg/nodecg/issues/575)) ([dd323cd](https://github.com/nodecg/nodecg/commit/dd323cd72dc38343d35a374158e5e1bfde70ddfd))
+- **deps:** fix some vulnerabilities of dependency ([81c9ee2](https://github.com/nodecg/nodecg/commit/81c9ee2edb296e5bef5b8d5df7e0c9ddc9279d5b))
+
+## [1.8.0](https://github.com/nodecg/nodecg/compare/v1.7.4...v1.8.0) (2021-03-08)
+
+### Features
+
+- **replicants:** remove local storage size quota ([#574](https://github.com/nodecg/nodecg/issues/574)) ([10bfd6f](https://github.com/nodecg/nodecg/commit/10bfd6ff87107fde16459140792cbc590f8497a0))
+
+### Bug Fixes
+
+- **types:** add persistenceInterval option ([#572](https://github.com/nodecg/nodecg/issues/572)) ([84c3c46](https://github.com/nodecg/nodecg/commit/84c3c463c1ee27fe8cc2e0e3fc8177cdccc91e14))
+
+### [1.7.4](https://github.com/nodecg/nodecg/compare/v1.7.3...v1.7.4) (2020-12-11)
+
+### Bug Fixes
+
+- remove node warnings ([#567](https://github.com/nodecg/nodecg/issues/567)) ([5d5c494](https://github.com/nodecg/nodecg/commit/5d5c494))
+
+### [1.7.3](https://github.com/nodecg/nodecg/compare/v1.7.2...v1.7.3) (2020-12-11)
+
+### Bug Fixes
+
+- **deps:** update express-bare-module-specifiers ([bd1d925](https://github.com/nodecg/nodecg/commit/bd1d925))
+
+### [1.7.2](https://github.com/nodecg/nodecg/compare/v1.7.1...v1.7.2) (2020-11-20)
+
+### Bug Fixes
+
+- **deps:** switch json-schema-lib repo ([7b7c7c1](https://github.com/nodecg/nodecg/commit/7b7c7c1))
+
+### [1.7.1](https://github.com/nodecg/nodecg/compare/v1.7.0...v1.7.1) (2020-10-02)
+
+### Bug Fixes
+
+- **assets:** filename ([#564](https://github.com/nodecg/nodecg/issues/564)) ([ddf936c](https://github.com/nodecg/nodecg/commit/ddf936c))
+
+## [1.7.0](https://github.com/nodecg/nodecg/compare/v1.6.1...v1.7.0) (2020-09-20)
+
+### Bug Fixes
+
+- **deps:** update dependencies through npm audit ([a871f4b](https://github.com/nodecg/nodecg/commit/a871f4b))
+
+### Features
+
+- **dashboard:** Add graphic obs drag parameters ([#561](https://github.com/nodecg/nodecg/issues/561)) ([5c5a833](https://github.com/nodecg/nodecg/commit/5c5a833))
+
+### [1.6.1](https://github.com/nodecg/nodecg/compare/v1.6.0...v1.6.1) (2020-04-30)
+
+### Bug Fixes
+
+- **auth:** send Client-ID header on all Twitch API requests ([#550](https://github.com/nodecg/nodecg/issues/550)) ([12d2a5e](https://github.com/nodecg/nodecg/commit/12d2a5e))
+
 ## [1.6.0](https://github.com/nodecg/nodecg/compare/v1.5.0...v1.6.0) (2020-02-24)
 
 ### Bug Fixes
@@ -366,11 +440,32 @@ nodecg.listenFor('example', (data, ack) => {
 - **dashboard:** show a much shorter and easier to read URL for each graphic on the Graphics page ([5b91af1](https://github.com/nodecg/nodecg/commit/5b91af1))
 - **replicants:** add .validationErrors property ([59f3c82](https://github.com/nodecg/nodecg/commit/59f3c82))
 - **replicants:** log a warning when attempting to access .value before the Replicant has finished declaring ([#274](https://github.com/nodecg/nodecg/issues/274)) ([293acf5](https://github.com/nodecg/nodecg/commit/293acf5)), closes [#265](https://github.com/nodecg/nodecg/issues/265)
-- **replicants:** support external \$refs in schemas ([3c34450](https://github.com/nodecg/nodecg/commit/3c34450))
+- **replicants:** support external $refs in schemas ([3c34450](https://github.com/nodecg/nodecg/commit/3c34450))
 - add convenience 'shared' directory ([#295](https://github.com/nodecg/nodecg/issues/295)) ([63a1119](https://github.com/nodecg/nodecg/commit/63a1119))
 - add Sentry integration for error tracking ([#305](https://github.com/nodecg/nodecg/issues/305)) ([92cd540](https://github.com/nodecg/nodecg/commit/92cd540))
 - adopt new routing style (/bundles/:bundleName/\*) ([1663670](https://github.com/nodecg/nodecg/commit/1663670))
 - log unhandled promise rejections if Sentry is not enabled ([59dc75e](https://github.com/nodecg/nodecg/commit/59dc75e))
+
+* **api:** add nodecg.unlisten method ([ea45b3f](https://github.com/nodecg/nodecg/commit/ea45b3f))
+* **api:** expose Logger class ([5882dc4](https://github.com/nodecg/nodecg/commit/5882dc4))
+* **api:** if an acknowledgement is called with an error as the first callback, serialize that error ([#300](https://github.com/nodecg/nodecg/issues/300)) ([1c05f81](https://github.com/nodecg/nodecg/commit/1c05f81))
+* **api:** make client-side sendMessage return a Promise ([#301](https://github.com/nodecg/nodecg/issues/301)) ([fe93c73](https://github.com/nodecg/nodecg/commit/fe93c73)), closes [#297](https://github.com/nodecg/nodecg/issues/297)
+* **config:** add support for whitelisted loading of bundles ([31533a8](https://github.com/nodecg/nodecg/commit/31533a8))
+* **config:** added `--bundlesEnabled` and `--bundlesDisabled` command-line arguments to specify a comma-separated list of bundle names to either whitelist or blacklist for loading on startup. Very useful when combined with things such as Run Configurations in your IDE of choosing.
+* **dashboard:** add "open in standalone window" button to panel headers ([ba077c0](https://github.com/nodecg/nodecg/commit/ba077c0))
+* **dashboard:** add default body background color style to panels ([3433529](https://github.com/nodecg/nodecg/commit/3433529))
+* **dashboard:** add support for "fullbleed" workspaces, which have one single panel that takes up the entire dashboard
+* **dashboard:** add support for multiple tabs of panels, called "workspaces". See the [Manifest tutorial](https://nodecg.dev/tutorial-manifest.html) (specifically the `nodecg.dashboardPanels` section) for more info.
+* **dashboard:** compatability with browsers other than Chrome has been greatly improved
+* **dashboard:** re-design dashboard with tabbed navigation ([8214b43](https://github.com/nodecg/nodecg/commit/8214b43))
+* **dashboard:** show a much shorter and easier to read URL for each graphic on the Graphics page ([5b91af1](https://github.com/nodecg/nodecg/commit/5b91af1))
+* **replicants:** add .validationErrors property ([59f3c82](https://github.com/nodecg/nodecg/commit/59f3c82))
+* **replicants:** log a warning when attempting to access .value before the Replicant has finished declaring ([#274](https://github.com/nodecg/nodecg/issues/274)) ([293acf5](https://github.com/nodecg/nodecg/commit/293acf5)), closes [#265](https://github.com/nodecg/nodecg/issues/265)
+* **replicants:** support external \$refs in schemas ([3c34450](https://github.com/nodecg/nodecg/commit/3c34450))
+* add convenience 'shared' directory ([#295](https://github.com/nodecg/nodecg/issues/295)) ([63a1119](https://github.com/nodecg/nodecg/commit/63a1119))
+* add Sentry integration for error tracking ([#305](https://github.com/nodecg/nodecg/issues/305)) ([92cd540](https://github.com/nodecg/nodecg/commit/92cd540))
+* adopt new routing style (/bundles/:bundleName/\*) ([1663670](https://github.com/nodecg/nodecg/commit/1663670))
+* log unhandled promise rejections if Sentry is not enabled ([59dc75e](https://github.com/nodecg/nodecg/commit/59dc75e))
 
 ### Performance Improvements
 

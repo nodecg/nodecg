@@ -8,7 +8,7 @@ import cheerio from 'cheerio';
 // Ours
 import { NodeCG } from '../../types/nodecg';
 
-export default function(dashboardDir: string, manifest: NodeCG.Manifest): NodeCG.Bundle.Panel[] {
+export default function (dashboardDir: string, manifest: NodeCG.Manifest): NodeCG.Bundle.Panel[] {
 	const unparsedPanels = manifest.dashboardPanels ?? undefined;
 	const bundleName = manifest.name;
 	const panels: NodeCG.Bundle.Panel[] = [];
@@ -37,7 +37,7 @@ export default function(dashboardDir: string, manifest: NodeCG.Manifest): NodeCG
 		assertRequiredProps(panel, index);
 
 		// Check if this bundle already has a panel by this name
-		const dupeFound = panels.some(p => p.name === panel.name);
+		const dupeFound = panels.some((p) => p.name === panel.name);
 		if (dupeFound) {
 			throw new Error(`Panel #${index} (${panel.name}) has the same name as another panel in ${bundleName}.`);
 		}
@@ -99,7 +99,7 @@ export default function(dashboardDir: string, manifest: NodeCG.Manifest): NodeCG
 			);
 		}
 
-		if (panel.workspace && panel.workspace.toLowerCase().startsWith('__nodecg')) {
+		if (panel.workspace?.toLowerCase().startsWith('__nodecg')) {
 			throw new Error(
 				`Panel "${path.basename(panel.file)}" in bundle "${bundleName}" is in a workspace ` +
 					'whose name begins with __nodecg, which is a reserved string. Please change the name ' +

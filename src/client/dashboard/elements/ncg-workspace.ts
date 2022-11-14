@@ -1,5 +1,11 @@
 import '@polymer/paper-spinner/paper-spinner.js';
-import './ncg-dashboard-panel';
+
+// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import * as keep1 from './ncg-dashboard-panel';
+keep1;
+/* eslint-enable @typescript-eslint/no-unused-expressions */
+
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
 import { timeOut } from '@polymer/polymer/lib/utils/async.js';
@@ -221,7 +227,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 			const allPanelsOrdered = arrayUnique(storedSortOrder.concat(allPanels));
 
 			// Remove panels that no longer exist
-			const removededOld = allPanelsOrdered.filter(val => {
+			const removededOld = allPanelsOrdered.filter((val) => {
 				return allPanels.includes(val);
 			});
 
@@ -238,7 +244,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 		this._packeryInitialized = true;
 
 		const panelsList: NcgDashboardPanel[] = this.$.panels.querySelectorAll('ncg-dashboard-panel');
-		panelsList.forEach(itemElem => {
+		panelsList.forEach((itemElem) => {
 			// Make element draggable with Draggabilly
 			const draggie = new Draggabilly(itemElem);
 
@@ -312,8 +318,8 @@ class NcgWorkspace extends Polymer.PolymerElement {
 		const workspaceName = workspace.route === '' ? 'default' : workspace.name;
 		const { bundles } = window.__renderData__;
 		const panels: NodeCG.Bundle.Panel[] = [];
-		bundles.forEach(bundle => {
-			bundle.dashboard.panels.forEach(panel => {
+		bundles.forEach((bundle) => {
+			bundle.dashboard.panels.forEach((panel) => {
 				if (panel.dialog) {
 					return;
 				}

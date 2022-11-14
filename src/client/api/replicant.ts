@@ -1,3 +1,4 @@
+/* eslint-disable no-constructor-return */
 // Packages
 import equal from 'deep-equal';
 import clone from 'clone';
@@ -83,7 +84,12 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 		// Initialize the Replicant.
 		this._declare();
 
-		socket.on('replicant:operations', data => this._handleOperations(data));
+		socket.on('replicant:operations', (data) =>
+			this._handleOperations({
+				...data,
+				operations: data.operations as Array<NodeCG.Replicant.Operation<T>>,
+			}),
+		);
 
 		// If we lose connection, redeclare everything on reconnect
 		socket.on('disconnect', () => this._handleDisconnect());
@@ -250,12 +256,12 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 					 * To ensure consistent behavior, we manually emit a `change` event in this case.
 					 */
 					if (this.value === undefined && this.revision === 0) {
-						this.emit('change');
+						this.emit('change', undefined, undefined, []);
 					}
 
 					// If there were any pre-declare actions queued, execute them.
 					if (this._actionQueue.length > 0) {
-						this._actionQueue.forEach(item => {
+						this._actionQueue.forEach((item) => {
 							item.fn.apply(this, item.args);
 						});
 						this._actionQueue = [];
@@ -274,17 +280,18 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 	 */
 	private _assignValue(newValue: T, revision: number): void {
 		const oldValue = clone(this.value);
-		this._applyOperation({
+		const op = {
 			path: '/',
-			method: 'overwrite',
+			method: 'overwrite' as const,
 			args: { newValue },
-		});
+		};
+		this._applyOperation(op);
 
 		if (typeof revision !== 'undefined') {
 			this.revision = revision;
 		}
 
-		this.emit('change', this.value, oldValue);
+		this.emit('change', this.value, oldValue, [op]);
 	}
 
 	/**
@@ -297,7 +304,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 		name: string;
 		namespace: string;
 		revision: number;
-		operations: Array<NodeCG.Replicant.Operation<any>>;
+		operations: Array<NodeCG.Replicant.Operation<T>>;
 	}): void {
 		if (this.status !== 'declared') {
 			return;
@@ -322,8 +329,8 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 		this.log.replicants('received replicantOperations', data);
 
 		const oldValue = clone(this.value);
-		data.operations.forEach(operation => {
-			this._applyOperation(operation as any);
+		data.operations.forEach((operation) => {
+			this._applyOperation(operation);
 		});
 		this.revision = data.revision;
 		this.emit('change', this.value, oldValue, data.operations);

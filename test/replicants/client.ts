@@ -22,7 +22,7 @@ test.before(async () => {
 	dashboard = await initDashboard();
 });
 
-test.serial('should return a reference to any already-declared replicant', async t => {
+test.serial('should return a reference to any already-declared replicant', async (t) => {
 	const ret = await dashboard.evaluate(() => {
 		const rep1 = window.dashboardApi.Replicant('clientDupRef');
 		const rep2 = window.dashboardApi.Replicant('clientDupRef');
@@ -32,7 +32,7 @@ test.serial('should return a reference to any already-declared replicant', async
 	t.true(ret);
 });
 
-test.serial('should only apply defaultValue when first declared', async t => {
+test.serial('should only apply defaultValue when first declared', async (t) => {
 	t.context.apis.extension.Replicant('clientTest', {
 		defaultValue: 'foo',
 		persistent: false,
@@ -40,7 +40,7 @@ test.serial('should only apply defaultValue when first declared', async t => {
 
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise((resolve) => {
 				const rep = window.dashboardApi.Replicant('clientTest', { defaultValue: 'bar' });
 				rep.on('declared', () => resolve(rep.value));
 			}),
@@ -49,7 +49,7 @@ test.serial('should only apply defaultValue when first declared', async t => {
 	t.is(ret, 'foo');
 });
 
-test.serial('should be readable without subscription, via readReplicant', async t => {
+test.serial('should be readable without subscription, via readReplicant', async (t) => {
 	t.context.apis.extension.Replicant('clientReadReplicentTest', {
 		defaultValue: 'foo',
 		persistent: false,
@@ -57,7 +57,7 @@ test.serial('should be readable without subscription, via readReplicant', async 
 
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise((resolve) => {
 				window.dashboardApi.readReplicant('clientReadReplicentTest', resolve);
 			}),
 	);
@@ -65,13 +65,12 @@ test.serial('should be readable without subscription, via readReplicant', async 
 	t.is(ret, 'foo');
 });
 
-test.serial('should throw an error when no name is provided', async t => {
+test.serial('should throw an error when no name is provided', async (t) => {
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise((resolve) => {
 				try {
-					// TODO: change to @ts-expect-error once TS 3.9 is out
-					// @ts-ignore
+					// @ts-expect-error
 					window.dashboardApi.Replicant();
 				} catch (e) {
 					resolve(e.message);
@@ -82,12 +81,12 @@ test.serial('should throw an error when no name is provided', async t => {
 	t.is(ret, 'Must supply a name when instantiating a Replicant');
 });
 
-test.serial('should be assignable via the ".value" property', async t => {
+test.serial('should be assignable via the ".value" property', async (t) => {
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise<{ value: unknown; revision: number }>(resolve => {
+			new Promise<{ value: unknown; revision: number }>((resolve) => {
 				const rep = window.dashboardApi.Replicant('clientAssignmentTest', { persistent: false });
-				rep.on('change', newVal => {
+				rep.on('change', (newVal) => {
 					if (newVal === 'assignmentOK') {
 						resolve({
 							value: rep.value,
@@ -103,10 +102,10 @@ test.serial('should be assignable via the ".value" property', async t => {
 	t.is(ret.revision, 1);
 });
 
-test.serial('should emit a "change" event after successful declaration when the value is undefined', async t => {
+test.serial('should emit a "change" event after successful declaration when the value is undefined', async (t) => {
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise<{ valueWasUndefined: boolean; revision: number }>(resolve => {
+			new Promise<{ valueWasUndefined: boolean; revision: number }>((resolve) => {
 				const rep = window.dashboardApi.Replicant('clientUndefinedChangeTest', { persistent: false });
 				rep.on('change', () => {
 					resolve({
@@ -124,10 +123,10 @@ test.serial('should emit a "change" event after successful declaration when the 
 
 test.serial(
 	'should log a warning when attempting to access .value before the Replicant has finished declaring',
-	async t => {
+	async (t) => {
 		const ret = await dashboard.evaluate(
 			async () =>
-				new Promise<unknown[]>(resolve => {
+				new Promise<unknown[]>((resolve) => {
 					const rep = window.dashboardApi.Replicant('clientEarlyValueAccess', { persistent: false });
 
 					// TODO: Replace this with sinon.
@@ -151,10 +150,10 @@ test.serial(
 	},
 );
 
-test.serial('should remove .once listeners when quickfired', async t => {
+test.serial('should remove .once listeners when quickfired', async (t) => {
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise<number>(resolve => {
+			new Promise<number>((resolve) => {
 				const rep = window.dashboardApi.Replicant('clientRemoveOnceListener', {
 					persistent: false,
 				});
@@ -170,14 +169,14 @@ test.serial('should remove .once listeners when quickfired', async t => {
 	t.is(ret, 0);
 });
 
-test.serial('when an array - should react to changes', async t => {
+test.serial('when an array - should react to changes', async (t) => {
 	const ret = await dashboard.evaluate(
 		async () =>
 			new Promise<{
 				newVal: unknown[];
 				oldVal: unknown[];
 				operations: Array<NodeCG.Replicant.Operation<unknown[]>>;
-			}>(resolve => {
+			}>((resolve) => {
 				const rep = window.dashboardApi.Replicant('clientArrTest', {
 					persistent: false,
 					defaultValue: ['starting'],
@@ -213,7 +212,7 @@ test.serial('when an array - should react to changes', async t => {
 	]);
 });
 
-test.serial('when an array - should support the "delete" operator', async t => {
+test.serial('when an array - should support the "delete" operator', async (t) => {
 	const ret = await dashboard.evaluate(
 		async () =>
 			new Promise<{
@@ -260,12 +259,12 @@ test.serial('when an array - should support the "delete" operator', async t => {
 	]);
 });
 
-test.serial.cb('when an array - should proxy objects added to arrays via array insertion methods', t => {
+test.serial.cb('when an array - should proxy objects added to arrays via array insertion methods', (t) => {
 	const rep = t.context.apis.extension.Replicant<Array<{ [k: string]: string }>>('serverArrInsertObj', {
 		defaultValue: [],
 	});
 	rep.value!.push({ foo: 'foo' });
-	rep.on('change', newVal => {
+	rep.on('change', (newVal) => {
 		if (!newVal) {
 			return t.fail('no value');
 		}
@@ -281,7 +280,7 @@ test.serial.cb('when an array - should proxy objects added to arrays via array i
 	});
 });
 
-test.serial.cb('when an object - should not cause server-side replicants to lose observation', t => {
+test.serial.cb('when an object - should not cause server-side replicants to lose observation', (t) => {
 	t.plan(2);
 	setTimeout(() => {
 		t.end('Timeout');
@@ -298,7 +297,7 @@ test.serial.cb('when an object - should not cause server-side replicants to lose
 				new Promise((resolve, reject) => {
 					let barred = false;
 					const rep = window.dashboardApi.Replicant<{ [k: string]: string }>('clientServerObservation');
-					rep.on('change', newVal => {
+					rep.on('change', (newVal) => {
 						if (!newVal) {
 							return reject(new Error('no value'));
 						}
@@ -312,10 +311,10 @@ test.serial.cb('when an object - should not cause server-side replicants to lose
 					});
 				}),
 		)
-		.then(ret => {
+		.then((ret) => {
 			t.deepEqual(ret, { foo: 'bar' });
 
-			rep.on('change', newVal => {
+			rep.on('change', (newVal) => {
 				if (!newVal) {
 					return t.fail('no value');
 				}
@@ -331,7 +330,7 @@ test.serial.cb('when an object - should not cause server-side replicants to lose
 		.catch(t.fail);
 });
 
-test.serial('when an object - should react to changes in nested properties', async t => {
+test.serial('when an object - should react to changes in nested properties', async (t) => {
 	type RepType = {
 		[k: string]: any;
 	};
@@ -341,7 +340,7 @@ test.serial('when an object - should react to changes in nested properties', asy
 				newVal: RepType;
 				oldVal: RepType;
 				operations: Array<NodeCG.Replicant.Operation<RepType>>;
-			}>(resolve => {
+			}>((resolve) => {
 				const rep = window.dashboardApi.Replicant<RepType>('clientObjTest', {
 					persistent: false,
 					defaultValue: {
@@ -396,7 +395,7 @@ test.serial('when an object - should react to changes in nested properties', asy
 // the server should detect that change event, emit it to all clients,
 // and the clients should then digest that change and emit a "change" event.
 // This test is to address a very specific bug reported by Love Olsson.
-test.serial('when an object - should react to server-side changes of array properties', async t => {
+test.serial('when an object - should react to server-side changes of array properties', async (t) => {
 	type RepType = { arr: any[] };
 	const serverRep = t.context.apis.extension.Replicant<RepType>('s2c_nestedArrTest', {
 		persistent: false,
@@ -407,7 +406,7 @@ test.serial('when an object - should react to server-side changes of array prope
 
 	await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise<void>((resolve) => {
 				const rep = window.dashboardApi.Replicant<RepType>('s2c_nestedArrTest');
 				rep.on('declared', () => {
 					resolve();
@@ -448,7 +447,7 @@ test.serial('when an object - should react to server-side changes of array prope
 	]);
 });
 
-test.serial('when an object - should support the "delete" operator', async t => {
+test.serial('when an object - should support the "delete" operator', async (t) => {
 	type RepType = {
 		foo?: string;
 		bar: string;
@@ -507,7 +506,7 @@ test.serial('when an object - should support the "delete" operator', async t => 
 	]);
 });
 
-test.serial.cb('when an object - should properly proxy new objects assigned to properties', t => {
+test.serial.cb('when an object - should properly proxy new objects assigned to properties', (t) => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant<{ [k: string]: any }>('serverObjProp', {
@@ -516,7 +515,7 @@ test.serial.cb('when an object - should properly proxy new objects assigned to p
 
 	rep.value!.foo = { baz: 'baz' };
 
-	rep.on('change', newVal => {
+	rep.on('change', (newVal) => {
 		if (!newVal) {
 			return t.fail('no value');
 		}
@@ -532,7 +531,7 @@ test.serial.cb('when an object - should properly proxy new objects assigned to p
 	});
 });
 
-test.serial('when a date - should emit the JSON value to clients', async t => {
+test.serial('when a date - should emit the JSON value to clients', async (t) => {
 	const date = new Date();
 
 	t.context.apis.extension.Replicant('clientDateTest', {
@@ -542,7 +541,7 @@ test.serial('when a date - should emit the JSON value to clients', async t => {
 
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise((resolve) => {
 				window.dashboardApi.readReplicant('clientDateTest', resolve);
 			}),
 	);
@@ -550,10 +549,10 @@ test.serial('when a date - should emit the JSON value to clients', async t => {
 	t.is(ret, date.toJSON());
 });
 
-test.serial('persistent - should load persisted values when they exist', async t => {
+test.serial('persistent - should load persisted values when they exist', async (t) => {
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise((resolve) => {
 				const rep = window.dashboardApi.Replicant('clientPersistence');
 				rep.on('change', () => resolve(rep.value));
 			}),
@@ -568,16 +567,16 @@ test.serial('persistent - should load persisted values when they exist', async t
  * I can't think of a good way to make this test less awful,
  * so it is being skipped for now.
  */
-test.serial.cb.skip('persistent - should persist assignment to disk', t => {
+test.serial.cb.skip('persistent - should persist assignment to disk', (t) => {
 	t.plan(1);
 
 	dashboard
 		.evaluate(
 			async () =>
-				new Promise(resolve => {
+				new Promise<void>((resolve) => {
 					const rep = window.dashboardApi.Replicant<any>('clientPersistence');
 					rep.value = { nested: 'hey we assigned!' };
-					rep.on('change', newVal => {
+					rep.on('change', (newVal) => {
 						if (!newVal) {
 							return t.fail('no value');
 						}
@@ -615,19 +614,19 @@ test.serial.cb.skip('persistent - should persist assignment to disk', t => {
  * I can't think of a good way to make this test less awful,
  * so it is being skipped for now.
  */
-test.cb.skip('persistent - should persist changes to disk', t => {
+test.cb.skip('persistent - should persist changes to disk', (t) => {
 	t.plan(1);
 
 	const serverRep = t.context.apis.extension.Replicant('clientChangePersistence', { defaultValue: { nested: '' } });
 	(async () => {
 		await dashboard.evaluate(
 			async () =>
-				new Promise(resolve => {
+				new Promise((resolve) => {
 					(window as any).clientChangePersistence = window.dashboardApi.Replicant('clientChangePersistence');
 					(window as any).clientChangePersistence.once('change', resolve);
 				}),
 		);
-		serverRep.on('change', newVal => {
+		serverRep.on('change', (newVal) => {
 			if (!newVal) {
 				return t.fail('no value');
 			}
@@ -665,16 +664,16 @@ test.cb.skip('persistent - should persist changes to disk', t => {
  * I can't think of a good way to make this test less awful,
  * so it is being skipped for now.
  */
-test.serial.cb.skip('persistent - should persist falsey values to disk', t => {
+test.serial.cb.skip('persistent - should persist falsey values to disk', (t) => {
 	t.plan(1);
 
 	dashboard
 		.evaluate(
 			async () =>
-				new Promise(resolve => {
+				new Promise<void>((resolve) => {
 					const rep = window.dashboardApi.Replicant('clientFalseyWrite');
 					rep.value = 0;
-					rep.on('change', newVal => {
+					rep.on('change', (newVal) => {
 						if (newVal === 0) {
 							resolve();
 						}
@@ -702,10 +701,10 @@ test.serial.cb.skip('persistent - should persist falsey values to disk', t => {
 		.catch(t.fail);
 });
 
-test.serial('persistent - should read falsey values from disk', async t => {
+test.serial('persistent - should read falsey values from disk', async (t) => {
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise((resolve) => {
 				const rep = window.dashboardApi.Replicant('clientFalseyRead');
 				rep.on('declared', () => resolve(rep.value));
 			}),
@@ -720,11 +719,11 @@ test.serial('persistent - should read falsey values from disk', async t => {
  * I can't think of a good way to make this test less awful,
  * so it is being skipped for now.
  */
-test.serial.cb.skip('transient - should not write their value to disk', t => {
+test.serial.cb.skip('transient - should not write their value to disk', (t) => {
 	t.plan(2);
 
 	const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientTransience.rep');
-	fs.unlink(replicantPath, err => {
+	fs.unlink(replicantPath, (err) => {
 		if (err && err.code !== 'ENOENT') {
 			throw err;
 		}
@@ -732,7 +731,7 @@ test.serial.cb.skip('transient - should not write their value to disk', t => {
 		dashboard
 			.evaluate(
 				async () =>
-					new Promise(resolve => {
+					new Promise<void>((resolve) => {
 						const rep = window.dashboardApi.Replicant('clientTransience', {
 							defaultValue: 'o no',
 							persistent: false,
@@ -749,7 +748,7 @@ test.serial.cb.skip('transient - should not write their value to disk', t => {
 				 * To whomeever rewrites this test: you will need to replace this
 				 * with something else.
 				 */
-				fs.readFile(replicantPath, err => {
+				fs.readFile(replicantPath, (err) => {
 					t.truthy(err);
 					t.is(err?.code, 'ENOENT');
 					t.end();
@@ -759,10 +758,10 @@ test.serial.cb.skip('transient - should not write their value to disk', t => {
 	});
 });
 
-test.serial('#waitForReplicants', async t => {
+test.serial('#waitForReplicants', async (t) => {
 	await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise((resolve) => {
 				const rep1 = window.dashboardApi.Replicant('wfp1');
 				const rep2 = window.dashboardApi.Replicant('wfp2');
 				const rep3 = window.dashboardApi.Replicant('wfp3');
@@ -773,12 +772,12 @@ test.serial('#waitForReplicants', async t => {
 	t.pass();
 });
 
-test.serial('emits assignment in the correct order', async t => {
+test.serial('emits assignment in the correct order', async (t) => {
 	const extRep = t.context.apis.extension.Replicant<any[]>('assignment_order', { defaultValue: [] });
 
 	await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise<void>((resolve) => {
 				(window as any).clientRep = window.dashboardApi.Replicant('assignment_order');
 				(window as any).clientRep.once('declared', () => {
 					resolve();
@@ -791,7 +790,7 @@ test.serial('emits assignment in the correct order', async t => {
 
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise((resolve) => {
 				(window as any).clientRep.on('change', (newVal: any) => {
 					if ((window as any).clientRep.revision === 2) {
 						resolve({

@@ -1,6 +1,12 @@
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-dialog/paper-dialog.js';
-import './ncg-graphic';
+
+// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import * as keep1 from './ncg-graphic';
+keep1;
+/* eslint-enable @typescript-eslint/no-unused-expressions */
+
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 import { NodeCG } from '../../../../types/nodecg';
@@ -133,7 +139,7 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 			return [];
 		}
 
-		return instances.filter(instance => {
+		return instances.filter((instance) => {
 			return instance.bundleName === bundle.name && instance.pathName === graphic.url;
 		});
 	}

@@ -25,6 +25,7 @@ type Events<T> = {
 		revision: number;
 	}) => void;
 	operationsRejected: (rejectReason: string) => void;
+	fullUpdate: (data: T) => void;
 };
 
 /**
@@ -61,9 +62,6 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 	protected _operationQueue: Array<NodeCG.Replicant.Operation<T>> = [];
 
 	protected _pendingOperationFlush: boolean;
-
-	abstract get value(): T | undefined;
-	abstract set value(newValue: T | undefined);
 
 	constructor(name: string, namespace: string, opts: NodeCG.Replicant.Options<T> = {}) {
 		super();
@@ -113,6 +111,9 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 		});
 	}
 
+	abstract get value(): T | undefined;
+	abstract set value(newValue: T | undefined);
+
 	/**
 	 * If the operation is an array mutator method, call it on the target array with the operation arguments.
 	 * Else, handle it with objectPath.
@@ -131,7 +132,7 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 				);
 			}
 
-			const arr: unknown = objectPath.get((this.value as unknown) as object, path);
+			const arr: unknown = objectPath.get(this.value as unknown as Record<string, unknown>, path);
 			if (!Array.isArray(arr)) {
 				throw new Error(
 					`expected to find an array in replicant "${this.namespace}:${this.name}" at path "${operation.path}"`,
@@ -218,7 +219,7 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 		 * @param [opts] {Object}
 		 * @param [opts.throwOnInvalid = true] {Boolean} - Whether or not to immediately throw when the provided value fails validation against the schema.
 		 */
-		return function(
+		return function (
 			this: AbstractReplicant<T>,
 			value: any = this.value,
 			{ throwOnInvalid = true }: ValidatorOptions = {},
@@ -229,7 +230,7 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 
 				if (throwOnInvalid) {
 					let errorMessage = `Invalid value rejected for replicant "${this.name}" in namespace "${this.namespace}":\n`;
-					this.validationErrors.forEach(error => {
+					this.validationErrors.forEach((error) => {
 						const field = error.field.replace(/^data\./, '');
 						if (error.message === 'is the wrong type') {
 							errorMessage += `\tField "${field}" ${error.message}. Value "${String(
@@ -308,7 +309,7 @@ export function isIgnoringProxy(replicant: AbstractReplicant<any>): boolean {
 	return ignoringProxy.has(replicant);
 }
 
-const deleteTrap = function<T>(target: T, prop: keyof T): boolean | void {
+const deleteTrap = function <T>(target: T, prop: keyof T): boolean | void {
 	const metadata = metadataMap.get(target);
 	if (!metadata) {
 		throw new Error('arrived at delete trap without any metadata');
@@ -598,7 +599,7 @@ function pathStrToPathArr(path: string): string[] {
 	const pathArr = path
 		.substr(1)
 		.split('/')
-		.map(part => {
+		.map((part) => {
 			// De-tokenize '/' characters in path name
 			return part.replace(/~1/g, '/');
 		});

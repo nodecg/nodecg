@@ -4,14 +4,14 @@ import * as Puppeteer from 'puppeteer';
 import { Acknowledgement } from '../../src/shared/api.base';
 
 export const sleep = async (milliseconds: number): Promise<void> =>
-	new Promise(resolve => {
+	new Promise((resolve) => {
 		setTimeout(resolve, milliseconds);
 	});
 
 export const waitForRegistration = async (page: Puppeteer.Page): Promise<unknown> => {
 	const response = await page.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise((resolve) => {
 				if ((window as any).__nodecgRegistrationAccepted__) {
 					finish();
 				} else {
@@ -32,7 +32,7 @@ export const shadowSelector = async <T extends Element>(
 	page: Puppeteer.Page,
 	...selectors: string[]
 ): Promise<Puppeteer.ElementHandle<T>> => {
-	return page.evaluateHandle(selectors => {
+	return page.evaluateHandle((selectors) => {
 		let foundDom = document.querySelector(selectors[0]);
 		for (const selector of selectors.slice(1)) {
 			if (foundDom.shadowRoot) {

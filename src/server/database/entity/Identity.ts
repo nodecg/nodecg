@@ -7,7 +7,7 @@ export class Identity {
 	id: string;
 
 	@Column('text')
-	provider_type: 'twitch' | 'steam' | 'local';
+	provider_type: 'twitch' | 'steam' | 'local' | 'discord';
 
 	/**
 	 * Hashed password for local, auth token from twitch, etc.

@@ -54,7 +54,7 @@ export const setup = (nodecgConfigName = 'nodecg.json'): void => {
 		}
 	});
 
-	test.beforeEach(t => {
+	test.beforeEach((t) => {
 		t.context.server = server;
 		t.context.apis = {
 			extension: server.getExtensions()[C.bundleName()] as any,

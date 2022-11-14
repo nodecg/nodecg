@@ -17,7 +17,7 @@ type TestContext = {
 
 const test = anyTest as TestInterface<TestContext>;
 
-test.beforeEach(t => {
+test.beforeEach((t) => {
 	t.context.logger = new Logger('testClient');
 
 	const SentryMock: any = {
@@ -35,26 +35,26 @@ test.beforeEach(t => {
 	t.context.sentryLogger = new SentryLogger('sentryClient');
 });
 
-test('console - should default to being silent', t => {
+test('console - should default to being silent', (t) => {
 	t.is(Logger._silent, true);
 });
 
-test('console - should default to level "info"', t => {
+test('console - should default to level "info"', (t) => {
 	t.is(Logger._level, 'info');
 });
 
-test('replicant - should default to false', t => {
+test('replicant - should default to false', (t) => {
 	t.is(Logger._shouldLogReplicants, false);
 });
 
-test('replicant - should do nothing when Logger._shouldLogReplicants is false', t => {
+test('replicant - should do nothing when Logger._shouldLogReplicants is false', (t) => {
 	const info = sinon.spy(console, 'info');
 	t.context.logger.replicants('replicants');
 	t.is(info.called, false);
 	info.restore();
 });
 
-test('logging methods should all do nothing when _silent is true', t => {
+test('logging methods should all do nothing when _silent is true', (t) => {
 	Logger._silent = true;
 	Logger._level = LogLevel.Trace;
 
@@ -95,7 +95,7 @@ test('logging methods should all do nothing when _silent is true', t => {
 	info.restore();
 });
 
-test('logging methods should all do nothing when the log level is above them', t => {
+test('logging methods should all do nothing when the log level is above them', (t) => {
 	Logger._silent = false;
 	Logger._level = LogLevel.Silent;
 
@@ -130,7 +130,7 @@ test('logging methods should all do nothing when the log level is above them', t
 	error.restore();
 });
 
-test('logging methods should all prepend the instance name to the output', t => {
+test('logging methods should all prepend the instance name to the output', (t) => {
 	Logger._level = LogLevel.Trace;
 	Logger._silent = false;
 
@@ -173,14 +173,14 @@ test('logging methods should all prepend the instance name to the output', t => 
 	Logger._shouldLogReplicants = false;
 });
 
-test('Sentry - should log errors to Sentry when global.sentryEnabled is true', t => {
+test('Sentry - should log errors to Sentry when global.sentryEnabled is true', (t) => {
 	t.context.sentryLogger.error('error message');
 	t.true(t.context.SentryMock.captureException.calledOnce);
 	t.true(t.context.SentryMock.captureException.firstCall.args[0] instanceof Error, 'first arg is Error');
 	t.is(t.context.SentryMock.captureException.firstCall.args[0].message, '[sentryClient] error message');
 });
 
-test('Sentry - should prettyprint objects', t => {
+test('Sentry - should prettyprint objects', (t) => {
 	t.context.sentryLogger.error('error message:', { foo: { bar: 'baz' } });
 	t.is(
 		t.context.SentryMock.captureException.firstCall.args[0].message,

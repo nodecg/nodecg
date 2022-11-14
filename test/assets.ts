@@ -23,12 +23,12 @@ test.before(async () => {
 	dashboard = await initDashboard();
 });
 
-const UPLOAD_SOURCE_PATH = path.resolve(__dirname, 'fixtures/assets-to-upload/twitter_banner.png');
-const TWITTER_BANNER_PATH = path.join(C.assetsRoot(), 'test-bundle/assets/twitter_banner.png');
+const UPLOAD_SOURCE_PATH = path.resolve(__dirname, 'fixtures/assets-to-upload/#twitter_banner.png');
+const TWITTER_BANNER_PATH = path.join(C.assetsRoot(), 'test-bundle/assets/#twitter_banner.png');
 
 // Doing twice to assert file 'change' event
 for (let i = 0; i < 2; i++) {
-	test.serial(`uploading #${i}`, async t => {
+	test.serial(`uploading #${i}`, async (t) => {
 		const assetRep = t.context.apis.extension.Replicant('assets:assets');
 
 		// Make sure the file to upload does not exist first
@@ -44,17 +44,20 @@ for (let i = 0; i < 2; i++) {
 			'ncg-assets',
 			'ncg-asset-category[collection-name="test-bundle"][category-name="assets"]',
 		);
-		const addEl: puppeteer.ElementHandle = (await dashboard.evaluateHandle(el => el.$.add, assetCategoryEl)) as any;
+		const addEl: puppeteer.ElementHandle = (await dashboard.evaluateHandle(
+			(el) => el.$.add,
+			assetCategoryEl,
+		)) as any;
 		await addEl.click();
-		const fileInputEl = await dashboard.evaluateHandle(el => el.$.uploader.$.fileInput, assetCategoryEl);
-		await new Promise(resolve => {
+		const fileInputEl = await dashboard.evaluateHandle((el) => el.$.uploader.$.fileInput, assetCategoryEl);
+		await new Promise((resolve) => {
 			assetRep.on('change', resolve);
 			(fileInputEl as any).uploadFile(UPLOAD_SOURCE_PATH);
 		});
 
 		await dashboard.evaluate(
-			async assetCategoryEl =>
-				new Promise(resolve => {
+			async (assetCategoryEl) =>
+				new Promise<void>((resolve) => {
 					if (assetCategoryEl._successfulUploads === 1) {
 						resolve();
 					} else {
@@ -71,15 +74,15 @@ for (let i = 0; i < 2; i++) {
 	});
 }
 
-test.serial('retrieval - 200', async t => {
-	const response = await axios.get(`${C.rootUrl()}assets/test-bundle/assets/twitter_banner.png`, {
+test.serial('retrieval - 200', async (t) => {
+	const response = await axios.get(`${C.rootUrl()}assets/test-bundle/assets/%23twitter_banner.png`, {
 		responseType: 'arraybuffer',
 	});
 	t.is(response.status, 200);
 	t.deepEqual(response.data.length, fs.readFileSync(TWITTER_BANNER_PATH).length);
 });
 
-test.serial('retrieval - 404', async t => {
+test.serial('retrieval - 404', async (t) => {
 	try {
 		await axios.get(`${C.rootUrl()}assets/test-bundle/assets/bad.png`);
 	} catch (error) {
@@ -87,7 +90,7 @@ test.serial('retrieval - 404', async t => {
 	}
 });
 
-test.serial('deletion - 200', async t => {
+test.serial('deletion - 200', async (t) => {
 	const deleteButton: puppeteer.ElementHandle = (await dashboard.waitForFunction(() => {
 		const file = document
 			.querySelector('ncg-dashboard')!
@@ -102,7 +105,7 @@ test.serial('deletion - 200', async t => {
 	t.false(fs.existsSync(TWITTER_BANNER_PATH));
 });
 
-test.serial('deletion - 410', async t => {
+test.serial('deletion - 410', async (t) => {
 	try {
 		await axios.delete(`${C.rootUrl()}assets/test-bundle/assets/bad.png`);
 	} catch (error) {

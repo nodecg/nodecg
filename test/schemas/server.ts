@@ -10,7 +10,7 @@ import * as server from '../helpers/server';
 const test = anyTest as TestInterface<server.ServerContext>;
 server.setup();
 
-test('should create a default value based on the schema, if none is provided', t => {
+test('should create a default value based on the schema, if none is provided', (t) => {
 	const rep = t.context.apis.extension.Replicant('schema1');
 	t.deepEqual(rep.value, {
 		string: '',
@@ -20,7 +20,7 @@ test('should create a default value based on the schema, if none is provided', t
 	});
 });
 
-test('should accept the defaultValue when it passes validation', t => {
+test('should accept the defaultValue when it passes validation', (t) => {
 	t.notThrows(() => {
 		t.context.apis.extension.Replicant('schema2', {
 			defaultValue: {
@@ -33,7 +33,7 @@ test('should accept the defaultValue when it passes validation', t => {
 	});
 });
 
-test('should throw when defaultValue fails validation', t => {
+test('should throw when defaultValue fails validation', (t) => {
 	const error = t.throws(() => {
 		t.context.apis.extension.Replicant('schema3', {
 			defaultValue: {
@@ -45,7 +45,7 @@ test('should throw when defaultValue fails validation', t => {
 	t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
-test('should accept the persisted value when it passes validation', t => {
+test('should accept the persisted value when it passes validation', (t) => {
 	// Persisted value is copied from fixtures
 	const rep = t.context.apis.extension.Replicant('schemaPersistencePass');
 	t.deepEqual(rep.value, {
@@ -56,7 +56,7 @@ test('should accept the persisted value when it passes validation', t => {
 	});
 });
 
-test('should reject the persisted value when it fails validation, replacing with schemaDefaults', t => {
+test('should reject the persisted value when it fails validation, replacing with schemaDefaults', (t) => {
 	// Persisted value is copied from fixtures
 	const rep = t.context.apis.extension.Replicant('schemaPersistenceFail');
 	t.deepEqual(rep.value, {
@@ -67,7 +67,7 @@ test('should reject the persisted value when it fails validation, replacing with
 	});
 });
 
-test('should accept valid assignment', t => {
+test('should accept valid assignment', (t) => {
 	t.notThrows(() => {
 		const rep = t.context.apis.extension.Replicant('schemaAssignPass');
 		rep.value = {
@@ -79,7 +79,7 @@ test('should accept valid assignment', t => {
 	});
 });
 
-test('should throw on invalid assignment', t => {
+test('should throw on invalid assignment', (t) => {
 	const error = t.throws(() => {
 		const rep = t.context.apis.extension.Replicant('schemaAssignFail');
 		rep.value = {
@@ -90,14 +90,14 @@ test('should throw on invalid assignment', t => {
 	t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
-test('should accept valid property deletion', t => {
+test('should accept valid property deletion', (t) => {
 	t.notThrows(() => {
 		const rep = t.context.apis.extension.Replicant<any>('schemaDeletionPass');
 		delete rep.value.object.numB;
 	});
 });
 
-test('should throw on invalid property deletion', t => {
+test('should throw on invalid property deletion', (t) => {
 	const error = t.throws(() => {
 		const rep = t.context.apis.extension.Replicant<any>('schemaDeletionFail');
 		delete rep.value.object.numA;
@@ -106,14 +106,14 @@ test('should throw on invalid property deletion', t => {
 	t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
-test('should accept valid array mutation via array mutator methods', t => {
+test('should accept valid array mutation via array mutator methods', (t) => {
 	t.notThrows(() => {
 		const rep = t.context.apis.extension.Replicant<any>('schemaArrayMutatorPass');
 		rep.value.array.push('foo');
 	});
 });
 
-test('should throw on invalid array mutation via array mutator methods', t => {
+test('should throw on invalid array mutation via array mutator methods', (t) => {
 	const error = t.throws(() => {
 		const rep = t.context.apis.extension.Replicant<any>('schemaArrayMutatorFail');
 		rep.value.array.push(0);
@@ -122,14 +122,14 @@ test('should throw on invalid array mutation via array mutator methods', t => {
 	t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
-test('should accept valid property changes to arrays', t => {
+test('should accept valid property changes to arrays', (t) => {
 	t.notThrows(() => {
 		const rep = t.context.apis.extension.Replicant<any>('schemaArrayChangePass');
 		rep.value.array[0] = 'bar';
 	});
 });
 
-test('should throw on invalid property changes to arrays', t => {
+test('should throw on invalid property changes to arrays', (t) => {
 	const error = t.throws(() => {
 		const rep = t.context.apis.extension.Replicant<any>('schemaArrayChangeFail');
 		rep.value.array[0] = 0;
@@ -138,14 +138,14 @@ test('should throw on invalid property changes to arrays', t => {
 	t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
-test('should accept valid property changes to objects', t => {
+test('should accept valid property changes to objects', (t) => {
 	t.notThrows(() => {
 		const rep = t.context.apis.extension.Replicant<any>('schemaObjectChangePass');
 		rep.value.object.numA = 1;
 	});
 });
 
-test('should throw on invalid property changes to objects', t => {
+test('should throw on invalid property changes to objects', (t) => {
 	const error = t.throws(() => {
 		const rep = t.context.apis.extension.Replicant<any>('schemaObjectChangeFail');
 		rep.value.object.numA = 'foo';
@@ -154,7 +154,7 @@ test('should throw on invalid property changes to objects', t => {
 	t.true(error.message.includes('Invalid value rejected for replicant'));
 });
 
-test('should properly load schemas provided with an absolute path', t => {
+test('should properly load schemas provided with an absolute path', (t) => {
 	const rep = t.context.apis.extension.Replicant('schemaAbsolutePath', {
 		schemaPath: path.resolve(__dirname, '../fixtures/nodecg-core/absolute-path-schemas/schemaAbsolutePath.json'),
 	});
@@ -167,7 +167,7 @@ test('should properly load schemas provided with an absolute path', t => {
 	});
 });
 
-test('supports local file $refs', t => {
+test('supports local file $refs', (t) => {
 	const rep = t.context.apis.extension.Replicant('schemaWithRef');
 	t.deepEqual(rep.schema, {
 		$schema: 'http://json-schema.org/draft-04/schema#',
@@ -204,7 +204,7 @@ test('supports local file $refs', t => {
 	});
 });
 
-test('supports internal $refs', t => {
+test('supports internal $refs', (t) => {
 	const rep = t.context.apis.extension.Replicant('schemaWithInternalRef');
 	t.deepEqual(rep.schema, {
 		$schema: 'http://json-schema.org/draft-04/schema#',

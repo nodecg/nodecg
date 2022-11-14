@@ -1,5 +1,5 @@
 export default {
-	files: ['test/**'],
+	files: ['test/**', '!test/helpers/**', '!test/fixtures/**', '!test/types/**'],
 	concurrency: 1,
 	timeout: '30s',
 	verbose: true,
@@ -11,7 +11,7 @@ export default {
 	},
 	babel: {
 		compileAsTests: ['test/fixtures/**', 'test/helpers/**', 'test/types/**'],
-		compileEnhancements: false
+		compileEnhancements: false,
 	},
 	extensions: ['ts'],
 	require: ['ts-node/register'],

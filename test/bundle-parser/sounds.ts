@@ -4,7 +4,7 @@ import test from 'ava';
 // Ours
 import parseSounds from '../../src/server/bundle-parser/sounds';
 
-test('should return the parsed soundCues', t => {
+test('should return the parsed soundCues', (t) => {
 	const input = [
 		{
 			name: 'name-only',
@@ -54,19 +54,18 @@ test('should return the parsed soundCues', t => {
 	t.deepEqual(result.soundCues, output);
 });
 
-test('should set bundle.soundCues to an empty array when pkg.nodecg.soundCues does not exist', t => {
+test('should set bundle.soundCues to an empty array when pkg.nodecg.soundCues does not exist', (t) => {
 	const result = parseSounds(__dirname, {
 		name: 'test-bundle',
 	});
 	t.deepEqual(result.soundCues, []);
 });
 
-test('should throw an error when pkg.nodecg.soundCues is not an Array', t => {
+test('should throw an error when pkg.nodecg.soundCues is not an Array', (t) => {
 	const error = t.throws(() => {
 		return parseSounds(__dirname, {
 			name: 'test-bundle',
-			// TODO: change to @ts-expect-error once TS 3.9 is out
-			// @ts-ignore
+			// @ts-expect-error
 			soundCues: 'foo',
 		});
 	});
@@ -74,12 +73,11 @@ test('should throw an error when pkg.nodecg.soundCues is not an Array', t => {
 	t.is(error.message, "test-bundle's nodecg.soundCues is not an Array");
 });
 
-test('should throw an error when a soundCue lacks a name', t => {
+test('should throw an error when a soundCue lacks a name', (t) => {
 	const error = t.throws(() => {
 		return parseSounds(__dirname, {
 			name: 'test-bundle',
-			// TODO: change to @ts-expect-error once TS 3.9 is out
-			// @ts-ignore
+			// @ts-expect-error
 			soundCues: [{}],
 		});
 	});
@@ -87,7 +85,7 @@ test('should throw an error when a soundCue lacks a name', t => {
 	t.is(error.message, 'nodecg.soundCues[0] in bundle test-bundle lacks a "name" property');
 });
 
-test('should clamp default volume to a max of 100', t => {
+test('should clamp default volume to a max of 100', (t) => {
 	const result = parseSounds(__dirname, {
 		name: 'test-bundle',
 		soundCues: [
@@ -100,7 +98,7 @@ test('should clamp default volume to a max of 100', t => {
 	t.is(result.soundCues[0].defaultVolume, 100);
 });
 
-test('should clamp default volume to a min of 0', t => {
+test('should clamp default volume to a min of 0', (t) => {
 	const result = parseSounds(__dirname, {
 		name: 'test-bundle',
 		soundCues: [
@@ -113,7 +111,7 @@ test('should clamp default volume to a min of 0', t => {
 	t.is(result.soundCues[0].defaultVolume, 0);
 });
 
-test("should throw an error when a soundCue's default file doesn't exist", t => {
+test("should throw an error when a soundCue's default file doesn't exist", (t) => {
 	const error = t.throws(() => {
 		return parseSounds(__dirname, {
 			name: 'test-bundle',

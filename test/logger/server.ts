@@ -24,7 +24,7 @@ test.before(() => {
 	}
 });
 
-test.beforeEach(t => {
+test.beforeEach((t) => {
 	t.context.logger = new Logger('testServer');
 
 	const SentryMock: any = {
@@ -35,45 +35,45 @@ test.beforeEach(t => {
 	t.context.sentryLogger = new sentryLogger('sentryServer');
 });
 
-test('console - should default to being silent', t => {
-	t.is(Logger._winston.transports.nodecgConsole.silent, true);
+test('console - should default to being silent', (t) => {
+	t.is(Logger._winston.transports[0].silent, true);
 });
 
-test('console - should default to level "info"', t => {
-	t.is(Logger._winston.transports.nodecgConsole.level, 'info');
+test('console - should default to level "info"', (t) => {
+	t.is(Logger._winston.transports[0].level, 'info');
 });
 
-test('file - should default to being silent', t => {
-	t.is(Logger._winston.transports.nodecgFile.silent, true);
+test('file - should default to being silent', (t) => {
+	t.is(Logger._winston.transports[1].silent, true);
 });
 
-test('file - should default to level "info"', t => {
-	t.is(Logger._winston.transports.nodecgFile.level, 'info');
+test('file - should default to level "info"', (t) => {
+	t.is(Logger._winston.transports[1].level, 'info');
 });
 
-test('file - should make the logs folder', t => {
+test('file - should make the logs folder', (t) => {
 	t.is(fs.existsSync('./logs'), true);
 });
 
-test('replicant - should default to false', t => {
+test('replicant - should default to false', (t) => {
 	t.is(Logger._shouldLogReplicants, false);
 });
 
-test('replicant - should do nothing when Logger._shouldLogReplicants is false', t => {
+test('replicant - should do nothing when Logger._shouldLogReplicants is false', (t) => {
 	const info = sinon.spy(Logger._winston, 'info');
 	t.context.logger.replicants('replicants');
 	t.is(info.called, false);
 	info.restore();
 });
 
-test('Sentry - should log errors to Sentry when global.sentryEnabled is true', t => {
+test('Sentry - should log errors to Sentry when global.sentryEnabled is true', (t) => {
 	t.context.sentryLogger.error('error message');
 	t.true(t.context.SentryMock.captureException.calledOnce);
 	t.true(t.context.SentryMock.captureException.firstCall.args[0] instanceof Error, 'first arg is Error');
 	t.is(t.context.SentryMock.captureException.firstCall.args[0].message, '[sentryServer] error message');
 });
 
-test('Sentry - should prettyprint objects', t => {
+test('Sentry - should prettyprint objects', (t) => {
 	t.context.sentryLogger.error('error message:', { foo: { bar: 'baz' } });
 	t.is(
 		t.context.SentryMock.captureException.firstCall.args[0].message,

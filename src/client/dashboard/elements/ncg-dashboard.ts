@@ -21,15 +21,28 @@ import '@polymer/paper-toast/paper-toast.js';
 import '@polymer/polymer/lib/elements/custom-style.js';
 import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
 import * as Polymer from '@polymer/polymer';
-import '../css/nodecg-theme';
-import './assets/ncg-assets';
-import './graphics/ncg-graphics';
-import './mixer/ncg-mixer';
-import './ncg-dialog';
-import './ncg-workspace';
-import './settings/ncg-settings';
+
+// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import keep1 from '../css/nodecg-theme';
+keep1;
+import * as keep2 from './assets/ncg-assets';
+keep2;
+import * as keep3 from './graphics/ncg-graphics';
+keep3;
+import * as keep4 from './mixer/ncg-mixer';
+keep4;
+import * as keep5 from './ncg-dialog';
+keep5;
+import * as keep6 from './ncg-workspace';
+keep6;
+import * as keep7 from './settings/ncg-settings';
+keep7;
+/* eslint-enable @typescript-eslint/no-unused-expressions */
+
 import { timeOut } from '@polymer/polymer/lib/utils/async.js';
 import { NodeCG } from '../../../types/nodecg';
+
 class NcgDashboard extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`
@@ -449,7 +462,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 			}
 		});
 
-		window.socket.on('error', err => {
+		window.socket.on('error', (err) => {
 			/* istanbul ignore next: coverage is buggy here */
 			if (err.type === 'UnauthorizedError') {
 				window.location.href = `/authError?code=${err.code}&message=${err.message}`;
@@ -465,7 +478,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 			this.disconnected = true;
 		});
 
-		window.socket.on('reconnecting', attempts => {
+		window.socket.on('reconnecting', (attempts) => {
 			if (!this.$.reconnectToast.opened) {
 				this.$.reconnectToast.open();
 			}
@@ -480,7 +493,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 			}
 		});
 
-		window.socket.on('reconnect', attempts => {
+		window.socket.on('reconnect', (attempts) => {
 			this.$.mainToast.show('Reconnected to NodeCG server!');
 			this.$.reconnectToast.hide();
 			this.disconnected = false;
@@ -558,7 +571,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 		// to know when the route has changed and when they should deselect their tabs.
 		const tabs = this.shadowRoot!.querySelectorAll('paper-tabs');
 		if (tabs) {
-			tabs.forEach(tabSet => {
+			tabs.forEach((tabSet) => {
 				if (tabSet.selected !== this.route.path) {
 					tabSet.selected = this.route.path;
 				}
@@ -576,8 +589,8 @@ class NcgDashboard extends Polymer.PolymerElement {
 
 	_computeDialogs(bundles: NodeCG.Bundle[]) {
 		const dialogs: any[] = [];
-		bundles.forEach(bundle => {
-			bundle.dashboard.panels.forEach(panel => {
+		bundles.forEach((bundle) => {
+			bundle.dashboard.panels.forEach((panel) => {
 				if (panel.dialog) {
 					dialogs.push(panel);
 				}
@@ -603,7 +616,7 @@ function getImageDataURI(
 	let canvas;
 	let ctx;
 	const img = new Image();
-	img.onload = function() {
+	img.onload = function () {
 		// Create the canvas element.
 		canvas = document.createElement('canvas');
 		canvas.width = img.width;
@@ -652,12 +665,12 @@ function notify(title: string, options: { body?: string; icon?: string; tag?: st
 			notification.close();
 		}, 5000);
 	} else if (window.Notification.permission !== 'denied') {
-		window.Notification.requestPermission(permission => {
+		window.Notification.requestPermission((permission) => {
 			// If the user is okay, let's create a notification
 			if (permission === 'granted') {
 				const notification = new window.Notification(title, options);
 				setTimeout(
-					n => {
+					(n) => {
 						n.close();
 					},
 					5000,

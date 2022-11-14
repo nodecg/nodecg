@@ -15,21 +15,20 @@ test.before(async () => {
 	dashboard = await initDashboard();
 });
 
-test.serial("should produce an error if a callback isn't given", t => {
+test.serial("should produce an error if a callback isn't given", (t) => {
 	const error = t.throws(() => {
 		t.context.apis.extension.listenFor(
 			'testMessageName',
-			// TODO: change to @ts-expect-error once TS 3.9 is out
-			// @ts-ignore
+			// @ts-expect-error
 			'test',
 		);
-	}, Error);
+	});
 
 	t.is(error.message, 'argument "handler" must be a function, but you provided a(n) undefined');
 });
 
 // Check for basic connectivity. The rest of the tests are run from the dashboard as well.
-test.serial('should receive messages', async t => {
+test.serial('should receive messages', async (t) => {
 	await dashboard.evaluate(() => {
 		(window as any).serverToDashboardReceived = false;
 		window.dashboardApi.listenFor('serverToDashboard', () => {
@@ -47,7 +46,7 @@ test.serial('should receive messages', async t => {
 	t.pass();
 });
 
-test.serial.cb('should send messages', t => {
+test.serial.cb('should send messages', (t) => {
 	setTimeout(() => {
 		t.end('Timeout');
 	}, 1000);
@@ -59,7 +58,7 @@ test.serial.cb('should send messages', t => {
 	});
 });
 
-test.serial('should support multiple listenFor handlers', async t => {
+test.serial('should support multiple listenFor handlers', async (t) => {
 	await dashboard.evaluate(() => {
 		let callbacksInvoked = 0;
 		window.dashboardApi.listenFor('serverToDashboardMultiple', () => {
@@ -84,14 +83,14 @@ test.serial('should support multiple listenFor handlers', async t => {
 	t.pass();
 });
 
-test.serial('#bundleVersion', async t => {
+test.serial('#bundleVersion', async (t) => {
 	const res = await dashboard.evaluate(() => {
 		return window.dashboardApi.bundleVersion;
 	});
 	t.is(res, '0.0.1');
 });
 
-test.serial('#bundleGit', async t => {
+test.serial('#bundleGit', async (t) => {
 	const res = await dashboard.evaluate(() => {
 		return window.dashboardApi.bundleGit;
 	});

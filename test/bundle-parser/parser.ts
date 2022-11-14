@@ -7,22 +7,22 @@ import test from 'ava';
 // Ours
 import parseBundle from '../../src/server/bundle-parser';
 
-test('should error when package.json does not exist', t => {
+test('should error when package.json does not exist', (t) => {
 	const error = t.throws(parseBundle.bind(parseBundle, './test'));
 	t.true(error.message.includes('does not contain a package.json!'));
 });
 
-test('should error when package.json has no "nodecg" property', t => {
+test('should error when package.json has no "nodecg" property', (t) => {
 	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/no-nodecg-prop'));
 	t.true(error.message.includes('lacks a "nodecg" property, and therefore cannot be parsed'));
 });
 
-test('should error when package.json is not valid JSON', t => {
+test('should error when package.json is not valid JSON', (t) => {
 	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/invalid-manifest-json'));
 	t.true(error.message.includes('package.json is not valid JSON'));
 });
 
-test('should return the expected data when "nodecg" property does exist', t => {
+test('should return the expected data when "nodecg" property does exist', (t) => {
 	const parsedBundle = parseBundle('./test/fixtures/bundle-parser/good-bundle');
 	t.is(parsedBundle.name, 'good-bundle');
 	t.is(parsedBundle.version, '0.0.1');
@@ -116,42 +116,37 @@ test('should return the expected data when "nodecg" property does exist', t => {
 	]);
 });
 
-test('should error when "nodecg.compatibleRange" is not a valid semver range', t => {
-	const error = t.throws(
-		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/no-compatible-range'),
-		/does not have a valid "nodecg.compatibleRange"/,
-	);
+test('should error when "nodecg.compatibleRange" is not a valid semver range', (t) => {
+	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/no-compatible-range'), {
+		message: /does not have a valid "nodecg.compatibleRange"/,
+	});
 	t.true(error.message.includes(''));
 });
 
-test('should error when both "extension.js" and a directory named "extension" exist', t => {
-	const error = t.throws(
-		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/double-extension'),
-		/has both "extension.js" and a folder named "extension"/,
-	);
+test('should error when both "extension.js" and a directory named "extension" exist', (t) => {
+	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/double-extension'), {
+		message: /has both "extension.js" and a folder named "extension"/,
+	});
 	t.true(error.message.includes(''));
 });
 
-test('should error when "extension" exists and it is not a directory', t => {
-	const error = t.throws(
-		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/illegal-extension'),
-		/has an illegal file named "extension"/,
-	);
+test('should error when "extension" exists and it is not a directory', (t) => {
+	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/illegal-extension'), {
+		message: /has an illegal file named "extension"/,
+	});
 	t.true(error.message.includes(''));
 });
 
-test("should error when the bundle's folder name doesn't match its manifest name", t => {
-	const error = t.throws(
-		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/bad-folder-name'),
-		/Please rename it to "/,
-	);
+test("should error when the bundle's folder name doesn't match its manifest name", (t) => {
+	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/bad-folder-name'), {
+		message: /Please rename it to "/,
+	});
 	t.true(error.message.includes(''));
 });
 
-test('should error when "version" is not present', t => {
-	const error = t.throws(
-		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/no-manifest-version'),
-		/must specify a valid version/,
-	);
+test('should error when "version" is not present', (t) => {
+	const error = t.throws(parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/no-manifest-version'), {
+		message: /must specify a valid version/,
+	});
 	t.true(error.message.includes(''));
 });

@@ -3,7 +3,13 @@ import '@polymer/iron-icons/hardware-icons.js';
 import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/iron-media-query/iron-media-query.js';
 import '@polymer/paper-button/paper-button.js';
-import './ncg-graphic-instance';
+
+// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import * as keep1 from './ncg-graphic-instance';
+keep1;
+/* eslint-enable @typescript-eslint/no-unused-expressions */
+
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 import Clipboard from 'clipboard';
@@ -316,10 +322,7 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 	}
 
 	_calcShortUrl(graphicUrl: string) {
-		return graphicUrl
-			.split('/')
-			.slice(4)
-			.join('/');
+		return graphicUrl.split('/').slice(4).join('/');
 	}
 
 	_computeFullGraphicUrl(url: string) {
@@ -339,12 +342,12 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 			return 'none';
 		}
 
-		const openInstances = instances.filter(instance => instance.open);
+		const openInstances = instances.filter((instance) => instance.open);
 		if (openInstances.length <= 0) {
 			return 'none';
 		}
 
-		const outOfDateInstance = openInstances.find(instance => instance.potentiallyOutOfDate);
+		const outOfDateInstance = openInstances.find((instance) => instance.potentiallyOutOfDate);
 		return outOfDateInstance ? 'out-of-date' : 'nominal';
 	}
 
@@ -353,7 +356,7 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 			return 'S';
 		}
 
-		return instances?.filter(instance => instance.open).length ?? '?';
+		return instances?.filter((instance) => instance.open).length ?? '?';
 	}
 
 	_computeCollapseIcon(_collapseOpened: boolean) {
@@ -368,9 +371,17 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 		if (!event.target || !event.dataTransfer) return;
 
 		const dragged = event.target as HTMLAnchorElement;
-		const obsURL = `${dragged.href}?layer-name=${this.graphic.file.replace('.html', '')}&layer-height=${
+		let obsURL;
+		if (window.ncgConfig.login.enabled && window.token) {
+			obsURL = `${dragged.href}&`;
+		} else {
+			obsURL = `${dragged.href}?`;
+		}
+
+		obsURL += `layer-name=${this.graphic.file.replace('.html', '')}&layer-height=${
 			this.graphic.height
 		}&layer-width=${this.graphic.width}`;
+
 		event.dataTransfer.setData('text/uri-list', obsURL);
 	}
 }

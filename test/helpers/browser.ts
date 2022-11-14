@@ -18,7 +18,6 @@ export type BrowserContext = {
 };
 const test = anyTest as TestInterface<BrowserContext>;
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const setup = () => {
 	let browser: puppeteer.Browser;
 	test.serial.before(async () => {
@@ -64,12 +63,12 @@ export const setup = () => {
 		/* eslint-enable no-await-in-loop */
 
 		if (argv.debugTests) {
-			await sleep(99999999);
+			await sleep(Infinity);
 		} else {
 			await browser.close();
 		}
 	});
-	test.beforeEach(t => {
+	test.beforeEach((t) => {
 		t.context.browser = browser;
 	});
 

@@ -18,34 +18,34 @@ test.before(async () => {
 	loginPage = await initLogin();
 });
 
-test.serial('redirects unauthorized users to /login', async t => {
+test.serial('redirects unauthorized users to /login', async (t) => {
 	await loginPage.goto(C.dashboardUrl());
 	t.is(loginPage.url(), C.loginUrl());
 });
 
-test.serial('login should deny access to bad credentials', async t => {
+test.serial('login should deny access to bad credentials', async (t) => {
 	await loginPage.type('#username', 'admin');
 	await loginPage.type('#password', 'wrong_password');
 	await loginPage.click('#localSubmit');
 	t.is(loginPage.url(), C.loginUrl());
 });
 
-test.serial('logging in and out should work', async t => {
+test.serial('logging in and out should work', async (t) => {
 	await logIn();
-	await loginPage.waitForFunction(url => location.href === url, {}, C.dashboardUrl());
+	await loginPage.waitForFunction((url) => location.href === url, {}, C.dashboardUrl());
 	await logOut(t);
 	await loginPage.reload();
 	t.is(loginPage.url(), C.loginUrl());
 });
 
-test.serial('should logging in with hashed password', async t => {
+test.serial('should logging in with hashed password', async (t) => {
 	await logIn('other_admin');
-	await loginPage.waitForFunction(url => location.href === url, {}, C.dashboardUrl());
+	await loginPage.waitForFunction((url) => location.href === url, {}, C.dashboardUrl());
 
 	t.pass();
 });
 
-test.serial('regenerating a token should send the user back to /login', async t => {
+test.serial('regenerating a token should send the user back to /login', async (t) => {
 	await logIn();
 
 	const page = await initDashboard();
@@ -59,17 +59,17 @@ test.serial('regenerating a token should send the user back to /login', async t 
 		return window.__coverage__;
 	});
 
-	await page.waitForFunction(loginUrl => location.href === loginUrl, {}, C.loginUrl());
+	await page.waitForFunction((loginUrl) => location.href === loginUrl, {}, C.loginUrl());
 
 	// Put our preserved coverage back on the page for later extraction.
-	await page.evaluate(injectedCoverage => {
+	await page.evaluate((injectedCoverage) => {
 		window.__coverage__ = injectedCoverage;
 	}, coverage);
 
 	t.pass();
 });
 
-test.serial('token invalidation should show an UnauthorizedError on open pages', async t => {
+test.serial('token invalidation should show an UnauthorizedError on open pages', async (t) => {
 	await logIn();
 	const dash = await initDashboard();
 	const graphic = await initGraphic();
@@ -78,14 +78,14 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 		window.socket.emit('regenerateToken', undefined, () => {});
 	});
 	await graphic.waitForFunction(
-		validUrl => location.href.startsWith(validUrl),
+		(validUrl) => location.href.startsWith(validUrl),
 		{},
 		`${C.rootUrl()}authError?code=token_invalidated`,
 	);
 	t.pass();
 });
 
-test.cb('socket should deny access to bad credentials', t => {
+test.cb('socket should deny access to bad credentials', (t) => {
 	t.plan(1);
 
 	const socket = socketIoClient(`${C.rootUrl()}?key=bad_credentials`);

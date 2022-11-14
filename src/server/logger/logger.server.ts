@@ -13,10 +13,12 @@ import { LoggerInterface, LogLevel } from '../../shared/logger-interface';
 type LoggerOptions = {
 	console: Partial<{
 		enabled: boolean;
+		timestamps: boolean;
 		level: LogLevel;
 	}>;
 	file: Partial<{
 		enabled: boolean;
+		timestamps: boolean;
 		level: LogLevel;
 		path: string;
 	}>;
@@ -29,33 +31,43 @@ type LoggerOptions = {
  * @returns A constructor used to create discrete logger instances.
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export default function(initialOpts: Partial<LoggerOptions> = {}, sentry: typeof Sentry | undefined = undefined) {
+export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeof Sentry | undefined = undefined) {
 	initialOpts = initialOpts || {};
 	initialOpts.console = initialOpts.console ?? {};
 	initialOpts.file = initialOpts.file ?? {};
 	initialOpts.file.path = initialOpts.file.path ?? 'logs/nodecg.log';
 
 	const consoleTransport = new winston.transports.Console({
-		name: 'nodecgConsole',
-		prettyPrint: true,
-		colorize: true,
 		level: initialOpts.console.level ?? LogLevel.Info,
 		silent: !initialOpts.console.enabled,
 		stderrLevels: ['warn', 'error'],
+		format: winston.format.combine(
+			winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), // Format local time for console.
+			winston.format.errors({ stack: true }),
+			winston.format.colorize(),
+			winston.format.printf(
+				(info) =>
+					`${initialOpts?.console?.timestamps ? `${info.timestamp} - ` : ''}${info.level}: ${info.message}`,
+			),
+		),
 	});
 
 	const fileTransport = new winston.transports.File({
-		name: 'nodecgFile',
-		json: false,
-		prettyPrint: true,
 		filename: initialOpts.file.path,
 		level: initialOpts.file.level ?? LogLevel.Info,
 		silent: !initialOpts.file.enabled,
+		format: winston.format.combine(
+			winston.format.timestamp(), // Leave formatting as ISO 8601 UTC for file.
+			winston.format.errors({ stack: true }),
+			winston.format.printf(
+				(info) =>
+					`${initialOpts?.file?.timestamps ? `${info.timestamp} - ` : ''}${info.level}: ${info.message}`,
+			),
+		),
 	});
 
 	if (typeof initialOpts.file.path !== 'undefined') {
-		// TODO: I think this typedef is wrong. Re-evaluate after upgrading to Winston 3.
-		(fileTransport as any).filename = initialOpts.file.path;
+		fileTransport.filename = initialOpts.file.path;
 
 		// Make logs folder if it does not exist.
 		if (!fs.existsSync(path.dirname(initialOpts.file.path))) {
@@ -71,7 +83,7 @@ export default function(initialOpts: Partial<LoggerOptions> = {}, sentry: typeof
 		error: 'red',
 	});
 
-	const mainLogger = new winston.Logger({
+	const mainLogger = winston.createLogger({
 		transports: [consoleTransport, fileTransport],
 		levels: {
 			verbose: 4,
@@ -102,26 +114,26 @@ export default function(initialOpts: Partial<LoggerOptions> = {}, sentry: typeof
 		}
 
 		trace(...args: any[]): void {
-			mainLogger.verbose(`[${this.name}]`, format(args[0], ...args.slice(1)));
+			mainLogger.verbose(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
 		}
 
 		debug(...args: any[]): void {
-			mainLogger.debug(`[${this.name}]`, format(args[0], ...args.slice(1)));
+			mainLogger.debug(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
 		}
 
 		info(...args: any[]): void {
-			mainLogger.info(`[${this.name}]`, format(args[0], ...args.slice(1)));
+			mainLogger.info(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
 		}
 
 		warn(...args: any[]): void {
-			mainLogger.warn(`[${this.name}]`, format(args[0], ...args.slice(1)));
+			mainLogger.warn(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
 		}
 
 		error(...args: any[]): void {
-			mainLogger.error(`[${this.name}]`, format(args[0], ...args.slice(1)));
+			mainLogger.error(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
 
 			if (sentry) {
-				const formattedArgs = args.map(argument => {
+				const formattedArgs = args.map((argument) => {
 					return typeof argument === 'object'
 						? inspect(argument, { depth: null, showProxy: true })
 						: argument;
@@ -138,7 +150,7 @@ export default function(initialOpts: Partial<LoggerOptions> = {}, sentry: typeof
 				return;
 			}
 
-			mainLogger.info(`[${this.name}]`, format(args[0], ...args.slice(1)));
+			mainLogger.info(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
 		}
 	};
 }

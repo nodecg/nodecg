@@ -146,3 +146,7 @@ $documentContainer.innerHTML = `<dom-module id="nodecg-theme">
 </dom-module>`;
 
 document.head.appendChild($documentContainer.content);
+
+// Force this file to be identified as a module so that TS can compile it.
+const hack = 'hack';
+export default hack;

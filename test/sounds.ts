@@ -23,7 +23,7 @@ test.before(async () => {
 	graphic = await initGraphic();
 });
 
-test.serial('soundCues replicant - should generate the correct defaultValue', t => {
+test.serial('soundCues replicant - should generate the correct defaultValue', (t) => {
 	const rep = t.context.apis.extension.Replicant('soundCues', 'test-bundle');
 	t.deepEqual(rep.value, [
 		{
@@ -66,7 +66,7 @@ test.serial('soundCues replicant - should generate the correct defaultValue', t 
 	]);
 });
 
-test.serial('soundCues replicant - should remove any persisted cues that are no longer in the bundle manifest', t => {
+test.serial('soundCues replicant - should remove any persisted cues that are no longer in the bundle manifest', (t) => {
 	const rep = t.context.apis.extension.Replicant('soundCues', 'remove-persisted-cues');
 	t.deepEqual(rep.value, [
 		{
@@ -79,7 +79,7 @@ test.serial('soundCues replicant - should remove any persisted cues that are no 
 
 test.serial(
 	"soundCues replicant - should add any cues in the bundle manifest that aren't in the persisted replicant.",
-	t => {
+	(t) => {
 		const rep = t.context.apis.extension.Replicant('soundCues', 'add-manifest-cues');
 		t.deepEqual(rep.value, [
 			{
@@ -98,7 +98,7 @@ test.serial(
 
 test.serial(
 	'soundCues replicant - should update any cues in that are in both in the persisted replicant and the bundle manifest.',
-	t => {
+	(t) => {
 		const rep = t.context.apis.extension.Replicant('soundCues', 'update-cues');
 		t.deepEqual(rep.value, [
 			{
@@ -126,15 +126,15 @@ test.serial(
 	},
 );
 
-test.serial('mixer - assignable cues - should list new sound Assets as they are uploaded', async t => {
+test.serial('mixer - assignable cues - should list new sound Assets as they are uploaded', async (t) => {
 	/*
 	 1. Switch to Dashboard tab
 	 2. Add a sound file directly to nodecg/assets/test-bundle/sounds
 	 3. Check the list of options in the dropdown select for all assignable cues
 	 */
-	await new Promise((resolve, reject) => {
+	await new Promise<void>((resolve, reject) => {
 		const oggPath = path.join(C.assetsRoot(), 'test-bundle/sounds/success.ogg');
-		fs.copy('test/fixtures/nodecg-core/assets/test-bundle/sounds/success.ogg', oggPath, err => {
+		fs.copy('test/fixtures/nodecg-core/assets/test-bundle/sounds/success.ogg', oggPath, (err) => {
 			if (err) {
 				reject(err);
 				return;
@@ -146,7 +146,7 @@ test.serial('mixer - assignable cues - should list new sound Assets as they are 
 
 	const ret = await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise<string | void>((resolve) => {
 				const el = (document as any)
 					.querySelector('ncg-dashboard')
 					.shadowRoot.querySelector('ncg-mixer')
@@ -170,10 +170,10 @@ test.serial('mixer - assignable cues - should list new sound Assets as they are 
 	t.true(ret !== 'NoSuchElement');
 });
 
-test.serial('client api - should emit "ncgSoundsReady" once all the sounds have loaded', async t => {
+test.serial('client api - should emit "ncgSoundsReady" once all the sounds have loaded', async (t) => {
 	await graphic.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise<void>((resolve) => {
 				if (window.graphicApi.soundsReady) {
 					resolve();
 				} else {
@@ -185,7 +185,7 @@ test.serial('client api - should emit "ncgSoundsReady" once all the sounds have 
 	t.pass();
 });
 
-test.serial('client api - #playSound should return a playing AbstractAudioInstance', async t => {
+test.serial('client api - #playSound should return a playing AbstractAudioInstance', async (t) => {
 	const ret = await graphic.evaluate(() => {
 		return window.graphicApi.playSound('default-file')!.playState;
 	});
@@ -193,7 +193,7 @@ test.serial('client api - #playSound should return a playing AbstractAudioInstan
 	t.is(ret, 'playSucceeded');
 });
 
-test.serial('client api - #stopSound should stop all instances of a cue', async t => {
+test.serial('client api - #stopSound should stop all instances of a cue', async (t) => {
 	const ret = await graphic.evaluate(() => {
 		window.graphicApi.playSound('default-file');
 		window.graphicApi.playSound('default-file');
@@ -204,7 +204,7 @@ test.serial('client api - #stopSound should stop all instances of a cue', async 
 	t.is(ret, 0);
 });
 
-test.serial('client api - #stopAllSounds should stop all instances', async t => {
+test.serial('client api - #stopAllSounds should stop all instances', async (t) => {
 	const ret = await graphic.evaluate(() => {
 		window.graphicApi.playSound('default-file');
 		window.graphicApi.playSound('default-file');

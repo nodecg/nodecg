@@ -40,14 +40,14 @@ test.before(async () => {
 	await collapseButton.click();
 });
 
-test('singleInstance - scripts get injected into /instance/*.html routes', async t => {
+test('singleInstance - scripts get injected into /instance/*.html routes', async (t) => {
 	const response = await axios.get(`${C.rootUrl()}instance/killed.html`);
 	t.is(response.status, 200);
 	t.true(response.data.includes('<script src="/nodecg-api.min.js">'));
 	t.true(response.data.includes('<script src="/socket.io/socket.io.js"></script>'));
 });
 
-test.serial('singleInstance - should redirect to busy.html when the instance is already taken', async t => {
+test.serial('singleInstance - should redirect to busy.html when the instance is already taken', async (t) => {
 	t.plan(0);
 	const page = await initSingleInstance();
 	await page.waitForFunction(
@@ -59,7 +59,7 @@ test.serial('singleInstance - should redirect to busy.html when the instance is 
 	);
 });
 
-test.serial('singleInstance - should redirect to killed.html when the instance is killed', async t => {
+test.serial('singleInstance - should redirect to killed.html when the instance is killed', async (t) => {
 	t.plan(0);
 
 	const graphicBoard = await util.shadowSelector(
@@ -72,13 +72,13 @@ test.serial('singleInstance - should redirect to killed.html when the instance i
 
 	await dashboard.bringToFront();
 	const expandButton: any = await dashboard.evaluateHandle(
-		el => el.shadowRoot.querySelector('paper-button#collapseButton'),
+		(el) => el.shadowRoot.querySelector('paper-button#collapseButton'),
 		graphicBoard,
 	);
 	await expandButton.click();
 
 	const button: any = await dashboard.evaluateHandle(
-		el => el.shadowRoot.querySelector('ncg-graphic-instance').$.killButton,
+		(el) => el.shadowRoot.querySelector('ncg-graphic-instance').$.killButton,
 		graphicBoard,
 	);
 	await button.click();
@@ -92,22 +92,22 @@ test.serial('singleInstance - should redirect to killed.html when the instance i
 	);
 });
 
-test.serial('singleInstance - should allow the graphic to be taken after being killed', async t => {
+test.serial('singleInstance - should allow the graphic to be taken after being killed', async (t) => {
 	const page = await initSingleInstance();
 	t.is(page.url(), C.singleInstanceUrl());
 });
 
-test.serial('refresh all instances in a bundle', async t => {
+test.serial('refresh all instances in a bundle', async (t) => {
 	const graphic = await initGraphic();
 	await util.waitForRegistration(graphic);
 
 	const graphicBundle = await util.shadowSelector(dashboard, 'ncg-dashboard', 'ncg-graphics', 'ncg-graphics-bundle');
 
 	await dashboard.bringToFront();
-	const reload: any = await dashboard.evaluateHandle(el => el.$.reloadButton, graphicBundle);
+	const reload: any = await dashboard.evaluateHandle((el) => el.$.reloadButton, graphicBundle);
 	await reload.click();
 	const confirm: any = await dashboard.evaluateHandle(
-		el => el.shadowRoot.querySelector('paper-button[dialog-confirm]'),
+		(el) => el.shadowRoot.querySelector('paper-button[dialog-confirm]'),
 		graphicBundle,
 	);
 	await confirm.click();
@@ -117,7 +117,7 @@ test.serial('refresh all instances in a bundle', async t => {
 	t.is(refreshMarker, undefined);
 });
 
-test.serial('refresh all instances of a graphic', async t => {
+test.serial('refresh all instances of a graphic', async (t) => {
 	const graphic = await initGraphic();
 	await util.waitForRegistration(graphic);
 
@@ -137,7 +137,7 @@ test.serial('refresh all instances of a graphic', async t => {
 	t.is(refreshMarker, undefined);
 });
 
-test.serial('refresh individual instance', async t => {
+test.serial('refresh individual instance', async (t) => {
 	const graphic = await initGraphic();
 	await util.waitForRegistration(graphic);
 
@@ -170,40 +170,40 @@ const statusEl = async (page: Page) =>
 		'#status',
 	);
 
-test.serial('version out of date', async t => {
-	replaceInFile.sync({
+test.serial('version out of date', async (t) => {
+	await replaceInFile({
 		files: path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle/package.json'),
 		from: '"version": "0.0.1"',
 		to: '"version": "0.0.2"',
 	});
 	await dashboard.waitFor(1500);
 
-	let text = await dashboard.evaluate(el => el.textContent, await statusEl(dashboard));
+	let text = await dashboard.evaluate((el) => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
 
-	replaceInFile.sync({
+	await replaceInFile({
 		files: path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle/package.json'),
 		from: '"version": "0.0.2"',
 		to: '"version": "0.0.1"',
 	});
 	await dashboard.waitFor(1500);
 
-	text = await dashboard.evaluate(el => el.textContent, await statusEl(dashboard));
+	text = await dashboard.evaluate((el) => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Latest');
 });
 
-test.serial('git out of date', async t => {
+test.serial('git out of date', async (t) => {
 	fs.writeFileSync(path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle/new_file.txt'), 'foo');
 	const git = simpleGit(path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle'));
 	await git.add('./new_file.txt');
 	await git.commit('new commit');
 	await dashboard.waitFor(1500);
 
-	const text = await dashboard.evaluate(el => el.textContent, await statusEl(dashboard));
+	const text = await dashboard.evaluate((el) => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
 });
 
-test.serial('shows a diff when hovering over "potentially out of date" status', async t => {
+test.serial('shows a diff when hovering over "potentially out of date" status', async (t) => {
 	await dashboard.bringToFront();
 	const graphicInstance = await util.shadowSelector(
 		dashboard,
@@ -215,26 +215,26 @@ test.serial('shows a diff when hovering over "potentially out of date" status', 
 	);
 
 	await graphicInstance.hover();
-	await dashboard.waitForFunction(el => getComputedStyle(el).display !== 'none', {}, graphicInstance);
-	const diffText = await dashboard.evaluate(el => el.$.diff.$.body.textContent, graphicInstance);
+	await dashboard.waitForFunction((el) => getComputedStyle(el).display !== 'none', {}, graphicInstance);
+	const diffText = await dashboard.evaluate((el) => el.$.diff.$.body.textContent, graphicInstance);
 	t.true(diffText.includes('Current:'));
 	t.true(diffText.includes('Latest:'));
 	t.regex(diffText, /0\.0\.1 - \w{7} \[Initial commit\]/);
 	t.regex(diffText, /0\.0\.1 - \w{7} \[new commit\]/);
 
 	const closeButton: any = await dashboard.evaluateHandle(
-		el => el.$.diff.shadowRoot.querySelector('paper-icon-button'),
+		(el) => el.$.diff.shadowRoot.querySelector('paper-icon-button'),
 		graphicInstance,
 	);
 	await closeButton.click();
 	await dashboard.waitForFunction(
-		el => getComputedStyle(el.$.diff).opacity === '0',
+		(el) => getComputedStyle(el.$.diff).opacity === '0',
 		{ timeout: 100000 },
 		graphicInstance,
 	);
 });
 
-test.serial('dragging the graphic generates the correct url for obs', async t => {
+test.serial('dragging the graphic generates the correct url for obs', async (t) => {
 	t.plan(1);
 
 	const graphicLink = await util.shadowSelector(
@@ -246,7 +246,7 @@ test.serial('dragging the graphic generates the correct url for obs', async t =>
 		'#url',
 	);
 
-	await dashboard.evaluateHandle(gl => {
+	await dashboard.evaluateHandle((gl) => {
 		gl.addEventListener('dragstart', (ev: DragEvent) => {
 			ev.preventDefault();
 
@@ -271,7 +271,7 @@ test.serial('dragging the graphic generates the correct url for obs', async t =>
 	);
 	await dashboard.mouse.down();
 
-	dashboard.on('console', msg => {
+	dashboard.on('console', (msg) => {
 		// This allows other console messages to come through while the test is running, as long as the required message comes through eventually
 		if (
 			msg.text() ===

@@ -182,28 +182,35 @@ export namespace NodeCG {
 			console: {
 				enabled: boolean;
 				level: string;
+				timestamps: boolean;
 			};
 			file: {
 				enabled: boolean;
 				level: string;
+				timestamps: boolean;
 			};
 		};
 		sentry: {
 			enabled: boolean;
 			dsn: string;
 		};
-		login?: {
+		login: {
 			enabled: boolean;
 			steam?: {
 				enabled: boolean;
 			};
 			twitch?: {
 				enabled: boolean;
-				clientID?: string;
+				clientID: string;
 				scope: string;
 			};
 			local?: {
 				enabled: boolean;
+			};
+			discord?: {
+				enabled: boolean;
+				clientID: string;
+				scope: string;
 			};
 		};
 		ssl?: {

@@ -4,8 +4,7 @@ import path from 'path';
 
 // Packages
 import clone from 'clone';
-import * as Joi from '@hapi/joi';
-import 'joi-extract-type';
+import Joi from 'joi';
 import { cosmiconfigSync as cosmiconfig } from 'cosmiconfig';
 import { argv } from 'yargs';
 
@@ -13,17 +12,12 @@ import { argv } from 'yargs';
 import { LogLevel } from '../../shared/logger-interface';
 import { NodeCG } from '../../types/nodecg';
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+// eslint-disable-next-line complexity
 function getConfigSchema(userConfig: { [k: string]: any }) {
 	return Joi.object({
-		host: Joi.string()
-			.default('0.0.0.0')
-			.description('The IP address or hostname that NodeCG should bind to.'),
+		host: Joi.string().default('0.0.0.0').description('The IP address or hostname that NodeCG should bind to.'),
 
-		port: Joi.number()
-			.port()
-			.default(9090)
-			.description('The port that NodeCG should listen on.'),
+		port: Joi.number().port().default(9090).description('The port that NodeCG should listen on.'),
 
 		baseURL: Joi.string()
 			.default('')
@@ -32,9 +26,7 @@ function getConfigSchema(userConfig: { [k: string]: any }) {
 					"If you use a reverse proxy, you'll likely need to set this value.",
 			),
 
-		exitOnUncaught: Joi.boolean()
-			.default(true)
-			.description('Whether or not to exit on uncaught exceptions.'),
+		exitOnUncaught: Joi.boolean().default(true).description('Whether or not to exit on uncaught exceptions.'),
 
 		logging: Joi.object({
 			replicants: Joi.boolean()
@@ -42,26 +34,26 @@ function getConfigSchema(userConfig: { [k: string]: any }) {
 				.description('Whether to enable logging of the Replicants subsystem. Very spammy.'),
 
 			console: Joi.object({
-				enabled: Joi.boolean()
-					.default(true)
-					.description('Whether to enable console logging.'),
+				enabled: Joi.boolean().default(true).description('Whether to enable console logging.'),
 
 				level: Joi.string()
 					.valid(...Object.values(LogLevel))
 					.default('info'),
+
+				timestamps: Joi.boolean()
+					.default(true)
+					.description('Whether to add timestamps to the console logging.'),
 			}).default(),
 
 			file: Joi.object({
-				enabled: Joi.boolean()
-					.default(false)
-					.description('Whether to enable file logging.'),
+				enabled: Joi.boolean().default(false).description('Whether to enable file logging.'),
 				level: Joi.string()
 					.valid(...Object.values(LogLevel))
 					.default('info'),
 
-				path: Joi.string()
-					.default('logs/nodecg.log')
-					.description('The filepath to log to.'),
+				path: Joi.string().default('logs/nodecg.log').description('The filepath to log to.'),
+
+				timestamps: Joi.boolean().default(true).description('Whether to add timestamps to the file logging.'),
 			}).default(),
 		}).default(),
 
@@ -89,12 +81,10 @@ function getConfigSchema(userConfig: { [k: string]: any }) {
 		}),
 
 		login: Joi.object({
-			enabled: Joi.boolean()
-				.default(false)
-				.description('Whether to enable login security.'),
+			enabled: Joi.boolean().default(false).description('Whether to enable login security.'),
 			sessionSecret: Joi.string()
 				// This will throw if the user does not provide a value, but only if login security is enabled.
-				.default(userConfig?.login?.enabled ? null : '')
+				.default(userConfig?.login?.enabled ? null : 'insecureButUnused')
 				.description('The secret used to salt sessions.'),
 			forceHttpsReturn: Joi.boolean()
 				.default(false)
@@ -102,9 +92,7 @@ function getConfigSchema(userConfig: { [k: string]: any }) {
 					'Forces Steam & Twitch login return URLs to use HTTPS instead of HTTP. Useful in reverse proxy setups.',
 				),
 			steam: Joi.object({
-				enabled: Joi.boolean()
-					.default(false)
-					.description('Whether to enable Steam authentication.'),
+				enabled: Joi.boolean().default(false).description('Whether to enable Steam authentication.'),
 				apiKey: Joi.string()
 					// This will throw if the user does not provide a value, but only if Steam auth is enabled.
 					.default(userConfig?.login?.steam?.enabled ? null : '')
@@ -117,9 +105,7 @@ function getConfigSchema(userConfig: { [k: string]: any }) {
 			}),
 
 			twitch: Joi.object({
-				enabled: Joi.boolean()
-					.default(false)
-					.description('Whether to enable Twitch authentication.'),
+				enabled: Joi.boolean().default(false).description('Whether to enable Twitch authentication.'),
 				clientID: Joi.string()
 					// This will throw if the user does not provide a value, but only if Twitch auth is enabled.
 					.default(userConfig?.login?.twitch?.enabled ? null : '')
@@ -131,18 +117,65 @@ function getConfigSchema(userConfig: { [k: string]: any }) {
 				scope: Joi.string()
 					.default('user_read')
 					.description('A space-separated string of Twitch application permissions.'),
-
 				allowedUsernames: Joi.array()
 					.items(Joi.string())
-					// This will throw if the user does not provide a value, but only if Twitch auth is enabled.
-					.default(userConfig?.login?.twitch?.enabled ? null : [])
+					// This will throw if the user does not provide a value and is not using allowedIds, but only if Twitch auth is enabled.
+					.default(userConfig?.login?.twitch?.enabled && !userConfig?.login?.twitch?.allowedIds ? null : [])
 					.description('Which Twitch usernames to allow.'),
+				allowedIds: Joi.array()
+					.items(Joi.string())
+					// This will throw if the user does not provide a value and is not using allowedUsernames, but only if Twitch auth is enabled.
+					.default(
+						userConfig?.login?.twitch?.enabled && !userConfig?.login?.twitch?.allowedUsernames ? null : [],
+					)
+					.description(
+						'Which Twitch IDs to allow. Can be obtained from https://twitchinsights.net/checkuser',
+					),
+			}),
+
+			discord: Joi.object({
+				enabled: Joi.boolean().default(false).description('Whether to enable Discord authentication.'),
+				clientID: Joi.string()
+					// This will throw if the user does not provide a value, but only if Twitch auth is enabled.
+					.default(userConfig?.login?.discord?.enabled ? null : '')
+					.description('A Discord application ClientID https://discord.com/developers/applications'),
+				clientSecret: Joi.string()
+					// This will throw if the user does not provide a value, but only if Twitch auth is enabled.
+					.default(userConfig?.login?.discord?.enabled ? null : '')
+					.description('A Discord application ClientSecret https://discord.com/developers/applications'),
+				scope: Joi.string()
+					.default('identify')
+					.description(
+						'A space-separated string of Discord application scopes. https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes',
+					),
+				allowedUserIDs: Joi.array()
+					.items(Joi.string())
+					// This will throw if the user does not provide a value and is not using allowedGuilds, but only if Discord auth is enabled.
+					.default(
+						userConfig?.login?.discord?.enabled && !userConfig?.login?.discord?.allowedGuilds ? null : [],
+					)
+					.description('Which Discord user IDs to allow.'),
+				allowedGuilds: Joi.array()
+					.items(
+						Joi.object({
+							guildID: Joi.string().description('Users in this Discord Server are allowed to log in.'),
+							allowedRoleIDs: Joi.array()
+								.items(Joi.string())
+								.default([])
+								.description('Additionally require one of the roles on the server to log in.'),
+							guildBotToken: Joi.string()
+								.default('')
+								.description('Discord bot token, needed if allowedRoleIDs is used.'),
+						}),
+					)
+					// This will throw if the user does not provide a value and is not using allowedUserIDs, but only if Discord auth is enabled.
+					.default(
+						userConfig?.login?.discord?.enabled && !userConfig?.login?.discord?.allowedUserIDs ? null : [],
+					),
 			}),
 
 			local: Joi.object({
-				enabled: Joi.boolean()
-					.default(false)
-					.description('Enable Local authentication.'),
+				enabled: Joi.boolean().default(false).description('Enable Local authentication.'),
 				allowedUsers: Joi.array()
 					.items(
 						Joi.object({
@@ -154,12 +187,10 @@ function getConfigSchema(userConfig: { [k: string]: any }) {
 					.default(userConfig?.login?.local?.enabled ? null : [])
 					.description('Which users can log in.'),
 			}),
-		}).optional(),
+		}).default(),
 
 		ssl: Joi.object({
-			enabled: Joi.boolean()
-				.default(false)
-				.description('Whether to enable SSL/HTTPS encryption.'),
+			enabled: Joi.boolean().default(false).description('Whether to enable SSL/HTTPS encryption.'),
 			allowHTTP: Joi.boolean()
 				.default(false)
 				.description('Whether to allow insecure HTTP connections while SSL is active.'),
@@ -171,15 +202,11 @@ function getConfigSchema(userConfig: { [k: string]: any }) {
 				// This will throw if the user does not provide a value, but only if SSL is enabled.
 				.default(userConfig?.ssl?.enabled ? null : '')
 				.description('The path to an SSL certificate file.'),
-			passphrase: Joi.string()
-				.description('The passphrase for the provided key file.')
-				.optional(),
+			passphrase: Joi.string().description('The passphrase for the provided key file.').optional(),
 		}).optional(),
 
 		sentry: Joi.object({
-			enabled: Joi.boolean()
-				.default(false)
-				.description('Whether to enable Sentry error reporting.'),
+			enabled: Joi.boolean().default(false).description('Whether to enable Sentry error reporting.'),
 			dsn: Joi.string()
 				// This will throw if the user does not provide a value, but only if Sentry is enabled.
 				.default(userConfig?.sentry?.enabled ? null : '')
@@ -189,7 +216,7 @@ function getConfigSchema(userConfig: { [k: string]: any }) {
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, complexity
-export default function(cfgDirOrFile: string) {
+export default function (cfgDirOrFile: string) {
 	let isDir = false;
 	try {
 		isDir = fs.lstatSync(cfgDirOrFile).isDirectory();
@@ -248,10 +275,6 @@ export default function(cfgDirOrFile: string) {
 		throw new Error('config undefined');
 	}
 
-	if (!config.login) {
-		(config as any).login = { enabled: false };
-	}
-
 	// Create the filtered config
 	const filteredConfig: NodeCG.FilteredConfig = {
 		host: config.host,
@@ -259,11 +282,19 @@ export default function(cfgDirOrFile: string) {
 		baseURL: config.baseURL,
 		logging: {
 			replicants: config.logging!.replicants,
-			console: config.logging!.console!,
+			console: {
+				enabled: config.logging!.console!.enabled,
+				level: config.logging!.console!.level,
+				timestamps: config.logging!.console!.timestamps,
+			},
 			file: {
 				enabled: config.logging!.file!.enabled,
 				level: config.logging!.file!.level,
+				timestamps: config.logging!.file!.timestamps,
 			},
+		},
+		login: {
+			enabled: config.login?.enabled,
 		},
 		sentry: {
 			enabled: config.sentry?.enabled ?? false,
@@ -271,30 +302,32 @@ export default function(cfgDirOrFile: string) {
 		},
 	};
 
-	if (config.login) {
-		filteredConfig.login = {
-			enabled: config.login.enabled,
+	if (config.login.steam) {
+		filteredConfig.login.steam = {
+			enabled: config.login.steam.enabled,
 		};
+	}
 
-		if (config.login.steam) {
-			filteredConfig.login.steam = {
-				enabled: config.login.steam.enabled,
-			};
-		}
+	if (config.login.twitch) {
+		filteredConfig.login.twitch = {
+			enabled: config.login.twitch.enabled,
+			clientID: config.login.twitch.clientID!, // Validation wil have thrown if this is falsey.
+			scope: config.login.twitch.scope,
+		};
+	}
 
-		if (config.login.twitch) {
-			filteredConfig.login.twitch = {
-				enabled: config.login.twitch.enabled,
-				clientID: config.login.twitch.clientID,
-				scope: config.login.twitch.scope,
-			};
-		}
+	if (config.login.local) {
+		filteredConfig.login.local = {
+			enabled: config.login.local.enabled,
+		};
+	}
 
-		if (config.login.local) {
-			filteredConfig.login.local = {
-				enabled: config.login.local.enabled,
-			};
-		}
+	if (config.login.discord) {
+		filteredConfig.login.discord = {
+			enabled: config.login.discord.enabled,
+			clientID: config.login.discord.clientID!, // Validation wil have thrown if this is falsey.
+			scope: config.login.discord.scope,
+		};
 	}
 
 	if (config.ssl) {

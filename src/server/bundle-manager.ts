@@ -313,9 +313,7 @@ export default class BundleManager extends EventEmitter {
 				this.add(reparsedBundle);
 				this.emit('bundleChanged', reparsedBundle);
 			} catch (error) {
-				log.warn('Unable to handle the bundle "%s" change: %s', bundleName, error.message, {
-					error,
-				});
+				log.warn('Unable to handle the bundle "%s" change:\n%s', bundleName, error.stack);
 				this.emit('invalidBundle', bundle, error);
 			}
 		}

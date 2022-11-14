@@ -5,8 +5,15 @@ import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
 import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@vaadin/vaadin-upload/vaadin-upload.js';
-import '../util-scrollable';
-import './ncg-asset-file';
+
+// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import * as keep1 from '../util-scrollable';
+keep1;
+import * as keep2 from './ncg-asset-file';
+keep2;
+/* eslint-enable @typescript-eslint/no-unused-expressions */
+
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 
@@ -103,7 +110,7 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 		<!-- 2017/03/18: Had to remove with-backdrop during the dashboard re-write -->
 		<paper-dialog id="uploadDialog">
 			<paper-dialog-scrollable>
-				<vaadin-upload id="uploader" target="/assets/[[collectionName]]/[[category.name]]" on-upload-start="refitUploadDialog" on-upload-before="_onUploadBefore" on-file-reject="_onFileReject" on-upload-success="_onUploadSuccess">
+				<vaadin-upload id="uploader" target="/assets/[[collectionName]]/[[category.name]]" on-upload-start="refitUploadDialog" on-file-reject="_onFileReject" on-upload-success="_onUploadSuccess">
 					<template is="dom-if" if="[[category.allowedTypes.length]]">
 						<div id="acceptsMsg">[[acceptsMsg]]</div>
 					</template>
@@ -166,7 +173,7 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 	}
 
 	_onAllowedTypesChanged(allowedTypes: string[]): void {
-		const prefixed = allowedTypes.map(type => '.' + type);
+		const prefixed = allowedTypes.map((type) => '.' + type);
 		this.$.uploader.accept = prefixed.join(',');
 	}
 
@@ -204,12 +211,6 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 		this.refitUploadDialog();
 	}
 
-	_onUploadBefore(event: any): void {
-		// Custom upload request url for file
-		const { file } = event.detail;
-		file.uploadTarget = `${event.target.target}/${file.name}`;
-	}
-
 	_onFileReject(event: any): void {
 		this.refitUploadDialog();
 		this.$.toast.text = `${event.detail.file.name} error: ${event.detail.error}`;
@@ -231,7 +232,7 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 			oldRep.removeEventListener('change');
 		}
 
-		newRep.on('change', newVal => {
+		newRep.on('change', (newVal) => {
 			this.files = newVal;
 			if (Array.isArray(newVal) && newVal.length > 0) {
 				this.$.empty.style.display = 'none';

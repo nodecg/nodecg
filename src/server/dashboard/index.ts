@@ -72,7 +72,7 @@ export default class DashboardLib {
 			const resName = req.params[0];
 			// If the target file is a panel or dialog, inject the appropriate scripts.
 			// Else, serve the file as-is.
-			const panel = bundle.dashboard.panels.find(p => p.file === resName);
+			const panel = bundle.dashboard.panels.find((p) => p.file === resName);
 			if (panel) {
 				const resourceType = panel.dialog ? 'dialog' : 'panel';
 				ncgUtils.injectScripts(
@@ -80,10 +80,10 @@ export default class DashboardLib {
 					resourceType,
 					{
 						createApiInstance: bundle,
-						standalone: req.query.standalone,
+						standalone: Boolean(req.query.standalone),
 						fullbleed: panel.fullbleed,
 					},
-					html => res.send(html),
+					(html) => res.send(html),
 				);
 			} else {
 				const fileLocation = path.join(bundle.dashboard.dir, resName);
@@ -100,11 +100,12 @@ export default class DashboardLib {
 
 function getDashboardContext(bundles: NodeCG.Bundle[]): DashboardContext {
 	return {
-		bundles: bundles.map(bundle => {
+		bundles: bundles.map((bundle) => {
 			const cleanedBundle = clone(bundle);
 			if (cleanedBundle.dashboard.panels) {
-				cleanedBundle.dashboard.panels.forEach(panel => {
-					delete panel.html;
+				cleanedBundle.dashboard.panels.forEach((panel) => {
+					// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+					delete (panel as any).html;
 				});
 			}
 
@@ -122,8 +123,8 @@ function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 	let otherWorkspacesHavePanels = false;
 	const workspaces: Workspace[] = [];
 	const workspaceNames = new Set<string>();
-	bundles.forEach(bundle => {
-		bundle.dashboard.panels.forEach(panel => {
+	bundles.forEach((bundle) => {
+		bundle.dashboard.panels.forEach((panel) => {
 			if (panel.dialog) {
 				return;
 			}
@@ -146,7 +147,7 @@ function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 		});
 	});
 
-	workspaceNames.forEach(name => {
+	workspaceNames.forEach((name) => {
 		workspaces.push({
 			name,
 			label: name,

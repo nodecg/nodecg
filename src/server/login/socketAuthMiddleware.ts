@@ -12,7 +12,7 @@ import createLogger from '../logger';
 const log = createLogger('socket-auth');
 const socketsByKey = new Map<string, Set<TypedServerSocket>>();
 
-export default async function(socket: TypedServerSocket, next: SocketIO.NextFunction): Promise<void> {
+export default async function (socket: TypedServerSocket, next: SocketIO.NextFunction): Promise<void> {
 	try {
 		const req = (socket as any).request; // Not typed in the typed-socket.io lib for some reason.
 		const token = req._query.token;
@@ -42,7 +42,7 @@ export default async function(socket: TypedServerSocket, next: SocketIO.NextFunc
 
 		// But only authed sockets can join the Authed room.
 		const provider = user.identities[0]?.provider_type;
-		const providerAllowed = config.login && config.login[provider]?.enabled;
+		const providerAllowed = config.login?.[provider]?.enabled;
 		const allowed = isSuperUser(user) && providerAllowed;
 
 		if (allowed) {
@@ -78,7 +78,7 @@ export default async function(socket: TypedServerSocket, next: SocketIO.NextFunc
 							throw new Error('should have been a user here');
 						}
 
-						user.apiKeys = user.apiKeys.filter(ak => {
+						user.apiKeys = user.apiKeys.filter((ak) => {
 							return ak.secret_key !== token;
 						});
 						user.apiKeys.push(newApiKey);

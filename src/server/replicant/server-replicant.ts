@@ -18,31 +18,6 @@ import { NodeCG } from '../../types/nodecg';
 // Always use Replicator.declare instead.
 // The Replicator needs to have complete control over the ServerReplicant class.
 export default class ServerReplicant<T> extends AbstractReplicant<T> {
-	get value(): T | undefined {
-		return this._value;
-	}
-
-	set value(newValue: T | undefined) {
-		if (newValue === this._value) {
-			this.log.replicants('value unchanged, no action will be taken');
-			return;
-		}
-
-		this.validate(newValue);
-		this.log.replicants('running setter with', newValue);
-		const clonedNewVal = clone(newValue);
-		ignoreProxy(this);
-		this._value = proxyRecursive(this, newValue, '/');
-		resumeProxy(this);
-		this._addOperation({
-			path: '/',
-			method: 'overwrite',
-			args: {
-				newValue: clonedNewVal,
-			},
-		});
-	}
-
 	constructor(
 		name: string,
 		namespace: string,
@@ -117,6 +92,31 @@ export default class ServerReplicant<T> extends AbstractReplicant<T> {
 				opts.defaultValue,
 			);
 		}
+	}
+
+	get value(): T | undefined {
+		return this._value;
+	}
+
+	set value(newValue: T | undefined) {
+		if (newValue === this._value) {
+			this.log.replicants('value unchanged, no action will be taken');
+			return;
+		}
+
+		this.validate(newValue);
+		this.log.replicants('running setter with', newValue);
+		const clonedNewVal = clone(newValue);
+		ignoreProxy(this);
+		this._value = proxyRecursive(this, newValue, '/');
+		resumeProxy(this);
+		this._addOperation({
+			path: '/',
+			method: 'overwrite',
+			args: {
+				newValue: clonedNewVal,
+			},
+		});
 	}
 
 	/**

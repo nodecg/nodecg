@@ -18,7 +18,7 @@ export function createServerConfig({
 		? {
 				test: /\.js$|\.ts$/,
 				use: {
-					loader: 'istanbul-instrumenter-loader',
+					loader: '@ephesoft/webpack.istanbul.loader',
 					options: { esModules: true },
 				},
 				enforce: 'post' as const,
@@ -45,27 +45,26 @@ export function createServerConfig({
 			__dirname: false,
 		},
 		externals: [nodeExternals()],
-		plugins: [new ForkTsCheckerWebpackPlugin({
-			typescript: {
-				configFile: 'src/client/tsconfig.json'
-			}
-		})],
+		plugins: [
+			new ForkTsCheckerWebpackPlugin({
+				typescript: {
+					build: true,
+					configFile: 'src/server/tsconfig.json',
+				},
+			}),
+		],
 		module: {
 			rules: [
+				instrumentationRule,
 				{
 					test: /\.ts$/,
-					loaders: [
-						{
-							loader: 'ts-loader',
-							options: {
-								transpileOnly: true,
-								configFile: 'src/server/tsconfig.json',
-							},
-						},
-					],
+					loader: 'ts-loader',
+					options: {
+						transpileOnly: true,
+						configFile: 'src/server/tsconfig.json',
+					},
 				},
 				{ test: /\.js$/, loader: 'babel-loader' },
-				instrumentationRule,
 			],
 		},
 	};

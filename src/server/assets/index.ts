@@ -206,9 +206,9 @@ export default class AssetManager {
 		const upload = multer({
 			storage: multer.diskStorage({
 				destination: this.assetsRoot,
-				filename(req, _file, cb) {
+				filename(req, file, cb) {
 					const p = req.params as { [k: string]: string };
-					cb(null, `${p.namespace}/${p.category}/${p.filePath}`);
+					cb(null, `${p.namespace}/${p.category}/${file.originalname}`);
 				},
 			}),
 		});
@@ -235,7 +235,7 @@ export default class AssetManager {
 
 		// Uploading new files
 		app.post(
-			'/assets/:namespace/:category/:filePath',
+			'/assets/:namespace/:category',
 
 			// Check if the user is authorized.
 			authCheck,

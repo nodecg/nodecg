@@ -37,7 +37,7 @@ export default function replaceRefs(inputObj: unknown, currentFile: File, allFil
 		let referenceFile: File | undefined;
 		if (isFileReference(obj)) {
 			const referenceUrl = resolveFileReference(obj.$ref, currentFile);
-			referenceFile = allFiles.find(file => {
+			referenceFile = allFiles.find((file) => {
 				return file.url === referenceUrl;
 			});
 
@@ -130,6 +130,6 @@ function resolveFileReference(url: string, file: File): string {
 	return schema.plugins.resolveURL({ from: file.url, to: url });
 }
 
-function resolvePointerReference(obj: object, ref: string): UnknownObject {
+function resolvePointerReference(obj: Record<string, unknown>, ref: string): UnknownObject {
 	return ptr.get(obj, ref) as UnknownObject;
 }

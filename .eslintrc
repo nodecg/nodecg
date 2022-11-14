@@ -6,6 +6,12 @@
 		"valid-jsdoc": 0,
 		"@typescript-eslint/camelcase": 0,
 		"@typescript-eslint/restrict-template-expressions": 0,
-		"@typescript-eslint/restrict-plus-operands": 0
+		"@typescript-eslint/restrict-plus-operands": 0,
+		"@typescript-eslint/prefer-readonly-parameter-types": 0, // TODO: turn this back on
+		"@typescript-eslint/no-unsafe-member-access": 0, // TODO: figure out why this thinks that non-any types are any
+		"@typescript-eslint/no-unsafe-call": 0, // TODO: figure out why this thinks that non-any types are any
+		"@typescript-eslint/no-unsafe-return": 0, // TODO: figure out why this thinks that non-any types are any
+		"@typescript-eslint/no-var-requires": 0, // we have legitimate use cases for this
+		"no-undef": 0 // https://typescript-eslint.io/docs/linting/troubleshooting/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
 	}
 }

@@ -12,9 +12,6 @@ export default async function(socket: TypedServerSocket, next: SocketIO.NextFunc
 	try {
 		log.trace('New socket connection: ID %s with IP %s', socket.id, (socket as any).handshake.address);
 
-		// Prevent console warnings when many extensions are installed
-		(socket as any).setMaxListeners(64);
-
 		socket.on('error', err => {
 			if (global.sentryEnabled) {
 				Sentry.captureException(err);

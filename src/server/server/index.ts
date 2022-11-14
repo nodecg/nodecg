@@ -6,13 +6,13 @@ import '../util/sentry-config';
 import { pjson } from '../util';
 
 global.exitOnUncaught = config.exitOnUncaught;
-if (config.sentry && config.sentry.enabled) {
+if (config.sentry?.enabled) {
 	Sentry.init({
 		dsn: config.sentry.dsn,
 		serverName: os.hostname(),
 		release: pjson.version,
 	});
-	Sentry.configureScope(scope => {
+	Sentry.configureScope((scope) => {
 		scope.setTags({
 			nodecgHost: config.host,
 			nodecgBaseURL: config.baseURL,
@@ -97,7 +97,7 @@ export default class NodeCGServer extends EventEmitter {
 		 */
 		const { _app: app } = this;
 		let server: Server;
-		if (config.ssl && config.ssl.enabled) {
+		if (config.ssl?.enabled) {
 			const sslOpts: { key: Buffer; cert: Buffer; passphrase?: string } = {
 				key: fs.readFileSync(config.ssl.keyPath!),
 				cert: fs.readFileSync(config.ssl.certificatePath!),
@@ -121,6 +121,7 @@ export default class NodeCGServer extends EventEmitter {
 		 * typed-socket.io isn't quite perfect.
 		 */
 		this._io = SocketIO(server) as TypedServer;
+		(this._io as any).setMaxListeners(75); // Prevent console warnings when many extensions are installed
 		(this._io as any).on('error', (err: Error) => {
 			if (global.sentryEnabled) {
 				Sentry.captureException(err);
@@ -157,7 +158,7 @@ export default class NodeCGServer extends EventEmitter {
 			});
 		});
 
-		if (config.login && config.login.enabled) {
+		if (config.login?.enabled) {
 			log.info('Login security enabled');
 			const login = await import('../login');
 			app.use(await login.createMiddleware());
@@ -170,10 +171,12 @@ export default class NodeCGServer extends EventEmitter {
 
 		(this._io as any).use(socketApiMiddleware);
 
-		const bundlesPaths = [path.join(process.env.NODECG_ROOT, 'bundles')].concat(config.bundles?.paths ?? []);
+		const bundlesPaths = [path.join(process.env.NODECG_ROOT, 'bundles')].concat(
+			(config as any).bundles?.paths ?? [],
+		);
 		const cfgPath = path.join(process.env.NODECG_ROOT, 'cfg');
 		const bundleManager = new BundleManager(bundlesPaths, cfgPath, pjson.version, config);
-		bundleManager.all().forEach(bundle => {
+		bundleManager.all().forEach((bundle) => {
 			// TODO: deprecate this feature once Import Maps are shipped and stable in browsers.
 			// TODO: remove this feature after Import Maps have been around a while (like a year maybe).
 			if (bundle.transformBareModuleSpecifiers) {
@@ -189,7 +192,7 @@ export default class NodeCGServer extends EventEmitter {
 		this._bundleManager = bundleManager;
 
 		log.trace(`Attempting to listen on ${config.host}:${config.port}`);
-		server.on('error', err => {
+		server.on('error', (err) => {
 			switch ((err as any).code) {
 				case 'EADDRINUSE':
 					if (process.env.NODECG_TEST) {
@@ -276,7 +279,7 @@ export default class NodeCGServer extends EventEmitter {
 		// This has two benefits:
 		// 1) Prevents the dashboard/views from being opened before everything has finished loading
 		// 2) Prevents dashboard/views from re-declaring replicants on reconnect before extensions have had a chance
-		return new Promise(resolve => {
+		return new Promise((resolve) => {
 			server.listen(
 				{
 					host: config.host,
@@ -296,7 +299,7 @@ export default class NodeCGServer extends EventEmitter {
 						process.env.NODECG_TEST_PORT = String(port);
 					}
 
-					const protocol = config.ssl && config.ssl.enabled ? 'https' : 'http';
+					const protocol = config.ssl?.enabled ? 'https' : 'http';
 					log.info('NodeCG running on %s://%s', protocol, config.baseURL);
 					this.emit('started');
 					resolve();
@@ -306,8 +309,8 @@ export default class NodeCGServer extends EventEmitter {
 	}
 
 	async stop(): Promise<void> {
-		await new Promise((resolve, reject) => {
-			this._server.close(err => {
+		await new Promise<void>((resolve, reject) => {
+			this._server.close((err) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -316,7 +319,7 @@ export default class NodeCGServer extends EventEmitter {
 			});
 		});
 
-		await new Promise(resolve => {
+		await new Promise<void>((resolve) => {
 			(this._io as any).close(() => {
 				resolve();
 			});

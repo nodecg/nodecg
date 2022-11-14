@@ -9,8 +9,11 @@ import { NodeCG as NCGTypes } from '../../../../types/nodecg';
 // This just imports the type at build time, no compile output.
 import { NcgSoundCue } from './ncg-sound-cue';
 
-// This ensures that the file gets included in the output bundle.
-import './ncg-sound-cue';
+// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import * as keep1 from './ncg-sound-cue';
+keep1;
+/* eslint-enable @typescript-eslint/no-unused-expressions */
 
 class NcgSounds extends Polymer.PolymerElement {
 	static get template() {
@@ -96,13 +99,13 @@ class NcgSounds extends Polymer.PolymerElement {
 			this.$.bundleFader.value = newVal;
 		});
 
-		cuesRep.on('change', newVal => {
+		cuesRep.on('change', (newVal) => {
 			if (!newVal) {
 				return;
 			}
 
 			// Update (or create) the ncg-sound-cue element for every cue in the Replicant.
-			newVal.forEach(cue => {
+			newVal.forEach((cue) => {
 				if (!cueElsByName[cue.name]) {
 					cueElsByName[cue.name] = document.createElement('ncg-sound-cue') as NcgSoundCue;
 					this.$.cues.appendChild(cueElsByName[cue.name]);
@@ -124,7 +127,7 @@ class NcgSounds extends Polymer.PolymerElement {
 				}
 
 				const cueEl = cueElsByName[name];
-				const index = newVal.findIndex(cue => cue.name === cueEl.name);
+				const index = newVal.findIndex((cue) => cue.name === cueEl.name);
 				if (index < 0) {
 					this.$.cues.removeChild(cueEl);
 					// eslint-disable-next-line @typescript-eslint/no-dynamic-delete

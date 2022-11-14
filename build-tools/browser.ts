@@ -18,7 +18,7 @@ export function createBrowserConfig({
 		? {
 				test: /\.js$|\.ts$/,
 				use: {
-					loader: 'istanbul-instrumenter-loader',
+					loader: '@ephesoft/webpack.istanbul.loader',
 					options: { esModules: true },
 				},
 				enforce: 'post' as const,
@@ -31,6 +31,9 @@ export function createBrowserConfig({
 		devtool: 'source-map',
 		resolve: {
 			extensions: ['.ts', '.js', '.json'],
+			fallback: {
+				util: require.resolve('util/'),
+			},
 		},
 		entry: {
 			dashboard: './src/client/dashboard/elements/ncg-dashboard.ts',
@@ -45,38 +48,40 @@ export function createBrowserConfig({
 		},
 		module: {
 			rules: [
+				instrumentationRule,
 				{
 					test: /\.ts$/,
-					loaders: [
-						{
-							loader: 'ts-loader',
-							options: {
-								transpileOnly: true,
-								configFile: 'src/client/tsconfig.json',
-							},
-						},
-					],
+					loader: 'ts-loader',
+					options: {
+						transpileOnly: true,
+						configFile: 'src/client/tsconfig.json',
+					},
 				},
 				{ test: /\.js$/, loader: 'babel-loader' },
-				instrumentationRule,
 			],
 		},
 		plugins: [
 			new webpack.EnvironmentPlugin({
 				BROWSER: true,
 			}),
-			new CopyPlugin([
-				'src/client/manifest.json',
-				'src/client/favicon.ico',
-				{ from: 'src/client/dashboard/img/', to: 'dashboard/img', toType: 'dir' },
-				{ from: 'src/client/dashboard/css/', to: 'dashboard/css', toType: 'dir' },
-				{ from: 'src/client/instance/', to: 'instance', toType: 'dir' },
-				{ from: 'src/client/login/', to: 'login', toType: 'dir' },
-			]),
+			new webpack.ProvidePlugin({
+				process: 'process/browser',
+			}),
+			new CopyPlugin({
+				patterns: [
+					'src/client/manifest.json',
+					'src/client/favicon.ico',
+					{ from: 'src/client/dashboard/img/', to: 'dashboard/img', toType: 'dir' },
+					{ from: 'src/client/dashboard/css/', to: 'dashboard/css', toType: 'dir' },
+					{ from: 'src/client/instance/', to: 'instance', toType: 'dir' },
+					{ from: 'src/client/login/', to: 'login', toType: 'dir' },
+				],
+			}),
 			new ForkTsCheckerWebpackPlugin({
 				typescript: {
-					configFile: 'src/client/tsconfig.json'
-				}
+					build: true,
+					configFile: 'src/client/tsconfig.json',
+				},
 			}),
 		],
 	};

@@ -18,7 +18,7 @@ test.before(async () => {
 	standalone = await initStandalone();
 });
 
-test.serial('panels - should show up on the dashboard', async t => {
+test.serial('panels - should show up on the dashboard', async (t) => {
 	setTimeout(t.fail, 1000);
 	await dashboard.waitForFunction(() => {
 		const found = document
@@ -30,25 +30,24 @@ test.serial('panels - should show up on the dashboard', async t => {
 	t.pass();
 });
 
-test.serial('panels - should show up standalone', async t => {
+test.serial('panels - should show up standalone', async (t) => {
 	setTimeout(t.fail, 1000);
 	await standalone.waitForSelector('#test-bundle-paragraph');
 	t.pass();
 });
 
-test('panels - get default styles injected', async t => {
+test('panels - get default styles injected', async (t) => {
 	const response = await axios.get(C.testPanelUrl());
 	t.is(response.status, 200);
 	t.true(response.data.includes('panel-defaults.css'));
 });
 
-test.serial('ncg-dialog - should have the buttons defined in dialogButtons', async t => {
+test.serial('ncg-dialog - should have the buttons defined in dialogButtons', async (t) => {
 	const res = await dashboard.evaluate(() => {
 		const dialog: any = window.dashboardApi.getDialog('test-dialog')!;
 		console.log(dialog);
 		dialog.open();
 
-		// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 		function gatherButtonStats(buttonEl: HTMLButtonElement) {
 			return {
 				confirm: buttonEl.hasAttribute('dialog-confirm'),
@@ -74,11 +73,11 @@ test.serial('ncg-dialog - should have the buttons defined in dialogButtons', asy
 	]);
 });
 
-test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog attribute is clicked', async t => {
+test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog attribute is clicked', async (t) => {
 	await dashboard.bringToFront();
 	await dashboard.evaluate(
 		async () =>
-			new Promise((resolve, reject) => {
+			new Promise<void>((resolve, reject) => {
 				try {
 					const openDialogButton = document!
 						.querySelector('ncg-dashboard')!
@@ -110,10 +109,10 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 	t.pass();
 });
 
-test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is clicked', async t => {
+test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is clicked', async (t) => {
 	await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise<void>((resolve) => {
 				const dialog: any = window.dashboardApi.getDialog('test-dialog');
 				const dialogDocument: any = window.dashboardApi.getDialogDocument('test-dialog');
 				const confirmButton: any = dialog.querySelector('paper-button[dialog-confirm]');
@@ -131,10 +130,10 @@ test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is 
 	t.pass();
 });
 
-test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async t => {
+test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async (t) => {
 	await dashboard.evaluate(
 		async () =>
-			new Promise(resolve => {
+			new Promise<void>((resolve) => {
 				// Open dialog first
 				const openDialogButton = document!
 					.querySelector('ncg-dashboard')!
@@ -161,7 +160,7 @@ test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is 
 	t.pass();
 });
 
-test.serial('connection toasts', async t => {
+test.serial('connection toasts', async (t) => {
 	let ret: any = await dashboard.evaluate(() => {
 		const dashboard: any = document.getElementById('nodecg_dashboard');
 		// TODO: use actual disconnection (setOfflineMode)
@@ -220,7 +219,7 @@ test.serial('connection toasts', async t => {
 	});
 });
 
-test.serial('retrieval - 404', async t => {
+test.serial('retrieval - 404', async (t) => {
 	try {
 		await axios.get(`${C.rootUrl()}bundles/test-bundle/dashboard/bad.png`);
 	} catch (error) {
@@ -228,7 +227,7 @@ test.serial('retrieval - 404', async t => {
 	}
 });
 
-test.serial('retrieval - wrong bundle is 404', async t => {
+test.serial('retrieval - wrong bundle is 404', async (t) => {
 	try {
 		await axios.get(`${C.rootUrl()}bundles/fake-bundle/dashboard/panel.html`);
 	} catch (error) {

@@ -1,4 +1,9 @@
-import './ncg-sounds';
+// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import * as keep1 from './ncg-sounds';
+keep1;
+/* eslint-enable @typescript-eslint/no-unused-expressions */
+
 import * as Polymer from '@polymer/polymer';
 class NcgMixer extends Polymer.PolymerElement {
 	static get template() {
@@ -69,7 +74,7 @@ class NcgMixer extends Polymer.PolymerElement {
 		return {
 			bundlesWithSounds: {
 				type: Array,
-				value: window.__renderData__.bundles.filter(bundle => {
+				value: window.__renderData__.bundles.filter((bundle) => {
 					return bundle.soundCues && bundle.soundCues.length > 0;
 				}),
 			},
@@ -86,7 +91,7 @@ class NcgMixer extends Polymer.PolymerElement {
 			masterVolume.value = e.target.value;
 		});
 
-		masterVolume.on('change', newVal => {
+		masterVolume.on('change', (newVal) => {
 			masterFader.value = newVal;
 		});
 	}

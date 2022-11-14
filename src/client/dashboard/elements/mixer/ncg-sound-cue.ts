@@ -1,7 +1,13 @@
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-slider/paper-slider.js';
 import '@polymer/paper-styles/typography.js';
-import '../ui/ui-select';
+
+// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import * as keep1 from '../ui/ui-select';
+keep1;
+/* eslint-enable @typescript-eslint/no-unused-expressions */
+
 import * as Polymer from '@polymer/polymer';
 import { NodeCG as NCGTypes } from '../../../../types/nodecg';
 export class NcgSoundCue extends Polymer.PolymerElement {
@@ -100,7 +106,7 @@ export class NcgSoundCue extends Polymer.PolymerElement {
 		this._assetsRepInitialized = true;
 		const assetsRep = NodeCG.Replicant<NCGTypes.AssetFile[]>('assets:sounds', bundleName);
 		assetsRep.setMaxListeners(50);
-		assetsRep.on('change', newVal => {
+		assetsRep.on('change', (newVal) => {
 			if (newVal && this.assignable) {
 				this.soundFiles = newVal;
 				this._generateOptions(newVal);

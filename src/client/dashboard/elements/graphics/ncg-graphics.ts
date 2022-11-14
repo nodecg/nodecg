@@ -1,5 +1,11 @@
 import '@polymer/paper-toast/paper-toast.js';
-import './ncg-graphics-bundle';
+
+// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+import * as keep1 from './ncg-graphics-bundle';
+keep1;
+/* eslint-enable @typescript-eslint/no-unused-expressions */
+
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 
@@ -37,7 +43,7 @@ class NcgGraphics extends MutableData(Polymer.PolymerElement) {
 		return {
 			bundlesWithGraphics: {
 				type: Array,
-				value: window.__renderData__.bundles.filter(bundle => {
+				value: window.__renderData__.bundles.filter((bundle) => {
 					return bundle.graphics && bundle.graphics.length > 0;
 				}),
 			},
@@ -49,7 +55,7 @@ class NcgGraphics extends MutableData(Polymer.PolymerElement) {
 		super.ready();
 		const instancesRep = NodeCG.Replicant('graphics:instances', 'nodecg');
 
-		instancesRep.on('change', newVal => {
+		instancesRep.on('change', (newVal) => {
 			this._graphicInstances = newVal;
 		});
 

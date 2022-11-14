@@ -9,7 +9,7 @@ import { config } from '../config';
 /**
  * Express middleware that checks if the user is authenticated.
  */
-export default async function(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+export default async function (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
 	try {
 		if (!config.login?.enabled) {
 			return next();
@@ -37,17 +37,18 @@ export default async function(req: express.Request, res: express.Response, next:
 			if (!apiKey) {
 				// Ensure we delete the existing cookie so that it doesn't become poisoned
 				// and cause an infinite login loop.
-				return req.session?.destroy(() => {
+				req.session?.destroy(() => {
 					res.clearCookie('socketToken', {
 						path: '/',
 						domain,
-						secure: config.ssl && config.ssl.enabled,
+						secure: config.ssl?.enabled,
 					});
 					res.clearCookie('connect.sid', { path: '/' });
 					res.clearCookie('io', { path: '/' });
 
 					res.redirect('/login');
 				});
+				return;
 			}
 
 			user = await findUser(apiKey.user.id);
@@ -63,7 +64,7 @@ export default async function(req: express.Request, res: express.Response, next:
 
 		const allowed = isSuperUser(user);
 		const provider = user.identities[0]?.provider_type;
-		const providerAllowed = config.login && config.login[provider]?.enabled;
+		const providerAllowed = config.login?.[provider]?.enabled;
 		if (req.isAuthenticated() && allowed && providerAllowed) {
 			// Set the cookie so that requests to other resources on the page
 			// can also be authenticated.
@@ -72,7 +73,7 @@ export default async function(req: express.Request, res: express.Response, next:
 			res.cookie('socketToken', user.apiKeys[0].secret_key, {
 				path: '/',
 				domain: domain as string,
-				secure: config.ssl && config.ssl.enabled,
+				secure: config.ssl?.enabled,
 			});
 
 			return next();
