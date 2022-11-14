@@ -28,21 +28,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check if build result is different from current branch
+      - name: Lint
         run: |
-          npm run build
-          git diff --name-only --exit-code
+          npm run lint
+
+      - name: Build w/ instrumentation for coverage reporting
+        run: |
+          npm run instrument
 
       - name: Test
         run: |
-          git config --global user.email "contact@nodecg.dev"
-          git config --global user.name "NodeCG Bot"
-          npm run static
-          npm test
+          npm run test
 
-      - run: npx nyc report --reporter=text-lcov > coverage.lcov
+      - name: Create code coverage report
+        run: npx nyc report --reporter=text-lcov > coverage.lcov
 
-      - name: Report code coverage to Codecov
-        uses: codecov/codecov-action@v1
+      - name: Send code coverage to Codecov
+        uses: codecov/codecov-action@v3
         with:
           file: ./coverage.lcov
