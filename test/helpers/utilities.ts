@@ -56,5 +56,9 @@ export function invokeAck(t: ExecutionContext, ack?: Acknowledgement, ...args: a
 		return;
 	}
 
-	return ack(...args);
+	if (args.length > 0) {
+		return ack(...args);
+	}
+
+	return ack();
 }
