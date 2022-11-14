@@ -19,6 +19,10 @@ test.before(async () => {
 	loginPage = await initLogin();
 });
 
+test.afterEach(async (t) => {
+	await logOut(t);
+});
+
 test.serial('redirects unauthorized users to /login', async (t) => {
 	await loginPage.goto(C.dashboardUrl());
 	t.is(loginPage.url(), C.loginUrl());
@@ -40,7 +44,7 @@ test.serial('logging in and out should work', async (t) => {
 });
 
 test.serial('should support logging in with a hashed password', async (t) => {
-	await logIn('other_admin');
+	await logIn('other_admin', 'password');
 	await loginPage.waitForFunction((url) => location.href === url, {}, C.dashboardUrl());
 
 	t.pass();
