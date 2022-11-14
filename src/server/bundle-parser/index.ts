@@ -12,9 +12,9 @@ import parseSounds from './sounds';
 import * as config from './config';
 import parseExtension from './extension';
 import parseGit from './git';
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
-export default function(bundlePath: string, bundleCfgPath?: string): NodeCG.Bundle {
+export default function (bundlePath: string, bundleCfgPath?: string): NodeCG.Bundle {
 	// Resolve the path to the bundle and its package.json
 	const pkgPath = path.join(bundlePath, 'package.json');
 
@@ -26,7 +26,7 @@ export default function(bundlePath: string, bundleCfgPath?: string): NodeCG.Bund
 	let pkg: NodeCG.PackageJSON;
 	try {
 		pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-	} catch (_) {
+	} catch (_: unknown) {
 		throw new Error(`${pkgPath} is not valid JSON, please check it against a validator such as jsonlint.com`);
 	}
 

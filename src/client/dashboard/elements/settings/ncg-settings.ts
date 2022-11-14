@@ -147,7 +147,7 @@ class NcgSettings extends Polymer.PolymerElement {
 		window.socket.emit(
 			'regenerateToken',
 			undefined,
-			/* istanbul ignore next */ err => {
+			/* istanbul ignore next */ (err) => {
 				if (err) {
 					console.error(err);
 					return;

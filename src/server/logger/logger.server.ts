@@ -5,10 +5,11 @@ import { format, inspect } from 'util';
 // Packages
 import * as fs from 'fs-extra';
 import winston from 'winston';
-import * as Sentry from '@sentry/node';
+import type * as Sentry from '@sentry/node';
 
 // Ours
-import { LoggerInterface, LogLevel } from '../../shared/logger-interface';
+import type { LoggerInterface } from '../../shared/logger-interface';
+import { LogLevel } from '../../shared/logger-interface';
 
 type LoggerOptions = {
 	console: Partial<{
@@ -30,7 +31,7 @@ type LoggerOptions = {
  *
  * @returns A constructor used to create discrete logger instances.
  */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+
 export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeof Sentry | undefined = undefined) {
 	initialOpts = initialOpts || {};
 	initialOpts.console = initialOpts.console ?? {};
@@ -107,9 +108,7 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 		// A messy bit of internal state used to determine if the special-case "replicants" logging level is active.
 		static _shouldLogReplicants = Boolean(initialOpts.replicants);
 
-		name: string;
-
-		constructor(name: string) {
+		constructor(public name: string) {
 			this.name = name;
 		}
 
@@ -133,11 +132,9 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 			mainLogger.error(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
 
 			if (sentry) {
-				const formattedArgs = args.map((argument) => {
-					return typeof argument === 'object'
-						? inspect(argument, { depth: null, showProxy: true })
-						: argument;
-				});
+				const formattedArgs = args.map((argument) =>
+					typeof argument === 'object' ? inspect(argument, { depth: null, showProxy: true }) : argument,
+				);
 
 				sentry.captureException(
 					new Error(`[${this.name}] ` + format(formattedArgs[0], ...formattedArgs.slice(1))),

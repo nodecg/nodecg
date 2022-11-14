@@ -4,7 +4,8 @@ import * as path from 'path';
 import { v4 as uuid } from 'uuid';
 
 // Packages
-import anyTest, { TestInterface } from 'ava';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
 import puppeteer from 'puppeteer';
 import { argv } from 'yargs';
 import isCi from 'is-ci';
@@ -40,7 +41,7 @@ export const setup = () => {
 
 		/* eslint-disable no-await-in-loop */
 		for (const page of await browser.pages()) {
-			let coverageObj: { [k: string]: any };
+			let coverageObj: Record<string, any>;
 			try {
 				coverageObj = await page.evaluate(() => window.__coverage__);
 			} catch (_) {

@@ -6,8 +6,8 @@ import clone from 'clone';
 import objectPath from 'object-path';
 
 // Ours
-import { LoggerInterface } from './logger-interface';
-import { NodeCG } from '../types/nodecg';
+import type { LoggerInterface } from './logger-interface';
+import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
 
 type Events<T> = {
@@ -15,7 +15,7 @@ type Events<T> = {
 	declared: (
 		data:
 			| { value: T; revision: number }
-			| { value: T; revision: number; schemaSum: string; schema: { [k: string]: any } },
+			| { value: T; revision: number; schemaSum: string; schema: Record<string, any> },
 	) => void;
 	declarationRejected: (rejectReason: string) => void;
 	operations: (params: {
@@ -47,7 +47,7 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 
 	log: LoggerInterface;
 
-	schema?: { [k: string]: any };
+	schema?: Record<string, any>;
 
 	schemaSum?: string;
 
@@ -91,7 +91,8 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 		const originalOnce = this.once.bind(this);
 		this.once = (event: string, listener: (...params: any[]) => void) => {
 			if (event === 'change' && this.status === 'declared') {
-				return listener(this.value);
+				listener(this.value);
+				return;
 			}
 
 			return originalOnce(event, listener);
@@ -139,6 +140,7 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 				);
 			}
 
+			// eslint-disable-next-line prefer-spread
 			result = arr[operation.method as any].apply(
 				arr,
 				'args' in operation && 'mutatorArgs' in operation.args ? operation.args.mutatorArgs : [],
@@ -193,9 +195,19 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 	 *
 	 * This is a stub that will be replaced if a Schema is available.
 	 */
-	validate: Validator = (): boolean => {
-		return true;
-	};
+	validate: Validator = (): boolean => true;
+
+	/**
+	 * Adds an operation to the operation queue, to be flushed at the end of the current tick.
+	 * @private
+	 */
+	abstract _addOperation(operation: NodeCG.Replicant.Operation<T>): void;
+
+	/**
+	 * Emits all queued operations via Socket.IO & empties this._operationQueue.
+	 * @private
+	 */
+	abstract _flushOperations(): void;
 
 	/**
 	 * Generates a JSON Schema validator function from the `schema` property of the provided replicant.
@@ -249,18 +261,6 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 			return result;
 		};
 	}
-
-	/**
-	 * Adds an operation to the operation queue, to be flushed at the end of the current tick.
-	 * @private
-	 */
-	abstract _addOperation(operation: NodeCG.Replicant.Operation<T>): void;
-
-	/**
-	 * Emits all queued operations via Socket.IO & empties this._operationQueue.
-	 * @private
-	 */
-	abstract _flushOperations(): void;
 }
 
 type Metadata<T> = {
@@ -361,6 +361,7 @@ const CHILD_ARRAY_HANDLER = {
 				if (replicant.schema) {
 					const valueClone = clone(replicant.value);
 					const targetClone = objectPath.get(valueClone, pathStrToPathArr(metadata.path));
+					// eslint-disable-next-line prefer-spread
 					targetClone[prop].apply(targetClone, args);
 					replicant.validate(valueClone);
 				}
@@ -599,10 +600,10 @@ function pathStrToPathArr(path: string): string[] {
 	const pathArr = path
 		.substr(1)
 		.split('/')
-		.map((part) => {
+		.map((part) =>
 			// De-tokenize '/' characters in path name
-			return part.replace(/~1/g, '/');
-		});
+			part.replace(/~1/g, '/'),
+		);
 
 	// For some reason, path arrays whose only item is an empty string cause errors.
 	// In this case, we replace the path with an empty array, which seems to be fine.

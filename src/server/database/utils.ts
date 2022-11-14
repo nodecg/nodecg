@@ -27,7 +27,7 @@ export async function upsertUser({
 	roles: User['roles'];
 }): Promise<User> {
 	const database = await getConnection();
-	const manager = database.manager;
+	const { manager } = database;
 	let user: User;
 
 	// Check for ident that matches.
@@ -55,12 +55,12 @@ export async function upsertUser({
 }
 
 export function isSuperUser(user: User): boolean {
-	return Boolean(user.roles?.find(role => role.name === 'superuser'));
+	return Boolean(user.roles?.find((role) => role.name === 'superuser'));
 }
 
 async function findRole(name: Role['name']): Promise<Role | undefined> {
 	const database = await getConnection();
-	const manager = database.manager;
+	const { manager } = database;
 	return manager.findOne(
 		Role,
 		{
@@ -72,14 +72,14 @@ async function findRole(name: Role['name']): Promise<Role | undefined> {
 
 async function createIdentity(identInfo: Pick<Identity, 'provider_type' | 'provider_hash'>): Promise<Identity> {
 	const database = await getConnection();
-	const manager = database.manager;
+	const { manager } = database;
 	const ident = manager.create(Identity, identInfo);
 	return manager.save(ident);
 }
 
 async function createApiKey(): Promise<ApiKey> {
 	const database = await getConnection();
-	const manager = database.manager;
+	const { manager } = database;
 	const apiKey = manager.create(ApiKey);
 	return manager.save(apiKey);
 }

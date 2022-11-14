@@ -9,15 +9,15 @@ import * as Sentry from '@sentry/node';
 // Ours
 import extensionApiClassFactory from '../api.server';
 import createLogger from '../logger';
-import { Replicator } from '../replicant';
-import { RootNS } from '../../types/socket-protocol';
-import BundleManager from '../bundle-manager';
-import { NodeCG } from '../../types/nodecg';
+import type { Replicator } from '../replicant';
+import type { RootNS } from '../../types/socket-protocol';
+import type BundleManager from '../bundle-manager';
+import type { NodeCG } from '../../types/nodecg';
 
 const log = createLogger('nodecg/lib/server/extensions');
 
 export default class ExtensionManager extends EventEmitter {
-	readonly extensions: { [k: string]: unknown } = {};
+	readonly extensions: Record<string, unknown> = {};
 
 	private readonly _satisfiedDepNames = new WeakMap<NodeCG.Bundle, string[]>();
 
@@ -73,7 +73,7 @@ export default class ExtensionManager extends EventEmitter {
 				// Any bundles left over must have had unsatisfied dependencies.
 				// Print a warning about each bundle, and what its unsatisfied deps were.
 				// Then, unload the bundle.
-				allBundles.forEach(bundle => {
+				allBundles.forEach((bundle) => {
 					const unsatisfiedDeps = [];
 
 					for (const dep in bundle.bundleDependencies) {
@@ -111,15 +111,11 @@ export default class ExtensionManager extends EventEmitter {
 		const ExtensionApi = this._ExtensionApi;
 		const extPath = path.join(bundle.dir, 'extension');
 		try {
-			// @ts-ignore
-			// eslint-disable-next-line no-undef
 			const requireFunc = process.env.NODECG_TEST ? require : __non_webpack_require__;
-
 			const extension = requireFunc(extPath)(new ExtensionApi(bundle));
-
 			log.info('Mounted %s extension', bundle.name);
 			this.extensions[bundle.name] = extension;
-		} catch (err) {
+		} catch (err: unknown) {
 			this._bundleManager.remove(bundle.name);
 			log.warn('Failed to mount %s extension:\n', err?.stack ?? err);
 			if (global.sentryEnabled) {
@@ -138,7 +134,7 @@ export default class ExtensionManager extends EventEmitter {
 		const unsatisfiedDepNames = Object.keys(deps);
 		const arr = this._satisfiedDepNames.get(bundle)?.slice(0) ?? [];
 
-		loadedBundles.forEach(loadedBundle => {
+		loadedBundles.forEach((loadedBundle) => {
 			// Find out if this loaded bundle is one of the dependencies of the bundle in question.
 			// If so, check if the version loaded satisfies the dependency.
 			const index = unsatisfiedDepNames.indexOf(loadedBundle.name);

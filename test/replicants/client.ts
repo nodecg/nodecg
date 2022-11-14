@@ -3,8 +3,9 @@ import fs from 'fs';
 import path from 'path';
 
 // Packages
-import anyTest, { TestInterface } from 'ava';
-import puppeteer from 'puppeteer';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
+import type puppeteer from 'puppeteer';
 
 // Ours
 import * as server from '../helpers/server';
@@ -15,7 +16,7 @@ server.setup();
 const { initDashboard } = browser.setup();
 
 import * as C from '../helpers/test-constants';
-import { NodeCG } from '../../src/types/nodecg';
+import type { NodeCG } from '../../src/types/nodecg';
 
 let dashboard: puppeteer.Page;
 test.before(async () => {
@@ -42,7 +43,9 @@ test.serial('should only apply defaultValue when first declared', async (t) => {
 		async () =>
 			new Promise((resolve) => {
 				const rep = window.dashboardApi.Replicant('clientTest', { defaultValue: 'bar' });
-				rep.on('declared', () => resolve(rep.value));
+				rep.on('declared', () => {
+					resolve(rep.value);
+				});
 			}),
 	);
 
@@ -228,7 +231,8 @@ test.serial('when an array - should support the "delete" operator', async (t) =>
 				let deleted = false;
 				rep.on('change', (newVal, oldVal, operations) => {
 					if (!newVal) {
-						return reject(new Error('no value'));
+						reject(new Error('no value'));
+						return;
 					}
 
 					if (newVal[0] === 'foo' && !deleted) {
@@ -260,13 +264,14 @@ test.serial('when an array - should support the "delete" operator', async (t) =>
 });
 
 test.serial.cb('when an array - should proxy objects added to arrays via array insertion methods', (t) => {
-	const rep = t.context.apis.extension.Replicant<Array<{ [k: string]: string }>>('serverArrInsertObj', {
+	const rep = t.context.apis.extension.Replicant<Array<Record<string, string>>>('serverArrInsertObj', {
 		defaultValue: [],
 	});
 	rep.value!.push({ foo: 'foo' });
 	rep.on('change', (newVal) => {
 		if (!newVal) {
-			return t.fail('no value');
+			t.fail('no value');
+			return;
 		}
 
 		if (newVal[0].foo === 'bar') {
@@ -286,7 +291,7 @@ test.serial.cb('when an object - should not cause server-side replicants to lose
 		t.end('Timeout');
 	}, 1000);
 
-	const rep = t.context.apis.extension.Replicant<{ [k: string]: string }>('clientServerObservation', {
+	const rep = t.context.apis.extension.Replicant<Record<string, string>>('clientServerObservation', {
 		defaultValue: { foo: 'foo' },
 		persistent: false,
 	});
@@ -296,10 +301,11 @@ test.serial.cb('when an object - should not cause server-side replicants to lose
 			async () =>
 				new Promise((resolve, reject) => {
 					let barred = false;
-					const rep = window.dashboardApi.Replicant<{ [k: string]: string }>('clientServerObservation');
+					const rep = window.dashboardApi.Replicant<Record<string, string>>('clientServerObservation');
 					rep.on('change', (newVal) => {
 						if (!newVal) {
-							return reject(new Error('no value'));
+							reject(new Error('no value'));
+							return;
 						}
 
 						if (newVal.foo === 'bar') {
@@ -316,7 +322,8 @@ test.serial.cb('when an object - should not cause server-side replicants to lose
 
 			rep.on('change', (newVal) => {
 				if (!newVal) {
-					return t.fail('no value');
+					t.fail('no value');
+					return;
 				}
 
 				if (newVal.foo === 'baz') {
@@ -331,9 +338,7 @@ test.serial.cb('when an object - should not cause server-side replicants to lose
 });
 
 test.serial('when an object - should react to changes in nested properties', async (t) => {
-	type RepType = {
-		[k: string]: any;
-	};
+	type RepType = Record<string, any>;
 	const ret = await dashboard.evaluate(
 		async () =>
 			new Promise<{
@@ -471,7 +476,8 @@ test.serial('when an object - should support the "delete" operator', async (t) =
 				let deleted = false;
 				rep.on('change', (newVal, oldVal, operations) => {
 					if (!newVal) {
-						return reject(new Error('no value'));
+						reject(new Error('no value'));
+						return;
 					}
 
 					if (newVal.foo && !deleted) {
@@ -509,7 +515,7 @@ test.serial('when an object - should support the "delete" operator', async (t) =
 test.serial.cb('when an object - should properly proxy new objects assigned to properties', (t) => {
 	t.plan(1);
 
-	const rep = t.context.apis.extension.Replicant<{ [k: string]: any }>('serverObjProp', {
+	const rep = t.context.apis.extension.Replicant<Record<string, any>>('serverObjProp', {
 		defaultValue: { foo: { bar: 'bar' } },
 	});
 
@@ -517,7 +523,8 @@ test.serial.cb('when an object - should properly proxy new objects assigned to p
 
 	rep.on('change', (newVal) => {
 		if (!newVal) {
-			return t.fail('no value');
+			t.fail('no value');
+			return;
 		}
 
 		if (newVal.foo.baz === 'bax') {
@@ -554,7 +561,9 @@ test.serial('persistent - should load persisted values when they exist', async (
 		async () =>
 			new Promise((resolve) => {
 				const rep = window.dashboardApi.Replicant('clientPersistence');
-				rep.on('change', () => resolve(rep.value));
+				rep.on('change', () => {
+					resolve(rep.value);
+				});
 			}),
 	);
 
@@ -578,7 +587,8 @@ test.serial.cb.skip('persistent - should persist assignment to disk', (t) => {
 					rep.value = { nested: 'hey we assigned!' };
 					rep.on('change', (newVal) => {
 						if (!newVal) {
-							return t.fail('no value');
+							t.fail('no value');
+							return;
 						}
 
 						if (newVal.nested && newVal.nested === 'hey we assigned!') {
@@ -628,7 +638,8 @@ test.cb.skip('persistent - should persist changes to disk', (t) => {
 		);
 		serverRep.on('change', (newVal) => {
 			if (!newVal) {
-				return t.fail('no value');
+				t.fail('no value');
+				return;
 			}
 
 			if (newVal.nested !== 'hey we changed!') {
@@ -706,7 +717,9 @@ test.serial('persistent - should read falsey values from disk', async (t) => {
 		async () =>
 			new Promise((resolve) => {
 				const rep = window.dashboardApi.Replicant('clientFalseyRead');
-				rep.on('declared', () => resolve(rep.value));
+				rep.on('declared', () => {
+					resolve(rep.value);
+				});
 			}),
 	);
 
@@ -737,7 +750,9 @@ test.serial.cb.skip('transient - should not write their value to disk', (t) => {
 							persistent: false,
 						});
 
-						rep.on('declared', () => resolve());
+						rep.on('declared', () => {
+							resolve();
+						});
 					}),
 			)
 			.then(() => {

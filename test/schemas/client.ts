@@ -1,6 +1,7 @@
 // Packages
-import anyTest, { TestInterface } from 'ava';
-import puppeteer from 'puppeteer';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
+import type puppeteer from 'puppeteer';
 
 // Ours
 import * as server from '../helpers/server';
@@ -20,7 +21,9 @@ test.serial('should create a default value based on the schema, if none is provi
 		async () =>
 			new Promise((resolve) => {
 				const rep = window.dashboardApi.Replicant('client_schemaDefaults');
-				rep.on('declared', () => resolve(JSON.parse(JSON.stringify(rep.value))));
+				rep.on('declared', () => {
+					resolve(JSON.parse(JSON.stringify(rep.value)));
+				});
 			}),
 	);
 
@@ -44,7 +47,9 @@ test.serial('should accept the defaultValue when it passes validation', async (t
 						},
 					},
 				});
-				rep.on('declared', () => resolve(JSON.parse(JSON.stringify(rep.value))));
+				rep.on('declared', () => {
+					resolve(JSON.parse(JSON.stringify(rep.value)));
+				});
 			}),
 	);
 
@@ -102,7 +107,9 @@ test.serial('should reject the persisted value when it fails validation, replaci
 		async () =>
 			new Promise((resolve) => {
 				const rep = window.dashboardApi.Replicant('client_schemaPersistenceFail');
-				rep.on('declared', () => resolve(JSON.parse(JSON.stringify(rep.value))));
+				rep.on('declared', () => {
+					resolve(JSON.parse(JSON.stringify(rep.value)));
+				});
 			}),
 	);
 

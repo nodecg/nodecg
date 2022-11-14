@@ -1,5 +1,5 @@
 // Packages
-import {
+import type {
 	ServerDefinition,
 	SimpleNamespace,
 	RootServer,
@@ -9,7 +9,7 @@ import {
 } from 'typed-socket.io';
 
 // Ours
-import { NodeCG } from './nodecg';
+import type { NodeCG } from './nodecg';
 
 export const enum UnAuthErrCode {
 	CredentialsBadFormat = 'credentials_bad_format',
@@ -33,7 +33,7 @@ export type GraphicRegRequest = {
 	bundleGit: NodeCG.Bundle.GitData;
 };
 
-export interface ProtocolDefinition extends ServerDefinition {
+export type ProtocolDefinition = {
 	namespaces: {
 		'/': SimpleNamespace<{
 			// Messages the server may send to the clients
@@ -111,7 +111,7 @@ export interface ProtocolDefinition extends ServerDefinition {
 						| {
 								value: any;
 								revision: number;
-								schema: { [k: string]: any };
+								schema: Record<string, any>;
 								schemaSum: string;
 						  };
 					error: string;
@@ -131,13 +131,13 @@ export interface ProtocolDefinition extends ServerDefinition {
 								operations: Array<NodeCG.Replicant.Operation<any>>;
 								opts: NodeCG.Replicant.Options<any>;
 								revision: number;
-								schema: { [k: string]: any };
+								schema: Record<string, any>;
 								schemaSum: string;
 						  };
 					response: {
 						value: any;
 						revision: number;
-						schema?: { [k: string]: any };
+						schema?: Record<string, any>;
 						schemaSum?: string;
 					};
 					error: string;
@@ -171,7 +171,7 @@ export interface ProtocolDefinition extends ServerDefinition {
 			};
 		}>;
 	};
-}
+} & ServerDefinition;
 
 type MissingBits = { id: string };
 export type TypedServer = RootServer<ProtocolDefinition>;

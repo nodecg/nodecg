@@ -6,7 +6,7 @@ import path from 'path';
 import test from 'ava';
 import axios from 'axios';
 import simpleGit from 'simple-git/promise';
-// @ts-ignore
+// @ts-expect-error
 import { replaceInFile } from 'replace-in-file';
 
 // Ours
@@ -18,7 +18,7 @@ const { initSingleInstance, initDashboard, initGraphic } = browser.setup();
 
 import * as C from './helpers/test-constants';
 import * as util from './helpers/utilities';
-import { Page } from 'puppeteer';
+import type { Page } from 'puppeteer';
 
 let singleInstance: Page;
 let dashboard: Page;
@@ -158,7 +158,6 @@ test.serial('refresh individual instance', async (t) => {
 	t.is(refreshMarker, undefined);
 });
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const statusEl = async (page: Page) =>
 	util.shadowSelector(
 		page,
@@ -250,7 +249,10 @@ test.serial('dragging the graphic generates the correct url for obs', async (t) 
 		gl.addEventListener('dragstart', (ev: DragEvent) => {
 			ev.preventDefault();
 
-			if (!ev.dataTransfer) return;
+			if (!ev.dataTransfer) {
+				return;
+			}
+
 			const data = ev.dataTransfer.getData('text/uri-list');
 			console.log(data);
 		});

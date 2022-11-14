@@ -1,4 +1,4 @@
-import { ISession } from 'connect-typeorm';
+import type { ISession } from 'connect-typeorm';
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 // Postgres returns string by default. Return number instead.

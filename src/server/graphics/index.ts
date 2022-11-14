@@ -7,9 +7,9 @@ import express from 'express';
 // Ours
 import { authCheck, injectScripts, sendFile } from '../util';
 import RegistrationCoordinator from './registration';
-import { Replicator } from '../replicant';
-import { RootNS } from '../../types/socket-protocol';
-import BundleManager from '../bundle-manager';
+import type { Replicator } from '../replicant';
+import type { RootNS } from '../../types/socket-protocol';
+import type BundleManager from '../bundle-manager';
 
 export default class GraphicsLib {
 	app = express();
@@ -22,7 +22,7 @@ export default class GraphicsLib {
 		app.use(new RegistrationCoordinator(io, bundleManager, replicator).app);
 
 		app.get('/bundles/:bundleName/graphics*', authCheck, (req, res, next) => {
-			const { bundleName } = req.params as { [k: string]: string };
+			const { bundleName } = req.params as Record<string, string>;
 			const bundle = bundleManager.find(bundleName);
 			if (!bundle) {
 				next();
@@ -48,7 +48,7 @@ export default class GraphicsLib {
 			// This flag is passed to injectScripts, which then injects the client-side portion of the
 			// singleInstance enforcement.
 			let isGraphic = false;
-			bundle.graphics.some(graphic => {
+			bundle.graphics.some((graphic) => {
 				if (`/${graphic.file}` === resName || graphic.file === resName) {
 					isGraphic = true;
 					return true;
@@ -67,7 +67,7 @@ export default class GraphicsLib {
 						createApiInstance: bundle,
 						sound: bundle.soundCues && bundle.soundCues.length > 0,
 					},
-					html => res.send(html),
+					(html) => res.send(html),
 				);
 			} else {
 				sendFile(fileLocation, res, next);

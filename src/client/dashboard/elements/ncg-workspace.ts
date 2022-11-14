@@ -12,8 +12,8 @@ import { timeOut } from '@polymer/polymer/lib/utils/async.js';
 import * as Polymer from '@polymer/polymer';
 import Draggabilly from 'draggabilly';
 import Packery from 'packery';
-import NcgDashboardPanel from './ncg-dashboard-panel';
-import { NodeCG } from '../../../types/nodecg';
+import type NcgDashboardPanel from './ncg-dashboard-panel';
+import type { NodeCG } from '../../../types/nodecg';
 
 class NcgWorkspace extends Polymer.PolymerElement {
 	static get template() {
@@ -185,7 +185,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 				attributeOldValue: false,
 				characterDataOldValue: false,
 			});
-		} catch (_) {
+		} catch (_: unknown) {
 			console.warn('MutationObserver not supported, dashboard panels may be less responsive to DOM changes');
 		}
 	}
@@ -203,12 +203,12 @@ class NcgWorkspace extends Polymer.PolymerElement {
 
 		// Initial sort
 		const sortOrder: string[] = []; // global variable for saving order, used later
-		let rawStoredSortOrder = localStorage.getItem(this.PANEL_SORT_ORDER_STORAGE_KEY);
+		const rawStoredSortOrder = localStorage.getItem(this.PANEL_SORT_ORDER_STORAGE_KEY);
 		if (rawStoredSortOrder) {
 			const storedSortOrder: string[] = JSON.parse(rawStoredSortOrder);
 
 			// Create a hash of items
-			const itemsByFullName: { [k: string]: HTMLElement } = {};
+			const itemsByFullName: Record<string, HTMLElement> = {};
 			const allPanels: string[] = [];
 			let panelName;
 			let bundleName;
@@ -227,9 +227,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 			const allPanelsOrdered = arrayUnique(storedSortOrder.concat(allPanels));
 
 			// Remove panels that no longer exist
-			const removededOld = allPanelsOrdered.filter((val) => {
-				return allPanels.includes(val);
-			});
+			const removededOld = allPanelsOrdered.filter((val) => allPanels.includes(val));
 
 			// Overwrite packery item order
 			len = removededOld.length;

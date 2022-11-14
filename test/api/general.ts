@@ -1,8 +1,9 @@
 // Packages
-import anyTest, { TestInterface } from 'ava';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
 import axios from 'axios';
 import express from 'express';
-import puppeteer from 'puppeteer';
+import type puppeteer from 'puppeteer';
 
 // Ours
 import * as server from '../helpers/server';
@@ -14,7 +15,7 @@ server.setup();
 const { initDashboard } = browser.setup();
 
 import * as C from '../helpers/test-constants';
-import { NodeCG } from '../../src/types/nodecg';
+import type { NodeCG } from '../../src/types/nodecg';
 
 let dashboard: puppeteer.Page;
 test.before(async () => {
@@ -22,7 +23,9 @@ test.before(async () => {
 });
 
 test.serial('should receive messages and fire acknowledgements', async (t) => {
-	t.context.apis.extension.listenFor('clientToServer', (_, cb) => invokeAck(t, cb, null));
+	t.context.apis.extension.listenFor('clientToServer', (_, cb) => {
+		invokeAck(t, cb, null);
+	});
 	await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
@@ -33,7 +36,9 @@ test.serial('should receive messages and fire acknowledgements', async (t) => {
 });
 
 test.serial('should serialize errors sent to acknowledgements', async (t) => {
-	t.context.apis.extension.listenFor('ackErrors', (_, cb) => invokeAck(t, cb, new Error('boom')));
+	t.context.apis.extension.listenFor('ackErrors', (_, cb) => {
+		invokeAck(t, cb, new Error('boom'));
+	});
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
@@ -46,13 +51,17 @@ test.serial('should serialize errors sent to acknowledgements', async (t) => {
 });
 
 test.serial('should resolve acknowledgement promises', async (t) => {
-	t.context.apis.extension.listenFor('ackPromiseResolve', (_, cb) => invokeAck(t, cb));
+	t.context.apis.extension.listenFor('ackPromiseResolve', (_, cb) => {
+		invokeAck(t, cb);
+	});
 	const res = await dashboard.evaluate(() => window.dashboardApi.sendMessage('ackPromiseResolve').catch());
 	t.is(res, undefined);
 });
 
 test.serial('should reject acknowledgement promises if there was an error', async (t) => {
-	t.context.apis.extension.listenFor('ackPromiseReject', (_, cb) => invokeAck(t, cb, new Error('boom')));
+	t.context.apis.extension.listenFor('ackPromiseReject', (_, cb) => {
+		invokeAck(t, cb, new Error('boom'));
+	});
 	const res = await dashboard.evaluate(() =>
 		window.dashboardApi
 			.sendMessage('ackPromiseReject')
@@ -63,7 +72,9 @@ test.serial('should reject acknowledgement promises if there was an error', asyn
 });
 
 test.serial('should not return a promise if the user provided a callback ', async (t) => {
-	t.context.apis.extension.listenFor('ackPromiseCallback', (_, cb) => invokeAck(t, cb));
+	t.context.apis.extension.listenFor('ackPromiseCallback', (_, cb) => {
+		invokeAck(t, cb);
+	});
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
@@ -125,7 +136,7 @@ test.serial.cb('should support multiple listenFor handlers', (t) => {
 		checkDone();
 	});
 
-	dashboard.evaluate(() => {
+	void dashboard.evaluate(() => {
 		window.dashboardApi.sendMessage('multipleListenFor');
 	});
 
@@ -143,11 +154,13 @@ test.serial.cb('should prevent acknowledgements from being called more than once
 
 	t.context.apis.extension.listenFor('singleAckEnforcement', (_, cb) => {
 		if (!cb) {
-			return t.fail('no callback');
+			t.fail('no callback');
+			return;
 		}
 
 		if (cb.handled) {
-			return t.fail('callback already handled');
+			t.fail('callback already handled');
+			return;
 		}
 
 		t.notThrows(cb);
@@ -156,7 +169,8 @@ test.serial.cb('should prevent acknowledgements from being called more than once
 
 	t.context.apis.extension.listenFor('singleAckEnforcement', (_, cb) => {
 		if (!cb) {
-			return t.fail('no callback');
+			t.fail('no callback');
+			return;
 		}
 
 		t.true(cb.handled);
@@ -165,10 +179,10 @@ test.serial.cb('should prevent acknowledgements from being called more than once
 		checkDone();
 	});
 
-	dashboard.evaluate(
+	void dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
-				return window.dashboardApi.sendMessage('singleAckEnforcement', null, resolve);
+				window.dashboardApi.sendMessage('singleAckEnforcement', null, resolve);
 			}),
 	);
 
@@ -214,9 +228,7 @@ test.serial('server - should support intra-context messaging', async (t) => {
 	});
 
 	// Verify that the browser got the right data along with the message.
-	const response = await dashboard.evaluate(() => {
-		return (window as any)._serverToServerData;
-	});
+	const response = await dashboard.evaluate(() => (window as any)._serverToServerData);
 	t.deepEqual(response, { foo: 'bar' });
 	incrementAssert();
 });

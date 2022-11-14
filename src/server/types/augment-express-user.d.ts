@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { User as NodeCGUser } from '../database';
+import type { User as NodeCGUser } from '../database';
 
 declare global {
 	namespace Express {

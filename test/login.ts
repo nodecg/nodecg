@@ -1,11 +1,12 @@
 // Packages
-import anyTest, { TestInterface, ExecutionContext } from 'ava';
+import type { TestInterface, ExecutionContext } from 'ava';
+import anyTest from 'ava';
 import socketIoClient from 'socket.io-client';
 
 // Ours
 import * as server from './helpers/server';
 import * as browser from './helpers/browser';
-import { Page } from 'puppeteer';
+import type { Page } from 'puppeteer';
 
 const test = anyTest as TestInterface<browser.BrowserContext & server.ServerContext>;
 server.setup('nodecg-login.json');

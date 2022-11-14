@@ -13,7 +13,7 @@ keep1;
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
 import Clipboard from 'clipboard';
-import { NodeCG } from '../../../../types/nodecg';
+import type { NodeCG } from '../../../../types/nodecg';
 
 /**
  * @customElement
@@ -368,7 +368,9 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 	}
 
 	_onDrag(event: DragEvent) {
-		if (!event.target || !event.dataTransfer) return;
+		if (!event.target || !event.dataTransfer) {
+			return;
+		}
 
 		const dragged = event.target as HTMLAnchorElement;
 		let obsURL;

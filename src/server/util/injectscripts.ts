@@ -9,7 +9,7 @@ import semver from 'semver';
 // Ours
 import { filteredConfig } from '../config';
 import { noop } from '../util';
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
 type Options = {
 	standalone?: boolean;
@@ -21,7 +21,7 @@ type Options = {
 /**
  * Injects the appropriate assets into a panel, dialog, or graphic.
  */
-export default function(
+export default function (
 	pathOrHtml: string,
 	resourceType: 'panel' | 'dialog' | 'graphic',
 	{ standalone = false, createApiInstance, sound = false, fullbleed = false }: Options = {} as Options,
@@ -35,14 +35,14 @@ export default function(
 		inject(null, pathOrHtml);
 	}
 
-	function inject(err: NodeJS.ErrnoException | null, html: string): void {
+	function inject(err: NodeJS.ErrnoException | undefined, html: string): void {
 		if (err) {
 			throw err;
 		}
 
 		const $ = cheerio.load(html);
-		let scripts = [];
-		let styles = [];
+		const scripts = [];
+		const styles = [];
 
 		// Everything needs the config
 		scripts.push(`<script>window.ncgConfig = ${JSON.stringify(filteredConfig)};</script>`);

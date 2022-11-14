@@ -1,10 +1,10 @@
 // Ours
 import '../../src/client/types/augment-window';
-import { NodeCGAPIClient } from '../../src/client/api/api.client';
+import type { NodeCGAPIClient } from '../../src/client/api/api.client';
 
 declare global {
 	interface Window {
-		__coverage__: { [k: string]: any };
+		__coverage__: Record<string, any>;
 		dashboardApi: NodeCGAPIClient;
 		graphicApi: NodeCGAPIClient;
 		singleInstanceApi: NodeCGAPIClient;

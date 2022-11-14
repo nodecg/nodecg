@@ -3,8 +3,9 @@ import fs from 'fs';
 import path from 'path';
 
 // Packages
-import anyTest, { TestInterface } from 'ava';
-import puppeteer from 'puppeteer';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
+import type puppeteer from 'puppeteer';
 
 // Ours
 import * as server from '../helpers/server';
@@ -78,7 +79,8 @@ test.serial.cb('should react to changes in nested properties of objects', (t) =>
 
 	rep.on('change', (newVal, oldVal, operations) => {
 		if (!newVal) {
-			return t.fail('no value');
+			t.fail('no value');
+			return;
 		}
 
 		if (newVal.a.b.c !== 'nestedChangeOK') {
@@ -122,7 +124,7 @@ test.serial.cb('should only apply array splices from the client once', (t) => {
 		defaultValue: [],
 	});
 
-	dashboard
+	void dashboard
 		.evaluate(
 			async () =>
 				new Promise((resolve) => {
@@ -139,7 +141,7 @@ test.serial.cb('should only apply array splices from the client once', (t) => {
 					t.end();
 				}
 			});
-			dashboard.evaluate(() => (window as any).clientDoubleApplyTest.value.push('test'));
+			void dashboard.evaluate(() => (window as any).clientDoubleApplyTest.value.push('test'));
 		});
 });
 
@@ -240,7 +242,7 @@ test.serial.cb('arrays - should react to changes', (t) => {
 });
 
 test.serial('objects - throw an error when an object is owned by multiple Replicants', (t) => {
-	type ValType = { [k: string]: { [k: string]: string } };
+	type ValType = Record<string, Record<string, string>>;
 	const rep1 = t.context.apis.extension.Replicant<ValType>('multiOwner1');
 	const rep2 = t.context.apis.extension.Replicant<ValType>('multiOwner2');
 	const bar = { bar: 'bar' };
@@ -309,9 +311,7 @@ test.serial.cb.skip('persistent - should persist assignment to database', (t) =>
 test.serial.cb.skip('persistent - should persist changes to database', (t) => {
 	t.plan(1);
 
-	const rep = t.context.apis.extension.Replicant<{
-		[k: string]: string;
-	}>('extensionPersistence', {
+	const rep = t.context.apis.extension.Replicant<Record<string, string>>('extensionPersistence', {
 		persistenceInterval: 0,
 	});
 	rep.value!.nested = 'hey we changed!';

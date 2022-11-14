@@ -16,21 +16,24 @@ import fetch from 'make-fetch-happen';
 // Ours
 import { config } from '../config';
 import createLogger from '../logger';
-import { User, Session, Role, getConnection } from '../database';
+import type { User, Role } from '../database';
+import { Session, getConnection } from '../database';
 import { findUser, upsertUser, getSuperUserRole } from '../database/utils';
 
-type StrategyDoneCb = (error: NodeJS.ErrnoException | null, profile?: User) => void;
+type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
 
 const log = createLogger('nodecg/lib/login');
-const protocol = config.ssl?.enabled || config.login.forceHttpsReturn ? 'https' : 'http';
+const protocol = config.ssl?.enabled ?? config.login.forceHttpsReturn ? 'https' : 'http';
 
 // Required for persistent login sessions.
 // Passport needs ability to serialize and unserialize users out of session.
-passport.serializeUser<User['id']>((user, done) => done(null, user.id));
+passport.serializeUser<User['id']>((user, done) => {
+	done(null, user.id);
+});
 passport.deserializeUser<User['id']>(async (id, done) => {
 	try {
 		done(null, await findUser(id));
-	} catch (error) {
+	} catch (error: unknown) {
 		done(error);
 	}
 });
@@ -64,7 +67,9 @@ if (config.login.steam?.enabled) {
 						provider_hash: profile.id,
 						roles,
 					});
-					return done(null, user);
+					done(undefined, user);
+					return;
+					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 				} catch (error) {
 					done(error);
 				}
@@ -117,7 +122,9 @@ if (config.login.twitch?.enabled) {
 						provider_hash: profile.id,
 						roles,
 					});
-					return done(null, user);
+					done(undefined, user);
+					return;
+					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 				} catch (error) {
 					done(error);
 				}
@@ -181,7 +188,8 @@ if (config.login.discord?.enabled) {
 			) => {
 				if (!config.login.discord) {
 					// Impossible but TS doesn't know that.
-					return done(new Error('Discord login config was impossibly undefined.'));
+					done(new Error('Discord login config was impossibly undefined.'));
+					return;
 				}
 
 				let allowed = false;
@@ -190,9 +198,9 @@ if (config.login.discord?.enabled) {
 					allowed = true;
 				} else if (config.login.discord.allowedGuilds) {
 					// Get guilds that are specified in the config and that user is in
-					const intersectingGuilds = config.login.discord.allowedGuilds.filter((allowedGuild) => {
-						return profile.guilds.some((profileGuild) => profileGuild.id === allowedGuild.guildID);
-					}) as any;
+					const intersectingGuilds = config.login.discord.allowedGuilds.filter((allowedGuild) =>
+						profile.guilds.some((profileGuild) => profileGuild.id === allowedGuild.guildID),
+					) as any;
 
 					const guildRequests = [];
 
@@ -246,7 +254,7 @@ if (config.login.discord?.enabled) {
 					provider_hash: profile.id,
 					roles,
 				});
-				return done(null, user);
+				done(undefined, user);
 			},
 		),
 	);
@@ -296,7 +304,9 @@ if (config.login.local?.enabled) {
 						provider_hash: username,
 						roles,
 					});
-					return done(null, user);
+					done(undefined, user);
+					return;
+					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 				} catch (error) {
 					done(error);
 				}
@@ -310,7 +320,7 @@ export async function createMiddleware(): Promise<express.Application> {
 	const sessionRepository = database.getRepository(Session);
 	const app = express();
 	const redirectPostLogin = (req: express.Request, res: express.Response): void => {
-		const url = req.session?.returnTo || '/dashboard';
+		const url = req.session?.returnTo ?? '/dashboard';
 		delete req.session.returnTo;
 		res.redirect(url);
 		app.emit('login', req.session);

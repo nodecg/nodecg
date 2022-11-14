@@ -2,7 +2,8 @@
 import path from 'path';
 
 // Packages
-import anyTest, { TestInterface } from 'ava';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
 import fse from 'fs-extra';
 import temp from 'temp';
 
@@ -11,8 +12,8 @@ import * as C from './test-constants';
 // Doing some tricks here:
 // This import is ONLY for a type.
 // The import for the value is later in this file.
-import NodeCGServer from '../../src/server/server';
-import serverApiFactory from '../../src/server/api.server';
+import type NodeCGServer from '../../src/server/server';
+import type serverApiFactory from '../../src/server/api.server';
 import populateTestData from './populateTestData';
 
 export type ServerContext = {

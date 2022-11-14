@@ -8,7 +8,7 @@ import defaults from 'json-schema-defaults';
 import extend from 'extend';
 import tv4 from 'tv4';
 
-export function parse(bundleName: string, bundleDir: string, cfgPath: string): { [k: string]: any } {
+export function parse(bundleName: string, bundleDir: string, cfgPath: string): Record<string, any> {
 	if (!fs.existsSync(cfgPath)) {
 		throw new Error(`bundleCfgPath "${cfgPath}" does not exist`);
 	}
@@ -16,7 +16,7 @@ export function parse(bundleName: string, bundleDir: string, cfgPath: string): {
 	let userConfig;
 	try {
 		userConfig = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
-	} catch (_) {
+	} catch (_: unknown) {
 		throw new Error(`bundleCfgPath "${cfgPath}" could not be read. Ensure that it is valid JSON.`);
 	}
 
@@ -41,10 +41,10 @@ export function parse(bundleName: string, bundleDir: string, cfgPath: string): {
 				continue;
 			}
 
-			const _foo: { [k: string]: any } = {};
+			const _foo: Record<string, any> = {};
 			_foo[key] = defaultConfig[key];
 
-			const _tempMerged: { [k: string]: any } = extend(true, _foo, clone(finalConfig));
+			const _tempMerged: Record<string, any> = extend(true, _foo, clone(finalConfig));
 			const result = tv4.validateResult(_tempMerged, schema);
 			if (result.valid) {
 				finalConfig = _tempMerged;
@@ -60,12 +60,11 @@ export function parse(bundleName: string, bundleDir: string, cfgPath: string): {
 	}
 
 	throw new Error(
-		`Config for bundle "${bundleName}" is invalid:\n${result.error.message as string} at ${result.error
-			.dataPath as string}`,
+		`Config for bundle "${bundleName}" is invalid:\n${result.error.message as string} at ${result.error.dataPath!}`,
 	);
 }
 
-export function parseDefaults(bundleName: string, bundleDir: string): { [k: string]: any } {
+export function parseDefaults(bundleName: string, bundleDir: string): Record<string, any> {
 	const cfgSchemaPath = path.resolve(bundleDir, 'configschema.json');
 	if (fs.existsSync(cfgSchemaPath)) {
 		const schema = _parseSchema(bundleName, cfgSchemaPath);
@@ -75,10 +74,10 @@ export function parseDefaults(bundleName: string, bundleDir: string): { [k: stri
 	return {};
 }
 
-function _parseSchema(bundleName: string, schemaPath: string): { [k: string]: any } {
+function _parseSchema(bundleName: string, schemaPath: string): Record<string, any> {
 	try {
 		return JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf8' }));
-	} catch (_) {
+	} catch (_: unknown) {
 		throw new Error(
 			`configschema.json for bundle "${bundleName}" could not be read. Ensure that it is valid JSON.`,
 		);

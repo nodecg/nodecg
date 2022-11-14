@@ -1,10 +1,11 @@
 // Ours
-import { NodeCGAPIBase, AbstractLogger } from '../../shared/api.base';
+import type { AbstractLogger } from '../../shared/api.base';
+import { NodeCGAPIBase } from '../../shared/api.base';
 import ClientReplicant from './replicant';
 import { filteredConfig } from './config';
 import { Logger } from './logger';
-import { TypedClientSocket } from '../../types/socket-protocol';
-import { NodeCG } from '../../types/nodecg';
+import type { TypedClientSocket } from '../../types/socket-protocol';
+import type { NodeCG } from '../../types/nodecg';
 
 type SendMessageCb = (error?: unknown, response?: unknown) => void;
 
@@ -19,8 +20,8 @@ const apiContexts = new Set<NodeCGAPIClient>();
  */
 function _forwardMessageToContext(messageName: string, bundleName: string, data: unknown): void {
 	setTimeout(() => {
-		apiContexts.forEach(ctx => {
-			ctx._messageHandlers.forEach(handler => {
+		apiContexts.forEach((ctx) => {
+			ctx._messageHandlers.forEach((handler) => {
 				if (messageName === handler.messageName && bundleName === handler.bundleName) {
 					handler.func(data);
 				}
@@ -30,6 +31,72 @@ function _forwardMessageToContext(messageName: string, bundleName: string, data:
 }
 
 export class NodeCGAPIClient extends NodeCGAPIBase {
+	static Replicant<T>(name: string, namespace: string, opts: NodeCG.Replicant.Options<T> = {}): ClientReplicant<T> {
+		return new ClientReplicant<T>(name, namespace, opts, (window as any).socket);
+	}
+
+	static sendMessageToBundle(messageName: string, bundleName: string, cb: SendMessageCb): void;
+	static sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): Promise<unknown>;
+	static sendMessageToBundle(messageName: string, bundleName: string, data: unknown, cb: SendMessageCb): void;
+	static sendMessageToBundle(
+		messageName: string,
+		bundleName: string,
+		dataOrCb?: unknown,
+		cb?: SendMessageCb,
+	): void | Promise<unknown> {
+		let data: any = null;
+		if (typeof dataOrCb === 'function') {
+			cb = dataOrCb as SendMessageCb;
+		} else {
+			data = dataOrCb;
+		}
+
+		_forwardMessageToContext(messageName, bundleName, data);
+
+		if (typeof cb === 'function') {
+			window.socket.emit(
+				'message',
+				{
+					bundleName,
+					messageName,
+					content: data,
+				},
+				(err: any, ...args: any[]) => {
+					cb!(err, ...args);
+				},
+			);
+		} else {
+			return new Promise((resolve, reject) => {
+				window.socket.emit(
+					'message',
+					{
+						bundleName,
+						messageName,
+						content: data,
+					},
+					(err: any, ...args: any[]) => {
+						if (err) {
+							reject(err);
+						} else {
+							resolve(args);
+						}
+					},
+				);
+			});
+		}
+	}
+	/* eslint-enable no-dupe-class-members */
+
+	static readReplicant(name: string, namespace: string, cb: ReadReplicantCb): void {
+		window.socket.emit('replicant:read', { name, namespace }, (error, value) => {
+			if (error) {
+				console.error(error);
+			} else {
+				cb(value);
+			}
+		});
+	}
+
 	get Logger(): new (name: string) => AbstractLogger {
 		return Logger;
 	}
@@ -96,7 +163,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 				}
 
 				loadedSums.add(e.data.sum);
-				const foundUnloaded = this._soundCues.some(cue => {
+				const foundUnloaded = this._soundCues.some((cue) => {
 					if (cue.file) {
 						return !loadedSums.has(cue.file.sum);
 					}
@@ -123,7 +190,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		}
 
 		// Upon receiving a message, execute any handlers for it
-		socket.on('message', data => {
+		socket.on('message', (data) => {
 			this.log.trace(
 				'Received message %s (sent to bundle %s) with data:',
 				data.messageName,
@@ -131,90 +198,23 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 				data.content,
 			);
 
-			this._messageHandlers.forEach(handler => {
+			this._messageHandlers.forEach((handler) => {
 				if (data.messageName === handler.messageName && data.bundleName === handler.bundleName) {
 					handler.func(data.content);
 				}
 			});
 		});
 
-		socket.on('error', err => {
+		socket.on('error', (err) => {
 			this.log.warn('Unhandled socket connection error:', err);
 		});
 
-		socket.on('protocol_error', err => {
+		socket.on('protocol_error', (err) => {
 			if (err.type === 'UnauthorizedError') {
 				const url = [location.protocol, '//', location.host, location.pathname].join('');
 				window.location.href = `/authError?code=${err.code as string}&message=${err.message}&viewUrl=${url}`;
 			} else {
 				this.log.error('Unhandled socket protocol error:', err);
-			}
-		});
-	}
-
-	static Replicant<T>(name: string, namespace: string, opts: NodeCG.Replicant.Options<T> = {}): ClientReplicant<T> {
-		return new ClientReplicant<T>(name, namespace, opts, (window as any).socket);
-	}
-
-	/* eslint-disable no-dupe-class-members */
-	static sendMessageToBundle(messageName: string, bundleName: string, cb: SendMessageCb): void;
-	static sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): Promise<unknown>;
-	static sendMessageToBundle(messageName: string, bundleName: string, data: unknown, cb: SendMessageCb): void;
-	static sendMessageToBundle(
-		messageName: string,
-		bundleName: string,
-		dataOrCb?: unknown,
-		cb?: SendMessageCb,
-	): void | Promise<unknown> {
-		let data: any = null;
-		if (typeof dataOrCb === 'function') {
-			cb = dataOrCb as SendMessageCb;
-		} else {
-			data = dataOrCb;
-		}
-
-		_forwardMessageToContext(messageName, bundleName, data);
-
-		if (typeof cb === 'function') {
-			window.socket.emit(
-				'message',
-				{
-					bundleName,
-					messageName,
-					content: data,
-				},
-				(err: any, ...args: any[]) => {
-					cb!(err, ...args);
-				},
-			);
-		} else {
-			return new Promise((resolve, reject) => {
-				window.socket.emit(
-					'message',
-					{
-						bundleName,
-						messageName,
-						content: data,
-					},
-					(err: any, ...args: any[]) => {
-						if (err) {
-							reject(err);
-						} else {
-							resolve(...args);
-						}
-					},
-				);
-			});
-		}
-	}
-	/* eslint-enable no-dupe-class-members */
-
-	static readReplicant(name: string, namespace: string, cb: ReadReplicantCb): void {
-		window.socket.emit('replicant:read', { name, namespace }, (error: NodeJS.ErrnoException, value: unknown) => {
-			if (error) {
-				console.error(error);
-			} else {
-				cb(value);
 			}
 		});
 	}
@@ -233,10 +233,8 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 			return undefined;
 		}
 
-		const dialog = topDoc
-			.querySelector('ncg-dashboard')
-			?.shadowRoot?.querySelector(`#dialogs #${bundle}_${name}`) as HTMLElement;
-		return dialog ?? undefined;
+		const dialog = topDoc.querySelector('ncg-dashboard')?.shadowRoot?.querySelector(`#dialogs #${bundle}_${name}`);
+		return (dialog as HTMLElement) ?? undefined;
 	}
 
 	/**
@@ -256,7 +254,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 	 * Returns undefined if a cue by that name cannot be found in this bundle.
 	 */
 	findCue(cueName: string): NodeCG.SoundCue | undefined {
-		return this._soundCues.find(cue => cue.name === cueName);
+		return this._soundCues.find((cue) => cue.name === cueName);
 	}
 
 	/**
@@ -308,7 +306,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 			throw new Error(`Bundle "${this.bundleName}" has no soundCues`);
 		}
 
-		if (!this._soundCues.find(cue => cue.name === cueName)) {
+		if (!this._soundCues.find((cue) => cue.name === cueName)) {
 			throw new Error(`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`);
 		}
 
@@ -337,7 +335,6 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		window.createjs.Sound.stop();
 	}
 
-	/* eslint-disable no-dupe-class-members */
 	sendMessageToBundle(messageName: string, bundleName: string, cb: SendMessageCb): void;
 	sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): Promise<unknown>;
 	sendMessageToBundle(messageName: string, bundleName: string, data: unknown, cb: SendMessageCb): void;
@@ -347,14 +344,14 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		dataOrCb?: unknown,
 		cb?: SendMessageCb,
 	): void | Promise<unknown> {
-		return NodeCGAPIClient.sendMessageToBundle(messageName, bundleName, dataOrCb, cb as any);
+		NodeCGAPIClient.sendMessageToBundle(messageName, bundleName, dataOrCb, cb as any);
 	}
 
 	sendMessage(messageName: string, cb: SendMessageCb): void;
 	sendMessage(messageName: string, data?: unknown): Promise<unknown>;
 	sendMessage(messageName: string, data: unknown, cb: SendMessageCb): void;
 	sendMessage(messageName: string, dataOrCb?: unknown, cb?: SendMessageCb): void | Promise<unknown> {
-		return this.sendMessageToBundle(messageName, this.bundleName, dataOrCb, cb as any);
+		this.sendMessageToBundle(messageName, this.bundleName, dataOrCb, cb as any);
 	}
 
 	readReplicant(name: string, cb: ReadReplicantCb): void;
@@ -369,7 +366,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 			cb = nspOrCb;
 		}
 
-		return NodeCGAPIClient.readReplicant(name, namespace, cb);
+		NodeCGAPIClient.readReplicant(name, namespace, cb);
 	}
 	/* eslint-enable no-dupe-class-members */
 
@@ -377,12 +374,10 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		name: string,
 		namespace: string,
 		opts: NodeCG.Replicant.Options<T>,
-	): ClientReplicant<T> => {
-		return new ClientReplicant<T>(name, namespace, opts, this.socket);
-	};
+	): ClientReplicant<T> => new ClientReplicant<T>(name, namespace, opts, this.socket);
 
 	private _registerSounds(): void {
-		this._soundCues.forEach(cue => {
+		this._soundCues.forEach((cue) => {
 			if (!cue.file) {
 				return;
 			}
@@ -413,8 +408,8 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		const instancesArr = (window.createjs.Sound as any)._instances as createjs.AbstractSoundInstance[];
 
 		// Update the volume of any playing instances that haven't opted out of automatic volume updates.
-		this._soundCues.forEach(cue => {
-			instancesArr.forEach(instance => {
+		this._soundCues.forEach((cue) => {
+			instancesArr.forEach((instance) => {
 				const meta = soundMetadata.get(instance);
 				if (meta && meta.cueName === cue.name && meta.updateVolume) {
 					this._setInstanceVolume(instance, cue);

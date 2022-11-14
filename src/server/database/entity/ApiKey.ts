@@ -7,9 +7,6 @@ export class ApiKey {
 	@Generated('uuid')
 	secret_key: string;
 
-	@ManyToOne(
-		() => User,
-		user => user.apiKeys,
-	)
+	@ManyToOne(() => User, (user) => user.apiKeys)
 	user: User;
 }

@@ -67,10 +67,10 @@ class NcgAssetFile extends Polymer.PolymerElement {
 	_handleDeleteClick() {
 		this.deleting = true;
 
-		fetch(this.file.url, {
+		void fetch(this.file.url, {
 			method: 'DELETE',
 			credentials: 'include',
-		}).then(response => {
+		}).then((response) => {
 			if (response.status === 410 || response.status === 200) {
 				this.dispatchEvent(new CustomEvent('deleted', { bubbles: true, composed: true }));
 			} else {

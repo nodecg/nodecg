@@ -68,7 +68,7 @@ class UiSelect extends Polymer.PolymerElement {
 
 	ready(): void {
 		super.ready();
-		['item', 'add', 'remove'].forEach(methodToForward => {
+		['item', 'add', 'remove'].forEach((methodToForward) => {
 			this[methodToForward] = this.$.select[methodToForward].bind(this.$.select);
 		});
 	}
@@ -85,7 +85,7 @@ class UiSelect extends Polymer.PolymerElement {
 
 		// Move all Light DOM <option> elements into the local Shadow DOM.
 		const options = this.querySelectorAll('option');
-		options.forEach(option => {
+		options.forEach((option) => {
 			this.$.select.add(option);
 		});
 

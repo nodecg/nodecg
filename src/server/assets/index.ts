@@ -12,9 +12,9 @@ import sha1File from 'sha1-file';
 import AssetFile from './AssetFile';
 import { authCheck, debounceName, sendFile } from '../util';
 import createLogger from '../logger';
-import Replicator from '../replicant/replicator';
-import ServerReplicant from '../replicant/server-replicant';
-import { NodeCG } from '../../types/nodecg';
+import type Replicator from '../replicant/replicator';
+import type ServerReplicant from '../replicant/server-replicant';
+import type { NodeCG } from '../../types/nodecg';
 
 type Collection = {
 	name: string;
@@ -56,7 +56,7 @@ export default class AssetManager {
 	private _computeCollections(bundles: NodeCG.Bundle[]): { collections: Collection[]; watchPatterns: Set<string> } {
 		const watchPatterns = new Set<string>();
 		const collections: Collection[] = [];
-		bundles.forEach(bundle => {
+		bundles.forEach((bundle) => {
 			if (!bundle.hasAssignableSoundCues && (!bundle.assetCategories || bundle.assetCategories.length <= 0)) {
 				return;
 			}
@@ -98,7 +98,7 @@ export default class AssetManager {
 				);
 
 				if (category.allowedTypes && category.allowedTypes.length > 0) {
-					category.allowedTypes.forEach(type => {
+					category.allowedTypes.forEach((type) => {
 						watchPatterns.add(`${categoryPath}/**/*.${type}`);
 					});
 				} else {
@@ -114,7 +114,7 @@ export default class AssetManager {
 		// Chokidar no longer accepts Windows-style path separators when using globs.
 		// Therefore, we must replace them with Unix-style ones.
 		// See https://github.com/paulmillr/chokidar/issues/777 for more details.
-		const fixedPaths = Array.from(watchPatterns).map(pattern => pattern.replace(/\\/g, '/'));
+		const fixedPaths = Array.from(watchPatterns).map((pattern) => pattern.replace(/\\/g, '/'));
 		const watcher = chokidar.watch(fixedPaths, { ignored: /[/\\]\./ });
 
 		/* When the Chokidar watcher first starts up, it will fire an 'add' event for each file found.
@@ -123,8 +123,8 @@ export default class AssetManager {
 		 * This is what the ready Boolean, deferredFiles Map, and resolveDeferreds function are for.
 		 */
 		let ready = false;
-		const deferredFiles = new Map<string, AssetFile | null>();
-		watcher.on('add', filepath => {
+		const deferredFiles = new Map<string, AssetFile | undefined>();
+		watcher.on('add', (filepath) => {
 			if (!ready) {
 				deferredFiles.set(filepath, null);
 			}
@@ -156,7 +156,7 @@ export default class AssetManager {
 			ready = true;
 		});
 
-		watcher.on('change', filepath => {
+		watcher.on('change', (filepath) => {
 			debounceName(filepath, () => {
 				sha1File(filepath, (err, sum) => {
 					if (err) {
@@ -170,7 +170,7 @@ export default class AssetManager {
 						throw new Error('should have had a replicant here');
 					}
 
-					const index = rep.value!.findIndex(uf => uf.url === newUploadedFile.url);
+					const index = rep.value!.findIndex((uf) => uf.url === newUploadedFile.url);
 					if (index > -1) {
 						rep.value!.splice(index, 1, newUploadedFile);
 					} else {
@@ -180,7 +180,7 @@ export default class AssetManager {
 			});
 		});
 
-		watcher.on('unlink', filepath => {
+		watcher.on('unlink', (filepath) => {
 			const deletedFile = new AssetFile(filepath, 'temp');
 			const rep = this._getCollectRep(deletedFile.namespace, deletedFile.category);
 			if (!rep) {
@@ -198,7 +198,7 @@ export default class AssetManager {
 			});
 		});
 
-		watcher.on('error', e => this.log.error(e.stack));
+		watcher.on('error', (e) => this.log.error(e.stack));
 	}
 
 	private _setupExpress(): ReturnType<typeof express> {
@@ -207,7 +207,7 @@ export default class AssetManager {
 			storage: multer.diskStorage({
 				destination: this.assetsRoot,
 				filename(req, file, cb) {
-					const p = req.params as { [k: string]: string };
+					const p = req.params as Record<string, string>;
 					cb(null, `${p.namespace}/${p.category}/${file.originalname}`);
 				},
 			}),
@@ -242,7 +242,7 @@ export default class AssetManager {
 
 			// Then receive the files they are sending, up to a max of 64.
 			(req, res, next) => {
-				uploader(req, res, err => {
+				uploader(req, res, (err) => {
 					if (err) {
 						console.error(err);
 						res.send(500);
@@ -272,10 +272,10 @@ export default class AssetManager {
 
 			// Delete the file (or an send appropriate error).
 			(req, res) => {
-				const { namespace, category, filename } = req.params as { [k: string]: string };
+				const { namespace, category, filename } = req.params as Record<string, string>;
 				const fullPath = path.join(this.assetsRoot, namespace, category, filename);
 
-				fs.unlink(fullPath, err => {
+				fs.unlink(fullPath, (err) => {
 					if (err) {
 						if (err.code === 'ENOENT') {
 							return res.status(410).send(`The file to delete does not exist: ${filename}`);
@@ -303,16 +303,16 @@ export default class AssetManager {
 		return assetsPath;
 	}
 
-	private _resolveDeferreds(deferredFiles: Map<string, AssetFile | null>): void {
+	private _resolveDeferreds(deferredFiles: Map<string, AssetFile | undefined>): void {
 		let foundNull = false;
-		deferredFiles.forEach(uf => {
+		deferredFiles.forEach((uf) => {
 			if (uf === null) {
 				foundNull = true;
 			}
 		});
 
 		if (!foundNull) {
-			deferredFiles.forEach(uploadedFile => {
+			deferredFiles.forEach((uploadedFile) => {
 				if (!uploadedFile) {
 					return;
 				}

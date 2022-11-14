@@ -1,7 +1,7 @@
 // Ours
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
-export default function(manifest: Pick<NodeCG.Manifest, 'assetCategories' | 'name'>): NodeCG.Bundle.AssetCategory[] {
+export default function (manifest: Pick<NodeCG.Manifest, 'assetCategories' | 'name'>): NodeCG.Bundle.AssetCategory[] {
 	if (!manifest.assetCategories) {
 		return [];
 	}

@@ -147,7 +147,7 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 				log: false,
 				resizeFrom: 'child',
 				heightCalculationMethod: 'documentElementOffset',
-				onResized: (data: any) => {
+				onResized(data: any) {
 					data.iframe.dispatchEvent(new CustomEvent('iframe-resized'));
 				},
 			},

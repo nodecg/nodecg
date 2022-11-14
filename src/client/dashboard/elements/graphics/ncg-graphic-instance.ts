@@ -10,7 +10,7 @@ keep1;
 
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
-import { NodeCG } from '../../../../types/nodecg';
+import type { NodeCG } from '../../../../types/nodecg';
 const pulseElement = document.createElement('div');
 setInterval(() => {
 	pulseElement.dispatchEvent(
@@ -299,9 +299,15 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 				hideDiff(false);
 			}
 		});
-		this.$.status.addEventListener('mouseleave', () => hideDiff(false));
-		this.$.diff.addEventListener('mouseleave', () => hideDiff(false));
-		this.$.diff.addEventListener('close', () => hideDiff(true));
+		this.$.status.addEventListener('mouseleave', () => {
+			hideDiff(false);
+		});
+		this.$.diff.addEventListener('mouseleave', () => {
+			hideDiff(false);
+		});
+		this.$.diff.addEventListener('close', () => {
+			hideDiff(true);
+		});
 	}
 
 	reload() {

@@ -42,7 +42,7 @@ import template from 'lodash.template';
 import memoize from 'fast-memoize';
 import transformMiddleware from 'express-transform-bare-module-specifiers';
 import compression from 'compression';
-import { Server } from 'http';
+import type { Server } from 'http';
 import SocketIO from 'socket.io';
 import appRootPath from 'app-root-path';
 
@@ -53,7 +53,7 @@ import socketAuthMiddleware from '../login/socketAuthMiddleware';
 import socketApiMiddleware from './socketApiMiddleware';
 import Replicator from '../replicant/replicator';
 import * as db from '../database';
-import { TypedServer } from '../../types/socket-protocol';
+import type { TypedServer } from '../../types/socket-protocol';
 import GraphicsLib from '../graphics';
 import DashboardLib from '../dashboard';
 import MountsLib from '../mounts';
@@ -62,11 +62,9 @@ import AssetManager from '../assets';
 import SharedSourcesLib from '../shared-sources';
 import ExtensionManager from './extensions';
 import SentryConfig from '../util/sentry-config';
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
-const renderTemplate = memoize((content, options) => {
-	return template(content)(options);
-});
+const renderTemplate = memoize((content, options) => template(content)(options));
 
 export default class NodeCGServer extends EventEmitter {
 	readonly log = createLogger('server');
@@ -84,7 +82,7 @@ export default class NodeCGServer extends EventEmitter {
 	/**
 	 * Only used by tests. Gross hack.
 	 */
-	// @ts-ignore
+	// @ts-expect-error Used only by tests.
 	private _bundleManager: BundleManager;
 
 	constructor() {
@@ -332,7 +330,7 @@ export default class NodeCGServer extends EventEmitter {
 		this.emit('stopped');
 	}
 
-	getExtensions(): { [k: string]: unknown } {
+	getExtensions(): Record<string, unknown> {
 		return { ...this._extensionManager.extensions };
 	}
 
@@ -340,7 +338,5 @@ export default class NodeCGServer extends EventEmitter {
 		return this._io;
 	}
 
-	mount: NodeCG.Middleware = (...args: any[]) => {
-		return this._app.use(...args);
-	};
+	mount: NodeCG.Middleware = (...args: any[]) => this._app.use(...args);
 }

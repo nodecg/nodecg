@@ -9,9 +9,9 @@ import appRootPath from 'app-root-path';
 
 // Ours
 import { config } from '../config';
-import BundleManager from '../bundle-manager';
+import type BundleManager from '../bundle-manager';
 import { authCheck, pjson } from '../util';
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
 const VIEWS_PATH = path.join(appRootPath.path, 'src/server/util');
 const baseSentryConfig = {
@@ -29,8 +29,8 @@ export default class SentryConfig {
 		app.set('views', VIEWS_PATH);
 
 		bundleManager.on('init', () => {
-			Sentry.configureScope(scope => {
-				bundleManager.all().forEach(bundle => {
+			Sentry.configureScope((scope) => {
+				bundleManager.all().forEach((bundle) => {
 					bundleMetadata.push({
 						name: bundle.name,
 						git: bundle.git,
@@ -41,8 +41,8 @@ export default class SentryConfig {
 			});
 		});
 
-		bundleManager.on('gitChanged', bundle => {
-			const metadataToUpdate = bundleMetadata.find(data => data.name === bundle.name);
+		bundleManager.on('gitChanged', (bundle) => {
+			const metadataToUpdate = bundleMetadata.find((data) => data.name === bundle.name);
 			if (!metadataToUpdate) {
 				return;
 			}

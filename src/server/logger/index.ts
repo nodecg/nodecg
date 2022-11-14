@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/node';
 // Ours
 import { config } from '../config';
 import loggerFactory from './logger.server';
-import { LoggerInterface } from '../../shared/logger-interface';
+import type { LoggerInterface } from '../../shared/logger-interface';
 
 export let Logger: new (name: string) => LoggerInterface;
 if (config.sentry?.enabled) {
@@ -13,6 +13,6 @@ if (config.sentry?.enabled) {
 	Logger = loggerFactory(config.logging as any);
 }
 
-export default function(name: string): LoggerInterface {
+export default function (name: string): LoggerInterface {
 	return new Logger(name);
 }

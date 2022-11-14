@@ -7,7 +7,7 @@ import * as server from './helpers/server';
 server.setup();
 
 import * as C from './helpers/test-constants';
-import { NodeCG } from '../src/types/nodecg';
+import type { NodeCG } from '../src/types/nodecg';
 
 test('should load bundles which have satisfied bundle dependencies', (t) => {
 	const allBundles: NodeCG.Bundle[] = (t as any).context.server._bundleManager.all();

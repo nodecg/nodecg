@@ -15,5 +15,7 @@
 /test/fixtures/bundle-parser/bad-json/bundleConfig.json
 /test/fixtures/bundle-parser/bad-schema/configschema.json
 /test/fixtures/bundle-parser/invalid-manifest-json/package.json
+/test/fixtures/nodecg-core/bundles/test-bundle/schemas/badSchema.json
+/test/fixtures/nodecg-core/cfg/invalidJSON.json
 
 /coverage

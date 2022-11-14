@@ -6,8 +6,8 @@ import clone from 'clone';
 // Ours
 import { AbstractReplicant, isIgnoringProxy } from '../../shared/replicants.shared';
 import createLogger from './logger';
-import { TypedClientSocket } from '../../types/socket-protocol';
-import { NodeCG } from '../../types/nodecg';
+import type { TypedClientSocket } from '../../types/socket-protocol';
+import type { NodeCG } from '../../types/nodecg';
 
 const declaredReplicants = new Map<string, Map<string, ClientReplicant<any>>>();
 
@@ -84,16 +84,20 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 		// Initialize the Replicant.
 		this._declare();
 
-		socket.on('replicant:operations', (data) =>
+		socket.on('replicant:operations', (data) => {
 			this._handleOperations({
 				...data,
 				operations: data.operations as Array<NodeCG.Replicant.Operation<T>>,
-			}),
-		);
+			});
+		});
 
 		// If we lose connection, redeclare everything on reconnect
-		socket.on('disconnect', () => this._handleDisconnect());
-		socket.on('reconnect', () => this._declare());
+		socket.on('disconnect', () => {
+			this._handleDisconnect();
+		});
+		socket.on('reconnect', () => {
+			this._declare();
+		});
 
 		const thisProxy = new Proxy(this, REPLICANT_HANDLER);
 		declaredReplicants.get(namespace)!.set(name, thisProxy);
@@ -104,8 +108,8 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 	 * A map of all Replicants declared in this context. Top-level keys are namespaces,
 	 * child keys are Replicant names.
 	 */
-	static get declaredReplicants(): { [k: string]: { [k: string]: ClientReplicant<unknown> } } {
-		const foo: { [k: string]: { [k: string]: ClientReplicant<unknown> } } = {};
+	static get declaredReplicants(): Record<string, Record<string, ClientReplicant<unknown>>> {
+		const foo: Record<string, Record<string, ClientReplicant<unknown>>> = {};
 		for (const [key, nsp] of declaredReplicants) {
 			foo[key] = Object.fromEntries(Object.entries(nsp));
 		}
@@ -126,7 +130,9 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 			this._pendingOperationFlush = true;
 
 			if (this.status === 'declared') {
-				setTimeout(() => this._flushOperations(), 0);
+				setTimeout(() => {
+					this._flushOperations();
+				}, 0);
 			} else {
 				this._queueAction(this._flushOperations);
 			}

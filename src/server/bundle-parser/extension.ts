@@ -3,9 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // Ours
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
-export default function(bundleDir: string, manifest: NodeCG.Manifest): boolean {
+export default function (bundleDir: string, manifest: NodeCG.Manifest): boolean {
 	const singleFilePath = path.resolve(bundleDir, 'extension.js');
 	const directoryPath = path.resolve(bundleDir, 'extension');
 	const singleFileExists = fs.existsSync(singleFilePath);

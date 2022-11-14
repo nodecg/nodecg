@@ -4,16 +4,16 @@ import isError from 'is-error';
 import serializeError from 'serialize-error';
 
 // Ours
-import { NodeCGAPIBase, AbstractLogger, Acknowledgement } from '../shared/api.base';
-import { Replicator, ServerReplicant } from './replicant';
+import type { AbstractLogger, Acknowledgement } from '../shared/api.base';
+import { NodeCGAPIBase } from '../shared/api.base';
+import type { Replicator, ServerReplicant } from './replicant';
 import { filteredConfig } from './config';
 import { Logger } from './logger';
 import * as ncgUtils from './util';
-import { RootNS } from '../types/socket-protocol';
-import { NodeCG } from '../types/nodecg';
+import type { RootNS } from '../types/socket-protocol';
+import type { NodeCG } from '../types/nodecg';
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: unknown }, mount: NodeCG.Middleware) => {
+export default (io: RootNS, replicator: Replicator, extensions: Record<string, unknown>, mount: NodeCG.Middleware) => {
 	const apiContexts = new Set<NodeCGAPIBase>();
 
 	/**
@@ -22,8 +22,8 @@ export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: u
 	 */
 	function _forwardMessageToContext(messageName: string, bundleName: string, data: unknown): void {
 		process.nextTick(() => {
-			apiContexts.forEach(ctx => {
-				ctx._messageHandlers.forEach(handler => {
+			apiContexts.forEach((ctx) => {
+				ctx._messageHandlers.forEach((handler) => {
 					if (messageName === handler.messageName && bundleName === handler.bundleName) {
 						handler.func(data);
 					}
@@ -33,6 +33,40 @@ export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: u
 	}
 
 	return class NodeCGAPIServer extends NodeCGAPIBase {
+		static sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): void {
+			_forwardMessageToContext(messageName, bundleName, data);
+			io.emit('message', {
+				bundleName,
+				messageName,
+				content: data,
+			});
+		}
+
+		static readReplicant(name: string, namespace: string): unknown {
+			if (!name || typeof name !== 'string') {
+				throw new Error('Must supply a name when reading a Replicant');
+			}
+
+			if (!namespace || typeof namespace !== 'string') {
+				throw new Error('Must supply a namespace when reading a Replicant');
+			}
+
+			const replicant = replicator.declare(name, namespace);
+			return replicant.value;
+		}
+
+		static Replicant<T>(name: string, namespace: string, opts: NodeCG.Replicant.Options<T>): ServerReplicant<T> {
+			if (!name || typeof name !== 'string') {
+				throw new Error('Must supply a name when reading a Replicant');
+			}
+
+			if (!namespace || typeof namespace !== 'string') {
+				throw new Error('Must supply a namespace when reading a Replicant');
+			}
+
+			return replicator.declare(name, namespace, opts);
+		}
+
 		get Logger(): new (name: string) => AbstractLogger {
 			return Logger;
 		}
@@ -91,7 +125,7 @@ export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: u
 		 *     // Now I can use `otherBundle`!
 		 * }
 		 */
-		get extensions(): { [k: string]: unknown } {
+		get extensions(): Record<string, unknown> {
 			return extensions;
 		}
 
@@ -103,15 +137,15 @@ export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: u
 		 */
 		mount = mount;
 
-		private _memoizedLogger?: AbstractLogger;
+		_memoizedLogger?: AbstractLogger;
 
 		constructor(bundle: NodeCG.Bundle) {
 			super(bundle);
 			apiContexts.add(this);
-			io.on('connection', socket => {
+			io.on('connection', (socket) => {
 				socket.on('message', (data, ack) => {
 					const wrappedAck = _wrapAcknowledgement(ack);
-					this._messageHandlers.forEach(handler => {
+					this._messageHandlers.forEach((handler) => {
 						if (data.messageName === handler.messageName && data.bundleName === handler.bundleName) {
 							handler.func(data.content, wrappedAck);
 						}
@@ -120,48 +154,12 @@ export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: u
 			});
 		}
 
-		static sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): void {
-			_forwardMessageToContext(messageName, bundleName, data);
-			io.emit('message', {
-				bundleName,
-				messageName,
-				content: data,
-			});
-		}
-
-		static readReplicant(name: string, namespace: string): unknown {
-			if (!name || typeof name !== 'string') {
-				throw new Error('Must supply a name when reading a Replicant');
-			}
-
-			if (!namespace || typeof namespace !== 'string') {
-				throw new Error('Must supply a namespace when reading a Replicant');
-			}
-
-			const replicant = replicator.declare(name, namespace);
-			return replicant.value;
-		}
-
-		static Replicant<T>(name: string, namespace: string, opts: NodeCG.Replicant.Options<T>): ServerReplicant<T> {
-			if (!name || typeof name !== 'string') {
-				throw new Error('Must supply a name when reading a Replicant');
-			}
-
-			if (!namespace || typeof namespace !== 'string') {
-				throw new Error('Must supply a namespace when reading a Replicant');
-			}
-
-			return replicator.declare(name, namespace, opts);
-		}
-
 		/**
 		 * _Extension only_<br/>
 		 * Gets the server Socket.IO context.
 		 * @function
 		 */
-		readonly getSocketIOServer = (): RootNS => {
-			return io;
-		};
+		readonly getSocketIOServer = (): RootNS => io;
 
 		/**
 		 * Sends a message to a specific bundle. Also available as a static method.
@@ -177,6 +175,7 @@ export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: u
 		 */
 		sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): void {
 			this.log.trace('Sending message %s to bundle %s with data:', messageName, bundleName, data);
+			// eslint-disable-next-line prefer-rest-params
 			return NodeCGAPIServer.sendMessageToBundle.apply(NodeCGAPIBase, arguments);
 		}
 
@@ -252,7 +251,7 @@ export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: u
 		 * });
 		 */
 		sendMessage(messageName: string, data?: unknown): void {
-			return this.sendMessageToBundle(messageName, this.bundleName, data);
+			this.sendMessageToBundle(messageName, this.bundleName, data);
 		}
 
 		/**
@@ -275,7 +274,7 @@ export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: u
 		 * });
 		 */
 		readReplicant(name: string, param2?: string | NodeCG.Bundle): unknown {
-			let bundleName = this.bundleName;
+			let { bundleName } = this;
 			if (typeof param2 === 'string') {
 				bundleName = param2;
 			} else if (typeof param2 === 'object' && bundleName in param2) {
@@ -285,13 +284,11 @@ export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: u
 			return (this.constructor as any).readReplicant(name, bundleName);
 		}
 
-		protected _replicantFactory = <T>(
+		_replicantFactory = <T>(
 			name: string,
 			namespace: string,
 			opts: NodeCG.Replicant.Options<T>,
-		): ServerReplicant<T> => {
-			return replicator.declare(name, namespace, opts);
-		};
+		): ServerReplicant<T> => replicator.declare(name, namespace, opts);
 	};
 };
 
@@ -307,7 +304,7 @@ export default (io: RootNS, replicator: Replicator, extensions: { [k: string]: u
  */
 function _wrapAcknowledgement(ack: (err?: any, response?: unknown) => void): Acknowledgement {
 	let handled = false;
-	const wrappedAck = function(firstArg: any, ...restArgs: any[]): void {
+	const wrappedAck = function (firstArg: any, ...restArgs: any[]): void {
 		if (handled) {
 			throw new Error('Acknowledgement already handled');
 		}

@@ -1,6 +1,7 @@
-import * as ExpressCore from 'express-serve-static-core';
-import express from 'express';
-import { Except } from 'type-fest';
+/* eslint-disable @typescript-eslint/no-namespace */
+import type * as ExpressCore from 'express-serve-static-core';
+import type express from 'express';
+import type { Except } from 'type-fest';
 
 type Person =
 	| {
@@ -10,7 +11,7 @@ type Person =
 	  }
 	| string;
 
-interface SocketIOConnectionEvents {
+type SocketIOConnectionEvents = {
 	connect: void;
 	connect_error: (error: Error) => void;
 	connect_timeout: void;
@@ -21,7 +22,7 @@ interface SocketIOConnectionEvents {
 	reconnecting: (attemptNumber: number) => void;
 	reconnect_error: (error: Error) => void;
 	reconnect_failed: void;
-}
+};
 
 export namespace NodeCG {
 	export namespace Manifest {
@@ -62,7 +63,7 @@ export namespace NodeCG {
 			defaultFile?: string;
 		};
 
-		export type UnparsedBundleDependencies = { [k: string]: string };
+		export type UnparsedBundleDependencies = Record<string, string>;
 
 		export type UnparsedManifest = {
 			compatibleRange: string;
@@ -92,7 +93,7 @@ export namespace NodeCG {
 
 	export namespace Bundle {
 		export type GitData =
-			| null
+			| undefined
 			| {
 					branch: string;
 					hash: string;
@@ -156,7 +157,7 @@ export namespace NodeCG {
 		transformBareModuleSpecifiers: boolean;
 		hasAssignableSoundCues: boolean;
 		hasExtension: boolean;
-		config: { [k: string]: any };
+		config: Record<string, any>;
 		dashboard: {
 			dir: string;
 			panels: Bundle.Panel[];
@@ -169,9 +170,9 @@ export namespace NodeCG {
 		bundleDependencies?: Bundle.BundleDependencies;
 	};
 
-	export interface SocketEvents extends SocketIOConnectionEvents {
+	export type SocketEvents = {
 		foo: (bar: number) => void;
-	}
+	} & SocketIOConnectionEvents;
 
 	export type FilteredConfig = {
 		host: string;
@@ -234,18 +235,18 @@ export namespace NodeCG {
 		assignable: boolean;
 		channels?: number;
 		bundleName?: TemplateStringsArray;
-		defaultVolume?: number | null;
+		defaultVolume?: number | undefined;
 		defaultFile?: CueFile;
 	};
 
-	export interface AssetFile {
+	export type AssetFile = {
 		sum: string;
 		base: string;
 		ext: string;
 		name: string;
 		namespace: string;
 		url: string;
-	}
+	};
 
 	export namespace Replicant {
 		export type Options<T> = {

@@ -1,6 +1,7 @@
 // Packages
 import sinon from 'sinon';
-import anyTest, { TestInterface } from 'ava';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
 
 // Ours
 import loggerFactory from '../../src/client/api/logger/logger.client';
@@ -77,13 +78,13 @@ test('logging methods should all do nothing when _silent is true', (t) => {
 	info.restore();
 
 	// Warn
-	let warn = sinon.spy(console, 'warn');
+	const warn = sinon.spy(console, 'warn');
 	t.context.logger.warn('warn');
 	t.is(warn.called, false);
 	warn.restore();
 
 	// Error
-	let error = sinon.spy(console, 'error');
+	const error = sinon.spy(console, 'error');
 	t.context.logger.error('error');
 	t.is(error.called, false);
 	error.restore();
@@ -118,13 +119,13 @@ test('logging methods should all do nothing when the log level is above them', (
 	info.restore();
 
 	// Warn
-	let warn = sinon.spy(console, 'warn');
+	const warn = sinon.spy(console, 'warn');
 	t.context.logger.warn('warn');
 	t.is(warn.called, false);
 	warn.restore();
 
 	// Error
-	let error = sinon.spy(console, 'error');
+	const error = sinon.spy(console, 'error');
 	t.context.logger.error('error');
 	t.is(error.called, false);
 	error.restore();
@@ -153,13 +154,13 @@ test('logging methods should all prepend the instance name to the output', (t) =
 	info.restore();
 
 	// Warn
-	let warn = sinon.spy(console, 'warn');
+	const warn = sinon.spy(console, 'warn');
 	t.context.logger.warn('warn');
 	t.deepEqual(warn.getCall(0).args, ['[testClient]', 'warn']);
 	warn.restore();
 
 	// Error
-	let error = sinon.spy(console, 'error');
+	const error = sinon.spy(console, 'error');
 	t.context.logger.error('error');
 	t.deepEqual(error.getCall(0).args, ['[testClient]', 'error']);
 	error.restore();

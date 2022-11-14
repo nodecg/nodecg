@@ -1,7 +1,7 @@
 // Ours
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
-export default function(manifest: Pick<NodeCG.Manifest, 'mount' | 'name'>): NodeCG.Bundle.Mount[] {
+export default function (manifest: Pick<NodeCG.Manifest, 'mount' | 'name'>): NodeCG.Bundle.Mount[] {
 	const mounts: NodeCG.Bundle.Mount[] = [];
 
 	// Return early if no mounts

@@ -9,7 +9,7 @@ keep1;
 /* eslint-enable @typescript-eslint/no-unused-expressions */
 
 import * as Polymer from '@polymer/polymer';
-import { NodeCG as NCGTypes } from '../../../../types/nodecg';
+import type { NodeCG as NCGTypes } from '../../../../types/nodecg';
 export class NcgSoundCue extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`
@@ -155,7 +155,7 @@ export class NcgSoundCue extends Polymer.PolymerElement {
 			const defaultOption = document.createElement('option');
 			defaultOption.value = 'default';
 			defaultOption.innerText = 'Default';
-			if (this.file && this.file.default) {
+			if (this.file?.default) {
 				defaultOption.setAttribute('selected', 'true');
 			}
 

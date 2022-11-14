@@ -43,9 +43,7 @@ class NcgGraphics extends MutableData(Polymer.PolymerElement) {
 		return {
 			bundlesWithGraphics: {
 				type: Array,
-				value: window.__renderData__.bundles.filter((bundle) => {
-					return bundle.graphics && bundle.graphics.length > 0;
-				}),
+				value: window.__renderData__.bundles.filter((bundle) => bundle.graphics && bundle.graphics.length > 0),
 			},
 			_graphicInstances: Array,
 		};

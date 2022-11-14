@@ -1,5 +1,5 @@
 // Packages
-import express from 'express';
+import type express from 'express';
 
 // Ours
 import { getConnection, ApiKey } from '../database';
@@ -12,7 +12,8 @@ import { config } from '../config';
 export default async function (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
 	try {
 		if (!config.login?.enabled) {
-			return next();
+			next();
+			return;
 		}
 
 		// To set a cookie on localhost, domain must be left blank
@@ -21,7 +22,7 @@ export default async function (req: express.Request, res: express.Response, next
 			domain = undefined;
 		}
 
-		let user = req.user;
+		let { user } = req;
 		if (req.query.key ?? req.cookies.socketToken) {
 			const database = await getConnection();
 			const apiKey = await database.getRepository(ApiKey).findOne(
@@ -59,7 +60,8 @@ export default async function (req: express.Request, res: express.Response, next
 				req.session.returnTo = req.url;
 			}
 
-			return res.status(403).redirect('/login');
+			res.status(403).redirect('/login');
+			return;
 		}
 
 		const allowed = isSuperUser(user);
@@ -72,19 +74,21 @@ export default async function (req: express.Request, res: express.Response, next
 			// where we don't have a session.
 			res.cookie('socketToken', user.apiKeys[0].secret_key, {
 				path: '/',
-				domain: domain as string,
+				domain: domain!,
 				secure: config.ssl?.enabled,
 			});
 
-			return next();
+			next();
+			return;
 		}
 
 		if (req.session) {
 			req.session.returnTo = req.url;
 		}
 
-		return res.status(403).redirect('/login');
-	} catch (error) {
+		res.status(403).redirect('/login');
+		return;
+	} catch (error: unknown) {
 		next(error);
 	}
 }

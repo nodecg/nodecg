@@ -1,6 +1,7 @@
 // Packages
-import anyTest, { TestInterface } from 'ava';
-import puppeteer from 'puppeteer';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
+import type puppeteer from 'puppeteer';
 
 // Ours
 import * as server from '../helpers/server';
@@ -47,22 +48,18 @@ test.serial('should receive messages', async (t) => {
 
 test.serial.cb('should send messages', (t) => {
 	t.context.apis.extension.listenFor('graphicToServer', t.end);
-	graphic.evaluate(() => {
+	void graphic.evaluate(() => {
 		window.graphicApi.sendMessage('graphicToServer');
 	});
 });
 
 test.serial('#bundleVersion', async (t) => {
-	const res = await graphic.evaluate(() => {
-		return window.graphicApi.bundleVersion;
-	});
+	const res = await graphic.evaluate(() => window.graphicApi.bundleVersion);
 	t.is(res, '0.0.1');
 });
 
 test.serial('#bundleGit', async (t) => {
-	const res = await graphic.evaluate(() => {
-		return window.graphicApi.bundleGit;
-	});
+	const res = await graphic.evaluate(() => window.graphicApi.bundleGit);
 	t.deepEqual(res, {
 		branch: 'master',
 		date: '2018-07-13T17:09:29.000Z',

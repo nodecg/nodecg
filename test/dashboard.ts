@@ -1,7 +1,7 @@
 // Packages
 import test from 'ava';
 import axios from 'axios';
-import puppeteer from 'puppeteer';
+import type puppeteer from 'puppeteer';
 
 // Ours
 import * as server from './helpers/server';
@@ -84,7 +84,7 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 						.shadowRoot!.querySelector('ncg-workspace')!
 						.shadowRoot!.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')!
 						.querySelector('iframe')!
-						.contentWindow!.document.querySelector('#openDialog')! as HTMLButtonElement;
+						.contentWindow!.document.querySelector('#openDialog')!;
 
 					const dialog = window.dashboardApi.getDialog('test-dialog') as HTMLElement & {
 						opened: boolean;
@@ -140,7 +140,7 @@ test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is 
 					.shadowRoot!.querySelector('ncg-workspace')!
 					.shadowRoot!.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')!
 					.querySelector('iframe')!
-					.contentWindow!.document.querySelector('#openDialog')! as HTMLButtonElement;
+					.contentWindow!.document.querySelector('#openDialog')!;
 				openDialogButton.click();
 
 				const dialog: any = window.dashboardApi.getDialog('test-dialog');

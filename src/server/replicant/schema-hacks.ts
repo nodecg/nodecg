@@ -37,9 +37,7 @@ export default function replaceRefs(inputObj: unknown, currentFile: File, allFil
 		let referenceFile: File | undefined;
 		if (isFileReference(obj)) {
 			const referenceUrl = resolveFileReference(obj.$ref, currentFile);
-			referenceFile = allFiles.find((file) => {
-				return file.url === referenceUrl;
-			});
+			referenceFile = allFiles.find((file) => file.url === referenceUrl);
 
 			/* istanbul ignore next: in theory this isn't possible */
 			if (!referenceFile) {

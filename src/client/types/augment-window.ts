@@ -1,6 +1,6 @@
-import { NodeCGAPIClient } from '../api/api.client';
-import { NodeCG } from '../../types/nodecg';
-import { TypedClientSocket } from '../../types/socket-protocol';
+import type { NodeCGAPIClient } from '../api/api.client';
+import type { NodeCG } from '../../types/nodecg';
+import type { TypedClientSocket } from '../../types/socket-protocol';
 
 type ConstructorType = typeof NodeCGAPIClient;
 

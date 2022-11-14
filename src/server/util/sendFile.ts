@@ -2,10 +2,10 @@
 import path from 'path';
 
 // Packages
-import express from 'express';
+import type express from 'express';
 
 export default (fileLocation: string, res: express.Response, next: express.NextFunction): void => {
-	return res.sendFile(fileLocation, (err: NodeJS.ErrnoException) => {
+	res.sendFile(fileLocation, (err: NodeJS.ErrnoException) => {
 		if (err) {
 			if (err.code === 'ENOENT') {
 				return res.type(path.extname(fileLocation)).sendStatus(404);
@@ -13,7 +13,7 @@ export default (fileLocation: string, res: express.Response, next: express.NextF
 
 			/* istanbul ignore next */
 			if (!res.headersSent) {
-				return next(err);
+				next(err);
 			}
 		}
 	});

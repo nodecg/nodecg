@@ -1,7 +1,8 @@
 // Packages
 import fs from 'fs-extra';
 import sinon from 'sinon';
-import anyTest, { TestInterface } from 'ava';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
 
 // Ours
 import loggerFactory from '../../src/server/logger/logger.server';

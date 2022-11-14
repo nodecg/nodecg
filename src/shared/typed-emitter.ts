@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/generic-type-naming */
 // Native
 import { EventEmitter } from 'events';
 

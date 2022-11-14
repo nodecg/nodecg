@@ -1,12 +1,12 @@
 // Packages
-import { PaperDialogElement } from '@polymer/paper-dialog';
+import type { PaperDialogElement } from '@polymer/paper-dialog';
 
 // Ours
-import { NodeCGAPIClient } from '../../api/api.client';
+import type { NodeCGAPIClient } from '../../api/api.client';
 
 document.addEventListener(
 	'click',
-	e => {
+	(e) => {
 		const nodecg = (window as any).nodecg as NodeCGAPIClient;
 		const elWithDialogAttr = (e as any).composedPath()[0].closest('[nodecg-dialog]');
 		if (elWithDialogAttr) {

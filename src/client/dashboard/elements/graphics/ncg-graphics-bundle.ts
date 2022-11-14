@@ -9,7 +9,7 @@ keep1;
 
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
-import { NodeCG } from '../../../../types/nodecg';
+import type { NodeCG } from '../../../../types/nodecg';
 
 /**
  * @customElement
@@ -139,9 +139,7 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 			return [];
 		}
 
-		return instances.filter((instance) => {
-			return instance.bundleName === bundle.name && instance.pathName === graphic.url;
-		});
+		return instances.filter((instance) => instance.bundleName === bundle.name && instance.pathName === graphic.url);
 	}
 
 	_handleReloadAllConfirmDialogClose(e: any) {

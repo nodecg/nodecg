@@ -1,12 +1,13 @@
 // Packages
-import SocketIO from 'socket.io';
+import type SocketIO from 'socket.io';
 
 // Ours
 import { getConnection, ApiKey } from '../database';
 import { isSuperUser, findUser } from '../database/utils';
 import { config } from '../config';
 import UnauthorizedError from '../login/UnauthorizedError';
-import { TypedServerSocket, UnAuthErrCode } from '../../types/socket-protocol';
+import type { TypedServerSocket } from '../../types/socket-protocol';
+import { UnAuthErrCode } from '../../types/socket-protocol';
 import createLogger from '../logger';
 
 const log = createLogger('socket-auth');
@@ -15,7 +16,7 @@ const socketsByKey = new Map<string, Set<TypedServerSocket>>();
 export default async function (socket: TypedServerSocket, next: SocketIO.NextFunction): Promise<void> {
 	try {
 		const req = (socket as any).request; // Not typed in the typed-socket.io lib for some reason.
-		const token = req._query.token;
+		const { token } = req._query;
 		const database = await getConnection();
 		const apiKey = await database.getRepository(ApiKey).findOne(
 			{
@@ -27,17 +28,19 @@ export default async function (socket: TypedServerSocket, next: SocketIO.NextFun
 		);
 
 		if (!apiKey) {
-			return next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no credentials found'));
+			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no credentials found'));
+			return;
 		}
 
 		const user = await findUser(apiKey.user.id);
 		if (!user) {
-			return next(
+			next(
 				new UnauthorizedError(
 					UnAuthErrCode.CredentialsRequired,
 					'no user associated with provided credentials',
 				),
 			);
+			return;
 		}
 
 		// But only authed sockets can join the Authed room.
@@ -78,9 +81,7 @@ export default async function (socket: TypedServerSocket, next: SocketIO.NextFun
 							throw new Error('should have been a user here');
 						}
 
-						user.apiKeys = user.apiKeys.filter((ak) => {
-							return ak.secret_key !== token;
-						});
+						user.apiKeys = user.apiKeys.filter((ak) => ak.secret_key !== token);
 						user.apiKeys.push(newApiKey);
 						await database.manager.save(user);
 
@@ -124,7 +125,7 @@ export default async function (socket: TypedServerSocket, next: SocketIO.NextFun
 					}
 
 					socketsByKey.delete(token);
-				} catch (error) {
+				} catch (error: unknown) {
 					log.error(error);
 					if (cb) {
 						cb(error);
@@ -138,7 +139,7 @@ export default async function (socket: TypedServerSocket, next: SocketIO.NextFun
 		} else {
 			next(new UnauthorizedError(UnAuthErrCode.InvalidToken, 'user is not allowed'));
 		}
-	} catch (error) {
+	} catch (error: unknown) {
 		next(error);
 	}
 }

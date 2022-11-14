@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import cheerio from 'cheerio';
 
 // Ours
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
 export default function (dashboardDir: string, manifest: NodeCG.Manifest): NodeCG.Bundle.Panel[] {
 	const unparsedPanels = manifest.dashboardPanels ?? undefined;

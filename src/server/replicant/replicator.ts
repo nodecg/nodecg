@@ -9,11 +9,11 @@ import clone from 'clone';
 import createLogger from '../logger';
 import Replicant from './server-replicant';
 import { throttleName } from '../util';
-import ServerReplicant from './server-replicant';
+import type ServerReplicant from './server-replicant';
 import uuid from 'uuid';
 import * as db from '../database';
-import { RootNS, TypedServerSocket, ProtocolDefinition } from '../../types/socket-protocol';
-import { NodeCG } from '../../types/nodecg';
+import type { RootNS, TypedServerSocket, ProtocolDefinition } from '../../types/socket-protocol';
+import type { NodeCG } from '../../types/nodecg';
 
 const log = createLogger('replicator');
 
@@ -37,7 +37,7 @@ export default class Replicator {
 		}
 
 		this.io = io;
-		io.on('connection', socket => {
+		io.on('connection', (socket) => {
 			this._attachToSocket(socket);
 		});
 
@@ -72,13 +72,11 @@ export default class Replicator {
 
 		// Look up the persisted value, if any.
 		let parsedPersistedValue;
-		const repEnt = this._repEntities.find(re => {
-			return re.namespace === namespace && re.name === name;
-		});
+		const repEnt = this._repEntities.find((re) => re.namespace === namespace && re.name === name);
 		if (repEnt) {
 			try {
 				parsedPersistedValue = repEnt.value === '' ? undefined : JSON.parse(repEnt.value);
-			} catch (_) {
+			} catch (_: unknown) {
 				parsedPersistedValue = repEnt.value;
 			}
 		}
@@ -93,7 +91,7 @@ export default class Replicator {
 		});
 
 		// Listen for server-side operations
-		rep.on('operations', data => {
+		rep.on('operations', (data) => {
 			this.emitToClients(rep, 'replicant:operations', data);
 		});
 
@@ -107,7 +105,7 @@ export default class Replicator {
 	 */
 	applyOperations<T>(replicant: Replicant<T>, operations: Array<NodeCG.Replicant.Operation<T>>): void {
 		const oldValue = clone(replicant.value);
-		operations.forEach(operation => replicant._applyOperation(operation));
+		operations.forEach((operation) => replicant._applyOperation(operation));
 		replicant.revision++;
 		replicant.emit('change', replicant.value, oldValue, operations);
 		this.emitToClients(replicant, 'replicant:operations', {
@@ -151,7 +149,7 @@ export default class Replicator {
 		throttleName(
 			`${this._uuid}:${replicant.namespace}:${replicant.name}`,
 			() => {
-				this._saveReplicant(replicant).catch(error => {
+				this._saveReplicant(replicant).catch((error) => {
 					log.error('Error saving replicant:', error);
 				});
 			},
@@ -173,9 +171,9 @@ export default class Replicator {
 		try {
 			let repEnt: db.Replicant;
 			const { manager } = await db.getConnection();
-			const exitingEnt = this._repEntities.find(pv => {
-				return pv.namespace === replicant.namespace && pv.name === replicant.name;
-			});
+			const exitingEnt = this._repEntities.find(
+				(pv) => pv.namespace === replicant.namespace && pv.name === replicant.name,
+			);
 			if (exitingEnt) {
 				repEnt = exitingEnt;
 			} else {
@@ -193,7 +191,7 @@ export default class Replicator {
 
 			repEnt.value = value;
 			await manager.save(repEnt);
-		} catch (error) {
+		} catch (error: unknown) {
 			replicant.log.error('Failed to persist value:', error);
 		} finally {
 			this._pendingSave.delete(replicant);
@@ -211,10 +209,12 @@ export default class Replicator {
 					schema: replicant.schema,
 					schemaSum: replicant.schemaSum,
 				});
+				// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 			} catch (e) {
 				if (e.message.startsWith('Invalid value rejected for replicant')) {
 					cb(e.message);
 				} else {
+					// eslint-disable-next-line @typescript-eslint/no-throw-literal
 					throw e;
 				}
 			}

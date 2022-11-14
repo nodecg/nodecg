@@ -9,7 +9,7 @@ import temp from 'temp';
 import test from 'ava';
 
 // Ours
-import BundleManagerTypeOnly from '../src/server/bundle-manager';
+import type BundleManagerTypeOnly from '../src/server/bundle-manager';
 import { sleep } from './helpers/utilities';
 
 const tempFolder = temp.mkdirSync();

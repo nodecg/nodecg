@@ -1,15 +1,16 @@
+ 
 // Packages
 import * as git from 'git-rev-sync';
 
 // Ours
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
-export default function(bundleDir: string): NodeCG.Bundle.GitData {
+export default function (bundleDir: string): NodeCG.Bundle.GitData {
 	const workingDir = process.cwd();
-	let retValue: NodeCG.Bundle.GitData = null;
+	let retValue: NodeCG.Bundle.GitData;
 	try {
 		// These will error if bundleDir is not a git repo
-		const branch = (git.branch(bundleDir) as unknown) as string; // Typedefs are wrong for this
+		const branch = git.branch(bundleDir);
 		const hash = git.long(bundleDir);
 		const shortHash = git.short(bundleDir);
 

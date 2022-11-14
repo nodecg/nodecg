@@ -43,7 +43,7 @@ if (!semver.satisfies(nodeVersion, pjson.engines.node)) {
 	process.exit(1);
 }
 
-process.on('uncaughtException', err => {
+process.on('uncaughtException', (err) => {
 	if (!global.sentryEnabled) {
 		if (global.exitOnUncaught) {
 			console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
@@ -58,7 +58,7 @@ process.on('uncaughtException', err => {
 	}
 });
 
-process.on('unhandledRejection', err => {
+process.on('unhandledRejection', (err) => {
 	if (!global.sentryEnabled) {
 		console.error('UNHANDLED PROMISE REJECTION!');
 		console.error(err);
@@ -72,7 +72,7 @@ server.on('stopped', () => {
 		process.exit(0);
 	}
 });
-server.start().catch(error => {
+server.start().catch((error) => {
 	console.error(error);
 	process.nextTick(() => {
 		process.exit(1);
@@ -80,7 +80,7 @@ server.start().catch(error => {
 });
 
 exitHook(() => {
-	server.stop();
+	void server.stop();
 });
 
 // Check for updates

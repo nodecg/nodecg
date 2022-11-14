@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-literal-enum-member */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Role } from './Role';
 
@@ -15,10 +16,7 @@ export class Permission {
 	@Column('text')
 	name: string;
 
-	@ManyToOne(
-		() => Role,
-		role => role.permissions,
-	)
+	@ManyToOne(() => Role, (role) => role.permissions)
 	role: Role;
 
 	@Column('text')

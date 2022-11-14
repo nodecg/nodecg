@@ -6,15 +6,15 @@ import express from 'express';
 
 // Ours
 import { authCheck, sendFile } from './util';
-import { NodeCG } from '../types/nodecg';
+import type { NodeCG } from '../types/nodecg';
 
 export default class SharedSourcesLib {
 	app = express();
 
 	constructor(bundles: NodeCG.Bundle[]) {
 		this.app.get('/bundles/:bundleName/shared/*', authCheck, (req, res, next) => {
-			const { bundleName } = req.params as { [k: string]: string };
-			const bundle = bundles.find(b => b.name === bundleName);
+			const { bundleName } = req.params as Record<string, string>;
+			const bundle = bundles.find((b) => b.name === bundleName);
 			if (!bundle) {
 				next();
 				return;

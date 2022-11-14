@@ -41,7 +41,7 @@ keep7;
 /* eslint-enable @typescript-eslint/no-unused-expressions */
 
 import { timeOut } from '@polymer/polymer/lib/utils/async.js';
-import { NodeCG } from '../../../types/nodecg';
+import type { NodeCG } from '../../../types/nodecg';
 
 class NcgDashboard extends Polymer.PolymerElement {
 	static get template() {
@@ -610,7 +610,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 
 function getImageDataURI(
 	url: string,
-	cb: (error: NodeJS.ErrnoException | null, result?: { image: HTMLImageElement; data: string }) => void,
+	cb: (error: NodeJS.ErrnoException | undefined, result?: { image: HTMLImageElement; data: string }) => void,
 ) {
 	let data;
 	let canvas;
@@ -627,10 +627,11 @@ function getImageDataURI(
 		// Get canvas data URL
 		try {
 			data = canvas.toDataURL();
-			cb(null, {
+			cb(undefined, {
 				image: img,
 				data,
 			});
+			// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 		} catch (e) {
 			/* istanbul ignore next: hard-to-test error */
 			cb(e);
@@ -642,6 +643,7 @@ function getImageDataURI(
 	// Load image URL.
 	try {
 		img.src = url;
+		// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 	} catch (e) {
 		/* istanbul ignore next: hard-to-test error */
 		cb(e);
@@ -665,7 +667,7 @@ function notify(title: string, options: { body?: string; icon?: string; tag?: st
 			notification.close();
 		}, 5000);
 	} else if (window.Notification.permission !== 'denied') {
-		window.Notification.requestPermission((permission) => {
+		void window.Notification.requestPermission((permission) => {
 			// If the user is okay, let's create a notification
 			if (permission === 'granted') {
 				const notification = new window.Notification(title, options);

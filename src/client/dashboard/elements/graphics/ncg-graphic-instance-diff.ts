@@ -101,7 +101,7 @@ class NcgGraphicInstanceDiff extends MutableData(Polymer.PolymerElement) {
 			return;
 		}
 
-		const bundle = bundlesRep.value.find(bundle => bundle.name === this.instance.bundleName);
+		const bundle = bundlesRep.value.find((bundle) => bundle.name === this.instance.bundleName);
 		if (!bundle) {
 			return;
 		}

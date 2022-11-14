@@ -232,15 +232,15 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 
 		afterNextRender(this, async () => {
 			const distributedNodes: HTMLElement[] = this.$.slot.assignedNodes({ flatten: true });
-			const iframe = distributedNodes.find(el => el.tagName === 'IFRAME') as HTMLIFrameElement;
+			const iframe = distributedNodes.find((el) => el.tagName === 'IFRAME') as HTMLIFrameElement;
 
 			// If Sentry is enabled, use it to report errors in panels to Sentry.io.
 			if (window.ncgConfig.sentry.enabled) {
 				const Sentry = await import('@sentry/browser');
-				iframe.contentWindow!.addEventListener('error', event => {
+				iframe.contentWindow!.addEventListener('error', (event) => {
 					Sentry.captureException(event.error);
 				});
-				iframe.contentWindow!.addEventListener('unhandledrejection', err => {
+				iframe.contentWindow!.addEventListener('unhandledrejection', (err) => {
 					Sentry.captureException(err.reason);
 				});
 			}
@@ -308,10 +308,7 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 	/* istanbul ignore next: tseems to confuse coverage */
 	_hexToRGB(hex: string) {
 		// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-		hex = hex.replace(HEX_PARSE_SHORTHAND_REGEX, (m, r, g, b) => {
-			// eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-			return r + r + g + g + b + b;
-		});
+		hex = hex.replace(HEX_PARSE_SHORTHAND_REGEX, (m, r, g, b) => r + r + g + g + b + b);
 
 		const result = HEX_PARSE_REGEX.exec(hex);
 		return result

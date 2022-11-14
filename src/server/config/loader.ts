@@ -10,10 +10,10 @@ import { argv } from 'yargs';
 
 // Ours
 import { LogLevel } from '../../shared/logger-interface';
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
 // eslint-disable-next-line complexity
-function getConfigSchema(userConfig: { [k: string]: any }) {
+function getConfigSchema(userConfig: Record<string, any>) {
 	return Joi.object({
 		host: Joi.string().default('0.0.0.0').description('The IP address or hostname that NodeCG should bind to.'),
 
@@ -215,13 +215,15 @@ function getConfigSchema(userConfig: { [k: string]: any }) {
 	});
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type, complexity
+// eslint-disable-next-line complexity
 export default function (cfgDirOrFile: string) {
 	let isDir = false;
 	try {
 		isDir = fs.lstatSync(cfgDirOrFile).isDirectory();
+		// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 	} catch (error) {
 		if (error.code !== 'ENOENT') {
+			// eslint-disable-next-line @typescript-eslint/no-throw-literal
 			throw error;
 		}
 	}

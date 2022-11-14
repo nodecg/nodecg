@@ -2,7 +2,8 @@
 import path from 'path';
 
 // Packages
-import anyTest, { TestInterface } from 'ava';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
 
 // Ours
 import * as server from '../helpers/server';

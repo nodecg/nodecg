@@ -2,10 +2,11 @@
 import { format, inspect } from 'util';
 
 // Packages
-import * as Sentry from '@sentry/browser';
+import type * as Sentry from '@sentry/browser';
 
 // Ours
-import { LoggerInterface, LogLevel } from '../../../shared/logger-interface';
+import type { LoggerInterface } from '../../../shared/logger-interface';
+import { LogLevel } from '../../../shared/logger-interface';
 
 const OrderedLogLevels: { [Level in LogLevel]: number } = {
 	verbose: 0,
@@ -29,8 +30,8 @@ type LoggerOptions = {
  *
  * @returns  A constructor used to create discrete logger instances.
  */
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export default function(initialOpts: Partial<LoggerOptions> = {}, sentry: typeof Sentry | undefined = undefined) {
+
+export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeof Sentry | undefined = undefined) {
 	/**
 	 * Constructs a new Logger instance that prefixes all output with the given name.
 	 * @param name {String} - The label to prefix all output of this logger with.
@@ -45,9 +46,7 @@ export default function(initialOpts: Partial<LoggerOptions> = {}, sentry: typeof
 
 		static _level: LogLevel = initialOpts.console?.level ?? LogLevel.Info;
 
-		name: string;
-
-		constructor(name: string) {
+		constructor(public name: string) {
 			this.name = name;
 		}
 
@@ -111,11 +110,9 @@ export default function(initialOpts: Partial<LoggerOptions> = {}, sentry: typeof
 			console.error(`[${this.name}]`, ...args);
 
 			if (sentry) {
-				const formattedArgs = args.map(argument => {
-					return typeof argument === 'object'
-						? inspect(argument, { depth: null, showProxy: true })
-						: argument;
-				});
+				const formattedArgs = args.map((argument) =>
+					typeof argument === 'object' ? inspect(argument, { depth: null, showProxy: true }) : argument,
+				);
 
 				sentry.captureException(
 					new Error(`[${this.name}] ` + format(formattedArgs[0], ...formattedArgs.slice(1))),

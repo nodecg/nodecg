@@ -9,8 +9,8 @@ import appRootPath from 'app-root-path';
 // Ours
 import { config, filteredConfig } from '../config';
 import * as ncgUtils from '../util';
-import BundleManager from '../bundle-manager';
-import { NodeCG } from '../../types/nodecg';
+import type BundleManager from '../bundle-manager';
+import type { NodeCG } from '../../types/nodecg';
 
 type Workspace = NodeCG.Workspace;
 
@@ -28,7 +28,7 @@ const VIEWS_PATH = path.join(appRootPath.path, 'src/server/dashboard');
 export default class DashboardLib {
 	app = express();
 
-	dashboardContext: DashboardContext | null = null;
+	dashboardContext: DashboardContext | undefined = null;
 
 	constructor(bundleManager: BundleManager) {
 		const { app } = this;
@@ -39,11 +39,14 @@ export default class DashboardLib {
 
 		app.use('/node_modules', express.static(path.join(appRootPath.path, 'node_modules')));
 
-		app.get('/', (_, res) => res.redirect('/dashboard/'));
+		app.get('/', (_, res) => {
+			res.redirect('/dashboard/');
+		});
 
 		app.get('/dashboard', ncgUtils.authCheck, (req, res) => {
 			if (!req.url.endsWith('/')) {
-				return res.redirect('/dashboard/');
+				res.redirect('/dashboard/');
+				return;
 			}
 
 			if (!this.dashboardContext) {
@@ -155,9 +158,7 @@ function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 		});
 	});
 
-	workspaces.sort((a, b) => {
-		return a.label.localeCompare(b.label);
-	});
+	workspaces.sort((a, b) => a.label.localeCompare(b.label));
 
 	if (defaultWorkspaceHasPanels || !otherWorkspacesHavePanels) {
 		workspaces.unshift({

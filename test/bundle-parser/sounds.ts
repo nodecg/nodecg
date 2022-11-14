@@ -62,25 +62,25 @@ test('should set bundle.soundCues to an empty array when pkg.nodecg.soundCues do
 });
 
 test('should throw an error when pkg.nodecg.soundCues is not an Array', (t) => {
-	const error = t.throws(() => {
-		return parseSounds(__dirname, {
+	const error = t.throws(() =>
+		parseSounds(__dirname, {
 			name: 'test-bundle',
 			// @ts-expect-error
 			soundCues: 'foo',
-		});
-	});
+		}),
+	);
 
 	t.is(error.message, "test-bundle's nodecg.soundCues is not an Array");
 });
 
 test('should throw an error when a soundCue lacks a name', (t) => {
-	const error = t.throws(() => {
-		return parseSounds(__dirname, {
+	const error = t.throws(() =>
+		parseSounds(__dirname, {
 			name: 'test-bundle',
 			// @ts-expect-error
 			soundCues: [{}],
-		});
-	});
+		}),
+	);
 
 	t.is(error.message, 'nodecg.soundCues[0] in bundle test-bundle lacks a "name" property');
 });
@@ -112,8 +112,8 @@ test('should clamp default volume to a min of 0', (t) => {
 });
 
 test("should throw an error when a soundCue's default file doesn't exist", (t) => {
-	const error = t.throws(() => {
-		return parseSounds(__dirname, {
+	const error = t.throws(() =>
+		parseSounds(__dirname, {
 			name: 'test-bundle',
 			soundCues: [
 				{
@@ -121,8 +121,8 @@ test("should throw an error when a soundCue's default file doesn't exist", (t) =
 					defaultFile: 'nope',
 				},
 			],
-		});
-	});
+		}),
+	);
 
 	t.is(error.message, 'nodecg.soundCues[0].defaultFile in bundle test-bundle does not exist');
 });

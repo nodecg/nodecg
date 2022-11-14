@@ -1,7 +1,7 @@
-(function() {
+(function () {
 	'use strict';
 
-	const nodecg = window.nodecg;
+	const { nodecg } = window;
 	const timestamp = Date.now();
 	let { pathname } = window.location;
 
@@ -11,7 +11,7 @@
 	}
 
 	/* istanbul ignore next: cant cover navigates page */
-	window.socket.on('graphic:kill', instance => {
+	window.socket.on('graphic:kill', (instance) => {
 		if (!instance) {
 			return;
 		}
@@ -23,7 +23,7 @@
 	});
 
 	/* istanbul ignore next: cant cover navigates page */
-	window.socket.on('graphic:refresh', instance => {
+	window.socket.on('graphic:refresh', (instance) => {
 		if (!instance) {
 			return;
 		}
@@ -35,7 +35,7 @@
 	});
 
 	/* istanbul ignore next: cant cover navigates page */
-	window.socket.on('graphic:refreshAll', graphic => {
+	window.socket.on('graphic:refreshAll', (graphic) => {
 		if (!graphic) {
 			return;
 		}
@@ -47,7 +47,7 @@
 	});
 
 	/* istanbul ignore next: cant cover navigates page */
-	window.socket.on('graphic:bundleRefresh', bundleName => {
+	window.socket.on('graphic:bundleRefresh', (bundleName) => {
 		if (!bundleName) {
 			return;
 		}

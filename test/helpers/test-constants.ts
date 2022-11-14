@@ -16,34 +16,18 @@ export const rootUrl = (): string => {
 	return `http://localhost:${NODECG_TEST_PORT}/`;
 };
 
-export const loginUrl = (): string => {
-	return `${rootUrl()}login/`;
-};
+export const loginUrl = (): string => `${rootUrl()}login/`;
 
-export const dashboardUrl = (): string => {
-	return `${rootUrl()}dashboard/`;
-};
+export const dashboardUrl = (): string => `${rootUrl()}dashboard/`;
 
-export const testBundleRoot = (): string => {
-	return `${rootUrl()}bundles/${bundleName()}/`;
-};
+export const testBundleRoot = (): string => `${rootUrl()}bundles/${bundleName()}/`;
 
-export const testPanelUrl = (): string => {
-	return `${testBundleRoot()}dashboard/panel.html`;
-};
+export const testPanelUrl = (): string => `${testBundleRoot()}dashboard/panel.html`;
 
-export const bundleBowerComponentsUrl = (): string => {
-	return `${testBundleRoot()}bower_components/`;
-};
+export const bundleBowerComponentsUrl = (): string => `${testBundleRoot()}bower_components/`;
 
-export const bundleNodeModulesUrl = (): string => {
-	return `${testBundleRoot()}node_modules/`;
-};
+export const bundleNodeModulesUrl = (): string => `${testBundleRoot()}node_modules/`;
 
-export const graphicUrl = (): string => {
-	return `${testBundleRoot()}graphics/`;
-};
+export const graphicUrl = (): string => `${testBundleRoot()}graphics/`;
 
-export const singleInstanceUrl = (): string => {
-	return `${testBundleRoot()}graphics/single_instance.html`;
-};
+export const singleInstanceUrl = (): string => `${testBundleRoot()}graphics/single_instance.html`;

@@ -1,8 +1,8 @@
 declare namespace NodeJS {
-	export interface Process {
+	export type Process = {
 		/**
 		 * This comes from webpack.
 		 */
 		BROWSER: boolean;
-	}
+	};
 }

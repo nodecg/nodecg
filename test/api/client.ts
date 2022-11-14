@@ -1,6 +1,6 @@
 // Packages
 import test from 'ava';
-import puppeteer from 'puppeteer';
+import type puppeteer from 'puppeteer';
 
 // Ours
 import * as server from '../helpers/server';
@@ -15,37 +15,29 @@ test.before(async () => {
 });
 
 test.serial('#config - should exist and have length', async (t) => {
-	const res = await dashboard.evaluate(() => {
-		return window.dashboardApi.config;
-	});
+	const res = await dashboard.evaluate(() => window.dashboardApi.config);
 	t.true(Object.keys(res).length > 0);
 });
 
 test.serial("#config - shouldn't reveal sensitive information", async (t) => {
-	const res = await dashboard.evaluate(() => {
-		return window.dashboardApi.config;
-	});
+	const res = await dashboard.evaluate(() => window.dashboardApi.config);
 	t.false(res.login.hasOwnProperty('sessionSecret')); // eslint-disable-line no-prototype-builtins
 });
 
 test.serial("#config - shouldn't be writable", async (t) => {
-	const res = await dashboard.evaluate(() => {
-		return Object.isFrozen(window.dashboardApi.config);
-	});
+	const res = await dashboard.evaluate(() => Object.isFrozen(window.dashboardApi.config));
 	t.true(res);
 });
 
 test.serial('#bundleConfig - should exist and have length', async (t) => {
-	const res = await dashboard.evaluate(() => {
-		return window.dashboardApi.bundleConfig;
-	});
+	const res = await dashboard.evaluate(() => window.dashboardApi.bundleConfig);
 	t.true(Object.keys(res).length > 0);
 });
 
 test.serial('#Logger - should exist and be the Logger constructor', async (t) => {
-	const res = await dashboard.evaluate(() => {
-		return window.dashboardApi.Logger && typeof window.dashboardApi.Logger === 'function';
-	});
+	const res = await dashboard.evaluate(
+		() => window.dashboardApi.Logger && typeof window.dashboardApi.Logger === 'function',
+	);
 	t.true(res);
 });
 

@@ -4,7 +4,8 @@ import fs from 'fs';
 
 // Packages
 import 'reflect-metadata';
-import { createConnection, Connection } from 'typeorm';
+import type { Connection } from 'typeorm';
+import { createConnection } from 'typeorm';
 import appRootPath from 'app-root-path';
 export * from './entity';
 

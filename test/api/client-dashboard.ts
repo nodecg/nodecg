@@ -1,6 +1,7 @@
 // Packages
-import anyTest, { TestInterface } from 'ava';
-import puppeteer from 'puppeteer';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
+import type puppeteer from 'puppeteer';
 
 // Ours
 import * as server from '../helpers/server';
@@ -53,7 +54,7 @@ test.serial.cb('should send messages', (t) => {
 	t.context.apis.extension.listenFor('dashboardToServer', () => {
 		t.end();
 	});
-	dashboard.evaluate(() => {
+	void dashboard.evaluate(() => {
 		window.dashboardApi.sendMessage('dashboardToServer');
 	});
 });
@@ -84,16 +85,12 @@ test.serial('should support multiple listenFor handlers', async (t) => {
 });
 
 test.serial('#bundleVersion', async (t) => {
-	const res = await dashboard.evaluate(() => {
-		return window.dashboardApi.bundleVersion;
-	});
+	const res = await dashboard.evaluate(() => window.dashboardApi.bundleVersion);
 	t.is(res, '0.0.1');
 });
 
 test.serial('#bundleGit', async (t) => {
-	const res = await dashboard.evaluate(() => {
-		return window.dashboardApi.bundleGit;
-	});
+	const res = await dashboard.evaluate(() => window.dashboardApi.bundleGit);
 	t.deepEqual(res, {
 		branch: 'master',
 		date: '2018-07-13T17:09:29.000Z',

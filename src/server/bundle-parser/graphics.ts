@@ -3,9 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // Ours
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
-export default function(graphicsDir: string, manifest: NodeCG.Manifest): NodeCG.Bundle.Graphic[] {
+export default function (graphicsDir: string, manifest: NodeCG.Manifest): NodeCG.Bundle.Graphic[] {
 	const graphics: NodeCG.Bundle.Graphic[] = [];
 
 	if (fs.existsSync(graphicsDir) && typeof manifest.graphics === 'undefined') {
@@ -54,7 +54,7 @@ export default function(graphicsDir: string, manifest: NodeCG.Manifest): NodeCG.
 		}
 
 		// Check if this bundle already has a graphic for this file
-		const dupeFound = graphics.some(g => g.file === graphic.file);
+		const dupeFound = graphics.some((g) => g.file === graphic.file);
 		if (dupeFound) {
 			throw new Error(
 				`Graphic #${index} (${graphic.file}) has the same file as another graphic in ${manifest.name}`,
@@ -64,6 +64,7 @@ export default function(graphicsDir: string, manifest: NodeCG.Manifest): NodeCG.
 		const filePath = path.join(graphicsDir, graphic.file);
 
 		// Check that the panel file exists, throws error if it doesn't
+		// eslint-disable-next-line no-bitwise
 		fs.accessSync(filePath, fs.constants.F_OK | fs.constants.R_OK);
 
 		const parsedGraphic: NodeCG.Bundle.Graphic = {

@@ -1,7 +1,7 @@
 // Packages
-import { ExecutionContext } from 'ava'; // eslint-disable-line ava/use-test
-import * as Puppeteer from 'puppeteer';
-import { Acknowledgement } from '../../src/shared/api.base';
+import type { ExecutionContext } from 'ava';
+import type * as Puppeteer from 'puppeteer';
+import type { Acknowledgement } from '../../src/shared/api.base';
 
 export const sleep = async (milliseconds: number): Promise<void> =>
 	new Promise((resolve) => {
@@ -31,8 +31,8 @@ export const waitForRegistration = async (page: Puppeteer.Page): Promise<unknown
 export const shadowSelector = async <T extends Element>(
 	page: Puppeteer.Page,
 	...selectors: string[]
-): Promise<Puppeteer.ElementHandle<T>> => {
-	return page.evaluateHandle((selectors) => {
+): Promise<Puppeteer.ElementHandle<T>> =>
+	page.evaluateHandle((selectors) => {
 		let foundDom = document.querySelector(selectors[0]);
 		for (const selector of selectors.slice(1)) {
 			if (foundDom.shadowRoot) {
@@ -44,15 +44,16 @@ export const shadowSelector = async <T extends Element>(
 
 		return foundDom;
 	}, selectors) as any;
-};
 
 export function invokeAck(t: ExecutionContext, ack?: Acknowledgement, ...args: any[]): void {
 	if (!ack) {
-		return t.fail('no callback provided');
+		t.fail('no callback provided');
+		return;
 	}
 
 	if (ack.handled) {
-		return t.fail('cb already handled');
+		t.fail('cb already handled');
+		return;
 	}
 
 	return ack(...args);

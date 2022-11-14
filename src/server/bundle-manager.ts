@@ -12,7 +12,7 @@ import semver from 'semver';
 import parseBundle from './bundle-parser';
 import parseBundleGit from './bundle-parser/git';
 import createLogger from './logger';
-import { NodeCG } from '../types/nodecg';
+import type { NodeCG } from '../types/nodecg';
 
 // Start up the watcher, but don't watch any files yet.
 // We'll add the files we want to watch later, in the init() method.
@@ -57,7 +57,7 @@ export default class BundleManager extends EventEmitter {
 		}
 	}, 100);
 
-	private readonly _debouncedGitChangeHandler = debounce(bundleName => {
+	private readonly _debouncedGitChangeHandler = debounce((bundleName) => {
 		const bundle = this.find(bundleName);
 		if (!bundle) {
 			return;
@@ -67,12 +67,12 @@ export default class BundleManager extends EventEmitter {
 		this.emit('gitChanged', bundle);
 	}, 250);
 
-	constructor(bundlesPaths: string[], cfgPath: string, nodecgVersion: string, nodecgConfig: { [k: string]: any }) {
+	constructor(bundlesPaths: string[], cfgPath: string, nodecgVersion: string, nodecgConfig: Record<string, any>) {
 		super();
 
 		this._cfgPath = cfgPath;
 
-		bundlesPaths.forEach(bundlesPath => {
+		bundlesPaths.forEach((bundlesPath) => {
 			log.trace(`Loading bundles from ${bundlesPath}`);
 
 			// Create the "bundles" dir if it does not exist.
@@ -82,7 +82,7 @@ export default class BundleManager extends EventEmitter {
 			}
 
 			/* istanbul ignore next */
-			watcher.on('add', filePath => {
+			watcher.on('add', (filePath) => {
 				const bundleName = extractBundleName(bundlesPath, filePath);
 
 				// In theory, the bundle parser would have thrown an error long before this block would execute,
@@ -96,7 +96,7 @@ export default class BundleManager extends EventEmitter {
 				}
 			});
 
-			watcher.on('change', filePath => {
+			watcher.on('change', (filePath) => {
 				const bundleName = extractBundleName(bundlesPath, filePath);
 
 				if (isManifest(bundleName, filePath) || this.isPanelHTMLFile(bundleName, filePath)) {
@@ -106,7 +106,7 @@ export default class BundleManager extends EventEmitter {
 				}
 			});
 
-			watcher.on('unlink', filePath => {
+			watcher.on('unlink', (filePath) => {
 				const bundleName = extractBundleName(bundlesPath, filePath);
 
 				if (this.isPanelHTMLFile(bundleName, filePath)) {
@@ -121,14 +121,14 @@ export default class BundleManager extends EventEmitter {
 			});
 
 			/* istanbul ignore next */
-			watcher.on('error', error => {
+			watcher.on('error', (error) => {
 				log.error(error.stack);
 			});
 
 			// Do an initial load of each bundle in the "bundles" folder.
 			// During runtime, any changes to a bundle's "dashboard" folder will trigger a re-load of that bundle,
 			// as will changes to its `package.json`.
-			fs.readdirSync(bundlesPath).forEach(bundleFolderName => {
+			fs.readdirSync(bundlesPath).forEach((bundleFolderName) => {
 				const bundlePath = path.join(bundlesPath, bundleFolderName);
 				if (!fs.statSync(bundlePath).isDirectory()) {
 					return;
@@ -198,7 +198,7 @@ export default class BundleManager extends EventEmitter {
 	 * @returns {Object|undefined}
 	 */
 	find(name: string): NodeCG.Bundle | undefined {
-		return bundles.find(b => b.name === name);
+		return bundles.find((b) => b.name === name);
 	}
 
 	/**
@@ -269,9 +269,7 @@ export default class BundleManager extends EventEmitter {
 	isPanelHTMLFile(bundleName: string, filePath: string): boolean {
 		const bundle = this.find(bundleName);
 		if (bundle) {
-			return bundle.dashboard.panels.some(panel => {
-				return panel.path.endsWith(filePath);
-			});
+			return bundle.dashboard.panels.some((panel) => panel.path.endsWith(filePath));
 		}
 
 		return false;
@@ -281,7 +279,7 @@ export default class BundleManager extends EventEmitter {
 	 * Only used by tests.
 	 */
 	_stopWatching(): void {
-		watcher.close();
+		void watcher.close();
 	}
 
 	private _handleChange(bundleName: string): void {
@@ -312,6 +310,7 @@ export default class BundleManager extends EventEmitter {
 
 				this.add(reparsedBundle);
 				this.emit('bundleChanged', reparsedBundle);
+				// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 			} catch (error) {
 				log.warn('Unable to handle the bundle "%s" change:\n%s', bundleName, error.stack);
 				this.emit('invalidBundle', bundle, error);

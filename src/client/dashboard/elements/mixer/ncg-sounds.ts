@@ -4,10 +4,10 @@ import '@polymer/paper-dialog/paper-dialog.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@polymer/paper-slider/paper-slider.js';
 import * as Polymer from '@polymer/polymer';
-import { NodeCG as NCGTypes } from '../../../../types/nodecg';
+import type { NodeCG as NCGTypes } from '../../../../types/nodecg';
 
 // This just imports the type at build time, no compile output.
-import { NcgSoundCue } from './ncg-sound-cue';
+import type { NcgSoundCue } from './ncg-sound-cue';
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -91,7 +91,7 @@ class NcgSounds extends Polymer.PolymerElement {
 	ready(): void {
 		super.ready();
 
-		const cueElsByName: { [k: string]: NcgSoundCue } = {};
+		const cueElsByName: Record<string, NcgSoundCue> = {};
 		this.bundleFaderRep = NodeCG.Replicant<number>(`volume:${this.bundleName}`, '_sounds');
 		const cuesRep = NodeCG.Replicant<NCGTypes.SoundCue[]>('soundCues', this.bundleName);
 

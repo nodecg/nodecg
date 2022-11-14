@@ -3,9 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // Ours
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
-export default function(
+export default function (
 	bundlePath: string,
 	manifest: Pick<NodeCG.Manifest, 'soundCues' | 'name'>,
 ): { soundCues: NodeCG.Bundle.SoundCue[]; hasAssignableSoundCues: boolean } {

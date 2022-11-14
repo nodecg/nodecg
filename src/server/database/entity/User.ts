@@ -18,15 +18,9 @@ export class User {
 	@JoinTable()
 	roles: Role[];
 
-	@OneToMany(
-		() => Identity,
-		identity => identity.user,
-	)
+	@OneToMany(() => Identity, (identity) => identity.user)
 	identities: Identity[];
 
-	@OneToMany(
-		() => ApiKey,
-		apiKey => apiKey.user,
-	)
+	@OneToMany(() => ApiKey, (apiKey) => apiKey.user)
 	apiKeys: ApiKey[];
 }

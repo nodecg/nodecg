@@ -8,10 +8,10 @@ import sha1File from 'sha1-file';
 import appRootPath from 'app-root-path';
 
 // Ours
-import { Replicator } from './replicant';
-import ServerReplicant from './replicant/server-replicant';
+import type { Replicator } from './replicant';
+import type ServerReplicant from './replicant/server-replicant';
 import { sendFile } from './util';
-import { NodeCG } from '../types/nodecg';
+import type { NodeCG } from '../types/nodecg';
 
 export default class SoundsLib {
 	app = express();
@@ -26,7 +26,7 @@ export default class SoundsLib {
 		// Create the replicant for the "Master Fader"
 		replicator.declare('volume:master', '_sounds', { defaultValue: 100 });
 
-		bundles.forEach(bundle => {
+		bundles.forEach((bundle) => {
 			// If this bundle has sounds
 			if (bundle.soundCues.length > 0) {
 				// Create an array replicant that will hold all this bundle's sound cues.
@@ -41,17 +41,15 @@ export default class SoundsLib {
 
 				if (cuesRep.value!.length > 0) {
 					// Remove any persisted cues that are no longer in the bundle manifest.
-					cuesRep.value = cuesRep.value!.filter(persistedCue => {
-						return defaultCuesRepValue.find(defaultCue => {
-							return defaultCue.name === persistedCue.name;
-						});
-					});
+					cuesRep.value = cuesRep.value!.filter((persistedCue) =>
+						defaultCuesRepValue.find((defaultCue) => defaultCue.name === persistedCue.name),
+					);
 
 					// Add/update any cues in the bundle manifest that aren't in the persisted replicant.
-					defaultCuesRepValue.forEach(defaultCue => {
-						const existingIndex = cuesRep.value!.findIndex(persistedCue => {
-							return persistedCue.name === defaultCue.name;
-						});
+					defaultCuesRepValue.forEach((defaultCue) => {
+						const existingIndex = cuesRep.value!.findIndex(
+							(persistedCue) => persistedCue.name === defaultCue.name,
+						);
 
 						// We need to just update a few key properties in the persisted cue.
 						// We leave things like volume as-is.
@@ -89,13 +87,13 @@ export default class SoundsLib {
 	}
 
 	private _serveDefault(req: express.Request, res: express.Response, next: express.NextFunction): void {
-		const bundle = this._bundles.find(b => b.name === req.params.bundleName);
+		const bundle = this._bundles.find((b) => b.name === req.params.bundleName);
 		if (!bundle) {
 			res.status(404).send(`File not found: ${req.path}`);
 			return;
 		}
 
-		const cue = bundle.soundCues.find(cue => cue.name === req.params.cueName);
+		const cue = bundle.soundCues.find((cue) => cue.name === req.params.cueName);
 		if (!cue) {
 			res.status(404).send(`File not found: ${req.path}`);
 			return;
@@ -113,7 +111,7 @@ export default class SoundsLib {
 	private _makeCuesRepDefaultValue(bundle: NodeCG.Bundle): NodeCG.SoundCue[] {
 		const formattedCues: NodeCG.SoundCue[] = [];
 		for (const rawCue of bundle.soundCues) {
-			let file: NodeCG.CueFile | null = null;
+			let file: NodeCG.CueFile | undefined;
 			if (rawCue.defaultFile) {
 				const filepath = path.join(bundle.dir, rawCue.defaultFile);
 				const parsedPath = path.parse(filepath);

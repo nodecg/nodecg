@@ -7,11 +7,11 @@ import appRootPath from 'app-root-path';
 
 // Ours
 import { injectScripts } from '../util';
-import { Replicator } from '../replicant';
-import ServerReplicant from '../replicant/server-replicant';
-import { RootNS, GraphicRegRequest } from '../../types/socket-protocol';
-import BundleManager from '../bundle-manager';
-import { NodeCG } from '../../types/nodecg';
+import type { Replicator } from '../replicant';
+import type ServerReplicant from '../replicant/server-replicant';
+import type { RootNS, GraphicRegRequest } from '../../types/socket-protocol';
+import type BundleManager from '../bundle-manager';
+import type { NodeCG } from '../../types/nodecg';
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 
@@ -36,7 +36,7 @@ export default class RegistrationCoordinator {
 		bundleManager.on('bundleChanged', this._updateInstanceStatuses.bind(this));
 		bundleManager.on('gitChanged', this._updateInstanceStatuses.bind(this));
 
-		io.on('connection', socket => {
+		io.on('connection', (socket) => {
 			socket.on('graphic:registerSocket', (regRequest, cb) => {
 				const { bundleName } = regRequest;
 				let { pathName } = regRequest;
@@ -79,7 +79,7 @@ export default class RegistrationCoordinator {
 				} else {
 					this._addRegistration({
 						...regRequest,
-						ipv4: (socket as any).request.connection.remoteAddress,
+						ipv4: socket.request.connection.remoteAddress,
 						socketId: socket.id,
 						singleInstance: Boolean(graphicManifest.singleInstance),
 						potentiallyOutOfDate:
@@ -145,18 +145,15 @@ export default class RegistrationCoordinator {
 		});
 
 		app.get('/instance/*', (req, res, next) => {
-			const resName = req.path
-				.split('/')
-				.slice(2)
-				.join('/');
+			const resName = req.path.split('/').slice(2).join('/');
 
 			// If it's a HTML file, inject the graphic setup script and serve that
 			// otherwise, send the file unmodified
 			if (resName.endsWith('.html')) {
 				const fileLocation = path.join(BUILD_PATH, resName);
-				injectScripts(fileLocation, 'graphic', {}, html => res.send(html));
+				injectScripts(fileLocation, 'graphic', {}, (html) => res.send(html));
 			} else {
-				return next();
+				next();
 			}
 		});
 	}
@@ -169,9 +166,7 @@ export default class RegistrationCoordinator {
 	}
 
 	private _removeRegistration(socketId: string): GraphicsInstance | false {
-		const registrationIndex = this._instancesRep.value!.findIndex(instance => {
-			return instance.socketId === socketId;
-		});
+		const registrationIndex = this._instancesRep.value!.findIndex((instance) => instance.socketId === socketId);
 
 		/* istanbul ignore next: simple error trapping */
 		if (registrationIndex < 0) {
@@ -182,19 +177,15 @@ export default class RegistrationCoordinator {
 	}
 
 	private _findRegistrationBySocketId(socketId: string): GraphicsInstance | undefined {
-		return this._instancesRep.value!.find(instance => {
-			return instance.socketId === socketId;
-		});
+		return this._instancesRep.value!.find((instance) => instance.socketId === socketId);
 	}
 
 	private _findOpenRegistrationByPathName(pathName: string): GraphicsInstance | undefined {
-		return this._instancesRep.value!.find(instance => {
-			return instance.pathName === pathName && instance.open;
-		});
+		return this._instancesRep.value!.find((instance) => instance.pathName === pathName && instance.open);
 	}
 
 	private _updateInstanceStatuses(): void {
-		this._instancesRep.value!.forEach(instance => {
+		this._instancesRep.value!.forEach((instance) => {
 			const { bundleName, pathName } = instance;
 			const bundle = this._bundleManager.find(bundleName);
 			/* istanbul ignore next: simple error trapping */
@@ -227,9 +218,7 @@ export default class RegistrationCoordinator {
 			return;
 		}
 
-		return bundle.graphics.find(graphic => {
-			return graphic.url === pathName;
-		});
+		return bundle.graphics.find((graphic) => graphic.url === pathName);
 	}
 }
 

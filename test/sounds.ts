@@ -3,7 +3,8 @@ import path from 'path';
 
 // Packages
 import fs from 'fs-extra';
-import anyTest, { TestInterface } from 'ava';
+import type { TestInterface } from 'ava';
+import anyTest from 'ava';
 
 // Ours
 import * as server from './helpers/server';
@@ -14,7 +15,7 @@ server.setup();
 const { initDashboard, initGraphic } = browser.setup();
 
 import * as C from './helpers/test-constants';
-import { Page } from 'puppeteer';
+import type { Page } from 'puppeteer';
 
 let dashboard: Page;
 let graphic: Page;
@@ -154,7 +155,8 @@ test.serial('mixer - assignable cues - should list new sound Assets as they are 
 					.shadowRoot.querySelector('ncg-sound-cue:nth-child(1)').$.select.$.select;
 
 				if (!el) {
-					return resolve('NoSuchElement');
+					resolve('NoSuchElement');
+					return;
 				}
 
 				const interval = setInterval(() => {
@@ -177,7 +179,9 @@ test.serial('client api - should emit "ncgSoundsReady" once all the sounds have 
 				if (window.graphicApi.soundsReady) {
 					resolve();
 				} else {
-					window.addEventListener('ncgSoundsReady', () => resolve());
+					window.addEventListener('ncgSoundsReady', () => {
+						resolve();
+					});
 				}
 			}),
 	);
@@ -186,9 +190,7 @@ test.serial('client api - should emit "ncgSoundsReady" once all the sounds have 
 });
 
 test.serial('client api - #playSound should return a playing AbstractAudioInstance', async (t) => {
-	const ret = await graphic.evaluate(() => {
-		return window.graphicApi.playSound('default-file')!.playState;
-	});
+	const ret = await graphic.evaluate(() => window.graphicApi.playSound('default-file')!.playState);
 
 	t.is(ret, 'playSucceeded');
 });

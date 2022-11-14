@@ -15,9 +15,6 @@ export class Identity {
 	@Column('text')
 	provider_hash: string;
 
-	@ManyToOne(
-		() => User,
-		user => user.identities,
-	)
+	@ManyToOne(() => User, (user) => user.identities)
 	user: User;
 }

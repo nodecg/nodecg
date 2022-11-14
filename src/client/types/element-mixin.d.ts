@@ -10,9 +10,9 @@ import '@polymer/polymer/lib/utils/resolve-url.js';
 
 import '@polymer/polymer/lib/elements/dom-module.js';
 
-import { PropertyEffects } from '@polymer/polymer/lib/mixins/property-effects.js';
+import type { PropertyEffects } from '@polymer/polymer/lib/mixins/property-effects.js';
 
-import { PropertiesMixin } from '@polymer/polymer/lib/mixins/properties-mixin.js';
+import type { PropertiesMixin } from '@polymer/polymer/lib/mixins/properties-mixin.js';
 
 export { ElementMixin };
 
@@ -82,17 +82,23 @@ declare function ElementMixin<T extends new (...args: any[]) => {}>(
 	PropertiesChangedConstructor &
 	PropertiesMixinConstructor;
 
-import { PropertyEffectsConstructor } from '@polymer/polymer/lib/mixins/property-effects.js';
+import type { PropertyEffectsConstructor } from '@polymer/polymer/lib/mixins/property-effects.js';
 
-import { TemplateStampConstructor, TemplateStamp } from '@polymer/polymer/lib/mixins/template-stamp.js';
+import type { TemplateStampConstructor, TemplateStamp } from '@polymer/polymer/lib/mixins/template-stamp.js';
 
-import { PropertyAccessorsConstructor, PropertyAccessors } from '@polymer/polymer/lib/mixins/property-accessors.js';
+import type {
+	PropertyAccessorsConstructor,
+	PropertyAccessors,
+} from '@polymer/polymer/lib/mixins/property-accessors.js';
 
-import { PropertiesChangedConstructor, PropertiesChanged } from '@polymer/polymer/lib/mixins/properties-changed.js';
+import type {
+	PropertiesChangedConstructor,
+	PropertiesChanged,
+} from '@polymer/polymer/lib/mixins/properties-changed.js';
 
-import { PropertiesMixinConstructor } from '@polymer/polymer/lib/mixins/properties-mixin.js';
+import type { PropertiesMixinConstructor } from '@polymer/polymer/lib/mixins/properties-mixin.js';
 
-export interface ElementMixinConstructor {
+export type ElementMixinConstructor = {
 	new (...args: any[]): ElementMixin;
 
 	/**
@@ -114,7 +120,7 @@ export interface ElementMixinConstructor {
 	 *
 	 * @param props .
 	 */
-	createProperties(props: object): void;
+	createProperties(props: Record<string, unknown>): void;
 
 	/**
 	 * Overrides `PropertyEffects` to warn on use of undeclared properties in
@@ -124,7 +130,11 @@ export interface ElementMixinConstructor {
 	 * @param prop Property that should trigger the effect
 	 * @param effect Effect metadata object
 	 */
-	_addTemplatePropertyEffect(templateInfo: object | null, prop: string, effect?: object | null): void;
+	_addTemplatePropertyEffect(
+		templateInfo: Record<string, unknown> | undefined,
+		prop: string,
+		effect?: Record<string, unknown> | undefined,
+	): void;
 
 	/**
 	 * Override of PropertiesMixin _finalizeClass to create observers and
@@ -143,7 +153,10 @@ export interface ElementMixinConstructor {
 	 *   that are functions and should trigger the effect when the function
 	 *   reference is changed
 	 */
-	createObservers(observers: object | null, dynamicFns: object | null): void;
+	createObservers(
+		observers: Record<string, unknown> | undefined,
+		dynamicFns: Record<string, unknown> | undefined,
+	): void;
 
 	/**
 	 * Gather style text for a style element in the template.
@@ -162,9 +175,9 @@ export interface ElementMixinConstructor {
 	 * @param is Tag name (or type extension name) for this element
 	 */
 	_finalizeTemplate(is: string): void;
-}
+};
 
-interface ElementMixin extends PropertyEffects, TemplateStamp, PropertyAccessors, PropertiesChanged, PropertiesMixin {
+type ElementMixin = {
 	/**
 	 * Lange: Yeah I kinda gave up here and just wanted to be done.
 	 *
@@ -173,16 +186,16 @@ interface ElementMixin extends PropertyEffects, TemplateStamp, PropertyAccessors
 	 */
 	[k: string]: any;
 
-	_template: HTMLTemplateElement | null;
+	_template: HTMLTemplateElement | undefined;
 	_importPath: string;
 	rootPath: string;
 	importPath: string;
-	root: StampedTemplate | HTMLElement | ShadowRoot | null;
+	root: StampedTemplate | HTMLElement | ShadowRoot | undefined;
 
 	/**
 	 * Lange: I modified  this from "Element" to "any".
 	 */
-	$: { [key: string]: any };
+	$: Record<string, any>;
 
 	/**
 	 * Stamps the element template.
@@ -227,7 +240,7 @@ interface ElementMixin extends PropertyEffects, TemplateStamp, PropertyAccessors
 	 * @param dom to attach to the element.
 	 * @returns node to which the dom has been attached.
 	 */
-	_attachDom(dom: StampedTemplate | null): ShadowRoot | null;
+	_attachDom(dom: StampedTemplate | undefined): ShadowRoot | undefined;
 
 	/**
 	 * When using the ShadyCSS scoping and custom property shim, causes all
@@ -248,7 +261,7 @@ interface ElementMixin extends PropertyEffects, TemplateStamp, PropertyAccessors
 	 * @param properties Bag of custom property key/values to
 	 *   apply to this element.
 	 */
-	updateStyles(properties?: object | null): void;
+	updateStyles(properties?: Record<string, unknown> | undefined): void;
 
 	/**
 	 * Rewrites a given URL relative to a base URL. The base URL defaults to
@@ -266,7 +279,11 @@ interface ElementMixin extends PropertyEffects, TemplateStamp, PropertyAccessors
 	 * @returns Rewritten URL relative to base
 	 */
 	resolveUrl(url: string, base?: string): string;
-}
+} & PropertyEffects &
+	TemplateStamp &
+	PropertyAccessors &
+	PropertiesChanged &
+	PropertiesMixin;
 
 export { updateStyles };
 
@@ -283,10 +300,10 @@ export { updateStyles };
  *
  * These properties are retained unless a value of `null` is set.
  */
-declare function updateStyles(props?: object | null): void;
+declare function updateStyles(props?: Record<string, unknown> | undefined): void;
 
-import { TemplateInfo } from '@polymer/polymer/interfaces';
+import type { TemplateInfo } from '@polymer/polymer/interfaces';
 
-import { NodeInfo } from '@polymer/polymer/interfaces';
+import type { NodeInfo } from '@polymer/polymer/interfaces';
 
-import { StampedTemplate } from '@polymer/polymer/interfaces';
+import type { StampedTemplate } from '@polymer/polymer/interfaces';

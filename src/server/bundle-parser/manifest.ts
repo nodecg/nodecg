@@ -5,9 +5,9 @@ import * as path from 'path';
 import * as semver from 'semver';
 
 // Ours
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
-export default function(pkg: NodeCG.PackageJSON, bundlePath: string): NodeCG.Manifest {
+export default function (pkg: NodeCG.PackageJSON, bundlePath: string): NodeCG.Manifest {
 	if (!semver.valid(pkg.version)) {
 		throw new Error(`${pkg.name}'s package.json must specify a valid version.`);
 	}

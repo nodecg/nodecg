@@ -12,7 +12,7 @@ import sha1 from 'sha1';
 import { proxyRecursive, ignoreProxy, resumeProxy, AbstractReplicant } from '../../shared/replicants.shared';
 import replaceRefs from './schema-hacks';
 import createLogger from '../logger';
-import { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from '../../types/nodecg';
 
 // Never instantiate this directly.
 // Always use Replicator.declare instead.
@@ -51,6 +51,7 @@ export default class ServerReplicant<T> extends AbstractReplicant<T> {
 					this.schema = parsedSchema;
 					this.schemaSum = sha1(JSON.stringify(parsedSchema));
 					this.validate = this._generateValidator();
+					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 				} catch (e) {
 					/* istanbul ignore next */
 					if (!process.env.NODECG_TEST) {
@@ -128,7 +129,9 @@ export default class ServerReplicant<T> extends AbstractReplicant<T> {
 		if (!this._pendingOperationFlush) {
 			this._oldValue = clone(this.value);
 			this._pendingOperationFlush = true;
-			process.nextTick(() => this._flushOperations());
+			process.nextTick(() => {
+				this._flushOperations();
+			});
 		}
 	}
 
