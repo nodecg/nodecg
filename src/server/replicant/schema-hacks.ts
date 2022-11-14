@@ -2,7 +2,7 @@
 
 // Packages
 import clone from 'clone';
-import ptr from 'json-ptr';
+import { JsonPointer } from 'json-ptr';
 
 // Crimes
 import jsonSchemaLibTypeOf = require('json-schema-lib/lib/util/typeOf');
@@ -131,5 +131,5 @@ function resolveFileReference(url: string, file: File): string {
 }
 
 function resolvePointerReference(obj: Record<string, unknown>, ref: string): UnknownObject {
-	return ptr.get(obj, ref) as UnknownObject;
+	return JsonPointer.get(obj, ref) as UnknownObject;
 }
