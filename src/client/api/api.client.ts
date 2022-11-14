@@ -344,14 +344,16 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		dataOrCb?: unknown,
 		cb?: SendMessageCb,
 	): void | Promise<unknown> {
-		NodeCGAPIClient.sendMessageToBundle(messageName, bundleName, dataOrCb, cb as any);
+		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+		return NodeCGAPIClient.sendMessageToBundle(messageName, bundleName, dataOrCb, cb as any);
 	}
 
 	sendMessage(messageName: string, cb: SendMessageCb): void;
 	sendMessage(messageName: string, data?: unknown): Promise<unknown>;
 	sendMessage(messageName: string, data: unknown, cb: SendMessageCb): void;
 	sendMessage(messageName: string, dataOrCb?: unknown, cb?: SendMessageCb): void | Promise<unknown> {
-		this.sendMessageToBundle(messageName, this.bundleName, dataOrCb, cb as any);
+		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+		return this.sendMessageToBundle(messageName, this.bundleName, dataOrCb, cb as any);
 	}
 
 	readReplicant(name: string, cb: ReadReplicantCb): void;

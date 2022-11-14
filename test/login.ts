@@ -39,7 +39,7 @@ test.serial('logging in and out should work', async (t) => {
 	t.is(loginPage.url(), C.loginUrl());
 });
 
-test.serial('should logging in with hashed password', async (t) => {
+test.serial('should support logging in with a hashed password', async (t) => {
 	await logIn('other_admin');
 	await loginPage.waitForFunction((url) => location.href === url, {}, C.dashboardUrl());
 
