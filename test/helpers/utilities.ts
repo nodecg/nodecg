@@ -34,12 +34,15 @@ export const shadowSelector = async <T extends Element>(
 ): Promise<Puppeteer.ElementHandle<T>> =>
 	page.evaluateHandle((selectors) => {
 		let foundDom = document.querySelector(selectors[0]);
+		if (!foundDom) throw new Error(`Failed to find selector "${selectors[0]}"`);
 		for (const selector of selectors.slice(1)) {
-			if (foundDom.shadowRoot) {
-				foundDom = foundDom.shadowRoot.querySelector(selector);
+			/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+			if (foundDom!.shadowRoot) {
+				foundDom = foundDom!.shadowRoot.querySelector(selector);
 			} else {
-				foundDom = foundDom.querySelector(selector);
+				foundDom = foundDom!.querySelector(selector);
 			}
+			/* eslint-enable @typescript-eslint/no-unnecessary-type-assertion */
 		}
 
 		return foundDom;

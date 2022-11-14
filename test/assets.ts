@@ -47,18 +47,18 @@ for (let i = 0; i < 2; i++) {
 			'ncg-asset-category[collection-name="test-bundle"][category-name="assets"]',
 		);
 		const addEl: puppeteer.ElementHandle = (await dashboard.evaluateHandle(
-			(el) => el.$.add,
+			(el: any) => el.$.add,
 			assetCategoryEl,
 		)) as any;
 		await addEl.click();
-		const fileInputEl = await dashboard.evaluateHandle((el) => el.$.uploader.$.fileInput, assetCategoryEl);
+		const fileInputEl = await dashboard.evaluateHandle((el: any) => el.$.uploader.$.fileInput, assetCategoryEl);
 		await new Promise((resolve) => {
 			assetRep.on('change', resolve);
 			(fileInputEl as any).uploadFile(UPLOAD_SOURCE_PATH);
 		});
 
 		await dashboard.evaluate(
-			async (assetCategoryEl) =>
+			async (assetCategoryEl: any) =>
 				new Promise<void>((resolve) => {
 					if (assetCategoryEl._successfulUploads === 1) {
 						resolve();

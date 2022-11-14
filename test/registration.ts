@@ -71,13 +71,13 @@ test.serial('singleInstance - should redirect to killed.html when the instance i
 
 	await dashboard.bringToFront();
 	const expandButton: any = await dashboard.evaluateHandle(
-		(el) => el.shadowRoot.querySelector('paper-button#collapseButton'),
+		(el: any) => el.shadowRoot.querySelector('paper-button#collapseButton'),
 		graphicBoard,
 	);
 	await expandButton.click();
 
 	const button: any = await dashboard.evaluateHandle(
-		(el) => el.shadowRoot.querySelector('ncg-graphic-instance').$.killButton,
+		(el: any) => el.shadowRoot.querySelector('ncg-graphic-instance').$.killButton,
 		graphicBoard,
 	);
 	await button.click();
@@ -103,15 +103,15 @@ test.serial('refresh all instances in a bundle', async (t) => {
 	const graphicBundle = await util.shadowSelector(dashboard, 'ncg-dashboard', 'ncg-graphics', 'ncg-graphics-bundle');
 
 	await dashboard.bringToFront();
-	const reload: any = await dashboard.evaluateHandle((el) => el.$.reloadButton, graphicBundle);
+	const reload: any = await dashboard.evaluateHandle((el: any) => el.$.reloadButton, graphicBundle);
 	await reload.click();
 	const confirm: any = await dashboard.evaluateHandle(
-		(el) => el.shadowRoot.querySelector('paper-button[dialog-confirm]'),
+		(el: any) => el.shadowRoot.querySelector('paper-button[dialog-confirm]'),
 		graphicBundle,
 	);
 	await confirm.click();
 
-	await graphic.waitFor(500);
+	await graphic.waitForTimeout(500);
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -131,7 +131,7 @@ test.serial('refresh all instances of a graphic', async (t) => {
 	);
 	await reload.click();
 
-	await graphic.waitFor(500);
+	await graphic.waitForTimeout(500);
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -152,7 +152,7 @@ test.serial('refresh individual instance', async (t) => {
 	);
 	await reload.click();
 
-	await graphic.waitFor(500);
+	await graphic.waitForTimeout(500);
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -174,7 +174,7 @@ test.serial('version out of date', async (t) => {
 		from: '"version": "0.0.1"',
 		to: '"version": "0.0.2"',
 	});
-	await dashboard.waitFor(1500);
+	await dashboard.waitForTimeout(1500);
 
 	let text = await dashboard.evaluate((el) => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
@@ -184,7 +184,7 @@ test.serial('version out of date', async (t) => {
 		from: '"version": "0.0.2"',
 		to: '"version": "0.0.1"',
 	});
-	await dashboard.waitFor(1500);
+	await dashboard.waitForTimeout(1500);
 
 	text = await dashboard.evaluate((el) => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Latest');
@@ -195,7 +195,7 @@ test.serial('git out of date', async (t) => {
 	const git = simpleGit(path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle'));
 	await git.add('./new_file.txt');
 	await git.commit('new commit');
-	await dashboard.waitFor(1500);
+	await dashboard.waitForTimeout(1500);
 
 	const text = await dashboard.evaluate((el) => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
@@ -214,19 +214,19 @@ test.serial('shows a diff when hovering over "potentially out of date" status', 
 
 	await graphicInstance.hover();
 	await dashboard.waitForFunction((el) => getComputedStyle(el).display !== 'none', {}, graphicInstance);
-	const diffText = await dashboard.evaluate((el) => el.$.diff.$.body.textContent, graphicInstance);
+	const diffText = await dashboard.evaluate((el: any) => el.$.diff.$.body.textContent, graphicInstance);
 	t.true(diffText.includes('Current:'));
 	t.true(diffText.includes('Latest:'));
 	t.regex(diffText, /0\.0\.1 - \w{7} \[Initial commit\]/);
 	t.regex(diffText, /0\.0\.1 - \w{7} \[new commit\]/);
 
 	const closeButton: any = await dashboard.evaluateHandle(
-		(el) => el.$.diff.shadowRoot.querySelector('paper-icon-button'),
+		(el: any) => el.$.diff.shadowRoot.querySelector('paper-icon-button'),
 		graphicInstance,
 	);
 	await closeButton.click();
 	await dashboard.waitForFunction(
-		(el) => getComputedStyle(el.$.diff).opacity === '0',
+		(el: any) => getComputedStyle(el.$.diff).opacity === '0',
 		{ timeout: 100000 },
 		graphicInstance,
 	);
@@ -286,5 +286,5 @@ test.serial('dragging the graphic generates the correct url for obs', async (t) 
 	// Dragstart event should be called during this
 	await dashboard.mouse.move(0, 0, { steps: 10 });
 
-	await dashboard.waitFor(200);
+	await dashboard.waitForTimeout(200);
 });

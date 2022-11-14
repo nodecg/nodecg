@@ -17,6 +17,7 @@
 		"@typescript-eslint/no-require-imports": 0, // we have legitimate use cases for this
 		"@typescript-eslint/consistent-type-definitions": 0, // there are legitimate use cases for using "interface" instead of "type"
 		"@typescript-eslint/naming-convention": 0, // we have legitimate use cases for this and we know what we're doing
-		"no-undef": 0 // https://typescript-eslint.io/docs/linting/troubleshooting/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
+		"no-undef": 0, // https://typescript-eslint.io/docs/linting/troubleshooting/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
+		"capitalized-comments": 0 // pedantic
 	}
 }

@@ -22,7 +22,7 @@ const test = anyTest as TestFn<BrowserContext>;
 export const setup = () => {
 	let browser: puppeteer.Browser;
 	test.serial.before(async () => {
-		// The --no-sandbox flag is required to run Headless Chrome on Travis
+		// The --no-sandbox flag is required to run Headless Chrome on CI
 		const args = isCi ? ['--no-sandbox'] : undefined;
 		browser = await puppeteer.launch({
 			headless: !argv.debugTests,
