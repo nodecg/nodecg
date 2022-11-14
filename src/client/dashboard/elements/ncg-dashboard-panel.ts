@@ -308,7 +308,7 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 	/* istanbul ignore next: tseems to confuse coverage */
 	_hexToRGB(hex: string) {
 		// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-		hex = hex.replace(HEX_PARSE_SHORTHAND_REGEX, (m, r, g, b) => r + r + g + g + b + b);
+		hex = hex.replace(HEX_PARSE_SHORTHAND_REGEX, (_m, r, g, b) => r + r + g + g + b + b);
 
 		const result = HEX_PARSE_REGEX.exec(hex);
 		return result

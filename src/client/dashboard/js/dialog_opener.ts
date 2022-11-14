@@ -12,8 +12,8 @@ document.addEventListener(
 		if (elWithDialogAttr) {
 			const dialogName = elWithDialogAttr.getAttribute('nodecg-dialog');
 			const dialogId = `${nodecg.bundleName}_${dialogName as string}`;
-			const dialogElement = window.top.document
-				.querySelector('ncg-dashboard')!
+			const dialogElement = window
+				.top!.document.querySelector('ncg-dashboard')!
 				.shadowRoot!.getElementById(dialogId) as PaperDialogElement;
 			dialogElement.open();
 		}

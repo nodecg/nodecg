@@ -118,7 +118,7 @@ export default class NodeCGServer extends EventEmitter {
 		 * We cast to "any" for a few things because
 		 * typed-socket.io isn't quite perfect.
 		 */
-		this._io = SocketIO(server) as TypedServer;
+		this._io = new SocketIO.Server(server) as TypedServer;
 		(this._io as any).setMaxListeners(75); // Prevent console warnings when many extensions are installed
 		(this._io as any).on('error', (err: Error) => {
 			if (global.sentryEnabled) {

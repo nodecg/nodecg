@@ -1,6 +1,6 @@
 // Packages
-import type * as SocketIO from 'socket.io';
 import * as Sentry from '@sentry/node';
+import type { ExtendedError } from 'socket.io/dist/namespace';
 
 // Ours
 import createLogger from '../logger';
@@ -8,7 +8,7 @@ import type { TypedServerSocket } from '../../types/socket-protocol';
 
 const log = createLogger('nodecg/lib/server');
 
-export default async function (socket: TypedServerSocket, next: SocketIO.NextFunction): Promise<void> {
+export default async function (socket: TypedServerSocket, next: (err?: ExtendedError) => void): Promise<void> {
 	try {
 		log.trace('New socket connection: ID %s with IP %s', socket.id, (socket as any).handshake.address);
 

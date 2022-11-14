@@ -1,5 +1,5 @@
 // Packages
-import type SocketIO from 'socket.io';
+import type { ExtendedError } from 'socket.io/dist/namespace';
 
 // Ours
 import { getConnection, ApiKey } from '../database';
@@ -13,7 +13,7 @@ import createLogger from '../logger';
 const log = createLogger('socket-auth');
 const socketsByKey = new Map<string, Set<TypedServerSocket>>();
 
-export default async function (socket: TypedServerSocket, next: SocketIO.NextFunction): Promise<void> {
+export default async function (socket: TypedServerSocket, next: (err?: ExtendedError) => void): Promise<void> {
 	try {
 		const req = (socket as any).request; // Not typed in the typed-socket.io lib for some reason.
 		const { token } = req._query;

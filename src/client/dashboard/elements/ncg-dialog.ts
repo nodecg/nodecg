@@ -109,7 +109,7 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 		this.addEventListener('iron-overlay-closed', this._onIronOverlayClosed);
 
 		afterNextRender(this, async () => {
-			const iframe = this.querySelector('iframe');
+			const iframe = this.querySelector('iframe')!;
 
 			// If Sentry is enabled, use it to report errors in panels to Sentry.io.
 			if (window.ncgConfig.sentry.enabled) {
@@ -122,7 +122,7 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 				});
 			}
 
-			if (iframe.contentWindow.document.readyState === 'complete') {
+			if (iframe.contentWindow!.document.readyState === 'complete') {
 				this._attachIframeResize(iframe);
 			} else {
 				iframe.addEventListener('load', () => {
@@ -135,7 +135,7 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		const iframe = this.querySelector('iframe');
+		const iframe = this.querySelector('iframe')!;
 		iframe.addEventListener('iframe-resized', () => {
 			this.refit();
 		});
@@ -180,12 +180,12 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 	}
 
 	_onIronOverlayOpened() {
-		const iframeDocument = this.querySelector('iframe').contentDocument;
+		const iframeDocument = this.querySelector('iframe')!.contentDocument!;
 		iframeDocument.dispatchEvent(new CustomEvent('dialog-opened'));
 	}
 
 	_onIronOverlayClosed(e: any) {
-		const iframeDocument = this.querySelector('iframe').contentDocument;
+		const iframeDocument = this.querySelector('iframe')!.contentDocument!;
 		if (e.detail.confirmed && !e.detail.canceled) {
 			iframeDocument.dispatchEvent(new CustomEvent('dialog-confirmed'));
 		} else {

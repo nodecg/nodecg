@@ -307,6 +307,8 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 		if (_narrow) {
 			return 'narrow';
 		}
+
+		return '';
 	}
 
 	_initClipboard(clipboard: Clipboard) {
