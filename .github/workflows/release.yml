@@ -14,7 +14,15 @@ jobs:
         with:
           node-version: '16'
 
-      - run: npm ci
+      - name: Restore node_modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn --ignore-engines --frozen-lockfile --network-timeout 1000000
 
       - name: Semantic Release
         run: npx semantic-release
