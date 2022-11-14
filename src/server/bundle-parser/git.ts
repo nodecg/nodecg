@@ -1,4 +1,3 @@
- 
 // Packages
 import * as git from 'git-rev-sync';
 
