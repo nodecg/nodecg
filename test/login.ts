@@ -115,29 +115,25 @@ test.serial('socket should deny access to bad credentials', async (t) => {
 });
 
 async function logIn(username = 'admin', password = 'password'): Promise<void | Page> {
-	const logs: string[] = [];
-	try {
-		loginPage.on('console', (event) => {
-			logs.push(event.text());
-		});
-		await loginPage.bringToFront();
-		await loginPage.goto(C.loginUrl());
-		if (loginPage.url() !== C.loginUrl()) {
-			return loginPage;
-		}
-
-		await loginPage.type('#username', username);
-		await loginPage.type('#password', password);
-
-		const navWait = loginPage.waitForNavigation();
-		await loginPage.click('#localSubmit');
-		await navWait;
-		if (loginPage.url() === C.loginUrl()) throw new Error('did not actually log in');
-	} catch (error: unknown) {
-		throw new Error(`Logging in failed (current URL: ${loginPage.url()}): ` + logs.join('\n'));
-	} finally {
-		loginPage.removeAllListeners('console');
+	await loginPage.bringToFront();
+	await loginPage.goto(C.loginUrl());
+	if (loginPage.url() !== C.loginUrl()) {
+		return loginPage;
 	}
+
+	// Use this instead of .type to ensure that any previous input is cleared.
+	await loginPage.evaluate((un) => {
+		const usernameInput = document.getElementById('username') as HTMLInputElement;
+		usernameInput.value = un;
+	}, username);
+	await loginPage.evaluate((pw) => {
+		const passwordInput = document.getElementById('password') as HTMLInputElement;
+		passwordInput.value = pw;
+	}, password);
+
+	const navWait = loginPage.waitForNavigation();
+	await loginPage.click('#localSubmit');
+	await navWait;
 }
 
 async function logOut(t: ExecutionContext<browser.BrowserContext>): Promise<void> {
