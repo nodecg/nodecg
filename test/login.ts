@@ -112,6 +112,9 @@ test.serial('socket should deny access to bad credentials', async (t) => {
 			resolve();
 		});
 	});
+
+	socket.removeAllListeners();
+	socket.close();
 });
 
 async function logIn(username = 'admin', password = 'password'): Promise<void | Page> {
@@ -122,14 +125,16 @@ async function logIn(username = 'admin', password = 'password'): Promise<void | 
 	}
 
 	// Use this instead of .type to ensure that any previous input is cleared.
-	await loginPage.evaluate((un) => {
-		const usernameInput = document.getElementById('username') as HTMLInputElement;
-		usernameInput.value = un;
-	}, username);
-	await loginPage.evaluate((pw) => {
-		const passwordInput = document.getElementById('password') as HTMLInputElement;
-		passwordInput.value = pw;
-	}, password);
+	await loginPage.evaluate(
+		(un, pw) => {
+			const usernameInput = document.getElementById('username') as HTMLInputElement;
+			const passwordInput = document.getElementById('password') as HTMLInputElement;
+			usernameInput.value = un;
+			passwordInput.value = pw;
+		},
+		username,
+		password,
+	);
 
 	const navWait = loginPage.waitForNavigation();
 	await loginPage.click('#localSubmit');
@@ -141,4 +146,5 @@ async function logOut(t: ExecutionContext<browser.BrowserContext>): Promise<void
 	await page.goto(`${C.rootUrl()}logout`);
 	await page.close();
 	await loginPage.bringToFront();
+	await loginPage.reload();
 }
