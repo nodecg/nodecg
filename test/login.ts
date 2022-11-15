@@ -132,6 +132,7 @@ async function logIn(username = 'admin', password = 'password'): Promise<void | 
 		const navWait = loginPage.waitForNavigation();
 		await loginPage.click('#localSubmit');
 		await navWait;
+		if (loginPage.url() === C.loginUrl()) throw new Error('did not actually log in');
 	} catch (error: unknown) {
 		throw new Error(`Logging in failed (current URL: ${loginPage.url()}): ` + logs.join('\n'));
 	} finally {
