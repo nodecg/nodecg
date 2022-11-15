@@ -37,7 +37,7 @@ test.serial('login should deny access to bad credentials', async (t) => {
 
 test.serial('logging in and out should work', async (t) => {
 	await logIn();
-	await loginPage.waitForFunction((url) => location.href === url, {}, C.dashboardUrl());
+	await loginPage.waitForNavigation();
 	await logOut(t);
 	await loginPage.reload();
 	t.is(loginPage.url(), C.loginUrl());
@@ -45,9 +45,8 @@ test.serial('logging in and out should work', async (t) => {
 
 test.serial('should support logging in with a hashed password', async (t) => {
 	await logIn('other_admin', 'password');
-	await loginPage.waitForFunction((url) => location.href === url, {}, C.dashboardUrl());
-
-	t.pass();
+	await loginPage.waitForNavigation();
+	t.is(loginPage.url(), C.dashboardUrl());
 });
 
 test.serial('regenerating a token should send the user back to /login', async (t) => {
