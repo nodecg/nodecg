@@ -52,50 +52,45 @@ test.serial('should support logging in with a hashed password', async (t) => {
 
 test.serial('regenerating a token should send the user back to /login', async (t) => {
 	await logIn();
-
 	const page = await initDashboard();
-	page.on('console', (event) => {
-		t.log(event.text());
-	});
-	const watchdog = page.waitForFunction((loginUrl) => location.href === loginUrl, {}, C.loginUrl());
-	// We need to preserve the coverage from this test, because it will be lost
-	// when the page is redirected to /login.
-	const coverage = await page.evaluate(() => {
-		const ncgSettings: any = (document as any)
-			.querySelector('ncg-dashboard')
-			.shadowRoot.querySelector('ncg-settings');
-		ncgSettings.resetKey();
-		return window.__coverage__;
-	});
+	const [_, coverage] = await Promise.all([
+		page.waitForNavigation(),
 
-	await watchdog;
+		page.evaluate(() => {
+			const ncgSettings: any = (document as any)
+				.querySelector('ncg-dashboard')
+				.shadowRoot.querySelector('ncg-settings');
+			ncgSettings.resetKey();
+
+			// We need to preserve the coverage from this test, because it will be lost
+			// when the page is redirected to /login.
+			return window.__coverage__;
+		}),
+	]);
 
 	// Put our preserved coverage back on the page for later extraction.
 	await page.evaluate((injectedCoverage) => {
 		window.__coverage__ = injectedCoverage;
 	}, coverage);
 
-	t.pass();
+	const expectedUrl = C.loginUrl();
+	t.true(page.url().startsWith(expectedUrl));
 });
 
 test.serial('token invalidation should show an UnauthorizedError on open pages', async (t) => {
 	await logIn();
 	const dash = await initDashboard();
 	const graphic = await initGraphic();
-	graphic.on('console', (event) => {
-		t.log(event.text());
-	});
-	const watchdog = graphic.waitForFunction(
-		(validUrl) => location.href.startsWith(validUrl),
-		{},
-		`${C.rootUrl()}authError?code=token_invalidated`,
-	);
-	await dash.evaluate(() => {
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		window.socket.emit('regenerateToken', undefined, () => {});
-	});
-	await watchdog;
-	t.pass();
+	await Promise.all([
+		graphic.waitForNavigation(),
+		dash.evaluate(() => {
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			window.socket.emit('regenerateToken', undefined, () => {});
+		}),
+	]);
+
+	const expectedUrl = `${C.rootUrl()}authError?code=token_invalidated`;
+	t.true(graphic.url().startsWith(expectedUrl));
 });
 
 test.serial('socket should deny access to bad credentials', async (t) => {
