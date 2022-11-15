@@ -79,6 +79,9 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 	await logIn();
 	const dash = await initDashboard();
 	const graphic = await initGraphic();
+	graphic.on('console', (event) => {
+		t.log(event.text());
+	});
 	const watchdog = graphic.waitForFunction(
 		(validUrl) => location.href.startsWith(validUrl),
 		{},
