@@ -64,7 +64,7 @@ export const setup = () => {
 		/* eslint-enable no-await-in-loop */
 
 		if (argv.debugTests) {
-			await sleep(Infinity);
+			await sleep(99999999);
 		} else {
 			await browser.close();
 		}
