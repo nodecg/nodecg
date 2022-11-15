@@ -3,7 +3,7 @@ import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
-import { NodeCG } from '../../../../types/nodecg';
+import type { NodeCG } from '../../../../types/nodecg';
 import type ClientReplicant from '../../../api/replicant';
 let bundlesRep: ClientReplicant<NodeCG.Bundle[]>;
 
