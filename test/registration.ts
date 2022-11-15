@@ -109,9 +109,9 @@ test.serial('refresh all instances in a bundle', async (t) => {
 		(el: any) => el.shadowRoot.querySelector('paper-button[dialog-confirm]'),
 		graphicBundle,
 	);
-	await confirm.click();
 
-	await graphic.waitForTimeout(500);
+	await Promise.all([confirm.click(), graphic.waitForNavigation()]);
+
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -129,9 +129,9 @@ test.serial('refresh all instances of a graphic', async (t) => {
 		'ncg-graphic',
 		'#reloadButton',
 	);
-	await reload.click();
 
-	await graphic.waitForTimeout(500);
+	await Promise.all([reload.click(), graphic.waitForNavigation()]);
+
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
@@ -150,9 +150,9 @@ test.serial('refresh individual instance', async (t) => {
 		'ncg-graphic-instance:last-of-type',
 		'#reloadButton',
 	);
-	await reload.click();
 
-	await graphic.waitForTimeout(500);
+	await Promise.all([reload.click(), graphic.waitForNavigation()]);
+
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
 });
