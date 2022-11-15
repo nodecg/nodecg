@@ -115,18 +115,22 @@ test.serial('socket should deny access to bad credentials', async (t) => {
 });
 
 async function logIn(username = 'admin', password = 'password'): Promise<void | Page> {
-	await loginPage.bringToFront();
-	await loginPage.goto(C.loginUrl());
-	if (loginPage.url() !== C.loginUrl()) {
-		return loginPage;
+	try {
+		await loginPage.bringToFront();
+		await loginPage.goto(C.loginUrl());
+		if (loginPage.url() !== C.loginUrl()) {
+			return loginPage;
+		}
+
+		await loginPage.type('#username', username);
+		await loginPage.type('#password', password);
+
+		const navWait = loginPage.waitForNavigation();
+		await loginPage.click('#localSubmit');
+		await navWait;
+	} catch (error: unknown) {
+		throw new Error('Logging in failed: ' + (error as any).message);
 	}
-
-	await loginPage.type('#username', username);
-	await loginPage.type('#password', password);
-
-	const navWait = loginPage.waitForNavigation();
-	await loginPage.click('#localSubmit');
-	await navWait;
 }
 
 async function logOut(t: ExecutionContext<browser.BrowserContext>): Promise<void> {
