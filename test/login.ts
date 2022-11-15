@@ -79,15 +79,16 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 	await logIn();
 	const dash = await initDashboard();
 	const graphic = await initGraphic();
-	await dash.evaluate(() => {
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		window.socket.emit('regenerateToken', undefined, () => {});
-	});
-	await graphic.waitForFunction(
+	const watchdog = graphic.waitForFunction(
 		(validUrl) => location.href.startsWith(validUrl),
 		{},
 		`${C.rootUrl()}authError?code=token_invalidated`,
 	);
+	await dash.evaluate(() => {
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		window.socket.emit('regenerateToken', undefined, () => {});
+	});
+	await watchdog;
 	t.pass();
 });
 
