@@ -19,6 +19,10 @@ test.before(async () => {
 	loginPage = await initLogin();
 });
 
+test.afterEach(async (t) => {
+	await logOut(t);
+});
+
 test.serial('redirects unauthorized users to /login', async (t) => {
 	await loginPage.goto(C.dashboardUrl());
 	t.is(loginPage.url(), C.loginUrl());
@@ -88,7 +92,7 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 	t.pass();
 });
 
-test('socket should deny access to bad credentials', async (t) => {
+test.serial('socket should deny access to bad credentials', async (t) => {
 	t.plan(1);
 
 	const socket = socketIoClient(`${C.rootUrl()}?key=bad_credentials`);
