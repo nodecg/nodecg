@@ -34,11 +34,12 @@ jobs:
           git config --global user.email "ci@nodecg.dev"
           git config --global user.name "NodeCG Bot"
 
-      - name: Restore node_modules
+      - name: Restore dependency caches
         uses: actions/cache@v3
         with:
           path: |
             node_modules
+            /home/runner/.cache/puppeteer
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
