@@ -54,6 +54,7 @@ test.serial('regenerating a token should send the user back to /login', async (t
 	await logIn();
 
 	const page = await initDashboard();
+	const watchdog = page.waitForFunction((loginUrl) => location.href === loginUrl, {}, C.loginUrl());
 	// We need to preserve the coverage from this test, because it will be lost
 	// when the page is redirected to /login.
 	const coverage = await page.evaluate(() => {
@@ -64,7 +65,7 @@ test.serial('regenerating a token should send the user back to /login', async (t
 		return window.__coverage__;
 	});
 
-	await page.waitForFunction((loginUrl) => location.href === loginUrl, {}, C.loginUrl());
+	await watchdog;
 
 	// Put our preserved coverage back on the page for later extraction.
 	await page.evaluate((injectedCoverage) => {
