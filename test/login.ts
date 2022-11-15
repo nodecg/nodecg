@@ -19,10 +19,6 @@ test.before(async () => {
 	loginPage = await initLogin();
 });
 
-test.afterEach(async (t) => {
-	await logOut(t);
-});
-
 test.serial('redirects unauthorized users to /login', async (t) => {
 	await loginPage.goto(C.dashboardUrl());
 	t.is(loginPage.url(), C.loginUrl());
