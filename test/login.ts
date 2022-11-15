@@ -54,6 +54,9 @@ test.serial('regenerating a token should send the user back to /login', async (t
 	await logIn();
 
 	const page = await initDashboard();
+	page.on('console', (event) => {
+		t.log(event.text());
+	});
 	const watchdog = page.waitForFunction((loginUrl) => location.href === loginUrl, {}, C.loginUrl());
 	// We need to preserve the coverage from this test, because it will be lost
 	// when the page is redirected to /login.

@@ -65,4 +65,4 @@ jobs:
         with:
           file: ./coverage.lcov
         # Only report once
-        if: runner.os == 'Linux' && matrix.node-version == 16
+        if: runner.os == 'Linux' && matrix.node-version == '16.x'
