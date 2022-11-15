@@ -58,7 +58,7 @@ jobs:
           npm run test
 
       - name: Create code coverage report
-        run: npx nyc report --reporter=text-lcov > coverage.lcov
+        run: npx nyc report --reporter=text-lcov --include=\"src/**\" > coverage.lcov
 
       - name: Send code coverage to Codecov
         uses: codecov/codecov-action@v3
