@@ -130,7 +130,6 @@ async function logIn(username = 'admin', password = 'password'): Promise<void | 
 }
 
 async function logOut(t: ExecutionContext<browser.BrowserContext>): Promise<void> {
-	if (loginPage.url() === C.loginUrl()) return;
 	const page = await t.context.browser.newPage();
 	await page.goto(`${C.rootUrl()}logout`);
 	await page.close();
