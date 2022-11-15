@@ -94,16 +94,16 @@ test('socket should deny access to bad credentials', async (t) => {
 	t.plan(1);
 
 	const socket = socketIoClient(`${C.rootUrl()}?key=bad_credentials`);
-	socket.on('connect', () => {
-		t.fail();
+	socket.once('connect', () => {
+		t.fail('Socket was able to connect.');
 	});
-	socket.on('event', () => {
-		t.fail();
+	socket.once('event', () => {
+		t.fail('Socket received data.');
 	});
 
 	await new Promise<void>((resolve) => {
-		socket.on('error', (error: unknown) => {
-			t.is(error, 'no credentials found');
+		socket.once('connect_error', (error: unknown) => {
+			t.is((error as any).message, 'no credentials found');
 			resolve();
 		});
 	});
