@@ -5,7 +5,7 @@ import path from 'path';
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import fse from 'fs-extra';
-import temp from 'temp';
+import tmp from 'tmp-promise';
 
 // Ours
 import * as C from './test-constants';
@@ -24,8 +24,8 @@ export type ServerContext = {
 const test = anyTest as TestFn<ServerContext>;
 
 export const setup = (nodecgConfigName = 'nodecg.json'): void => {
-	const tempFolder = temp.mkdirSync();
-	temp.track(); // Automatically track and cleanup files at exit.
+	tmp.setGracefulCleanup();
+	const tempFolder = tmp.dirSync().name;
 
 	// Tell NodeCG to look in our new temp folder for bundles, cfg, db, and assets, rather than whatever ones the user
 	// may have. We don't want to touch any existing user data!

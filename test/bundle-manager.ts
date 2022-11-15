@@ -5,15 +5,15 @@ import os from 'os';
 
 // Packages
 import fse from 'fs-extra';
-import temp from 'temp';
+import tmp from 'tmp-promise';
 import test from 'ava';
 
 // Ours
 import type BundleManagerTypeOnly from '../src/server/bundle-manager';
 import { sleep } from './helpers/utilities';
 
-const tempFolder = temp.mkdirSync();
-temp.track(); // Automatically track and cleanup files at exit.
+tmp.setGracefulCleanup();
+const tempFolder = tmp.dirSync().name;
 
 let bundleManager: BundleManagerTypeOnly;
 test.before(async () => {

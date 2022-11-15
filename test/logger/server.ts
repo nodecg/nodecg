@@ -1,14 +1,22 @@
+// Native
+import path from 'path';
+
 // Packages
 import fs from 'fs-extra';
 import sinon from 'sinon';
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
+import tmp from 'tmp-promise';
 
 // Ours
 import loggerFactory from '../../src/server/logger/logger.server';
 
-// Start up the logger lib with defaults only
-const Logger = loggerFactory();
+tmp.setGracefulCleanup();
+const tempFolder = tmp.dirSync().name;
+const logsDir = path.join(tempFolder, 'logs');
+
+// Start up the logger lib
+const Logger = loggerFactory({ file: { path: path.join(logsDir, 'nodecg.log') } });
 
 type TestContext = {
 	logger: InstanceType<typeof Logger>;
@@ -18,20 +26,13 @@ type TestContext = {
 
 const test = anyTest as TestFn<TestContext>;
 
-test.before(() => {
-	// Remove the "logs" folder
-	if (fs.existsSync('./logs')) {
-		fs.removeSync('./logs');
-	}
-});
-
 test.beforeEach((t) => {
 	t.context.logger = new Logger('testServer');
 
 	const SentryMock: any = {
 		captureException: sinon.stub(),
 	};
-	const sentryLogger = loggerFactory({}, SentryMock);
+	const sentryLogger = loggerFactory({ file: { path: path.join(logsDir, 'sentry.log') } }, SentryMock);
 	t.context.SentryMock = SentryMock;
 	t.context.sentryLogger = new sentryLogger('sentryServer');
 });
@@ -53,7 +54,7 @@ test('file - should default to level "info"', (t) => {
 });
 
 test('file - should make the logs folder', (t) => {
-	t.is(fs.existsSync('./logs'), true);
+	t.is(fs.existsSync(logsDir), true);
 });
 
 test('replicant - should default to false', (t) => {
