@@ -15,8 +15,11 @@ const { initLogin, initDashboard, initGraphic } = browser.setup();
 import * as C from './helpers/test-constants';
 
 let loginPage: Page;
-test.before(async () => {
+test.before(async (t) => {
 	loginPage = await initLogin();
+	loginPage.on('console', (event) => {
+		t.log(event.text());
+	});
 });
 
 test.afterEach(async (t) => {
@@ -43,7 +46,7 @@ test.serial('logging in and out should work', async (t) => {
 });
 
 test.serial('should support logging in with a hashed password', async (t) => {
-	await logIn('other_admin', 'password');
+	await logIn('other_admin');
 	return t.is(loginPage.url(), C.dashboardUrl());
 });
 
@@ -51,26 +54,20 @@ test.serial('regenerating a token should send the user back to /login', async (t
 	await logIn();
 	const page = await initDashboard();
 
-	let coverage = {};
-	try {
-		const result = await Promise.all([
-			page.waitForNavigation(),
+	const [_, coverage] = await Promise.all([
+		page.waitForNavigation(),
 
-			page.evaluate(() => {
-				const ncgSettings: any = (document as any)
-					.querySelector('ncg-dashboard')
-					.shadowRoot.querySelector('ncg-settings');
-				ncgSettings.resetKey();
+		page.evaluate(() => {
+			const ncgSettings: any = (document as any)
+				.querySelector('ncg-dashboard')
+				.shadowRoot.querySelector('ncg-settings');
+			ncgSettings.resetKey();
 
-				// We need to preserve the coverage from this test, because it will be lost
-				// when the page is redirected to /login.
-				return window.__coverage__;
-			}),
-		]);
-		coverage = result[1];
-	} catch (_) {
-		return t.fail('Test failed, current URL is: ' + page.url());
-	}
+			// We need to preserve the coverage from this test, because it will be lost
+			// when the page is redirected to /login.
+			return window.__coverage__;
+		}),
+	]);
 
 	// Put our preserved coverage back on the page for later extraction.
 	await page.evaluate((injectedCoverage) => {
@@ -86,17 +83,13 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 	const dash = await initDashboard();
 	const graphic = await initGraphic();
 
-	try {
-		await Promise.all([
-			graphic.waitForNavigation(),
-			dash.evaluate(() => {
-				// eslint-disable-next-line @typescript-eslint/no-empty-function
-				window.socket.emit('regenerateToken', undefined, () => {});
-			}),
-		]);
-	} catch (_) {
-		return t.fail('Test failed, current URL is: ' + graphic.url());
-	}
+	await Promise.all([
+		graphic.waitForNavigation(),
+		dash.evaluate(() => {
+			// eslint-disable-next-line @typescript-eslint/no-empty-function
+			window.socket.emit('regenerateToken', undefined, () => {});
+		}),
+	]);
 
 	const expectedUrl = `${C.rootUrl()}authError?code=token_invalidated`;
 	return t.true(graphic.url().startsWith(expectedUrl));
@@ -137,7 +130,9 @@ async function logIn(username = 'admin', password = 'password'): Promise<void | 
 }
 
 async function logOut(t: ExecutionContext<browser.BrowserContext>): Promise<void> {
+	if (loginPage.url() === C.loginUrl()) return;
 	const page = await t.context.browser.newPage();
 	await page.goto(`${C.rootUrl()}logout`);
+	await page.close();
 	await loginPage.bringToFront();
 }
