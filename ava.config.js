@@ -1,6 +1,5 @@
 module.exports = {
 	files: ['test/**', '!test/helpers/**', '!test/fixtures/**', '!test/types/**'],
-	concurrency: 1,
 	timeout: '45s',
 	verbose: true,
 	environmentVariables: {
