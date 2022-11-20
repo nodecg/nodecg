@@ -6,7 +6,8 @@
 		"esModuleInterop": false,
 		"allowSyntheticDefaultImports": true,
 		"composite": true,
-		"outDir": "../../build/client_for_test",
+		"emitDeclarationOnly": true,
+		"outDir": "../../build/client_types",
 		"baseUrl": ".",
 		"paths": {
 			"@polymer/polymer": ["./types/polymer-element.d.ts"]
