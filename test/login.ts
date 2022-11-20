@@ -118,7 +118,7 @@ async function logIn(
 	password = 'password',
 ): Promise<void | Page> {
 	await loginPage.bringToFront();
-	await loginPage.goto(C.loginUrl());
+	await loginPage.goto(C.dashboardUrl()); // Should redirect to the login page, but set our returnTo to the dashboard, which we want.
 	t.is(loginPage.url(), C.loginUrl());
 
 	// Use this instead of .type to ensure that any previous input is cleared.
