@@ -77,6 +77,7 @@ export const setup = () => {
 		const page = await browser.newPage();
 		await page.goto(C.dashboardUrl());
 		await page.waitForFunction(() => typeof window.dashboardApi !== 'undefined');
+		await page.waitForFunction(() => window.WebComponentsReady);
 		return page;
 	};
 

@@ -16,6 +16,7 @@ declare global {
 			bundles: NodeCG.Bundle[];
 			workspaces: NodeCG.Workspace[];
 		};
+		WebComponentsReady: boolean;
 	}
 
 	const NodeCG: ConstructorType;
