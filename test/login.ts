@@ -31,24 +31,22 @@ test.serial('redirects unauthorized users to /login', async (t) => {
 test.serial('login should deny access to bad credentials', async (t) => {
 	await loginPage.type('#username', 'admin');
 	await loginPage.type('#password', 'wrong_password');
-	await loginPage.click('#localSubmit');
+	await Promise.all([loginPage.waitForNavigation(), loginPage.click('#localSubmit')]);
 	t.is(loginPage.url(), C.loginUrl());
 });
 
 test.serial('logging in and out should work', async (t) => {
-	await logIn();
+	await logIn(t);
 	await logOut(t);
-	await loginPage.reload();
-	return t.is(loginPage.url(), C.loginUrl());
 });
 
 test.serial('should support logging in with a hashed password', async (t) => {
-	await logIn('other_admin');
+	await logIn(t, 'other_admin');
 	return t.is(loginPage.url(), C.dashboardUrl());
 });
 
 test.serial('regenerating a token should send the user back to /login', async (t) => {
-	await logIn();
+	await logIn(t);
 	const page = await initDashboard();
 
 	const [_, coverage] = await Promise.all([
@@ -76,7 +74,7 @@ test.serial('regenerating a token should send the user back to /login', async (t
 });
 
 test.serial('token invalidation should show an UnauthorizedError on open pages', async (t) => {
-	await logIn();
+	await logIn(t);
 	const dash = await initDashboard();
 	const graphic = await initGraphic();
 
@@ -114,12 +112,14 @@ test.serial('socket should deny access to bad credentials', async (t) => {
 	socket.close();
 });
 
-async function logIn(username = 'admin', password = 'password'): Promise<void | Page> {
+async function logIn(
+	t: ExecutionContext<browser.BrowserContext>,
+	username = 'admin',
+	password = 'password',
+): Promise<void | Page> {
 	await loginPage.bringToFront();
 	await loginPage.goto(C.loginUrl());
-	if (loginPage.url() !== C.loginUrl()) {
-		return loginPage;
-	}
+	t.is(loginPage.url(), C.loginUrl());
 
 	// Use this instead of .type to ensure that any previous input is cleared.
 	await loginPage.evaluate(
@@ -134,6 +134,7 @@ async function logIn(username = 'admin', password = 'password'): Promise<void | 
 	);
 
 	await Promise.all([loginPage.waitForNavigation(), loginPage.click('#localSubmit')]);
+	t.is(loginPage.url(), C.dashboardUrl());
 }
 
 async function logOut(t: ExecutionContext<browser.BrowserContext>): Promise<void> {
