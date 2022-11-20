@@ -139,7 +139,7 @@ async function logIn(
 				clearInterval(interval);
 				reject(
 					new Error(
-						'Timed out while waiting for login page to redirect to dashboard page after successful login.',
+						`Timed out while waiting for login page to redirect to dashboard page after successful login. Current URL is: "${loginPage.url()}"`,
 					),
 				);
 			}, 30000);

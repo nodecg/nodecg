@@ -18,7 +18,7 @@ import { config } from '../config';
 import createLogger from '../logger';
 import type { User, Role } from '../database';
 import { Session, getConnection } from '../database';
-import { findUser, upsertUser, getSuperUserRole } from '../database/utils';
+import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/utils';
 
 type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
 
@@ -360,10 +360,15 @@ export async function createMiddleware(): Promise<express.Application> {
 	app.set('views', VIEWS_DIR);
 
 	app.get('/login', (req, res) => {
-		res.render(path.join(VIEWS_DIR, 'login.tmpl'), {
-			user: req.user,
-			config,
-		});
+		// If the user is already logged in, don't show them the login page again.
+		if (req.user && isSuperUser(req.user)) {
+			res.redirect('/dashboard');
+		} else {
+			res.render(path.join(VIEWS_DIR, 'login.tmpl'), {
+				user: req.user,
+				config,
+			});
+		}
 	});
 
 	app.get('/authError', (req, res) => {
