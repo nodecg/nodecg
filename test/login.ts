@@ -69,8 +69,8 @@ test.serial('regenerating a token should send the user back to /login', async (t
 		window.__coverage__ = injectedCoverage;
 	}, coverage);
 
-	const expectedUrl = C.loginUrl();
-	return t.true(page.url().startsWith(expectedUrl));
+	t.is(page.url(), C.loginUrl());
+	await page.close();
 });
 
 test.serial('token invalidation should show an UnauthorizedError on open pages', async (t) => {
@@ -133,7 +133,16 @@ async function logIn(
 		password,
 	);
 
-	await Promise.all([loginPage.waitForNavigation(), loginPage.click('#localSubmit')]);
+	await Promise.all([
+		loginPage.waitForFunction(
+			(dashUrl) => {
+				window.location.href = dashUrl;
+			},
+			{},
+			C.dashboardUrl(),
+		),
+		loginPage.click('#localSubmit'),
+	]);
 	t.is(loginPage.url(), C.dashboardUrl());
 }
 
