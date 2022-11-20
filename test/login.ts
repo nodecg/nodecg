@@ -133,7 +133,26 @@ async function logIn(
 		password,
 	);
 
-	await Promise.all([loginPage.waitForNavigation(), loginPage.click('#localSubmit')]);
+	await Promise.all([
+		new Promise<void>((resolve, reject) => {
+			const timeout = setTimeout(() => {
+				clearInterval(interval);
+				reject(
+					new Error(
+						'Timed out while waiting for login page to redirect to dashboard page after successful login.',
+					),
+				);
+			}, 30000);
+			const interval = setInterval(() => {
+				if (loginPage.url() === C.dashboardUrl()) {
+					clearTimeout(timeout);
+					clearInterval(interval);
+					resolve();
+				}
+			}, 1000);
+		}),
+		loginPage.click('#localSubmit'),
+	]);
 	t.is(loginPage.url(), C.dashboardUrl());
 }
 
