@@ -15,14 +15,11 @@ const { initLogin, initDashboard, initGraphic } = browser.setup();
 import * as C from './helpers/test-constants';
 
 let loginPage: Page;
-test.before(async (t) => {
+test.before(async () => {
 	loginPage = await initLogin();
-	loginPage.on('console', (event) => {
-		t.log(event.text());
-	});
 });
 
-test.afterEach(async (t) => {
+test.afterEach.always(async (t) => {
 	await logOut(t);
 });
 
