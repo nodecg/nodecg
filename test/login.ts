@@ -133,16 +133,7 @@ async function logIn(
 		password,
 	);
 
-	await Promise.all([
-		loginPage.waitForFunction(
-			(dashUrl) => {
-				window.location.href = dashUrl;
-			},
-			{},
-			C.dashboardUrl(),
-		),
-		loginPage.click('#localSubmit'),
-	]);
+	await Promise.all([loginPage.waitForNavigation(), loginPage.click('#localSubmit')]);
 	t.is(loginPage.url(), C.dashboardUrl());
 }
 
