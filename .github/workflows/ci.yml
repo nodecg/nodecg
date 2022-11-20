@@ -34,13 +34,28 @@ jobs:
           git config --global user.email "ci@nodecg.dev"
           git config --global user.name "NodeCG Bot"
 
-      - name: Restore dependency caches
+      - name: Restore npm/yarn dependency cache
         uses: actions/cache@v3
         with:
           path: |
             node_modules
-            /home/runner/.cache/puppeteer
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Restore Chromium dependency cache (Linux)
+        uses: actions/cache@v3
+        with:
+          path: |
+            /home/runner/.cache/puppeteer
+          key: chromium-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+        if: runner.os == 'Linux'
+
+      - name: Restore Chromium dependency cache (Windows)
+        uses: actions/cache@v3
+        with:
+          path: |
+            C:\Users\runneradmin\.cache\puppeteer
+          key: chromium-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+        if: runner.os == 'Windows'
 
       - name: Install dependencies
         run: yarn --ignore-engines --frozen-lockfile --network-timeout 1000000
