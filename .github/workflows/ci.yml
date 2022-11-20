@@ -39,7 +39,7 @@ jobs:
         with:
           path: |
             node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: npm-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Restore Chromium dependency cache (Linux)
         uses: actions/cache@v3
