@@ -133,9 +133,7 @@ async function logIn(username = 'admin', password = 'password'): Promise<void | 
 		password,
 	);
 
-	const navWait = loginPage.waitForNavigation();
-	await loginPage.click('#localSubmit');
-	await navWait;
+	await Promise.all([loginPage.waitForNavigation(), loginPage.click('#localSubmit')]);
 }
 
 async function logOut(t: ExecutionContext<browser.BrowserContext>): Promise<void> {
@@ -143,5 +141,6 @@ async function logOut(t: ExecutionContext<browser.BrowserContext>): Promise<void
 	await page.goto(`${C.rootUrl()}logout`);
 	await page.close();
 	await loginPage.bringToFront();
-	await loginPage.reload();
+	await loginPage.goto(C.loginUrl());
+	t.is(loginPage.url(), C.loginUrl());
 }
