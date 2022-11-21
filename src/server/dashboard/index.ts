@@ -107,7 +107,6 @@ function getDashboardContext(bundles: NodeCG.Bundle[]): DashboardContext {
 			const cleanedBundle = clone(bundle);
 			if (cleanedBundle.dashboard.panels) {
 				cleanedBundle.dashboard.panels.forEach((panel) => {
-					// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 					delete (panel as any).html;
 				});
 			}

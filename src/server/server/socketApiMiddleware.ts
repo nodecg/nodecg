@@ -33,7 +33,8 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 
 		socket.on('joinRoom', (room, cb) => {
 			if (typeof room !== 'string') {
-				return cb('Room must be a string');
+				cb('Room must be a string');
+				return;
 			}
 
 			if (!Object.keys((socket as any).rooms).includes(room)) {

@@ -133,11 +133,6 @@ export abstract class NodeCGAPIBase {
 	 */
 	abstract get log(): AbstractLogger;
 
-	/**
-	 * A filtered copy of the NodeCG server config with some sensitive keys removed.
-	 */
-	abstract get config(): Readonly<NodeCG.FilteredConfig>;
-
 	constructor(bundle: NodeCG.Bundle) {
 		this.bundleName = bundle.name;
 		this.bundleConfig = bundle.config;

@@ -7,7 +7,7 @@ import serializeError from 'serialize-error';
 import type { AbstractLogger, Acknowledgement } from '../shared/api.base';
 import { NodeCGAPIBase } from '../shared/api.base';
 import type { Replicator, ServerReplicant } from './replicant';
-import { filteredConfig } from './config';
+import { config } from './config';
 import { Logger } from './logger';
 import * as ncgUtils from './util';
 import type { RootNS } from '../types/socket-protocol';
@@ -80,8 +80,11 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 			return this._memoizedLogger;
 		}
 
-		get config(): typeof filteredConfig {
-			return JSON.parse(JSON.stringify(filteredConfig));
+		/**
+		 * The full NodeCG server config, including potentially sensitive keys.
+		 */
+		get config(): Readonly<typeof config> {
+			return JSON.parse(JSON.stringify(config));
 		}
 
 		/**

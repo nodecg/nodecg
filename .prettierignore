@@ -9,6 +9,8 @@
 /logs
 /media
 /node_modules
+/build-types
+/generated-types
 .env
 
 # Intentionally broken as part of tests

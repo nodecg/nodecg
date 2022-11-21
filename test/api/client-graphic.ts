@@ -55,7 +55,7 @@ test.serial('should send messages', async (t) => {
 		});
 	});
 	void graphic.evaluate(() => {
-		window.graphicApi.sendMessage('graphicToServer');
+		void window.graphicApi.sendMessage('graphicToServer');
 	});
 	return promise;
 });

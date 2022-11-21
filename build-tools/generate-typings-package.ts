@@ -79,33 +79,31 @@ function generateFinishingTouches() {
 	// Generate the package.json for the types package
 	fs.writeFileSync(
 		path.join(outputDir, 'package.json'),
-		JSON.stringify({
-			name: '@nodecg/types',
-			description: 'Typings package for NodeCG',
-			main: 'index.d.ts',
-			version: pjson.version,
-			repository: pjson.repository,
-			bugs: pjson.bugs,
-			homepage: pjson.homepage,
-			license: pjson.license,
-			keywords: [...pjson.keywords, 'types'],
-			devDependencies: {
-				// Because these are referenced via a triple-slash directive, our rollup d.ts bundler can't include them.
-				// So, we have to manually specify them here to ensure that they are available to consumers of our types.
-				'@types/soundjs': pjson.devDependencies['@types/soundjs'],
+		JSON.stringify(
+			{
+				name: '@nodecg/types',
+				description: 'Typings package for NodeCG',
+				main: 'index.d.ts',
+				version: pjson.version,
+				repository: pjson.repository,
+				bugs: pjson.bugs,
+				homepage: pjson.homepage,
+				license: pjson.license,
+				keywords: [...pjson.keywords, 'types'],
+				devDependencies: {
+					// Because these are referenced via a triple-slash directive, our rollup d.ts bundler can't include them.
+					// So, we have to manually specify them here to ensure that they are available to consumers of our types.
+					'@types/soundjs': pjson.devDependencies['@types/soundjs'],
+				},
 			},
-		}),
+			undefined,
+			2,
+		),
 		{ encoding: 'utf8' },
 	);
 
-	// Generate the index.d.ts file that ties the whole thing together
-	fs.writeFileSync(
-		path.join(outputDir, 'index.d.ts'),
-		`export * from './client/api/api.client'
-import serverApiFactory from './server/api.server'
-export type NodeCGAPIServer = InstanceType<ReturnType<typeof serverApiFactory>>`,
-		'utf8',
-	);
+	// Copy the index.d.ts file that ties the whole thing together
+	fs.copyFileSync(path.resolve(appRootPath.path, 'src/index.d.ts'), path.join(outputDir, 'index.d.ts'));
 }
 
 function inputPathToOutputPath(filePath: string): string {

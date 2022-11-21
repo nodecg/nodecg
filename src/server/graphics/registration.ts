@@ -67,7 +67,8 @@ export default class RegistrationCoordinator {
 				// then deny the registration, unless the socket ID matches.
 				if (existingPathRegistration && graphicManifest.singleInstance) {
 					if (existingPathRegistration.socketId === socket.id) {
-						return cb(null, true);
+						cb(null, true);
+						return;
 					}
 
 					cb(null, !existingPathRegistration.open);
@@ -79,7 +80,6 @@ export default class RegistrationCoordinator {
 				} else {
 					this._addRegistration({
 						...regRequest,
-						// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 						ipv4: (socket as any).request.connection.remoteAddress,
 						socketId: socket.id,
 						singleInstance: Boolean(graphicManifest.singleInstance),
@@ -103,7 +103,8 @@ export default class RegistrationCoordinator {
 			socket.on('graphic:requestBundleRefresh', (bundleName, cb) => {
 				const bundle = bundleManager.find(bundleName);
 				if (!bundle) {
-					return cb(null);
+					cb(null);
+					return;
 				}
 
 				io.emit('graphic:bundleRefresh', bundleName);

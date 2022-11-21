@@ -54,7 +54,7 @@ test.serial('should resolve acknowledgement promises', async (t) => {
 	t.context.apis.extension.listenFor('ackPromiseResolve', (_, cb) => {
 		invokeAck(t, cb);
 	});
-	const res = await dashboard.evaluate(() => window.dashboardApi.sendMessage('ackPromiseResolve').catch());
+	const res = await dashboard.evaluate(async () => window.dashboardApi.sendMessage('ackPromiseResolve').catch());
 	t.deepEqual(res, undefined);
 });
 
@@ -62,7 +62,7 @@ test.serial('should reject acknowledgement promises if there was an error', asyn
 	t.context.apis.extension.listenFor('ackPromiseReject', (_, cb) => {
 		invokeAck(t, cb, new Error('boom'));
 	});
-	const res = await dashboard.evaluate(() =>
+	const res = await dashboard.evaluate(async () =>
 		window.dashboardApi
 			.sendMessage('ackPromiseReject')
 			.then(() => new Error('Promise resolved when it should have rejected.'))
@@ -78,6 +78,7 @@ test.serial('should not return a promise if the user provided a callback ', asyn
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
+				// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 				const returnVal = window.dashboardApi.sendMessage('ackPromiseCallback', () => {
 					resolve(returnVal === undefined);
 				});
@@ -137,7 +138,7 @@ test.serial('should support multiple listenFor handlers', async (t) => {
 	});
 
 	void dashboard.evaluate(() => {
-		window.dashboardApi.sendMessage('multipleListenFor');
+		void window.dashboardApi.sendMessage('multipleListenFor');
 	});
 
 	return new Promise<void>((resolve) => {
@@ -175,7 +176,6 @@ test.serial('should prevent acknowledgements from being called more than once', 
 		}
 
 		t.true(cb.handled);
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 		t.throws(cb as any);
 		callbacksInvoked++;
 	});
@@ -254,7 +254,7 @@ test.serial('client - should support intra-context messaging', async (t) => {
 				});
 
 				// Send the message only after both listeners have been set up.
-				window.dashboardApi.sendMessage('clientToClient', { baz: 'qux' });
+				void window.dashboardApi.sendMessage('clientToClient', { baz: 'qux' });
 			}),
 	);
 	t.deepEqual(response, { baz: 'qux' });

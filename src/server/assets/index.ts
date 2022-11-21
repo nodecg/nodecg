@@ -198,7 +198,9 @@ export default class AssetManager {
 			});
 		});
 
-		watcher.on('error', (e) => this.log.error(e.stack));
+		watcher.on('error', (e) => {
+			this.log.error(e.stack);
+		});
 	}
 
 	private _setupExpress(): ReturnType<typeof express> {

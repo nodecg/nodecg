@@ -8,6 +8,7 @@ nodecg-api.min.js
 /coverage
 /build-types
 /generated-types
+/src/index.d.ts
 
 # Just a stub file
 /index.js

@@ -128,7 +128,7 @@ export default class SoundsLib {
 			const formatted: NodeCG.SoundCue = {
 				name: rawCue.name,
 				assignable: Boolean(rawCue.assignable),
-				volume: rawCue.defaultVolume === undefined ? 30 : rawCue.defaultVolume,
+				volume: rawCue.defaultVolume ?? 30,
 			};
 
 			if ('defaultVolume' in rawCue) {

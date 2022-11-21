@@ -174,7 +174,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 					if (this.listenerCount('operationsRejected') > 0) {
 						this.emit('operationsRejected', rejectReason);
 					} else {
-						return this.log.error(rejectReason);
+						this.log.error(rejectReason);
 					}
 				}
 			},
@@ -216,7 +216,8 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 				(rejectReason, data) => {
 					if (rejectReason) {
 						if (this.listenerCount('declarationRejected') > 0) {
-							return this.emit('declarationRejected', rejectReason);
+							this.emit('declarationRejected', rejectReason);
+							return;
 						}
 
 						throw new Error(rejectReason);
@@ -224,7 +225,8 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 
 					if (!data) {
 						if (this.listenerCount('declarationRejected') > 0) {
-							return this.emit('declarationRejected', 'data unexpectedly falsey');
+							this.emit('declarationRejected', 'data unexpectedly falsey');
+							return;
 						}
 
 						throw new Error('data unexpectedly falsey');

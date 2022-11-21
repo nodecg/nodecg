@@ -110,7 +110,10 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		return this._memoizedLogger;
 	}
 
-	get config(): typeof filteredConfig {
+	/**
+	 * A filtered copy of the NodeCG server config with some sensitive keys removed.
+	 */
+	get config(): Readonly<typeof filteredConfig> {
 		return Object.freeze(JSON.parse(JSON.stringify(filteredConfig)));
 	}
 

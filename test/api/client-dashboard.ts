@@ -61,7 +61,7 @@ test.serial('should send messages', async (t) => {
 		});
 	});
 	void dashboard.evaluate(() => {
-		window.dashboardApi.sendMessage('dashboardToServer');
+		void window.dashboardApi.sendMessage('dashboardToServer');
 	});
 	return promise;
 });

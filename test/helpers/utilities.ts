@@ -36,13 +36,11 @@ export const shadowSelector = async <T extends Element>(
 		let foundDom = document.querySelector(selectors[0]);
 		if (!foundDom) throw new Error(`Failed to find selector "${selectors[0]}"`);
 		for (const selector of selectors.slice(1)) {
-			/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 			if (foundDom!.shadowRoot) {
 				foundDom = foundDom!.shadowRoot.querySelector(selector);
 			} else {
 				foundDom = foundDom!.querySelector(selector);
 			}
-			/* eslint-enable @typescript-eslint/no-unnecessary-type-assertion */
 		}
 
 		return foundDom;
@@ -60,8 +58,9 @@ export function invokeAck(t: ExecutionContext, ack?: Acknowledgement, ...args: a
 	}
 
 	if (args.length > 0) {
-		return ack(...args);
+		ack(...args);
+		return;
 	}
 
-	return ack();
+	ack();
 }
