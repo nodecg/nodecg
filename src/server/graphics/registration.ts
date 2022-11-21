@@ -80,6 +80,7 @@ export default class RegistrationCoordinator {
 				} else {
 					this._addRegistration({
 						...regRequest,
+						// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 						ipv4: (socket as any).request.connection.remoteAddress,
 						socketId: socket.id,
 						singleInstance: Boolean(graphicManifest.singleInstance),
