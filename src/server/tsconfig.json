@@ -1,11 +1,10 @@
 {
 	"extends": "../../tsconfig_base.json",
 	"compilerOptions": {
-		"outDir": "../../build/server_types",
+		"outDir": "../../build-types/server",
 		"rootDir": ".",
 		"module": "commonjs",
-		"composite": true,
-		"emitDeclarationOnly": true
+		"composite": true
 	},
 	"include": [
 		"./**/*",

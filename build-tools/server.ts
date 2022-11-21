@@ -2,7 +2,7 @@
 import path from 'path';
 
 // Packages
-import webpack from 'webpack';
+import type webpack from 'webpack';
 import nodeExternals from 'webpack-node-externals';
 import appRootPath from 'app-root-path';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
@@ -49,6 +49,7 @@ export function createServerConfig({
 			new ForkTsCheckerWebpackPlugin({
 				typescript: {
 					build: true,
+					mode: 'write-dts',
 					configFile: 'src/server/tsconfig.json',
 				},
 			}),
@@ -60,7 +61,7 @@ export function createServerConfig({
 					test: /\.ts$/,
 					loader: 'ts-loader',
 					options: {
-						transpileOnly: true,
+						projectReferences: true,
 						configFile: 'src/server/tsconfig.json',
 					},
 				},

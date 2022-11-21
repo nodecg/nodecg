@@ -2,6 +2,7 @@
 /bower_components
 /node_modules
 npm-debug.log
+yarn-error.log
 
 # Local bundles
 /bundles/**
@@ -41,6 +42,8 @@ docs
 
 # Build artifacts
 /build
+/build-types
+/generated-types
 
 # Don't ignore .empty_directory files
 !.empty_directory

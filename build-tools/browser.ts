@@ -53,11 +53,11 @@ export function createBrowserConfig({
 					test: /\.ts$/,
 					loader: 'ts-loader',
 					options: {
-						transpileOnly: true,
+						projectReferences: true,
 						configFile: 'src/client/tsconfig.json',
 					},
 				},
-				{ test: /\.js$/, loader: 'babel-loader' },
+				// { test: /\.js$/, loader: 'babel-loader' },
 			],
 		},
 		plugins: [
@@ -80,6 +80,7 @@ export function createBrowserConfig({
 			new ForkTsCheckerWebpackPlugin({
 				typescript: {
 					build: true,
+					mode: 'write-dts',
 					configFile: 'src/client/tsconfig.json',
 				},
 			}),

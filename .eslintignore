@@ -6,6 +6,8 @@ nodecg-api.min.js
 /test/fixtures
 /test/helpers/retarget-browser-coverage.js
 /coverage
+/build-types
+/generated-types
 
 # Just a stub file
 /index.js
