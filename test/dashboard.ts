@@ -87,11 +87,7 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 						.querySelector('iframe')!
 						.contentWindow!.document.querySelector('#openDialog')! as HTMLElement;
 
-					const dialog = window.dashboardApi.getDialog('test-dialog') as HTMLElement & {
-						opened: boolean;
-						close: () => void;
-						open: () => void;
-					};
+					const dialog = window.dashboardApi.getDialog('test-dialog')!;
 
 					const originalOpen = dialog.open;
 					const stubOpen = (): void => {

@@ -229,7 +229,16 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 	 * @param {string} [bundle=CURR_BNDL] - The bundle from which to select the dialog.
 	 * @returns {object}
 	 */
-	getDialog(name: string, bundle?: string): HTMLElement | undefined {
+	getDialog(
+		name: string,
+		bundle?: string,
+	):
+		| (HTMLElement & {
+				opened: boolean;
+				close: () => void;
+				open: () => void;
+		  })
+		| undefined {
 		bundle = bundle ?? this.bundleName;
 		const topDoc = window.top?.document;
 		if (!topDoc) {
@@ -237,7 +246,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		}
 
 		const dialog = topDoc.querySelector('ncg-dashboard')?.shadowRoot?.querySelector(`#dialogs #${bundle}_${name}`);
-		return (dialog as HTMLElement) ?? undefined;
+		return (dialog as any) ?? undefined;
 	}
 
 	/**
