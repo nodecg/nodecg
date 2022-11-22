@@ -37,7 +37,7 @@ export default class Replicator {
 		}
 
 		this.io = io;
-		io.on('connection', (socket) => {
+		io.on('connection', (socket: TypedServerSocket) => {
 			this._attachToSocket(socket);
 		});
 
