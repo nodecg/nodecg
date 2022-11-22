@@ -95,7 +95,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 		socket.on('disconnect', () => {
 			this._handleDisconnect();
 		});
-		socket.on('reconnect', () => {
+		socket.io.on('reconnect', () => {
 			this._declare();
 		});
 

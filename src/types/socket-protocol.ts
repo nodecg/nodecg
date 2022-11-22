@@ -1,3 +1,6 @@
+// Native
+import type { EventEmitter } from 'events';
+
 // Packages
 import type {
 	ServerDefinition,
@@ -173,7 +176,7 @@ export type ProtocolDefinition = {
 	};
 } & ServerDefinition;
 
-type MissingBits = { id: string };
+type MissingBits = { id: string; io: EventEmitter };
 export type TypedServer = RootServer<ProtocolDefinition>;
 export type RootNS = ServerNamespace<ProtocolDefinition, '/'>;
 export type TypedClientSocket = ClientSideSocket<ProtocolDefinition, '/'> & MissingBits;

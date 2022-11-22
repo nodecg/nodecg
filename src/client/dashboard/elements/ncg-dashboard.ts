@@ -493,7 +493,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 			}
 		});
 
-		window.socket.on('reconnect', (attempts) => {
+		window.socket.io.on('reconnect', (attempts) => {
 			this.$.mainToast.show('Reconnected to NodeCG server!');
 			this.$.reconnectToast.hide();
 			this.disconnected = false;
@@ -507,7 +507,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 			}
 		});
 
-		window.socket.on('reconnect_failed', () => {
+		window.socket.io.on('reconnect_failed', () => {
 			this.$.mainToast.show('Failed to reconnect to NodeCG server!');
 
 			notify('Reconnection Failed', {

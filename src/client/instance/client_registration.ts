@@ -62,7 +62,7 @@
 	// In single-instance graphics, this registration will be rejected if the graphic is already open elsewhere.
 	register();
 	/* istanbul ignore next: hard to test reconnection stuff right now */
-	window.socket.on('reconnect', () => {
+	window.socket.io.on('reconnect', () => {
 		register();
 	});
 
