@@ -91,7 +91,7 @@ function generateFinishingTouches() {
 				license: pjson.license,
 				keywords: [...pjson.keywords, 'types'],
 				devDependencies: {
-					// Because these are referenced via a triple-slash directive, our rollup d.ts bundler can't include them.
+					// Because these are referenced via a triple-slash directive, this gather process can't include them.
 					// So, we have to manually specify them here to ensure that they are available to consumers of our types.
 					'@types/soundjs': pjson.devDependencies['@types/soundjs'],
 				},
@@ -104,6 +104,22 @@ function generateFinishingTouches() {
 
 	// Copy the index.d.ts file that ties the whole thing together
 	fs.copyFileSync(path.resolve(appRootPath.path, 'src/index.d.ts'), path.join(outputDir, 'index.d.ts'));
+
+	// Write the browser-specific window augmentation types
+	fs.writeFileSync(
+		path.join(outputDir, 'augment-window.ts'),
+		`import { NodeCGAPIClient } from './client/api/api.client';
+		
+declare global {
+	interface Window {
+		NodeCG: typeof NodeCGAPIClient;
+		nodecg: NodeCGAPIClient;
+	}
+
+	const NodeCG: typeof NodeCGAPIClient;
+	const nodecg: NodeCGAPIClient;
+}`,
+	);
 }
 
 function inputPathToOutputPath(filePath: string): string {
