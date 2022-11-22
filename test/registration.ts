@@ -151,7 +151,7 @@ test.serial('refresh individual instance', async (t) => {
 		'#reloadButton',
 	);
 
-	await Promise.all([reload.click(), graphic.waitForNavigation()]);
+	await Promise.all([graphic.waitForNavigation(), reload.click()]);
 
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
