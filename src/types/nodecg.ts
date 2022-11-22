@@ -260,7 +260,7 @@ export namespace NodeCG {
 			path: string;
 		} & ( // Objects and arrays
 			| { method: 'overwrite'; args: { newValue: T | undefined } }
-			| { method: 'delete'; args: { prop: keyof T } }
+			| { method: 'delete'; args: { prop: string | number | symbol } }
 			| { method: 'add'; args: { prop: string; newValue: any } }
 			| { method: 'update'; args: { prop: string; newValue: any } }
 
