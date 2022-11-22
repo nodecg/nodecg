@@ -107,7 +107,7 @@ function generateFinishingTouches() {
 
 	// Write the browser-specific window augmentation types
 	fs.writeFileSync(
-		path.join(outputDir, 'augment-window.ts'),
+		path.join(outputDir, 'augment-window.d.ts'),
 		`import { NodeCGAPIClient } from './client/api/api.client';
 		
 declare global {
