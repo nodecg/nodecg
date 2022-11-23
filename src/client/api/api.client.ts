@@ -7,7 +7,7 @@ import { Logger } from './logger';
 import type { TypedClientSocket } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';
 
-type SendMessageCb = (error?: unknown, response?: unknown) => void;
+type SendMessageCb<T> = (error?: unknown, response?: T) => void;
 
 type ReadReplicantCb = (value: unknown) => void;
 
@@ -35,18 +35,23 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		return new ClientReplicant<T>(name, namespace, opts, (window as any).socket);
 	}
 
-	static sendMessageToBundle(messageName: string, bundleName: string, cb: SendMessageCb): void;
-	static sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): Promise<unknown>;
-	static sendMessageToBundle(messageName: string, bundleName: string, data: unknown, cb: SendMessageCb): void;
-	static sendMessageToBundle(
+	static sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, cb: SendMessageCb<T>): void;
+	static sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, data?: unknown): Promise<T>;
+	static sendMessageToBundle<T = unknown>(
+		messageName: string,
+		bundleName: string,
+		data: unknown,
+		cb: SendMessageCb<T>,
+	): void;
+	static sendMessageToBundle<T = unknown>(
 		messageName: string,
 		bundleName: string,
 		dataOrCb?: unknown,
-		cb?: SendMessageCb,
-	): void | Promise<unknown> {
+		cb?: SendMessageCb<T>,
+	): void | Promise<T> {
 		let data: any = null;
 		if (typeof dataOrCb === 'function') {
-			cb = dataOrCb as SendMessageCb;
+			cb = dataOrCb as SendMessageCb<T>;
 		} else {
 			data = dataOrCb;
 		}
@@ -66,7 +71,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 				},
 			);
 		} else {
-			return new Promise<any[]>((resolve, reject) => {
+			return new Promise<T>((resolve, reject) => {
 				window.socket.emit(
 					'message',
 					{
@@ -347,23 +352,28 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		window.createjs.Sound.stop();
 	}
 
-	sendMessageToBundle(messageName: string, bundleName: string, cb: SendMessageCb): void;
-	sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): Promise<unknown>;
-	sendMessageToBundle(messageName: string, bundleName: string, data: unknown, cb: SendMessageCb): void;
-	sendMessageToBundle(
+	sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, cb: SendMessageCb<T>): void;
+	sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, data?: unknown): Promise<T>;
+	sendMessageToBundle<T = unknown>(
+		messageName: string,
+		bundleName: string,
+		data: unknown,
+		cb: SendMessageCb<T>,
+	): void;
+	sendMessageToBundle<T = unknown>(
 		messageName: string,
 		bundleName: string,
 		dataOrCb?: unknown,
-		cb?: SendMessageCb,
-	): void | Promise<unknown> {
+		cb?: SendMessageCb<T>,
+	): void | Promise<T> {
 		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 		return NodeCGAPIClient.sendMessageToBundle(messageName, bundleName, dataOrCb, cb as any);
 	}
 
-	sendMessage(messageName: string, cb: SendMessageCb): void;
-	sendMessage(messageName: string, data?: unknown): Promise<unknown>;
-	sendMessage(messageName: string, data: unknown, cb: SendMessageCb): void;
-	sendMessage(messageName: string, dataOrCb?: unknown, cb?: SendMessageCb): void | Promise<unknown> {
+	sendMessage<T = unknown>(messageName: string, cb: SendMessageCb<T>): void;
+	sendMessage<T = unknown>(messageName: string, data?: unknown): Promise<T>;
+	sendMessage<T = unknown>(messageName: string, data: unknown, cb: SendMessageCb<T>): void;
+	sendMessage<T = unknown>(messageName: string, dataOrCb?: unknown, cb?: SendMessageCb<T>): void | Promise<T> {
 		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 		return this.sendMessageToBundle(messageName, this.bundleName, dataOrCb, cb as any);
 	}
