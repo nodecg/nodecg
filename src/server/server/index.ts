@@ -53,7 +53,7 @@ import socketAuthMiddleware from '../login/socketAuthMiddleware';
 import socketApiMiddleware from './socketApiMiddleware';
 import Replicator from '../replicant/replicator';
 import * as db from '../database';
-import type { TypedServer } from '../../types/socket-protocol';
+import type { ClientToServerEvents, ServerToClientEvents, TypedSocketServer } from '../../types/socket-protocol';
 import GraphicsLib from '../graphics';
 import DashboardLib from '../dashboard';
 import MountsLib from '../mounts';
@@ -69,7 +69,7 @@ const renderTemplate = memoize((content, options) => template(content)(options))
 export default class NodeCGServer extends EventEmitter {
 	readonly log = createLogger('server');
 
-	private readonly _io: TypedServer;
+	private readonly _io: TypedSocketServer;
 
 	private readonly _app = express();
 
@@ -118,9 +118,9 @@ export default class NodeCGServer extends EventEmitter {
 		 * We cast to "any" for a few things because
 		 * typed-socket.io isn't quite perfect.
 		 */
-		this._io = new SocketIO.Server(server) as TypedServer;
-		(this._io as any).setMaxListeners(75); // Prevent console warnings when many extensions are installed
-		(this._io as any).on('error', (err: Error) => {
+		this._io = new SocketIO.Server<ClientToServerEvents, ServerToClientEvents>(server);
+		this._io.setMaxListeners(75); // Prevent console warnings when many extensions are installed
+		this._io.on('error', (err) => {
 			if (global.sentryEnabled) {
 				Sentry.captureException(err);
 			}
@@ -160,14 +160,14 @@ export default class NodeCGServer extends EventEmitter {
 			log.info('Login security enabled');
 			const login = await import('../login');
 			app.use(await login.createMiddleware());
-			(this._io as any).use(socketAuthMiddleware);
+			this._io.use(socketAuthMiddleware);
 		} else {
 			app.get('/login*', (_, res) => {
 				res.redirect('/dashboard');
 			});
 		}
 
-		(this._io as any).use(socketApiMiddleware);
+		this._io.use(socketApiMiddleware);
 
 		const bundlesPaths = [path.join(process.env.NODECG_ROOT, 'bundles')].concat(
 			(config as any).bundles?.paths ?? [],
@@ -334,7 +334,7 @@ export default class NodeCGServer extends EventEmitter {
 		return { ...this._extensionManager.extensions };
 	}
 
-	getSocketIOServer(): TypedServer {
+	getSocketIOServer(): TypedSocketServer {
 		return this._io;
 	}
 

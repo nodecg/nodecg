@@ -2394,11 +2394,6 @@
   resolved "https://registry.yarnpkg.com/@types/sinonjs__fake-timers/-/sinonjs__fake-timers-8.1.2.tgz#bf2e02a3dbd4aecaf95942ecd99b7402e03fad5e"
   integrity sha512-9GcLXF0/v3t80caGs5p2rRfkB+a8VBGLJZVih6CNFkx8IZ994wiKKLSRs9nuFwk1HevWs/1mnUmkApGrSGsShA==
 
-"@types/socket.io-client@^1.4.32":
-  version "1.4.36"
-  resolved "https://registry.yarnpkg.com/@types/socket.io-client/-/socket.io-client-1.4.36.tgz#e4f1ca065f84c20939e9850e70222202bd76ff3f"
-  integrity sha512-ZJWjtFBeBy1kRSYpVbeGYTElf6BqPQUkXDlHHD4k/42byCN5Rh027f4yARHCink9sKAkbtGZXEAmR0ZCnc2/Ag==
-
 "@types/soundjs@^0.6.27":
   version "0.6.28"
   resolved "https://registry.yarnpkg.com/@types/soundjs/-/soundjs-0.6.28.tgz#cf748e90dd78f66c3f54fab41536f60a42c8c002"
@@ -10869,11 +10864,6 @@ type-is@^1.6.4, type-is@~1.6.18:
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.24"
-
-typed-socket.io@^0.6.8:
-  version "0.6.8"
-  resolved "https://registry.yarnpkg.com/typed-socket.io/-/typed-socket.io-0.6.8.tgz#117b9525bff100debe33960aa7771f82ae5b5f8a"
-  integrity sha512-HC87KjUyDu+CWOB8WSOIXf/rNYMUohZpBIQQgHYLTW1B7J8C3FA5/3KRp/x1VlfhGdNQmbzpPJl2ISL1CDy0kQ==
 
 typedarray-to-buffer@^3.1.5:
   version "3.1.5"

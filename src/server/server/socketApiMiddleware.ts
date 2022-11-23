@@ -10,7 +10,7 @@ const log = createLogger('nodecg/lib/server');
 
 export default async function (socket: TypedServerSocket, next: (err?: ExtendedError) => void): Promise<void> {
 	try {
-		log.trace('New socket connection: ID %s with IP %s', socket.id, (socket as any).handshake.address);
+		log.trace('New socket connection: ID %s with IP %s', socket.id, socket.handshake.address);
 
 		socket.on('error', (err) => {
 			if (global.sentryEnabled) {
@@ -28,21 +28,21 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 				data.content,
 			);
 
-			(socket as any).broadcast.emit('message', data);
+			socket.broadcast.emit('message', data);
 		});
 
 		socket.on('joinRoom', (room, cb) => {
 			if (typeof room !== 'string') {
-				cb('Room must be a string');
+				cb('Room must be a string', undefined);
 				return;
 			}
 
-			if (!Object.keys((socket as any).rooms).includes(room)) {
+			if (!Object.keys(socket.rooms).includes(room)) {
 				log.trace('Socket %s joined room:', socket.id, room);
 				socket.join(room);
 			}
 
-			cb(null);
+			cb(undefined, undefined);
 		});
 
 		next();

@@ -82,7 +82,7 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 		graphic.waitForNavigation(),
 		dash.evaluate(() => {
 			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			window.socket.emit('regenerateToken', undefined, () => {});
+			window.socket.emit('regenerateToken', () => {});
 		}),
 	]);
 
@@ -93,7 +93,7 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 test.serial('socket should deny access to bad credentials', async (t) => {
 	t.plan(1);
 
-	const socket = socketIoClient(`${C.rootUrl()}?key=bad_credentials`);
+	const socket = socketIoClient(`${C.rootUrl()}?token=bad_credentials`);
 	socket.once('connect', () => {
 		t.fail('Socket was able to connect.');
 	});

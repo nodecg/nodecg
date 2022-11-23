@@ -462,7 +462,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 			}
 		});
 
-		window.socket.on('error', (err) => {
+		window.socket.on('protocol_error', (err) => {
 			/* istanbul ignore next: coverage is buggy here */
 			if (err.type === 'UnauthorizedError') {
 				window.location.href = `/authError?code=${err.code}&message=${err.message}`;
@@ -478,7 +478,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 			this.disconnected = true;
 		});
 
-		window.socket.on('reconnecting', (attempts) => {
+		window.socket.io.on('reconnect_attempt', (attempts) => {
 			if (!this.$.reconnectToast.opened) {
 				this.$.reconnectToast.open();
 			}

@@ -47,7 +47,7 @@ export default class RegistrationCoordinator {
 				const bundle = bundleManager.find(bundleName);
 				/* istanbul ignore if: simple error trapping */
 				if (!bundle) {
-					cb(null, false);
+					cb(undefined, false);
 					return;
 				}
 
@@ -55,7 +55,7 @@ export default class RegistrationCoordinator {
 
 				/* istanbul ignore if: simple error trapping */
 				if (!graphicManifest) {
-					cb(null, false);
+					cb(undefined, false);
 					return;
 				}
 
@@ -67,11 +67,11 @@ export default class RegistrationCoordinator {
 				// then deny the registration, unless the socket ID matches.
 				if (existingPathRegistration && graphicManifest.singleInstance) {
 					if (existingPathRegistration.socketId === socket.id) {
-						cb(null, true);
+						cb(undefined, true);
 						return;
 					}
 
-					cb(null, !existingPathRegistration.open);
+					cb(undefined, !existingPathRegistration.open);
 					return;
 				}
 
@@ -80,8 +80,7 @@ export default class RegistrationCoordinator {
 				} else {
 					this._addRegistration({
 						...regRequest,
-						// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-						ipv4: (socket as any).request.connection.remoteAddress,
+						ipv4: socket.request.socket.remoteAddress!,
 						socketId: socket.id,
 						singleInstance: Boolean(graphicManifest.singleInstance),
 						potentiallyOutOfDate:
@@ -94,39 +93,39 @@ export default class RegistrationCoordinator {
 					}
 				}
 
-				cb(null, true);
+				cb(undefined, true);
 			});
 
 			socket.on('graphic:queryAvailability', (pathName, cb) => {
-				cb(null, !this._findOpenRegistrationByPathName(pathName));
+				cb(undefined, !this._findOpenRegistrationByPathName(pathName));
 			});
 
 			socket.on('graphic:requestBundleRefresh', (bundleName, cb) => {
 				const bundle = bundleManager.find(bundleName);
 				if (!bundle) {
-					cb(null);
+					cb(undefined, undefined);
 					return;
 				}
 
 				io.emit('graphic:bundleRefresh', bundleName);
-				cb(null);
+				cb(undefined, undefined);
 			});
 
 			socket.on('graphic:requestRefreshAll', (graphic, cb) => {
 				io.emit('graphic:refreshAll', graphic);
 				if (typeof cb === 'function') {
-					cb(null);
+					cb(undefined, undefined);
 				}
 			});
 
 			socket.on('graphic:requestRefresh', (instance, cb) => {
 				io.emit('graphic:refresh', instance);
-				cb(null);
+				cb(undefined, undefined);
 			});
 
 			socket.on('graphic:requestKill', (instance, cb) => {
 				io.emit('graphic:kill', instance);
-				cb(null);
+				cb(undefined, undefined);
 			});
 
 			socket.on('disconnect', () => {

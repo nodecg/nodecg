@@ -15,8 +15,17 @@ const socketsByKey = new Map<string, Set<TypedServerSocket>>();
 
 export default async function (socket: TypedServerSocket, next: (err?: ExtendedError) => void): Promise<void> {
 	try {
-		const req = (socket as any).request; // Not typed in the typed-socket.io lib for some reason.
-		const { token } = req._query;
+		const { token } = socket.handshake.query;
+		if (!token) {
+			next(new UnauthorizedError(UnAuthErrCode.InvalidToken, 'no token provided'));
+			return;
+		}
+
+		if (Array.isArray(token)) {
+			next(new UnauthorizedError(UnAuthErrCode.InvalidToken, 'more than one token provided'));
+			return;
+		}
+
 		const database = await getConnection();
 		const apiKey = await database.getRepository(ApiKey).findOne(
 			{
@@ -61,7 +70,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 
 			socketSet.add(socket);
 
-			socket.on('regenerateToken', async (_, cb) => {
+			socket.on('regenerateToken', async (cb) => {
 				try {
 					// Lookup the ApiKey for this token we want to revoke.
 					const keyToDelete = await database
@@ -89,12 +98,12 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 						await database.manager.delete(ApiKey, { secret_key: token });
 
 						if (cb) {
-							cb(null);
+							cb(undefined, undefined);
 						}
 					} else {
 						// Something is weird if we're here, just close the socket.
 						if (cb) {
-							cb(null);
+							cb(undefined, undefined);
 						}
 
 						socket.disconnect(true);
@@ -128,7 +137,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 				} catch (error: unknown) {
 					log.error(error);
 					if (cb) {
-						cb(error as string);
+						cb(error as string, undefined);
 					}
 				}
 			});

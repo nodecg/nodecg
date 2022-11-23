@@ -66,8 +66,12 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 					messageName,
 					content: data,
 				},
-				(err: any, response: any) => {
-					cb!(err, response);
+				(err, response?) => {
+					if (response) {
+						cb!(err, response as T);
+					} else {
+						cb!(err);
+					}
 				},
 			);
 		} else {
@@ -79,11 +83,11 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 						messageName,
 						content: data,
 					},
-					(err: any, response: any) => {
+					(err, response?) => {
 						if (err) {
 							reject(err);
 						} else {
-							resolve(response);
+							resolve(response as T);
 						}
 					},
 				);
@@ -93,7 +97,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 	/* eslint-enable no-dupe-class-members */
 
 	static readReplicant(name: string, namespace: string, cb: ReadReplicantCb): void {
-		window.socket.emit('replicant:read', { name, namespace }, (error, value) => {
+		window.socket.emit('replicant:read', { name, namespace }, (error, value?) => {
 			if (error) {
 				console.error(error);
 			} else {
@@ -213,7 +217,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 			});
 		});
 
-		socket.on('error', (err) => {
+		socket.io.on('error', (err) => {
 			this.log.warn('Unhandled socket connection error:', err);
 		});
 

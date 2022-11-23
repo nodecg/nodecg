@@ -12,7 +12,7 @@ import { throttleName } from '../util';
 import type ServerReplicant from './server-replicant';
 import uuid from 'uuid';
 import * as db from '../database';
-import type { RootNS, TypedServerSocket, ProtocolDefinition } from '../../types/socket-protocol';
+import type { TypedServerSocket, ServerToClientEvents, RootNS } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';
 
 const log = createLogger('replicator');
@@ -37,7 +37,7 @@ export default class Replicator {
 		}
 
 		this.io = io;
-		io.on('connection', (socket: TypedServerSocket) => {
+		io.on('connection', (socket) => {
 			this._attachToSocket(socket);
 		});
 
@@ -122,15 +122,15 @@ export default class Replicator {
 	 * @param eventName - The name of the event to emit.
 	 * @param data - The data to emit with the event.
 	 */
-	emitToClients<T extends keyof ProtocolDefinition['namespaces']['/']['ServerMessages']>(
+	emitToClients<T extends keyof ServerToClientEvents>(
 		replicant: ServerReplicant<any>,
 		eventName: T,
-		data: ProtocolDefinition['namespaces']['/']['ServerMessages'][T],
+		data: Parameters<ServerToClientEvents[T]>[0],
 	): void {
 		// Emit to clients (in the given namespace's room) using Socket.IO
 		const namespace = `replicant:${replicant.namespace}:${replicant.name}`;
 		log.replicants('emitting %s to %s:', eventName, namespace, data);
-		this.io.to(namespace).emit(eventName, data);
+		(this.io as any).to(namespace).emit(eventName, data); // TODO: figure out how to type this properly
 	}
 
 	saveAllReplicants(): void {
@@ -203,7 +203,7 @@ export default class Replicator {
 			log.replicants('received replicant:declare', data);
 			try {
 				const replicant = this.declare(data.name, data.namespace, data.opts);
-				cb(null, {
+				cb(undefined, {
 					value: replicant.value,
 					revision: replicant.revision,
 					schema: replicant.schema,
@@ -212,7 +212,7 @@ export default class Replicator {
 				// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 			} catch (e) {
 				if (e.message.startsWith('Invalid value rejected for replicant')) {
-					cb(e.message);
+					cb(e.message, undefined);
 				} else {
 					// eslint-disable-next-line @typescript-eslint/no-throw-literal
 					throw e;
@@ -259,9 +259,9 @@ export default class Replicator {
 			const replicant = this.declare(data.name, data.namespace);
 			if (typeof cb === 'function') {
 				if (replicant) {
-					cb(null, replicant.value);
+					cb(undefined, replicant.value);
 				} else {
-					cb(null);
+					cb(undefined, undefined);
 				}
 			}
 		});

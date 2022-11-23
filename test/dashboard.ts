@@ -161,10 +161,9 @@ test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is 
 // This got much harder to test after Socket.IO reserved the `disconnect` event in v4+.
 // eslint-disable-next-line ava/no-skip-test
 test.serial.skip('connection toasts', async (t) => {
+	await dashboard.setOfflineMode(true);
 	let ret: any = await dashboard.evaluate(() => {
 		const dashboard: any = document.getElementById('nodecg_dashboard');
-		// TODO: use actual disconnection (setOfflineMode)
-		(window as any).socket.emit('disconnect');
 		return {
 			toastText: dashboard.$.mainToast.text,
 			toastOpened: dashboard.$.mainToast.opened,
@@ -177,9 +176,10 @@ test.serial.skip('connection toasts', async (t) => {
 		disconnected: true,
 	});
 
+	// Need to wait for (3?) reconnect events here somehow
+
 	ret = await dashboard.evaluate(() => {
 		const dashboard: any = document.getElementById('nodecg_dashboard');
-		(window as any).socket.emit('reconnecting', 3);
 		return {
 			reconnectToastOpened: dashboard.$.reconnectToast.opened,
 		};
@@ -188,9 +188,10 @@ test.serial.skip('connection toasts', async (t) => {
 		reconnectToastOpened: true,
 	});
 
+	// Need to wait for reconnect_failed event here somehow
+
 	ret = await dashboard.evaluate(() => {
 		const dashboard: any = document.getElementById('nodecg_dashboard');
-		(window as any).socket.emit('reconnect_failed');
 		return {
 			toastText: dashboard.$.mainToast.text,
 			toastOpened: dashboard.$.mainToast.opened,
@@ -201,9 +202,10 @@ test.serial.skip('connection toasts', async (t) => {
 		toastOpened: true,
 	});
 
+	// Need to wait for reconnect event here somehow
+
 	ret = await dashboard.evaluate(() => {
 		const dashboard: any = document.getElementById('nodecg_dashboard');
-		(window as any).socket.emit('reconnect', 3);
 		return {
 			toastText: dashboard.$.mainToast.text,
 			toastOpened: dashboard.$.mainToast.opened,
