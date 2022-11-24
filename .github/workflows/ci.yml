@@ -40,7 +40,7 @@ jobs:
           path: |
             /home/runner/.cache/puppeteer
           key: chromium-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-        if: runner.os == 'Linux' || runner.os === 'macOS''
+        if: runner.os == 'Linux' || runner.os === 'macOS'
 
       - name: Restore Chromium dependency cache (Windows)
         uses: actions/cache@v3
