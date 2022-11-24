@@ -10,7 +10,7 @@ interface NodeCallback<T = undefined> {
 	(err: undefined, response: T): void;
 }
 
-export const enum UnAuthErrCode {
+export enum UnAuthErrCode {
 	CredentialsBadFormat = 'credentials_bad_format',
 	CredentialsRequired = 'credentials_required',
 	InternalError = 'internal_error',
