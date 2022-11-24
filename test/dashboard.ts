@@ -158,11 +158,17 @@ test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is 
 	t.pass();
 });
 
-// This got much harder to test after Socket.IO reserved the `disconnect` event in v4+.
+// This got much harder to test after Socket.IO reserved their internal events in v3+.
 // eslint-disable-next-line ava/no-skip-test
 test.serial.skip('connection toasts', async (t) => {
+	// Test the "offline" toast
 	await dashboard.setOfflineMode(true);
 	let ret: any = await dashboard.evaluate(() => {
+		// Used by later test assertions
+		window.socket.io.on('reconnect_attempt', (attempt) => {
+			(window as any)._reconnectAttempt = attempt;
+		});
+
 		const dashboard: any = document.getElementById('nodecg_dashboard');
 		return {
 			toastText: dashboard.$.mainToast.text,
@@ -176,8 +182,8 @@ test.serial.skip('connection toasts', async (t) => {
 		disconnected: true,
 	});
 
-	// Need to wait for (3?) reconnect events here somehow
-
+	// Test the "reconnecting" toast
+	await dashboard.waitForFunction(() => (window as any)._reconnectAttempt >= 1);
 	ret = await dashboard.evaluate(() => {
 		const dashboard: any = document.getElementById('nodecg_dashboard');
 		return {
@@ -188,22 +194,21 @@ test.serial.skip('connection toasts', async (t) => {
 		reconnectToastOpened: true,
 	});
 
-	// Need to wait for reconnect_failed event here somehow
+	// Test the "reconnect failed" toast
+	// ret = await dashboard.evaluate(() => {
+	// 	const dashboard: any = document.getElementById('nodecg_dashboard');
+	// 	return {
+	// 		toastText: dashboard.$.mainToast.text,
+	// 		toastOpened: dashboard.$.mainToast.opened,
+	// 	};
+	// });
+	// t.deepEqual(ret, {
+	// 	toastText: 'Failed to reconnect to NodeCG server!',
+	// 	toastOpened: true,
+	// });
 
-	ret = await dashboard.evaluate(() => {
-		const dashboard: any = document.getElementById('nodecg_dashboard');
-		return {
-			toastText: dashboard.$.mainToast.text,
-			toastOpened: dashboard.$.mainToast.opened,
-		};
-	});
-	t.deepEqual(ret, {
-		toastText: 'Failed to reconnect to NodeCG server!',
-		toastOpened: true,
-	});
-
-	// Need to wait for reconnect event here somehow
-
+	// Test the "reconnected" toast
+	await dashboard.setOfflineMode(false);
 	ret = await dashboard.evaluate(() => {
 		const dashboard: any = document.getElementById('nodecg_dashboard');
 		return {
