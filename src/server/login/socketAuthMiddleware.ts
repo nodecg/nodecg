@@ -141,6 +141,11 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 					}
 				}
 			});
+
+			// Don't leak memory by retaining references to all sockets indefinitely
+			socket.on('disconnect', () => {
+				socketSet.delete(socket);
+			});
 		}
 
 		if (allowed) {
