@@ -60,11 +60,7 @@ export default class SoundsLib {
 							// If we're updating the cue to not be assignable, then we have to
 							// set the `defaultFile` as the selected `file`.
 							if (!defaultCue.assignable && defaultCue.defaultFile) {
-								const foo = {
-									...clone(defaultCue.defaultFile),
-									assignable: Boolean(defaultCue.assignable),
-								};
-								cuesRep.value![existingIndex].file = foo;
+								cuesRep.value![existingIndex].file = clone(defaultCue.defaultFile);
 							}
 						} else {
 							cuesRep.value!.push(defaultCue);
