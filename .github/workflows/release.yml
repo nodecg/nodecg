@@ -24,9 +24,20 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines --frozen-lockfile --network-timeout 1000000
 
+      - name: Build
+        run: yarn build
+
       - name: Semantic Release
         run: npx semantic-release
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ github.token }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish types
+        run: |
+          npm run generate-types-package
+          cd generated-types
+          npm publish --public
+        env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
