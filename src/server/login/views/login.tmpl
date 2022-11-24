@@ -6,7 +6,6 @@
 
 		<title>NodeCG Login</title>
 
-		<script type="module" src="/node_modules/@polymer/paper-styles/typography.js"></script>
 		<style is="custom-style" include="iron-flex iron-flex-alignment">
 			body {
 				display: flex;
@@ -17,7 +16,12 @@
 			}
 
 			h2 {
-				@apply(--paper-font-headline);
+				font-family: 'Roboto', 'Noto', sans-serif;
+        		-webkit-font-smoothing: antialiased;
+				font-size: 24px;
+				font-weight: 400;
+				letter-spacing: -.012em;
+				line-height: 32px;
 			}
 
 			label {
