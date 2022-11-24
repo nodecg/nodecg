@@ -333,7 +333,7 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 		let absUrl = a.href;
 
 		if (window.ncgConfig.login?.enabled && window.token) {
-			absUrl += `?token=${window.token}`;
+			absUrl += `?key=${window.token}`;
 		}
 
 		return absUrl;

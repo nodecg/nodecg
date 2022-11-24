@@ -7,7 +7,7 @@ window.token = params.get('key') ?? Cookies.get('socketToken');
 if (window.token) {
 	window.socket = io(undefined as unknown as string, {
 		query: { token: window.token },
-	}) as unknown as TypedClientSocket;
+	}) as TypedClientSocket;
 } else {
-	window.socket = io() as unknown as TypedClientSocket;
+	window.socket = io() as TypedClientSocket;
 }
