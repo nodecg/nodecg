@@ -18,10 +18,6 @@ import type { NodeCG } from '../../types/nodecg';
 const log = createLogger('replicator');
 
 export default class Replicator {
-	readonly replicantsRoot = path.join(process.env.NODECG_ROOT, 'db/replicants');
-
-	readonly io: RootNS;
-
 	readonly declaredReplicants = new Map<string, Map<string, Replicant<any>>>();
 
 	private readonly _uuid = uuid.v4();
@@ -30,12 +26,7 @@ export default class Replicator {
 
 	private readonly _pendingSave = new WeakSet<Replicant<any>>();
 
-	constructor(io: RootNS, repEntities: db.Replicant[]) {
-		// Make 'db/replicants' folder if it doesn't exist
-		if (!fs.existsSync(this.replicantsRoot)) {
-			fs.mkdirpSync(this.replicantsRoot);
-		}
-
+	constructor(public readonly io: RootNS, repEntities: db.Replicant[]) {
 		this.io = io;
 		io.on('connection', (socket) => {
 			this._attachToSocket(socket);
