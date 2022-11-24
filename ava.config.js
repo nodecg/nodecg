@@ -1,5 +1,5 @@
 module.exports = {
-	files: ['test/**.ts', '!test/helpers/**', '!test/fixtures/**', '!test/types/**'],
+	files: ['test/**/*.ts', '!test/helpers/**', '!test/fixtures/**', '!test/types/**'],
 	timeout: '45s',
 	verbose: true,
 	environmentVariables: {
