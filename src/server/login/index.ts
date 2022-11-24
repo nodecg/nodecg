@@ -55,10 +55,10 @@ if (config.login.steam?.enabled) {
 					const roles: Role[] = [];
 					const allowed = config.login.steam?.allowedIds?.includes(profile.id);
 					if (allowed) {
-						log.info('Granting "%s" (%s) access', profile.id, profile.displayName);
+						log.info('(Steam) Granting "%s" (%s) access', profile.id, profile.displayName);
 						roles.push(await getSuperUserRole());
 					} else {
-						log.info('Denying "%s" (%s) access', profile.id, profile.displayName);
+						log.info('(Steam) Denying "%s" (%s) access', profile.id, profile.displayName);
 					}
 
 					const user = await upsertUser({
@@ -110,10 +110,10 @@ if (config.login.twitch?.enabled) {
 						config.login.twitch?.allowedUsernames?.includes(profile.username) ??
 						config.login.twitch?.allowedIds?.includes(profile.id);
 					if (allowed) {
-						log.info('Granting %s access', profile.username);
+						log.info('(Twitch) Granting %s access', profile.username);
 						roles.push(await getSuperUserRole());
 					} else {
-						log.info('Denying %s access', profile.username);
+						log.info('(Twitch) Denying %s access', profile.username);
 					}
 
 					const user = await upsertUser({
@@ -242,10 +242,20 @@ if (config.login.discord?.enabled) {
 
 				const roles: Role[] = [];
 				if (allowed) {
-					log.info('Granting %s#%s (%s) access', profile.username, profile.discriminator, profile.id);
+					log.info(
+						'(Discord) Granting %s#%s (%s) access',
+						profile.username,
+						profile.discriminator,
+						profile.id,
+					);
 					roles.push(await getSuperUserRole());
 				} else {
-					log.info('Denying %s#%s (%s) access', profile.username, profile.discriminator, profile.id);
+					log.info(
+						'(Discord) Denying %s#%s (%s) access',
+						profile.username,
+						profile.discriminator,
+						profile.id,
+					);
 				}
 
 				const user = await upsertUser({
@@ -298,7 +308,7 @@ if (config.login.local?.enabled) {
 						}
 					}
 
-					log.info('%s "%s" access using local auth', allowed ? 'Granting' : 'Denying', username);
+					log.info('(Local) %s "%s" access', allowed ? 'Granting' : 'Denying', username);
 
 					const user = await upsertUser({
 						name: username,
