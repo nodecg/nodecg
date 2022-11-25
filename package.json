@@ -129,7 +129,7 @@
     "postrelease": "npm publish && git push --follow-tags"
   },
   "engines": {
-    "node": ">=14.17.3"
+    "node": "^16 || ^18"
   },
   "files": [
     "build",
