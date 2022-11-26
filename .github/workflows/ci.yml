@@ -9,6 +9,35 @@ on:
       - master
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Restore npm/yarn dependency cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+          key: npm-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn --ignore-engines --frozen-lockfile --network-timeout 1000000
+
+      - name: Lint
+        run: |
+          npm run lint
+
   build-test:
     strategy:
       matrix:
@@ -59,10 +88,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn --ignore-engines --frozen-lockfile --network-timeout 1000000
-
-      - name: Lint
-        run: |
-          npm run lint
 
       - name: Build w/ instrumentation for coverage reporting
         run: |
