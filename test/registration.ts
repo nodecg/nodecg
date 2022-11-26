@@ -151,7 +151,13 @@ test.serial('refresh individual instance', async (t) => {
 		'#reloadButton',
 	);
 
-	await Promise.all([graphic.waitForNavigation(), reload.click()]);
+	await Promise.all([
+		graphic.waitForNavigation(),
+		// https://github.com/puppeteer/puppeteer/issues/6033#issuecomment-1129520106
+		dashboard.evaluate((rel) => {
+			(rel as HTMLElement).click();
+		}, reload),
+	]);
 
 	const refreshMarker = await util.waitForRegistration(graphic);
 	t.is(refreshMarker, undefined);
