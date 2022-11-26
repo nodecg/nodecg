@@ -129,7 +129,7 @@
     "generate-migrations": "cd src/server && typeorm-ts-node-commonjs migration:generate ./database/migration/rename-me -d ./database/datasource.ts"
   },
   "engines": {
-    "node": "^16 || ^18"
+    "node": "^16"
   },
   "files": [
     "build",
