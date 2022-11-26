@@ -63,13 +63,21 @@ jobs:
           git config --global user.email "ci@nodecg.dev"
           git config --global user.name "NodeCG Bot"
 
-      - name: Restore Chromium dependency cache (Linux & macOS)
+      - name: Restore Chromium dependency cache (Linux)
         uses: actions/cache@v3
         with:
           path: |
             /home/runner/.cache/puppeteer
           key: chromium-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-        if: runner.os == 'Linux' || runner.os == 'macOS'
+        if: runner.os == 'Linux'
+
+      - name: Restore Chromium dependency cache (macOS)
+        uses: actions/cache@v3
+        with:
+          path: |
+            /Users/runner/.cache/puppeteer
+          key: chromium-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+        if: runner.os == 'macOS'
 
       - name: Restore Chromium dependency cache (Windows)
         uses: actions/cache@v3
