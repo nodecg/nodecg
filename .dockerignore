@@ -1,10 +1,8 @@
 *
-!lib
-!src
+!build-tools
 !schemas
-!build
-!bower.json
+!src
 !index.js
 !package.json
-!package-lock.json
-!types
+!tsconfig_base.json
+!yarn.lock
