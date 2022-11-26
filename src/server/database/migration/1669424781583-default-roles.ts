@@ -6,16 +6,16 @@ const PERMISSION_ID = '923561ef-4186-4370-b7df-f12e64fc7bd2';
 
 export class defaultRoles1669424781583 implements MigrationInterface {
 	async up(queryRunner: QueryRunner): Promise<void> {
-		await queryRunner.query(`INSERT INTO role (id, name) VALUES ("${ROLE_ID}", "superuser");`);
+		await queryRunner.query(`INSERT INTO role (id, name) VALUES ('${ROLE_ID}', 'superuser');`);
 		await queryRunner.query(
-			`INSERT INTO permission (name, id, roleId, entityId, actions) VALUES ("superuser", "${PERMISSION_ID}", "${ROLE_ID}", "*", ${
+			`INSERT INTO permission (name, id, roleId, entityId, actions) VALUES ('superuser', '${PERMISSION_ID}', '${ROLE_ID}', '*', ${
 				Action.READ | Action.WRITE
 			});`,
 		);
 	}
 
 	async down(queryRunner: QueryRunner): Promise<void> {
-		await queryRunner.query('DELETE FROM role WHERE id="$1"', [ROLE_ID]);
-		await queryRunner.query('DELETE FROM permission WHERE id="$1"', [PERMISSION_ID]);
+		await queryRunner.query(`DELETE FROM role WHERE id='$1'`, [ROLE_ID]);
+		await queryRunner.query(`DELETE FROM permission WHERE id='$1'`, [PERMISSION_ID]);
 	}
 }
