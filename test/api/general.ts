@@ -176,7 +176,7 @@ test.serial('should prevent acknowledgements from being called more than once', 
 		}
 
 		t.true(cb.handled);
-
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 		t.throws(cb as any);
 		callbacksInvoked++;
 	});
