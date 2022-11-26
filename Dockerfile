@@ -2,10 +2,13 @@ FROM node:16
 
 WORKDIR /opt/nodecg
 
+# Sets up the runtime user, makes nodecg-cli available to images which extend this image, and creates the directory structure with the appropriate permissions.
 RUN addgroup --system nodecg && adduser --system nodecg --ingroup nodecg && \
+    yarn global add nodecg-cli && \
     mkdir cfg && mkdir bundles && mkdir logs && mkdir db && mkdir assets && \
     chown -R nodecg:nodecg /opt/nodecg
 
+# Switch to the nodecg user
 USER nodecg
 
 # Copy NodeCG
