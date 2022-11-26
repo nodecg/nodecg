@@ -1,10 +1,11 @@
 import type { ISession } from 'connect-typeorm';
-import { Column, Entity, Index, PrimaryColumn, ValueTransformer, DeleteDateColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn, DeleteDateColumn } from 'typeorm';
+import type { ValueTransformer } from 'typeorm';
 
 // Postgres returns string by default. Return number instead.
 const Bigint: ValueTransformer = {
-	from: (value) => new Number(value),
-	to: (value) => (value === Infinity ? '+Infinity' : new Number(value)),
+	from: (value) => Number(value),
+	to: (value) => (value === Infinity ? '+Infinity' : Number(value)),
 };
 
 @Entity()
