@@ -45,7 +45,7 @@
     "@vaadin/vaadin-upload": "^4.2.2",
     "@webcomponents/webcomponentsjs": "^2.2.10",
     "app-root-path": "^3.0.0",
-    "better-sqlite3": "7.0.0",
+    "better-sqlite3": "^7.6.2",
     "body-parser": "^1.18.3",
     "cheerio": "^1.0.0-rc.2",
     "chokidar": "^3.3.1",
