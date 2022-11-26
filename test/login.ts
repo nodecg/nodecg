@@ -65,7 +65,7 @@ test.serial('regenerating a token should send the user back to /login', async (t
 	]);
 
 	// Put our preserved coverage back on the page for later extraction.
-	await page.evaluate((injectedCoverage) => {
+	await page.evaluate((injectedCoverage: any) => {
 		window.__coverage__ = injectedCoverage;
 	}, coverage);
 

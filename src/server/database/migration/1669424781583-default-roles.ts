@@ -1,10 +1,10 @@
-import type { MigrationInterface, QueryRunner } from 'typeorm';
+import { type MigrationInterface, type QueryRunner } from 'typeorm';
 import { Action } from '../entity/Permission';
 
 const ROLE_ID = '07e18d80-fa74-4d98-ac18-838c745a480f';
 const PERMISSION_ID = '923561ef-4186-4370-b7df-f12e64fc7bd2';
 
-export class Initial1586065330368 implements MigrationInterface {
+export class defaultRoles1669424781583 implements MigrationInterface {
 	async up(queryRunner: QueryRunner): Promise<void> {
 		await queryRunner.query(`INSERT INTO role (id, name) VALUES ("${ROLE_ID}", "superuser");`);
 		await queryRunner.query(

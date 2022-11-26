@@ -1,8 +1,4 @@
-// Native
-import path from 'path';
-
 // Packages
-import fs from 'fs-extra';
 import clone from 'clone';
 
 // Ours
@@ -10,7 +6,7 @@ import createLogger from '../logger';
 import Replicant from './server-replicant';
 import { throttleName } from '../util';
 import type ServerReplicant from './server-replicant';
-import uuid from 'uuid';
+import * as uuid from 'uuid';
 import * as db from '../database';
 import type { TypedServerSocket, ServerToClientEvents, RootNS } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';

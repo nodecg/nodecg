@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 // Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
-import puppeteer from 'puppeteer';
+import * as puppeteer from 'puppeteer';
 import { argv } from 'yargs';
 import isCi from 'is-ci';
 

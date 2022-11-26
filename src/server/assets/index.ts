@@ -124,21 +124,13 @@ export default class AssetManager {
 		 */
 		let ready = false;
 		const deferredFiles = new Map<string, AssetFile | undefined>();
-		watcher.on('add', (filepath) => {
+		watcher.on('add', async (filepath) => {
 			if (!ready) {
 				deferredFiles.set(filepath, undefined);
 			}
 
-			sha1File(filepath, (err, sum) => {
-				if (err) {
-					if (deferredFiles) {
-						deferredFiles.delete(filepath);
-					}
-
-					this.log.error(err);
-					return;
-				}
-
+			try {
+				const sum = await sha1File(filepath);
 				const uploadedFile = new AssetFile(filepath, sum);
 				if (deferredFiles) {
 					deferredFiles.set(filepath, uploadedFile);
@@ -149,7 +141,13 @@ export default class AssetManager {
 						rep.value!.push(uploadedFile);
 					}
 				}
-			});
+			} catch (err: unknown) {
+				if (deferredFiles) {
+					deferredFiles.delete(filepath);
+				}
+
+				this.log.error(err);
+			}
 		});
 
 		watcher.on('ready', () => {
@@ -157,13 +155,9 @@ export default class AssetManager {
 		});
 
 		watcher.on('change', (filepath) => {
-			debounceName(filepath, () => {
-				sha1File(filepath, (err, sum) => {
-					if (err) {
-						this.log.error(err);
-						return;
-					}
-
+			debounceName(filepath, async () => {
+				try {
+					const sum = await sha1File(filepath);
 					const newUploadedFile = new AssetFile(filepath, sum);
 					const rep = this._getCollectRep(newUploadedFile.namespace, newUploadedFile.category);
 					if (!rep) {
@@ -176,7 +170,9 @@ export default class AssetManager {
 					} else {
 						rep.value!.push(newUploadedFile);
 					}
-				});
+				} catch (err: unknown) {
+					this.log.error(err);
+				}
 			});
 		});
 

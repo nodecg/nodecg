@@ -1,7 +1,7 @@
 // Packages
 import test from 'ava';
 import axios from 'axios';
-import type puppeteer from 'puppeteer';
+import type * as puppeteer from 'puppeteer';
 
 // Ours
 import * as server from './helpers/server';

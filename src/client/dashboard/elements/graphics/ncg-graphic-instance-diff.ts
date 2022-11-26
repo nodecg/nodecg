@@ -99,7 +99,7 @@ class NcgGraphicInstanceDiff extends MutableData(Polymer.PolymerElement) {
 			return;
 		}
 
-		if (!this.instance || !this.instance.bundleName) {
+		if (!this.instance?.bundleName) {
 			return;
 		}
 

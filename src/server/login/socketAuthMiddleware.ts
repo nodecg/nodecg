@@ -27,14 +27,10 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 		}
 
 		const database = await getConnection();
-		const apiKey = await database.getRepository(ApiKey).findOne(
-			{
-				secret_key: token,
-			},
-			{
-				relations: ['user'],
-			},
-		);
+		const apiKey = await database.getRepository(ApiKey).findOne({
+			where: { secret_key: token },
+			relations: ['user'],
+		});
 
 		if (!apiKey) {
 			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no credentials found'));
@@ -75,7 +71,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 					// Lookup the ApiKey for this token we want to revoke.
 					const keyToDelete = await database
 						.getRepository(ApiKey)
-						.findOne({ secret_key: token }, { relations: ['user'] });
+						.findOne({ where: { secret_key: token }, relations: ['user'] });
 
 					// If there's a User associated to this key (there should be)
 					// give them a new ApiKey

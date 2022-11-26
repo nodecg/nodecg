@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { getConnection, User, Role, Identity } from '../database';
 import { ApiKey } from './entity/ApiKey';
 
-export async function findUser(id: User['id']): Promise<User | undefined> {
+export async function findUser(id: User['id']): Promise<User | null> {
 	const database = await getConnection();
-	return database.getRepository(User).findOne(id, { relations: ['roles', 'identities', 'apiKeys'], cache: true });
+	return database
+		.getRepository(User)
+		.findOne({ where: { id }, relations: ['roles', 'identities', 'apiKeys'], cache: true });
 }
 
 export async function getSuperUserRole(): Promise<Role> {
@@ -58,22 +61,17 @@ export function isSuperUser(user: User): boolean {
 	return Boolean(user.roles?.find((role) => role.name === 'superuser'));
 }
 
-async function findRole(name: Role['name']): Promise<Role | undefined> {
+async function findRole(name: Role['name']): Promise<Role | null> {
 	const database = await getConnection();
 	const { manager } = database;
-	return manager.findOne(
-		Role,
-		{
-			name,
-		},
-		{ relations: ['permissions'] },
-	);
+	return manager.findOne(Role, { where: { name }, relations: ['permissions'] });
 }
 
 async function createIdentity(identInfo: Pick<Identity, 'provider_type' | 'provider_hash'>): Promise<Identity> {
 	const database = await getConnection();
 	const { manager } = database;
-	const ident = manager.create(Identity, identInfo);
+	// See https://github.com/typeorm/typeorm/issues/9070
+	const ident = manager.create<Identity>(Identity, identInfo);
 	return manager.save(ident);
 }
 
@@ -84,18 +82,10 @@ async function createApiKey(): Promise<ApiKey> {
 	return manager.save(apiKey);
 }
 
-async function findIdent(
-	type: Identity['provider_type'],
-	hash: Identity['provider_hash'],
-): Promise<Identity | undefined> {
+async function findIdent(type: Identity['provider_type'], hash: Identity['provider_hash']): Promise<Identity | null> {
 	const database = await getConnection();
-	return database.getRepository(Identity).findOne(
-		{
-			provider_hash: hash,
-			provider_type: type,
-		},
-		{
-			relations: ['user'],
-		},
-	);
+	return database.getRepository(Identity).findOne({
+		where: { provider_hash: hash, provider_type: type },
+		relations: ['user'],
+	});
 }

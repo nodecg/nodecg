@@ -1,8 +1,11 @@
 import type { ISession } from 'connect-typeorm';
-import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn, ValueTransformer, DeleteDateColumn } from 'typeorm';
 
 // Postgres returns string by default. Return number instead.
-const Bigint = { from: Number, to: Number };
+const Bigint: ValueTransformer = {
+	from: (value) => new Number(value),
+	to: (value) => (value === Infinity ? '+Infinity' : new Number(value)),
+};
 
 @Entity()
 export class Session implements ISession {
@@ -15,4 +18,7 @@ export class Session implements ISession {
 
 	@Column('text')
 	json = '';
+
+	@DeleteDateColumn()
+	public destroyedAt?: Date;
 }

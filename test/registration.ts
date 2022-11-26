@@ -5,7 +5,7 @@ import path from 'path';
 // Packages
 import test from 'ava';
 import axios from 'axios';
-import simpleGit from 'simple-git/promise';
+import { simpleGit } from 'simple-git';
 import { replaceInFile } from 'replace-in-file';
 
 // Ours

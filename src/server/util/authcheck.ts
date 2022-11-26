@@ -25,14 +25,10 @@ export default async function (req: express.Request, res: express.Response, next
 		let { user } = req;
 		if (req.query.key ?? req.cookies.socketToken) {
 			const database = await getConnection();
-			const apiKey = await database.getRepository(ApiKey).findOne(
-				{
-					secret_key: req.query.key ?? req.cookies.socketToken,
-				},
-				{
-					relations: ['user'],
-				},
-			);
+			const apiKey = await database.getRepository(ApiKey).findOne({
+				where: { secret_key: req.query.key ?? req.cookies.socketToken },
+				relations: ['user'],
+			});
 
 			// No record of this API Key found, reject the request.
 			if (!apiKey) {
@@ -52,7 +48,7 @@ export default async function (req: express.Request, res: express.Response, next
 				return;
 			}
 
-			user = await findUser(apiKey.user.id);
+			user = (await findUser(apiKey.user.id)) ?? undefined;
 		}
 
 		if (!user) {

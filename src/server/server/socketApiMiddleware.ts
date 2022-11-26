@@ -31,7 +31,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 			socket.broadcast.emit('message', data);
 		});
 
-		socket.on('joinRoom', (room, cb) => {
+		socket.on('joinRoom', async (room, cb) => {
 			if (typeof room !== 'string') {
 				cb('Room must be a string', undefined);
 				return;
@@ -39,7 +39,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 
 			if (!Object.keys(socket.rooms).includes(room)) {
 				log.trace('Socket %s joined room:', socket.id, room);
-				socket.join(room);
+				await socket.join(room);
 			}
 
 			cb(undefined, undefined);

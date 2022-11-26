@@ -3,7 +3,7 @@ import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import axios from 'axios';
 import express from 'express';
-import type puppeteer from 'puppeteer';
+import type * as puppeteer from 'puppeteer';
 
 // Ours
 import * as server from '../helpers/server';
@@ -176,7 +176,7 @@ test.serial('should prevent acknowledgements from being called more than once', 
 		}
 
 		t.true(cb.handled);
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+
 		t.throws(cb as any);
 		callbacksInvoked++;
 	});

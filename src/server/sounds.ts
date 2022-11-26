@@ -112,7 +112,7 @@ export default class SoundsLib {
 				const filepath = path.join(bundle.dir, rawCue.defaultFile);
 				const parsedPath = path.parse(filepath);
 				file = {
-					sum: sha1File(filepath),
+					sum: sha1File.sync(filepath),
 					base: parsedPath.base,
 					ext: parsedPath.ext,
 					name: parsedPath.name,

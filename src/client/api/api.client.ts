@@ -300,7 +300,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 			throw new Error(`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`);
 		}
 
-		if (!window.createjs || !window.createjs.Sound) {
+		if (!window.createjs?.Sound) {
 			throw new Error("NodeCG Sound API methods are not available when SoundJS isn't present");
 		}
 
@@ -331,7 +331,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 			throw new Error(`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`);
 		}
 
-		if (!window.createjs || !window.createjs.Sound) {
+		if (!window.createjs?.Sound) {
 			throw new Error("NodeCG Sound API methods are not available when SoundJS isn't present");
 		}
 
@@ -349,7 +349,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 	 * Stops all currently playing sounds on the page.
 	 */
 	stopAllSounds(): void {
-		if (!window.createjs || !window.createjs.Sound) {
+		if (!window.createjs?.Sound) {
 			throw new Error("NodeCG Sound API methods are not available when SoundJS isn't present");
 		}
 

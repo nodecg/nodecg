@@ -5,7 +5,7 @@ import path, { resolve } from 'path';
 // Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
-import type puppeteer from 'puppeteer';
+import type * as puppeteer from 'puppeteer';
 
 // Ours
 import * as server from '../helpers/server';

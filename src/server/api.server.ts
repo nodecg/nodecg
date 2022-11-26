@@ -1,7 +1,7 @@
 // Packages
 import express from 'express';
 import isError from 'is-error';
-import serializeError from 'serialize-error';
+import { serializeError } from 'serialize-error';
 
 // Ours
 import type { AbstractLogger, Acknowledgement } from '../shared/api.base';
