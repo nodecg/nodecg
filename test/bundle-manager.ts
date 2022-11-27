@@ -86,6 +86,8 @@ test.serial('loader - should detect and load bundle located in custom bundle pat
 });
 
 test.serial('watcher - should emit a change event when the manifest file changes', async (t) => {
+	t.plan(1);
+
 	await new Promise<void>((resolve) => {
 		const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-manifest/package.json`, 'utf8'));
 		bundleManager.once('bundleChanged', (bundle) => {
@@ -94,11 +96,13 @@ test.serial('watcher - should emit a change event when the manifest file changes
 		});
 
 		manifest._changed = true;
-		fs.writeFileSync(`${tempFolder}/bundles/change-manifest/package.json`, JSON.stringify(manifest));
+		fs.writeFileSync(`${tempFolder}/bundles/change-manifest/package.json`, JSON.stringify(manifest), 'utf8');
 	});
 });
 
 test.serial('watcher - should remove the bundle when the manifest file is renamed', async (t) => {
+	t.plan(1);
+
 	const promise = new Promise<void>((resolve) => {
 		bundleManager.once('bundleRemoved', () => {
 			const result = bundleManager.find('rename-manifest');
@@ -116,6 +120,8 @@ test.serial('watcher - should remove the bundle when the manifest file is rename
 });
 
 test.serial('watcher - should emit a removed event when the manifest file is removed', async (t) => {
+	t.plan(1);
+
 	const promise = new Promise<void>((resolve) => {
 		bundleManager.once('bundleRemoved', () => {
 			const result = bundleManager.find('remove-manifest');
@@ -130,6 +136,8 @@ test.serial('watcher - should emit a removed event when the manifest file is rem
 });
 
 test.serial('watcher - should emit a change event when a panel HTML file changes', async (t) => {
+	t.plan(1);
+
 	const promise = new Promise<void>((resolve) => {
 		bundleManager.once('bundleChanged', (bundle) => {
 			t.is(bundle.name, 'change-panel');
@@ -149,6 +157,8 @@ if (os.platform() !== 'win32') {
 	// This can't be tested on Windows unless run with admin privs.
 	// For some reason, creating symlinks on Windows requires admin.
 	test.serial('watcher - should detect panel HTML file changes when the bundle is symlinked', async (t) => {
+		t.plan(1);
+
 		const promise = new Promise<void>((resolve) => {
 			bundleManager.once('bundleChanged', (bundle) => {
 				t.is(bundle.name, 'change-panel-symlink');
@@ -166,6 +176,8 @@ if (os.platform() !== 'win32') {
 }
 
 test.serial("watcher - should reload the bundle's config when the bundle is reloaded due to a change", async (t) => {
+	t.plan(2);
+
 	const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-config/package.json`, 'utf8'));
 	const config = JSON.parse(fs.readFileSync(`${tempFolder}/cfg/change-config.json`, 'utf8'));
 
@@ -189,6 +201,8 @@ test.serial("watcher - should reload the bundle's config when the bundle is relo
 });
 
 test.serial('watcher - should emit an `invalidBundle` error when a panel HTML file is removed', async (t) => {
+	t.plan(2);
+
 	const promise = new Promise<void>((resolve) => {
 		bundleManager.once('invalidBundle', (bundle, error) => {
 			t.is(bundle.name, 'remove-panel');
@@ -203,6 +217,8 @@ test.serial('watcher - should emit an `invalidBundle` error when a panel HTML fi
 });
 
 test.serial('watcher - should emit an `invalidBundle` error when the manifest becomes invalid', async (t) => {
+	t.plan(2);
+
 	const promise = new Promise<void>((resolve) => {
 		bundleManager.once('invalidBundle', (bundle, error) => {
 			t.is(bundle.name, 'invalid-manifest');
