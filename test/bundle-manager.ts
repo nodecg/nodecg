@@ -85,7 +85,7 @@ test.serial('loader - should detect and load bundle located in custom bundle pat
 	t.is(bundle?.name, 'another-test-bundle');
 });
 
-test.serial('watcher - hould emit a change event when the manifest file changes', async (t) => {
+test.serial('watcher - should emit a change event when the manifest file changes', async (t) => {
 	await new Promise<void>((resolve) => {
 		const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-manifest/package.json`, 'utf8'));
 		bundleManager.once('bundleChanged', (bundle) => {
