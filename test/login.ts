@@ -81,8 +81,13 @@ test.serial('token invalidation should show an UnauthorizedError on open pages',
 	await Promise.all([
 		graphic.waitForNavigation(),
 		dash.evaluate(() => {
-			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			window.socket.emit('regenerateToken', () => {});
+			// In a timeout in an attempt to make this test less flaky.
+			// The flakiness _might_ be because the token regen happens before the "waitForNavigation" has a chance to attach?
+			// Who knows.
+			setTimeout(() => {
+				// eslint-disable-next-line @typescript-eslint/no-empty-function
+				window.socket.emit('regenerateToken', () => {});
+			}, 500);
 		}),
 	]);
 
