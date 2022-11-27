@@ -51,3 +51,13 @@ test('should not have any whitelisted nor blacklisted bundles by default', (t) =
 	t.is(result.config.bundles.enabled, null);
 	t.is(result.config.bundles.disabled, null);
 });
+
+test('should support YAML configs', (t) => {
+	const result = loadConfig('test/fixtures/nodecg-core/cfg-yaml');
+	t.is(result.config.host, 'yaml-config');
+});
+
+test('should support CommonJS configs', (t) => {
+	const result = loadConfig('test/fixtures/nodecg-core/cfg-js');
+	t.is(result.config.host, 'js-config');
+});

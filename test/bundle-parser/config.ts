@@ -1,3 +1,6 @@
+// Native
+import fs from 'fs';
+
 // Packages
 import test from 'ava';
 
@@ -7,7 +10,7 @@ import parseBundle from '../../src/server/bundle-parser';
 test('parsing - when the config file exists, parse the config and add it as bundle.config', (t) => {
 	const parsedBundle = parseBundle(
 		'./test/fixtures/bundle-parser/good-bundle',
-		'./test/fixtures/bundle-parser/good-bundle/bundleConfig.json',
+		JSON.parse(fs.readFileSync('./test/fixtures/bundle-parser/good-bundle/bundleConfig.json', 'utf8')),
 	);
 	t.deepEqual(parsedBundle.config, { foo: 'foo' });
 });
@@ -20,35 +23,16 @@ test("parsing - when the config file exists, set default values if the config do
 test("parsing - when the config file exists, should not reject a config if it doesn't provide a value, but the schema provides a default", (t) => {
 	const parsedBundle = parseBundle(
 		'./test/fixtures/bundle-parser/required-defaults',
-		'./test/fixtures/bundle-parser/required-defaults/bundleConfig.json',
+		JSON.parse(fs.readFileSync('./test/fixtures/bundle-parser/required-defaults/bundleConfig.json', 'utf8')),
 	);
 	t.deepEqual(parsedBundle.config, { foo: 'foo', bar: 'bar' });
-});
-
-test('parsing - when the config file does not exist, throw an error', (t) => {
-	const error = t.throws(
-		parseBundle.bind(parseBundle, './test/fixtures/bundle-parser/good-bundle', './made/up/path.json'),
-	);
-	if (!error) return t.fail();
-	return t.true(error.message.includes('does not exist'));
-});
-
-test("parsing when the config file isn't valid JSON, throw an error", (t) => {
-	const fn = parseBundle.bind(
-		parseBundle,
-		'./test/fixtures/bundle-parser/bad-json',
-		'./test/fixtures/bundle-parser/bad-json/bundleConfig.json',
-	);
-	const error = t.throws(fn);
-	if (!error) return t.fail();
-	return t.true(error.message.includes('Ensure that it is valid JSON'));
 });
 
 test('validation - when the schema file exists, should not throw when the config passes validation', (t) => {
 	const fn = parseBundle.bind(
 		parseBundle,
 		'./test/fixtures/bundle-parser/config-validation',
-		'./test/fixtures/bundle-parser/config-validation/validConfig.json',
+		JSON.parse(fs.readFileSync('./test/fixtures/bundle-parser/config-validation/validConfig.json', 'utf8')),
 	);
 	t.notThrows(fn);
 });
@@ -57,7 +41,7 @@ test('validation - when the schema file exists, should throw when the config fai
 	const fn = parseBundle.bind(
 		parseBundle,
 		'./test/fixtures/bundle-parser/config-validation',
-		'./test/fixtures/bundle-parser/config-validation/invalidConfig.json',
+		JSON.parse(fs.readFileSync('./test/fixtures/bundle-parser/config-validation/invalidConfig.json', 'utf8')),
 	);
 	const error = t.throws(fn);
 	if (!error) return t.fail();
@@ -68,7 +52,9 @@ test('validation - when the schema file exists, should throw when the config fai
 test('validation - when the schema file exists, properly merge configs that have arrays of objects', (t) => {
 	const parsedBundle = parseBundle(
 		'./test/fixtures/bundle-parser/config-schema-array-of-objects',
-		'./test/fixtures/bundle-parser/config-schema-array-of-objects/bundleConfig.json',
+		JSON.parse(
+			fs.readFileSync('./test/fixtures/bundle-parser/config-schema-array-of-objects/bundleConfig.json', 'utf8'),
+		),
 	);
 	t.deepEqual(parsedBundle.config, {
 		gameAudioChannels: [
@@ -84,7 +70,7 @@ test('validation - when the schema file does not exist, skip validation and not 
 	const fn = parseBundle.bind(
 		parseBundle,
 		'./test/fixtures/bundle-parser/good-bundle',
-		'./test/fixtures/bundle-parser/good-bundle/bundleConfig.json',
+		JSON.parse(fs.readFileSync('./test/fixtures/bundle-parser/good-bundle/bundleConfig.json', 'utf8')),
 	);
 	t.notThrows(fn);
 });
@@ -93,7 +79,7 @@ test("validation - when the schema file isn't valid JSON, throw an error", (t) =
 	const fn = parseBundle.bind(
 		parseBundle,
 		'./test/fixtures/bundle-parser/bad-schema',
-		'./test/fixtures/bundle-parser/bad-schema/bundleConfig.json',
+		JSON.parse(fs.readFileSync('./test/fixtures/bundle-parser/bad-schema/bundleConfig.json', 'utf8')),
 	);
 	const error = t.throws(fn);
 	if (!error) return t.fail();
@@ -103,7 +89,12 @@ test("validation - when the schema file isn't valid JSON, throw an error", (t) =
 test("validation - should not reject a config if it doesn't an optional object that has some properties with defaults and other required properties that do not have defaults", (t) => {
 	const parsedBundle = parseBundle(
 		'./test/fixtures/bundle-parser/optional-object-with-required-props-and-defaults',
-		'./test/fixtures/bundle-parser/optional-object-with-required-props-and-defaults/bundleConfig.json',
+		JSON.parse(
+			fs.readFileSync(
+				'./test/fixtures/bundle-parser/optional-object-with-required-props-and-defaults/bundleConfig.json',
+				'utf8',
+			),
+		),
 	);
 	t.deepEqual(parsedBundle.config, {});
 });

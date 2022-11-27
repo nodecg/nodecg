@@ -142,6 +142,8 @@ export namespace NodeCG {
 		export type AssetCategory = Manifest.UnparsedAssetCategory;
 
 		export type BundleDependencies = Manifest.UnparsedBundleDependencies;
+
+		export type Config = Record<string, unknown>;
 	}
 
 	export type Bundle = {

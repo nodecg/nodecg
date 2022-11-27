@@ -7,6 +7,7 @@ import fs from 'fs-extra';
 import chokidar from 'chokidar';
 import debounce from 'lodash.debounce';
 import semver from 'semver';
+import { cosmiconfigSync as cosmiconfig } from 'cosmiconfig';
 
 // Ours
 import parseBundle from './bundle-parser';
@@ -152,10 +153,7 @@ export default class BundleManager extends EventEmitter {
 				log.debug(`Loading bundle ${bundleFolderName}`);
 
 				// Parse each bundle and push the result onto the bundles array
-				const bundleCfgPath = path.join(cfgPath, `${bundleFolderName}.json`);
-				const bundle = fs.existsSync(bundleCfgPath)
-					? parseBundle(bundlePath, bundleCfgPath)
-					: parseBundle(bundlePath);
+				const bundle = parseBundle(bundlePath, loadBundleCfg(cfgPath, bundleFolderName));
 
 				// Check if the bundle is compatible with this version of NodeCG
 				if (!semver.satisfies(nodecgVersion, bundle.compatibleRange)) {
@@ -299,15 +297,7 @@ export default class BundleManager extends EventEmitter {
 			this.resetBackoffTimer();
 
 			try {
-				let reparsedBundle;
-				const bundleCfgPath = path.join(this._cfgPath, `${bundleName}.json`);
-
-				if (fs.existsSync(bundleCfgPath)) {
-					reparsedBundle = parseBundle(bundle.dir, bundleCfgPath);
-				} else {
-					reparsedBundle = parseBundle(bundle.dir);
-				}
-
+				const reparsedBundle = parseBundle(bundle.dir, loadBundleCfg(this._cfgPath, bundle.name));
 				this.add(reparsedBundle);
 				this.emit('bundleChanged', reparsedBundle);
 				// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
@@ -350,4 +340,28 @@ function isManifest(bundleName: string, filePath: string): boolean {
 function isGitData(bundleName: string, filePath: string): boolean {
 	const regex = new RegExp(`${bundleName}${'\\'}${path.sep}${'\\'}.git`);
 	return regex.test(filePath);
+}
+
+/**
+ * Determines which config file to use for a bundle.
+ */
+function loadBundleCfg(cfgDir: string, bundleName: string): NodeCG.Bundle.Config | undefined {
+	try {
+		const cc = cosmiconfig('nodecg', {
+			searchPlaces: [
+				`${bundleName}.json`,
+				`${bundleName}.yaml`,
+				`${bundleName}.yml`,
+				`${bundleName}.js`,
+				`${bundleName}.config.js`,
+			],
+			stopDir: cfgDir,
+		});
+		const result = cc.search(cfgDir);
+		return result?.config;
+	} catch (_: unknown) {
+		throw new Error(
+			`Config for bundle "${bundleName}" could not be read. Ensure that it is valid JSON, YAML, or CommonJS.`,
+		);
+	}
 }

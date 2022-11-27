@@ -14,7 +14,7 @@ import parseExtension from './extension';
 import parseGit from './git';
 import type { NodeCG } from '../../types/nodecg';
 
-export default function (bundlePath: string, bundleCfgPath?: string): NodeCG.Bundle {
+export default function (bundlePath: string, bundleCfg?: NodeCG.Bundle.Config): NodeCG.Bundle {
 	// Resolve the path to the bundle and its package.json
 	const pkgPath = path.join(bundlePath, 'package.json');
 
@@ -39,8 +39,8 @@ export default function (bundlePath: string, bundleCfgPath?: string): NodeCG.Bun
 
 		// If there is a config file for this bundle, parse it.
 		// Else if there is only a configschema for this bundle, parse that and apply any defaults.
-		config: bundleCfgPath
-			? config.parse(manifest.name, bundlePath, bundleCfgPath)
+		config: bundleCfg
+			? config.parse(manifest.name, bundlePath, bundleCfg)
 			: config.parseDefaults(manifest.name, bundlePath),
 
 		dashboard: {

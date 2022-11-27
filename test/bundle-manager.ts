@@ -57,7 +57,11 @@ test.after(() => {
 });
 
 test.serial('loader - should detect and load bundle configuration files', (t) => {
-	const bundle = bundleManager.find('config-test');
+	let bundle = bundleManager.find('config-test-json');
+	t.deepEqual(bundle?.config, { bundleConfig: true });
+	bundle = bundleManager.find('config-test-yaml');
+	t.deepEqual(bundle?.config, { bundleConfig: true });
+	bundle = bundleManager.find('config-test-js');
 	t.deepEqual(bundle?.config, { bundleConfig: true });
 });
 

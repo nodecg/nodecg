@@ -7,19 +7,9 @@ import clone from 'clone';
 import defaults from 'json-schema-defaults';
 import extend from 'extend';
 import tv4 from 'tv4';
+import type { NodeCG } from '../../types/nodecg';
 
-export function parse(bundleName: string, bundleDir: string, cfgPath: string): Record<string, any> {
-	if (!fs.existsSync(cfgPath)) {
-		throw new Error(`bundleCfgPath "${cfgPath}" does not exist`);
-	}
-
-	let userConfig;
-	try {
-		userConfig = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
-	} catch (_: unknown) {
-		throw new Error(`bundleCfgPath "${cfgPath}" could not be read. Ensure that it is valid JSON.`);
-	}
-
+export function parse(bundleName: string, bundleDir: string, userConfig: NodeCG.Bundle.Config): NodeCG.Bundle.Config {
 	const cfgSchemaPath = path.resolve(bundleDir, 'configschema.json');
 	if (!fs.existsSync(cfgSchemaPath)) {
 		return userConfig;
