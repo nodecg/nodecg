@@ -64,11 +64,26 @@ export default async function (req: express.Request, res: express.Response, next
 		const provider = user.identities[0]?.provider_type;
 		const providerAllowed = config.login?.[provider]?.enabled;
 		if (req.isAuthenticated() && allowed && providerAllowed) {
+			let apiKey = user.apiKeys[0];
+
+			// This should only happen if the database is manually edited, say, in the event of a security breach
+			// that reavealed an API key that needed to be deleted.
+			if (!apiKey) {
+				// Make a new api key.
+				const database = await getConnection();
+				apiKey = database.manager.create(ApiKey);
+				await database.manager.save(apiKey);
+
+				// Assign this key to the user.
+				user.apiKeys.push(apiKey);
+				await database.manager.save(user);
+			}
+
 			// Set the cookie so that requests to other resources on the page
 			// can also be authenticated.
 			// This is crucial for things like OBS browser sources,
 			// where we don't have a session.
-			res.cookie('socketToken', user.apiKeys[0].secret_key, {
+			res.cookie('socketToken', apiKey.secret_key, {
 				path: '/',
 				domain: domain!,
 				secure: config.ssl?.enabled,
