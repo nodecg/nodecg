@@ -34,7 +34,7 @@ const watcher = chokidar.watch(
 const blacklistedBundleDirectories = ['node_modules', 'bower_components'];
 
 const bundles: NodeCG.Bundle[] = [];
-const log = createLogger('nodecg/lib/bundles');
+const log = createLogger('bundle-manager');
 const hasChanged = new Set<string>();
 let backoffTimer: NodeJS.Timeout | undefined;
 

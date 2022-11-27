@@ -22,7 +22,7 @@ type Collection = {
 };
 
 export default class AssetManager {
-	readonly log = createLogger('nodecg/lib/assets');
+	readonly log = createLogger('assets');
 
 	readonly assetsRoot = path.join(process.env.NODECG_ROOT, 'assets');
 

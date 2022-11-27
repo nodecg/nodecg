@@ -14,7 +14,7 @@ import type { RootNS } from '../../types/socket-protocol';
 import type BundleManager from '../bundle-manager';
 import type { NodeCG } from '../../types/nodecg';
 
-const log = createLogger('nodecg/lib/server/extensions');
+const log = createLogger('extensions');
 
 export default class ExtensionManager extends EventEmitter {
 	readonly extensions: Record<string, unknown> = {};

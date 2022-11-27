@@ -22,7 +22,7 @@ import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database
 
 type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
 
-const log = createLogger('nodecg/lib/login');
+const log = createLogger('login');
 const protocol = config.ssl?.enabled ?? config.login.forceHttpsReturn ? 'https' : 'http';
 
 // Required for persistent login sessions.

@@ -6,7 +6,7 @@ import type { ExtendedError } from 'socket.io/dist/namespace';
 import createLogger from '../logger';
 import type { TypedServerSocket } from '../../types/socket-protocol';
 
-const log = createLogger('nodecg/lib/server');
+const log = createLogger('socket-api');
 
 export default async function (socket: TypedServerSocket, next: (err?: ExtendedError) => void): Promise<void> {
 	try {
