@@ -1,7 +1,7 @@
 // Packages
 import type { ExecutionContext } from 'ava';
 import type * as Puppeteer from 'puppeteer';
-import type { Acknowledgement } from '../../src/shared/api.base';
+import type { NodeCG } from '../../src/types/nodecg';
 
 export const sleep = async (milliseconds: number): Promise<void> =>
 	new Promise((resolve) => {
@@ -46,7 +46,7 @@ export const shadowSelector = async <T extends Element>(
 		return foundDom;
 	}, selectors) as any;
 
-export function invokeAck(t: ExecutionContext, ack?: Acknowledgement, ...args: any[]): void {
+export function invokeAck(t: ExecutionContext, ack?: NodeCG.Acknowledgement, ...args: any[]): void {
 	if (!ack) {
 		t.fail('no callback provided');
 		return;
