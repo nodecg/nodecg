@@ -6,6 +6,7 @@ import path from 'path';
 import appRootPath from 'app-root-path';
 import ts from 'typescript';
 import { mkdirpSync } from 'fs-extra';
+import isBuiltinModule from 'is-builtin-module';
 
 const pjsonPath = path.join(appRootPath.path, 'package.json');
 const rawContents = fs.readFileSync(pjsonPath, 'utf8');
@@ -30,6 +31,10 @@ function rewriteTypePaths(filePath: string) {
 				const { text } = (node as any).moduleSpecifier;
 				const isRelativeImport = text.startsWith('.');
 				if (isRelativeImport) {
+					return node;
+				}
+
+				if (isBuiltinModule(text)) {
 					return node;
 				}
 

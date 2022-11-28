@@ -197,6 +197,7 @@
     "eslint-plugin-ava": "^13.2.0",
     "fork-ts-checker-webpack-plugin": "^7.2.13",
     "husky": "^8.0.2",
+    "is-builtin-module": "^3.2.0",
     "is-ci": "^3.0.1",
     "is-windows": "^1.0.2",
     "lint-staged": "^13.0.4",
