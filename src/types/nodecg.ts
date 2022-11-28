@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import type * as ExpressCore from 'express-serve-static-core';
 import type express from 'express';
+import { ServerToClientEvents, ClientToServerEvents } from './socket-protocol';
 
 type Person =
 	| {
@@ -11,27 +12,23 @@ type Person =
 	  }
 	| string;
 
-type SocketIOConnectionEvents = {
-	connect: void;
-	connect_error: (error: Error) => void;
-	connect_timeout: void;
-	error: (error: Error) => void;
-	disconnect: (reason: string) => void;
-	reconnect: (attemptNumber: number) => void;
-	reconnect_attempt: (attemptNumber: number) => void;
-	reconnecting: (attemptNumber: number) => void;
-	reconnect_error: (error: Error) => void;
-	reconnect_failed: void;
-};
-
 export namespace NodeCG {
+	/**
+	 * A collection of types that represent the raw data from the `nodecg` stanza in a bundle's `package.json`.
+	 */
 	export namespace Manifest {
+		/**
+		 * An unparsed `assetCategory` from a bundle's `package.json`.
+		 */
 		export type UnparsedAssetCategory = {
 			name: string;
 			title: string;
 			allowedTypes?: string[];
 		};
 
+		/**
+		 * An unparsed `panel` from a bundle's `package.json`.
+		 */
 		export type UnparsedPanel = {
 			name: string;
 			title: string;
@@ -44,6 +41,9 @@ export namespace NodeCG {
 			width?: number;
 		};
 
+		/**
+		 * An unparsed `graphic` from a bundle's `package.json`.
+		 */
 		export type UnparsedGraphic = {
 			file: string;
 			width: number;
@@ -51,11 +51,17 @@ export namespace NodeCG {
 			singleInstance?: boolean;
 		};
 
+		/**
+		 * An unparsed `mount` configuration from a bundle's `package.json`.
+		 */
 		export type UnparsedMount = {
 			directory: string;
 			endpoint: string;
 		};
 
+		/**
+		 * An unparsed `soundCue` from a bundle's `package.json`.
+		 */
 		export type UnparsedSoundCue = {
 			name: string;
 			assignable?: boolean;
@@ -63,8 +69,14 @@ export namespace NodeCG {
 			defaultFile?: string;
 		};
 
+		/**
+		 * An unparsed record of `bundleDependencies` from a bundle's `package.json`.
+		 */
 		export type UnparsedBundleDependencies = Record<string, string>;
 
+		/**
+		 * The actual structure of a bundle's `nodecg` stanza from it's `package.json`.
+		 */
 		export type UnparsedManifest = {
 			compatibleRange: string;
 			transformBareModuleSpecifiers?: boolean;
@@ -77,6 +89,10 @@ export namespace NodeCG {
 		};
 	}
 
+	/**
+	 * The rough structure of a bundle's `package.json`.
+	 * Only includes types that NodeCG cares about.
+	 */
 	export type PackageJSON = {
 		name: string;
 		version: string;
@@ -88,9 +104,15 @@ export namespace NodeCG {
 		nodecg: Manifest.UnparsedManifest;
 	};
 
+	/**
+	 * A _parsed_ bundle manifest as used internally by NodeCG.
+	 */
 	export type Manifest = Omit<PackageJSON, 'nodecg'> &
 		Manifest.UnparsedManifest & { transformBareModuleSpecifiers: boolean };
 
+	/**
+	 * A collection of types that comprise a `bundle`.
+	 */
 	export namespace Bundle {
 		export type GitData =
 			| undefined
@@ -146,6 +168,9 @@ export namespace NodeCG {
 		export type UnknownConfig = Record<string, unknown>;
 	}
 
+	/**
+	 * The actual type of a `bundle`.
+	 */
 	export type Bundle = {
 		name: string;
 		version: string;
@@ -172,10 +197,21 @@ export namespace NodeCG {
 		bundleDependencies?: Bundle.BundleDependencies;
 	};
 
-	export type SocketEvents = {
-		foo: (bar: number) => void;
-	} & SocketIOConnectionEvents;
+	/**
+	 * NodeCG's socket protocol.
+	 * It is unikely that you will need to use this directly.
+	 * Does not include builtin Socket.IO events such as `connect`, `disconnect`, etc.
+	 */
+	export type SocketProtocol = {
+		serverToClient: ServerToClientEvents;
+		clientToServer: ClientToServerEvents;
+	};
 
+	/**
+	 * The full, parsed NodeCG config (i.e `cfg/nodecg.{json,yaml,js}`).
+	 * Contains sensitive secrets!
+	 * Available to server-side code (extensions) only.
+	 */
 	export type Config = {
 		host: string;
 		port: number;
@@ -243,6 +279,11 @@ export namespace NodeCG {
 		};
 	};
 
+	/**
+	 * The filtered, minimal, parsed NodeCG config (i.e `cfg/nodecg.{json,yaml,js}`).
+	 * Does not contain any sensitive secrets.
+	 * Available to client-side code (dashboard, graphics) only.
+	 */
 	export type FilteredConfig = {
 		host: string;
 		port: number;
@@ -288,6 +329,9 @@ export namespace NodeCG {
 		};
 	};
 
+	/**
+	 * A sound cue `file`, as used in sound cue Replicants.
+	 */
 	export type CueFile = {
 		sum: string;
 		base: string;
@@ -297,6 +341,9 @@ export namespace NodeCG {
 		default: boolean;
 	};
 
+	/**
+	 * A sound cue definition, as used in sound cue Replicants.
+	 */
 	export type SoundCue = {
 		name: string;
 		volume: number;
@@ -308,6 +355,9 @@ export namespace NodeCG {
 		defaultFile?: CueFile;
 	};
 
+	/**
+	 * An asset file, as used in assets Replicants.
+	 */
 	export type AssetFile = {
 		sum: string;
 		base: string;
@@ -317,6 +367,10 @@ export namespace NodeCG {
 		url: string;
 	};
 
+	/**
+	 * A namespace containing various types used in the Replicant system.
+	 * It should be unlikely that you need to use these directly.
+	 */
 	export namespace Replicant {
 		export type Options<T> = {
 			persistent?: boolean;
@@ -348,8 +402,15 @@ export namespace NodeCG {
 		);
 	}
 
+	/**
+	 * Express middleware that can be mounted to NodeCG's webserver via `nodecg.mount`.
+	 */
 	export type Middleware = ExpressCore.ApplicationRequestHandler<express.Application>;
 
+	/**
+	 * A description of an instance of a currently-open graphic.
+	 * It is unlikely that you will need to use this type directly.
+	 */
 	export type GraphicsInstance = {
 		ipv4: string;
 		timestamp: number;
@@ -363,6 +424,10 @@ export namespace NodeCG {
 		potentiallyOutOfDate: boolean;
 	};
 
+	/**
+	 * A description of a dashboard workspace.
+	 * It is unlikely that you will need to use this type directly.
+	 */
 	export type Workspace = {
 		name: string;
 		label: string;
@@ -370,19 +435,36 @@ export namespace NodeCG {
 		fullbleed?: boolean;
 	};
 
+	/**
+	 * A handled `listenFor` acknowledgement.
+	 * Attempting to call/invoke a handled acknowledgement will throw an error.
+	 */
 	export type HandledAcknowledgement = {
 		handled: true;
 	};
 
+	/**
+	 * An unhandled `listenFor` acknowledgement.
+	 * It can safely be called/invoked.
+	 */
 	export type UnhandledAcknowledgement = {
 		handled: false;
 		(err?: any, response?: unknown): void;
 	};
 
+	/**
+	 * A `listenFor` acknowledgement, sent from client to server.
+	 */
 	export type Acknowledgement = HandledAcknowledgement | UnhandledAcknowledgement;
 
+	/**
+	 * A `listenFor` handler function/callback.
+	 */
 	export type ListenHandler = (data: any, ack?: Acknowledgement) => void;
 
+	/**
+	 * A description of NodeCG's logger interface.
+	 */
 	export type Logger = {
 		name: string;
 		trace: (...args: any[]) => void;
@@ -393,6 +475,9 @@ export namespace NodeCG {
 		replicants: (...args: any[]) => void;
 	};
 
+	/**
+	 * The logging levels available to NodeCG.
+	 */
 	export enum LogLevel {
 		Trace = 'verbose',
 		Debug = 'debug',
@@ -402,5 +487,9 @@ export namespace NodeCG {
 		Silent = 'silent',
 	}
 
+	/**
+	 * A description of which platform/environment an instance of the NodeCG API is being used in.
+	 * It should not be necessary to ever use this type directly in your bundle's code.
+	 */
 	export type Platform = 'server' | 'client' | 'either';
 }
