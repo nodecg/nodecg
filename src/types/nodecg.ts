@@ -381,7 +381,7 @@ export namespace NodeCG {
 
 	export type Acknowledgement = HandledAcknowledgement | UnhandledAcknowledgement;
 
-	export type ListenHandler = (data: unknown, ack?: Acknowledgement) => void;
+	export type ListenHandler = (data: any, ack?: Acknowledgement) => void;
 
 	export type Logger = {
 		name: string;
@@ -401,4 +401,6 @@ export namespace NodeCG {
 		Error = 'error',
 		Silent = 'silent',
 	}
+
+	export type Platform = 'server' | 'client' | 'either';
 }

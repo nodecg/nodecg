@@ -36,12 +36,12 @@ type Events<T> = {
  *
  * So, we code this like its 2010 and just use "_" on some public members.
  */
-export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
+export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends TypedEmitter<Events<V>> {
 	name: string;
 
 	namespace: string;
 
-	opts: NodeCG.Replicant.Options<T>;
+	opts: NodeCG.Replicant.Options<V>;
 
 	revision = 0;
 
@@ -55,15 +55,15 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 
 	validationErrors: validator.ValidationError[] = [];
 
-	protected _value: T | undefined;
+	protected _value: V | undefined;
 
-	protected _oldValue: T | undefined;
+	protected _oldValue: V | undefined;
 
-	protected _operationQueue: Array<NodeCG.Replicant.Operation<T>> = [];
+	protected _operationQueue: Array<NodeCG.Replicant.Operation<V>> = [];
 
 	protected _pendingOperationFlush = false;
 
-	constructor(name: string, namespace: string, opts: NodeCG.Replicant.Options<T> = {}) {
+	constructor(name: string, namespace: string, opts: NodeCG.Replicant.Options<V> = {}) {
 		super();
 
 		if (!name || typeof name !== 'string') {
@@ -113,15 +113,15 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 		});
 	}
 
-	abstract get value(): T | undefined;
-	abstract set value(newValue: T | undefined);
+	abstract get value(): P extends 'server' ? V : V | undefined;
+	abstract set value(newValue: V | undefined);
 
 	/**
 	 * If the operation is an array mutator method, call it on the target array with the operation arguments.
 	 * Else, handle it with objectPath.
 	 */
-	_applyOperation(operation: NodeCG.Replicant.Operation<T>): boolean {
-		ignoreProxy(this);
+	_applyOperation(operation: NodeCG.Replicant.Operation<V>): boolean {
+		ignoreProxy(this as AbstractReplicant<'either', V>);
 
 		let result;
 		const path = pathStrToPathArr(operation.path);
@@ -149,12 +149,12 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 
 			// Recursively check for any objects that may have been added by the above method
 			// and that need to be Proxied.
-			proxyRecursive(this, arr, operation.path);
+			proxyRecursive(this as AbstractReplicant<'either', V>, arr, operation.path);
 		} else {
 			switch (operation.method) {
 				case 'overwrite': {
 					const { newValue } = operation.args;
-					this.value = proxyRecursive(this, newValue, operation.path);
+					this.value = proxyRecursive(this as AbstractReplicant<'either', V>, newValue, operation.path);
 					result = true;
 					break;
 				}
@@ -165,7 +165,11 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 
 					let { newValue } = operation.args;
 					if (typeof newValue === 'object') {
-						newValue = proxyRecursive(this, newValue, pathArrToPathStr(path));
+						newValue = proxyRecursive(
+							this as AbstractReplicant<'either', V>,
+							newValue,
+							pathArrToPathStr(path),
+						);
 					}
 
 					result = objectPath.set(this.value as any, path, newValue);
@@ -187,7 +191,7 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 			}
 		}
 
-		resumeProxy(this);
+		resumeProxy(this as AbstractReplicant<'either', V>);
 		return result;
 	}
 
@@ -202,7 +206,7 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 	 * Adds an operation to the operation queue, to be flushed at the end of the current tick.
 	 * @private
 	 */
-	abstract _addOperation(operation: NodeCG.Replicant.Operation<T>): void;
+	abstract _addOperation(operation: NodeCG.Replicant.Operation<V>): void;
 
 	/**
 	 * Emits all queued operations via Socket.IO & empties this._operationQueue.
@@ -233,7 +237,7 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 		 * @param [opts.throwOnInvalid = true] {Boolean} - Whether or not to immediately throw when the provided value fails validation against the schema.
 		 */
 		return function (
-			this: AbstractReplicant<T>,
+			this: AbstractReplicant<P, V>,
 			value: any = this.value,
 			{ throwOnInvalid = true }: ValidatorOptions = {},
 		) {
@@ -265,7 +269,7 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 }
 
 type Metadata<T> = {
-	replicant: AbstractReplicant<T>;
+	replicant: AbstractReplicant<'either', T>;
 	path: string;
 	proxy: unknown;
 };
@@ -279,7 +283,7 @@ export type Validator = (newValue: any, opts?: ValidatorOptions) => boolean;
 const proxyMetadataMap = new WeakMap();
 const metadataMap = new WeakMap<any, Metadata<any>>();
 const proxySet = new WeakSet();
-const ignoringProxy = new WeakSet<AbstractReplicant<any>>();
+const ignoringProxy = new WeakSet<AbstractReplicant<'either', any>>();
 
 export const ARRAY_MUTATOR_METHODS = [
 	'copyWithin',
@@ -298,15 +302,15 @@ export const ARRAY_MUTATOR_METHODS = [
  */
 const DEFAULT_PERSISTENCE_INTERVAL = 100;
 
-export function ignoreProxy(replicant: AbstractReplicant<any>): void {
+export function ignoreProxy(replicant: AbstractReplicant<'either', any>): void {
 	ignoringProxy.add(replicant);
 }
 
-export function resumeProxy(replicant: AbstractReplicant<any>): void {
+export function resumeProxy(replicant: AbstractReplicant<'either', any>): void {
 	ignoringProxy.delete(replicant);
 }
 
-export function isIgnoringProxy(replicant: AbstractReplicant<any>): boolean {
+export function isIgnoringProxy(replicant: AbstractReplicant<'either', any>): boolean {
 	return ignoringProxy.has(replicant);
 }
 
@@ -535,7 +539,7 @@ const CHILD_OBJECT_HANDLER = {
  * @returns {*} - The recursively Proxied value (or just `value` unchanged, if `value` is a primitive)
  * @private
  */
-export function proxyRecursive<T>(replicant: AbstractReplicant<any>, value: T, path: string): T {
+export function proxyRecursive<T>(replicant: AbstractReplicant<'either', any>, value: T, path: string): T {
 	if (typeof value === 'object' && value !== null) {
 		let p;
 
@@ -634,7 +638,7 @@ function pathArrToPathStr(path: string[]): string {
  * @param replicant {object} - The Replicant that this value should belong to.
  * @param value {*} - The value to check ownership of.
  */
-function assertSingleOwner(replicant: AbstractReplicant<any>, value: any): void {
+function assertSingleOwner(replicant: AbstractReplicant<'either', any>, value: any): void {
 	let metadata: Metadata<any>;
 	if (proxySet.has(value)) {
 		metadata = proxyMetadataMap.get(value);

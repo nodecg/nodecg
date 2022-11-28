@@ -44,7 +44,7 @@ const REPLICANT_HANDLER = {
 	},
 };
 
-export default class ClientReplicant<T> extends AbstractReplicant<T> {
+export default class ClientReplicant<T> extends AbstractReplicant<'client', T> {
 	value: T | undefined = undefined;
 
 	/**

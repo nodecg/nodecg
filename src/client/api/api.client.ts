@@ -29,7 +29,7 @@ function _forwardMessageToContext(messageName: string, bundleName: string, data:
 	}, 0);
 }
 
-export class NodeCGAPIClient extends NodeCGAPIBase {
+export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 	static Replicant<T>(name: string, namespace: string, opts: NodeCG.Replicant.Options<T> = {}): ClientReplicant<T> {
 		return new ClientReplicant<T>(name, namespace, opts, (window as any).socket);
 	}

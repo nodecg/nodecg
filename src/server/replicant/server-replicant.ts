@@ -17,7 +17,7 @@ import type { NodeCG } from '../../types/nodecg';
 // Never instantiate this directly.
 // Always use Replicator.declare instead.
 // The Replicator needs to have complete control over the ServerReplicant class.
-export default class ServerReplicant<T> extends AbstractReplicant<T> {
+export default class ServerReplicant<T> extends AbstractReplicant<'server', T> {
 	constructor(
 		name: string,
 		namespace: string,
@@ -52,14 +52,10 @@ export default class ServerReplicant<T> extends AbstractReplicant<T> {
 					this.schemaSum = sha1(JSON.stringify(parsedSchema));
 					this.validate = this._generateValidator();
 					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
-				} catch (e) {
+				} catch (e: any) {
 					/* istanbul ignore next */
 					if (!process.env.NODECG_TEST) {
-						// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-						this.log.error(
-							'Schema could not be loaded, are you sure that it is valid JSON?\n',
-							(e as any).stack,
-						);
+						this.log.error('Schema could not be loaded, are you sure that it is valid JSON?\n', e.stack);
 					}
 				}
 			}

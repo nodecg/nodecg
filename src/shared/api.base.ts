@@ -9,14 +9,14 @@ type MessageHandler = {
 	func: NodeCG.ListenHandler;
 };
 
-export abstract class NodeCGAPIBase {
+export abstract class NodeCGAPIBase<P extends NodeCG.Platform> {
 	static version = version;
 
 	/**
 	 * An object containing references to all Replicants that have been declared in this `window`, sorted by bundle.
 	 * E.g., `NodeCG.declaredReplicants.myBundle.myRep`
 	 */
-	static declaredReplicants: Map<string, Map<string, AbstractReplicant<any>>>;
+	static declaredReplicants: Map<string, Map<string, AbstractReplicant<'client', any>>>;
 
 	/**
 	 * Lets you easily wait for a group of Replicants to finish declaring.
@@ -41,7 +41,7 @@ export abstract class NodeCGAPIBase {
 	 *     console.log('rep1 and rep2 are fully declared and ready to use!');
 	 * });
 	 */
-	static async waitForReplicants(...replicants: Array<AbstractReplicant<any>>): Promise<void> {
+	static async waitForReplicants(...replicants: Array<AbstractReplicant<'client', any>>): Promise<void> {
 		return new Promise((resolve) => {
 			const numReplicants = replicants.length;
 			let declaredReplicants = 0;
@@ -89,7 +89,7 @@ export abstract class NodeCGAPIBase {
 		name: string,
 		namespace: string,
 		opts: NodeCG.Replicant.Options<T>,
-	) => AbstractReplicant<T>;
+	) => AbstractReplicant<P, T>;
 
 	/**
 	 * Provides easy access to the Logger class.
@@ -263,13 +263,13 @@ export abstract class NodeCGAPIBase {
 	 * myRep.value = {objects: {can: {be: 'nested!'}}};
 	 * myRep.value = ['Even', 'arrays', 'work!'];
 	 */
-	Replicant<T>(name: string, namespace: string, opts?: NodeCG.Replicant.Options<T>): AbstractReplicant<T>;
-	Replicant<T>(name: string, opts?: NodeCG.Replicant.Options<T>): AbstractReplicant<T>;
+	Replicant<T>(name: string, namespace: string, opts?: NodeCG.Replicant.Options<T>): AbstractReplicant<P, T>;
+	Replicant<T>(name: string, opts?: NodeCG.Replicant.Options<T>): AbstractReplicant<P, T>;
 	Replicant<T>(
 		name: string,
 		namespaceOrOpts?: string | NodeCG.Replicant.Options<T>,
 		opts?: NodeCG.Replicant.Options<T>,
-	): AbstractReplicant<T> {
+	): AbstractReplicant<P, T> {
 		let namespace: string;
 		if (typeof namespaceOrOpts === 'string') {
 			namespace = namespaceOrOpts;
