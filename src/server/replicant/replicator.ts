@@ -197,7 +197,7 @@ export default class Replicator {
 					schemaSum: replicant.schemaSum,
 				});
 				// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
-			} catch (e) {
+			} catch (e: any) {
 				if (e.message.startsWith('Invalid value rejected for replicant')) {
 					cb(e.message, undefined);
 				} else {

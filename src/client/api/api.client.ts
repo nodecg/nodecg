@@ -129,11 +129,11 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 
 	soundsReady = false;
 
-	private readonly _soundFiles: ClientReplicant<NodeCG.AssetFile[]>;
+	private readonly _soundFiles?: ClientReplicant<NodeCG.AssetFile[]>;
 
-	private readonly _bundleVolume: ClientReplicant<number>;
+	private readonly _bundleVolume?: ClientReplicant<number>;
 
-	private readonly _masterVolume: ClientReplicant<number>;
+	private readonly _masterVolume?: ClientReplicant<number>;
 
 	private _soundCues: NodeCG.SoundCue[] = [];
 
@@ -418,9 +418,9 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 
 	private _setInstanceVolume(instance: createjs.AbstractSoundInstance, cue: NodeCG.SoundCue): void {
 		if (
-			this._masterVolume.status !== 'declared' ||
+			this._masterVolume?.status !== 'declared' ||
 			typeof this._masterVolume.value !== 'number' ||
-			this._bundleVolume.status !== 'declared' ||
+			this._bundleVolume?.status !== 'declared' ||
 			typeof this._bundleVolume.value !== 'number'
 		) {
 			return;

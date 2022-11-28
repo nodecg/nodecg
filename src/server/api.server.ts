@@ -177,8 +177,8 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 		 */
 		sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): void {
 			this.log.trace('Sending message %s to bundle %s with data:', messageName, bundleName, data);
-			// eslint-disable-next-line prefer-rest-params
-			return NodeCGAPIServer.sendMessageToBundle.apply(NodeCGAPIBase, arguments);
+			// eslint-disable-next-line prefer-rest-params,@typescript-eslint/no-confusing-void-expression
+			return NodeCGAPIServer.sendMessageToBundle.apply(NodeCGAPIBase, arguments as any);
 		}
 
 		/**

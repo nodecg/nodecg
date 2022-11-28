@@ -4,14 +4,14 @@ import { Permission } from './Permission';
 @Entity()
 export class Role {
 	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	id!: string;
 
 	@Column({
 		type: 'text',
 		unique: true,
 	})
-	name: string;
+	name!: string;
 
 	@OneToMany(() => Permission, (permission) => permission.role)
-	permissions: Permission[];
+	permissions!: Permission[];
 }

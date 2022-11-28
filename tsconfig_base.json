@@ -3,6 +3,7 @@
 		// Output related
 		"target": "ES6",
 		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
 
 		// Module resolution
 		"moduleResolution": "node",
@@ -10,16 +11,7 @@
 		"resolveJsonModule": true,
 
 		// Type checking
-		"alwaysStrict": true,
-		"forceConsistentCasingInFileNames": true,
-		"noFallthroughCasesInSwitch": true,
-		"noImplicitAny": true,
-		"noImplicitReturns": true,
-		"noImplicitThis": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"strictNullChecks": true,
-		"experimentalDecorators": true,
+		"strict": true,
 
 		// Extra output
 		"declaration": true,

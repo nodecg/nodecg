@@ -11,17 +11,17 @@ export const enum Action {
 @Entity()
 export class Permission {
 	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	id!: string;
 
 	@Column('text')
-	name: string;
+	name!: string;
 
 	@ManyToOne(() => Role, (role) => role.permissions)
-	role: Role;
+	role!: Role;
 
 	@Column('text')
-	entityId: string;
+	entityId!: string;
 
 	@Column('int')
-	actions: number;
+	actions!: number;
 }

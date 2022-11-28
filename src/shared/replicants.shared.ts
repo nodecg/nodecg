@@ -45,13 +45,13 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 
 	revision = 0;
 
-	log: LoggerInterface;
+	log!: LoggerInterface; // Gets assigned by implementing classes
 
 	schema?: Record<string, any>;
 
 	schemaSum?: string;
 
-	status: 'undeclared' | 'declared' | 'declaring';
+	status: 'undeclared' | 'declared' | 'declaring' = 'undeclared';
 
 	validationErrors: validator.ValidationError[] = [];
 
@@ -61,7 +61,7 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 
 	protected _operationQueue: Array<NodeCG.Replicant.Operation<T>> = [];
 
-	protected _pendingOperationFlush: boolean;
+	protected _pendingOperationFlush = false;
 
 	constructor(name: string, namespace: string, opts: NodeCG.Replicant.Options<T> = {}) {
 		super();
@@ -95,7 +95,8 @@ export abstract class AbstractReplicant<T> extends TypedEmitter<Events<T>> {
 				return;
 			}
 
-			return originalOnce(event, listener);
+			// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+			return originalOnce(event as any, listener);
 		};
 
 		/**

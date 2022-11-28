@@ -16,7 +16,7 @@ test('should redirect /graphics to /graphics/', async (t) => {
 test('should 404 on non-existent file', async (t) => {
 	try {
 		await axios.get(`${C.graphicUrl()}confirmation_404.js`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 404);
 	}
 });
@@ -24,7 +24,7 @@ test('should 404 on non-existent file', async (t) => {
 test('should 404 on non-existent bundle', async (t) => {
 	try {
 		await axios.get(`${C.rootUrl()}bundles/false-bundle/graphics/confirmation_404.js`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 404);
 	}
 });

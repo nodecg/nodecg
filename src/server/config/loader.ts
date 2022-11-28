@@ -221,7 +221,7 @@ export default function (cfgDirOrFile: string) {
 	try {
 		isDir = fs.lstatSync(cfgDirOrFile).isDirectory();
 		// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
-	} catch (error) {
+	} catch (error: any) {
 		if (error.code !== 'ENOENT') {
 			// eslint-disable-next-line @typescript-eslint/no-throw-literal
 			throw error;
@@ -283,16 +283,16 @@ export default function (cfgDirOrFile: string) {
 		port: config.port,
 		baseURL: config.baseURL,
 		logging: {
-			replicants: config.logging!.replicants,
+			replicants: config.logging.replicants,
 			console: {
-				enabled: config.logging!.console!.enabled,
-				level: config.logging!.console!.level,
-				timestamps: config.logging!.console!.timestamps,
+				enabled: config.logging.console.enabled,
+				level: config.logging.console.level,
+				timestamps: config.logging.console.timestamps,
 			},
 			file: {
-				enabled: config.logging!.file!.enabled,
-				level: config.logging!.file!.level,
-				timestamps: config.logging!.file!.timestamps,
+				enabled: config.logging.file.enabled,
+				level: config.logging.file.level,
+				timestamps: config.logging.file.timestamps,
 			},
 		},
 		login: {
@@ -313,7 +313,7 @@ export default function (cfgDirOrFile: string) {
 	if (config.login.twitch) {
 		filteredConfig.login.twitch = {
 			enabled: config.login.twitch.enabled,
-			clientID: config.login.twitch.clientID!, // Validation wil have thrown if this is falsey.
+			clientID: config.login.twitch.clientID, // Validation wil have thrown if this is falsey.
 			scope: config.login.twitch.scope,
 		};
 	}
@@ -327,7 +327,7 @@ export default function (cfgDirOrFile: string) {
 	if (config.login.discord) {
 		filteredConfig.login.discord = {
 			enabled: config.login.discord.enabled,
-			clientID: config.login.discord.clientID!, // Validation wil have thrown if this is falsey.
+			clientID: config.login.discord.clientID, // Validation wil have thrown if this is falsey.
 			scope: config.login.discord.scope,
 		};
 	}

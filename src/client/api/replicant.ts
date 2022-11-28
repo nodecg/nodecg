@@ -54,7 +54,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 	 */
 	private _actionQueue: Array<{ fn: (...args: any[]) => void; args?: any[] }> = [];
 
-	private readonly _socket: TypedClientSocket;
+	private readonly _socket!: TypedClientSocket;
 
 	constructor(
 		name: string,
@@ -270,7 +270,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<T> {
 					// If there were any pre-declare actions queued, execute them.
 					if (this._actionQueue.length > 0) {
 						this._actionQueue.forEach((item) => {
-							item.fn.apply(this, item.args);
+							item.fn.apply(this, item.args ?? []);
 						});
 						this._actionQueue = [];
 					}

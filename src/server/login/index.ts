@@ -70,7 +70,7 @@ if (config.login.steam?.enabled) {
 					done(undefined, user);
 					return;
 					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
-				} catch (error) {
+				} catch (error: any) {
 					done(error);
 				}
 			},
@@ -82,7 +82,7 @@ if (config.login.twitch?.enabled) {
 	const TwitchStrategy = require('passport-twitch-helix').Strategy;
 
 	// The "user:read:email" scope is required. Add it if not present.
-	const scopesArray = config.login!.twitch!.scope!.split(' ');
+	const scopesArray = config.login.twitch.scope.split(' ');
 	if (!scopesArray.includes('user:read:email')) {
 		scopesArray.push('user:read:email');
 	}
@@ -125,7 +125,7 @@ if (config.login.twitch?.enabled) {
 					done(undefined, user);
 					return;
 					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
-				} catch (error) {
+				} catch (error: any) {
 					done(error);
 				}
 			},
@@ -154,7 +154,7 @@ if (config.login.discord?.enabled) {
 	const DiscordStrategy = require('passport-discord').Strategy;
 
 	// The "identify" scope is required. Add it if not present.
-	const scopeArray = config.login!.discord!.scope!.split(' ');
+	const scopeArray = config.login.discord.scope.split(' ');
 	if (!scopeArray.includes('identify')) {
 		scopeArray.push('identify');
 	}
@@ -319,7 +319,7 @@ if (config.login.local?.enabled) {
 					done(undefined, user);
 					return;
 					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
-				} catch (error) {
+				} catch (error: any) {
 					done(error);
 				}
 			},

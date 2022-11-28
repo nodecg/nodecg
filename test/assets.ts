@@ -87,20 +87,23 @@ test.serial('retrieval - 200', async (t) => {
 test.serial('retrieval - 404', async (t) => {
 	try {
 		await axios.get(`${C.rootUrl()}assets/test-bundle/assets/bad.png`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 404);
 	}
 });
 
 test.serial('deletion - 200', async (t) => {
-	const deleteButton: puppeteer.ElementHandle = (await dashboard.waitForFunction(() => {
-		const file = document
-			.querySelector('ncg-dashboard')!
-			.shadowRoot!.querySelector('ncg-assets')!
-			.shadowRoot!.querySelector('ncg-asset-category[collection-name="test-bundle"][category-name="assets"]')!
-			.shadowRoot!.querySelector('util-scrollable > ncg-asset-file');
-		return (file as any).$?.delete;
-	})) as any;
+	const assetFileEl = await util.shadowSelector(
+		dashboard,
+		'ncg-dashboard',
+		'ncg-assets',
+		'ncg-asset-category[collection-name="test-bundle"][category-name="assets"]',
+		'util-scrollable > ncg-asset-file',
+	);
+	const deleteButton: puppeteer.ElementHandle = (await dashboard.evaluateHandle(
+		(el: any) => el.$.delete,
+		assetFileEl,
+	)) as any;
 
 	await deleteButton.click();
 	await util.sleep(500);
@@ -110,7 +113,7 @@ test.serial('deletion - 200', async (t) => {
 test.serial('deletion - 410', async (t) => {
 	try {
 		await axios.delete(`${C.rootUrl()}assets/test-bundle/assets/bad.png`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 410);
 	}
 });

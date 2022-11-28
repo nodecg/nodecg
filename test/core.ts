@@ -36,7 +36,7 @@ test('should serve bundle-specific node_modules', async (t) => {
 test('should 404 on non-existent bower_component', async (t) => {
 	try {
 		await axios.get(`${C.bundleBowerComponentsUrl()}confirmation_404.js`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 404);
 	}
 });
@@ -44,7 +44,7 @@ test('should 404 on non-existent bower_component', async (t) => {
 test('should 404 on non-existent node_module', async (t) => {
 	try {
 		await axios.get(`${C.bundleNodeModulesUrl()}confirmation_404.js`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 404);
 	}
 });
@@ -52,7 +52,7 @@ test('should 404 on non-existent node_module', async (t) => {
 test('should 404 on non-existent bundle node_modules/bower_components', async (t) => {
 	try {
 		await axios.get(`${C.rootUrl()}bundles/false-bundle/node_modules/confirmation_404.js`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 404);
 	}
 });
@@ -72,7 +72,7 @@ test.serial('shared sources - 200', async (t) => {
 test('shared sources - 404', async (t) => {
 	try {
 		await axios.get(`${C.rootUrl()}bundles/test-bundle/shared/404.js`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 404);
 	}
 });
@@ -80,7 +80,7 @@ test('shared sources - 404', async (t) => {
 test('shared sources - no bundle 404', async (t) => {
 	try {
 		await axios.get(`${C.rootUrl()}bundles/false-bundle/shared/404.js`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 404);
 	}
 });

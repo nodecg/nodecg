@@ -5,8 +5,8 @@ import { User } from './User';
 export class ApiKey {
 	@PrimaryColumn()
 	@Generated('uuid')
-	secret_key: string;
+	secret_key!: string;
 
 	@ManyToOne(() => User, (user) => user.apiKeys)
-	user: User;
+	user!: User;
 }

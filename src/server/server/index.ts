@@ -75,9 +75,9 @@ export default class NodeCGServer extends EventEmitter {
 
 	private readonly _server: Server;
 
-	private _replicator: Replicator;
+	private _replicator?: Replicator;
 
-	private _extensionManager: ExtensionManager;
+	private _extensionManager?: ExtensionManager;
 
 	/**
 	 * Only used by tests. Gross hack.
@@ -97,8 +97,8 @@ export default class NodeCGServer extends EventEmitter {
 		let server: Server;
 		if (config.ssl?.enabled) {
 			const sslOpts: { key: Buffer; cert: Buffer; passphrase?: string } = {
-				key: fs.readFileSync(config.ssl.keyPath!),
-				cert: fs.readFileSync(config.ssl.certificatePath!),
+				key: fs.readFileSync(config.ssl.keyPath),
+				cert: fs.readFileSync(config.ssl.certificatePath),
 			};
 			if (config.ssl.passphrase) {
 				sslOpts.passphrase = config.ssl.passphrase;
@@ -329,7 +329,7 @@ export default class NodeCGServer extends EventEmitter {
 	}
 
 	getExtensions(): Record<string, unknown> {
-		return { ...this._extensionManager.extensions };
+		return { ...this._extensionManager?.extensions };
 	}
 
 	getSocketIOServer(): TypedSocketServer {

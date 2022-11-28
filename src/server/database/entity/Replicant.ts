@@ -3,11 +3,11 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 @Entity()
 export class Replicant {
 	@PrimaryColumn('text')
-	namespace: string;
+	namespace!: string;
 
 	@PrimaryColumn('text')
-	name: string;
+	name!: string;
 
 	@Column('text')
-	value: string;
+	value!: string;
 }

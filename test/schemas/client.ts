@@ -161,7 +161,7 @@ test.serial('should throw on invalid assignment', async (t) => {
 						rep.value = {
 							string: 0,
 						};
-					} catch (e) {
+					} catch (e: any) {
 						resolve(e.message);
 					}
 				});
@@ -203,7 +203,7 @@ test.serial('should throw on invalid property deletion', async (t) => {
 				rep.once('declared', () => {
 					try {
 						delete rep.value.object.numA;
-					} catch (e) {
+					} catch (e: any) {
 						resolve(e.message);
 					}
 				});
@@ -243,7 +243,7 @@ test.serial('should throw on invalid array mutation via array mutator methods', 
 				rep.once('declared', () => {
 					try {
 						rep.value.array.push(0);
-					} catch (e) {
+					} catch (e: any) {
 						resolve(e.message);
 					}
 				});
@@ -283,7 +283,7 @@ test.serial('should throw on invalid property changes to arrays', async (t) => {
 				rep.once('declared', () => {
 					try {
 						rep.value.array[0] = 0;
-					} catch (e) {
+					} catch (e: any) {
 						resolve(e.message);
 					}
 				});
@@ -325,7 +325,7 @@ test.serial('should throw on invalid property changes to objects', async (t) => 
 				rep.once('declared', () => {
 					try {
 						rep.value.object.numA = 'foo';
-					} catch (e) {
+					} catch (e: any) {
 						resolve(e.message);
 					}
 				});
@@ -349,7 +349,7 @@ test.serial('should reject assignment if it was validated against a different ve
 								numA: 1,
 							},
 						};
-					} catch (e) {
+					} catch (e: any) {
 						resolve(e.message);
 					}
 				});
@@ -372,7 +372,7 @@ test.serial('should reject mutations if they were validated against a different 
 					rep.schemaSum = 'baz';
 					try {
 						rep.value.object.numA = 1;
-					} catch (e) {
+					} catch (e: any) {
 						resolve(e.message);
 					}
 				});
@@ -405,7 +405,7 @@ test.serial("shouldn't fuck up", async (t) => {
 							try {
 								rep.value!.matchMap[6] = true;
 								resolve(true);
-							} catch (e) {
+							} catch (e: any) {
 								resolve(e.message);
 							}
 						}

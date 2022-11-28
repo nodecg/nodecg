@@ -301,7 +301,7 @@ export default class BundleManager extends EventEmitter {
 				this.add(reparsedBundle);
 				this.emit('bundleChanged', reparsedBundle);
 				// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
-			} catch (error) {
+			} catch (error: any) {
 				log.warn('Unable to handle the bundle "%s" change:\n%s', bundleName, error.stack);
 				this.emit('invalidBundle', bundle, error);
 			}

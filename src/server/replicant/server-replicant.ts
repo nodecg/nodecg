@@ -55,7 +55,11 @@ export default class ServerReplicant<T> extends AbstractReplicant<T> {
 				} catch (e) {
 					/* istanbul ignore next */
 					if (!process.env.NODECG_TEST) {
-						this.log.error('Schema could not be loaded, are you sure that it is valid JSON?\n', e.stack);
+						// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+						this.log.error(
+							'Schema could not be loaded, are you sure that it is valid JSON?\n',
+							(e as any).stack,
+						);
 					}
 				}
 			}

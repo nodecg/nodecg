@@ -56,7 +56,9 @@ test.serial('ncg-dialog - should have the buttons defined in dialogButtons', asy
 			};
 		}
 
-		return Array.from(dialog.querySelector('.buttons')!.querySelectorAll('paper-button')).map(gatherButtonStats);
+		return Array.from(dialog.querySelector('.buttons')!.querySelectorAll('paper-button')).map(
+			gatherButtonStats as any,
+		);
 	});
 
 	t.deepEqual(res, [
@@ -229,7 +231,7 @@ test.serial.skip('connection toasts', async (t) => {
 test.serial('retrieval - 404', async (t) => {
 	try {
 		await axios.get(`${C.rootUrl()}bundles/test-bundle/dashboard/bad.png`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 404);
 	}
 });
@@ -237,7 +239,7 @@ test.serial('retrieval - 404', async (t) => {
 test.serial('retrieval - wrong bundle is 404', async (t) => {
 	try {
 		await axios.get(`${C.rootUrl()}bundles/fake-bundle/dashboard/panel.html`);
-	} catch (error) {
+	} catch (error: any) {
 		t.is(error.response.status, 404);
 	}
 });

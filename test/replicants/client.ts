@@ -75,7 +75,7 @@ test.serial('should throw an error when no name is provided', async (t) => {
 				try {
 					// @ts-expect-error
 					window.dashboardApi.Replicant();
-				} catch (e) {
+				} catch (e: any) {
 					resolve(e.message);
 				}
 			}),

@@ -6,21 +6,21 @@ import { ApiKey } from './ApiKey';
 @Entity()
 export class User {
 	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	id!: string;
 
 	@CreateDateColumn()
-	created_at: number;
+	created_at!: number;
 
 	@Column('text')
-	name: string;
+	name!: string;
 
 	@ManyToMany(() => Role)
 	@JoinTable()
-	roles: Role[];
+	roles!: Role[];
 
 	@OneToMany(() => Identity, (identity) => identity.user)
-	identities: Identity[];
+	identities!: Identity[];
 
 	@OneToMany(() => ApiKey, (apiKey) => apiKey.user)
-	apiKeys: ApiKey[];
+	apiKeys!: ApiKey[];
 }

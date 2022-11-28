@@ -250,7 +250,7 @@ test.serial('dragging the graphic generates the correct url for obs', async (t) 
 		'#url',
 	);
 
-	await dashboard.evaluateHandle((gl) => {
+	await dashboard.evaluateHandle((gl: HTMLElement) => {
 		gl.addEventListener('dragstart', (ev: DragEvent) => {
 			ev.preventDefault();
 
@@ -261,7 +261,7 @@ test.serial('dragging the graphic generates the correct url for obs', async (t) 
 			const data = ev.dataTransfer.getData('text/uri-list');
 			console.log(data);
 		});
-	}, graphicLink);
+	}, graphicLink as any);
 
 	const linkBoundingBox = await graphicLink.boundingBox();
 	if (!linkBoundingBox) {

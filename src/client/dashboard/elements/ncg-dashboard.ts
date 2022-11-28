@@ -634,7 +634,8 @@ function getImageDataURI(
 			// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 		} catch (e) {
 			/* istanbul ignore next: hard-to-test error */
-			cb(e);
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+			cb(e as any);
 		}
 
 		canvas.remove();
@@ -646,7 +647,8 @@ function getImageDataURI(
 		// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 	} catch (e) {
 		/* istanbul ignore next: hard-to-test error */
-		cb(e);
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+		cb(e as any);
 	}
 }
 
