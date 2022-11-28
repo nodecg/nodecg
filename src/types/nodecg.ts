@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import type * as ExpressCore from 'express-serve-static-core';
 import type express from 'express';
-import type { Except } from 'type-fest';
 
 type Person =
 	| {
@@ -88,7 +87,7 @@ export namespace NodeCG {
 		nodecg: Manifest.UnparsedManifest;
 	};
 
-	export type Manifest = Except<PackageJSON, 'nodecg'> &
+	export type Manifest = Omit<PackageJSON, 'nodecg'> &
 		Manifest.UnparsedManifest & { transformBareModuleSpecifiers: boolean };
 
 	export namespace Bundle {
