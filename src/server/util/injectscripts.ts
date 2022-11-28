@@ -47,7 +47,7 @@ export default function (
 		const styles = [];
 
 		// Everything needs the config
-		scripts.push(`<script>window.ncgConfig = ${JSON.stringify(filteredConfig)};</script>`);
+		scripts.push(`<script>globalThis.ncgConfig = ${JSON.stringify(filteredConfig)};</script>`);
 
 		if (resourceType === 'panel' || resourceType === 'dialog') {
 			if (standalone) {
@@ -128,7 +128,9 @@ export default function (
 			};
 
 			scripts.push(
-				`<script>window.nodecg = new NodeCG(${JSON.stringify(partialBundle)}, window.socket)</script>`,
+				`<script>globalThis.nodecg = new globalThis.NodeCG(${JSON.stringify(
+					partialBundle,
+				)}, globalThis.socket)</script>`,
 			);
 		}
 

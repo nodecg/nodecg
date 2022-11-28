@@ -1,9 +1,9 @@
 (function () {
 	'use strict';
 
-	const { nodecg } = window;
+	const { nodecg } = globalThis;
 	const timestamp = Date.now();
-	let { pathname } = window.location;
+	let { pathname } = globalThis.location;
 
 	// If the pathname ends with /bundleName/ then we must be on index.html.
 	if (pathname.endsWith(`/${nodecg.bundleName}/graphics/`)) {
@@ -11,50 +11,50 @@
 	}
 
 	/* istanbul ignore next: cant cover navigates page */
-	window.socket.on('graphic:kill', (instance) => {
+	globalThis.socket.on('graphic:kill', (instance) => {
 		if (!instance) {
 			return;
 		}
 
-		if (instance.socketId === window.socket.id) {
+		if (instance.socketId === globalThis.socket.id) {
 			/* istanbul ignore next: cant cover navigates page */
-			window.location.href = '/instance/killed.html?pathname=' + pathname;
+			globalThis.location.href = '/instance/killed.html?pathname=' + pathname;
 		}
 	});
 
 	/* istanbul ignore next: cant cover navigates page */
-	window.socket.on('graphic:refresh', (instance) => {
+	globalThis.socket.on('graphic:refresh', (instance) => {
 		if (!instance) {
 			return;
 		}
 
-		if (instance.socketId === window.socket.id) {
+		if (instance.socketId === globalThis.socket.id) {
 			/* istanbul ignore next: cant cover navigates page */
-			window.location.reload();
+			globalThis.location.reload();
 		}
 	});
 
 	/* istanbul ignore next: cant cover navigates page */
-	window.socket.on('graphic:refreshAll', (graphic) => {
+	globalThis.socket.on('graphic:refreshAll', (graphic) => {
 		if (!graphic) {
 			return;
 		}
 
 		if (graphic.url === pathname) {
 			/* istanbul ignore next: cant cover navigates page */
-			window.location.reload();
+			globalThis.location.reload();
 		}
 	});
 
 	/* istanbul ignore next: cant cover navigates page */
-	window.socket.on('graphic:bundleRefresh', (bundleName) => {
+	globalThis.socket.on('graphic:bundleRefresh', (bundleName) => {
 		if (!bundleName) {
 			return;
 		}
 
 		if (bundleName === nodecg.bundleName) {
 			/* istanbul ignore next: cant cover navigates page */
-			window.location.reload();
+			globalThis.location.reload();
 		}
 	});
 
@@ -62,12 +62,12 @@
 	// In single-instance graphics, this registration will be rejected if the graphic is already open elsewhere.
 	register();
 	/* istanbul ignore next: hard to test reconnection stuff right now */
-	window.socket.io.on('reconnect', () => {
+	globalThis.socket.io.on('reconnect', () => {
 		register();
 	});
 
 	function register(): void {
-		window.socket.emit(
+		globalThis.socket.emit(
 			'graphic:registerSocket',
 			{
 				timestamp,
@@ -85,7 +85,7 @@
 					(window as any).__nodecgRegistrationAccepted__ = true;
 				} else {
 					/* istanbul ignore next: cant cover navigates page */
-					window.location.href = '/instance/busy.html?pathname=' + pathname;
+					globalThis.location.href = '/instance/busy.html?pathname=' + pathname;
 				}
 			},
 		);

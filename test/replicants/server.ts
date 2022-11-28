@@ -112,7 +112,7 @@ test.serial('should react to changes in nested properties of objects', async (t)
 		});
 	});
 
-	rep.value!.a.b.c = 'nestedChangeOK';
+	rep.value.a.b.c = 'nestedChangeOK';
 
 	return promise;
 });
@@ -211,7 +211,7 @@ test.serial('arrays - should support the "delete" operator', async (t) => {
 		});
 	});
 
-	delete rep.value![0];
+	delete rep.value[0];
 	return promise;
 });
 
@@ -251,7 +251,7 @@ test.serial('arrays - should react to changes', async (t) => {
 		});
 	});
 
-	rep.value!.push('arrPushOK');
+	rep.value.push('arrPushOK');
 	return promise;
 });
 
@@ -265,7 +265,7 @@ test.serial('objects - throw an error when an object is owned by multiple Replic
 	rep1.value.foo = bar;
 
 	const error = t.throws(() => {
-		rep2.value!.foo = bar;
+		rep2.value.foo = bar;
 	});
 
 	if (!error) return t.fail();
@@ -331,7 +331,7 @@ test.serial.skip('persistent - should persist changes to database', async (t) =>
 	const rep = t.context.apis.extension.Replicant<Record<string, string>>('extensionPersistence', {
 		persistenceInterval: 0,
 	});
-	rep.value!.nested = 'hey we changed!';
+	rep.value.nested = 'hey we changed!';
 
 	/**
 	 * This is from 1.0, when we used files on disk
@@ -507,7 +507,7 @@ test.serial('should return true when deleting a non-existing property', (t) => {
 
 test.serial("test that one else path that's hard to hit", (t) => {
 	const rep = t.context.apis.extension.Replicant<boolean[]>('arrayWithoutSchemaSetHandler', { defaultValue: [] });
-	rep.value![0] = true;
+	rep.value[0] = true;
 	t.pass();
 });
 

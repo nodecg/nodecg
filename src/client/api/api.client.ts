@@ -58,7 +58,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 		_forwardMessageToContext(messageName, bundleName, data);
 
 		if (typeof cb === 'function') {
-			window.socket.emit(
+			globalThis.socket.emit(
 				'message',
 				{
 					bundleName,
@@ -75,7 +75,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 			);
 		} else {
 			return new Promise<T>((resolve, reject) => {
-				window.socket.emit(
+				globalThis.socket.emit(
 					'message',
 					{
 						bundleName,
@@ -96,7 +96,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 	/* eslint-enable no-dupe-class-members */
 
 	static readReplicant(name: string, namespace: string, cb: ReadReplicantCb): void {
-		window.socket.emit('replicant:read', { name, namespace }, (error, value?) => {
+		globalThis.socket.emit('replicant:read', { name, namespace }, (error, value?) => {
 			if (error) {
 				console.error(error);
 			} else {
@@ -144,22 +144,24 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 		apiContexts.add(this);
 
 		// If title isn't set, set it to the bundle name
-		document.addEventListener(
-			'DOMContentLoaded',
-			() => {
-				if (document.title === '') {
-					document.title = this.bundleName;
-				}
-			},
-			false,
-		);
+		if (globalThis.document) {
+			document.addEventListener(
+				'DOMContentLoaded',
+				() => {
+					if (document.title === '') {
+						document.title = this.bundleName;
+					}
+				},
+				false,
+			);
+		}
 
 		// Make socket accessible to public methods
 		this.socket = socket;
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		this.socket.emit('joinRoom', bundle.name, () => {});
 
-		if (bundle._hasSounds && window.createjs && window.createjs.Sound) {
+		if (globalThis.window && bundle._hasSounds && window.createjs && window.createjs.Sound) {
 			const soundCuesRep = new ClientReplicant<NodeCG.SoundCue[]>('soundCues', this.bundleName, {}, socket);
 			this._soundFiles = new ClientReplicant<NodeCG.AssetFile[]>('assets:sounds', this.bundleName, {}, socket);
 			this._bundleVolume = new ClientReplicant<number>(`volume:${this.bundleName}`, '_sounds', {}, socket);
@@ -222,8 +224,14 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 
 		socket.on('protocol_error', (err) => {
 			if (err.type === 'UnauthorizedError') {
-				const url = [location.protocol, '//', location.host, location.pathname].join('');
-				window.location.href = `/authError?code=${err.code as string}&message=${err.message}&viewUrl=${url}`;
+				if (globalThis.window) {
+					const url = [location.protocol, '//', location.host, location.pathname].join('');
+					window.location.href = `/authError?code=${err.code as string}&message=${
+						err.message
+					}&viewUrl=${url}`;
+				} else {
+					globalThis.close();
+				}
 			} else {
 				this.log.error('Unhandled socket protocol error:', err);
 			}
@@ -231,7 +239,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 	}
 
 	/**
-	 * _Browser only_<br/>
+	 * _Browser only, except workers_<br/>
 	 * Returns the specified dialog element.
 	 * @param {string} name - The desired dialog's name.
 	 * @param {string} [bundle=CURR_BNDL] - The bundle from which to select the dialog.
@@ -247,6 +255,10 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 				open: () => void;
 		  })
 		| undefined {
+		if (!globalThis.window) {
+			return undefined;
+		}
+
 		bundle = bundle ?? this.bundleName;
 		const topDoc = window.top?.document;
 		if (!topDoc) {
@@ -258,13 +270,17 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 	}
 
 	/**
-	 * _Browser only_<br/>
+	 * _Browser only, except workers_<br/>
 	 * Returns the specified dialog's iframe document.
 	 * @param {string} name - The desired dialog's name.
 	 * @param {string} [bundle=CURR_BNDL] - The bundle from which to select the dialog.
 	 * @returns {object}
 	 */
 	getDialogDocument(name: string, bundle?: string): Document | undefined {
+		if (!globalThis.window) {
+			return undefined;
+		}
+
 		bundle = bundle ?? this.bundleName;
 		return this.getDialog(name, bundle)?.querySelector('iframe')?.contentWindow?.document;
 	}
@@ -290,6 +306,10 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 		cueName: string,
 		{ updateVolume = true }: { updateVolume: boolean } = { updateVolume: true },
 	): createjs.AbstractSoundInstance | undefined {
+		if (!globalThis.window) {
+			throw new Error('NodeCG Sound API methods are not available in workers');
+		}
+
 		if (!this._soundCues) {
 			throw new Error(`Bundle "${this.bundleName}" has no soundCues`);
 		}
@@ -322,6 +342,10 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 	 * @param cueName {String}
 	 */
 	stopSound(cueName: string): void {
+		if (!globalThis.window) {
+			throw new Error('NodeCG Sound API methods are not available in workers');
+		}
+
 		if (!this._soundCues) {
 			throw new Error(`Bundle "${this.bundleName}" has no soundCues`);
 		}
@@ -348,6 +372,10 @@ export class NodeCGAPIClient extends NodeCGAPIBase<'client'> {
 	 * Stops all currently playing sounds on the page.
 	 */
 	stopAllSounds(): void {
+		if (!globalThis.window) {
+			throw new Error('NodeCG Sound API methods are not available in workers');
+		}
+
 		if (!window.createjs?.Sound) {
 			throw new Error("NodeCG Sound API methods are not available when SoundJS isn't present");
 		}

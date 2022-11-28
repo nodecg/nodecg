@@ -267,7 +267,7 @@ test.serial('when an array - should proxy objects added to arrays via array inse
 	const rep = t.context.apis.extension.Replicant<Array<Record<string, string>>>('serverArrInsertObj', {
 		defaultValue: [],
 	});
-	rep.value!.push({ foo: 'foo' });
+	rep.value.push({ foo: 'foo' });
 
 	const promise = new Promise<void>((resolve) => {
 		rep.on('change', (newVal) => {
@@ -284,7 +284,7 @@ test.serial('when an array - should proxy objects added to arrays via array inse
 	});
 
 	process.nextTick(() => {
-		rep.value![0].foo = 'bar';
+		rep.value[0].foo = 'bar';
 	});
 
 	await promise;
@@ -339,7 +339,7 @@ test.serial('when an object - should not cause server-side replicants to lose ob
 				});
 			});
 
-			rep.value!.foo = 'baz';
+			rep.value.foo = 'baz';
 			return promise;
 		})
 		.catch(t.fail);
@@ -438,7 +438,7 @@ test.serial('when an object - should react to server-side changes of array prope
 			}),
 	);
 
-	serverRep.value!.arr.push('test');
+	serverRep.value.arr.push('test');
 
 	const ret = await dashboard.waitForFunction(() => (window as any).s2c_nestedArrChange, { timeout: 1000 });
 	const retJson: {
@@ -527,7 +527,7 @@ test.serial('when an object - should properly proxy new objects assigned to prop
 		defaultValue: { foo: { bar: 'bar' } },
 	});
 
-	rep.value!.foo = { baz: 'baz' };
+	rep.value.foo = { baz: 'baz' };
 
 	const promise = new Promise<void>((resolve) => {
 		rep.on('change', (newVal) => {
@@ -544,7 +544,7 @@ test.serial('when an object - should properly proxy new objects assigned to prop
 	});
 
 	process.nextTick(() => {
-		rep.value!.foo.baz = 'bax';
+		rep.value.foo.baz = 'bax';
 	});
 
 	await promise;
@@ -822,7 +822,7 @@ test.serial('emits assignment in the correct order', async (t) => {
 			}),
 	);
 
-	extRep.value!.push('foo');
+	extRep.value.push('foo');
 	extRep.value = ['bar'];
 
 	const ret = await dashboard.evaluate(
