@@ -13,7 +13,7 @@ import type { RootNS } from '../types/socket-protocol';
 import type { NodeCG } from '../types/nodecg';
 
 export default (io: RootNS, replicator: Replicator, extensions: Record<string, unknown>, mount: NodeCG.Middleware) => {
-	const apiContexts = new Set<NodeCGAPIBase<'server'>>();
+	const apiContexts = new Set<NodeCGAPIBase<'server', NodeCG.Bundle.UnknownConfig>>();
 
 	/**
 	 * This is what enables intra-context messaging.
@@ -31,7 +31,10 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 		});
 	}
 
-	return class NodeCGAPIServer extends NodeCGAPIBase<'server'> {
+	return class NodeCGAPIServer<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> extends NodeCGAPIBase<
+		'server',
+		C
+	> {
 		static sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): void {
 			_forwardMessageToContext(messageName, bundleName, data);
 			io.emit('message', {

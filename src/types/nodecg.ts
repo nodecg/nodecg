@@ -143,7 +143,7 @@ export namespace NodeCG {
 
 		export type BundleDependencies = Manifest.UnparsedBundleDependencies;
 
-		export type Config = Record<string, unknown>;
+		export type UnknownConfig = Record<string, unknown>;
 	}
 
 	export type Bundle = {
@@ -159,7 +159,7 @@ export namespace NodeCG {
 		transformBareModuleSpecifiers: boolean;
 		hasAssignableSoundCues: boolean;
 		hasExtension: boolean;
-		config: Record<string, any>;
+		config: Bundle.UnknownConfig;
 		dashboard: {
 			dir: string;
 			panels: Bundle.Panel[];

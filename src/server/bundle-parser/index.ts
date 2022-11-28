@@ -14,7 +14,7 @@ import parseExtension from './extension';
 import parseGit from './git';
 import type { NodeCG } from '../../types/nodecg';
 
-export default function (bundlePath: string, bundleCfg?: NodeCG.Bundle.Config): NodeCG.Bundle {
+export default function (bundlePath: string, bundleCfg?: NodeCG.Bundle.UnknownConfig): NodeCG.Bundle {
 	// Resolve the path to the bundle and its package.json
 	const pkgPath = path.join(bundlePath, 'package.json');
 

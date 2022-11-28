@@ -345,7 +345,7 @@ function isGitData(bundleName: string, filePath: string): boolean {
 /**
  * Determines which config file to use for a bundle.
  */
-function loadBundleCfg(cfgDir: string, bundleName: string): NodeCG.Bundle.Config | undefined {
+function loadBundleCfg(cfgDir: string, bundleName: string): NodeCG.Bundle.UnknownConfig | undefined {
 	try {
 		const cc = cosmiconfig('nodecg', {
 			searchPlaces: [

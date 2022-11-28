@@ -9,7 +9,7 @@ type MessageHandler = {
 	func: NodeCG.ListenHandler;
 };
 
-export abstract class NodeCGAPIBase<P extends NodeCG.Platform> {
+export abstract class NodeCGAPIBase<P extends NodeCG.Platform, C extends Record<string, any>> {
 	static version = version;
 
 	/**
@@ -65,7 +65,7 @@ export abstract class NodeCGAPIBase<P extends NodeCG.Platform> {
 	 * An object containing the parsed content of `cfg/<bundle-name>.json`, the contents of which
 	 * are read once when NodeCG starts up. Used to quickly access per-bundle configuration properties.
 	 */
-	readonly bundleConfig: Readonly<Record<string, unknown>>; // TODO: type this better
+	readonly bundleConfig: Readonly<C>;
 
 	/**
 	 * The version (from package.json) of the bundle which this NodeCG API instance is for.
@@ -112,7 +112,7 @@ export abstract class NodeCGAPIBase<P extends NodeCG.Platform> {
 
 	constructor(bundle: NodeCG.Bundle) {
 		this.bundleName = bundle.name;
-		this.bundleConfig = bundle.config;
+		this.bundleConfig = bundle.config as Readonly<C>;
 		this.bundleVersion = bundle.version;
 		this.bundleGit = bundle.git;
 	}
