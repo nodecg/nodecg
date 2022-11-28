@@ -128,13 +128,8 @@ function generateFinishingTouches() {
 		`import { NodeCGAPIClient } from './client/api/api.client';
 		
 declare global {
-	interface Window {
-		NodeCG: typeof NodeCGAPIClient;
-		nodecg: NodeCGAPIClient;
-	}
-
-	const NodeCG: typeof NodeCGAPIClient;
-	const nodecg: NodeCGAPIClient;
+	var NodeCG: typeof NodeCGAPIClient;
+	var nodecg: NodeCGAPIClient;
 }`,
 	);
 }
