@@ -161,33 +161,33 @@ export default class RegistrationCoordinator {
 	}
 
 	private _addRegistration(registration: GraphicsInstance): void {
-		this._instancesRep.value!.push({
+		this._instancesRep.value.push({
 			...registration,
 			open: true,
 		});
 	}
 
 	private _removeRegistration(socketId: string): GraphicsInstance | false {
-		const registrationIndex = this._instancesRep.value!.findIndex((instance) => instance.socketId === socketId);
+		const registrationIndex = this._instancesRep.value.findIndex((instance) => instance.socketId === socketId);
 
 		/* istanbul ignore next: simple error trapping */
 		if (registrationIndex < 0) {
 			return false;
 		}
 
-		return this._instancesRep.value!.splice(registrationIndex, 1)[0];
+		return this._instancesRep.value.splice(registrationIndex, 1)[0];
 	}
 
 	private _findRegistrationBySocketId(socketId: string): GraphicsInstance | undefined {
-		return this._instancesRep.value!.find((instance) => instance.socketId === socketId);
+		return this._instancesRep.value.find((instance) => instance.socketId === socketId);
 	}
 
 	private _findOpenRegistrationByPathName(pathName: string): GraphicsInstance | undefined {
-		return this._instancesRep.value!.find((instance) => instance.pathName === pathName && instance.open);
+		return this._instancesRep.value.find((instance) => instance.pathName === pathName && instance.open);
 	}
 
 	private _updateInstanceStatuses(): void {
-		this._instancesRep.value!.forEach((instance) => {
+		this._instancesRep.value.forEach((instance) => {
 			const { bundleName, pathName } = instance;
 			const bundle = this._bundleManager.find(bundleName);
 			/* istanbul ignore next: simple error trapping */

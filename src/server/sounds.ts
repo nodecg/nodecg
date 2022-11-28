@@ -39,31 +39,31 @@ export default class SoundsLib {
 
 				this._cueRepsByBundle.set(bundle.name, cuesRep);
 
-				if (cuesRep.value!.length > 0) {
+				if (cuesRep.value.length > 0) {
 					// Remove any persisted cues that are no longer in the bundle manifest.
-					cuesRep.value = cuesRep.value!.filter((persistedCue) =>
+					cuesRep.value = cuesRep.value.filter((persistedCue) =>
 						defaultCuesRepValue.find((defaultCue) => defaultCue.name === persistedCue.name),
 					);
 
 					// Add/update any cues in the bundle manifest that aren't in the persisted replicant.
 					defaultCuesRepValue.forEach((defaultCue) => {
-						const existingIndex = cuesRep.value!.findIndex(
+						const existingIndex = cuesRep.value.findIndex(
 							(persistedCue) => persistedCue.name === defaultCue.name,
 						);
 
 						// We need to just update a few key properties in the persisted cue.
 						// We leave things like volume as-is.
 						if (existingIndex >= 0) {
-							cuesRep.value![existingIndex].assignable = defaultCue.assignable;
-							cuesRep.value![existingIndex].defaultFile = defaultCue.defaultFile;
+							cuesRep.value[existingIndex].assignable = defaultCue.assignable;
+							cuesRep.value[existingIndex].defaultFile = defaultCue.defaultFile;
 
 							// If we're updating the cue to not be assignable, then we have to
 							// set the `defaultFile` as the selected `file`.
 							if (!defaultCue.assignable && defaultCue.defaultFile) {
-								cuesRep.value![existingIndex].file = clone(defaultCue.defaultFile);
+								cuesRep.value[existingIndex].file = clone(defaultCue.defaultFile);
 							}
 						} else {
-							cuesRep.value!.push(defaultCue);
+							cuesRep.value.push(defaultCue);
 						}
 					});
 				} else {

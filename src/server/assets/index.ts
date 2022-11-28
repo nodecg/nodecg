@@ -80,7 +80,7 @@ export default class AssetManager {
 			const namespacedAssetsPath = this._calcNamespacedAssetsPath(name);
 			const collectionReps = new Map<string, ServerReplicant<AssetFile[]>>();
 			this._repsByNamespace.set(name, collectionReps);
-			this.collectionsRep.value!.push({ name, categories });
+			this.collectionsRep.value.push({ name, categories });
 
 			for (const category of categories) {
 				/* istanbul ignore next: Simple directory creation. */
@@ -138,7 +138,7 @@ export default class AssetManager {
 				} else {
 					const rep = this._getCollectRep(uploadedFile.namespace, uploadedFile.category);
 					if (rep) {
-						rep.value!.push(uploadedFile);
+						rep.value.push(uploadedFile);
 					}
 				}
 			} catch (err: unknown) {
@@ -164,11 +164,11 @@ export default class AssetManager {
 						throw new Error('should have had a replicant here');
 					}
 
-					const index = rep.value!.findIndex((uf) => uf.url === newUploadedFile.url);
+					const index = rep.value.findIndex((uf) => uf.url === newUploadedFile.url);
 					if (index > -1) {
-						rep.value!.splice(index, 1, newUploadedFile);
+						rep.value.splice(index, 1, newUploadedFile);
 					} else {
-						rep.value!.push(newUploadedFile);
+						rep.value.push(newUploadedFile);
 					}
 				} catch (err: unknown) {
 					this.log.error(err);
@@ -183,9 +183,9 @@ export default class AssetManager {
 				return;
 			}
 
-			rep.value!.some((assetFile, index) => {
+			rep.value.some((assetFile, index) => {
 				if (assetFile.url === deletedFile.url) {
-					rep.value!.splice(index, 1);
+					rep.value.splice(index, 1);
 					this.log.debug('"%s" was deleted', deletedFile.url);
 					return true;
 				}
@@ -317,7 +317,7 @@ export default class AssetManager {
 
 				const rep = this._getCollectRep(uploadedFile.namespace, uploadedFile.category);
 				if (rep) {
-					rep.value!.push(uploadedFile);
+					rep.value.push(uploadedFile);
 				}
 			});
 			deferredFiles.clear();

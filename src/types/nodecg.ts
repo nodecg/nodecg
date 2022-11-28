@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-namespace */
 import type * as ExpressCore from 'express-serve-static-core';
 import type express from 'express';
@@ -175,6 +176,73 @@ export namespace NodeCG {
 		foo: (bar: number) => void;
 	} & SocketIOConnectionEvents;
 
+	export type Config = {
+		host: string;
+		port: number;
+		baseURL: string;
+		exitOnUncaught: boolean;
+		logging: {
+			replicants: boolean;
+			console: {
+				enabled: boolean;
+				level: LogLevel;
+				timestamps: boolean;
+			};
+			file: {
+				enabled: boolean;
+				level: LogLevel;
+				path: string;
+				timestamps: boolean;
+			};
+		};
+		bundles: {
+			enabled: string[] | null;
+			disabled: string[] | null;
+			paths: string[];
+		};
+		sentry: {
+			enabled: boolean;
+			dsn: string;
+		};
+		login: {
+			enabled: boolean;
+			sessionSecret: string;
+			forceHttpsReturn: boolean;
+			steam?: {
+				enabled: boolean;
+				apiKey: string;
+				allowedIds: string[];
+			};
+			twitch?: {
+				enabled: boolean;
+				clientID: string;
+				clientSecret: string;
+				scope: string;
+				allowedUsernames: string[];
+				allowedIds: string[];
+			};
+			local?: {
+				enabled: boolean;
+				allowedUsers: Array<{ username: string; password: string }>;
+			};
+			discord?: {
+				enabled: boolean;
+				clientID: string;
+				clientSecret: string;
+				scope: string;
+				allowedUserIDs: string[];
+				allowedGuilds: Array<{ guildID: string; allowedRoleIDs: string[]; guildBotToken: string }>;
+			};
+		};
+		ssl?: {
+			enabled: boolean;
+			allowHTTP: boolean;
+			keyPath: string;
+			certificatePath: string;
+			passphrase?: string;
+		};
+	};
+
 	export type FilteredConfig = {
 		host: string;
 		port: number;
@@ -301,4 +369,36 @@ export namespace NodeCG {
 		route: string;
 		fullbleed?: boolean;
 	};
+
+	export type HandledAcknowledgement = {
+		handled: true;
+	};
+
+	export type UnhandledAcknowledgement = {
+		handled: false;
+		(err?: any, response?: unknown): void;
+	};
+
+	export type Acknowledgement = HandledAcknowledgement | UnhandledAcknowledgement;
+
+	export type ListenHandler = (data: unknown, ack?: Acknowledgement) => void;
+
+	export type Logger = {
+		name: string;
+		trace: (...args: any[]) => void;
+		debug: (...args: any[]) => void;
+		info: (...args: any[]) => void;
+		warn: (...args: any[]) => void;
+		error: (...args: any[]) => void;
+		replicants: (...args: any[]) => void;
+	};
+
+	export enum LogLevel {
+		Trace = 'verbose',
+		Debug = 'debug',
+		Info = 'info',
+		Warn = 'warn',
+		Error = 'error',
+		Silent = 'silent',
+	}
 }

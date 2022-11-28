@@ -268,7 +268,7 @@ export default function (cfgDirOrFile: string) {
 		throw new Error(validationResult.error.details[0].message);
 	}
 
-	const config: Joi.extractType<typeof schema> = validationResult.value;
+	const config: NodeCG.Config = validationResult.value;
 	if (!config) {
 		if (!process.env.NODECG_TEST) {
 			console.error('[nodecg] config unexpectedly undefined. This is a bug with NodeCG, not your config.');

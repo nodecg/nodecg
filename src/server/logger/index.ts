@@ -8,9 +8,9 @@ import type { LoggerInterface } from '../../shared/logger-interface';
 
 export let Logger: new (name: string) => LoggerInterface;
 if (config.sentry?.enabled) {
-	Logger = loggerFactory(config.logging as any, Sentry);
+	Logger = loggerFactory(config.logging, Sentry);
 } else {
-	Logger = loggerFactory(config.logging as any);
+	Logger = loggerFactory(config.logging);
 }
 
 export default function (name: string): LoggerInterface {

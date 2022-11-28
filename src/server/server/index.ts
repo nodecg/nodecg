@@ -169,9 +169,7 @@ export default class NodeCGServer extends EventEmitter {
 
 		this._io.use(socketApiMiddleware);
 
-		const bundlesPaths = [path.join(process.env.NODECG_ROOT, 'bundles')].concat(
-			(config as any).bundles?.paths ?? [],
-		);
+		const bundlesPaths = [path.join(process.env.NODECG_ROOT, 'bundles')].concat(config.bundles?.paths ?? []);
 		const cfgPath = path.join(process.env.NODECG_ROOT, 'cfg');
 		const bundleManager = new BundleManager(bundlesPaths, cfgPath, pjson.version, config);
 		bundleManager.all().forEach((bundle) => {

@@ -4,7 +4,6 @@ import isError from 'is-error';
 import { serializeError } from 'serialize-error';
 
 // Ours
-import type { AbstractLogger, Acknowledgement } from '../shared/api.base';
 import { NodeCGAPIBase } from '../shared/api.base';
 import type { Replicator, ServerReplicant } from './replicant';
 import { config } from './config';
@@ -67,11 +66,11 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 			return replicator.declare(name, namespace, opts);
 		}
 
-		get Logger(): new (name: string) => AbstractLogger {
+		get Logger(): new (name: string) => NodeCG.Logger {
 			return Logger;
 		}
 
-		get log(): AbstractLogger {
+		get log(): NodeCG.Logger {
 			if (this._memoizedLogger) {
 				return this._memoizedLogger;
 			}
@@ -140,7 +139,7 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 		 */
 		mount = mount;
 
-		_memoizedLogger?: AbstractLogger;
+		_memoizedLogger?: NodeCG.Logger;
 
 		constructor(bundle: NodeCG.Bundle) {
 			super(bundle);
@@ -305,7 +304,7 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
  * @ignore
  * @returns {Function}
  */
-function _wrapAcknowledgement(ack: (err?: any, response?: unknown) => void): Acknowledgement {
+function _wrapAcknowledgement(ack: (err?: any, response?: unknown) => void): NodeCG.Acknowledgement {
 	let handled = false;
 	const wrappedAck = function (firstArg: any, ...restArgs: any[]): void {
 		if (handled) {
@@ -326,5 +325,5 @@ function _wrapAcknowledgement(ack: (err?: any, response?: unknown) => void): Ack
 		},
 	});
 
-	return wrappedAck as Acknowledgement;
+	return wrappedAck as NodeCG.Acknowledgement;
 }

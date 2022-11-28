@@ -1,5 +1,4 @@
 // Ours
-import type { AbstractLogger } from '../../shared/api.base';
 import { NodeCGAPIBase } from '../../shared/api.base';
 import ClientReplicant from './replicant';
 import { filteredConfig } from './config';
@@ -106,11 +105,11 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 		});
 	}
 
-	get Logger(): new (name: string) => AbstractLogger {
+	get Logger(): new (name: string) => NodeCG.Logger {
 		return Logger;
 	}
 
-	get log(): AbstractLogger {
+	get log(): NodeCG.Logger {
 		if (this._memoizedLogger) {
 			return this._memoizedLogger;
 		}
@@ -138,7 +137,7 @@ export class NodeCGAPIClient extends NodeCGAPIBase {
 
 	private _soundCues: NodeCG.SoundCue[] = [];
 
-	private _memoizedLogger?: AbstractLogger;
+	private _memoizedLogger?: NodeCG.Logger;
 
 	constructor(bundle: NodeCG.Bundle & { _hasSounds?: boolean }, socket: TypedClientSocket) {
 		super(bundle);

@@ -95,8 +95,9 @@ export default class ServerReplicant<T> extends AbstractReplicant<T> {
 		}
 	}
 
-	get value(): T | undefined {
-		return this._value;
+	get value(): T {
+		// It is safe to assume that server-side Replicants are not unexpectedly undefined.
+		return this._value as T;
 	}
 
 	set value(newValue: T | undefined) {

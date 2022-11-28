@@ -43,9 +43,21 @@ function rewriteTypePaths(filePath: string) {
 					fauxModules,
 				);
 
+				if (!hasTypesPackage(text)) {
+					try {
+						// Copy this module's package.json if it exists.
+						const pkgDir = findRoot(path.dirname(require.resolve(text)));
+						const input = path.join(pkgDir, 'package.json');
+						if (fs.existsSync(input)) {
+							const output = path.resolve(fauxModules, text, 'package.json');
+							mkdirpSync(path.dirname(output));
+							fs.copyFileSync(input, output);
+						}
+					} catch (_: unknown) {}
+				}
+
 				return context.factory.updateImportDeclaration(
 					node,
-					undefined,
 					undefined,
 					node.importClause
 						? context.factory.createImportClause(
@@ -140,6 +152,36 @@ function isNodeModule(filePath: string): boolean {
 function hasTypesPackage(packageName: string): boolean {
 	const typesPackagePath = path.join(appRootPath.path, 'node_modules/@types', packageName);
 	return fs.existsSync(typesPackagePath);
+}
+
+function findRoot(input: string | string[]): string {
+	let start: string | string[] = input;
+	if (typeof start === 'string') {
+		if (!start.endsWith(path.sep)) {
+			start += path.sep;
+		}
+
+		start = start.split(path.sep);
+	}
+
+	if (!start.length) {
+		throw new Error('package.json not found in path');
+	}
+
+	start.pop();
+	const dir = start.join(path.sep);
+	try {
+		const pjsonPath = path.join(dir, 'package.json');
+		const pjsonExists = fs.existsSync(pjsonPath);
+		if (pjsonExists) {
+			const dirNameMatchesPjsonName = dir.endsWith(require(pjsonPath).name);
+			if (dirNameMatchesPjsonName) {
+				return dir;
+			}
+		}
+	} catch (_: unknown) {}
+
+	return findRoot(start);
 }
 
 rewriteTypePaths(path.resolve(appRootPath.path, 'build-types/client/api/api.client.d.ts'));

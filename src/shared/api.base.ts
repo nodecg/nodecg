@@ -3,33 +3,10 @@ const { version } = require('../../package.json');
 import type { AbstractReplicant } from './replicants.shared';
 import type { NodeCG } from '../types/nodecg';
 
-export type AbstractLogger = {
-	name: string;
-	trace: (...args: any[]) => void;
-	debug: (...args: any[]) => void;
-	info: (...args: any[]) => void;
-	warn: (...args: any[]) => void;
-	error: (...args: any[]) => void;
-	replicants: (...args: any[]) => void;
-};
-
-export type HandledAcknowledgement = {
-	handled: true;
-};
-
-export type UnhandledAcknowledgement = {
-	handled: false;
-	(err?: any, response?: unknown): void;
-};
-
-export type Acknowledgement = HandledAcknowledgement | UnhandledAcknowledgement;
-
-export type ListenFunc = (data: unknown, ack?: Acknowledgement) => void;
-
 type MessageHandler = {
 	messageName: string;
 	bundleName: string;
-	func: ListenFunc;
+	func: NodeCG.ListenHandler;
 };
 
 export abstract class NodeCGAPIBase {
@@ -118,7 +95,7 @@ export abstract class NodeCGAPIBase {
 	 * Provides easy access to the Logger class.
 	 * Useful in cases where you want to create your own custom logger.
 	 */
-	abstract get Logger(): new (name: string) => AbstractLogger;
+	abstract get Logger(): new (name: string) => NodeCG.Logger;
 
 	/**
 	 * An instance of NodeCG's Logger, with the following methods. The logging level is set in `cfg/nodecg.json`,
@@ -131,7 +108,7 @@ export abstract class NodeCGAPIBase {
 	 * nodecg.log.error('error level logging');
 	 * ```
 	 */
-	abstract get log(): AbstractLogger;
+	abstract get log(): NodeCG.Logger;
 
 	constructor(bundle: NodeCG.Bundle) {
 		this.bundleName = bundle.name;
@@ -160,9 +137,13 @@ export abstract class NodeCGAPIBase {
 	 *     console.log(message);
 	 * });
 	 */
-	listenFor(messageName: string, handlerFunc: ListenFunc): void;
-	listenFor(messageName: string, bundleName: string, handlerFunc: ListenFunc): void;
-	listenFor(messageName: string, bundleNameOrHandlerFunc: string | ListenFunc, handlerFunc?: ListenFunc): void {
+	listenFor(messageName: string, handlerFunc: NodeCG.ListenHandler): void;
+	listenFor(messageName: string, bundleName: string, handlerFunc: NodeCG.ListenHandler): void;
+	listenFor(
+		messageName: string,
+		bundleNameOrHandlerFunc: string | NodeCG.ListenHandler,
+		handlerFunc?: NodeCG.ListenHandler,
+	): void {
 		let bundleName: string;
 		if (typeof bundleNameOrHandlerFunc === 'string') {
 			bundleName = bundleNameOrHandlerFunc;
@@ -200,8 +181,12 @@ export abstract class NodeCGAPIBase {
 	 * @example <caption>Removing a listener from a message in another bundle's namespace:</caption>
 	 * nodecg.unlisten('printMessage', 'another-bundle', someFunctionName);
 	 */
-	unlisten(messageName: string, handlerFunc: ListenFunc): boolean;
-	unlisten(messageName: string, bundleNameOrHandler: string | ListenFunc, maybeHandler?: ListenFunc): boolean {
+	unlisten(messageName: string, handlerFunc: NodeCG.ListenHandler): boolean;
+	unlisten(
+		messageName: string,
+		bundleNameOrHandler: string | NodeCG.ListenHandler,
+		maybeHandler?: NodeCG.ListenHandler,
+	): boolean {
 		let { bundleName } = this;
 		let handlerFunc = maybeHandler;
 		if (typeof bundleNameOrHandler === 'string') {

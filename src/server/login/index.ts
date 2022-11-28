@@ -200,7 +200,7 @@ if (config.login.discord?.enabled) {
 					// Get guilds that are specified in the config and that user is in
 					const intersectingGuilds = config.login.discord.allowedGuilds.filter((allowedGuild) =>
 						profile.guilds.some((profileGuild) => profileGuild.id === allowedGuild.guildID),
-					) as any;
+					);
 
 					const guildRequests = [];
 
@@ -287,7 +287,7 @@ if (config.login.local?.enabled) {
 			async (username: string, password: string, done: StrategyDoneCb) => {
 				try {
 					const roles: Role[] = [];
-					const foundUser = (allowedUsers as any)?.find(
+					const foundUser = allowedUsers?.find(
 						(u: { username: string; password: string }) => u.username === username,
 					);
 					let allowed = false;
@@ -299,7 +299,7 @@ if (config.login.local?.enabled) {
 
 						if (match && hashes.includes(match[1])) {
 							expected = match[2];
-							actual = crypto.createHmac(match[1], sessionSecret!).update(actual, 'utf8').digest('hex');
+							actual = crypto.createHmac(match[1], sessionSecret).update(actual, 'utf8').digest('hex');
 						}
 
 						if (expected === actual) {
