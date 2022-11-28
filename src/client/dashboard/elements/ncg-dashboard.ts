@@ -632,10 +632,9 @@ function getImageDataURI(
 				data,
 			});
 			// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
-		} catch (e) {
+		} catch (e: any) {
 			/* istanbul ignore next: hard-to-test error */
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-			cb(e as any);
+			cb(e);
 		}
 
 		canvas.remove();
@@ -645,10 +644,9 @@ function getImageDataURI(
 	try {
 		img.src = url;
 		// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
-	} catch (e) {
+	} catch (e: any) {
 		/* istanbul ignore next: hard-to-test error */
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-		cb(e as any);
+		cb(e);
 	}
 }
 

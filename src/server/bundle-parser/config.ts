@@ -9,7 +9,11 @@ import extend from 'extend';
 import tv4 from 'tv4';
 import type { NodeCG } from '../../types/nodecg';
 
-export function parse(bundleName: string, bundleDir: string, userConfig: NodeCG.Bundle.UnknownConfig): NodeCG.Bundle.UnknownConfig {
+export function parse(
+	bundleName: string,
+	bundleDir: string,
+	userConfig: NodeCG.Bundle.UnknownConfig,
+): NodeCG.Bundle.UnknownConfig {
 	const cfgSchemaPath = path.resolve(bundleDir, 'configschema.json');
 	if (!fs.existsSync(cfgSchemaPath)) {
 		return userConfig;

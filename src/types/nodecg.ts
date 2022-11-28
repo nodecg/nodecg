@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import type * as ExpressCore from 'express-serve-static-core';
 import type express from 'express';
-import { ServerToClientEvents, ClientToServerEvents } from './socket-protocol';
+import type { ServerToClientEvents, ClientToServerEvents } from './socket-protocol';
 
 type Person =
 	| {
