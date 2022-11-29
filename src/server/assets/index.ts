@@ -15,7 +15,7 @@ import createLogger from '../logger';
 import type Replicator from '../replicant/replicator';
 import type ServerReplicant from '../replicant/server-replicant';
 import type { NodeCG } from '../../types/nodecg';
-import { stringifyError } from '../../shared/utils'
+import { stringifyError } from '../../shared/utils';
 
 type Collection = {
 	name: string;
