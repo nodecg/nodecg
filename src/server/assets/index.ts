@@ -15,6 +15,7 @@ import createLogger from '../logger';
 import type Replicator from '../replicant/replicator';
 import type ServerReplicant from '../replicant/server-replicant';
 import type { NodeCG } from '../../types/nodecg';
+import { stringifyError } from '../../shared/utils'
 
 type Collection = {
 	name: string;
@@ -146,7 +147,7 @@ export default class AssetManager {
 					deferredFiles.delete(filepath);
 				}
 
-				this.log.error(err);
+				this.log.error(stringifyError(err));
 			}
 		});
 
@@ -171,7 +172,7 @@ export default class AssetManager {
 						rep.value.push(newUploadedFile);
 					}
 				} catch (err: unknown) {
-					this.log.error(err);
+					this.log.error(stringifyError(err));
 				}
 			});
 		});

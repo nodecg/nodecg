@@ -13,6 +13,7 @@ import type { Replicator } from '../replicant';
 import type { RootNS } from '../../types/socket-protocol';
 import type BundleManager from '../bundle-manager';
 import type { NodeCG } from '../../types/nodecg';
+import { stringifyError } from '../../shared/utils';
 
 const log = createLogger('extensions');
 
@@ -124,7 +125,7 @@ export default class ExtensionManager extends EventEmitter {
 			this.extensions[bundle.name] = extension;
 		} catch (err: unknown) {
 			this._bundleManager.remove(bundle.name);
-			log.warn('Failed to mount %s extension:\n', (err as Error)?.stack ?? err);
+			log.warn('Failed to mount %s extension:\n', stringifyError(err));
 			if (global.sentryEnabled) {
 				(err as Error).message = `Failed to mount ${bundle.name} extension: ${
 					// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion

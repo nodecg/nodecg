@@ -9,6 +9,7 @@ import UnauthorizedError from '../login/UnauthorizedError';
 import type { TypedServerSocket } from '../../types/socket-protocol';
 import { UnAuthErrCode } from '../../types/socket-protocol';
 import createLogger from '../logger';
+import { serializeError } from 'serialize-error';
 
 const log = createLogger('socket-auth');
 const socketsByKey = new Map<string, Set<TypedServerSocket>>();
@@ -131,7 +132,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 
 					socketsByKey.delete(token);
 				} catch (error: unknown) {
-					log.error(error);
+					log.error(serializeError(error));
 					if (cb) {
 						cb(error as string, undefined);
 					}

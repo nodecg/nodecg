@@ -10,6 +10,7 @@ import * as uuid from 'uuid';
 import * as db from '../database';
 import type { TypedServerSocket, ServerToClientEvents, RootNS } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';
+import { stringifyError } from '../../shared/utils';
 
 const log = createLogger('replicator');
 
@@ -179,7 +180,7 @@ export default class Replicator {
 			repEnt.value = value;
 			await manager.save(repEnt);
 		} catch (error: unknown) {
-			replicant.log.error('Failed to persist value:', error);
+			replicant.log.error('Failed to persist value:', stringifyError(error));
 		} finally {
 			this._pendingSave.delete(replicant);
 		}
