@@ -10,6 +10,9 @@ type SendMessageCb<T> = (error?: unknown, response?: T) => void;
 
 type ReadReplicantCb = (value: unknown) => void;
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+type EventMap = {};
+
 const soundMetadata = new WeakMap<createjs.AbstractSoundInstance, { cueName: string; updateVolume: boolean }>();
 const apiContexts = new Set<NodeCGAPIClient>();
 
@@ -31,7 +34,8 @@ function _forwardMessageToContext(messageName: string, bundleName: string, data:
 
 export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> extends NodeCGAPIBase<
 	'client',
-	C
+	C,
+	EventMap
 > {
 	static Replicant<V>(name: string, namespace: string, opts: NodeCG.Replicant.Options<V> = {}): ClientReplicant<V> {
 		return new ClientReplicant<V>(name, namespace, opts, (window as any).socket);

@@ -17,6 +17,11 @@ import { stringifyError } from '../../shared/utils';
 
 const log = createLogger('extensions');
 
+type EventMap = {
+	login: (user: Express.Request['user']) => void;
+	logout: (user: Express.Request['user']) => void;
+};
+
 export default class ExtensionManager extends EventEmitter {
 	readonly extensions: Record<string, unknown> = {};
 
@@ -25,6 +30,8 @@ export default class ExtensionManager extends EventEmitter {
 	private readonly _ExtensionApi: ReturnType<typeof extensionApiClassFactory>;
 
 	private readonly _bundleManager: BundleManager;
+
+	private readonly _apiInstances = new Set<InstanceType<ReturnType<typeof extensionApiClassFactory>>>();
 
 	constructor(io: RootNS, bundleManager: BundleManager, replicator: Replicator, mount: NodeCG.Middleware) {
 		super();
@@ -108,6 +115,12 @@ export default class ExtensionManager extends EventEmitter {
 		log.trace('Completed extension mounting');
 	}
 
+	public emitToAllInstances<K extends keyof EventMap>(eventName: K, ...params: Parameters<EventMap[K]>): void {
+		for (const instance of this._apiInstances) {
+			instance.emit(eventName, ...params);
+		}
+	}
+
 	private _loadExtension(bundle: NodeCG.Bundle): void {
 		const ExtensionApi = this._ExtensionApi;
 		const extPath = path.join(bundle.dir, 'extension');
@@ -120,7 +133,9 @@ export default class ExtensionManager extends EventEmitter {
 				mod = mod.default;
 			}
 
-			const extension = mod(new ExtensionApi(bundle));
+			const apiInstance = new ExtensionApi(bundle);
+			this._apiInstances.add(apiInstance);
+			const extension = mod(apiInstance);
 			log.info('Mounted %s extension', bundle.name);
 			this.extensions[bundle.name] = extension;
 		} catch (err: unknown) {

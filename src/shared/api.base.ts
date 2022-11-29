@@ -2,6 +2,7 @@
 const { version } = require('../../package.json');
 import type { AbstractReplicant } from './replicants.shared';
 import type { NodeCG } from '../types/nodecg';
+import { TypedEmitter, type EventMap } from './typed-emitter';
 
 type MessageHandler = {
 	messageName: string;
@@ -9,7 +10,11 @@ type MessageHandler = {
 	func: NodeCG.ListenHandler;
 };
 
-export abstract class NodeCGAPIBase<P extends NodeCG.Platform, C extends Record<string, any>> {
+export abstract class NodeCGAPIBase<
+	P extends NodeCG.Platform,
+	C extends Record<string, any>,
+	E extends EventMap,
+> extends TypedEmitter<E> {
 	static version = version;
 
 	/**
@@ -111,6 +116,7 @@ export abstract class NodeCGAPIBase<P extends NodeCG.Platform, C extends Record<
 	abstract get log(): NodeCG.Logger;
 
 	constructor(bundle: NodeCG.Bundle) {
+		super();
 		this.bundleName = bundle.name;
 		this.bundleConfig = bundle.config as Readonly<C>;
 		this.bundleVersion = bundle.version;

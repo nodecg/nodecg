@@ -20,4 +20,12 @@ export = (nodecg: NodeCG.ServerAPI<BundleConfig>) => {
 			}
 		}
 	});
+
+	nodecg.on('login', (user) => {
+		console.log(user.id, user.name);
+	});
+
+	nodecg.on('logout', (user) => {
+		console.log(user.id, user.name);
+	});
 };

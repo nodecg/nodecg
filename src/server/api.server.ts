@@ -12,8 +12,13 @@ import * as ncgUtils from './util';
 import type { RootNS } from '../types/socket-protocol';
 import type { NodeCG } from '../types/nodecg';
 
+type EventMap = {
+	login: (user: Express.User) => void;
+	logout: (user: Express.User) => void;
+};
+
 export default (io: RootNS, replicator: Replicator, extensions: Record<string, unknown>, mount: NodeCG.Middleware) => {
-	const apiContexts = new Set<NodeCGAPIBase<'server', NodeCG.Bundle.UnknownConfig>>();
+	const apiContexts = new Set<NodeCGAPIBase<'server', NodeCG.Bundle.UnknownConfig, EventMap>>();
 
 	/**
 	 * This is what enables intra-context messaging.
@@ -33,7 +38,8 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 
 	return class NodeCGAPIServer<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> extends NodeCGAPIBase<
 		'server',
-		C
+		C,
+		EventMap
 	> {
 		static sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): void {
 			_forwardMessageToContext(messageName, bundleName, data);

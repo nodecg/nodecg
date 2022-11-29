@@ -159,7 +159,15 @@ export default class NodeCGServer extends EventEmitter {
 		if (config.login?.enabled) {
 			log.info('Login security enabled');
 			const login = await import('../login');
-			app.use(await login.createMiddleware());
+			const loginMiddleware = await login.createMiddleware({
+				onLogin: (user) => {
+					this._extensionManager?.emitToAllInstances('login', user);
+				},
+				onLogout: (user) => {
+					this._extensionManager?.emitToAllInstances('logout', user);
+				},
+			});
+			app.use(loginMiddleware);
 			this._io.use(socketAuthMiddleware);
 		} else {
 			app.get('/login*', (_, res) => {

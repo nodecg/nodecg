@@ -19,7 +19,6 @@ import createLogger from '../logger';
 import type { User, Role } from '../database';
 import { Session, getConnection } from '../database';
 import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/utils';
-import type { NodeCG } from '../../types/nodecg';
 
 type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
 
@@ -339,7 +338,10 @@ if (config.login.local?.enabled) {
 	);
 }
 
-export async function createMiddleware(): Promise<express.Application> {
+export async function createMiddleware(callbacks: {
+	onLogin(user: Express.User): void;
+	onLogout(user: Express.User): void;
+}): Promise<express.Application> {
 	const database = await getConnection();
 	const sessionRepository = database.getRepository(Session);
 	const app = express();
@@ -347,7 +349,7 @@ export async function createMiddleware(): Promise<express.Application> {
 		const url = req.session?.returnTo ?? '/dashboard';
 		delete req.session.returnTo;
 		res.redirect(url);
-		app.emit('login', req.session);
+		app.emit('login', req.user);
 	};
 
 	if (!config.login.sessionSecret) {
@@ -418,7 +420,7 @@ export async function createMiddleware(): Promise<express.Application> {
 	app.post('/login/local', passport.authenticate('local', { failureRedirect: '/login' }), redirectPostLogin);
 
 	app.get('/logout', (req, res) => {
-		app.emit('logout', req.session);
+		app.emit('logout', req.user);
 		req.session?.destroy(() => {
 			// To set a cookie on localhost, domain must be left blank
 			let domain: string | undefined = config.baseURL.replace(/:[0-9]+/, '');

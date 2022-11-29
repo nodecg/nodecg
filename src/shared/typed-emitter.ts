@@ -5,12 +5,12 @@ type Builtins = {
 	newListener(event: string, listener: EventReceiver<unknown>): void;
 };
 
-type EventMap = Record<string, any>;
-type EventKey<T extends EventMap> = string & keyof T;
-type EventReceiver<T> = (params: T) => void;
+export type EventMap = Record<string, any>;
+export type EventKey<T extends EventMap> = string & keyof T;
+export type EventReceiver<T> = (params: T) => void;
 
 export class TypedEmitter<T extends EventMap> {
-	private readonly _emitter = new EventEmitter();
+	readonly _emitter = new EventEmitter();
 	on<K extends EventKey<T & Builtins>>(eventName: K, fn: (T & Builtins)[K]): void {
 		this._emitter.on(eventName, fn);
 	}
