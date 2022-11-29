@@ -105,6 +105,11 @@ jobs:
         run: |
           npm run test
 
+      - name: Generate and test types
+        run: |
+          npm run generate-types-package
+          npm run test:types
+
       - name: Create code coverage report
         run: npx nyc report --reporter=text-lcov --include=\"src/**\" > coverage.lcov
 

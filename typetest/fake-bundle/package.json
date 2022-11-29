@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "fake-bundle",
+  "dependencies": {},
+  "scripts": {
+    "build": "tsc --build src/dashboard src/extension"
+  }
+}

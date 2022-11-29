@@ -308,7 +308,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	playSound(
 		cueName: string,
 		{ updateVolume = true }: { updateVolume: boolean } = { updateVolume: true },
-	): createjs.AbstractSoundInstance | undefined {
+	): createjs.AbstractSoundInstance {
 		if (!globalThis.window) {
 			throw new Error('NodeCG Sound API methods are not available in workers');
 		}
@@ -327,7 +327,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		}
 
 		if (!cue.file) {
-			return;
+			throw new Error(`Cue $"{cueName}" does not have a file specified.`);
 		}
 
 		// Create an instance of the sound, which begins playing immediately.

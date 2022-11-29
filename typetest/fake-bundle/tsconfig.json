@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		// Generally-used configs
+		"target": "ES2017",
+		"module": "commonjs",
+		"lib": ["ES2017"],
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"noEmit": true,
+
+		// Most strict type checking
+		"strict": true,
+
+		// Required to simulate bundle directory, excluding parent typedef packages
+		"types": [],
+		"baseUrl": "./",
+		"typeRoots": ["./"]
+	}
+}

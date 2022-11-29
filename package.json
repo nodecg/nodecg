@@ -110,6 +110,7 @@
     "test": "nyc --instrument=false --reporter=none ava --config ava.config.js && nyc report --reporter=html --reporter=text --include=\"src/**\"",
     "test:debug": "ava --config ava.config.js --verbose -- --debug-tests",
     "test:no-coverage": "ava --config ava.config.js",
+    "test:types": "cd typetest/fake-bundle && npm run build",
     "report-coverage": "nyc report --reporter=text-lcov --include=\"src/**\" > coverage.lcov && codecov",
     "lint": "npm-run-all -s lint:*",
     "lint:prettier": "prettier --check \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
