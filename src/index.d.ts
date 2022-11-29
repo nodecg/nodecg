@@ -3,6 +3,7 @@ import { NodeCG } from './types/nodecg';
 import { NodeCGAPIClient } from './client/api/api.client';
 import serverApiFactory from './server/api.server';
 import * as LoggerStuff from './shared/logger-interface';
+import { AbstractReplicant } from './shared/replicants.shared';
 
 type NodeCGAPIServer<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> = InstanceType<
 	ReturnType<typeof serverApiFactory>
@@ -30,20 +31,16 @@ declare module './types/nodecg' {
 		 * The only substantial difference between client and server Replicants
 		 * is that the `value` of a ClientReplicant could always be `undefined`
 		 * due to the time it takes to initialize.
-		 *
-		 * Detailed Intellisense docs are available from the `ClientAPI['Replicant']` type.
 		 */
-		export type ClientReplicant = ClientAPI['Replicant'];
+		export type ClientReplicant<V> = AbstractReplicant<'client', V>;
 
 		/**
 		 * A Replicant used in server-side (extension) code.
 		 * The only substantial difference between server and client Replicants
 		 * is that the `value` of a ServerReplicant will never be unexpectedly `undefined`
 		 * due to initialization time.
-		 *
-		 * Detailed Intellisense docs are available from the `ServerAPI['Replicant']` type.
 		 */
-		export type ServerReplicant = ServerAPI['Replicant'];
+		export type ServerReplicant<V> = AbstractReplicant<'server', V>;
 
 		/**
 		 * An interface represting a NodeCG.Logger instance.

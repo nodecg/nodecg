@@ -33,8 +33,8 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	'client',
 	C
 > {
-	static Replicant<T>(name: string, namespace: string, opts: NodeCG.Replicant.Options<T> = {}): ClientReplicant<T> {
-		return new ClientReplicant<T>(name, namespace, opts, (window as any).socket);
+	static Replicant<V>(name: string, namespace: string, opts: NodeCG.Replicant.Options<V> = {}): ClientReplicant<V> {
+		return new ClientReplicant<V>(name, namespace, opts, (window as any).socket);
 	}
 
 	static sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, cb: SendMessageCb<T>): void;

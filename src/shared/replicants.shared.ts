@@ -10,22 +10,26 @@ import type { LoggerInterface } from './logger-interface';
 import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
 
-type Events<T> = {
-	change: (newVal: T | undefined, oldVal: T | undefined, operations: Array<NodeCG.Replicant.Operation<T>>) => void;
+type Events<P extends NodeCG.Platform, V> = {
+	change: (
+		newVal: P extends 'server' ? V : V | undefined,
+		oldVal: V | undefined,
+		operations: Array<NodeCG.Replicant.Operation<V>>,
+	) => void;
 	declared: (
 		data:
-			| { value: T; revision: number }
-			| { value: T; revision: number; schemaSum: string; schema: Record<string, any> },
+			| { value: V; revision: number }
+			| { value: V; revision: number; schemaSum: string; schema: Record<string, any> },
 	) => void;
 	declarationRejected: (rejectReason: string) => void;
 	operations: (params: {
 		name: string;
 		namespace: string;
-		operations: Array<NodeCG.Replicant.Operation<T>>;
+		operations: Array<NodeCG.Replicant.Operation<V>>;
 		revision: number;
 	}) => void;
 	operationsRejected: (rejectReason: string) => void;
-	fullUpdate: (data: T) => void;
+	fullUpdate: (data: V) => void;
 };
 
 /**
@@ -36,7 +40,7 @@ type Events<T> = {
  *
  * So, we code this like its 2010 and just use "_" on some public members.
  */
-export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends TypedEmitter<Events<V>> {
+export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends TypedEmitter<Events<P, V>> {
 	name: string;
 
 	namespace: string;

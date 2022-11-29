@@ -101,6 +101,7 @@ function generateFinishingTouches() {
 				name: '@nodecg/types',
 				description: 'Typings package for NodeCG',
 				main: 'index.d.ts',
+				types: 'index.d.ts',
 				version: pjson.version,
 				repository: pjson.repository,
 				bugs: pjson.bugs,
