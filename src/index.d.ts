@@ -1,4 +1,6 @@
 // This file is for the typings package only.
+/// <reference types="passport" />
+/// <reference path="./server/types/augment-express-user.d.ts" />
 import { NodeCG } from './types/nodecg';
 import { NodeCGAPIClient } from './client/api/api.client';
 import serverApiFactory from './server/api.server';

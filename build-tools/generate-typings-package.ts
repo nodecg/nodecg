@@ -123,6 +123,13 @@ function generateFinishingTouches() {
 	// Copy the index.d.ts file that ties the whole thing together
 	fs.copyFileSync(path.resolve(appRootPath.path, 'src/index.d.ts'), path.join(outputDir, 'index.d.ts'));
 
+	// Copy the d.ts file that lets middleware access req.user with appropriate types.
+	fs.mkdirSync(path.join(outputDir, 'server/types'));
+	fs.copyFileSync(
+		path.resolve(appRootPath.path, 'src/server/types/augment-express-user.d.ts'),
+		path.join(outputDir, 'server/types/augment-express-user.d.ts'),
+	);
+
 	// Write the browser-specific window augmentation types
 	fs.writeFileSync(
 		path.join(outputDir, 'augment-window.d.ts'),

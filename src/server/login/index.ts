@@ -19,8 +19,37 @@ import createLogger from '../logger';
 import type { User, Role } from '../database';
 import { Session, getConnection } from '../database';
 import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/utils';
+import type { NodeCG } from '../../types/nodecg';
 
 type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
+
+/**
+ * The "user profile" for Steam-authenticated users, as consumed by Express.
+ */
+type SteamProfile = { id: string; displayName: string };
+
+/**
+ * The "user profile" for Twitch-authenticated users, as consumed by Express.
+ */
+type TwitchProfile = {
+	provider: 'twitch';
+	id: string;
+	username: string;
+	displayName: string;
+	email: string;
+};
+
+/**
+ * The "user profile" for Discord-authenticated users, as consumed by Express.
+ */
+type DiscordProfile = {
+	provider: 'discord';
+	accessToken: string;
+	username: string;
+	discriminator: string;
+	id: string;
+	guilds: Array<{ id: string; name: string }>;
+};
 
 const log = createLogger('login');
 const protocol = config.ssl?.enabled ?? config.login.forceHttpsReturn ? 'https' : 'http';
@@ -46,11 +75,7 @@ if (config.login.steam?.enabled) {
 				realm: `${protocol}://${config.baseURL}/login/auth/steam`,
 				apiKey: config.login.steam.apiKey,
 			},
-			async (
-				_: unknown,
-				profile: { id: string; allowed: boolean; displayName: string },
-				done: StrategyDoneCb,
-			) => {
+			async (_: unknown, profile: SteamProfile, done: StrategyDoneCb) => {
 				try {
 					const roles: Role[] = [];
 					const allowed = config.login.steam?.allowedIds?.includes(profile.id);
@@ -98,12 +123,7 @@ if (config.login.twitch?.enabled) {
 				scope: concatScopes,
 				customHeaders: { 'Client-ID': config.login.twitch.clientID },
 			},
-			async (
-				_accessToken: string,
-				_refreshToken: string,
-				profile: { provider: 'twitch'; id: string; username: string; displayName: string; email: string },
-				done: StrategyDoneCb,
-			) => {
+			async (accessToken: string, refreshToken: string, profile: TwitchProfile, done: StrategyDoneCb) => {
 				try {
 					const roles: Role[] = [];
 					const allowed =
@@ -120,6 +140,8 @@ if (config.login.twitch?.enabled) {
 						name: profile.displayName,
 						provider_type: 'twitch',
 						provider_hash: profile.id,
+						provider_access_token: accessToken,
+						provider_refresh_token: refreshToken,
 						roles,
 					});
 					done(undefined, user);
@@ -173,19 +195,7 @@ if (config.login.discord?.enabled) {
 				callbackURL: `${protocol}://${config.baseURL}/login/auth/discord`,
 				scope,
 			},
-			async (
-				_accessToken: string,
-				_refreshToken: string,
-				profile: {
-					provider: 'discord';
-					accessToken: string;
-					username: string;
-					discriminator: string;
-					id: string;
-					guilds: Array<{ id: string; name: string }>;
-				},
-				done: StrategyDoneCb,
-			) => {
+			async (accessToken: string, refreshToken: string, profile: DiscordProfile, done: StrategyDoneCb) => {
 				if (!config.login.discord) {
 					// Impossible but TS doesn't know that.
 					done(new Error('Discord login config was impossibly undefined.'));
@@ -262,6 +272,8 @@ if (config.login.discord?.enabled) {
 					name: `${profile.username}#${profile.discriminator}`,
 					provider_type: 'discord',
 					provider_hash: profile.id,
+					provider_access_token: accessToken,
+					provider_refresh_token: refreshToken,
 					roles,
 				});
 				done(undefined, user);

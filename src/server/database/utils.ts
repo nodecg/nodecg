@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
+ 
 import { getConnection, User, Role, Identity } from '../database';
 import { ApiKey } from './entity/ApiKey';
 
@@ -22,11 +22,15 @@ export async function upsertUser({
 	name,
 	provider_type,
 	provider_hash,
+	provider_access_token,
+	provider_refresh_token,
 	roles,
 }: {
 	name: User['name'];
 	provider_type: Identity['provider_type'];
 	provider_hash: Identity['provider_hash'];
+	provider_access_token?: Identity['provider_access_token'];
+	provider_refresh_token?: Identity['provider_refresh_token'];
 	roles: User['roles'];
 }): Promise<User> {
 	const database = await getConnection();
@@ -38,11 +42,16 @@ export async function upsertUser({
 	// Else, make an ident and user.
 	const existingIdent = await findIdent(provider_type, provider_hash);
 	if (existingIdent) {
+		existingIdent.provider_access_token = provider_access_token ?? null;
+		existingIdent.provider_refresh_token = provider_refresh_token ?? null;
+		await manager.save(existingIdent);
 		user = existingIdent.user;
 	} else {
 		const ident = await createIdentity({
 			provider_type,
 			provider_hash,
+			provider_access_token: provider_access_token ?? null,
+			provider_refresh_token: provider_refresh_token ?? null,
 		});
 		const apiKey = await createApiKey();
 		user = manager.create(User, {
@@ -67,7 +76,9 @@ async function findRole(name: Role['name']): Promise<Role | null> {
 	return manager.findOne(Role, { where: { name }, relations: ['permissions'] });
 }
 
-async function createIdentity(identInfo: Pick<Identity, 'provider_type' | 'provider_hash'>): Promise<Identity> {
+async function createIdentity(
+	identInfo: Pick<Identity, 'provider_type' | 'provider_hash' | 'provider_access_token' | 'provider_refresh_token'>,
+): Promise<Identity> {
 	const database = await getConnection();
 	const { manager } = database;
 	// See https://github.com/typeorm/typeorm/issues/9070

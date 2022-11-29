@@ -15,6 +15,18 @@ export class Identity {
 	@Column('text')
 	provider_hash!: string;
 
+	/**
+	 * Only used by Twitch and Discord providers.
+	 */
+	@Column('text', { nullable: true })
+	provider_access_token: string | null = null;
+
+	/**
+	 * Only used by Twitch and Discord providers.
+	 */
+	@Column('text', { nullable: true })
+	provider_refresh_token: string | null = null;
+
 	@ManyToOne(() => User, (user) => user.identities)
 	user!: User;
 }

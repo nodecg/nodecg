@@ -11,7 +11,7 @@ export class initialize1669424617013 implements MigrationInterface {
 			`CREATE TABLE "role" ("id" varchar PRIMARY KEY NOT NULL, "name" text NOT NULL, CONSTRAINT "UQ_ae4578dcaed5adff96595e61660" UNIQUE ("name"))`,
 		);
 		await queryRunner.query(
-			`CREATE TABLE "identity" ("id" varchar PRIMARY KEY NOT NULL, "provider_type" text NOT NULL, "provider_hash" text NOT NULL, "userId" varchar)`,
+			`CREATE TABLE "identity" ("id" varchar PRIMARY KEY NOT NULL, "provider_type" text NOT NULL, "provider_hash" text NOT NULL, "provider_access_token" text, "provider_refresh_token" text, "userId" varchar)`,
 		);
 		await queryRunner.query(
 			`CREATE TABLE "user" ("id" varchar PRIMARY KEY NOT NULL, "created_at" datetime NOT NULL DEFAULT (datetime('now')), "name" text NOT NULL)`,
@@ -38,10 +38,10 @@ export class initialize1669424617013 implements MigrationInterface {
 		await queryRunner.query(`DROP TABLE "permission"`);
 		await queryRunner.query(`ALTER TABLE "temporary_permission" RENAME TO "permission"`);
 		await queryRunner.query(
-			`CREATE TABLE "temporary_identity" ("id" varchar PRIMARY KEY NOT NULL, "provider_type" text NOT NULL, "provider_hash" text NOT NULL, "userId" varchar, CONSTRAINT "FK_12915039d2868ab654567bf5181" FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION)`,
+			`CREATE TABLE "temporary_identity" ("id" varchar PRIMARY KEY NOT NULL, "provider_type" text NOT NULL, "provider_hash" text NOT NULL, "provider_access_token" text, "provider_refresh_token" text, "userId" varchar, CONSTRAINT "FK_12915039d2868ab654567bf5181" FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION)`,
 		);
 		await queryRunner.query(
-			`INSERT INTO "temporary_identity"("id", "provider_type", "provider_hash", "userId") SELECT "id", "provider_type", "provider_hash", "userId" FROM "identity"`,
+			`INSERT INTO "temporary_identity"("id", "provider_type", "provider_hash", "provider_access_token", "provider_refresh_token", "userId") SELECT "id", "provider_type", "provider_hash", "provider_access_token", "provider_refresh_token", "userId" FROM "identity"`,
 		);
 		await queryRunner.query(`DROP TABLE "identity"`);
 		await queryRunner.query(`ALTER TABLE "temporary_identity" RENAME TO "identity"`);
@@ -88,10 +88,10 @@ export class initialize1669424617013 implements MigrationInterface {
 		await queryRunner.query(`DROP TABLE "temporary_api_key"`);
 		await queryRunner.query(`ALTER TABLE "identity" RENAME TO "temporary_identity"`);
 		await queryRunner.query(
-			`CREATE TABLE "identity" ("id" varchar PRIMARY KEY NOT NULL, "provider_type" text NOT NULL, "provider_hash" text NOT NULL, "userId" varchar)`,
+			`CREATE TABLE "identity" ("id" varchar PRIMARY KEY NOT NULL, "provider_type" text NOT NULL, "provider_hash" text NOT NULL, "provider_access_token" text, "provider_refresh_token" text, "userId" varchar)`,
 		);
 		await queryRunner.query(
-			`INSERT INTO "identity"("id", "provider_type", "provider_hash", "userId") SELECT "id", "provider_type", "provider_hash", "userId" FROM "temporary_identity"`,
+			`INSERT INTO "identity"("id", "provider_type", "provider_hash", "provider_access_token", "provider_refresh_token", "userId") SELECT "id", "provider_type", "provider_hash", "provider_access_token", "provider_refresh_token", "userId" FROM "temporary_identity"`,
 		);
 		await queryRunner.query(`DROP TABLE "temporary_identity"`);
 		await queryRunner.query(`ALTER TABLE "permission" RENAME TO "temporary_permission"`);
