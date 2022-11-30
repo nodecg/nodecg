@@ -132,7 +132,9 @@
     "predev": "trash build && trash build-types"
   },
   "engines": {
-    "node": "^16"
+    "node": "^16",
+    "npm": "please-use-yarn",
+    "yarn": "^1.22.19"
   },
   "files": [
     "build",
