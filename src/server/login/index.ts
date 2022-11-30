@@ -11,7 +11,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import { TypeormStore } from 'connect-typeorm';
 import cookieParser from 'cookie-parser';
 import appRootPath from 'app-root-path';
-import fetch from 'make-fetch-happen';
+import fetch from 'node-fetch-commonjs';
 
 // Ours
 import { config } from '../config';
@@ -163,7 +163,8 @@ async function makeDiscordAPIRequest(
 			Authorization: `Bot ${guild.guildBotToken}`,
 		},
 	});
-	const data = await res.json();
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+	const data = (await res.json()) as any;
 	if (res.status === 200) {
 		return [guild, false, data];
 	}

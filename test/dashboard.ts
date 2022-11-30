@@ -1,6 +1,6 @@
 // Packages
 import test from 'ava';
-import axios from 'axios';
+import fetch from 'node-fetch-commonjs';
 import type * as puppeteer from 'puppeteer';
 
 // Ours
@@ -37,9 +37,9 @@ test.serial('panels - should show up standalone', async (t) => {
 });
 
 test('panels - get default styles injected', async (t) => {
-	const response = await axios.get(C.testPanelUrl());
+	const response = await fetch(C.testPanelUrl());
 	t.is(response.status, 200);
-	t.true(response.data.includes('panel-defaults.css'));
+	t.true((await response.text()).includes('panel-defaults.css'));
 });
 
 test.serial('ncg-dialog - should have the buttons defined in dialogButtons', async (t) => {
@@ -229,17 +229,11 @@ test.serial.skip('connection toasts', async (t) => {
 });
 
 test.serial('retrieval - 404', async (t) => {
-	try {
-		await axios.get(`${C.rootUrl()}bundles/test-bundle/dashboard/bad.png`);
-	} catch (error: any) {
-		t.is(error.response.status, 404);
-	}
+	const response = await fetch(`${C.rootUrl()}bundles/test-bundle/dashboard/bad.png`);
+	t.is(response.status, 404);
 });
 
 test.serial('retrieval - wrong bundle is 404', async (t) => {
-	try {
-		await axios.get(`${C.rootUrl()}bundles/fake-bundle/dashboard/panel.html`);
-	} catch (error: any) {
-		t.is(error.response.status, 404);
-	}
+	const response = await fetch(`${C.rootUrl()}bundles/fake-bundle/dashboard/panel.html`);
+	t.is(response.status, 404);
 });

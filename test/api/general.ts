@@ -1,7 +1,7 @@
 // Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
-import axios from 'axios';
+import fetch from 'node-fetch-commonjs';
 import express from 'express';
 import type * as puppeteer from 'puppeteer';
 
@@ -94,9 +94,9 @@ test('should mount custom routes via nodecg.mount', async (t) => {
 	});
 	t.context.apis.extension.mount(app);
 
-	const response = await axios.get(`${C.rootUrl()}test-bundle/test-route`);
+	const response = await fetch(`${C.rootUrl()}test-bundle/test-route`);
 	t.is(response.status, 200);
-	t.is(response.data, 'custom route confirmed');
+	t.is(await response.text(), 'custom route confirmed');
 });
 
 test('should mount prefixed custom routes via nodecg.mount', async (t) => {
@@ -106,9 +106,9 @@ test('should mount prefixed custom routes via nodecg.mount', async (t) => {
 	});
 	t.context.apis.extension.mount('/test-bundle', app);
 
-	const response = await axios.get(`${C.rootUrl()}test-bundle/test-route`);
+	const response = await fetch(`${C.rootUrl()}test-bundle/test-route`);
 	t.is(response.status, 200);
-	t.is(response.data, 'custom route confirmed');
+	t.is(await response.text(), 'custom route confirmed');
 });
 
 test('should mount custom routes via the built-in router and nodecg.mount', async (t) => {
@@ -118,9 +118,9 @@ test('should mount custom routes via the built-in router and nodecg.mount', asyn
 	});
 	t.context.apis.extension.mount(app);
 
-	const response = await axios.get(`${C.rootUrl()}test-bundle/test-route`);
+	const response = await fetch(`${C.rootUrl()}test-bundle/test-route`);
 	t.is(response.status, 200);
-	t.is(response.data, 'custom route confirmed');
+	t.is(await response.text(), 'custom route confirmed');
 });
 
 test.serial('should support multiple listenFor handlers', async (t) => {

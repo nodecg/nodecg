@@ -5,7 +5,7 @@ import path from 'path';
 // Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
-import axios from 'axios';
+import fetch from 'node-fetch-commonjs';
 import type * as puppeteer from 'puppeteer';
 
 // Ours
@@ -77,19 +77,14 @@ for (let i = 0; i < 2; i++) {
 }
 
 test.serial('retrieval - 200', async (t) => {
-	const response = await axios.get(`${C.rootUrl()}assets/test-bundle/assets/%23twitter_banner.png`, {
-		responseType: 'arraybuffer',
-	});
+	const response = await fetch(`${C.rootUrl()}assets/test-bundle/assets/%23twitter_banner.png`);
 	t.is(response.status, 200);
-	t.deepEqual(response.data.length, fs.readFileSync(TWITTER_BANNER_PATH).length);
+	t.deepEqual((await response.arrayBuffer()).byteLength, fs.readFileSync(TWITTER_BANNER_PATH).length);
 });
 
 test.serial('retrieval - 404', async (t) => {
-	try {
-		await axios.get(`${C.rootUrl()}assets/test-bundle/assets/bad.png`);
-	} catch (error: any) {
-		t.is(error.response.status, 404);
-	}
+	const response = await fetch(`${C.rootUrl()}assets/test-bundle/assets/bad.png`);
+	t.is(response.status, 404);
 });
 
 test.serial('deletion - 200', async (t) => {
@@ -111,9 +106,6 @@ test.serial('deletion - 200', async (t) => {
 });
 
 test.serial('deletion - 410', async (t) => {
-	try {
-		await axios.delete(`${C.rootUrl()}assets/test-bundle/assets/bad.png`);
-	} catch (error: any) {
-		t.is(error.response.status, 410);
-	}
+	const response = await fetch(`${C.rootUrl()}assets/test-bundle/assets/bad.png`, { method: 'delete' });
+	t.is(response.status, 410);
 });

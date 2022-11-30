@@ -13,7 +13,7 @@
 import appRootPath from 'app-root-path';
 import semver from 'semver';
 import exitHook from 'exit-hook';
-import fetch from 'make-fetch-happen';
+import fetch from 'node-fetch-commonjs';
 
 const cwd = process.cwd();
 if (cwd !== appRootPath.path) {

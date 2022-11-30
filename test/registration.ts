@@ -4,7 +4,7 @@ import path from 'path';
 
 // Packages
 import test from 'ava';
-import axios from 'axios';
+import fetch from 'node-fetch-commonjs';
 import { simpleGit } from 'simple-git';
 import { replaceInFile } from 'replace-in-file';
 
@@ -40,10 +40,11 @@ test.before(async () => {
 });
 
 test('singleInstance - scripts get injected into /instance/*.html routes', async (t) => {
-	const response = await axios.get(`${C.rootUrl()}instance/killed.html`);
+	const response = await fetch(`${C.rootUrl()}instance/killed.html`);
 	t.is(response.status, 200);
-	t.true(response.data.includes('<script src="/nodecg-api.min.js">'));
-	t.true(response.data.includes('<script src="/socket.io/socket.io.js"></script>'));
+	const body = await response.text();
+	t.true(body.includes('<script src="/nodecg-api.min.js">'));
+	t.true(body.includes('<script src="/socket.io/socket.io.js"></script>'));
 });
 
 test.serial('singleInstance - should redirect to busy.html when the instance is already taken', async (t) => {
