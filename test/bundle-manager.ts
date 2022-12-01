@@ -89,9 +89,20 @@ test.serial('watcher - should emit a change event when the manifest file changes
 	t.plan(1);
 
 	await new Promise<void>((resolve) => {
+		let handled = false;
 		const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-manifest/package.json`, 'utf8'));
+
 		bundleManager.once('bundleChanged', (bundle) => {
+			if (handled) return;
+			handled = true;
 			t.is(bundle.name, 'change-manifest');
+			resolve();
+		});
+
+		bundleManager.once('invalidBundle', (bundle, error) => {
+			if (handled) return;
+			handled = true;
+			t.fail(`Received an "invalid-bundle" event for bundle "${bundle.name}": ${error.message}`);
 			resolve();
 		});
 
