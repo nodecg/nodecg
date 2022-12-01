@@ -68,7 +68,7 @@ jobs:
         with:
           path: |
             /home/runner/.cache/puppeteer
-          key: chromium-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('yarn.lock') }}
         if: runner.os == 'Linux'
 
       - name: Restore Chromium dependency cache (macOS)
@@ -76,7 +76,7 @@ jobs:
         with:
           path: |
             /Users/runner/.cache/puppeteer
-          key: chromium-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('yarn.lock') }}
         if: runner.os == 'macOS'
 
       - name: Restore Chromium dependency cache (Windows)
@@ -84,7 +84,7 @@ jobs:
         with:
           path: |
             C:\Users\runneradmin\.cache\puppeteer
-          key: chromium-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('yarn.lock') }}
         if: runner.os == 'Windows'
 
       - name: Restore npm/yarn dependency cache
@@ -92,7 +92,7 @@ jobs:
         with:
           path: |
             node_modules
-          key: npm-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          key: npm-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('yarn.lock') }}
 
       - name: Install dependencies
         run: yarn --ignore-engines --frozen-lockfile --network-timeout 1000000

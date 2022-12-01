@@ -12,14 +12,14 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
 
       - name: Restore node_modules
         uses: actions/cache@v3
         with:
           path: |
             node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: npm-${{ runner.os }}-18.x-${{ hashFiles('yarn.lock') }}
 
       - name: Install dependencies
         run: yarn --ignore-engines --frozen-lockfile --network-timeout 1000000
