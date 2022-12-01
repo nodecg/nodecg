@@ -41,7 +41,7 @@ jobs:
   build-test:
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [16.x, 18.x]
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     runs-on: ${{matrix.os}}
@@ -118,4 +118,4 @@ jobs:
         with:
           file: ./coverage.lcov
         # Only report once
-        if: runner.os == 'Linux' && matrix.node-version == '16.x'
+        if: runner.os == 'Linux' && matrix.node-version == '18.x'

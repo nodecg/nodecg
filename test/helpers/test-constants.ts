@@ -13,7 +13,9 @@ export const rootUrl = (): string => {
 		throw new Error('NODECG_TEST_PORT is missing. Is NodeCG initialized yet?');
 	}
 
-	return `http://localhost:${NODECG_TEST_PORT}/`;
+	// https://github.com/node-fetch/node-fetch/issues/1624
+	// https://github.com/nodejs/node/issues/40702
+	return `http://127.0.0.1:${NODECG_TEST_PORT}/`;
 };
 
 export const loginUrl = (): string => `${rootUrl()}login/`;
