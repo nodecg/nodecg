@@ -49,7 +49,7 @@ test.before(async () => {
 	// Give chokidar a little time to catch up.
 	// This is gross, I know. Sorry.
 	// The tests WILL fail without this sleep.
-	return sleep(100);
+	return sleep(1000);
 });
 
 test.after(() => {
