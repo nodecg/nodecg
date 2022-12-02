@@ -18,7 +18,7 @@ import { TypedEmitter } from '../shared/typed-emitter';
 /**
  * Milliseconds
  */
-const READY_WAIT_THRESHOLD = 1500;
+const READY_WAIT_THRESHOLD = 1000;
 
 // Start up the watcher, but don't watch any files yet.
 // We'll add the files we want to watch later, in the init() method.
@@ -59,7 +59,6 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 	}
 
 	private _ready = false;
-	private _canBeReady = false;
 
 	private readonly _cfgPath: string;
 
@@ -93,6 +92,14 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 
 		this._cfgPath = cfgPath;
 
+		let anyBundlesExist = false;
+
+		const readyTimeout = setTimeout(() => {
+			console.log('ready!');
+			this._ready = true;
+			this.emit('ready');
+		}, READY_WAIT_THRESHOLD);
+
 		bundlesPaths.forEach((bundlesPath) => {
 			log.trace(`Loading bundles from ${bundlesPath}`);
 
@@ -103,9 +110,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 			}
 
 			/* istanbul ignore next */
-			let lastAdd: number;
 			watcher.on('add', (filePath) => {
-				lastAdd = performance.now();
 				const bundleName = extractBundleName(bundlesPath, filePath);
 
 				// In theory, the bundle parser would have thrown an error long before this block would execute,
@@ -118,15 +123,9 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 					this._debouncedGitChangeHandler(bundleName);
 				}
 
-				if (this._canBeReady && !this._ready) {
-					const now = performance.now();
-					const timeSinceLastAdd = now - lastAdd;
-					if (timeSinceLastAdd > READY_WAIT_THRESHOLD) {
-						this._ready = true;
-						this.emit('ready');
-					}
-
-					lastAdd = now;
+				console.log('add:', filePath);
+				if (!this.ready) {
+					readyTimeout.refresh();
 				}
 			});
 
@@ -162,7 +161,10 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 			// Do an initial load of each bundle in the "bundles" folder.
 			// During runtime, any changes to a bundle's "dashboard" folder will trigger a re-load of that bundle,
 			// as will changes to its `package.json`.
-			fs.readdirSync(bundlesPath).forEach((bundleFolderName) => {
+			const bundleFolders = fs.readdirSync(bundlesPath);
+			bundleFolders.forEach((bundleFolderName) => {
+				anyBundlesExist = true;
+
 				const bundlePath = path.join(bundlesPath, bundleFolderName);
 				if (!fs.statSync(bundlePath).isDirectory()) {
 					return;
@@ -211,8 +213,6 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 					path.join(bundlePath, 'dashboard'), // Watch `dashboard` directories.
 					path.join(bundlePath, 'package.json'), // Watch each bundle's `package.json`.
 				]);
-
-				this._canBeReady = true;
 			});
 		});
 	}
