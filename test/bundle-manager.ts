@@ -108,7 +108,8 @@ test.serial('loader - should detect and load bundle located in custom bundle pat
 test.serial('watcher - should emit a change event when the manifest file changes', async (t) => {
 	t.plan(1);
 
-	await new Promise<void>((resolve) => {
+	// eslint-disable-next-line no-async-promise-executor
+	await new Promise<void>(async (resolve) => {
 		let handled = false;
 		const manifest = JSON.parse(fs.readFileSync(`${tempFolder}/bundles/change-manifest/package.json`, 'utf8'));
 
@@ -127,6 +128,7 @@ test.serial('watcher - should emit a change event when the manifest file changes
 		});
 
 		manifest._changed = true;
+		await sleep(100);
 		fs.writeFileSync(`${tempFolder}/bundles/change-manifest/package.json`, JSON.stringify(manifest), 'utf8');
 	});
 });
