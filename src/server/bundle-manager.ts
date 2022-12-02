@@ -95,7 +95,6 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 		let anyBundlesExist = false;
 
 		const readyTimeout = setTimeout(() => {
-			console.log('ready!');
 			this._ready = true;
 			this.emit('ready');
 		}, READY_WAIT_THRESHOLD);
