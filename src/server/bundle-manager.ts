@@ -92,8 +92,6 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 
 		this._cfgPath = cfgPath;
 
-		let anyBundlesExist = false;
-
 		const readyTimeout = setTimeout(() => {
 			this._ready = true;
 			this.emit('ready');
@@ -161,8 +159,6 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 			// as will changes to its `package.json`.
 			const bundleFolders = fs.readdirSync(bundlesPath);
 			bundleFolders.forEach((bundleFolderName) => {
-				anyBundlesExist = true;
-
 				const bundlePath = path.join(bundlesPath, bundleFolderName);
 				if (!fs.statSync(bundlePath).isDirectory()) {
 					return;
