@@ -141,10 +141,8 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 			});
 
 			watcher.once('ready', () => {
-				process.nextTick(() => {
-					this._ready = true;
-					this.emit('ready');
-				});
+				this._ready = true;
+				this.emit('ready');
 			});
 
 			// Do an initial load of each bundle in the "bundles" folder.

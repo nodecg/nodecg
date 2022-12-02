@@ -47,13 +47,27 @@ test.before(async () => {
 	);
 
 	// Wait for Chokidar to finish its initial scan.
-	await new Promise<void>((resolve) => {
+	await new Promise<void>((resolve, reject) => {
+		let handled = false;
+		const timeout = setTimeout(() => {
+			if (handled) return;
+			handled = true;
+			reject(new Error('Timed out while waiting for the bundle manager to become ready.'));
+		}, 15000);
+
 		if (bundleManager.ready) {
-			resolve();
+			succeed();
 		} else {
 			bundleManager.once('ready', () => {
-				resolve();
+				succeed();
 			});
+		}
+
+		function succeed() {
+			if (handled) return;
+			handled = true;
+			clearTimeout(timeout);
+			resolve();
 		}
 	});
 });
