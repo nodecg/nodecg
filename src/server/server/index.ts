@@ -180,6 +180,18 @@ export default class NodeCGServer extends EventEmitter {
 		const bundlesPaths = [path.join(process.env.NODECG_ROOT, 'bundles')].concat(config.bundles?.paths ?? []);
 		const cfgPath = path.join(process.env.NODECG_ROOT, 'cfg');
 		const bundleManager = new BundleManager(bundlesPaths, cfgPath, pjson.version, config);
+
+		// Wait for Chokidar to finish its initial scan.
+		await new Promise<void>((resolve) => {
+			if (bundleManager.ready) {
+				resolve();
+			} else {
+				bundleManager.once('ready', () => {
+					resolve();
+				});
+			}
+		});
+
 		bundleManager.all().forEach((bundle) => {
 			// TODO: deprecate this feature once Import Maps are shipped and stable in browsers.
 			// TODO: remove this feature after Import Maps have been around a while (like a year maybe).
@@ -269,7 +281,7 @@ export default class NodeCGServer extends EventEmitter {
 		const updateBundlesReplicant = debounce(() => {
 			bundlesReplicant.value = clone(bundleManager.all());
 		}, 100);
-		bundleManager.on('init', updateBundlesReplicant);
+		bundleManager.on('ready', updateBundlesReplicant);
 		bundleManager.on('bundleChanged', updateBundlesReplicant);
 		bundleManager.on('gitChanged', updateBundlesReplicant);
 		bundleManager.on('bundleRemoved', updateBundlesReplicant);

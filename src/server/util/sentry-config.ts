@@ -28,7 +28,7 @@ export default class SentryConfig {
 		const { app, bundleMetadata } = this;
 		app.set('views', VIEWS_PATH);
 
-		bundleManager.on('init', () => {
+		bundleManager.on('ready', () => {
 			Sentry.configureScope((scope) => {
 				bundleManager.all().forEach((bundle) => {
 					bundleMetadata.push({
