@@ -6,8 +6,10 @@ import * as fs from 'fs';
 import clone from 'clone';
 import defaults from 'json-schema-defaults';
 import extend from 'extend';
-import tv4 from 'tv4';
+import Ajv from 'ajv';
 import type { NodeCG } from '../../types/nodecg';
+
+const ajv = new Ajv();
 
 export function parse(
 	bundleName: string,
@@ -21,7 +23,8 @@ export function parse(
 
 	const schema = _parseSchema(bundleName, cfgSchemaPath);
 	const defaultConfig = defaults(schema);
-	const userConfigValid = tv4.validateResult(userConfig, schema).valid;
+	const validateUserConfig = ajv.compile(schema);
+	const userConfigValid = validateUserConfig(userConfig);
 	let finalConfig;
 
 	// If the user's config is currently valid before any defaults from the schema have been added,
@@ -39,8 +42,8 @@ export function parse(
 			_foo[key] = defaultConfig[key];
 
 			const _tempMerged: Record<string, any> = extend(true, _foo, clone(finalConfig));
-			const result = tv4.validateResult(_tempMerged, schema);
-			if (result.valid) {
+			const result = validateUserConfig(_tempMerged);
+			if (result) {
 				finalConfig = _tempMerged;
 			}
 		}
@@ -48,14 +51,12 @@ export function parse(
 		finalConfig = extend(true, defaultConfig, userConfig);
 	}
 
-	const result = tv4.validateResult(finalConfig, schema);
-	if (result.valid) {
+	const result = validateUserConfig(finalConfig);
+	if (result) {
 		return finalConfig;
 	}
 
-	throw new Error(
-		`Config for bundle "${bundleName}" is invalid:\n${result.error.message as string} at ${result.error.dataPath!}`,
-	);
+	throw new Error(`Config for bundle "${bundleName}" is invalid:\n${ajv.errorsText(validateUserConfig.errors)}`);
 }
 
 export function parseDefaults(bundleName: string, bundleDir: string): Record<string, any> {
