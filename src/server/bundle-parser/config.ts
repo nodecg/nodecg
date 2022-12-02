@@ -6,10 +6,10 @@ import * as fs from 'fs';
 import clone from 'clone';
 import defaults from 'json-schema-defaults';
 import extend from 'extend';
-import Ajv from 'ajv';
 import type { NodeCG } from '../../types/nodecg';
 
-const ajv = new Ajv({ allErrors: true });
+// Ours
+import { compileJsonSchema, formatJsonSchemaErrors } from '../../shared/utils';
 
 export function parse(
 	bundleName: string,
@@ -23,7 +23,7 @@ export function parse(
 
 	const schema = _parseSchema(bundleName, cfgSchemaPath);
 	const defaultConfig = defaults(schema);
-	const validateUserConfig = ajv.compile(schema);
+	const validateUserConfig = compileJsonSchema(schema);
 	const userConfigValid = validateUserConfig(userConfig);
 	let finalConfig;
 
@@ -57,9 +57,7 @@ export function parse(
 	}
 
 	throw new Error(
-		`Config for bundle "${bundleName}" is invalid:\n${ajv
-			.errorsText(validateUserConfig.errors)
-			.replace(/^data\//gm, '')}`,
+		`Config for bundle "${bundleName}" is invalid:\n${formatJsonSchemaErrors(schema, validateUserConfig.errors)}`,
 	);
 }
 

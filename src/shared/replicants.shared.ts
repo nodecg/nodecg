@@ -1,7 +1,7 @@
 // This file contains code that is used in both server-side and client-side replicants.
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 // Packages
-import Ajv, { type ErrorObject } from 'ajv';
+import type { ErrorObject } from 'ajv';
 import clone from 'clone';
 import objectPath from 'object-path';
 
@@ -9,6 +9,7 @@ import objectPath from 'object-path';
 import type { LoggerInterface } from './logger-interface';
 import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
+import { compileJsonSchema, formatJsonSchemaErrors } from './utils';
 
 type Events<P extends NodeCG.Platform, V> = {
 	change: (
@@ -31,8 +32,6 @@ type Events<P extends NodeCG.Platform, V> = {
 	operationsRejected: (rejectReason: string) => void;
 	fullUpdate: (data: V) => void;
 };
-
-const ajv = new Ajv({ allErrors: true, verbose: true });
 
 /**
  * If you're wondering why some things are prefixed with "_",
@@ -227,11 +226,12 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 	 * @returns {function} - The generated validator function.
 	 */
 	protected _generateValidator(): Validator {
-		if (!this.schema) {
+		const { schema } = this;
+		if (!schema) {
 			throw new Error("can't generate a validator for a replicant which lacks a schema");
 		}
 
-		const validate = ajv.compile(this.schema);
+		const validate = compileJsonSchema(schema);
 
 		/**
 		 * Validates a value against the current Replicant's schema.
@@ -250,9 +250,9 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 				this.validationErrors = validate.errors;
 				if (throwOnInvalid) {
 					throw new Error(
-						`Invalid value rejected for replicant "${this.name}" in namespace "${this.namespace}":\n${ajv
-							.errorsText(validate.errors)
-							.replace(/^data\//gm, '')}}`,
+						`Invalid value rejected for replicant "${this.name}" in namespace "${
+							this.namespace
+						}":\n${formatJsonSchemaErrors(schema, validate.errors)}}`,
 					);
 				}
 			}

@@ -1,3 +1,5 @@
+export * from './compileJsonSchema';
+
 /**
  * Make a string out of an error (or other equivalents),
  * including any additional data such as stack trace if available.
