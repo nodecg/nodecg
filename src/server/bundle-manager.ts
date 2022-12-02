@@ -1,5 +1,4 @@
 // Native
-import { EventEmitter } from 'events';
 import path from 'path';
 
 // Packages
@@ -14,6 +13,7 @@ import parseBundle from './bundle-parser';
 import parseBundleGit from './bundle-parser/git';
 import createLogger from './logger';
 import type { NodeCG } from '../types/nodecg';
+import { TypedEmitter } from '../shared/typed-emitter';
 
 // Start up the watcher, but don't watch any files yet.
 // We'll add the files we want to watch later, in the init() method.
@@ -38,8 +38,22 @@ const log = createLogger('bundle-manager');
 const hasChanged = new Set<string>();
 let backoffTimer: NodeJS.Timeout | undefined;
 
-export default class BundleManager extends EventEmitter {
+type EventMap = {
+	bundleRemoved: (bundleName: string) => void;
+	gitChanged: (bundle: NodeCG.Bundle) => void;
+	bundleChanged: (reparsedBundle: NodeCG.Bundle) => void;
+	invalidBundle: (bundle: NodeCG.Bundle, error: Error) => void;
+	ready: () => void;
+};
+
+export default class BundleManager extends TypedEmitter<EventMap> {
 	bundles: NodeCG.Bundle[] = [];
+
+	get ready() {
+		return this._ready;
+	}
+
+	private _ready = false;
 
 	private readonly _cfgPath: string;
 
@@ -124,6 +138,11 @@ export default class BundleManager extends EventEmitter {
 			/* istanbul ignore next */
 			watcher.on('error', (error) => {
 				log.error(error.stack);
+			});
+
+			watcher.once('ready', () => {
+				this._ready = true;
+				this.emit('ready');
 			});
 
 			// Do an initial load of each bundle in the "bundles" folder.

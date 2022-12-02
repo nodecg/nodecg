@@ -46,10 +46,16 @@ test.before(async () => {
 		nodecgConfig,
 	);
 
-	// Give chokidar a little time to catch up.
-	// This is gross, I know. Sorry.
-	// The tests WILL fail without this sleep.
-	return sleep(1000);
+	// Wait for Chokidar to finish its initial scan.
+	await new Promise<void>((resolve) => {
+		if (bundleManager.ready) {
+			resolve();
+		} else {
+			bundleManager.once('ready', () => {
+				resolve();
+			});
+		}
+	});
 });
 
 test.after(() => {
