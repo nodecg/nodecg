@@ -73,7 +73,6 @@
     "iframe-resizer": "^4.1.1",
     "io-ts": "^2.0.1",
     "is-error": "^2.2.2",
-    "is-my-json-valid": "^2.20.6",
     "joi": "^17.7.0",
     "json-ptr": "^3.1.1",
     "json-schema-defaults": "^0.4.0",

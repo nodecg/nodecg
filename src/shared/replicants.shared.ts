@@ -1,7 +1,7 @@
 // This file contains code that is used in both server-side and client-side replicants.
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 // Packages
-import validator from 'is-my-json-valid';
+import Ajv, { type ErrorObject } from 'ajv';
 import clone from 'clone';
 import objectPath from 'object-path';
 
@@ -32,6 +32,8 @@ type Events<P extends NodeCG.Platform, V> = {
 	fullUpdate: (data: V) => void;
 };
 
+const ajv = new Ajv({ allErrors: true, verbose: true });
+
 /**
  * If you're wondering why some things are prefixed with "_",
  * but not marked as protected or private, this is because our Proxy
@@ -57,7 +59,8 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 
 	status: 'undeclared' | 'declared' | 'declaring' = 'undeclared';
 
-	validationErrors: validator.ValidationError[] = [];
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	validationErrors?: null | ErrorObject[] = [];
 
 	protected _value: V | undefined;
 
@@ -228,10 +231,7 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 			throw new Error("can't generate a validator for a replicant which lacks a schema");
 		}
 
-		const validate = validator(this.schema as any, {
-			greedy: true,
-			verbose: true,
-		});
+		const validate = ajv.compile(this.schema);
 
 		/**
 		 * Validates a value against the current Replicant's schema.
@@ -245,29 +245,19 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 			value: any = this.value,
 			{ throwOnInvalid = true }: ValidatorOptions = {},
 		) {
-			const result = validate(value);
-			if (!result) {
+			const valid = validate(value);
+			if (!valid) {
 				this.validationErrors = validate.errors;
-
 				if (throwOnInvalid) {
-					let errorMessage = `Invalid value rejected for replicant "${this.name}" in namespace "${this.namespace}":\n`;
-					this.validationErrors.forEach((error) => {
-						const field = error.field.replace(/^data\./, '');
-						if (error.message === 'is the wrong type') {
-							errorMessage += `\tField "${field}" ${error.message}. Value "${String(
-								error.value,
-							)}" (type: ${typeof error.value}) was provided, expected type "${error.type}"\n `;
-						} else if (error.message === 'has additional properties') {
-							errorMessage += `\tField "${field}" ${error.message}: "${String(error.value)}"\n`;
-						} else {
-							errorMessage += `\tField "${field}" ${error.message}\n`;
-						}
-					});
-					throw new Error(errorMessage);
+					throw new Error(
+						`Invalid value rejected for replicant "${this.name}" in namespace "${this.namespace}":\n${ajv
+							.errorsText(validate.errors)
+							.replace(/^data\//gm, '')}}`,
+					);
 				}
 			}
 
-			return result;
+			return valid;
 		};
 	}
 }

@@ -177,7 +177,7 @@ test('should properly load schemas provided with an absolute path', (t) => {
 test('supports local file $refs', (t) => {
 	const rep = t.context.apis.extension.Replicant('schemaWithRef');
 	t.deepEqual(rep.schema, {
-		$schema: 'http://json-schema.org/draft-04/schema#',
+		$schema: 'http://json-schema.org/draft-07/schema',
 		type: 'object',
 		properties: {
 			string: {
@@ -214,7 +214,7 @@ test('supports local file $refs', (t) => {
 test('supports internal $refs', (t) => {
 	const rep = t.context.apis.extension.Replicant('schemaWithInternalRef');
 	t.deepEqual(rep.schema, {
-		$schema: 'http://json-schema.org/draft-04/schema#',
+		$schema: 'http://json-schema.org/draft-07/schema',
 		definitions: {
 			numA: {
 				type: 'number',

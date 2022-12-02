@@ -9,7 +9,7 @@ import extend from 'extend';
 import Ajv from 'ajv';
 import type { NodeCG } from '../../types/nodecg';
 
-const ajv = new Ajv();
+const ajv = new Ajv({ allErrors: true });
 
 export function parse(
 	bundleName: string,
@@ -56,7 +56,11 @@ export function parse(
 		return finalConfig;
 	}
 
-	throw new Error(`Config for bundle "${bundleName}" is invalid:\n${ajv.errorsText(validateUserConfig.errors)}`);
+	throw new Error(
+		`Config for bundle "${bundleName}" is invalid:\n${ajv
+			.errorsText(validateUserConfig.errors)
+			.replace(/^data\//gm, '')}`,
+	);
 }
 
 export function parseDefaults(bundleName: string, bundleDir: string): Record<string, any> {
