@@ -423,18 +423,11 @@ export async function createMiddleware(callbacks: {
 	app.get('/logout', (req, res) => {
 		app.emit('logout', req.user);
 		req.session?.destroy(() => {
-			// To set a cookie on localhost, domain must be left blank
-			let domain: string | undefined = config.baseURL.replace(/:[0-9]+/, '');
-			if (domain === 'localhost') {
-				domain = undefined;
-			}
-
 			res.clearCookie('connect.sid', { path: '/' });
 			res.clearCookie('io', { path: '/' });
 			res.clearCookie('socketToken', {
-				path: '/',
-				domain,
-				secure: config.ssl?.enabled,
+				secure: req.secure,
+				sameSite: req.secure ? 'none' : undefined,
 			});
 			res.redirect('/login');
 		});

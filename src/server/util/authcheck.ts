@@ -16,12 +16,6 @@ export default async function (req: express.Request, res: express.Response, next
 			return;
 		}
 
-		// To set a cookie on localhost, domain must be left blank
-		let domain: string | undefined = config.baseURL.replace(/:[0-9]+/, '');
-		if (domain === 'localhost') {
-			domain = undefined;
-		}
-
 		let { user } = req;
 		if (req.query.key ?? req.cookies.socketToken) {
 			const database = await getConnection();
@@ -36,9 +30,8 @@ export default async function (req: express.Request, res: express.Response, next
 				// and cause an infinite login loop.
 				req.session?.destroy(() => {
 					res.clearCookie('socketToken', {
-						path: '/',
-						domain,
-						secure: config.ssl?.enabled,
+						secure: req.secure,
+						sameSite: req.secure ? 'none' : undefined,
 					});
 					res.clearCookie('connect.sid', { path: '/' });
 					res.clearCookie('io', { path: '/' });
@@ -84,9 +77,8 @@ export default async function (req: express.Request, res: express.Response, next
 			// This is crucial for things like OBS browser sources,
 			// where we don't have a session.
 			res.cookie('socketToken', apiKey.secret_key, {
-				path: '/',
-				domain: domain!,
-				secure: config.ssl?.enabled,
+				secure: req.secure,
+				sameSite: req.secure ? 'none' : undefined,
 			});
 
 			next();

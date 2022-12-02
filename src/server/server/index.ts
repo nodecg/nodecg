@@ -153,6 +153,8 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		app.use(bodyParser.json());
 		app.use(bodyParser.urlencoded({ extended: true }));
 
+		app.set('trust proxy', true);
+
 		app.engine('tmpl', (filePath: string, options: any, callback: any) => {
 			fs.readFile(filePath, (error, content) => {
 				if (error) {
