@@ -15,6 +15,11 @@ import createLogger from './logger';
 import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
 
+/**
+ * Milliseconds
+ */
+const READY_WAIT_THRESHOLD = 1500;
+
 // Start up the watcher, but don't watch any files yet.
 // We'll add the files we want to watch later, in the init() method.
 const watcher = chokidar.watch(
@@ -54,6 +59,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 	}
 
 	private _ready = false;
+	private _canBeReady = false;
 
 	private readonly _cfgPath: string;
 
@@ -97,7 +103,9 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 			}
 
 			/* istanbul ignore next */
+			let lastAdd: number;
 			watcher.on('add', (filePath) => {
+				lastAdd = performance.now();
 				const bundleName = extractBundleName(bundlesPath, filePath);
 
 				// In theory, the bundle parser would have thrown an error long before this block would execute,
@@ -108,6 +116,17 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 					this.handleChange(bundleName);
 				} else if (isGitData(bundleName, filePath)) {
 					this._debouncedGitChangeHandler(bundleName);
+				}
+
+				if (this._canBeReady && !this._ready) {
+					const now = performance.now();
+					const timeSinceLastAdd = now - lastAdd;
+					if (timeSinceLastAdd > READY_WAIT_THRESHOLD) {
+						this._ready = true;
+						this.emit('ready');
+					}
+
+					lastAdd = now;
 				}
 			});
 
@@ -138,11 +157,6 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 			/* istanbul ignore next */
 			watcher.on('error', (error) => {
 				log.error(error.stack);
-			});
-
-			watcher.once('ready', () => {
-				this._ready = true;
-				this.emit('ready');
 			});
 
 			// Do an initial load of each bundle in the "bundles" folder.
@@ -197,6 +211,8 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 					path.join(bundlePath, 'dashboard'), // Watch `dashboard` directories.
 					path.join(bundlePath, 'package.json'), // Watch each bundle's `package.json`.
 				]);
+
+				this._canBeReady = true;
 			});
 		});
 	}
