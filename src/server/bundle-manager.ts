@@ -122,7 +122,6 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 					this._debouncedGitChangeHandler(bundleName);
 				}
 
-				console.log('add:', filePath);
 				if (!this.ready) {
 					readyTimeout.refresh();
 				}
