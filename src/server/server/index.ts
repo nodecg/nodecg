@@ -29,7 +29,6 @@ if (config.sentry?.enabled) {
 }
 
 // Native
-import { EventEmitter } from 'events';
 import fs = require('fs');
 import path = require('path');
 
@@ -63,10 +62,18 @@ import SharedSourcesLib from '../shared-sources';
 import ExtensionManager from './extensions';
 import SentryConfig from '../util/sentry-config';
 import type { NodeCG } from '../../types/nodecg';
+import { TypedEmitter } from '../../shared/typed-emitter';
 
 const renderTemplate = memoize((content, options) => template(content)(options));
 
-export default class NodeCGServer extends EventEmitter {
+type EventMap = {
+	error: (error: unknown) => void;
+	extensionsLoaded: () => void;
+	started: () => void;
+	stopped: () => void;
+};
+
+export default class NodeCGServer extends TypedEmitter<EventMap> {
 	readonly log = createLogger('server');
 
 	private readonly _io: TypedSocketServer;
@@ -336,7 +343,7 @@ export default class NodeCGServer extends EventEmitter {
 		});
 
 		await new Promise<void>((resolve) => {
-			(this._io as any).close(() => {
+			this._io.close(() => {
 				resolve();
 			});
 		});
