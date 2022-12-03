@@ -11,26 +11,34 @@ import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
 import { compileJsonSchema, formatJsonSchemaErrors } from './utils';
 
-type Events<P extends NodeCG.Platform, V> = {
+type ReplicantValue<P extends NodeCG.Platform, V, O, S extends boolean> = P extends 'server'
+	? S extends true
+		? V
+		: O extends NodeCG.Replicant.OptionsWithDefault<V>
+		? O['defaultValue']
+		: V | undefined
+	: (O extends NodeCG.Replicant.OptionsWithDefault<V> ? O['defaultValue'] : V) | undefined;
+
+type Events<P extends NodeCG.Platform, V, O, S extends boolean> = {
 	change: (
-		newVal: P extends 'server' ? V : V | undefined,
-		oldVal: V | undefined,
-		operations: Array<NodeCG.Replicant.Operation<V>>,
+		newVal: ReplicantValue<P, V, O, S>,
+		oldVal: ReplicantValue<P, V, O, S> | undefined,
+		operations: Array<NodeCG.Replicant.Operation<ReplicantValue<P, V, O, S>>>,
 	) => void;
 	declared: (
 		data:
-			| { value: V; revision: number }
-			| { value: V; revision: number; schemaSum: string; schema: Record<string, any> },
+			| { value: ReplicantValue<P, V, O, S>; revision: number }
+			| { value: ReplicantValue<P, V, O, S>; revision: number; schemaSum: string; schema: Record<string, any> },
 	) => void;
 	declarationRejected: (rejectReason: string) => void;
 	operations: (params: {
 		name: string;
 		namespace: string;
-		operations: Array<NodeCG.Replicant.Operation<V>>;
+		operations: Array<NodeCG.Replicant.Operation<ReplicantValue<P, V, O, S>>>;
 		revision: number;
 	}) => void;
 	operationsRejected: (rejectReason: string) => void;
-	fullUpdate: (data: V) => void;
+	fullUpdate: (data: ReplicantValue<P, V, O, S>) => void;
 };
 
 /**
@@ -41,12 +49,17 @@ type Events<P extends NodeCG.Platform, V> = {
  *
  * So, we code this like its 2010 and just use "_" on some public members.
  */
-export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends TypedEmitter<Events<P, V>> {
+export abstract class AbstractReplicant<
+	P extends NodeCG.Platform,
+	V = unknown,
+	O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+	S extends boolean = false,
+> extends TypedEmitter<Events<P, V, O, S>> {
 	name: string;
 
 	namespace: string;
 
-	opts: NodeCG.Replicant.Options<V>;
+	opts: O;
 
 	revision = 0;
 
@@ -61,15 +74,15 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	validationErrors?: null | ErrorObject[] = [];
 
-	protected _value: V | undefined;
+	protected _value: ReplicantValue<P, V, O, S> | undefined;
 
-	protected _oldValue: V | undefined;
+	protected _oldValue: ReplicantValue<P, V, O, S> | undefined;
 
-	protected _operationQueue: Array<NodeCG.Replicant.Operation<V>> = [];
+	protected _operationQueue: Array<NodeCG.Replicant.Operation<ReplicantValue<P, V, O, S>>> = [];
 
 	protected _pendingOperationFlush = false;
 
-	constructor(name: string, namespace: string, opts: NodeCG.Replicant.Options<V> = {}) {
+	constructor(name: string, namespace: string, opts: O = {} as Record<any, unknown>) {
 		super();
 
 		if (!name || typeof name !== 'string') {
@@ -119,7 +132,7 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 		});
 	}
 
-	abstract get value(): P extends 'server' ? V : V | undefined;
+	abstract get value(): ReplicantValue<P, V, O, S>;
 	abstract set value(newValue: V | undefined);
 
 	/**
@@ -127,7 +140,7 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 	 * Else, handle it with objectPath.
 	 */
 	_applyOperation(operation: NodeCG.Replicant.Operation<V>): boolean {
-		ignoreProxy(this as AbstractReplicant<'either', V>);
+		ignoreProxy(this as AbstractReplicant<P, V, O>);
 
 		let result;
 		const path = pathStrToPathArr(operation.path);
@@ -155,12 +168,12 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 
 			// Recursively check for any objects that may have been added by the above method
 			// and that need to be Proxied.
-			proxyRecursive(this as AbstractReplicant<'either', V>, arr, operation.path);
+			proxyRecursive(this as AbstractReplicant<P, V, O>, arr, operation.path);
 		} else {
 			switch (operation.method) {
 				case 'overwrite': {
 					const { newValue } = operation.args;
-					this.value = proxyRecursive(this as AbstractReplicant<'either', V>, newValue, operation.path);
+					this.value = proxyRecursive(this as AbstractReplicant<P, V, O>, newValue, operation.path);
 					result = true;
 					break;
 				}
@@ -171,11 +184,7 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 
 					let { newValue } = operation.args;
 					if (typeof newValue === 'object') {
-						newValue = proxyRecursive(
-							this as AbstractReplicant<'either', V>,
-							newValue,
-							pathArrToPathStr(path),
-						);
+						newValue = proxyRecursive(this as AbstractReplicant<P, V, O>, newValue, pathArrToPathStr(path));
 					}
 
 					result = objectPath.set(this.value as any, path, newValue);
@@ -197,7 +206,7 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 			}
 		}
 
-		resumeProxy(this as AbstractReplicant<'either', V>);
+		resumeProxy(this as AbstractReplicant<P, V, O>);
 		return result;
 	}
 
@@ -241,7 +250,7 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 		 * @param [opts.throwOnInvalid = true] {Boolean} - Whether or not to immediately throw when the provided value fails validation against the schema.
 		 */
 		return function (
-			this: AbstractReplicant<P, V>,
+			this: AbstractReplicant<P, V, O>,
 			value: any = this.value,
 			{ throwOnInvalid = true }: ValidatorOptions = {},
 		) {
@@ -262,8 +271,8 @@ export abstract class AbstractReplicant<P extends NodeCG.Platform, V> extends Ty
 	}
 }
 
-type Metadata<T> = {
-	replicant: AbstractReplicant<'either', T>;
+type Metadata<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>> = {
+	replicant: AbstractReplicant<any, V, O>;
 	path: string;
 	proxy: unknown;
 };
@@ -277,7 +286,7 @@ export type Validator = (newValue: any, opts?: ValidatorOptions) => boolean;
 const proxyMetadataMap = new WeakMap();
 const metadataMap = new WeakMap<any, Metadata<any>>();
 const proxySet = new WeakSet();
-const ignoringProxy = new WeakSet<AbstractReplicant<'either', any>>();
+const ignoringProxy = new WeakSet<AbstractReplicant<any, any>>();
 
 export const ARRAY_MUTATOR_METHODS = [
 	'copyWithin',
@@ -296,15 +305,15 @@ export const ARRAY_MUTATOR_METHODS = [
  */
 const DEFAULT_PERSISTENCE_INTERVAL = 100;
 
-export function ignoreProxy(replicant: AbstractReplicant<'either', any>): void {
+export function ignoreProxy(replicant: AbstractReplicant<any, any>): void {
 	ignoringProxy.add(replicant);
 }
 
-export function resumeProxy(replicant: AbstractReplicant<'either', any>): void {
+export function resumeProxy(replicant: AbstractReplicant<any, any>): void {
 	ignoringProxy.delete(replicant);
 }
 
-export function isIgnoringProxy(replicant: AbstractReplicant<'either', any>): boolean {
+export function isIgnoringProxy(replicant: AbstractReplicant<any, any>): boolean {
 	return ignoringProxy.has(replicant);
 }
 
@@ -533,7 +542,7 @@ const CHILD_OBJECT_HANDLER = {
  * @returns {*} - The recursively Proxied value (or just `value` unchanged, if `value` is a primitive)
  * @private
  */
-export function proxyRecursive<T>(replicant: AbstractReplicant<'either', any>, value: T, path: string): T {
+export function proxyRecursive<T>(replicant: AbstractReplicant<any, any>, value: T, path: string): T {
 	if (typeof value === 'object' && value !== null) {
 		let p;
 
@@ -632,7 +641,7 @@ function pathArrToPathStr(path: string[]): string {
  * @param replicant {object} - The Replicant that this value should belong to.
  * @param value {*} - The value to check ownership of.
  */
-function assertSingleOwner(replicant: AbstractReplicant<'either', any>, value: any): void {
+function assertSingleOwner(replicant: AbstractReplicant<any, any>, value: any): void {
 	let metadata: Metadata<any>;
 	if (proxySet.has(value)) {
 		metadata = proxyMetadataMap.get(value);

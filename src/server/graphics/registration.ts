@@ -20,7 +20,10 @@ const BUILD_PATH = path.join(appRootPath.path, 'build/client/instance');
 export default class RegistrationCoordinator {
 	app = express();
 
-	private readonly _instancesRep: ServerReplicant<GraphicsInstance[]>;
+	private readonly _instancesRep: ServerReplicant<
+		GraphicsInstance[],
+		NodeCG.Replicant.OptionsWithDefault<GraphicsInstance[]>
+	>;
 
 	private readonly _bundleManager: BundleManager;
 
@@ -31,6 +34,7 @@ export default class RegistrationCoordinator {
 		this._instancesRep = replicator.declare('graphics:instances', 'nodecg', {
 			schemaPath: path.resolve(appRootPath.path, 'schemas/graphics%3Ainstances.json'),
 			persistent: false,
+			defaultValue: [],
 		});
 
 		bundleManager.on('bundleChanged', this._updateInstanceStatuses.bind(this));

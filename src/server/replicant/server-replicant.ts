@@ -14,15 +14,22 @@ import replaceRefs from './schema-hacks';
 import createLogger from '../logger';
 import type { NodeCG } from '../../types/nodecg';
 
+type ReplicantValue<V, O extends NodeCG.Replicant.Options<V>> = O extends NodeCG.Replicant.OptionsWithDefault<V>
+	? O['defaultValue']
+	: V | undefined;
+
 // Never instantiate this directly.
 // Always use Replicator.declare instead.
 // The Replicator needs to have complete control over the ServerReplicant class.
-export default class ServerReplicant<T> extends AbstractReplicant<'server', T> {
+export default class ServerReplicant<
+	V,
+	O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+> extends AbstractReplicant<'server', V, O> {
 	constructor(
 		name: string,
 		namespace: string,
-		opts: NodeCG.Replicant.Options<T> = {},
-		startingValue: T | undefined = undefined,
+		opts: O = {} as Record<any, unknown>,
+		startingValue: V | undefined = undefined,
 	) {
 		super(name, namespace, opts);
 
@@ -61,46 +68,49 @@ export default class ServerReplicant<T> extends AbstractReplicant<'server', T> {
 			}
 		}
 
+		let defaultValue = 'defaultValue' in opts ? opts.defaultValue : undefined;
+
 		// Set the default value, if a schema is present and no default value was provided.
-		if (this.schema && typeof opts.defaultValue === 'undefined') {
-			opts.defaultValue = schemaDefaults(this.schema) as T;
+		if (this.schema && defaultValue === undefined) {
+			defaultValue = schemaDefaults(this.schema) as V;
 		}
 
 		// If `opts.persistent` is true and this replicant has a persisted value, try to load that persisted value.
-		// Else, apply `opts.defaultValue`.
+		// Else, apply `defaultValue`.
 		if (opts.persistent && typeof startingValue !== 'undefined' && startingValue !== null) {
 			if (this.validate(startingValue, { throwOnInvalid: false })) {
-				this.value = startingValue;
+				this.value = startingValue as any;
 				this.log.replicants('Loaded a persisted value:', startingValue);
 			} else if (this.schema) {
-				this.value = schemaDefaults(this.schema) as T;
+				this.value = schemaDefaults(this.schema) as any;
 				this.log.replicants(
 					'Discarded persisted value, as it failed schema validation. Replaced with defaults from schema.',
 				);
 			}
 		} else {
-			if (this.schema) {
-				if (typeof opts.defaultValue !== 'undefined') {
-					this.validate(opts.defaultValue);
-				}
+			if (this.schema && defaultValue !== undefined) {
+				this.validate(defaultValue);
 			}
 
-			this.value = clone(opts.defaultValue);
-			this.log.replicants(
-				'Declared "%s" in namespace "%s" with defaultValue:\n',
-				name,
-				namespace,
-				opts.defaultValue,
-			);
+			if (defaultValue === undefined) {
+				this.log.replicants('Declared "%s" in namespace "%s"\n', name, namespace);
+			} else {
+				this.value = clone(defaultValue) as any;
+				this.log.replicants(
+					'Declared "%s" in namespace "%s" with defaultValue:\n',
+					name,
+					namespace,
+					defaultValue,
+				);
+			}
 		}
 	}
 
-	get value(): T {
-		// It is safe to assume that server-side Replicants are not unexpectedly undefined.
-		return this._value as T;
+	get value(): ReplicantValue<V, O> {
+		return this._value as any;
 	}
 
-	set value(newValue: T | undefined) {
+	set value(newValue) {
 		if (newValue === this._value) {
 			this.log.replicants('value unchanged, no action will be taken');
 			return;
@@ -125,7 +135,7 @@ export default class ServerReplicant<T> extends AbstractReplicant<'server', T> {
 	 * Refer to the abstract base class' implementation for details.
 	 * @private
 	 */
-	_addOperation(operation: NodeCG.Replicant.Operation<T>): void {
+	_addOperation(operation: NodeCG.Replicant.Operation<ReplicantValue<V, O>>): void {
 		this._operationQueue.push(operation);
 		if (!this._pendingOperationFlush) {
 			this._oldValue = clone(this.value);

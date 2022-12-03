@@ -372,11 +372,19 @@ export namespace NodeCG {
 	 * It should be unlikely that you need to use these directly.
 	 */
 	export namespace Replicant {
-		export type Options<T> = {
+		export type Options<V> = OptionsNoDefault | OptionsWithDefault<V>;
+
+		export type OptionsNoDefault = {
 			persistent?: boolean;
 			persistenceInterval?: number;
 			schemaPath?: string;
-			defaultValue?: T;
+		};
+
+		export type OptionsWithDefault<V> = {
+			persistent?: boolean;
+			persistenceInterval?: number;
+			schemaPath?: string;
+			defaultValue: V;
 		};
 
 		export type Operation<T> = {
@@ -491,5 +499,5 @@ export namespace NodeCG {
 	 * A description of which platform/environment an instance of the NodeCG API is being used in.
 	 * It should not be necessary to ever use this type directly in your bundle's code.
 	 */
-	export type Platform = 'server' | 'client' | 'either';
+	export type Platform = 'server' | 'client';
 }

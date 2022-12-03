@@ -45,14 +45,28 @@ export default class Replicator {
 	 * Defaults to `nodecg/bundles/${bundleName}/schemas/${replicantName}.json`.
 	 * @returns {object}
 	 */
-	declare<T>(name: string, namespace: string, opts?: NodeCG.Replicant.Options<T>): Replicant<T> {
+	declare<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
+		name: string,
+		namespace: string,
+		opts?: O,
+	): Replicant<V, O>;
+	declare<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
+		name: string,
+		namespace: string,
+		opts?: O,
+	): Replicant<V, O>;
+	declare<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+		name: string,
+		namespace: string,
+		opts?: O,
+	): Replicant<V, O> {
 		// If replicant already exists, return that.
 		const nsp = this.declaredReplicants.get(namespace);
 		if (nsp) {
 			const existing = nsp.get(name);
 			if (existing) {
 				existing.log.replicants('Existing replicant found, returning that instead of creating a new one.');
-				return existing;
+				return existing as any;
 			}
 		} else {
 			this.declaredReplicants.set(namespace, new Map());
@@ -91,7 +105,10 @@ export default class Replicator {
 	 * @param replicant {object} - The Replicant to perform these operation on.
 	 * @param operations {array} - An array of operations.
 	 */
-	applyOperations<T>(replicant: Replicant<T>, operations: Array<NodeCG.Replicant.Operation<T>>): void {
+	applyOperations<V>(
+		replicant: Replicant<V, NodeCG.Replicant.Options<V>>,
+		operations: Array<NodeCG.Replicant.Operation<V>>,
+	): void {
 		const oldValue = clone(replicant.value);
 		operations.forEach((operation) => replicant._applyOperation(operation));
 		replicant.revision++;

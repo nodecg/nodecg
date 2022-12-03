@@ -1,11 +1,11 @@
 // This file is for the typings package only.
 /// <reference types="passport" />
 /// <reference path="./server/types/augment-express-user.d.ts" />
-import { NodeCG } from './types/nodecg';
-import { NodeCGAPIClient } from './client/api/api.client';
-import serverApiFactory from './server/api.server';
-import * as LoggerStuff from './shared/logger-interface';
-import { AbstractReplicant } from './shared/replicants.shared';
+import type { NodeCG } from './types/nodecg';
+import type { NodeCGAPIClient } from './client/api/api.client';
+import type serverApiFactory from './server/api.server';
+import type * as LoggerStuff from './shared/logger-interface';
+import type { AbstractReplicant } from './shared/replicants.shared';
 
 type NodeCGAPIServer<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> = InstanceType<
 	ReturnType<typeof serverApiFactory>
@@ -30,19 +30,28 @@ declare module './types/nodecg' {
 
 		/**
 		 * A Replicant used in client-side (dashboard, graphic) code.
-		 * The only substantial difference between client and server Replicants
-		 * is that the `value` of a ClientReplicant could always be `undefined`
-		 * due to the time it takes to initialize.
 		 */
-		export type ClientReplicant<V> = AbstractReplicant<'client', V>;
+		export type ClientReplicant<
+			V,
+			O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+		> = AbstractReplicant<'client', V, O>;
 
 		/**
 		 * A Replicant used in server-side (extension) code.
-		 * The only substantial difference between server and client Replicants
-		 * is that the `value` of a ServerReplicant will never be unexpectedly `undefined`
-		 * due to initialization time.
 		 */
-		export type ServerReplicant<V> = AbstractReplicant<'server', V>;
+		export type ServerReplicant<
+			V,
+			O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+		> = AbstractReplicant<'server', V, O>;
+
+		/**
+		 * A Replicant used in server-side (extension) code with an assertion that it will have a default value provided by its schema.
+		 * Cannot be used with an explicit `opts.defaultValue`, as it would override the schema's default value.
+		 */
+		export type ServerReplicantWithSchemaDefault<
+			V,
+			O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault,
+		> = AbstractReplicant<'server', V, O, true>;
 
 		/**
 		 * An interface represting a NodeCG.Logger instance.

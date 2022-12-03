@@ -27,11 +27,14 @@ export default class AssetManager {
 
 	readonly assetsRoot = path.join(process.env.NODECG_ROOT, 'assets');
 
-	readonly collectionsRep: ServerReplicant<Collection[]>;
+	readonly collectionsRep: ServerReplicant<Collection[], NodeCG.Replicant.OptionsWithDefault<Collection[]>>;
 
 	readonly app: ReturnType<typeof express>;
 
-	private readonly _repsByNamespace = new Map<string, Map<string, ServerReplicant<AssetFile[]>>>();
+	private readonly _repsByNamespace = new Map<
+		string,
+		Map<string, ServerReplicant<AssetFile[], NodeCG.Replicant.OptionsWithDefault<AssetFile[]>>>
+	>();
 
 	private readonly _replicator: Replicator;
 
@@ -79,7 +82,10 @@ export default class AssetManager {
 
 		collections.forEach(({ name, categories }) => {
 			const namespacedAssetsPath = this._calcNamespacedAssetsPath(name);
-			const collectionReps = new Map<string, ServerReplicant<AssetFile[]>>();
+			const collectionReps = new Map<
+				string,
+				ServerReplicant<AssetFile[], NodeCG.Replicant.OptionsWithDefault<AssetFile[]>>
+			>();
 			this._repsByNamespace.set(name, collectionReps);
 			this.collectionsRep.value.push({ name, categories });
 
@@ -325,7 +331,10 @@ export default class AssetManager {
 		}
 	}
 
-	private _getCollectRep(namespace: string, category: string): ServerReplicant<AssetFile[]> | undefined {
+	private _getCollectRep(
+		namespace: string,
+		category: string,
+	): ServerReplicant<AssetFile[], NodeCG.Replicant.OptionsWithDefault<AssetFile[]>> | undefined {
 		const nspReps = this._repsByNamespace.get(namespace);
 		if (nspReps) {
 			return nspReps.get(category);

@@ -10,6 +10,7 @@ import type * as puppeteer from 'puppeteer';
 // Ours
 import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
+import type { AbstractReplicant } from '../../src/shared/replicants.shared';
 
 const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
@@ -330,7 +331,7 @@ test.serial.skip('persistent - should persist changes to database', async (t) =>
 
 	const rep = t.context.apis.extension.Replicant<Record<string, string>>('extensionPersistence', {
 		persistenceInterval: 0,
-	});
+	}) as unknown as AbstractReplicant<'server', Record<string, string>, Record<string, unknown>, true>;
 	rep.value.nested = 'hey we changed!';
 
 	/**

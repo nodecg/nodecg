@@ -90,11 +90,14 @@ export abstract class NodeCGAPIBase<
 	 * the client and server, this abstract class relies on its child classes
 	 * to define this method that handles this context-specific logic.
 	 */
-	protected abstract readonly _replicantFactory: <T>(
+	protected abstract readonly _replicantFactory: <
+		V,
+		O extends NodeCG.Replicant.Options<any> = NodeCG.Replicant.Options<V>,
+	>(
 		name: string,
 		namespace: string,
-		opts: NodeCG.Replicant.Options<T>,
-	) => AbstractReplicant<P, T>;
+		opts: O,
+	) => AbstractReplicant<P, V, O>;
 
 	/**
 	 * Provides easy access to the Logger class.
@@ -269,13 +272,48 @@ export abstract class NodeCGAPIBase<
 	 * myRep.value = {objects: {can: {be: 'nested!'}}};
 	 * myRep.value = ['Even', 'arrays', 'work!'];
 	 */
-	Replicant<T>(name: string, namespace: string, opts?: NodeCG.Replicant.Options<T>): AbstractReplicant<P, T>;
-	Replicant<T>(name: string, opts?: NodeCG.Replicant.Options<T>): AbstractReplicant<P, T>;
-	Replicant<T>(
+	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
 		name: string,
-		namespaceOrOpts?: string | NodeCG.Replicant.Options<T>,
-		opts?: NodeCG.Replicant.Options<T>,
-	): AbstractReplicant<P, T> {
+		namespace: string,
+		opts?: O,
+	): AbstractReplicant<P, V, O>;
+	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
+		name: string,
+		opts?: O,
+	): AbstractReplicant<P, V, O>;
+	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
+		name: string,
+		namespaceOrOpts?: string | O,
+		opts?: O,
+	): AbstractReplicant<P, V, O>;
+	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
+		name: string,
+		namespace: string,
+		opts?: O,
+	): AbstractReplicant<P, V, O>;
+	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
+		name: string,
+		opts?: O,
+	): AbstractReplicant<P, V, O>;
+	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
+		name: string,
+		namespaceOrOpts?: string | O,
+		opts?: O,
+	): AbstractReplicant<P, V, O>;
+	Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+		name: string,
+		namespace: string,
+		opts?: O,
+	): AbstractReplicant<P, V, O>;
+	Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+		name: string,
+		opts?: O,
+	): AbstractReplicant<P, V, O>;
+	Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+		name: string,
+		namespaceOrOpts?: string | O,
+		opts?: O,
+	): AbstractReplicant<P, V, O> {
 		let namespace: string;
 		if (typeof namespaceOrOpts === 'string') {
 			namespace = namespaceOrOpts;
@@ -287,7 +325,8 @@ export abstract class NodeCGAPIBase<
 			opts = namespaceOrOpts;
 		}
 
-		opts = opts ?? {};
+		const defaultOpts: Record<any, unknown> = {};
+		opts = opts ?? defaultOpts;
 		if (typeof opts.schemaPath === 'undefined') {
 			opts.schemaPath = `bundles/${encodeURIComponent(namespace)}/schemas/${encodeURIComponent(name)}.json`;
 		}

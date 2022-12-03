@@ -63,7 +63,11 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 			return replicant.value;
 		}
 
-		static Replicant<T>(name: string, namespace: string, opts: NodeCG.Replicant.Options<T>): ServerReplicant<T> {
+		static Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+			name: string,
+			namespace: string,
+			opts: O,
+		): ServerReplicant<V, O> {
 			if (!name || typeof name !== 'string') {
 				throw new Error('Must supply a name when reading a Replicant');
 			}
@@ -295,11 +299,11 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 			return (this.constructor as any).readReplicant(name, bundleName);
 		}
 
-		_replicantFactory = <T>(
+		_replicantFactory = <V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
 			name: string,
 			namespace: string,
-			opts: NodeCG.Replicant.Options<T>,
-		): ServerReplicant<T> => replicator.declare(name, namespace, opts);
+			opts: O,
+		): ServerReplicant<V, O> => replicator.declare<V, O>(name, namespace, opts);
 	};
 };
 

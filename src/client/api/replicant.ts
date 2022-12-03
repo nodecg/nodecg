@@ -9,6 +9,10 @@ import createLogger from './logger';
 import type { TypedClientSocket } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';
 
+type ReplicantValue<V, O extends NodeCG.Replicant.Options<V>> =
+	| (O extends NodeCG.Replicant.OptionsWithDefault<V> ? O['defaultValue'] : V)
+	| undefined;
+
 const declaredReplicants = new Map<string, Map<string, ClientReplicant<any>>>();
 
 const REPLICANT_HANDLER = {
@@ -44,8 +48,11 @@ const REPLICANT_HANDLER = {
 	},
 };
 
-export default class ClientReplicant<T> extends AbstractReplicant<'client', T> {
-	value: T | undefined = undefined;
+export default class ClientReplicant<
+	V,
+	O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+> extends AbstractReplicant<'client', V, O> {
+	value: ReplicantValue<V, O> = undefined;
 
 	/**
 	 * When running in the browser, we have to wait until the socket joins the room
@@ -56,12 +63,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<'client', T> {
 
 	private readonly _socket!: TypedClientSocket;
 
-	constructor(
-		name: string,
-		namespace: string,
-		opts: NodeCG.Replicant.Options<T>,
-		socket: TypedClientSocket = (window as any).socket,
-	) {
+	constructor(name: string, namespace: string, opts: O, socket: TypedClientSocket = (window as any).socket) {
 		super(name, namespace, opts);
 
 		// Load logger
@@ -73,7 +75,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<'client', T> {
 			const existing = nsp.get(name);
 			if (existing) {
 				existing.log.replicants('Existing replicant found, returning that instead of creating a new one.');
-				return existing;
+				return existing as any;
 			}
 		} else {
 			declaredReplicants.set(namespace, new Map());
@@ -87,7 +89,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<'client', T> {
 		socket.on('replicant:operations', (data) => {
 			this._handleOperations({
 				...data,
-				operations: data.operations as Array<NodeCG.Replicant.Operation<T>>,
+				operations: data.operations as Array<NodeCG.Replicant.Operation<ReplicantValue<V, O>>>,
 			});
 		});
 
@@ -101,7 +103,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<'client', T> {
 
 		const thisProxy = new Proxy(this, REPLICANT_HANDLER);
 		declaredReplicants.get(namespace)!.set(name, thisProxy);
-		return thisProxy;
+		return thisProxy as any;
 	}
 
 	/**
@@ -124,7 +126,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<'client', T> {
 	 * @param args {array} - The arguments provided to this operation
 	 * @private
 	 */
-	_addOperation(operation: NodeCG.Replicant.Operation<T>): void {
+	_addOperation(operation: NodeCG.Replicant.Operation<ReplicantValue<V, O>>): void {
 		this._operationQueue.push(operation);
 		if (!this._pendingOperationFlush) {
 			this._pendingOperationFlush = true;
@@ -286,7 +288,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<'client', T> {
 	 * @param revision {number} - The new revision number.
 	 * @private
 	 */
-	private _assignValue(newValue: T, revision: number): void {
+	private _assignValue(newValue: ReplicantValue<V, O>, revision: number): void {
 		const oldValue = clone(this.value);
 		const op = {
 			path: '/',
@@ -312,7 +314,7 @@ export default class ClientReplicant<T> extends AbstractReplicant<'client', T> {
 		name: string;
 		namespace: string;
 		revision: number;
-		operations: Array<NodeCG.Replicant.Operation<T>>;
+		operations: Array<NodeCG.Replicant.Operation<ReplicantValue<V, O>>>;
 	}): void {
 		if (this.status !== 'declared') {
 			return;

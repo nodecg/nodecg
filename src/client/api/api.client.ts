@@ -37,8 +37,12 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	C,
 	EventMap
 > {
-	static Replicant<V>(name: string, namespace: string, opts: NodeCG.Replicant.Options<V> = {}): ClientReplicant<V> {
-		return new ClientReplicant<V>(name, namespace, opts, (window as any).socket);
+	static Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+		name: string,
+		namespace: string,
+		opts: O = {} as Record<any, unknown>,
+	): ClientReplicant<V, O> {
+		return new ClientReplicant<V, O>(name, namespace, opts, (window as any).socket);
 	}
 
 	static sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, cb: SendMessageCb<T>): void;
@@ -432,11 +436,11 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	}
 	/* eslint-enable no-dupe-class-members */
 
-	protected _replicantFactory = <T>(
+	protected _replicantFactory = <V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
 		name: string,
 		namespace: string,
-		opts: NodeCG.Replicant.Options<T>,
-	): ClientReplicant<T> => new ClientReplicant<T>(name, namespace, opts, this.socket);
+		opts: O,
+	): ClientReplicant<V, O> => new ClientReplicant<V, O>(name, namespace, opts, this.socket);
 
 	private _registerSounds(): void {
 		this._soundCues.forEach((cue) => {
