@@ -133,8 +133,7 @@
   },
   "engines": {
     "node": "^16 || ^18",
-    "npm": "please-use-yarn",
-    "yarn": "^1.22.19"
+    "npm": "please-use-yarn"
   },
   "files": [
     "build",
