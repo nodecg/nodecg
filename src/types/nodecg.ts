@@ -372,7 +372,7 @@ export namespace NodeCG {
 	 * It should be unlikely that you need to use these directly.
 	 */
 	export namespace Replicant {
-		export type Options<V> = OptionsNoDefault | OptionsWithDefault<V>;
+		export type Options<D> = OptionsNoDefault | OptionsWithDefault<D>;
 
 		export type OptionsNoDefault = {
 			persistent?: boolean;
@@ -380,11 +380,11 @@ export namespace NodeCG {
 			schemaPath?: string;
 		};
 
-		export type OptionsWithDefault<V> = {
+		export type OptionsWithDefault<D> = {
 			persistent?: boolean;
 			persistenceInterval?: number;
 			schemaPath?: string;
-			defaultValue: V;
+			defaultValue: D;
 		};
 
 		export type Operation<T> = {

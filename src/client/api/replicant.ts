@@ -4,14 +4,10 @@ import equal from 'deep-equal';
 import clone from 'clone';
 
 // Ours
-import { AbstractReplicant, isIgnoringProxy } from '../../shared/replicants.shared';
+import { AbstractReplicant, isIgnoringProxy, type ReplicantValue } from '../../shared/replicants.shared';
 import createLogger from './logger';
 import type { TypedClientSocket } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';
-
-type ReplicantValue<V, O extends NodeCG.Replicant.Options<V>> =
-	| (O extends NodeCG.Replicant.OptionsWithDefault<V> ? O['defaultValue'] : V)
-	| undefined;
 
 const declaredReplicants = new Map<string, Map<string, ClientReplicant<any>>>();
 
@@ -52,7 +48,7 @@ export default class ClientReplicant<
 	V,
 	O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
 > extends AbstractReplicant<'client', V, O> {
-	value: ReplicantValue<V, O> = undefined;
+	value: ReplicantValue<'client', V, O> = undefined;
 
 	/**
 	 * When running in the browser, we have to wait until the socket joins the room
@@ -89,7 +85,7 @@ export default class ClientReplicant<
 		socket.on('replicant:operations', (data) => {
 			this._handleOperations({
 				...data,
-				operations: data.operations as Array<NodeCG.Replicant.Operation<ReplicantValue<V, O>>>,
+				operations: data.operations as Array<NodeCG.Replicant.Operation<ReplicantValue<'client', V, O>>>,
 			});
 		});
 
@@ -126,7 +122,7 @@ export default class ClientReplicant<
 	 * @param args {array} - The arguments provided to this operation
 	 * @private
 	 */
-	_addOperation(operation: NodeCG.Replicant.Operation<ReplicantValue<V, O>>): void {
+	_addOperation(operation: NodeCG.Replicant.Operation<ReplicantValue<'client', V, O>>): void {
 		this._operationQueue.push(operation);
 		if (!this._pendingOperationFlush) {
 			this._pendingOperationFlush = true;
@@ -288,7 +284,7 @@ export default class ClientReplicant<
 	 * @param revision {number} - The new revision number.
 	 * @private
 	 */
-	private _assignValue(newValue: ReplicantValue<V, O>, revision: number): void {
+	private _assignValue(newValue: ReplicantValue<'client', V, O>, revision: number): void {
 		const oldValue = clone(this.value);
 		const op = {
 			path: '/',
@@ -314,7 +310,7 @@ export default class ClientReplicant<
 		name: string;
 		namespace: string;
 		revision: number;
-		operations: Array<NodeCG.Replicant.Operation<ReplicantValue<V, O>>>;
+		operations: Array<NodeCG.Replicant.Operation<ReplicantValue<'client', V, O>>>;
 	}): void {
 		if (this.status !== 'declared') {
 			return;

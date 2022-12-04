@@ -11,13 +11,13 @@ import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
 import { compileJsonSchema, formatJsonSchemaErrors } from './utils';
 
-type ReplicantValue<P extends NodeCG.Platform, V, O, S extends boolean> = P extends 'server'
+export type ReplicantValue<P extends NodeCG.Platform, V, O, S extends boolean = false> = P extends 'server'
 	? S extends true
 		? V
-		: O extends NodeCG.Replicant.OptionsWithDefault<V>
-		? O['defaultValue']
+		: O extends { defaultValue: infer D extends V }
+		? D
 		: V | undefined
-	: (O extends NodeCG.Replicant.OptionsWithDefault<V> ? O['defaultValue'] : V) | undefined;
+	: (O extends { defaultValue: infer D extends V } ? D : V) | undefined;
 
 type Events<P extends NodeCG.Platform, V, O, S extends boolean> = {
 	change: (
@@ -51,7 +51,7 @@ type Events<P extends NodeCG.Platform, V, O, S extends boolean> = {
  */
 export abstract class AbstractReplicant<
 	P extends NodeCG.Platform,
-	V = unknown,
+	V,
 	O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
 	S extends boolean = false,
 > extends TypedEmitter<Events<P, V, O, S>> {
@@ -133,14 +133,14 @@ export abstract class AbstractReplicant<
 	}
 
 	abstract get value(): ReplicantValue<P, V, O, S>;
-	abstract set value(newValue: V | undefined);
+	abstract set value(newValue: ReplicantValue<P, V, O, S>);
 
 	/**
 	 * If the operation is an array mutator method, call it on the target array with the operation arguments.
 	 * Else, handle it with objectPath.
 	 */
 	_applyOperation(operation: NodeCG.Replicant.Operation<V>): boolean {
-		ignoreProxy(this as AbstractReplicant<P, V, O>);
+		ignoreProxy(this);
 
 		let result;
 		const path = pathStrToPathArr(operation.path);
@@ -173,7 +173,7 @@ export abstract class AbstractReplicant<
 			switch (operation.method) {
 				case 'overwrite': {
 					const { newValue } = operation.args;
-					this.value = proxyRecursive(this as AbstractReplicant<P, V, O>, newValue, operation.path);
+					this.value = proxyRecursive(this, newValue as any, operation.path);
 					result = true;
 					break;
 				}
@@ -184,7 +184,7 @@ export abstract class AbstractReplicant<
 
 					let { newValue } = operation.args;
 					if (typeof newValue === 'object') {
-						newValue = proxyRecursive(this as AbstractReplicant<P, V, O>, newValue, pathArrToPathStr(path));
+						newValue = proxyRecursive(this, newValue, pathArrToPathStr(path));
 					}
 
 					result = objectPath.set(this.value as any, path, newValue);
@@ -305,15 +305,15 @@ export const ARRAY_MUTATOR_METHODS = [
  */
 const DEFAULT_PERSISTENCE_INTERVAL = 100;
 
-export function ignoreProxy(replicant: AbstractReplicant<any, any>): void {
+export function ignoreProxy(replicant: AbstractReplicant<any, any, NodeCG.Replicant.Options<any>, any>): void {
 	ignoringProxy.add(replicant);
 }
 
-export function resumeProxy(replicant: AbstractReplicant<any, any>): void {
+export function resumeProxy(replicant: AbstractReplicant<any, any, NodeCG.Replicant.Options<any>, any>): void {
 	ignoringProxy.delete(replicant);
 }
 
-export function isIgnoringProxy(replicant: AbstractReplicant<any, any>): boolean {
+export function isIgnoringProxy(replicant: AbstractReplicant<any, any, NodeCG.Replicant.Options<any>, any>): boolean {
 	return ignoringProxy.has(replicant);
 }
 
@@ -542,7 +542,11 @@ const CHILD_OBJECT_HANDLER = {
  * @returns {*} - The recursively Proxied value (or just `value` unchanged, if `value` is a primitive)
  * @private
  */
-export function proxyRecursive<T>(replicant: AbstractReplicant<any, any>, value: T, path: string): T {
+export function proxyRecursive<T>(
+	replicant: AbstractReplicant<any, any, NodeCG.Replicant.Options<any>, any>,
+	value: T,
+	path: string,
+): T {
 	if (typeof value === 'object' && value !== null) {
 		let p;
 

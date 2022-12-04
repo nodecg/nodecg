@@ -40,3 +40,13 @@ const fail = 4 + unknownRep.value;
 
 // @ts-expect-error
 nodecg.Replicant('unsupportedOptions', { madeUp: true });
+
+const replicants: {
+	mappedReplicant: NodeCGTypes.ClientReplicant<string>;
+	[k: string]: NodeCGTypes.ClientReplicant<unknown>;
+} = {
+	mappedReplicant: nodecg.Replicant('mappedReplicant'),
+};
+const what: NodeCGTypes.ClientReplicant<unknown> = nodecg.Replicant<string>('haha');
+console.log(what.value);
+assertTypeOrUndefined<string>(replicants.mappedReplicant.value);

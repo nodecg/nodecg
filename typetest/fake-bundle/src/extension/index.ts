@@ -61,4 +61,12 @@ export = (nodecg: NodeCG.ServerAPI<BundleConfig>) => {
 
 	// @ts-expect-error
 	nodecg.Replicant('unsupportedOptions', { madeUp: true });
+
+	const replicants: {
+		mappedReplicant: NodeCG.ServerReplicant<string>;
+		[k: string]: NodeCG.ServerReplicant<unknown>;
+	} = {
+		mappedReplicant: nodecg.Replicant('mappedReplicant'),
+	};
+	assertTypeOrUndefined<string>(replicants.mappedReplicant.value);
 };

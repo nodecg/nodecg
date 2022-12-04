@@ -9,14 +9,16 @@ import schemaDefaults from 'json-schema-defaults';
 import sha1 from 'sha1';
 
 // Ours
-import { proxyRecursive, ignoreProxy, resumeProxy, AbstractReplicant } from '../../shared/replicants.shared';
+import {
+	proxyRecursive,
+	ignoreProxy,
+	resumeProxy,
+	AbstractReplicant,
+	type ReplicantValue,
+} from '../../shared/replicants.shared';
 import replaceRefs from './schema-hacks';
 import createLogger from '../logger';
 import type { NodeCG } from '../../types/nodecg';
-
-type ReplicantValue<V, O extends NodeCG.Replicant.Options<V>> = O extends NodeCG.Replicant.OptionsWithDefault<V>
-	? O['defaultValue']
-	: V | undefined;
 
 // Never instantiate this directly.
 // Always use Replicator.declare instead.
@@ -107,7 +109,7 @@ export default class ServerReplicant<
 		}
 	}
 
-	get value(): ReplicantValue<V, O> {
+	get value(): ReplicantValue<'server', V, O> {
 		return this._value as any;
 	}
 
@@ -136,7 +138,7 @@ export default class ServerReplicant<
 	 * Refer to the abstract base class' implementation for details.
 	 * @private
 	 */
-	_addOperation(operation: NodeCG.Replicant.Operation<ReplicantValue<V, O>>): void {
+	_addOperation(operation: NodeCG.Replicant.Operation<ReplicantValue<'server', V, O>>): void {
 		this._operationQueue.push(operation);
 		if (!this._pendingOperationFlush) {
 			this._oldValue = clone(this.value);
