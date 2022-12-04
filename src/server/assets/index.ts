@@ -122,7 +122,7 @@ export default class AssetManager {
 		// Therefore, we must replace them with Unix-style ones.
 		// See https://github.com/paulmillr/chokidar/issues/777 for more details.
 		const fixedPaths = Array.from(watchPatterns).map((pattern) => pattern.replace(/\\/g, '/'));
-		const watcher = chokidar.watch(fixedPaths, { ignored: /[/\\]\./ });
+		const watcher = chokidar.watch(fixedPaths, { ignored: '**/.*' });
 
 		/* When the Chokidar watcher first starts up, it will fire an 'add' event for each file found.
 		 * After that, it will emit the 'ready' event.
