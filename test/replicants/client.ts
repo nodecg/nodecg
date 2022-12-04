@@ -17,10 +17,13 @@ const { initDashboard } = browser.setup();
 
 import * as C from '../helpers/test-constants';
 import type { NodeCG } from '../../src/types/nodecg';
+import { getConnection, Replicant } from '../../src/server/database';
 
 let dashboard: puppeteer.Page;
+let database: Awaited<ReturnType<typeof getConnection>>;
 test.before(async () => {
 	dashboard = await initDashboard();
+	database = await getConnection();
 });
 
 test.serial('should return a reference to any already-declared replicant', async (t) => {
@@ -582,153 +585,94 @@ test.serial('persistent - should load persisted values when they exist', async (
 	t.is(ret, 'it work good!');
 });
 
-/**
- * This test is really gross.
- * It relies on a race, it hits the database, it is just nasty.
- * I can't think of a good way to make this test less awful,
- * so it is being skipped for now.
- */
-test.serial.skip('persistent - should persist assignment to disk', async (t) => {
+test.serial('persistent - should persist assignment to disk', async (t) => {
 	t.plan(1);
 
-	dashboard
-		.evaluate(
-			async () =>
-				new Promise<void>((resolve) => {
-					const rep = window.dashboardApi.Replicant<any>('clientPersistence');
-					rep.value = { nested: 'hey we assigned!' };
-					rep.on('change', (newVal) => {
-						if (!newVal) {
-							t.fail('no value');
-							return;
-						}
-
-						if (newVal.nested && newVal.nested === 'hey we assigned!') {
-							resolve();
-						}
-					});
-				}),
-		)
-		.then(async () => {
-			/**
-			 * This is from 1.0, when we used files on disk
-			 * instead of a database.
-			 *
-			 * To whomeever rewrites this test: you will need to replace this
-			 * with something else.
-			 */
-			const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientPersistence.rep');
-			return new Promise<void>((resolve) => {
-				fs.readFile(replicantPath, 'utf-8', (err, data) => {
-					if (err) {
-						throw err;
+	await dashboard.evaluate(
+		async () =>
+			new Promise<void>((resolve) => {
+				const rep = window.dashboardApi.Replicant<any>('clientPersistence');
+				rep.value = { nested: 'hey we assigned!' };
+				rep.on('change', (newVal) => {
+					if (!newVal) {
+						t.fail('no value');
+						return;
 					}
 
-					t.is(data, '{"nested":"hey we assigned!"}');
-					resolve();
+					if (newVal.nested && newVal.nested === 'hey we assigned!') {
+						resolve();
+					}
 				});
-			});
-		})
-		.catch(t.fail);
+			}),
+	);
+
+	await t.context.server.saveAllReplicantsNow();
+
+	const fromDb = await database.manager.findOneByOrFail(Replicant, {
+		namespace: 'test-bundle',
+		name: 'clientPersistence',
+	});
+
+	t.is(fromDb.value, '{"nested":"hey we assigned!"}');
 });
 
-/**
- * This test is really gross.
- * It relies on setTimeout, it hits the database, it is just nasty.
- * I can't think of a good way to make this test less awful,
- * so it is being skipped for now.
- */
-test.skip('persistent - should persist changes to disk', async (t) => {
+test('persistent - should persist changes to disk', async (t) => {
 	t.plan(1);
 
 	const serverRep = t.context.apis.extension.Replicant('clientChangePersistence', { defaultValue: { nested: '' } });
 
 	await dashboard.evaluate(
 		async () =>
-			new Promise((resolve) => {
-				(window as any).clientChangePersistence = window.dashboardApi.Replicant('clientChangePersistence');
-				(window as any).clientChangePersistence.once('change', resolve);
+			new Promise<void>((resolve) => {
+				const rep = window.dashboardApi.Replicant<any>('clientPersistence');
+				rep.value.nested = 'hey we changed!';
+				rep.on('change', (newVal) => {
+					if (!newVal) {
+						t.fail('no value');
+						return;
+					}
+
+					if (newVal.nested && newVal.nested === 'hey we changed!') {
+						resolve();
+					}
+				});
 			}),
 	);
 
-	const promise = new Promise<void>((resolve) => {
-		serverRep.on('change', (newVal) => {
-			if (!newVal) {
-				t.fail('no value');
-				return;
-			}
+	await t.context.server.saveAllReplicantsNow();
 
-			if (newVal.nested !== 'hey we changed!') {
-				return;
-			}
-
-			/**
-			 * This is from 1.0, when we used files on disk
-			 * instead of a database.
-			 *
-			 * To whomeever rewrites this test: you will need to replace this
-			 * with something else.
-			 */
-			// On a short timeout to give the Replicator time to write the new value to disk
-			setTimeout(() => {
-				const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientChangePersistence.rep');
-				const data = fs.readFileSync(replicantPath, 'utf-8');
-				t.is(data, '{"nested":"hey we changed!"}');
-				resolve();
-			}, 10);
-		});
+	const fromDb = await database.manager.findOneByOrFail(Replicant, {
+		namespace: 'test-bundle',
+		name: 'clientPersistence',
 	});
 
-	await dashboard.evaluate(() => {
-		(window as any).clientChangePersistence.value.nested = 'hey we changed!';
-	});
-
-	return promise;
+	t.is(fromDb.value, '{"nested":"hey we changed!"}');
 });
 
-/**
- * This test is really gross.
- * It relies on a race, it hits the database, it is just nasty.
- * I can't think of a good way to make this test less awful,
- * so it is being skipped for now.
- */
-test.serial.skip('persistent - should persist falsey values to disk', async (t) => {
+test.serial('persistent - should persist falsey values to disk', async (t) => {
 	t.plan(1);
 
-	dashboard
-		.evaluate(
-			async () =>
-				new Promise<void>((resolve) => {
-					const rep = window.dashboardApi.Replicant('clientFalseyWrite');
-					rep.value = 0;
-					rep.on('change', (newVal) => {
-						if (newVal === 0) {
-							resolve();
-						}
-					});
-				}),
-		)
-		.then(async () => {
-			/**
-			 * This is from 1.0, when we used files on disk
-			 * instead of a database.
-			 *
-			 * To whomeever rewrites this test: you will need to replace this
-			 * with something else.
-			 */
-			const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientFalseyWrite.rep');
-			return new Promise<void>((resolve) => {
-				fs.readFile(replicantPath, 'utf-8', (err, data) => {
-					if (err) {
-						throw err;
+	await dashboard.evaluate(
+		async () =>
+			new Promise<void>((resolve) => {
+				const rep = window.dashboardApi.Replicant('clientFalseyWrite');
+				rep.value = 0;
+				rep.on('change', (newVal) => {
+					if (newVal === 0) {
+						resolve();
 					}
-
-					t.is(data, '0');
-					resolve();
 				});
-			});
-		})
-		.catch(t.fail);
+			}),
+	);
+
+	await t.context.server.saveAllReplicantsNow();
+
+	const fromDb = await database.manager.findOneByOrFail(Replicant, {
+		namespace: 'test-bundle',
+		name: 'clientFalseyWrite',
+	});
+
+	t.is(fromDb.value, '0');
 });
 
 test.serial('persistent - should read falsey values from disk', async (t) => {
@@ -745,54 +689,31 @@ test.serial('persistent - should read falsey values from disk', async (t) => {
 	t.is(ret, 0);
 });
 
-/**
- * This test is really gross.
- * It relies on a race, it hits the database, it is just nasty.
- * I can't think of a good way to make this test less awful,
- * so it is being skipped for now.
- */
-test.serial.skip('transient - should not write their value to disk', async (t) => {
-	t.plan(2);
+test.serial('transient - should not write their value to disk', async (t) => {
+	t.plan(1);
 
-	const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/clientTransience.rep');
-	fs.unlink(replicantPath, (err) => {
-		if (err && err.code !== 'ENOENT') {
-			throw err;
-		}
+	await dashboard.evaluate(
+		async () =>
+			new Promise<void>((resolve) => {
+				const rep = window.dashboardApi.Replicant('clientTransience', {
+					defaultValue: 'o no',
+					persistent: false,
+				});
 
-		dashboard
-			.evaluate(
-				async () =>
-					new Promise<void>((resolve) => {
-						const rep = window.dashboardApi.Replicant('clientTransience', {
-							defaultValue: 'o no',
-							persistent: false,
-						});
+				rep.on('declared', () => {
+					resolve();
+				});
+			}),
+	);
 
-						rep.on('declared', () => {
-							resolve();
-						});
-					}),
-			)
-			.then(
-				async () =>
-					/**
-					 * This is from 1.0, when we used files on disk
-					 * instead of a database.
-					 *
-					 * To whomeever rewrites this test: you will need to replace this
-					 * with something else.
-					 */
-					new Promise<void>((resolve) => {
-						fs.readFile(replicantPath, (err) => {
-							t.truthy(err);
-							t.is(err?.code, 'ENOENT');
-							resolve();
-						});
-					}),
-			)
-			.catch(t.fail);
+	await t.context.server.saveAllReplicantsNow();
+
+	const fromDb = await database.manager.findOneBy(Replicant, {
+		namespace: 'test-bundle',
+		name: 'clientTransience',
 	});
+
+	t.is(fromDb, null);
 });
 
 test.serial('#waitForReplicants', async (t) => {
