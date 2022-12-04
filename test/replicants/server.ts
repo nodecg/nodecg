@@ -1,7 +1,3 @@
-// Native
-import fs from 'fs';
-import path, { resolve } from 'path';
-
 // Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
@@ -16,11 +12,13 @@ const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
-import * as C from '../helpers/test-constants';
+import { getConnection, Replicant } from '../../src/server/database';
 
 let dashboard: puppeteer.Page;
+let database: Awaited<ReturnType<typeof getConnection>>;
 test.before(async () => {
 	dashboard = await initDashboard();
+	database = await getConnection();
 });
 
 test.serial('should return a reference to any already-declared replicant', (t) => {
@@ -286,47 +284,23 @@ test.serial('persistent - should load persisted values when they exist', (t) => 
 	t.is(rep.value, 'it work good!');
 });
 
-/**
- * This test is really gross.
- * It uses setTimeout, it hits the database, it is just nasty.
- * I can't think of a good way to make this test less awful,
- * so it is being skipped for now.
- */
-test.serial.skip('persistent - should persist assignment to database', async (t) => {
+test.serial('persistent - should persist assignment to database', async (t) => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence', { persistenceInterval: 0 });
 	rep.value = { nested: 'hey we assigned!' };
 
-	/**
-	 * This is from 1.0, when we used files on disk
-	 * instead of a database.
-	 *
-	 * To whomeever rewrites this test: you will need to replace this
-	 * with something else.
-	 */
-	return new Promise<void>((resolve) => {
-		setTimeout(() => {
-			const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
-			fs.readFile(replicantPath, 'utf-8', (err, data) => {
-				if (err) {
-					throw err;
-				}
+	await t.context.server.saveAllReplicantsNow();
 
-				t.is(data, '{"nested":"hey we assigned!"}');
-				resolve();
-			});
-		}, 10);
+	const fromDb = await database.manager.findOneByOrFail(Replicant, {
+		namespace: 'test-bundle',
+		name: 'extensionPersistence',
 	});
+
+	t.is(fromDb.value, '{"nested":"hey we assigned!"}');
 });
 
-/**
- * This test is really gross.
- * It uses setTimeout, it hits the database, it is just nasty.
- * I can't think of a good way to make this test less awful,
- * so it is being skipped for now.
- */
-test.serial.skip('persistent - should persist changes to database', async (t) => {
+test.serial('persistent - should persist changes to database', async (t) => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant<Record<string, string>>('extensionPersistence', {
@@ -334,130 +308,62 @@ test.serial.skip('persistent - should persist changes to database', async (t) =>
 	}) as unknown as AbstractReplicant<'server', Record<string, string>, Record<string, unknown>, true>;
 	rep.value.nested = 'hey we changed!';
 
-	/**
-	 * This is from 1.0, when we used files on disk
-	 * instead of a database.
-	 *
-	 * To whomeever rewrites this test: you will need to replace this
-	 * with something else.
-	 */
-	return new Promise<void>((resolve) => {
-		setTimeout(() => {
-			const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
-			fs.readFile(replicantPath, 'utf-8', (err, data) => {
-				if (err) {
-					throw err;
-				}
+	await t.context.server.saveAllReplicantsNow();
 
-				t.is(data, '{"nested":"hey we changed!"}');
-				resolve();
-			});
-		}, 250); // Delay needs to be longer than the persistence interval.
+	const fromDb = await database.manager.findOneByOrFail(Replicant, {
+		namespace: 'test-bundle',
+		name: 'extensionPersistence',
 	});
+
+	t.is(fromDb.value, '{"nested":"hey we changed!"}');
 });
 
-/**
- * This test is really gross.
- * It uses setTimeout, it hits the database, it is just nasty.
- * I can't think of a good way to make this test less awful,
- * so it is being skipped for now.
- */
-test.serial.skip('persistent - should persist top-level string', async (t) => {
+test.serial('persistent - should persist top-level string', async (t) => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence', { persistenceInterval: 0 });
 	rep.value = 'lorem';
 
-	/**
-	 * This is from 1.0, when we used files on disk
-	 * instead of a database.
-	 *
-	 * To whomeever rewrites this test: you will need to replace this
-	 * with something else.
-	 */
-	return new Promise<void>((resolve) => {
-		setTimeout(() => {
-			const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
+	await t.context.server.saveAllReplicantsNow();
 
-			fs.readFile(replicantPath, 'utf-8', (err, data) => {
-				if (err) {
-					throw err;
-				}
-
-				t.is(data, '"lorem"');
-				resolve();
-			});
-		}, 10);
+	const fromDb = await database.manager.findOneByOrFail(Replicant, {
+		namespace: 'test-bundle',
+		name: 'extensionPersistence',
 	});
+
+	t.is(fromDb.value, '"lorem"');
 });
 
-/**
- * This test is really gross.
- * It uses setTimeout, it hits the database, it is just nasty.
- * I can't think of a good way to make this test less awful,
- * so it is being skipped for now.
- */
-test.serial.skip('persistent - should persist top-level undefined', async (t) => {
+test.serial('persistent - should persist top-level undefined', async (t) => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence', { persistenceInterval: 0 });
 	rep.value = undefined;
 
-	/**
-	 * This is from 1.0, when we used files on disk
-	 * instead of a database.
-	 *
-	 * To whomeever rewrites this test: you will need to replace this
-	 * with something else.
-	 */
-	return new Promise<void>(() => {
-		setTimeout(() => {
-			const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionPersistence.rep');
+	await t.context.server.saveAllReplicantsNow();
 
-			fs.readFile(replicantPath, 'utf-8', (err, data) => {
-				if (err) {
-					throw err;
-				}
-
-				t.is(data, '');
-				resolve();
-			});
-		}, 10);
+	const fromDb = await database.manager.findOneByOrFail(Replicant, {
+		namespace: 'test-bundle',
+		name: 'extensionPersistence',
 	});
+
+	t.is(fromDb.value, '');
 });
 
-/**
- * This test is really gross.
- * It uses setTimeout, it hits the database, it is just nasty.
- * I can't think of a good way to make this test less awful,
- * so it is being skipped for now.
- */
-test.serial.skip('persistent - should persist falsey values to disk', async (t) => {
+test.serial('persistent - should persist falsey values to disk', async (t) => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant('extensionFalseyWrite', { persistenceInterval: 0 });
 	rep.value = 0;
 
-	/**
-	 * This is from 1.0, when we used files on disk
-	 * instead of a database.
-	 *
-	 * To whomeever rewrites this test: you will need to replace this
-	 * with something else.
-	 */
-	return new Promise<void>((resolve) => {
-		setTimeout(() => {
-			const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionFalseyWrite.rep');
-			fs.readFile(replicantPath, 'utf-8', (err, data) => {
-				if (err) {
-					throw err;
-				}
+	await t.context.server.saveAllReplicantsNow();
 
-				t.is(data, '0');
-				resolve();
-			});
-		}, 10);
+	const fromDb = await database.manager.findOneByOrFail(Replicant, {
+		namespace: 'test-bundle',
+		name: 'extensionFalseyWrite',
 	});
+
+	t.is(fromDb.value, '0');
 });
 
 test.serial('persistent - should read falsey values from disk', (t) => {
@@ -465,39 +371,20 @@ test.serial('persistent - should read falsey values from disk', (t) => {
 	t.is(rep.value, 0);
 });
 
-/**
- * This test is really gross.
- * It uses setTimeout, it hits the database, it is just nasty.
- * I can't think of a good way to make this test less awful,
- * so it is being skipped for now.
- */
-test.serial.skip('transient - should not write their value to disk', async (t) => {
-	t.plan(2);
+test.serial('transient - should not write their value to disk', async (t) => {
+	t.plan(1);
 
-	/**
-	 * This is from 1.0, when we used files on disk
-	 * instead of a database.
-	 *
-	 * To whomeever rewrites this test: you will need to replace this
-	 * with something else.
-	 */
-	// Remove the file if it exists for some reason
-	const replicantPath = path.join(C.replicantsRoot(), 'test-bundle/extensionTransience.rep');
-	return new Promise<void>((resolve) => {
-		fs.unlink(replicantPath, (err) => {
-			if (err && err.code !== 'ENOENT') {
-				throw err;
-			}
+	const rep = t.context.apis.extension.Replicant('extensionTransience', { persistent: false });
+	rep.value = 'o no';
 
-			const rep = t.context.apis.extension.Replicant('extensionTransience', { persistent: false });
-			rep.value = 'o no';
-			fs.readFile(replicantPath, (err) => {
-				t.truthy(err);
-				t.is(err!.code, 'ENOENT');
-				resolve();
-			});
-		});
+	await t.context.server.saveAllReplicantsNow();
+
+	const fromDb = await database.manager.findOneBy(Replicant, {
+		namespace: 'test-bundle',
+		name: 'extensionTransience',
 	});
+
+	t.is(fromDb, null);
 });
 
 test.serial('should return true when deleting a non-existing property', (t) => {

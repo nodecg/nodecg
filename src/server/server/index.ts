@@ -380,4 +380,8 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 	}
 
 	mount: NodeCG.Middleware = (...args: any[]) => this._app.use(...args);
+
+	async saveAllReplicantsNow(): Promise<void> {
+		return this._replicator?.saveAllReplicantsNow();
+	}
 }

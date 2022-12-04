@@ -146,6 +146,17 @@ export default class Replicator {
 		}
 	}
 
+	async saveAllReplicantsNow(): Promise<void> {
+		const promises: Array<Promise<void>> = [];
+		for (const replicants of this.declaredReplicants.values()) {
+			for (const replicant of replicants.values()) {
+				promises.push(this._saveReplicant(replicant));
+			}
+		}
+
+		await Promise.all(promises);
+	}
+
 	saveReplicant(replicant: ServerReplicant<any>): void {
 		if (!replicant.opts.persistent) {
 			return;
