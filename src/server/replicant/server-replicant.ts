@@ -155,6 +155,7 @@ export default class ServerReplicant<
 	 */
 	_flushOperations(): void {
 		this._pendingOperationFlush = false;
+		if (this._operationQueue.length <= 0) return;
 		this.revision++;
 		this.emit('operations', {
 			name: this.name,

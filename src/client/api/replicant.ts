@@ -143,6 +143,7 @@ export default class ClientReplicant<
 	 */
 	_flushOperations(): void {
 		this._pendingOperationFlush = false;
+		if (this._operationQueue.length <= 0) return;
 		this._socket.emit(
 			'replicant:proposeOperations',
 			{
