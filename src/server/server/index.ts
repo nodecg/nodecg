@@ -122,8 +122,6 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 
 		/**
 		 * Socket.IO server setup.
-		 * We cast to "any" for a few things because
-		 * typed-socket.io isn't quite perfect.
 		 */
 		this._io = new SocketIO.Server<ClientToServerEvents, ServerToClientEvents>(server);
 		this._io.setMaxListeners(75); // Prevent console warnings when many extensions are installed
