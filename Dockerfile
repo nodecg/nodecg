@@ -4,7 +4,7 @@ WORKDIR /opt/nodecg
 
 # Sets up the runtime user, makes nodecg-cli available to images which extend this image, and creates the directory structure with the appropriate permissions.
 RUN addgroup --system nodecg && adduser --system nodecg --ingroup nodecg && \
-    yarn global add nodecg-cli && \
+    npm i -g nodecg-cli && \
     mkdir cfg && mkdir bundles && mkdir logs && mkdir db && mkdir assets && \
     chown -R nodecg:nodecg /opt/nodecg
 
@@ -15,10 +15,10 @@ USER nodecg
 COPY --chown=nodecg:nodecg . /opt/nodecg/
 
 # Install dependencies
-RUN yarn --ignore-engines --frozen-lockfile --network-timeout 1000000
+RUN npm ci
 
 # Build
-RUN yarn build
+RUN npm run build
 
 # Define directories that should be persisted in a volume
 VOLUME /opt/nodecg/cfg /opt/nodecg/bundles /opt/nodecg/logs /opt/nodecg/db /opt/nodecg/assets

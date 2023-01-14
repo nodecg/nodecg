@@ -19,13 +19,13 @@ jobs:
         with:
           path: |
             node_modules
-          key: npm-${{ runner.os }}-18.x-${{ hashFiles('yarn.lock') }}
+          key: npm-${{ runner.os }}-18.x-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        run: yarn --ignore-engines --frozen-lockfile --network-timeout 1000000
+        run: npm ci
 
       - name: Build
-        run: yarn build
+        run: npm run build
 
       - name: Semantic Release
         run: npx semantic-release
