@@ -1,4 +1,4 @@
-/// <reference path="../../../../generated-types/augment-window.d.ts" />
+/// <reference path="./augment-window-with-bundleconfig.d.ts" />
 import type NodeCGTypes from '../../../../generated-types';
 import { assertTypeOrUndefined } from '../shared/utils';
 
@@ -50,3 +50,11 @@ const replicants: {
 const what: NodeCGTypes.ClientReplicant<unknown> = nodecg.Replicant<string>('haha');
 console.log(what.value);
 assertTypeOrUndefined<string>(replicants.mappedReplicant.value);
+
+// This tests that bundleConfig is deep read only
+// @ts-expect-error
+nodecg.bundleConfig.foo.bar = 'bar';
+
+// This tests that bundleConfig only specifies known properties
+// @ts-expect-error
+nodecg.bundleConfig.nope;

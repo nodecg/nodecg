@@ -69,4 +69,12 @@ export = (nodecg: NodeCG.ServerAPI<BundleConfig>) => {
 		mappedReplicant: nodecg.Replicant('mappedReplicant'),
 	};
 	assertTypeOrUndefined<string>(replicants.mappedReplicant.value);
+
+	// This tests that bundleConfig is deep read only
+	// @ts-expect-error
+	nodecg.bundleConfig.foo.bar = 'bar';
+
+	// This tests that bundleConfig only specifies known properties
+	// @ts-expect-error
+	nodecg.bundleConfig.nope;
 };

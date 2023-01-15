@@ -6,10 +6,12 @@ import type { NodeCGAPIClient } from './client/api/api.client';
 import type serverApiFactory from './server/api.server';
 import type * as LoggerStuff from './shared/logger-interface';
 import type { AbstractReplicant } from './shared/replicants.shared';
+import { DeepReadonly } from 'ts-essentials';
 
-type NodeCGAPIServer<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> = InstanceType<
-	ReturnType<typeof serverApiFactory>
-> & { bundleConfig: C };
+type NodeCGAPIServer<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> = Omit<
+	InstanceType<ReturnType<typeof serverApiFactory>>,
+	'bundleConfig'
+> & { bundleConfig: DeepReadonly<C> };
 
 declare module './types/nodecg' {
 	/**
