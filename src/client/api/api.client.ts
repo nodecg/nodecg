@@ -1,3 +1,6 @@
+// Packages
+import type { DeepReadonly } from 'ts-essentials';
+
 // Ours
 import { NodeCGAPIBase } from '../../shared/api.base';
 import ClientReplicant from './replicant';
@@ -132,7 +135,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	/**
 	 * A filtered copy of the NodeCG server config with some sensitive keys removed.
 	 */
-	get config(): Readonly<typeof filteredConfig> {
+	get config(): DeepReadonly<typeof filteredConfig> {
 		return Object.freeze(JSON.parse(JSON.stringify(filteredConfig)));
 	}
 

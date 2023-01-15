@@ -1,3 +1,6 @@
+// Packages
+import type { DeepReadonly } from 'ts-essentials';
+
 // Ours
 const { version } = require('../../package.json');
 import type { AbstractReplicant } from './replicants.shared';
@@ -70,7 +73,7 @@ export abstract class NodeCGAPIBase<
 	 * An object containing the parsed content of `cfg/<bundle-name>.json`, the contents of which
 	 * are read once when NodeCG starts up. Used to quickly access per-bundle configuration properties.
 	 */
-	readonly bundleConfig: Readonly<C>;
+	readonly bundleConfig: DeepReadonly<C>;
 
 	/**
 	 * The version (from package.json) of the bundle which this NodeCG API instance is for.
@@ -121,7 +124,7 @@ export abstract class NodeCGAPIBase<
 	constructor(bundle: NodeCG.Bundle) {
 		super();
 		this.bundleName = bundle.name;
-		this.bundleConfig = bundle.config as Readonly<C>;
+		this.bundleConfig = bundle.config as DeepReadonly<C>;
 		this.bundleVersion = bundle.version;
 		this.bundleGit = bundle.git;
 	}

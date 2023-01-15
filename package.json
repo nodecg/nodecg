@@ -213,6 +213,7 @@
     "standard-version": "^9.0.0",
     "tmp-promise": "^3.0.3",
     "trash-cli": "^5.0.0",
+    "ts-essentials": "^9.3.0",
     "ts-loader": "^9.4.1",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
