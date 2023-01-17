@@ -3,14 +3,15 @@ import AjvDraft07, { type ValidateFunction, type Options, type ErrorObject } fro
 import AjvDraft04 from 'ajv-draft-04';
 import Ajv2019 from 'ajv/dist/2019';
 import Ajv2020 from 'ajv/dist/2020';
+import addFormats from 'ajv-formats';
 
 const options: Options = { allErrors: true, verbose: true };
 
 const ajv = {
-	draft04: new AjvDraft04(options),
-	draft07: new AjvDraft07(options),
-	'draft2019-09': new Ajv2019(options),
-	'draft2020-12': new Ajv2020(options),
+	draft04: addFormats(new AjvDraft04(options)),
+	draft07: addFormats(new AjvDraft07(options)),
+	'draft2019-09': addFormats(new Ajv2019(options)),
+	'draft2020-12': addFormats(new Ajv2020(options)),
 };
 
 export function compileJsonSchema(schema: Record<any, unknown>): ValidateFunction {
