@@ -364,6 +364,7 @@ export namespace NodeCG {
 		ext: string;
 		name: string;
 		namespace: string;
+		category: string;
 		url: string;
 	};
 
