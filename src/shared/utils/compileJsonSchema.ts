@@ -5,7 +5,16 @@ import Ajv2019 from 'ajv/dist/2019';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 
-const options: Options = { allErrors: true, verbose: true };
+const options: Options = {
+	allErrors: true,
+	verbose: true,
+	strict: undefined,
+	strictSchema: true,
+	strictNumbers: true,
+	strictTypes: true,
+	strictTuples: true,
+	strictRequired: false,
+};
 
 const ajv = {
 	draft04: addFormats(new AjvDraft04(options)),
