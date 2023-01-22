@@ -14,7 +14,18 @@ module.exports = {
 		],
 		'@semantic-release/changelog',
 		'@semantic-release/npm',
-		'@semantic-release/github',
+		[
+			'@semantic-release/github',
+			{
+				assets: [
+					{
+						path: 'nodecg.zip',
+						name: 'NodeCG-${nextRelease.gitTag}.zip',
+						label: 'NodeCG (${nextRelease.gitTag}) distribution',
+					},
+				],
+			},
+		],
 		'@semantic-release/git',
 	],
 };

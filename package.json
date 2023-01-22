@@ -137,10 +137,10 @@
   },
   "files": [
     "build",
+    "generated-types",
     "bundles/.empty_directory",
     "db/.empty_directory",
     "schemas",
-    "types",
     "AUTHORS",
     "package-lock.json"
   ],
