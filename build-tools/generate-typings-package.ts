@@ -7,6 +7,7 @@ import appRootPath from 'app-root-path';
 import ts from 'typescript';
 import { mkdirpSync } from 'fs-extra';
 import isBuiltinModule from 'is-builtin-module';
+import { execSync } from 'child_process';
 
 const pjsonPath = path.join(appRootPath.path, 'package.json');
 const rawContents = fs.readFileSync(pjsonPath, 'utf8');
@@ -92,6 +93,13 @@ function rewriteTypePaths(filePath: string) {
 	}
 }
 
+function copyIndexFile() {
+	mkdirpSync('build-types');
+
+	// Copy the index.d.ts file that ties the whole thing together
+	fs.copyFileSync(path.resolve(appRootPath.path, 'src/index.d.ts'), path.join('build-types/index.d.ts'));
+}
+
 function generateFinishingTouches() {
 	// Generate the package.json for the types package
 	fs.writeFileSync(
@@ -112,6 +120,8 @@ function generateFinishingTouches() {
 					// Because these are referenced via a triple-slash directive, this gather process can't include them.
 					// So, we have to manually specify them here to ensure that they are available to consumers of our types.
 					'@types/soundjs': pjson.devDependencies['@types/soundjs'],
+					'@types/node': pjson.devDependencies['@types/node'],
+					'@types/passport': pjson.devDependencies['@types/passport'],
 				},
 			},
 			undefined,
@@ -120,11 +130,13 @@ function generateFinishingTouches() {
 		{ encoding: 'utf8' },
 	);
 
-	// Copy the index.d.ts file that ties the whole thing together
-	fs.copyFileSync(path.resolve(appRootPath.path, 'src/index.d.ts'), path.join(outputDir, 'index.d.ts'));
+	// index.d.ts needs some manual fixes
+	let index = fs.readFileSync(path.join(outputDir, 'index.d.ts'), 'utf8');
+	index = index.replace(/(from "faux_modules)/gm, 'from "./faux_modules'); // ensure that all paths are relative that should be
+	fs.writeFileSync(path.join(outputDir, 'index.d.ts'), index, 'utf8');
 
 	// Copy the d.ts file that lets middleware access req.user with appropriate types.
-	fs.mkdirSync(path.join(outputDir, 'server/types'));
+	mkdirpSync(path.join(outputDir, 'server/types'));
 	fs.copyFileSync(
 		path.resolve(appRootPath.path, 'src/server/types/augment-express-user.d.ts'),
 		path.join(outputDir, 'server/types/augment-express-user.d.ts'),
@@ -187,6 +199,13 @@ function findRoot(input: string | string[]): string {
 	return findRoot(start);
 }
 
+function installDeps() {
+	execSync('npm i', { cwd: outputDir });
+}
+
+copyIndexFile();
 rewriteTypePaths(path.resolve(appRootPath.path, 'build-types/client/api/api.client.d.ts'));
 rewriteTypePaths(path.resolve(appRootPath.path, 'build-types/server/api.server.d.ts'));
+rewriteTypePaths(path.resolve(appRootPath.path, 'build-types/index.d.ts'));
 generateFinishingTouches();
+installDeps();
