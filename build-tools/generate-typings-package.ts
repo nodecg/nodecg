@@ -116,7 +116,7 @@ function generateFinishingTouches() {
 				homepage: pjson.homepage,
 				license: pjson.license,
 				keywords: [...pjson.keywords, 'types'],
-				devDependencies: {
+				dependencies: {
 					// Because these are referenced via a triple-slash directive, this gather process can't include them.
 					// So, we have to manually specify them here to ensure that they are available to consumers of our types.
 					'@types/soundjs': pjson.devDependencies['@types/soundjs'],
