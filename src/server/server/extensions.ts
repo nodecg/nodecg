@@ -140,7 +140,7 @@ export default class ExtensionManager extends EventEmitter {
 			this.extensions[bundle.name] = extension;
 		} catch (err: unknown) {
 			this._bundleManager.remove(bundle.name);
-			log.warn('Failed to mount %s extension:\n', stringifyError(err));
+			log.warn('Failed to mount %s extension:\n', bundle.name, stringifyError(err));
 			if (global.sentryEnabled) {
 				(err as Error).message = `Failed to mount ${bundle.name} extension: ${
 					// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
