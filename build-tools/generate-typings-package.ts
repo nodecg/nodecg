@@ -28,8 +28,15 @@ function rewriteTypePaths(filePath: string) {
 
 			node = ts.visitEachChild(node, visit, context);
 
-			if (ts.isImportDeclaration(node)) {
-				const { text } = (node as any).moduleSpecifier;
+			if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node) || isImportType(node)) {
+				if (ts.isExportDeclaration(node) && !node.moduleSpecifier) {
+					// We only care about "export from" statements, and this filters out anything that is not one of those.
+					return node;
+				}
+
+				const { text }: { text: string } = isImportType(node)
+					? (node.argument as any).literal
+					: (node as any).moduleSpecifier;
 				const isRelativeImport = text.startsWith('.');
 				if (isRelativeImport) {
 					return node;
@@ -57,23 +64,43 @@ function rewriteTypePaths(filePath: string) {
 					} catch (_: unknown) {}
 				}
 
-				return context.factory.updateImportDeclaration(
-					node,
-					undefined,
-					node.importClause
-						? context.factory.createImportClause(
-								false,
-								node.importClause.name,
-								node.importClause.namedBindings,
-						  )
-						: undefined,
-					context.factory.createStringLiteral(
-						hasTypesPackage(text)
-							? path.join(relativePathToFauxModules, '@types', text)
-							: path.join(relativePathToFauxModules, text),
-					),
-					undefined,
+				const newPath = context.factory.createStringLiteral(
+					hasTypesPackage(text)
+						? path.join(relativePathToFauxModules, '@types', text)
+						: path.join(relativePathToFauxModules, text),
 				);
+
+				if (ts.isImportDeclaration(node)) {
+					return context.factory.updateImportDeclaration(
+						node,
+						undefined,
+						node.importClause
+							? context.factory.createImportClause(
+									false,
+									node.importClause.name,
+									node.importClause.namedBindings,
+							  )
+							: undefined,
+						newPath,
+
+						undefined,
+					);
+				}
+
+				if (ts.isExportDeclaration(node)) {
+					return context.factory.updateExportDeclaration(
+						node,
+						undefined,
+						node.isTypeOnly,
+						undefined,
+						newPath,
+						undefined,
+					);
+				}
+
+				if (isImportType(node)) {
+					return updateImportType(node, newPath);
+				}
 			}
 
 			return node;
@@ -201,6 +228,28 @@ function findRoot(input: string | string[]): string {
 
 function installDeps() {
 	execSync('npm i', { cwd: outputDir });
+}
+
+/**
+ * https://github.com/microsoft/TypeScript/pull/37376
+ */
+function isImportType(node: ts.Node): node is ts.ImportTypeNode {
+	return node.kind === ts.SyntaxKind.ImportType;
+}
+
+/**
+ * https://github.com/microsoft/TypeScript/pull/37376
+ */
+function updateImportType(node: ts.ImportTypeNode, newPath: ts.StringLiteral) {
+	const argument = ts.factory.createLiteralTypeNode(newPath);
+	return ts.factory.updateImportTypeNode(
+		node,
+		argument,
+		node.assertions,
+		node.qualifier,
+		node.typeArguments,
+		node.isTypeOf,
+	);
 }
 
 copyIndexFile();
