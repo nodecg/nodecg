@@ -4,6 +4,8 @@ import AjvDraft04 from 'ajv-draft-04';
 import Ajv2019 from 'ajv/dist/2019';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
+import defaults from '@nodecg/json-schema-defaults';
+import { stringifyError } from '.';
 
 const options: Options = {
 	allErrors: true,
@@ -24,46 +26,56 @@ const ajv = {
 };
 
 export function compileJsonSchema(schema: Record<any, unknown>): ValidateFunction {
-	const scheamVersion = extractSchemaVersion(schema);
-	if (scheamVersion.includes('draft-04')) {
+	const schemaVersion = extractSchemaVersion(schema);
+	if (schemaVersion.includes('draft-04')) {
 		return ajv.draft04.compile(schema);
 	}
 
-	if (scheamVersion.includes('draft-07')) {
+	if (schemaVersion.includes('draft-07')) {
 		return ajv.draft07.compile(schema);
 	}
 
-	if (scheamVersion.includes('draft-2019-09')) {
+	if (schemaVersion.includes('draft-2019-09')) {
 		return ajv['draft2019-09'].compile(schema);
 	}
 
-	if (scheamVersion.includes('draft-2020-12')) {
+	if (schemaVersion.includes('draft-2020-12')) {
 		return ajv['draft2020-12'].compile(schema);
 	}
 
-	throw new Error(`Unsupported JSON Schema version "${scheamVersion}"`);
+	throw new Error(`Unsupported JSON Schema version "${schemaVersion}"`);
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function formatJsonSchemaErrors(schema: Record<any, unknown>, errors?: ErrorObject[] | null): string {
-	const scheamVersion = extractSchemaVersion(schema);
-	if (scheamVersion.includes('draft-04')) {
+	const schemaVersion = extractSchemaVersion(schema);
+	if (schemaVersion.includes('draft-04')) {
 		return ajv.draft04.errorsText(errors).replace(/^data\//gm, '');
 	}
 
-	if (scheamVersion.includes('draft-07')) {
+	if (schemaVersion.includes('draft-07')) {
 		return ajv.draft07.errorsText(errors).replace(/^data\//gm, '');
 	}
 
-	if (scheamVersion.includes('draft-2019-09')) {
+	if (schemaVersion.includes('draft-2019-09')) {
 		return ajv['draft2019-09'].errorsText(errors).replace(/^data\//gm, '');
 	}
 
-	if (scheamVersion.includes('draft-2020-12')) {
+	if (schemaVersion.includes('draft-2020-12')) {
 		return ajv['draft2020-12'].errorsText(errors).replace(/^data\//gm, '');
 	}
 
-	throw new Error(`Unsupported JSON Schema version "${scheamVersion}"`);
+	throw new Error(`Unsupported JSON Schema version "${schemaVersion}"`);
+}
+
+export function getSchemaDefault(schema: Record<any, unknown>, labelForDebugging: string): unknown {
+	try {
+		return defaults(schema);
+	} catch (error: unknown) {
+		throw new Error(
+			`Error generating default value(s) for schema "${labelForDebugging}":\n\t${stringifyError(error)}`,
+		);
+	}
 }
 
 function extractSchemaVersion(schema: Record<any, unknown>): string {

@@ -1,7 +1,7 @@
 // This file contains code that is used in both server-side and client-side replicants.
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 // Packages
-import type { ErrorObject } from 'ajv';
+import type { ErrorObject, ValidateFunction } from 'ajv';
 import clone from 'clone';
 import objectPath from 'object-path';
 
@@ -9,7 +9,7 @@ import objectPath from 'object-path';
 import type { LoggerInterface } from './logger-interface';
 import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
-import { compileJsonSchema, formatJsonSchemaErrors } from './utils';
+import { compileJsonSchema, formatJsonSchemaErrors, stringifyError } from './utils';
 
 export type ReplicantValue<P extends NodeCG.Platform, V, O, S extends boolean = false> = P extends 'server'
 	? S extends true
@@ -240,7 +240,16 @@ export abstract class AbstractReplicant<
 			throw new Error("can't generate a validator for a replicant which lacks a schema");
 		}
 
-		const validate = compileJsonSchema(schema);
+		let validate: ValidateFunction;
+		try {
+			validate = compileJsonSchema(schema);
+		} catch (error: unknown) {
+			throw new Error(
+				`Error compiling JSON Schema for Replicant "${this.namespace}:${this.name}":\n\t${stringifyError(
+					error,
+				)}`,
+			);
+		}
 
 		/**
 		 * Validates a value against the current Replicant's schema.

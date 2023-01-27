@@ -4,12 +4,12 @@ import * as fs from 'fs';
 
 // Packages
 import clone from 'clone';
-import defaults from 'json-schema-defaults';
 import extend from 'extend';
 import type { NodeCG } from '../../types/nodecg';
+import type { ValidateFunction } from 'ajv';
 
 // Ours
-import { compileJsonSchema, formatJsonSchemaErrors } from '../../shared/utils';
+import { compileJsonSchema, formatJsonSchemaErrors, getSchemaDefault, stringifyError } from '../../shared/utils';
 
 export function parse(
 	bundleName: string,
@@ -22,8 +22,14 @@ export function parse(
 	}
 
 	const schema = _parseSchema(bundleName, cfgSchemaPath);
-	const defaultConfig = defaults(schema);
-	const validateUserConfig = compileJsonSchema(schema);
+	const defaultConfig = getSchemaDefault(schema, bundleName) as NodeCG.Bundle.UnknownConfig;
+	let validateUserConfig: ValidateFunction;
+	try {
+		validateUserConfig = compileJsonSchema(schema);
+	} catch (error: unknown) {
+		throw new Error(`Error compiling JSON Schema for bundle config "${bundleName}":\n\t${stringifyError(error)}`);
+	}
+
 	const userConfigValid = validateUserConfig(userConfig);
 	let finalConfig;
 
@@ -65,7 +71,7 @@ export function parseDefaults(bundleName: string, bundleDir: string): Record<str
 	const cfgSchemaPath = path.resolve(bundleDir, 'configschema.json');
 	if (fs.existsSync(cfgSchemaPath)) {
 		const schema = _parseSchema(bundleName, cfgSchemaPath);
-		return defaults(schema);
+		return getSchemaDefault(schema, bundleName) as Record<string, any>;
 	}
 
 	return {};

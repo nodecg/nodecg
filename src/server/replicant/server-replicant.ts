@@ -5,7 +5,6 @@ import * as path from 'path';
 // Packages
 import $RefParser from 'json-schema-lib';
 import clone from 'clone';
-import schemaDefaults from 'json-schema-defaults';
 import sha1 from 'sha1';
 
 // Ours
@@ -19,6 +18,7 @@ import {
 import replaceRefs from './schema-hacks';
 import createLogger from '../logger';
 import type { NodeCG } from '../../types/nodecg';
+import { getSchemaDefault } from '../../shared/utils';
 
 // Never instantiate this directly.
 // Always use Replicator.declare instead.
@@ -74,7 +74,7 @@ export default class ServerReplicant<
 
 		// Set the default value, if a schema is present and no default value was provided.
 		if (this.schema && defaultValue === undefined) {
-			defaultValue = schemaDefaults(this.schema) as V;
+			defaultValue = getSchemaDefault(this.schema, `${this.namespace}:${this.name}`) as V;
 		}
 
 		// If `opts.persistent` is true and this replicant has a persisted value, try to load that persisted value.
@@ -84,7 +84,7 @@ export default class ServerReplicant<
 				this.value = startingValue as any;
 				this.log.replicants('Loaded a persisted value:', startingValue);
 			} else if (this.schema) {
-				this.value = schemaDefaults(this.schema) as any;
+				this.value = getSchemaDefault(this.schema, `${this.namespace}:${this.name}`) as any;
 				this.log.replicants(
 					'Discarded persisted value, as it failed schema validation. Replaced with defaults from schema.',
 				);
