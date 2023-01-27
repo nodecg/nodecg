@@ -16,6 +16,7 @@ export enum UnAuthErrCode {
 	InternalError = 'internal_error',
 	InvalidToken = 'invalid_token',
 	TokenRevoked = 'token_invalidated',
+	InvalidSession = 'invalid_session',
 }
 
 export type ProtocolError = {

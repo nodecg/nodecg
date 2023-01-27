@@ -44,6 +44,7 @@ import compression from 'compression';
 import type { Server } from 'http';
 import SocketIO from 'socket.io';
 import appRootPath from 'app-root-path';
+import passport from 'passport';
 
 // Ours
 import BundleManager from '../bundle-manager';
@@ -166,7 +167,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		if (config.login?.enabled) {
 			log.info('Login security enabled');
 			const login = await import('../login');
-			const loginMiddleware = await login.createMiddleware({
+			const { app: loginMiddleware, sessionMiddleware } = await login.createMiddleware({
 				onLogin: (user) => {
 					this._extensionManager?.emitToAllInstances('login', user);
 				},
@@ -175,6 +176,15 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 				},
 			});
 			app.use(loginMiddleware);
+
+			// convert a connect middleware to a Socket.IO middleware
+			const wrap = (middleware: any) => (socket: SocketIO.Socket, next: any) =>
+				middleware(socket.request, {}, next);
+
+			io.use(wrap(sessionMiddleware));
+			io.use(wrap(passport.initialize()));
+			io.use(wrap(passport.session()));
+
 			this._io.use(socketAuthMiddleware);
 		} else {
 			app.get('/login*', (_, res) => {

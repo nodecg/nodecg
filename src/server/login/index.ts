@@ -342,7 +342,7 @@ if (config.login.local?.enabled) {
 export async function createMiddleware(callbacks: {
 	onLogin(user: Express.User): void;
 	onLogout(user: Express.User): void;
-}): Promise<express.Application> {
+}): Promise<{ app: express.Application; sessionMiddleware: express.RequestHandler }> {
 	const database = await getConnection();
 	const sessionRepository = database.getRepository(Session);
 	const app = express();
@@ -351,6 +351,7 @@ export async function createMiddleware(callbacks: {
 		delete req.session.returnTo;
 		res.redirect(url);
 		app.emit('login', req.user);
+		if (req.user) callbacks.onLogin(req.user);
 	};
 
 	if (!config.login.sessionSecret) {
@@ -359,22 +360,22 @@ export async function createMiddleware(callbacks: {
 
 	app.use(cookieParser(config.login.sessionSecret));
 
-	app.use(
-		expressSession({
-			resave: false,
-			saveUninitialized: false,
-			store: new TypeormStore({
-				cleanupLimit: 2,
-				ttl: Infinity,
-			}).connect(sessionRepository),
-			secret: config.login.sessionSecret,
-			cookie: {
-				path: '/',
-				httpOnly: true,
-				secure: config.ssl?.enabled,
-			},
-		}),
-	);
+	const sessionMiddleware = expressSession({
+		resave: false,
+		saveUninitialized: false,
+		store: new TypeormStore({
+			cleanupLimit: 2,
+			ttl: Infinity,
+		}).connect(sessionRepository),
+		secret: config.login.sessionSecret,
+		cookie: {
+			path: '/',
+			httpOnly: true,
+			secure: config.ssl?.enabled,
+		},
+	});
+
+	app.use(sessionMiddleware);
 
 	app.use(passport.initialize());
 	app.use(passport.session());
@@ -431,7 +432,8 @@ export async function createMiddleware(callbacks: {
 			});
 			res.redirect('/login');
 		});
+		if (req.user) callbacks.onLogout(req.user);
 	});
 
-	return app;
+	return { app, sessionMiddleware };
 }
