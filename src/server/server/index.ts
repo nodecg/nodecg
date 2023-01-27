@@ -346,17 +346,10 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 	}
 
 	async stop(): Promise<void> {
-		await new Promise<void>((resolve, reject) => {
-			this._server.close((err) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve();
-				}
-			});
-		});
+		this._io.disconnectSockets(true);
 
 		await new Promise<void>((resolve) => {
+			// Also closes the underlying HTTP server.
 			this._io.close(() => {
 				resolve();
 			});
