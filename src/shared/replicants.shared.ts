@@ -173,7 +173,11 @@ export abstract class AbstractReplicant<
 			switch (operation.method) {
 				case 'overwrite': {
 					const { newValue } = operation.args;
-					this.value = proxyRecursive(this, newValue as any, operation.path);
+					this[process.env.BROWSER ? 'value' : '_value'] = proxyRecursive(
+						this,
+						newValue as any,
+						operation.path,
+					);
 					result = true;
 					break;
 				}

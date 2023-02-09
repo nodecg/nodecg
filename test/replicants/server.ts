@@ -88,7 +88,7 @@ test.serial('should react to changes in nested properties of objects', async (t)
 				return;
 			}
 
-			t.deepEqual(oldVal, { a: { b: { c: 'c' } } });
+			t.deepEqual(oldVal, undefined);
 			t.deepEqual(newVal, { a: { b: { c: 'nestedChangeOK' } } });
 			t.deepEqual(operations, [
 				{
@@ -121,7 +121,7 @@ test.serial('memoization', (t) => {
 });
 
 test.serial('should only apply array splices from the client once', async (t) => {
-	t.plan(1);
+	t.plan(3);
 
 	const serverRep = t.context.apis.extension.Replicant('clientDoubleApplyTest', {
 		persistent: false,
@@ -131,23 +131,34 @@ test.serial('should only apply array splices from the client once', async (t) =>
 	return dashboard
 		.evaluate(
 			async () =>
-				new Promise((resolve) => {
+				new Promise<void>((resolve) => {
 					(window as any).clientDoubleApplyTest = window.dashboardApi.Replicant('clientDoubleApplyTest');
-					(window as any).clientDoubleApplyTest.on('declared', () => {
-						(window as any).clientDoubleApplyTest.on('change', resolve);
+					(window as any).clientDoubleApplyTest.once('declared', () => {
+						(window as any).clientDoubleApplyTest.on('change', () => {
+							resolve();
+						});
 					});
 				}),
 		)
 		.then(async () => {
+			let changeNum = 0;
 			const promise = new Promise<void>((resolve) => {
 				serverRep.on('change', (newVal) => {
-					if (Array.isArray(newVal) && newVal[0] === 'test') {
+					if (changeNum === 0) {
+						t.deepEqual(newVal, []);
+					} else {
 						t.deepEqual(newVal, ['test']);
 						resolve();
 					}
+
+					changeNum++;
 				});
 			});
-			void dashboard.evaluate(() => (window as any).clientDoubleApplyTest.value.push('test'));
+
+			t.deepEqual(serverRep.value, []);
+
+			await dashboard.evaluate(() => (window as any).clientDoubleApplyTest.value.push('test'));
+
 			return promise;
 		});
 });
@@ -181,6 +192,8 @@ test.serial('should not override/quickfire .once for events other than "change"'
 test.serial('arrays - should support the "delete" operator', async (t) => {
 	t.plan(3);
 
+	let deleted = false;
+
 	const rep = t.context.apis.extension.Replicant<any[]>('serverArrayDelete', {
 		persistent: false,
 		defaultValue: ['foo', 'bar'],
@@ -188,34 +201,35 @@ test.serial('arrays - should support the "delete" operator', async (t) => {
 
 	const promise = new Promise<void>((resolve) => {
 		rep.on('change', (newVal, oldVal, operations) => {
-			if (operations && operations[1].method === 'delete') {
-				t.deepEqual(newVal, [, 'bar']); // eslint-disable-line no-sparse-arrays
-				t.deepEqual(oldVal, ['foo', 'bar']);
-				t.deepEqual(operations, [
-					{
-						path: '/',
-						method: 'overwrite' as const,
-						args: {
-							newValue: ['foo', 'bar'],
-						},
-					},
-					{
-						args: { prop: '0' as any },
-						path: '/',
-						method: 'delete' as const,
-					},
-				]);
-				resolve();
+			if (!deleted) {
+				return;
 			}
+
+			t.deepEqual(newVal, [, 'bar']); // eslint-disable-line no-sparse-arrays
+			t.deepEqual(oldVal, ['foo', 'bar']);
+			t.deepEqual(operations, [
+				{
+					args: { prop: '0' as any },
+					path: '/',
+					method: 'delete' as const,
+				},
+			]);
+			resolve();
 		});
 	});
 
-	delete rep.value[0];
+	process.nextTick(() => {
+		delete rep.value[0];
+		deleted = true;
+	});
+
 	return promise;
 });
 
 test.serial('arrays - should react to changes', async (t) => {
 	t.plan(3);
+
+	let pushed = false;
 
 	const rep = t.context.apis.extension.Replicant('extensionArrTest', {
 		persistent: false,
@@ -224,20 +238,13 @@ test.serial('arrays - should react to changes', async (t) => {
 
 	const promise = new Promise<void>((resolve) => {
 		rep.on('change', (newVal, oldVal, operations) => {
-			if (!operations) {
+			if (!pushed) {
 				return;
 			}
 
 			t.deepEqual(oldVal, ['starting']);
 			t.deepEqual(newVal, ['starting', 'arrPushOK']);
 			t.deepEqual(operations, [
-				{
-					args: {
-						newValue: ['starting'],
-					},
-					path: '/',
-					method: 'overwrite',
-				},
 				{
 					args: {
 						mutatorArgs: ['arrPushOK'],
@@ -250,7 +257,11 @@ test.serial('arrays - should react to changes', async (t) => {
 		});
 	});
 
-	rep.value.push('arrPushOK');
+	process.nextTick(() => {
+		rep.value.push('arrPushOK');
+		pushed = true;
+	});
+
 	return promise;
 });
 
@@ -405,4 +416,49 @@ test.serial('should leave the default value intact', (t) => {
 
 	t.is(rep.opts.defaultValue, defaultValue);
 	t.not(rep.value, defaultValue);
+});
+
+test.serial('provides accurate new and old values for assignment operations', async (t) => {
+	t.plan(8);
+
+	const rep = t.context.apis.extension.Replicant<number | undefined>('serverNewAndOldValues');
+	let changeNumber = 0;
+
+	const promise = new Promise<void>((resolve, reject) => {
+		rep.on('change', (n, o) => {
+			switch (changeNumber++) {
+				case 0:
+					t.is(n, undefined);
+					t.is(o, undefined);
+					break;
+				case 1:
+					t.is(n, 1);
+					t.is(o, undefined);
+					break;
+				case 2:
+					t.is(n, 2);
+					t.is(o, 1);
+					break;
+				case 3:
+					t.is(n, 3);
+					t.is(o, 2);
+					resolve();
+					return;
+				default:
+					t.fail(`Unexpected change number "${changeNumber}"`);
+					reject();
+					return;
+			}
+
+			setTimeout(() => {
+				if (n === undefined) {
+					rep.value = 1;
+				} else {
+					(rep as any).value++;
+				}
+			}, 0);
+		});
+	});
+
+	await promise;
 });

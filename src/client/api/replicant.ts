@@ -280,7 +280,6 @@ export default class ClientReplicant<
 
 	/**
 	 * Overwrites the value completely, and assigns a new one.
-	 * Does not send a `change` argument with the change event.
 	 * @param newValue {*} - The value to assign.
 	 * @param revision {number} - The new revision number.
 	 * @private

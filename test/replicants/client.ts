@@ -769,3 +769,66 @@ test.serial('emits assignment in the correct order', async (t) => {
 		revision: 2,
 	});
 });
+
+test.serial('provides accurate new and old values for assignment operations', async (t) => {
+	t.plan(1);
+
+	await dashboard.evaluate(
+		async () =>
+			new Promise<void>((resolve, reject) => {
+				const rep = window.dashboardApi.Replicant<number | undefined>('clientNewAndOldValues');
+				let changeNumber = 0;
+
+				rep.on('operationsRejected', (reason) => {
+					reject(new Error(`Operations rejected: ${reason}`));
+				});
+
+				rep.on('change', (n, o) => {
+					switch (changeNumber++) {
+						case 0:
+							if (n !== undefined || o !== undefined) {
+								reject(new Error(`Test case 0 failed: n: ${n}, o: ${o}`));
+								return;
+							}
+
+							break;
+						case 1:
+							if (n !== 1 || o !== undefined) {
+								reject(new Error(`Test case 1 failed: n: ${n}, o: ${o}`));
+								return;
+							}
+
+							break;
+						case 2:
+							if (n !== 2 || o !== 1) {
+								reject(new Error(`Test case 2 failed: n: ${n}, o: ${o}`));
+								return;
+							}
+
+							break;
+						case 3:
+							if (n === 3 && o === 2) {
+								resolve();
+							} else {
+								reject(new Error(`Test case 3 failed: n: ${n}, o: ${o}`));
+							}
+
+							return;
+						default:
+							reject(new Error(`Unexpected default`));
+							return;
+					}
+
+					setTimeout(() => {
+						if (n === undefined) {
+							rep.value = 1;
+						} else {
+							(rep as any).value++;
+						}
+					}, 0);
+				});
+			}),
+	);
+
+	t.pass();
+});

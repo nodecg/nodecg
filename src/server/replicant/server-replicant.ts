@@ -122,9 +122,6 @@ export default class ServerReplicant<
 		this.validate(newValue);
 		this.log.replicants('running setter with', newValue);
 		const clonedNewVal = clone(newValue);
-		ignoreProxy(this);
-		this._value = proxyRecursive(this, newValue, '/');
-		resumeProxy(this);
 		this._addOperation({
 			path: '/',
 			method: 'overwrite',
@@ -132,6 +129,9 @@ export default class ServerReplicant<
 				newValue: clonedNewVal,
 			},
 		});
+		ignoreProxy(this);
+		this._value = proxyRecursive(this, newValue, '/');
+		resumeProxy(this);
 	}
 
 	/**

@@ -134,7 +134,7 @@ export default class Replicator {
 	): void {
 		// Emit to clients (in the given namespace's room) using Socket.IO
 		const namespace = `replicant:${replicant.namespace}:${replicant.name}`;
-		log.replicants('emitting %s to %s:', eventName, namespace, data);
+		log.replicants('emitting %s to %s:', eventName, namespace, JSON.stringify(data, undefined, 2));
 		(this.io as any).to(namespace).emit(eventName, data); // TODO: figure out how to type this properly
 	}
 
@@ -216,7 +216,7 @@ export default class Replicator {
 
 	private _attachToSocket(socket: TypedServerSocket): void {
 		socket.on('replicant:declare', (data, cb) => {
-			log.replicants('received replicant:declare', data);
+			log.replicants('received replicant:declare', JSON.stringify(data, undefined, 2));
 			try {
 				const replicant = this.declare(data.name, data.namespace, data.opts);
 				cb(undefined, {
@@ -237,7 +237,7 @@ export default class Replicator {
 		});
 
 		socket.on('replicant:proposeOperations', (data, cb) => {
-			log.replicants('received replicant:proposeOperations', data);
+			log.replicants('received replicant:proposeOperations', JSON.stringify(data, undefined, 2));
 			const serverReplicant = this.declare(data.name, data.namespace, data.opts);
 			if (serverReplicant.schema && (!('schemaSum' in data) || data.schemaSum !== serverReplicant.schemaSum)) {
 				log.replicants(
@@ -271,7 +271,7 @@ export default class Replicator {
 		});
 
 		socket.on('replicant:read', (data, cb) => {
-			log.replicants('replicant:read', data);
+			log.replicants('replicant:read', JSON.stringify(data, undefined, 2));
 			const replicant = this.declare(data.name, data.namespace);
 			if (typeof cb === 'function') {
 				if (replicant) {
