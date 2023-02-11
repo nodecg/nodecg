@@ -88,16 +88,9 @@ test.serial('should react to changes in nested properties of objects', async (t)
 				return;
 			}
 
-			t.deepEqual(oldVal, undefined);
+			t.deepEqual(oldVal, { a: { b: { c: 'c' } } });
 			t.deepEqual(newVal, { a: { b: { c: 'nestedChangeOK' } } });
 			t.deepEqual(operations, [
-				{
-					args: {
-						newValue: { a: { b: { c: 'c' } } },
-					},
-					method: 'overwrite',
-					path: '/',
-				},
 				{
 					args: {
 						newValue: 'nestedChangeOK',
@@ -461,4 +454,26 @@ test.serial('provides accurate new and old values for assignment operations', as
 	});
 
 	await promise;
+});
+
+test.serial('should not emit more than one change event on startup when a defaultValue is supplied', async (t) => {
+	t.plan(1);
+
+	const rep = t.context.apis.extension.Replicant('multipleStartupChangeEvents', { defaultValue: 0 });
+
+	let numAChanges = 0;
+	rep.on('change', () => {
+		numAChanges++;
+		if (numAChanges > 1) {
+			t.fail('Too many change events emitted');
+		}
+	});
+
+	await new Promise<void>((resolve) => {
+		process.nextTick(() => {
+			resolve();
+		});
+	});
+
+	t.is(numAChanges, 1);
 });

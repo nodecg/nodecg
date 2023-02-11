@@ -750,7 +750,7 @@ test.serial('emits assignment in the correct order', async (t) => {
 		async () =>
 			new Promise((resolve) => {
 				(window as any).clientRep.on('change', (newVal: any) => {
-					if ((window as any).clientRep.revision === 2) {
+					if ((window as any).clientRep.revision === 1) {
 						resolve({
 							// Without this JSON.parse hack,
 							// newVal gets serialized as an empty object.
@@ -766,7 +766,7 @@ test.serial('emits assignment in the correct order', async (t) => {
 	// If the ordering is wrong, `ret` will be `['bar', 'foo']`.
 	t.deepEqual(ret, {
 		newVal: ['bar'],
-		revision: 2,
+		revision: 1,
 	});
 });
 
