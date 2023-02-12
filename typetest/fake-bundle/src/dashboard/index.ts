@@ -58,3 +58,8 @@ nodecg.bundleConfig.foo.bar = 'bar';
 // This tests that bundleConfig only specifies known properties
 // @ts-expect-error
 nodecg.bundleConfig.nope;
+
+// This tests that the generic for readReplicant works
+nodecg.readReplicant<string>('readTest', (value) => {
+	assertTypeOrUndefined<string>(value);
+});

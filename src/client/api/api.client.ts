@@ -11,7 +11,7 @@ import type { NodeCG } from '../../types/nodecg';
 
 type SendMessageCb<T> = (error?: unknown, response?: T) => void;
 
-type ReadReplicantCb = (value: unknown) => void;
+type ReadReplicantCb<T = unknown> = (value: T | undefined) => void;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type EventMap = {};
@@ -109,12 +109,12 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	}
 	/* eslint-enable no-dupe-class-members */
 
-	static readReplicant(name: string, namespace: string, cb: ReadReplicantCb): void {
+	static readReplicant<T = unknown>(name: string, namespace: string, cb: ReadReplicantCb<T>): void {
 		globalThis.socket.emit('replicant:read', { name, namespace }, (error, value?) => {
 			if (error) {
 				console.error(error);
 			} else {
-				cb(value);
+				cb(value as T | undefined);
 			}
 		});
 	}
@@ -423,11 +423,11 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		return this.sendMessageToBundle(messageName, this.bundleName, dataOrCb, cb as any);
 	}
 
-	readReplicant(name: string, cb: ReadReplicantCb): void;
-	readReplicant(name: string, namespace: string, cb: ReadReplicantCb): void;
-	readReplicant(name: string, nspOrCb: string | ReadReplicantCb, maybeCb?: ReadReplicantCb): void {
+	readReplicant<T = unknown>(name: string, cb: ReadReplicantCb<T>): void;
+	readReplicant<T = unknown>(name: string, namespace: string, cb: ReadReplicantCb<T>): void;
+	readReplicant<T = unknown>(name: string, nspOrCb: string | ReadReplicantCb<T>, maybeCb?: ReadReplicantCb<T>): void {
 		let namespace = this.bundleName;
-		let cb: ReadReplicantCb;
+		let cb: ReadReplicantCb<T>;
 		if (typeof nspOrCb === 'string') {
 			namespace = nspOrCb;
 			cb = maybeCb!;
@@ -435,7 +435,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 			cb = nspOrCb;
 		}
 
-		NodeCGAPIClient.readReplicant(name, namespace, cb);
+		NodeCGAPIClient.readReplicant<T>(name, namespace, cb);
 	}
 	/* eslint-enable no-dupe-class-members */
 

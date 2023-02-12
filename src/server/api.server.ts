@@ -51,7 +51,7 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 			});
 		}
 
-		static readReplicant(name: string, namespace: string): unknown {
+		static readReplicant<T = unknown>(name: string, namespace: string): T | undefined {
 			if (!name || typeof name !== 'string') {
 				throw new Error('Must supply a name when reading a Replicant');
 			}
@@ -61,7 +61,7 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 			}
 
 			const replicant = replicator.declare(name, namespace);
-			return replicant.value;
+			return replicant.value as T | undefined;
 		}
 
 		static Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
@@ -289,7 +289,7 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 		 *     console.log('myRep has the value '+ value +'!');
 		 * });
 		 */
-		readReplicant(name: string, param2?: string | NodeCG.Bundle): unknown {
+		readReplicant<T = unknown>(name: string, param2?: string | NodeCG.Bundle): T | undefined {
 			let { bundleName } = this;
 			if (typeof param2 === 'string') {
 				bundleName = param2;

@@ -77,4 +77,8 @@ export = (nodecg: NodeCG.ServerAPI<BundleConfig>) => {
 	// This tests that bundleConfig only specifies known properties
 	// @ts-expect-error
 	nodecg.bundleConfig.nope;
+
+	// This tests that the generic for readReplicant works
+	const readResult = nodecg.readReplicant<string>('readTest');
+	assertTypeOrUndefined<string>(readResult);
 };
