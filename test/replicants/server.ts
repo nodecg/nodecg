@@ -13,6 +13,7 @@ server.setup();
 const { initDashboard } = browser.setup();
 
 import { getConnection, Replicant } from '../../src/server/database';
+import { sleep } from '../helpers/utilities';
 
 let dashboard: puppeteer.Page;
 let database: Awaited<ReturnType<typeof getConnection>>;
@@ -476,4 +477,30 @@ test.serial('should not emit more than one change event on startup when a defaul
 	});
 
 	t.is(numAChanges, 1);
+});
+
+test.serial.only('should force persistence after maximumTimeAReplicantCanGoWithoutSaving', async (t) => {
+	t.plan(1);
+
+	const rep = t.context.apis.extension.Replicant('maximumTimeAReplicantCanGoWithoutSaving', {
+		defaultValue: 0,
+		persistenceInterval: 100,
+	});
+
+	// Update faster than the persistenceInterval, to prevent the throttle/debounce from ever resolving
+	const interval = setInterval(() => {
+		rep.value++;
+	}, 50);
+
+	await sleep(250);
+
+	// If the Replicant hasn't been able to persist a single time yet,
+	// this call will fail saying it couldn't find it.
+	const fromDb = await database.manager.findOneByOrFail(Replicant, {
+		namespace: 'test-bundle',
+		name: 'maximumTimeAReplicantCanGoWithoutSaving',
+	});
+
+	t.true(parseInt(fromDb.value, 10) > 0);
+	clearInterval(interval);
 });
