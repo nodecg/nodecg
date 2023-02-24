@@ -8,6 +8,11 @@ export const sleep = async (milliseconds: number): Promise<void> =>
 		setTimeout(resolve, milliseconds);
 	});
 
+export const waitOneTick = async (): Promise<void> =>
+	new Promise((resolve) => {
+		process.nextTick(resolve);
+	});
+
 export const waitForRegistration = async (page: Puppeteer.Page): Promise<unknown> => {
 	const response = await page.evaluate(
 		async () =>

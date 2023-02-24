@@ -20,9 +20,11 @@ import createLogger from '../logger';
 import type { NodeCG } from '../../types/nodecg';
 import { getSchemaDefault } from '../../shared/utils';
 
-// Never instantiate this directly.
-// Always use Replicator.declare instead.
-// The Replicator needs to have complete control over the ServerReplicant class.
+/**
+ * Never instantiate this directly.
+ * Always use Replicator.declare instead.
+ * The Replicator needs to have complete control over the ServerReplicant class.
+ */
 export default class ServerReplicant<
 	V,
 	O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
@@ -167,7 +169,8 @@ export default class ServerReplicant<
 			operations: this._operationQueue,
 			revision: this.revision,
 		});
-		this.emit('change', this.value, this._oldValue, this._operationQueue);
+		const opQ = this._operationQueue;
 		this._operationQueue = [];
+		this.emit('change', this.value, this._oldValue, opQ);
 	}
 }

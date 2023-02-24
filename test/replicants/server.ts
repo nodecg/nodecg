@@ -13,7 +13,7 @@ server.setup();
 const { initDashboard } = browser.setup();
 
 import { getConnection, Replicant } from '../../src/server/database';
-import { sleep } from '../helpers/utilities';
+import { sleep, waitOneTick } from '../helpers/utilities';
 
 let dashboard: puppeteer.Page;
 let database: Awaited<ReturnType<typeof getConnection>>;
@@ -462,24 +462,20 @@ test.serial('should not emit more than one change event on startup when a defaul
 
 	const rep = t.context.apis.extension.Replicant('multipleStartupChangeEvents', { defaultValue: 0 });
 
-	let numAChanges = 0;
+	let numChanges = 0;
 	rep.on('change', () => {
-		numAChanges++;
-		if (numAChanges > 1) {
+		numChanges++;
+		if (numChanges > 1) {
 			t.fail('Too many change events emitted');
 		}
 	});
 
-	await new Promise<void>((resolve) => {
-		process.nextTick(() => {
-			resolve();
-		});
-	});
+	await waitOneTick();
 
-	t.is(numAChanges, 1);
+	t.is(numChanges, 1);
 });
 
-test.serial.only('should force persistence after maximumTimeAReplicantCanGoWithoutSaving', async (t) => {
+test.serial('should force persistence after maximumTimeAReplicantCanGoWithoutSaving', async (t) => {
 	t.plan(1);
 
 	const rep = t.context.apis.extension.Replicant('maximumTimeAReplicantCanGoWithoutSaving', {
