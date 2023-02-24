@@ -29,10 +29,6 @@ function getConfigSchema(userConfig: Record<string, any>) {
 		exitOnUncaught: Joi.boolean().default(true).description('Whether or not to exit on uncaught exceptions.'),
 
 		logging: Joi.object({
-			replicants: Joi.boolean()
-				.default(false)
-				.description('Whether to enable logging of the Replicants subsystem. Very spammy.'),
-
 			console: Joi.object({
 				enabled: Joi.boolean().default(true).description('Whether to enable console logging.'),
 
@@ -43,6 +39,10 @@ function getConfigSchema(userConfig: Record<string, any>) {
 				timestamps: Joi.boolean()
 					.default(true)
 					.description('Whether to add timestamps to the console logging.'),
+
+				replicants: Joi.boolean()
+					.default(false)
+					.description('Whether to enable logging of the Replicants subsystem. Very spammy.'),
 			}).default(),
 
 			file: Joi.object({
@@ -54,6 +54,10 @@ function getConfigSchema(userConfig: Record<string, any>) {
 				path: Joi.string().default('logs/nodecg.log').description('The filepath to log to.'),
 
 				timestamps: Joi.boolean().default(true).description('Whether to add timestamps to the file logging.'),
+
+				replicants: Joi.boolean()
+					.default(false)
+					.description('Whether to enable logging of the Replicants subsystem. Very spammy.'),
 			}).default(),
 		}).default(),
 
@@ -283,16 +287,17 @@ export default function (cfgDirOrFile: string) {
 		port: config.port,
 		baseURL: config.baseURL,
 		logging: {
-			replicants: config.logging.replicants,
 			console: {
 				enabled: config.logging.console.enabled,
 				level: config.logging.console.level,
 				timestamps: config.logging.console.timestamps,
+				replicants: config.logging.console.replicants,
 			},
 			file: {
 				enabled: config.logging.file.enabled,
 				level: config.logging.file.level,
 				timestamps: config.logging.file.timestamps,
+				replicants: config.logging.file.replicants,
 			},
 		},
 		login: {

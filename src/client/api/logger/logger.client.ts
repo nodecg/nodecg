@@ -21,8 +21,8 @@ type LoggerOptions = {
 	console: {
 		enabled: boolean;
 		level?: LogLevel;
+		replicants?: boolean;
 	};
-	replicants: boolean;
 };
 
 /**
@@ -40,7 +40,7 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 	 */
 	return class Logger implements LoggerInterface {
 		// A messy bit of internal state used to determine if the special-case "replicants" logging level is active.
-		static _shouldLogReplicants = Boolean(initialOpts.replicants);
+		static _shouldLogReplicants = Boolean(initialOpts.console?.replicants);
 
 		static _silent = !initialOpts.console?.enabled;
 

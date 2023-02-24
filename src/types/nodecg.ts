@@ -218,17 +218,18 @@ export namespace NodeCG {
 		baseURL: string;
 		exitOnUncaught: boolean;
 		logging: {
-			replicants: boolean;
 			console: {
 				enabled: boolean;
 				level: LogLevel;
 				timestamps: boolean;
+				replicants: boolean;
 			};
 			file: {
 				enabled: boolean;
 				level: LogLevel;
 				path: string;
 				timestamps: boolean;
+				replicants: boolean;
 			};
 		};
 		bundles: {
@@ -289,16 +290,17 @@ export namespace NodeCG {
 		port: number;
 		baseURL: string;
 		logging: {
-			replicants: boolean;
 			console: {
 				enabled: boolean;
 				level: string;
 				timestamps: boolean;
+				replicants: boolean;
 			};
 			file: {
 				enabled: boolean;
 				level: string;
 				timestamps: boolean;
+				replicants: boolean;
 			};
 		};
 		sentry: {

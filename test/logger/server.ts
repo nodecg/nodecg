@@ -58,7 +58,8 @@ test('file - should make the logs folder', (t) => {
 });
 
 test('replicant - should default to false', (t) => {
-	t.is(Logger._shouldLogReplicants, false);
+	t.is(Logger._shouldConsoleLogReplicants, false);
+	t.is(Logger._shouldFileLogReplicants, false);
 });
 
 test('replicant - should do nothing when Logger._shouldLogReplicants is false', (t) => {

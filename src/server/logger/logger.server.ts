@@ -16,14 +16,15 @@ type LoggerOptions = {
 		enabled: boolean;
 		timestamps: boolean;
 		level: LogLevel;
+		replicants: boolean;
 	}>;
 	file: Partial<{
 		enabled: boolean;
 		timestamps: boolean;
 		level: LogLevel;
 		path: string;
+		replicants: boolean;
 	}>;
-	replicants: boolean;
 };
 
 /**
@@ -84,8 +85,20 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 		error: 'red',
 	});
 
-	const mainLogger = winston.createLogger({
-		transports: [consoleTransport, fileTransport],
+	const consoleLogger = winston.createLogger({
+		transports: [consoleTransport],
+		levels: {
+			verbose: 4,
+			trace: 4,
+			debug: 3,
+			info: 2,
+			warn: 1,
+			error: 0,
+		},
+	});
+
+	const fileLogger = winston.createLogger({
+		transports: [fileTransport],
 		levels: {
 			verbose: 4,
 			trace: 4,
@@ -103,33 +116,44 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 	 * @constructor
 	 */
 	return class Logger implements LoggerInterface {
-		static readonly _winston = mainLogger;
+		static readonly _winston = consoleLogger;
 
 		// A messy bit of internal state used to determine if the special-case "replicants" logging level is active.
-		static _shouldLogReplicants = Boolean(initialOpts.replicants);
+		static _shouldConsoleLogReplicants = Boolean(initialOpts.console?.replicants);
+		static _shouldFileLogReplicants = Boolean(initialOpts.file?.replicants);
 
 		constructor(public name: string) {
 			this.name = name;
 		}
 
 		trace(...args: any[]): void {
-			mainLogger.verbose(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
+			[consoleLogger, fileLogger].forEach((logger) =>
+				logger.verbose(`[${this.name}] ${format(args[0], ...args.slice(1))}`),
+			);
 		}
 
 		debug(...args: any[]): void {
-			mainLogger.debug(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
+			[consoleLogger, fileLogger].forEach((logger) =>
+				logger.debug(`[${this.name}] ${format(args[0], ...args.slice(1))}`),
+			);
 		}
 
 		info(...args: any[]): void {
-			mainLogger.info(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
+			[consoleLogger, fileLogger].forEach((logger) =>
+				logger.info(`[${this.name}] ${format(args[0], ...args.slice(1))}`),
+			);
 		}
 
 		warn(...args: any[]): void {
-			mainLogger.warn(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
+			[consoleLogger, fileLogger].forEach((logger) =>
+				logger.warn(`[${this.name}] ${format(args[0], ...args.slice(1))}`),
+			);
 		}
 
 		error(...args: any[]): void {
-			mainLogger.error(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
+			[consoleLogger, fileLogger].forEach((logger) =>
+				logger.error(`[${this.name}] ${format(args[0], ...args.slice(1))}`),
+			);
 
 			if (sentry) {
 				const formattedArgs = args.map((argument) =>
@@ -143,11 +167,13 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 		}
 
 		replicants(...args: any[]): void {
-			if (!Logger._shouldLogReplicants) {
-				return;
+			if (Logger._shouldConsoleLogReplicants) {
+				consoleLogger.info(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
 			}
 
-			mainLogger.info(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
+			if (Logger._shouldFileLogReplicants) {
+				fileLogger.info(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
+			}
 		}
 	};
 }
