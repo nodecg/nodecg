@@ -34,14 +34,7 @@ import NodeCGServer from './server';
 process.title = 'NodeCG';
 global.exitOnUncaught = true;
 
-const nodeVersion = process.versions.node;
 process.title += ` - ${String(pjson.version)}`;
-
-if (!semver.satisfies(nodeVersion, pjson.engines.node)) {
-	console.error(`ERROR: NodeCG requires Node.js ${String(pjson.engines.node)}`);
-	console.error(`       Your Node.js version: v${nodeVersion}`);
-	process.exit(1);
-}
 
 process.on('uncaughtException', (err) => {
 	if (!global.sentryEnabled) {

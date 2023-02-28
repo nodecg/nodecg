@@ -31,7 +31,7 @@ jobs:
         uses: vimtor/action-zip@v1
         with:
           # Be sure to keep this in sync with the `files` array in `package.json`
-          files: build/ generated-types/ bundles/.empty_directory db/.empty_directory schemas/ AUTHORS package-lock.json package.json
+          files: build/ scripts/ generated-types/ bundles/.empty_directory db/.empty_directory schemas/ AUTHORS package-lock.json package.json
           recursive: true
           dest: nodecg.zip
 

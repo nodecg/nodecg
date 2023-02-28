@@ -130,13 +130,12 @@
     "release": "standard-version",
     "postrelease": "npm publish && git push --follow-tags",
     "generate-migrations": "cd src/server && typeorm-ts-node-commonjs migration:generate ./database/migration/rename-me -d ./database/datasource.ts",
-    "predev": "trash build && trash build-types"
-  },
-  "engines": {
-    "node": "^16 || ^18"
+    "predev": "trash build && trash build-types",
+    "postinstall": "node scripts/warn-engines.mjs"
   },
   "files": [
     "build",
+    "scripts",
     "generated-types",
     "bundles/.empty_directory",
     "db/.empty_directory",
