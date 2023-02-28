@@ -66,6 +66,17 @@
 		register();
 	});
 
+	globalThis.socket.on('disconnect', (reason) => {
+		if (reason === 'io server disconnect') {
+			// The server forcibly closed the socket.
+			// In this case, the client won't automatically reconnect.
+			// So, we manually do it here:
+			socket.connect();
+		} else {
+			console.log('Socket disconnect reason:', reason);
+		}
+	});
+
 	function register(): void {
 		globalThis.socket.emit(
 			'graphic:registerSocket',
