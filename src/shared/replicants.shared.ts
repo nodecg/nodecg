@@ -274,7 +274,7 @@ export abstract class AbstractReplicant<
 					throw new Error(
 						`Invalid value rejected for replicant "${this.name}" in namespace "${
 							this.namespace
-						}":\n${formatJsonSchemaErrors(schema, validate.errors)}}`,
+						}":\n${formatJsonSchemaErrors(schema, validate.errors)}`,
 					);
 				}
 			}
