@@ -1,4 +1,4 @@
-import semver from 'semver';
+const semver = require('semver');
 
 if (!semver.satisfies(process.versions.node, '^16 || ^18')) {
 	console.warn(
