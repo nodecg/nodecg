@@ -269,7 +269,7 @@ test.serial('objects - throw an error when an object is owned by multiple Replic
 	rep1.value.foo = bar;
 
 	const error = t.throws(() => {
-		rep2.value.foo = bar;
+		(rep2.value as any).foo = bar;
 	});
 
 	if (!error) return t.fail();

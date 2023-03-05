@@ -286,5 +286,5 @@ test('server - #bundleGit', (t) => {
 
 test('bundles replicant', (t) => {
 	const bundlesRep = t.context.apis.extension.Replicant<NodeCG.Bundle[]>('bundles', 'nodecg');
-	t.is(bundlesRep.value.length, 5);
+	t.is(bundlesRep.value?.length, 5);
 });

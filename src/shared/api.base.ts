@@ -275,30 +275,30 @@ export abstract class NodeCGAPIBase<
 	 * myRep.value = {objects: {can: {be: 'nested!'}}};
 	 * myRep.value = ['Even', 'arrays', 'work!'];
 	 */
-	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
+	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
 		name: string,
 		namespace: string,
 		opts?: O,
 	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
+	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
 		name: string,
 		opts?: O,
 	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
+	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
 		name: string,
 		namespaceOrOpts?: string | O,
 		opts?: O,
 	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
+	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
 		name: string,
 		namespace: string,
 		opts?: O,
 	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
+	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
 		name: string,
 		opts?: O,
 	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
+	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
 		name: string,
 		namespaceOrOpts?: string | O,
 		opts?: O,

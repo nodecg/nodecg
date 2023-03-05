@@ -81,4 +81,12 @@ export = (nodecg: NodeCG.ServerAPI<BundleConfig>) => {
 	// This tests that the generic for readReplicant works
 	const readResult = nodecg.readReplicant<string>('readTest');
 	assertTypeOrUndefined<string>(readResult);
+
+	// This tests some conditions for having "undefined" be a possible value of a Replicant.
+	const withGenericButNoOptions = nodecg.Replicant<{ param: string }>('withGenericButNoOptions');
+	// @ts-expect-error
+	withGenericButNoOptions.value.param = 'thing';
+	const withGenericAndEmptyOptions = nodecg.Replicant<{ param: string }>('withGenericAndEmptyOptions', {});
+	// @ts-expect-error
+	withGenericAndEmptyOptions.value.param = 'thing';
 };
