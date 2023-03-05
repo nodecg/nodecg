@@ -284,9 +284,10 @@ test.serial('dates - should not throw an error', (t) => {
 	});
 });
 
-test.serial('persistent - should load persisted values when they exist', (t) => {
+test.serial('persistent - should load persisted values when they exist', async (t) => {
 	const rep = t.context.apis.extension.Replicant('extensionPersistence', { persistenceInterval: 0 });
 	t.is(rep.value, 'it work good!');
+	await t.context.server.saveAllReplicantsNow();
 });
 
 test.serial('persistent - should persist assignment to database', async (t) => {
