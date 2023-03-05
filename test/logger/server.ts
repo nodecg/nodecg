@@ -38,19 +38,19 @@ test.beforeEach((t) => {
 });
 
 test('console - should default to being silent', (t) => {
-	t.is(Logger._winston.transports[0].silent, true);
+	t.is(Logger._consoleLogger.transports[0].silent, true);
 });
 
 test('console - should default to level "info"', (t) => {
-	t.is(Logger._winston.transports[0].level, 'info');
+	t.is(Logger._consoleLogger.transports[0].level, 'info');
 });
 
 test('file - should default to being silent', (t) => {
-	t.is(Logger._winston.transports[1].silent, true);
+	t.is(Logger._fileLogger.transports[0].silent, true);
 });
 
 test('file - should default to level "info"', (t) => {
-	t.is(Logger._winston.transports[1].level, 'info');
+	t.is(Logger._fileLogger.transports[0].level, 'info');
 });
 
 test('file - should make the logs folder', (t) => {
@@ -63,7 +63,12 @@ test('replicant - should default to false', (t) => {
 });
 
 test('replicant - should do nothing when Logger._shouldLogReplicants is false', (t) => {
-	const info = sinon.spy(Logger._winston, 'info');
+	let info = sinon.spy(Logger._consoleLogger, 'info');
+	t.context.logger.replicants('replicants');
+	t.is(info.called, false);
+	info.restore();
+
+	info = sinon.spy(Logger._fileLogger, 'info');
 	t.context.logger.replicants('replicants');
 	t.is(info.called, false);
 	info.restore();

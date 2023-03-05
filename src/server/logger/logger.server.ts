@@ -116,7 +116,8 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 	 * @constructor
 	 */
 	return class Logger implements LoggerInterface {
-		static readonly _winston = consoleLogger;
+		static readonly _consoleLogger = consoleLogger;
+		static readonly _fileLogger = fileLogger;
 
 		// A messy bit of internal state used to determine if the special-case "replicants" logging level is active.
 		static _shouldConsoleLogReplicants = Boolean(initialOpts.console?.replicants);
