@@ -163,7 +163,7 @@ async function makeDiscordAPIRequest(
 			Authorization: `Bot ${guild.guildBotToken}`,
 		},
 	});
-	 
+
 	const data = (await res.json()) as any;
 	if (res.status === 200) {
 		return [guild, false, data];
