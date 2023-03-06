@@ -322,6 +322,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		const extensionManager = new ExtensionManager(io, bundleManager, replicator, this.mount);
 		this._extensionManager = extensionManager;
 		this.emit('extensionsLoaded');
+		this._extensionManager?.emitToAllInstances('extensionsLoaded');
 
 		// We intentionally wait until all bundles and extensions are loaded before starting the server.
 		// This has two benefits:
@@ -350,6 +351,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 					const protocol = config.ssl?.enabled ? 'https' : 'http';
 					log.info('NodeCG running on %s://%s', protocol, config.baseURL);
 					this.emit('started');
+					this._extensionManager?.emitToAllInstances('serverStarted');
 					resolve();
 				},
 			);
@@ -357,6 +359,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 	}
 
 	async stop(): Promise<void> {
+		this._extensionManager?.emitToAllInstances('serverStopping');
 		this._io.disconnectSockets(true);
 
 		await new Promise<void>((resolve) => {

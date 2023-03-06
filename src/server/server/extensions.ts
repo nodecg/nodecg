@@ -17,9 +17,12 @@ import { stringifyError } from '../../shared/utils';
 
 const log = createLogger('extensions');
 
-type EventMap = {
+export type ExtensionEventMap = {
 	login: (user: Express.Request['user']) => void;
 	logout: (user: Express.Request['user']) => void;
+	extensionsLoaded: () => void;
+	serverStarted: () => void;
+	serverStopping: () => void;
 };
 
 export default class ExtensionManager extends EventEmitter {
@@ -115,7 +118,10 @@ export default class ExtensionManager extends EventEmitter {
 		log.trace('Completed extension mounting');
 	}
 
-	public emitToAllInstances<K extends keyof EventMap>(eventName: K, ...params: Parameters<EventMap[K]>): void {
+	public emitToAllInstances<K extends keyof ExtensionEventMap>(
+		eventName: K,
+		...params: Parameters<ExtensionEventMap[K]>
+	): void {
 		for (const instance of this._apiInstances) {
 			instance.emit(eventName, ...params);
 		}
