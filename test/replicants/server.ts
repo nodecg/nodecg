@@ -269,7 +269,9 @@ test.serial('objects - throw an error when an object is owned by multiple Replic
 	rep1.value.foo = bar;
 
 	const error = t.throws(() => {
-		(rep2.value as any).foo = bar;
+		if (rep2.value) {
+			rep2.value.foo = bar;
+		}
 	});
 
 	if (!error) return t.fail();
@@ -448,8 +450,10 @@ test.serial('provides accurate new and old values for assignment operations', as
 			setTimeout(() => {
 				if (n === undefined) {
 					rep.value = 1;
+				} else if (typeof rep.value === 'number') {
+					rep.value++;
 				} else {
-					(rep as any).value++;
+					throw new Error('Not sure how we got here');
 				}
 			}, 0);
 		});
