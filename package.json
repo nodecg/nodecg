@@ -63,7 +63,6 @@
     "cosmiconfig": "^8.0.0",
     "deep-equal": "^2.1.0",
     "draggabilly": "^2.4.1",
-    "exit-hook": "^2.2.1",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "express-transform-bare-module-specifiers": "^1.0.4",

@@ -12,7 +12,6 @@
 // Packages
 import appRootPath from 'app-root-path';
 import semver from 'semver';
-import exitHook from 'exit-hook';
 import fetch from 'node-fetch-commonjs';
 
 const cwd = process.cwd();
@@ -28,7 +27,7 @@ if (!process.env.NODECG_ROOT) {
 }
 
 // Ours
-import { pjson } from './util';
+import { pjson, asyncExitHook } from './util';
 import NodeCGServer from './server';
 
 process.title = 'NodeCG';
@@ -72,9 +71,14 @@ server.start().catch((error) => {
 	});
 });
 
-exitHook(() => {
-	void server.stop();
-});
+asyncExitHook(
+	async () => {
+		await server.stop();
+	},
+	{
+		minimumWait: 100,
+	},
+);
 
 // Check for updates
 fetch('https://registry.npmjs.org/nodecg/latest')
