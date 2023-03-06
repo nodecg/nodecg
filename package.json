@@ -104,6 +104,7 @@
     "yargs": "^15.3.1"
   },
   "scripts": {
+    "prepare": "husky install",
     "start": "node index.js",
     "dev": "concurrently --kill-others \"npm run build:watch:browser\" \"nodemon\"",
     "pretest": "trash .nyc_output coverage",
