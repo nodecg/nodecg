@@ -103,7 +103,7 @@ export default class ServerReplicant<
 			if (defaultValue === undefined) {
 				this.log.replicants('Declared "%s" in namespace "%s"\n', name, namespace);
 			} else {
-				// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+				 
 				this._value = proxyRecursive(this, clone(defaultValue), '/') as any;
 				this.log.replicants(
 					'Declared "%s" in namespace "%s" with defaultValue:\n',
