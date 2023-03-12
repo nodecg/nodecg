@@ -79,6 +79,7 @@ function addHook(options: { onExit: anyExitFn; minimumWait?: number; isSynchrono
 
 		// Exit cases that support asynchronous handling
 		process.once('beforeExit', exit.bind(undefined, true, false, -128));
+		process.once('SIGHUP', exit.bind(undefined, true, false, 1));
 		process.once('SIGINT', exit.bind(undefined, true, false, 2));
 		process.once('SIGTERM', exit.bind(undefined, true, false, 15));
 
