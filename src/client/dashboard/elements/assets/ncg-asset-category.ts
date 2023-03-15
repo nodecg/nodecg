@@ -66,6 +66,8 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 			vaadin-upload {
 				width: 400px;
 				margin: 16px;
+				--lumo-primary-text-color: var(--nodecg-brand-blue);
+				--lumo-secondary-text-color: darkgray;
 			}
 
 			#acceptsMsg {
