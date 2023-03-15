@@ -29,6 +29,7 @@ if (!process.env.NODECG_ROOT) {
 // Ours
 import { pjson, asyncExitHook } from './util';
 import NodeCGServer from './server';
+import { gracefulExit } from './util/exit-hook';
 
 process.title = 'NodeCG';
 global.exitOnUncaught = true;
@@ -45,7 +46,7 @@ process.on('uncaughtException', (err) => {
 
 		console.error(err);
 		if (global.exitOnUncaught) {
-			process.exit(1);
+			gracefulExit(1);
 		}
 	}
 });
@@ -58,16 +59,18 @@ process.on('unhandledRejection', (err) => {
 });
 
 const server = new NodeCGServer();
-server.on('error', () => process.exit(1));
+server.on('error', () => {
+	gracefulExit(1);
+});
 server.on('stopped', () => {
 	if (!process.exitCode) {
-		process.exit(0);
+		gracefulExit(0);
 	}
 });
 server.start().catch((error) => {
 	console.error(error);
 	process.nextTick(() => {
-		process.exit(1);
+		gracefulExit(1);
 	});
 });
 
