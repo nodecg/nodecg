@@ -5,7 +5,7 @@ import path from 'path';
 // Packages
 import appRootPath from 'app-root-path';
 import { mkdirpSync } from 'fs-extra';
-import { execSync, spawnSync } from 'child_process';
+import { execSync } from 'child_process';
 import cpy from 'cpy';
 
 const pjsonPath = path.join(appRootPath.path, 'package.json');
