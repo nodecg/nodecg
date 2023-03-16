@@ -187,6 +187,7 @@
     "ava": "^5.2.0",
     "babel-loader": "^9.1.0",
     "concurrently": "^7.6.0",
+    "cpy": "8",
     "cross-env": "^7.0.2",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",

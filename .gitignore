@@ -49,3 +49,6 @@ docs
 !.empty_directory
 
 ormconfig.json
+
+# temporarily move node_modules for type package test
+tmp_node_modules
