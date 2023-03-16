@@ -98,6 +98,12 @@ const generate = async () => {
 		parents: true,
 	});
 
+	// Copy the entry point of the types file into the types package
+	await cpy('./src/index.d.ts', outputDir, {
+		cwd: appRootPath.path,
+		parents: false,
+	});
+
 	// Without removing the root node_modules folder, tsc will use it along with the types package's node_modules
 	fs.renameSync(rootNodeModulesPath, tmpNodeModulesPath);
 
