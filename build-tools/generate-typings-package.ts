@@ -98,7 +98,11 @@ const generate = async () => {
 		parents: true,
 	});
 
-	// Copy the entry point of the types file into the types package
+	// Copy some files that need to be manually copied
+	await cpy('./src/server/types/augment-express-user.d.ts', path.join(outputDir, 'server/types'), {
+		cwd: appRootPath.path,
+		parents: false,
+	});
 	await cpy('./src/index.d.ts', outputDir, {
 		cwd: appRootPath.path,
 		parents: false,
