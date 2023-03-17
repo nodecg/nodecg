@@ -103,7 +103,7 @@
     "yargs": "^15.3.1"
   },
   "scripts": {
-    "prepare": "(npm ls husky && husky prepare) || true",
+    "prepare": "(npm ls husky && husky prepare) || echo \"Skipping husky.\"",
     "start": "node index.js",
     "dev": "concurrently --kill-others \"npm run build:watch:browser\" \"nodemon\"",
     "pretest": "trash .nyc_output coverage",
