@@ -58,6 +58,7 @@ test.serial('singleInstance - should redirect to busy.html when the instance is 
 		{},
 		C.rootUrl(),
 	);
+	await page.close();
 });
 
 test.serial('singleInstance - should redirect to killed.html when the instance is killed', async (t) => {
