@@ -18,6 +18,7 @@ const { initSingleInstance, initDashboard, initGraphic } = browser.setup();
 import * as C from './helpers/test-constants';
 import * as util from './helpers/utilities';
 import type { Page } from 'puppeteer';
+import { sleep } from './helpers/utilities';
 
 let singleInstance: Page;
 let dashboard: Page;
@@ -90,6 +91,8 @@ test.serial('singleInstance - should redirect to killed.html when the instance i
 		{},
 		C.rootUrl(),
 	);
+
+	await sleep(2500); // We have to give the registration system some time to clear out the old connection.
 });
 
 test.serial('singleInstance - should allow the graphic to be taken after being killed', async (t) => {
