@@ -23,11 +23,11 @@ export = (nodecg: NodeCG.ServerAPI<BundleConfig>) => {
 	});
 
 	nodecg.on('login', (user) => {
-		console.log(user.id, user.name);
+		console.log(user?.id, user?.name);
 	});
 
 	nodecg.on('logout', (user) => {
-		console.log(user.id, user.name);
+		console.log(user?.id, user?.name);
 	});
 
 	// Even though a generic type is specified, the value could still be

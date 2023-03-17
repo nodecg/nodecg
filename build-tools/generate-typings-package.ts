@@ -4,130 +4,45 @@ import path from 'path';
 
 // Packages
 import appRootPath from 'app-root-path';
-import ts from 'typescript';
 import { mkdirpSync } from 'fs-extra';
-import isBuiltinModule from 'is-builtin-module';
 import { execSync } from 'child_process';
+import cpy from 'cpy';
 
 const pjsonPath = path.join(appRootPath.path, 'package.json');
-const rawContents = fs.readFileSync(pjsonPath, 'utf8');
-const pjson = JSON.parse(rawContents);
+const rootNodeModulesPath = appRootPath.resolve('node_modules');
+const tmpNodeModulesPath = appRootPath.resolve('tmp_node_modules');
 const outputDir = path.resolve(__dirname, '../generated-types');
-const fauxModules = path.join(outputDir, 'faux_modules');
 
-function rewriteTypePaths(filePath: string) {
-	const program = ts.createProgram([filePath], {});
-	const printer = ts.createPrinter();
+const generate = async () => {
+	const rawContents = fs.readFileSync(pjsonPath, 'utf8');
+	const pjson = JSON.parse(rawContents);
 
-	let lastSourceFile = '';
-	const importDeclarationTransformer: ts.TransformerFactory<ts.SourceFile> = (context) => {
-		const visit: ts.Visitor = (node) => {
-			if (node.getSourceFile()) {
-				lastSourceFile = node.getSourceFile().fileName;
-			}
+	/**
+	 * List of dependencies that should be included in the types package.
+	 * This is a subset of the dependencies in the root package.json.
+	 * If this script fails in the subsequent `npx tsc`, it's likely because a dependency is missing from this list.
+	 */
+	const TYPES_PACKAGE_DEPENDENCIES = [
+		'@polymer/polymer',
+		'@sentry/node',
+		'@sentry/browser',
+		'@types/cookie-parser',
+		'@types/express-session',
+		'@types/multer',
+		'@types/node',
+		'@types/passport',
+		'@types/soundjs',
+		'ajv',
+		'connect-typeorm',
+		'socket.io',
+		'socket.io-client',
+		'ts-essentials',
+		'typeorm',
+		'winston',
+	];
 
-			node = ts.visitEachChild(node, visit, context);
+	mkdirpSync('generated-types');
 
-			if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node) || isImportType(node)) {
-				if (ts.isExportDeclaration(node) && !node.moduleSpecifier) {
-					// We only care about "export from" statements, and this filters out anything that is not one of those.
-					return node;
-				}
-
-				const { text }: { text: string } = isImportType(node)
-					? (node.argument as any).literal
-					: (node as any).moduleSpecifier;
-				const isRelativeImport = text.startsWith('.');
-				if (isRelativeImport) {
-					return node;
-				}
-
-				if (isBuiltinModule(text)) {
-					return node;
-				}
-
-				const relativePathToFauxModules = path.relative(
-					path.dirname(inputPathToOutputPath(lastSourceFile)),
-					fauxModules,
-				);
-
-				if (!hasTypesPackage(text)) {
-					try {
-						// Copy this module's package.json if it exists.
-						const pkgDir = findRoot(path.dirname(require.resolve(text)));
-						const input = path.join(pkgDir, 'package.json');
-						if (fs.existsSync(input)) {
-							const output = path.resolve(fauxModules, text, 'package.json');
-							mkdirpSync(path.dirname(output));
-							fs.copyFileSync(input, output);
-						}
-					} catch (_: unknown) {}
-				}
-
-				const newPath = context.factory.createStringLiteral(
-					hasTypesPackage(text)
-						? path.join(relativePathToFauxModules, '@types', text)
-						: path.join(relativePathToFauxModules, text),
-				);
-
-				if (ts.isImportDeclaration(node)) {
-					return context.factory.updateImportDeclaration(
-						node,
-						undefined,
-						node.importClause
-							? context.factory.createImportClause(
-									false,
-									node.importClause.name,
-									node.importClause.namedBindings,
-							  )
-							: undefined,
-						newPath,
-
-						undefined,
-					);
-				}
-
-				if (ts.isExportDeclaration(node)) {
-					return context.factory.updateExportDeclaration(
-						node,
-						undefined,
-						node.isTypeOnly,
-						undefined,
-						newPath,
-						undefined,
-					);
-				}
-
-				if (isImportType(node)) {
-					return updateImportType(node, newPath);
-				}
-			}
-
-			return node;
-		};
-
-		return (node) => ts.visitNode(node, visit);
-	};
-
-	// Run source file through our transformer
-	const result = ts.transform(program.getSourceFiles().slice(), [importDeclarationTransformer]);
-
-	// Write pretty printed transformed typescript to output directory
-	for (const file of result.transformed) {
-		const outputPath = inputPathToOutputPath(file.fileName);
-		mkdirpSync(path.dirname(outputPath));
-		fs.writeFileSync(outputPath, printer.printFile(file));
-	}
-}
-
-function copyIndexFile() {
-	mkdirpSync('build-types');
-
-	// Copy the index.d.ts file that ties the whole thing together
-	fs.copyFileSync(path.resolve(appRootPath.path, 'src/index.d.ts'), path.join('build-types/index.d.ts'));
-}
-
-function generateFinishingTouches() {
 	// Generate the package.json for the types package
 	fs.writeFileSync(
 		path.join(outputDir, 'package.json'),
@@ -135,7 +50,6 @@ function generateFinishingTouches() {
 			{
 				name: '@nodecg/types',
 				description: 'Typings package for NodeCG',
-				main: 'index.d.ts',
 				types: 'index.d.ts',
 				version: pjson.version,
 				repository: pjson.repository,
@@ -143,12 +57,12 @@ function generateFinishingTouches() {
 				homepage: pjson.homepage,
 				license: pjson.license,
 				keywords: [...pjson.keywords, 'types'],
-				dependencies: {
-					// Because these are referenced via a triple-slash directive, this gather process can't include them.
-					// So, we have to manually specify them here to ensure that they are available to consumers of our types.
-					'@types/soundjs': pjson.devDependencies['@types/soundjs'],
-					'@types/node': pjson.devDependencies['@types/node'],
-					'@types/passport': pjson.devDependencies['@types/passport'],
+				dependencies: TYPES_PACKAGE_DEPENDENCIES.reduce(
+					(obj, name) => ({ ...obj, [name]: pjson.dependencies[name] ?? pjson.devDependencies[name] }),
+					{},
+				),
+				devDependencies: {
+					typescript: pjson.devDependencies.typescript,
 				},
 			},
 			undefined,
@@ -157,104 +71,56 @@ function generateFinishingTouches() {
 		{ encoding: 'utf8' },
 	);
 
-	// index.d.ts needs some manual fixes
-	let index = fs.readFileSync(path.join(outputDir, 'index.d.ts'), 'utf8');
-	index = index.replace(/(from "faux_modules)/gm, 'from "./faux_modules'); // ensure that all paths are relative that should be
-	fs.writeFileSync(path.join(outputDir, 'index.d.ts'), index, 'utf8');
-
-	// Copy the d.ts file that lets middleware access req.user with appropriate types.
-	mkdirpSync(path.join(outputDir, 'server/types'));
-	fs.copyFileSync(
-		path.resolve(appRootPath.path, 'src/server/types/augment-express-user.d.ts'),
-		path.join(outputDir, 'server/types/augment-express-user.d.ts'),
-	);
-
-	// Write the browser-specific window augmentation types
+	// Generate tsconfig for the types package to test that the typings are valid
 	fs.writeFileSync(
-		path.join(outputDir, 'augment-window.d.ts'),
-		`import { NodeCGAPIClient } from './client/api/api.client';
-		
-declare global {
-	var NodeCG: typeof NodeCGAPIClient;
-	var nodecg: NodeCGAPIClient;
-}`,
+		path.join(outputDir, 'tsconfig.json'),
+		JSON.stringify(
+			{
+				compilerOptions: {
+					strict: true,
+					noEmit: true,
+					esModuleInterop: true,
+				},
+				include: ['./**/*.ts'],
+			},
+			undefined,
+			2,
+		),
+		{ encoding: 'utf8' },
 	);
-}
 
-function inputPathToOutputPath(filePath: string): string {
-	return isNodeModule(filePath)
-		? filePath.replace(/.+node_modules/, fauxModules)
-		: filePath.replace(/.+build-types/, outputDir);
-}
+	// Install dependencies in the types package
+	execSync('npm i', { cwd: outputDir, stdio: 'inherit' });
 
-function isNodeModule(filePath: string): boolean {
-	return filePath.includes('node_modules');
-}
+	// Copy all .d.ts files from the root build-types folder to the types package
+	await cpy(['./**/*.d.ts'], outputDir, {
+		cwd: appRootPath.resolve('./build-types'),
+		parents: true,
+	});
 
-function hasTypesPackage(packageName: string): boolean {
-	const typesPackagePath = path.join(appRootPath.path, 'node_modules/@types', packageName);
-	return fs.existsSync(typesPackagePath);
-}
+	// Copy the entry point of the types file into the types package
+	await cpy('./src/index.d.ts', outputDir, {
+		cwd: appRootPath.path,
+		parents: false,
+	});
 
-function findRoot(input: string | string[]): string {
-	let start: string | string[] = input;
-	if (typeof start === 'string') {
-		if (!start.endsWith(path.sep)) {
-			start += path.sep;
+	// Without removing the root node_modules folder, tsc will use it along with the types package's node_modules
+	fs.renameSync(rootNodeModulesPath, tmpNodeModulesPath);
+
+	// Test that the typings and dependencies are valid
+	execSync('npx tsc', { cwd: outputDir, stdio: 'inherit' });
+
+	// Roll back the node_modules folder
+	fs.renameSync(tmpNodeModulesPath, rootNodeModulesPath);
+};
+
+generate()
+	.catch((error) => {
+		console.error(error);
+	})
+	.finally(() => {
+		// Clean up tmp_node_modules folder if generate() ended up with an error
+		if (fs.existsSync(tmpNodeModulesPath)) {
+			fs.renameSync(tmpNodeModulesPath, rootNodeModulesPath);
 		}
-
-		start = start.split(path.sep);
-	}
-
-	if (!start.length) {
-		throw new Error('package.json not found in path');
-	}
-
-	start.pop();
-	const dir = start.join(path.sep);
-	try {
-		const pjsonPath = path.join(dir, 'package.json');
-		const pjsonExists = fs.existsSync(pjsonPath);
-		if (pjsonExists) {
-			const dirNameMatchesPjsonName = dir.endsWith(require(pjsonPath).name);
-			if (dirNameMatchesPjsonName) {
-				return dir;
-			}
-		}
-	} catch (_: unknown) {}
-
-	return findRoot(start);
-}
-
-function installDeps() {
-	execSync('npm i', { cwd: outputDir });
-}
-
-/**
- * https://github.com/microsoft/TypeScript/pull/37376
- */
-function isImportType(node: ts.Node): node is ts.ImportTypeNode {
-	return node.kind === ts.SyntaxKind.ImportType;
-}
-
-/**
- * https://github.com/microsoft/TypeScript/pull/37376
- */
-function updateImportType(node: ts.ImportTypeNode, newPath: ts.StringLiteral) {
-	const argument = ts.factory.createLiteralTypeNode(newPath);
-	return ts.factory.updateImportTypeNode(
-		node,
-		argument,
-		node.assertions,
-		node.qualifier,
-		node.typeArguments,
-		node.isTypeOf,
-	);
-}
-
-copyIndexFile();
-rewriteTypePaths(path.resolve(appRootPath.path, 'build-types/client/api/api.client.d.ts'));
-rewriteTypePaths(path.resolve(appRootPath.path, 'build-types/server/api.server.d.ts'));
-rewriteTypePaths(path.resolve(appRootPath.path, 'build-types/index.d.ts'));
-generateFinishingTouches();
-installDeps();
+	});
