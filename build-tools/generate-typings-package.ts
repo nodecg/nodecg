@@ -108,6 +108,17 @@ const generate = async () => {
 		parents: false,
 	});
 
+	// Write the browser-specific window augmentation types
+	fs.writeFileSync(
+		path.join(outputDir, 'augment-window.d.ts'),
+		`import { NodeCGAPIClient } from './client/api/api.client';
+		
+declare global {
+	var NodeCG: typeof NodeCGAPIClient;
+	var nodecg: NodeCGAPIClient;
+}`,
+	);
+
 	// Without removing the root node_modules folder, tsc will use it along with the types package's node_modules
 	fs.renameSync(rootNodeModulesPath, tmpNodeModulesPath);
 
