@@ -3,7 +3,7 @@
 const replace = require('replace-in-file');
 
 replace.sync({
-	files: 'instrumented/**/*.js',
+	files: 'build/client/**/*.js',
 	from: /new Function\('return this'\)/g,
-	to: 'new Function(\'return window.top\')'
+	to: "new Function('return window.top')",
 });

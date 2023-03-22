@@ -1,7 +1,7 @@
 {
 	"extends": "../../tsconfig",
 	"compilerOptions": {
-		"lib": ["es6", "dom"]
+		"lib": ["es2017", "dom"]
 	},
-	"include": ["./**/*.ts"]
+	"include": ["./**/*.ts", "../shared/utils.ts"]
 }

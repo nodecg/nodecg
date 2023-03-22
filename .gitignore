@@ -1,9 +1,8 @@
 # Node / Bower
 /bower_components
 /node_modules
-/build/bower_components
-/build/node_modules
 npm-debug.log
+yarn-error.log
 
 # Local bundles
 /bundles/**
@@ -41,7 +40,15 @@ docs
 # Assets
 /assets
 
-/instrumented
+# Build artifacts
+/build
+/build-types
+/generated-types
 
 # Don't ignore .empty_directory files
 !.empty_directory
+
+ormconfig.json
+
+# temporarily move node_modules for type package test
+tmp_node_modules

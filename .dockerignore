@@ -1,9 +1,8 @@
 *
-!lib
-!src
+!build-tools
 !schemas
-!build
-!bower.json
+!src
 !index.js
 !package.json
-!types
+!tsconfig_base.json
+!package-lock.json

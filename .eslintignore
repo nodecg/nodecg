@@ -2,5 +2,17 @@
 node_modules
 bower_components
 nodecg-api.min.js
-/typetest
-/test/fixtures/bundle-parser/invalid-manifest-json/package.json
+/build
+/test/fixtures
+/test/helpers/retarget-browser-coverage.js
+/coverage
+/build-types
+/generated-types
+/src/index.d.ts
+
+# Just a stub file
+/index.js
+
+ava.config.js
+nyc.config.js
+.prettierrc.js

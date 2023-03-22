@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge; charset=UTF-8">
+		<meta name="viewport" content="width=device-width" initial-scale="1">
+
+		<title>NodeCG Login</title>
+
+		<style is="custom-style" include="iron-flex iron-flex-alignment">
+			body {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 40px;
+				background-color: #eee;
+				font-family: 'Roboto', 'Noto', sans-serif;
+			}
+
+			h2 {
+        		-webkit-font-smoothing: antialiased;
+				font-size: 24px;
+				font-weight: 400;
+				letter-spacing: -.012em;
+				line-height: 32px;
+			}
+
+			label {
+				display: block;
+			}
+
+			button {
+				margin-top: 2px;
+			}
+		</style>
+	</head>
+	<body>
+		<h2>Please sign in</h2>
+
+		<% if (config.login.steam && config.login.steam.enabled) { %>
+			<a href="/login/steam">
+				<img src="/login/signin_steam.png">
+			</a>
+		<% } %>
+
+		<% if (config.login.twitch && config.login.twitch.enabled) { %>
+			<a href="/login/twitch">
+				<img src="/login/signin_twitch.png">
+			</a>
+		<% } %>
+
+		<% if (config.login.discord && config.login.discord.enabled) { %>
+			<a href="/login/discord">
+				<img src="/login/signin_discord.png">
+			</a>
+		<% } %>
+
+		<% if (config.login.local && config.login.local.enabled) { %>
+			<form id="localForm" method="post" action="/login/local">
+				<div class="form-group">
+					<label for="username">Username:</label>
+					<input id="username" class="form-control" type="text" name="username" />
+				</div>
+				<div class="form-group">
+					<label for="password">Password:</label>
+					<input id="password" class="form-control" type="password" name="password" />
+				</div>
+				<button id="localSubmit" class="btn btn-primary" type="submit">Login</button>
+			</form>
+		<% } %>
+	</body>
+</html>

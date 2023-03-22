@@ -9,40 +9,146 @@ on:
       - master
 
 jobs:
-  build-test:
-    strategy:
-      matrix:
-        node-version: [12.x, 14.x]
-        os: [ubuntu-latest, windows-latest]
-
-    runs-on: ${{matrix.os}}
+  lint:
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{matrix.node-version}}
+          node-version: '18'
+
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Restore npm dependency cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+          key: npm-${{ runner.os }}-18.x-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Check if build result is different from current branch
+      - name: Lint
+        run: |
+          npm run lint
+
+  test-types:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Restore npm dependency cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+          key: npm-${{ runner.os }}-18.x-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
         run: |
           npm run build
-          git diff --name-only --exit-code
+
+      - name: Generate types
+        run: |
+          npm run generate-types-package
+
+      - name: Test types
+        run: |
+          npm run test:types
+
+  build-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [16.x, 18.x]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{matrix.os}}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{matrix.node-version}}
+
+      - name: Add msbuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Ensure that bundle git parsing functionality works
+        run: |
+          git config --global user.email "ci@nodecg.dev"
+          git config --global user.name "NodeCG Bot"
+
+      - name: Restore Chromium dependency cache (Linux)
+        uses: actions/cache@v3
+        with:
+          path: |
+            /home/runner/.cache/puppeteer
+          key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
+        if: runner.os == 'Linux'
+
+      - name: Restore Chromium dependency cache (macOS)
+        uses: actions/cache@v3
+        with:
+          path: |
+            /Users/runner/.cache/puppeteer
+          key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
+        if: runner.os == 'macOS'
+
+      - name: Restore Chromium dependency cache (Windows)
+        uses: actions/cache@v3
+        with:
+          path: |
+            C:\Users\runneradmin\.cache\puppeteer
+          key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
+        if: runner.os == 'Windows'
+
+      - name: Restore npm dependency cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+          key: npm-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build w/ instrumentation for coverage reporting
+        run: |
+          npm run instrument
 
       - name: Test
         run: |
-          git config --global user.email "contact@nodecg.dev"
-          git config --global user.name "NodeCG Bot"
-          npm run static
-          npm test
+          npm run test
 
-      - run: npx nyc report --reporter=text-lcov > coverage.lcov
+      - name: Create code coverage report
+        run: npx nyc report --reporter=text-lcov --include=\"src/**\" > coverage.lcov
 
-      - name: Report code coverage to Codecov
-        uses: codecov/codecov-action@v1
+      - name: Send code coverage to Codecov
+        uses: codecov/codecov-action@v3
         with:
           file: ./coverage.lcov
+        # Only report once
+        if: runner.os == 'Linux' && matrix.node-version == '18.x'

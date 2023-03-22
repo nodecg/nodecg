@@ -2,5 +2,5 @@
 'use strict';
 
 module.exports = {
-	lorem: 'ipsum'
+	lorem: 'ipsum',
 };

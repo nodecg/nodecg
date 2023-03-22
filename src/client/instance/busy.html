@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title></title>
+		<link rel="stylesheet" href="instances.css" />
+	</head>
+	<body>
+		<div id="container">
+			<p>The <span class="code">singleInstance</span> graphic located at:</p>
+			<p id="graphicPath"></p>
+			<p>
+				... is currently in use. As soon as the current user closes their instance of it, this page will
+				automatically load the graphic.
+			</p>
+
+			<p>
+				If you need to forcibly close the current instance, you can kill it from the
+				<a href="/dashboard/#graphics">graphics</a> tab in the dashboard.
+			</p>
+		</div>
+
+		<script>
+			// Copy-pasted from lib/login/public/QueryString.js
+			// I copy-pasted it because the file is only served when login security is enabled,
+			// and singleInstance can be active when login security is not.
+			// Definitely need to make this DRYer.
+			var qs = (function (a) {
+				if (a == '') return {};
+				var b = {};
+				for (var i = 0; i < a.length; ++i) {
+					var p = a[i].split('=', 2);
+					if (p.length == 1) b[p[0]] = '';
+					else b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, ' '));
+				}
+				return b;
+			})(window.location.search.substr(1).split('&'));
+
+			document.getElementById('graphicPath').textContent = qs['pathname'];
+
+			// TODO: show error if qs['pathname'] is undefined
+
+			// The dashboard will have some kind of killswitch to destroy all instances of a singleInstance graphic.
+			// This includes the active instance *and* all "busy" pages waiting for that graphic to become available.
+			window.socket.on('graphicKill', function (pathToKill) {
+				if (pathToKill === qs['pathname']) {
+					window.location.href = '/instance/killed.html?path=' + qs['pathname'];
+				}
+			});
+
+			// Check if the desired graphic is available, on an interval
+			setInterval(_checkAvailability, 1000);
+			_checkAvailability();
+
+			function _checkAvailability() {
+				window.socket.emit('graphic:queryAvailability', qs['pathname'], function (_error, available) {
+					// If the graphic is available, go to it
+					if (available) {
+						window.location.href = qs['pathname'];
+					}
+				});
+			}
+		</script>
+	</body>
+</html>

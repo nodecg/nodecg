@@ -1,14 +1,30 @@
-FROM node:10
+FROM node:18
 
-WORKDIR /usr/src/app
+WORKDIR /opt/nodecg
 
-# Copy NodeCG (just the files we need)
-RUN mkdir cfg && mkdir bundles && mkdir logs && mkdir db
-COPY . /usr/src/app/
+# Sets up the runtime user, makes nodecg-cli available to images which extend this image, and creates the directory structure with the appropriate permissions.
+RUN addgroup --system nodecg && adduser --system nodecg --ingroup nodecg && \
+    npm i -g nodecg-cli && \
+    mkdir cfg && mkdir bundles && mkdir logs && mkdir db && mkdir assets && \
+    chown -R nodecg:nodecg /opt/nodecg
+
+# Switch to the nodecg user
+USER nodecg
+
+# Copy NodeCG
+COPY --chown=nodecg:nodecg . /opt/nodecg/
 
 # Install dependencies
-RUN npm install --production
+RUN npm ci
 
-# The command to run
-EXPOSE 9090
+# Build
+RUN npm run build
+
+# Define directories that should be persisted in a volume
+VOLUME /opt/nodecg/cfg /opt/nodecg/bundles /opt/nodecg/logs /opt/nodecg/db /opt/nodecg/assets
+# Define ports that should be used to communicate
+EXPOSE 9090/tcp
+
+# Define command to run NodeCG
+# Using `node` directly is slightly faster than using `nodecg start`.
 CMD ["node", "index.js"]

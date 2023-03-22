@@ -1,0 +1,7 @@
+{
+	"watch": ["index.js", "src/server/*", "src/shared/*", "cfg/*"],
+	"exec": "npm run build:server && node ./index.js",
+	"ext": "js,ts,json,yaml",
+	"delay": 500,
+	"ignoreRoot": [".git", "node_modules", ".nyc_output", "build", "build-types", "coverage", "test", "bundles"]
+}

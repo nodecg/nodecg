@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		// Output related
+		"target": "ES6",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+
+		// Module resolution
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+
+		// Type checking
+		"strict": true,
+
+		// Extra output
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"inlineSourceMap": false
+	}
+}

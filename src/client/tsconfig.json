@@ -1,0 +1,17 @@
+{
+	"extends": "../../tsconfig_base.json",
+	"compilerOptions": {
+		"target": "es2019",
+		"module": "ESNext",
+		"esModuleInterop": false,
+		"allowSyntheticDefaultImports": true,
+		"composite": true,
+		"outDir": "../../build-types/client",
+		"baseUrl": ".",
+		"paths": {
+			"@polymer/polymer": ["./types/polymer-element.d.ts"]
+		}
+	},
+	"include": ["./**/*.ts", "./**/*.js", "../types/stubs.d.ts", "types/augment-window.ts"],
+	"references": [{ "path": "../shared" }, { "path": "../types" }]
+}

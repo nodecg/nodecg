@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge; charset=UTF-8">
+		<meta name="viewport" content="width=device-width" initial-scale="1">
+		<meta name="theme-color" content="#ffffff">
+		<link rel="manifest" href="/manifest.json">
+
+		<title>NodeCG Dashboard</title>
+
+		<script type="text/javascript">
+			// Allow child iframes to reliably find this parent frame
+			window.__nodecg__ = true;
+
+			// Make the global config (and other render-time data) available during runtime.
+			globalThis.ncgConfig = <%= JSON.stringify(publicConfig) %>;
+			window.__renderData__ = {
+				bundles: <%= JSON.stringify(bundles) %>,
+				workspaces: <%= JSON.stringify(workspaces) %>
+			};
+			Object.freeze(window.__renderData__);
+
+			// An unfortunate hack used by tests to account for some Polymer-related race conditions.
+			window.addEventListener('WebComponentsReady', () => {
+				window.WebComponentsReady = true
+			});
+		</script>
+
+		<% if (sentryEnabled) { %>
+			<script src="/sentry.js" type="module"></script>
+		<% } %>
+
+		<!-- Register service worker -->
+		<script type="text/javascript">
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.register('/service-worker.js')
+					.then(function(registration) {
+						// Service worker successfully installed.
+					}).catch(function(err) {
+						console.error('Error installing service worker!');
+						console.error(err);
+					});
+			}
+		</script>
+
+		<!-- initialize the socket -->
+		<script src="/socket.js"></script>
+
+		<!-- make the API available -->
+		<script src="/api.js"></script>
+
+		<!-- our custom dashboard elements -->
+		<script src="/dashboard.js"></script>
+
+		<style>
+			body {
+				overflow: hidden;
+				background-color: #232C3D;
+				display: flex;
+				flex-direction: column;
+				margin: 0;
+				height: 100vh;
+			}
+		</style>
+	</head>
+	<body>
+		<ncg-dashboard id="nodecg_dashboard"></ncg-dashboard>
+	</body>
+</html>

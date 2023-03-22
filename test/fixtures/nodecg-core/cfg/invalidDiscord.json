@@ -1,9 +1,9 @@
 {
-  "login": {
-    "enabled": true,
-    "sessionSecret": "secret",
-    "discord": {
-      "enabled": true
-    }
-  }
+	"login": {
+		"enabled": true,
+		"sessionSecret": "secret",
+		"discord": {
+			"enabled": true
+		}
+	}
 }
