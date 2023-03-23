@@ -2,7 +2,7 @@
   "name": "unsatisfied-bundle-deps",
   "version": "0.0.0",
   "nodecg": {
-    "compatibleRange": "^1.0.0",
+    "compatibleRange": "*",
     "bundleDependencies": {
       "test-bundle": "^9.9.9"
     }
