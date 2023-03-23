@@ -23,7 +23,7 @@ type DashboardContext = {
 };
 
 const BUILD_PATH = path.join(appRootPath.path, 'build/client');
-const VIEWS_PATH = path.join(appRootPath.path, 'src/server/dashboard');
+const VIEWS_PATH = path.join(appRootPath.path, 'build/server/templates');
 
 export default class DashboardLib {
 	app = express();

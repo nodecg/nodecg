@@ -380,7 +380,7 @@ export async function createMiddleware(callbacks: {
 	app.use(passport.initialize());
 	app.use(passport.session());
 
-	const VIEWS_DIR = path.join(appRootPath.path, 'src/server/login/views');
+	const VIEWS_DIR = path.join(appRootPath.path, 'build/server/templates');
 
 	app.use('/login', express.static(path.join(appRootPath.path, 'build/client/login')));
 	app.set('views', VIEWS_DIR);

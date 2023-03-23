@@ -6,6 +6,7 @@ import type webpack from 'webpack';
 import nodeExternals from 'webpack-node-externals';
 import appRootPath from 'app-root-path';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
 
 export function createServerConfig({
 	isProduction,
@@ -52,6 +53,16 @@ export function createServerConfig({
 					mode: 'write-dts',
 					configFile: 'src/server/tsconfig.json',
 				},
+			}),
+			new CopyPlugin({
+				patterns: [
+					{
+						from: 'src/server/**/*.tmpl',
+						to() {
+							return 'templates/[name][ext]';
+						},
+					},
+				],
 			}),
 		],
 		module: {
