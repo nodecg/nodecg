@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.1](https://github.com/nodecg/nodecg/compare/v2.0.0...v2.0.1) (2023-03-23)
+
+
+### Bug Fixes
+
+* **docker:** fix failing Dockerfile ([#617](https://github.com/nodecg/nodecg/issues/617)) ([1e243da](https://github.com/nodecg/nodecg/commit/1e243dac2a9d9f107cdcd57959851f62a8c05b50))
+* don't list package-lock in files ([#620](https://github.com/nodecg/nodecg/issues/620)) ([e2ed466](https://github.com/nodecg/nodecg/commit/e2ed4668402c308ffddf1a2aebc93565e3d537fd))
+
 ## [2.0.0](https://github.com/nodecg/nodecg/compare/v1.9.0...v2.0.0) (2023-03-23)
 
 
