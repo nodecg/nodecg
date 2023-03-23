@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/nodecg/nodecg/compare/v1.9.0...v2.0.0) (2023-03-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* details at https://www.nodecg.dev/docs/migrating/migrating-1.x-to-2.x
+
+### Features
+
+* port to typescript ([#546](https://github.com/nodecg/nodecg/issues/546)) ([0060f49](https://github.com/nodecg/nodecg/commit/0060f49d2c5f1f7d91adf93f41d914eb8b81b702))
+
 ## [1.9.0](https://github.com/nodecg/nodecg/compare/v1.8.1...v1.9.0) (2022-03-30)
 
 ### Features
