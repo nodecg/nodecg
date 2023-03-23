@@ -20,7 +20,7 @@ module.exports = {
 	 * This does _not_ affect self-closing JSX tags, which will still have the
 	 * closing bracket on a new line to clearly indicate the lack of children.
 	 */
-	jsxBracketSameLine: true,
+	bracketSameLine: true,
 
 	/* It's true that Prettier warns pretty heavily against setting
 	 * this higher than 80 columns: https://prettier.io/docs/en/options.html#print-width
