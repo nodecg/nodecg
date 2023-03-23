@@ -8,7 +8,7 @@
     "url": "https://nodecg.dev"
   },
   "nodecg": {
-    "compatibleRange": "^1.0.0",
+    "compatibleRange": "*",
     "soundCues": [
       {
         "name": "updated-cue",

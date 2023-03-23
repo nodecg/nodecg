@@ -13,7 +13,7 @@
   "description": "A test bundle",
   "license": "MIT",
   "nodecg": {
-    "compatibleRange": "^1.0.0",
+    "compatibleRange": "*",
     "assetCategories": [
       {
         "name": "assets",
