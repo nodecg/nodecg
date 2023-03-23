@@ -12,7 +12,16 @@ RUN addgroup --system nodecg && adduser --system nodecg --ingroup nodecg && \
 USER nodecg
 
 # Copy NodeCG
-COPY --chown=nodecg:nodecg . /opt/nodecg/
+COPY --chown=nodecg:nodecg \
+	package.json \
+	package-lock.json \
+	index.js \
+	tsconfig_base.json \
+	./
+COPY --chown=nodecg:nodecg build-tools ./build-tools
+COPY --chown=nodecg:nodecg schemas ./schemas
+COPY --chown=nodecg:nodecg src ./src
+COPY --chown=nodecg:nodecg scripts ./scripts
 
 # Install dependencies
 RUN npm ci

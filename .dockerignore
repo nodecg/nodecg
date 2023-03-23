@@ -1,8 +1,8 @@
-*
-!build-tools
-!schemas
-!src
-!index.js
-!package.json
-!tsconfig_base.json
-!package-lock.json
+node_modules
+**/node_modules
+
+build
+build-types
+bundles
+db
+generated-types
