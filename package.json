@@ -140,8 +140,7 @@
     "bundles/.empty_directory",
     "db/.empty_directory",
     "schemas",
-    "AUTHORS",
-    "package-lock.json"
+    "AUTHORS"
   ],
   "devDependencies": {
     "@babel/core": "^7.20.2",
