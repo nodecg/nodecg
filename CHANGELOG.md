@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.2](https://github.com/nodecg/nodecg/compare/v2.0.1...v2.0.2) (2023-03-24)
+
+
+### Bug Fixes
+
+* include templates in server build outputs ([#625](https://github.com/nodecg/nodecg/issues/625)) ([cdd8bf2](https://github.com/nodecg/nodecg/commit/cdd8bf2cf7c7b0821212d99d777b9d45e2d27e6a))
+* make node-fetch-commonjs a prod dep ([#623](https://github.com/nodecg/nodecg/issues/623)) ([72610c1](https://github.com/nodecg/nodecg/commit/72610c1a6ea0a990e918f388569977a5e4fba03d))
+
 ## [2.0.1](https://github.com/nodecg/nodecg/compare/v2.0.0...v2.0.1) (2023-03-23)
 
 
