@@ -311,7 +311,7 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 		hex = hex.replace(HEX_PARSE_SHORTHAND_REGEX, (_m, r, g, b) => r + r + g + g + b + b);
 
 		const result = HEX_PARSE_REGEX.exec(hex);
-		return result
+		return result?.[1] && result?.[2] && result?.[3]
 			? {
 					r: parseInt(result[1], 16),
 					g: parseInt(result[2], 16),

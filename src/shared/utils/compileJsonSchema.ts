@@ -10,7 +10,6 @@ import { stringifyError } from '.';
 const options: Options = {
 	allErrors: true,
 	verbose: true,
-	strict: undefined,
 	strictSchema: true,
 	strictNumbers: true,
 	strictTypes: true,
@@ -81,6 +80,6 @@ export function getSchemaDefault(schema: Record<any, unknown>, labelForDebugging
 function extractSchemaVersion(schema: Record<any, unknown>): string {
 	// For backwards compat, we default to draft-04.
 	const defaultVersion = 'https://json-schema.org/draft-04/schema';
-	const extractedVersion = schema.$schema;
+	const extractedVersion = schema['$schema'];
 	return typeof extractedVersion === 'string' ? extractedVersion : defaultVersion;
 }

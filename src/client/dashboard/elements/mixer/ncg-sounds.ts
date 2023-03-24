@@ -106,18 +106,19 @@ class NcgSounds extends Polymer.PolymerElement {
 
 			// Update (or create) the ncg-sound-cue element for every cue in the Replicant.
 			newVal.forEach((cue) => {
-				if (!cueElsByName[cue.name]) {
-					cueElsByName[cue.name] = document.createElement('ncg-sound-cue') as NcgSoundCue;
+				let cueEl = cueElsByName[cue.name];
+				if (!cueEl) {
+					cueEl = document.createElement('ncg-sound-cue') as NcgSoundCue;
 					this.$.cues.appendChild(cueElsByName[cue.name]);
 				}
 
-				cueElsByName[cue.name].name = cue.name;
-				cueElsByName[cue.name].assignable = cue.assignable;
-				cueElsByName[cue.name].defaultFile = cue.defaultFile;
-				cueElsByName[cue.name].file = cue.file;
-				cueElsByName[cue.name].volume = cue.volume;
-				cueElsByName[cue.name]._cueRef = cue;
-				cueElsByName[cue.name].bundleName = this.bundleName; // Must be last
+				cueEl.name = cue.name;
+				cueEl.assignable = cue.assignable;
+				cueEl.defaultFile = cue.defaultFile;
+				cueEl.file = cue.file;
+				cueEl.volume = cue.volume;
+				cueEl._cueRef = cue;
+				cueEl.bundleName = this.bundleName; // Must be last
 			});
 
 			// Remove cueEls that belong to soundCues that no longer exist.
@@ -127,7 +128,7 @@ class NcgSounds extends Polymer.PolymerElement {
 				}
 
 				const cueEl = cueElsByName[name];
-				const index = newVal.findIndex((cue) => cue.name === cueEl.name);
+				const index = newVal.findIndex((cue) => cue.name === cueEl?.name);
 				if (index < 0) {
 					this.$.cues.removeChild(cueEl);
 					// eslint-disable-next-line @typescript-eslint/no-dynamic-delete

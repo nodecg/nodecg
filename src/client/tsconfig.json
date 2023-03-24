@@ -3,9 +3,12 @@
 	"compilerOptions": {
 		"target": "es2019",
 		"module": "ESNext",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
 		"esModuleInterop": false,
 		"allowSyntheticDefaultImports": true,
 		"composite": true,
+		"noPropertyAccessFromIndexSignature": false,
 		"outDir": "../../build-types/client",
 		"baseUrl": ".",
 		"paths": {

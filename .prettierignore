@@ -23,3 +23,7 @@ CHANGELOG.md
 /test/fixtures/nodecg-core/cfg/invalidJSON.json
 
 /coverage
+
+# ignore some files in the fake-bundle
+/typetest/fake-bundle/**/*.js
+/typetest/fake-bundle/**/*.map

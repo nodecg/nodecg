@@ -4,7 +4,9 @@
 		"outDir": "../../build-types/server",
 		"rootDir": ".",
 		"module": "commonjs",
-		"composite": true
+		"composite": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true
 	},
 	"include": [
 		"./**/*",

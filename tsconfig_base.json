@@ -1,22 +1,23 @@
 {
 	"compilerOptions": {
-		// Output related
 		"target": "ES6",
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
 
-		// Module resolution
 		"moduleResolution": "node",
 		"esModuleInterop": true,
 		"resolveJsonModule": true,
 
-		// Type checking
 		"strict": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"exactOptionalPropertyTypes": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"noUncheckedIndexedAccess": true,
 
-		// Extra output
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
 		"inlineSourceMap": false
-	}
+	},
+	"include": []
 }

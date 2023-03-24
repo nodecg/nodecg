@@ -233,7 +233,9 @@ class NcgWorkspace extends Polymer.PolymerElement {
 			len = removededOld.length;
 			for (i = 0; i < len; i++) {
 				panelName = removededOld[i];
-				packery.items[i] = itemsByFullName[panelName];
+				if (panelName) {
+					packery.items[i] = itemsByFullName[panelName];
+				}
 			}
 		}
 

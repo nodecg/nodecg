@@ -67,12 +67,12 @@ export abstract class AbstractReplicant<
 
 	schema?: Record<string, any>;
 
-	schemaSum?: string;
+	schemaSum?: string | undefined;
 
 	status: 'undeclared' | 'declared' | 'declaring' = 'undeclared';
 
 	// eslint-disable-next-line @typescript-eslint/ban-types
-	validationErrors?: null | ErrorObject[] = [];
+	validationErrors?: undefined | null | ErrorObject[] = [];
 
 	protected _value: ReplicantValue<P, V, O, S> | undefined;
 
@@ -173,7 +173,7 @@ export abstract class AbstractReplicant<
 			switch (operation.method) {
 				case 'overwrite': {
 					const { newValue } = operation.args;
-					this[process.env.BROWSER ? 'value' : '_value'] = proxyRecursive(
+					this[process.env['BROWSER'] ? 'value' : '_value'] = proxyRecursive(
 						this,
 						newValue as any,
 						operation.path,
@@ -355,7 +355,7 @@ const deleteTrap = function <T>(target: T, prop: keyof T): boolean | void {
 	}
 
 	replicant._addOperation({ path: metadata.path, method: 'delete', args: { prop } });
-	if (!process.env.BROWSER) {
+	if (!process.env['BROWSER']) {
 		return delete target[prop];
 	}
 };
@@ -387,7 +387,7 @@ const CHILD_ARRAY_HANDLER = {
 					replicant.validate(valueClone);
 				}
 
-				if (process.env.BROWSER) {
+				if (process.env['BROWSER']) {
 					metadata.replicant._addOperation({
 						path: metadata.path,
 						method: prop as any,
@@ -465,7 +465,7 @@ const CHILD_ARRAY_HANDLER = {
 		}
 
 		// If this Replicant is running in the server context, immediately apply the value.
-		if (!process.env.BROWSER) {
+		if (!process.env['BROWSER']) {
 			target[prop] = proxyRecursive(metadata.replicant, newValue, joinPathParts(metadata.path, prop as string));
 		}
 
@@ -537,7 +537,7 @@ const CHILD_OBJECT_HANDLER = {
 		}
 
 		// If this Replicant is running in the server context, immediately apply the value.
-		if (!process.env.BROWSER) {
+		if (!process.env['BROWSER']) {
 			target[prop] = proxyRecursive(metadata.replicant, newValue, joinPathParts(metadata.path, prop as string));
 		}
 

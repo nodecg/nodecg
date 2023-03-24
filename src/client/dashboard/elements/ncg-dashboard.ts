@@ -532,8 +532,11 @@ class NcgDashboard extends Polymer.PolymerElement {
 
 		// If the default workspace is hidden (due to it having no panels),
 		// show the next workspace by default.
-		if (this.route.path === '' && window.__renderData__.workspaces[0].route !== '') {
-			window.location.hash = window.__renderData__.workspaces[0].route;
+		if (this.route.path === '') {
+			const hash = window.__renderData__.workspaces[0]?.route;
+			if (hash) {
+				window.location.hash = hash;
+			}
 		}
 
 		if (!this.routeData) {
@@ -592,7 +595,10 @@ class NcgDashboard extends Polymer.PolymerElement {
 		// If the current hash points to a route that doesn't exist, (such as
 		// after a refresh which removed a workspace), default to the first workspace.
 		if (!this.$.pages.selectedItem) {
-			window.location.hash = window.__renderData__.workspaces[0].route;
+			const hash = window.__renderData__.workspaces[0]?.route;
+			if (hash) {
+				window.location.hash = hash;
+			}
 		}
 	}
 

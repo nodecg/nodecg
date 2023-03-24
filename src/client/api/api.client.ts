@@ -375,9 +375,11 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		const instancesArr = (window.createjs.Sound as any)._instances as createjs.AbstractSoundInstance[];
 		for (let i = instancesArr.length - 1; i >= 0; i--) {
 			const instance = instancesArr[i];
-			const meta = soundMetadata.get(instance);
-			if (meta && meta.cueName === cueName) {
-				instance.stop();
+			if (instance) {
+				const meta = soundMetadata.get(instance);
+				if (meta && meta.cueName === cueName) {
+					instance.stop();
+				}
 			}
 		}
 	}

@@ -55,7 +55,7 @@ export default class ClientReplicant<
 	 * and the replicant is fully declared before running any additional commands.
 	 * After this time, commands do not need to be added to the queue and are simply executed immediately.
 	 */
-	private _actionQueue: Array<{ fn: (...args: any[]) => void; args?: any[] }> = [];
+	private _actionQueue: Array<{ fn: (...args: any[]) => void; args?: any[] | undefined }> = [];
 
 	private readonly _socket!: TypedClientSocket;
 
