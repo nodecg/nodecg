@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.3](https://github.com/nodecg/nodecg/compare/v2.0.2...v2.0.3) (2023-03-24)
+
+
+### Bug Fixes
+
+* mark more required deps as prod deps ([#627](https://github.com/nodecg/nodecg/issues/627)) ([bc2875a](https://github.com/nodecg/nodecg/commit/bc2875ae0828008366f08ef87d221a640e7f3559))
+
 ## [2.0.2](https://github.com/nodecg/nodecg/compare/v2.0.1...v2.0.2) (2023-03-24)
 
 
