@@ -141,7 +141,6 @@
   "files": [
     "build",
     "scripts",
-    "generated-types",
     "bundles/.empty_directory",
     "db/.empty_directory",
     "schemas",
