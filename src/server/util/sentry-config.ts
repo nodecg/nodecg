@@ -13,7 +13,7 @@ import type BundleManager from '../bundle-manager';
 import { authCheck, pjson } from '../util';
 import type { NodeCG } from '../../types/nodecg';
 
-const VIEWS_PATH = path.join(appRootPath.path, 'src/server/util');
+const VIEWS_PATH = path.join(appRootPath.path, 'build/server/templates');
 const baseSentryConfig = {
 	dsn: config.sentry?.dsn,
 	serverName: os.hostname(),
