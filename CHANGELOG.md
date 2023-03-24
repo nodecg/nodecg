@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.4](https://github.com/nodecg/nodecg/compare/v2.0.3...v2.0.4) (2023-03-24)
+
+
+### Bug Fixes
+
+* **login:** fix `key=xxx` URLs not working ([#629](https://github.com/nodecg/nodecg/issues/629)) ([6c21ff0](https://github.com/nodecg/nodecg/commit/6c21ff00df9fe5725396275d0d5738244b13d3eb))
+
 ## [2.0.3](https://github.com/nodecg/nodecg/compare/v2.0.2...v2.0.3) (2023-03-24)
 
 
