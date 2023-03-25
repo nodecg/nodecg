@@ -16,11 +16,6 @@ const socketsByKey = new Map<string, Set<TypedServerSocket>>();
 
 export default async function (socket: TypedServerSocket, next: (err?: ExtendedError) => void): Promise<void> {
 	try {
-		if (!socket.request.isAuthenticated()) {
-			next(new UnauthorizedError(UnAuthErrCode.InvalidSession, 'not logged in'));
-			return;
-		}
-
 		const { token } = socket.handshake.query;
 		if (!token) {
 			next(new UnauthorizedError(UnAuthErrCode.InvalidToken, 'no token provided'));
