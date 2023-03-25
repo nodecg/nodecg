@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/nodecg/nodecg/compare/v2.0.4...v2.1.0) (2023-03-25)
+
+
+### Features
+
+* **docker:** smaller docker image ([#631](https://github.com/nodecg/nodecg/issues/631)) ([f560619](https://github.com/nodecg/nodecg/commit/f56061921f2fb188031920925c6a9818be459063))
+
+
+### Bug Fixes
+
+* allow socket authentication with a token only ([#635](https://github.com/nodecg/nodecg/issues/635)) ([0241071](https://github.com/nodecg/nodecg/commit/024107127e97685bdaa4f95e7d817b42a135085a))
+
 ## [2.0.4](https://github.com/nodecg/nodecg/compare/v2.0.3...v2.0.4) (2023-03-24)
 
 
