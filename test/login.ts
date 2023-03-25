@@ -108,7 +108,7 @@ test.serial('socket should deny access to bad credentials', async (t) => {
 
 	await new Promise<void>((resolve) => {
 		socket.once('connect_error', (error: unknown) => {
-			t.is((error as any).message, 'not logged in');
+			t.is((error as any).message, 'no credentials found');
 			resolve();
 		});
 	});
