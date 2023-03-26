@@ -24,6 +24,11 @@ test('prevents directory traversal attacks', async (t) => {
 	response = await fetch(`${C.rootUrl()}bundles/test-bundle/dashboard/..%5c..%5c../should-be-forbidden.txt`);
 	t.is(response.status, 404);
 
-	response = await fetch(`${C.rootUrl()}assets/test-bundle/assets/..%5c..%5c..%5cshould-be-forbidden.txt`);
-	t.is(response.status, 404);
+	if (process.platform === 'win32') {
+		response = await fetch(`${C.rootUrl()}assets/test-bundle/assets/..%5c..%5c..%5cshould-be-forbidden.txt`);
+		t.is(response.status, 404);
+	} else {
+		response = await fetch(`${C.rootUrl()}assets/test-bundle/assets/..%5c..%5c..%5c/should-be-forbidden.txt`);
+		t.is(response.status, 404);
+	}
 });
