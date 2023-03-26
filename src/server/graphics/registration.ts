@@ -1,5 +1,6 @@
 // Native
 import path from 'path';
+import fs from 'fs';
 
 // Packages
 import express from 'express';
@@ -157,7 +158,11 @@ export default class RegistrationCoordinator {
 			// otherwise, send the file unmodified
 			if (resName.endsWith('.html')) {
 				const fileLocation = path.join(BUILD_PATH, resName);
-				injectScripts(fileLocation, 'graphic', {}, (html) => res.send(html));
+				if (fs.existsSync(fileLocation)) {
+					injectScripts(fileLocation, 'graphic', {}, (html) => res.send(html));
+				} else {
+					next();
+				}
 			} else {
 				next();
 			}
