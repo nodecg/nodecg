@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.1](https://github.com/nodecg/nodecg/compare/v2.1.0...v2.1.1) (2023-03-26)
+
+
+### Bug Fixes
+
+* **server:** don't crash when `/instance/**/*.html` route 404s ([#636](https://github.com/nodecg/nodecg/issues/636)) ([c59adc8](https://github.com/nodecg/nodecg/commit/c59adc8bc24374a1a30f5cab272606b440b300d0))
+* **server:** prevent directory traversal attacks ([#639](https://github.com/nodecg/nodecg/issues/639)) ([0646587](https://github.com/nodecg/nodecg/commit/0646587c1057b3a19eace430d979b6a502a4e8a7))
+
 ## [2.1.0](https://github.com/nodecg/nodecg/compare/v2.0.4...v2.1.0) (2023-03-25)
 
 
