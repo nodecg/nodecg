@@ -57,7 +57,8 @@ export default class GraphicsLib {
 				return false;
 			});
 
-			const fileLocation = path.join(bundle.dir, 'graphics', resName);
+			const parentDir = path.join(bundle.dir, 'graphics');
+			const fileLocation = path.join(parentDir, resName);
 			// If this file is a main HTML file for a graphic, inject the graphic setup scripts.
 			if (isGraphic) {
 				injectScripts(
@@ -70,7 +71,7 @@ export default class GraphicsLib {
 					(html) => res.send(html),
 				);
 			} else {
-				sendFile(fileLocation, res, next);
+				sendFile(parentDir, fileLocation, res, next);
 			}
 		});
 
@@ -84,8 +85,9 @@ export default class GraphicsLib {
 			}
 
 			const resName = req.params[0];
-			const fileLocation = path.join(bundle.dir, req.params.target, resName);
-			sendFile(fileLocation, res, next);
+			const parentDir = path.join(bundle.dir, req.params.target);
+			const fileLocation = path.join(parentDir, resName);
+			sendFile(parentDir, fileLocation, res, next);
 		});
 	}
 }
