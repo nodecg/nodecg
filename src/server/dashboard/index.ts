@@ -89,8 +89,9 @@ export default class DashboardLib {
 					(html) => res.send(html),
 				);
 			} else {
-				const fileLocation = path.join(bundle.dashboard.dir, resName);
-				ncgUtils.sendFile(fileLocation, res, next);
+				const parentDir = bundle.dashboard.dir;
+				const fileLocation = path.join(parentDir, resName);
+				ncgUtils.sendFile(parentDir, fileLocation, res, next);
 			}
 		});
 

@@ -228,13 +228,9 @@ export default class AssetManager {
 
 			// Send the file (or an appropriate error).
 			(req, res, next) => {
-				const fullPath = path.join(
-					this.assetsRoot,
-					req.params.namespace,
-					req.params.category,
-					req.params.filePath,
-				);
-				sendFile(fullPath, res, next);
+				const parentDir = this.assetsRoot;
+				const fullPath = path.join(parentDir, req.params.namespace, req.params.category, req.params.filePath);
+				sendFile(parentDir, fullPath, res, next);
 			},
 		);
 

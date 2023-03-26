@@ -36,6 +36,7 @@ export const setup = (nodecgConfigName = 'nodecg.json'): void => {
 	fse.moveSync(path.join(tempFolder, 'bundles/test-bundle/git'), path.join(tempFolder, 'bundles/test-bundle/.git'));
 	fse.copySync('test/fixtures/nodecg-core/cfg', path.join(tempFolder, 'cfg'));
 	fse.copySync(`test/fixtures/nodecg-core/cfg/${nodecgConfigName}`, path.join(tempFolder, 'cfg/nodecg.json'));
+	fse.writeFileSync(path.join(tempFolder, 'should-be-forbidden.txt'), 'exploit succeeded', 'utf-8');
 
 	let server: NodeCGServer;
 	test.before(async () => {

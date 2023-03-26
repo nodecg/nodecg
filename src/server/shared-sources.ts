@@ -23,8 +23,9 @@ export default class SharedSourcesLib {
 			// Essentially behave like express.static
 			// Serve up files with no extra logic
 			const resName = req.params[0];
-			const fileLocation = path.join(bundle.dir, 'shared', resName);
-			sendFile(fileLocation, res, next);
+			const parentDir = path.join(bundle.dir, 'shared');
+			const fileLocation = path.join(parentDir, resName);
+			sendFile(parentDir, fileLocation, res, next);
 		});
 	}
 }

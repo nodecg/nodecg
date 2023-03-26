@@ -100,8 +100,9 @@ export default class SoundsLib {
 			return;
 		}
 
-		const fullPath = path.join(bundle.dir, cue.defaultFile);
-		sendFile(fullPath, res, next);
+		const parentDir = bundle.dir;
+		const fullPath = path.join(parentDir, cue.defaultFile);
+		sendFile(parentDir, fullPath, res, next);
 	}
 
 	private _makeCuesRepDefaultValue(bundle: NodeCG.Bundle): NodeCG.SoundCue[] {
