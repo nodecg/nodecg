@@ -225,9 +225,14 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		});
 
 		bundleManager.all().forEach((bundle) => {
-			// TODO: deprecate this feature once Import Maps are shipped and stable in browsers.
-			// TODO: remove this feature after Import Maps have been around a while (like a year maybe).
+			// TODO: remove this feature in v3
 			if (bundle.transformBareModuleSpecifiers) {
+				log.warn(
+					`${bundle.name} uses the deprecated "transformBareModuleSpecifiers" feature. ` +
+						'This feature will be removed in NodeCG v3. ' +
+						'Please migrate to using browser-native import maps instead: ' +
+						'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap',
+				);
 				const opts = {
 					rootDir: process.env.NODECG_ROOT,
 					modulesUrl: `/bundles/${bundle.name}/node_modules`,
