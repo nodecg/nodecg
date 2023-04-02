@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.2](https://github.com/nodecg/nodecg/compare/v2.1.1...v2.1.2) (2023-04-02)
+
+
+### Bug Fixes
+
+* **server:** prevent another possible (but unreproduced) directory traversal attack ([#643](https://github.com/nodecg/nodecg/issues/643)) ([ca2208c](https://github.com/nodecg/nodecg/commit/ca2208c32304c5ee7750925f7481104a81f4cddc))
+
 ## [2.1.1](https://github.com/nodecg/nodecg/compare/v2.1.0...v2.1.1) (2023-03-26)
 
 
