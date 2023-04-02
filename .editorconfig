@@ -17,3 +17,6 @@ indent_size = 2
 # Don't remove trailing whitespace from Markdown
 [*.md]
 trim_trailing_whitespace = false
+
+[*.js]
+quote_type = single
