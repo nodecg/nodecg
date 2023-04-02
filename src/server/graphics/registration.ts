@@ -13,6 +13,7 @@ import type ServerReplicant from '../replicant/server-replicant';
 import type { RootNS, GraphicRegRequest } from '../../types/socket-protocol';
 import type BundleManager from '../bundle-manager';
 import type { NodeCG } from '../../types/nodecg';
+import isChildOf from '../util/isChildOf';
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 
@@ -156,8 +157,8 @@ export default class RegistrationCoordinator {
 
 			// If it's a HTML file, inject the graphic setup script and serve that
 			// otherwise, send the file unmodified
-			if (resName.endsWith('.html')) {
-				const fileLocation = path.join(BUILD_PATH, resName);
+			const fileLocation = path.join(BUILD_PATH, resName);
+			if (resName.endsWith('.html') && isChildOf(BUILD_PATH, fileLocation)) {
 				if (fs.existsSync(fileLocation)) {
 					injectScripts(fileLocation, 'graphic', {}, (html) => res.send(html));
 				} else {
