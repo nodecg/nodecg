@@ -56,4 +56,4 @@ EXPOSE 9090/tcp
 
 # Define command to run NodeCG
 # Using `node` directly is slightly faster than using `nodecg start`.
-CMD ["node", "index.js"]
+CMD ["node", "/opt/nodecg/index.js"]
