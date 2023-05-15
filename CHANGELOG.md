@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.4](https://github.com/nodecg/nodecg/compare/v2.1.3...v2.1.4) (2023-05-15)
+
+
+### Bug Fixes
+
+* fix error when running NodeCG after installation as a dependency via npm ([#647](https://github.com/nodecg/nodecg/issues/647)) ([3aaaae8](https://github.com/nodecg/nodecg/commit/3aaaae8d71bfecb3966e34e304aaac003e3e063c))
+
 ## [2.1.3](https://github.com/nodecg/nodecg/compare/v2.1.2...v2.1.3) (2023-04-24)
 
 
