@@ -4,7 +4,6 @@ import fs from 'fs';
 
 // Packages
 import express from 'express';
-import appRootPath from 'app-root-path';
 
 // Ours
 import { injectScripts } from '../util';
@@ -14,10 +13,11 @@ import type { RootNS, GraphicRegRequest } from '../../types/socket-protocol';
 import type BundleManager from '../bundle-manager';
 import type { NodeCG } from '../../types/nodecg';
 import isChildOf from '../util/isChildOf';
+import rootPath from '../../shared/utils/rootPath';
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 
-const BUILD_PATH = path.join(appRootPath.path, 'build/client/instance');
+const BUILD_PATH = path.join(rootPath.path, 'build/client/instance');
 
 export default class RegistrationCoordinator {
 	app = express();
@@ -34,7 +34,7 @@ export default class RegistrationCoordinator {
 		const { app } = this;
 
 		this._instancesRep = replicator.declare('graphics:instances', 'nodecg', {
-			schemaPath: path.resolve(appRootPath.path, 'schemas/graphics%3Ainstances.json'),
+			schemaPath: path.resolve(rootPath.path, 'schemas/graphics%3Ainstances.json'),
 			persistent: false,
 			defaultValue: [],
 		});

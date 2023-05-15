@@ -10,15 +10,17 @@
  */
 
 // Packages
-import appRootPath from 'app-root-path';
 import semver from 'semver';
 import fetch from 'node-fetch-commonjs';
 
+// Ours
+import rootPath from '../shared/utils/rootPath';
+
 const cwd = process.cwd();
-if (cwd !== appRootPath.path) {
-	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, appRootPath.path);
-	process.chdir(appRootPath.path);
-	console.info('[nodecg] Changed process.cwd to %s', appRootPath.path);
+if (cwd !== rootPath.path) {
+	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, rootPath.path);
+	process.chdir(rootPath.path);
+	console.info('[nodecg] Changed process.cwd to %s', rootPath.path);
 }
 
 if (!process.env.NODECG_ROOT) {

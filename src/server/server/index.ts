@@ -44,7 +44,6 @@ import transformMiddleware from 'express-transform-bare-module-specifiers';
 import compression from 'compression';
 import type { Server } from 'http';
 import SocketIO from 'socket.io';
-import appRootPath from 'app-root-path';
 import passport from 'passport';
 
 // Ours
@@ -65,6 +64,7 @@ import ExtensionManager from './extensions';
 import SentryConfig from '../util/sentry-config';
 import type { NodeCG } from '../../types/nodecg';
 import { TypedEmitter } from '../../shared/typed-emitter';
+import rootPath from '../../shared/utils/rootPath';
 
 const renderTemplate = memoize((content, options) => template(content)(options));
 
@@ -312,7 +312,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 
 		// Set up "bundles" Replicant.
 		const bundlesReplicant = replicator.declare('bundles', 'nodecg', {
-			schemaPath: path.resolve(appRootPath.path, 'schemas/bundles.json'),
+			schemaPath: path.resolve(rootPath.path, 'schemas/bundles.json'),
 			persistent: false,
 		});
 		const updateBundlesReplicant = debounce(() => {
