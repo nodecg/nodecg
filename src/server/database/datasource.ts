@@ -4,7 +4,6 @@ import path from 'path';
 // Packages
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import appRootPath from 'app-root-path';
 export * from './entity';
 
 // Ours
@@ -15,8 +14,9 @@ import { Replicant } from './entity/Replicant';
 import { Permission } from './entity/Permission';
 import { Identity } from './entity/Identity';
 import { ApiKey } from './entity/ApiKey';
+import rootPath from '../../shared/utils/rootPath';
 
-const dbPath = path.join(appRootPath.path, 'db/nodecg.sqlite3');
+const dbPath = path.join(rootPath.path, 'db/nodecg.sqlite3');
 export const testing = process.env.NODECG_TEST?.toLowerCase() === 'true';
 
 const dataSource = new DataSource({
@@ -36,8 +36,8 @@ const dataSource = new DataSource({
 	database: testing ? ':memory:' : dbPath,
 	logging: false,
 	entities: [ApiKey, Identity, Permission, Replicant, Role, Session, User],
-	migrations: [path.join(appRootPath.path, 'build/typeorm/migration/**/*.js')],
-	subscribers: [path.join(appRootPath.path, 'build/typeorm/subscriber/**/*.js')],
+	migrations: [path.join(rootPath.path, 'build/typeorm/migration/**/*.js')],
+	subscribers: [path.join(rootPath.path, 'build/typeorm/subscriber/**/*.js')],
 	migrationsRun: true,
 	synchronize: false,
 });

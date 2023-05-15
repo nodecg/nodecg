@@ -5,13 +5,13 @@ import path from 'path';
 import clone from 'clone';
 import express from 'express';
 import sha1File from 'sha1-file';
-import appRootPath from 'app-root-path';
 
 // Ours
 import type { Replicator } from './replicant';
 import type ServerReplicant from './replicant/server-replicant';
 import { sendFile } from './util';
 import type { NodeCG } from '../types/nodecg';
+import rootPath from '../shared/utils/rootPath';
 
 export default class SoundsLib {
 	app = express();
@@ -33,7 +33,7 @@ export default class SoundsLib {
 				const defaultCuesRepValue = this._makeCuesRepDefaultValue(bundle);
 
 				const cuesRep = replicator.declare<NodeCG.SoundCue[]>('soundCues', bundle.name, {
-					schemaPath: path.resolve(appRootPath.path, 'schemas/soundCues.json'),
+					schemaPath: path.resolve(rootPath.path, 'schemas/soundCues.json'),
 					defaultValue: [],
 				});
 

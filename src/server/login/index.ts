@@ -10,7 +10,6 @@ import steamStrategy from 'passport-steam';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { TypeormStore } from 'connect-typeorm';
 import cookieParser from 'cookie-parser';
-import appRootPath from 'app-root-path';
 import fetch from 'node-fetch-commonjs';
 
 // Ours
@@ -19,6 +18,7 @@ import createLogger from '../logger';
 import type { User, Role } from '../database';
 import { Session, getConnection } from '../database';
 import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/utils';
+import rootPath from '../../shared/utils/rootPath';
 
 type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
 
@@ -380,9 +380,9 @@ export async function createMiddleware(callbacks: {
 	app.use(passport.initialize());
 	app.use(passport.session());
 
-	const VIEWS_DIR = path.join(appRootPath.path, 'build/server/templates');
+	const VIEWS_DIR = path.join(rootPath.path, 'build/server/templates');
 
-	app.use('/login', express.static(path.join(appRootPath.path, 'build/client/login')));
+	app.use('/login', express.static(path.join(rootPath.path, 'build/client/login')));
 	app.set('views', VIEWS_DIR);
 
 	app.get('/login', (req, res) => {

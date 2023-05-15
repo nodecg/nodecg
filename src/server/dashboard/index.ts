@@ -4,13 +4,13 @@ import path from 'path';
 // Packages
 import clone from 'clone';
 import express from 'express';
-import appRootPath from 'app-root-path';
 
 // Ours
 import { config, filteredConfig } from '../config';
 import * as ncgUtils from '../util';
 import type BundleManager from '../bundle-manager';
 import type { NodeCG } from '../../types/nodecg';
+import rootPath from '../../shared/utils/rootPath';
 
 type Workspace = NodeCG.Workspace;
 
@@ -22,8 +22,8 @@ type DashboardContext = {
 	sentryEnabled: boolean;
 };
 
-const BUILD_PATH = path.join(appRootPath.path, 'build/client');
-const VIEWS_PATH = path.join(appRootPath.path, 'build/server/templates');
+const BUILD_PATH = path.join(rootPath.path, 'build/client');
+const VIEWS_PATH = path.join(rootPath.path, 'build/server/templates');
 
 export default class DashboardLib {
 	app = express();
@@ -37,7 +37,7 @@ export default class DashboardLib {
 
 		app.use(express.static(BUILD_PATH));
 
-		app.use('/node_modules', express.static(path.join(appRootPath.path, 'node_modules')));
+		app.use('/node_modules', express.static(path.join(rootPath.path, 'node_modules')));
 
 		app.get('/', (_, res) => {
 			res.redirect('/dashboard/');

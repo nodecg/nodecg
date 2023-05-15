@@ -5,15 +5,15 @@ import os from 'os';
 // Packages
 import * as Sentry from '@sentry/node';
 import express from 'express';
-import appRootPath from 'app-root-path';
 
 // Ours
 import { config } from '../config';
 import type BundleManager from '../bundle-manager';
 import { authCheck, pjson } from '../util';
 import type { NodeCG } from '../../types/nodecg';
+import rootPath from '../../shared/utils/rootPath';
 
-const VIEWS_PATH = path.join(appRootPath.path, 'build/server/templates');
+const VIEWS_PATH = path.join(rootPath.path, 'build/server/templates');
 const baseSentryConfig = {
 	dsn: config.sentry?.dsn,
 	serverName: os.hostname(),
