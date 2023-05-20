@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/triple-slash-reference */
+/// <reference path="../../shared/types/augment-node-global.d.ts" />
+
 /* eslint-disable no-var */
 export {};
 
