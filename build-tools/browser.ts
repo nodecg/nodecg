@@ -61,9 +61,6 @@ export function createBrowserConfig({
 			],
 		},
 		plugins: [
-			new webpack.EnvironmentPlugin({
-				BROWSER: true,
-			}),
 			new webpack.ProvidePlugin({
 				process: 'process/browser',
 			}),

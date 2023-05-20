@@ -9,7 +9,7 @@ import objectPath from 'object-path';
 import type { LoggerInterface } from './logger-interface';
 import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
-import { compileJsonSchema, formatJsonSchemaErrors, stringifyError } from './utils';
+import { compileJsonSchema, formatJsonSchemaErrors, isBrowser, stringifyError } from './utils';
 
 export type ReplicantValue<P extends NodeCG.Platform, V, O, S extends boolean = false> = P extends 'server'
 	? S extends true
@@ -173,11 +173,7 @@ export abstract class AbstractReplicant<
 			switch (operation.method) {
 				case 'overwrite': {
 					const { newValue } = operation.args;
-					this[process.env.BROWSER ? 'value' : '_value'] = proxyRecursive(
-						this,
-						newValue as any,
-						operation.path,
-					);
+					this[isBrowser() ? 'value' : '_value'] = proxyRecursive(this, newValue as any, operation.path);
 					result = true;
 					break;
 				}
@@ -355,7 +351,7 @@ const deleteTrap = function <T>(target: T, prop: keyof T): boolean | void {
 	}
 
 	replicant._addOperation({ path: metadata.path, method: 'delete', args: { prop } });
-	if (!process.env.BROWSER) {
+	if (!isBrowser()) {
 		return delete target[prop];
 	}
 };
@@ -387,7 +383,7 @@ const CHILD_ARRAY_HANDLER = {
 					replicant.validate(valueClone);
 				}
 
-				if (process.env.BROWSER) {
+				if (isBrowser()) {
 					metadata.replicant._addOperation({
 						path: metadata.path,
 						method: prop as any,
@@ -465,7 +461,7 @@ const CHILD_ARRAY_HANDLER = {
 		}
 
 		// If this Replicant is running in the server context, immediately apply the value.
-		if (!process.env.BROWSER) {
+		if (!isBrowser()) {
 			target[prop] = proxyRecursive(metadata.replicant, newValue, joinPathParts(metadata.path, prop as string));
 		}
 
@@ -537,7 +533,7 @@ const CHILD_OBJECT_HANDLER = {
 		}
 
 		// If this Replicant is running in the server context, immediately apply the value.
-		if (!process.env.BROWSER) {
+		if (!isBrowser()) {
 			target[prop] = proxyRecursive(metadata.replicant, newValue, joinPathParts(metadata.path, prop as string));
 		}
 

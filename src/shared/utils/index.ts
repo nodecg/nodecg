@@ -66,3 +66,7 @@ export function stringifyErrorInner(error: unknown): {
 		stack,
 	};
 }
+
+export function isBrowser(): boolean {
+	return typeof globalThis.window !== 'undefined';
+}
