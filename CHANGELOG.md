@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.5](https://github.com/nodecg/nodecg/compare/v2.1.4...v2.1.5) (2023-05-20)
+
+
+### Bug Fixes
+
+* avoid using process.env.browser to avoid real-world env conflicts ([#649](https://github.com/nodecg/nodecg/issues/649)) ([e2c80e0](https://github.com/nodecg/nodecg/commit/e2c80e03bd217854f5bca3a06dd0bdf4e7e0961f))
+
 ## [2.1.4](https://github.com/nodecg/nodecg/compare/v2.1.3...v2.1.4) (2023-05-15)
 
 
