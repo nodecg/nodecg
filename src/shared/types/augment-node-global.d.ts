@@ -3,6 +3,6 @@ declare namespace NodeJS {
 		/**
 		 * This comes from webpack.
 		 */
-		BROWSER: boolean;
+		browser: boolean;
 	}
 }
