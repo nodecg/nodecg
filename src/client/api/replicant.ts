@@ -328,7 +328,7 @@ export default class ClientReplicant<
 				expectedRevision,
 				data.revision,
 			);
-			this._fullUpdate();
+			this._fullUpdate(data.revision);
 			return;
 		}
 
@@ -352,10 +352,10 @@ export default class ClientReplicant<
 	 * Requests the latest value from the Replicator, discarding the local value.
 	 * @private
 	 */
-	private _fullUpdate(): void {
+	private _fullUpdate(revision: number): void {
 		(window as any).NodeCG.readReplicant(this.name, this.namespace, (data: any) => {
 			this.emit('fullUpdate', data);
-			this._assignValue(data.value, data.revision);
+			this._assignValue(data, revision);
 		});
 	}
 }
