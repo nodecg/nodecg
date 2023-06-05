@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.6](https://github.com/nodecg/nodecg/compare/v2.1.5...v2.1.6) (2023-06-05)
+
+
+### Bug Fixes
+
+* correct full update read code ([#652](https://github.com/nodecg/nodecg/issues/652)) ([490d033](https://github.com/nodecg/nodecg/commit/490d033b0e7040535bac9c07d569194555c59b08))
+
 ## [2.1.5](https://github.com/nodecg/nodecg/compare/v2.1.4...v2.1.5) (2023-05-20)
 
 
