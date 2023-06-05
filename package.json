@@ -170,7 +170,7 @@
     "@types/lodash.template": "^4.4.6",
     "@types/make-fetch-happen": "^10.0.0",
     "@types/multer": "^1.4.2",
-    "@types/node": "^18.11.9",
+    "@types/node": "^18.16.16",
     "@types/object-path": "^0.11.0",
     "@types/passport": "^1.0.3",
     "@types/passport-local": "^1.0.33",

@@ -213,8 +213,7 @@ export default class AssetManager {
 				destination: this.assetsRoot,
 				filename(req, file, cb) {
 					const p = req.params as Record<string, string>;
-					cb(null, `${p.namespace}/${p.category}/${file.originalname}`);
-				},
+					cb(null, `${p.namespace}/${p.category}/${Buffer.from(file.originalname, 'latin1').toString('utf8')
 			}),
 		});
 		const uploader = upload.array('file', 64);
