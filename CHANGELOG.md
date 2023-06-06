@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.7](https://github.com/nodecg/nodecg/compare/v2.1.6...v2.1.7) (2023-06-06)
+
+
+### Bug Fixes
+
+* support uploading files with non-ascii characters in their filenames ([#657](https://github.com/nodecg/nodecg/issues/657)) ([318332e](https://github.com/nodecg/nodecg/commit/318332e71b176389b0da4cb639f9b10bf1694147))
+
 ## [2.1.6](https://github.com/nodecg/nodecg/compare/v2.1.5...v2.1.6) (2023-06-05)
 
 
