@@ -194,6 +194,7 @@ export abstract class NodeCGAPIBase<
 	 * nodecg.unlisten('printMessage', 'another-bundle', someFunctionName);
 	 */
 	unlisten(messageName: string, handlerFunc: NodeCG.ListenHandler): boolean;
+	unlisten(messageName: string, bundleName: string, handlerFunc: NodeCG.ListenHandler): boolean;
 	unlisten(
 		messageName: string,
 		bundleNameOrHandler: string | NodeCG.ListenHandler,
