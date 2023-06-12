@@ -1,5 +1,5 @@
 // Packages
-import clone from 'clone';
+import { klona as clone } from 'klona/json';
 
 // Ours
 import createLogger from '../logger';

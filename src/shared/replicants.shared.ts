@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-dynamic-delete */
 // Packages
 import type { ErrorObject, ValidateFunction } from 'ajv';
-import clone from 'clone';
+import { klona as clone } from 'klona/json';
 import objectPath from 'object-path';
 
 // Ours

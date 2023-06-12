@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
 
 // Packages
-import clone from 'clone';
+import { klona as clone } from 'klona/json';
 import { JsonPointer } from 'json-ptr';
 
 // Crimes

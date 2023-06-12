@@ -1,7 +1,7 @@
 /* eslint-disable no-constructor-return */
 // Packages
-import equal from 'deep-equal';
-import clone from 'clone';
+import { deepEqual as equal } from 'fast-equals';
+import { klona as clone } from 'klona/json';
 
 // Ours
 import { AbstractReplicant, isIgnoringProxy, type ReplicantValue } from '../../shared/replicants.shared';
