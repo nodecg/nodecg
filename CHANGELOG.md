@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.8](https://github.com/nodecg/nodecg/compare/v2.1.7...v2.1.8) (2023-06-12)
+
+
+### Bug Fixes
+
+* unlisten overload missing ([#659](https://github.com/nodecg/nodecg/issues/659)) ([d387aec](https://github.com/nodecg/nodecg/commit/d387aecc01f410838691a8befaa0b170df14f9cb))
+
 ## [2.1.7](https://github.com/nodecg/nodecg/compare/v2.1.6...v2.1.7) (2023-06-06)
 
 
