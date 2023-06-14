@@ -4,7 +4,7 @@ import * as path from 'path';
 
 // Packages
 import $RefParser from 'json-schema-lib';
-import clone from 'clone';
+import { klona as clone } from 'klona/json';
 import sha1 from 'sha1';
 
 // Ours

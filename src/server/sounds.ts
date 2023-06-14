@@ -2,7 +2,7 @@
 import path from 'path';
 
 // Packages
-import clone from 'clone';
+import { klona as clone } from 'klona/json';
 import express from 'express';
 import sha1File from 'sha1-file';
 

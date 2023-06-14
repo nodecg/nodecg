@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Packages
-import clone from 'clone';
+import { klona as clone } from 'klona/json';
 import Joi from 'joi';
 import { cosmiconfigSync as cosmiconfig } from 'cosmiconfig';
 import { argv } from 'yargs';
