@@ -140,11 +140,11 @@ function getConfigSchema(userConfig: Record<string, any>) {
 			discord: Joi.object({
 				enabled: Joi.boolean().default(false).description('Whether to enable Discord authentication.'),
 				clientID: Joi.string()
-					// This will throw if the user does not provide a value, but only if Twitch auth is enabled.
+					// This will throw if the user does not provide a value, but only if Discord auth is enabled.
 					.default(userConfig?.login?.discord?.enabled ? null : '')
 					.description('A Discord application ClientID https://discord.com/developers/applications'),
 				clientSecret: Joi.string()
-					// This will throw if the user does not provide a value, but only if Twitch auth is enabled.
+					// This will throw if the user does not provide a value, but only if Discord auth is enabled.
 					.default(userConfig?.login?.discord?.enabled ? null : '')
 					.description('A Discord application ClientSecret https://discord.com/developers/applications'),
 				scope: Joi.string()
