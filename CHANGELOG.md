@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.9](https://github.com/nodecg/nodecg/compare/v2.1.8...v2.1.9) (2023-06-24)
+
+
+### Bug Fixes
+
+* validation of URI in json schema for certain spec drafts ([#663](https://github.com/nodecg/nodecg/issues/663)) ([4076a5d](https://github.com/nodecg/nodecg/commit/4076a5d4bacf9ff7f34ea85b98a0a7378f29697f))
+
+
+### Performance Improvements
+
+* replace deep-equal and clone with fast-equals and klona/json ([#661](https://github.com/nodecg/nodecg/issues/661)) ([a4cc07b](https://github.com/nodecg/nodecg/commit/a4cc07bb9a09e96d2c49a1a805c9a7447a7ee1c7))
+
 ## [2.1.8](https://github.com/nodecg/nodecg/compare/v2.1.7...v2.1.8) (2023-06-12)
 
 
