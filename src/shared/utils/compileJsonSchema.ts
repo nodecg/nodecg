@@ -35,11 +35,11 @@ export function compileJsonSchema(schema: Record<any, unknown>): ValidateFunctio
 		return ajv.draft07.compile(schema);
 	}
 
-	if (schemaVersion.includes('draft-2019-09')) {
+	if (schemaVersion.includes('draft/2019-09')) {
 		return ajv['draft2019-09'].compile(schema);
 	}
 
-	if (schemaVersion.includes('draft-2020-12')) {
+	if (schemaVersion.includes('draft/2020-12')) {
 		return ajv['draft2020-12'].compile(schema);
 	}
 
@@ -57,11 +57,11 @@ export function formatJsonSchemaErrors(schema: Record<any, unknown>, errors?: Er
 		return ajv.draft07.errorsText(errors).replace(/^data\//gm, '');
 	}
 
-	if (schemaVersion.includes('draft-2019-09')) {
+	if (schemaVersion.includes('draft/2019-09')) {
 		return ajv['draft2019-09'].errorsText(errors).replace(/^data\//gm, '');
 	}
 
-	if (schemaVersion.includes('draft-2020-12')) {
+	if (schemaVersion.includes('draft/2020-12')) {
 		return ajv['draft2020-12'].errorsText(errors).replace(/^data\//gm, '');
 	}
 
