@@ -34,7 +34,7 @@ export async function upsertUser({
 }): Promise<User> {
 	const database = await getConnection();
 	const { manager } = database;
-	let user: User;
+	let user: User | null = null;
 
 	// Check for ident that matches.
 	// If found, it should have an associated user, so return that.
@@ -44,7 +44,7 @@ export async function upsertUser({
 		existingIdent.provider_access_token = provider_access_token ?? null;
 		existingIdent.provider_refresh_token = provider_refresh_token ?? null;
 		await manager.save(existingIdent);
-		user = existingIdent.user;
+		user = await findUserById(existingIdent.user.id);
 	} else {
 		const ident = await createIdentity({
 			provider_type,
@@ -58,6 +58,11 @@ export async function upsertUser({
 			identities: [ident],
 			apiKeys: [apiKey],
 		});
+	}
+
+	if (!user) {
+		// Something went very wrong.
+		throw new Error('Failed to find user after upserting.');
 	}
 
 	// Always update the roles, regardless of if we are making a new user or updating an existing one.
@@ -97,5 +102,15 @@ async function findIdent(type: Identity['provider_type'], hash: Identity['provid
 	return database.getRepository(Identity).findOne({
 		where: { provider_hash: hash, provider_type: type },
 		relations: ['user'],
+	});
+}
+
+async function findUserById(userId: User['id']): Promise<User | null> {
+	const database = await getConnection();
+	return database.getRepository(User).findOne({
+		where: {
+			id: userId,
+		},
+		relations: ['roles', 'identities', 'apiKeys'],
 	});
 }
