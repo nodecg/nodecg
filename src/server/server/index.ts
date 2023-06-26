@@ -170,10 +170,18 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 			const login = await import('../login');
 			const { app: loginMiddleware, sessionMiddleware } = await login.createMiddleware({
 				onLogin: (user) => {
-					this._extensionManager?.emitToAllInstances('login', user);
+					// If the user had no roles, then that means they "logged in"
+					// with a third-party auth provider but weren't able to
+					// get past the login page because the NodeCG config didn't allow that user.
+					// At this time, we only tell extensions about users that are valid.
+					if (user.roles.length > 0) {
+						this._extensionManager?.emitToAllInstances('login', user);
+					}
 				},
 				onLogout: (user) => {
-					this._extensionManager?.emitToAllInstances('logout', user);
+					if (user.roles.length > 0) {
+						this._extensionManager?.emitToAllInstances('logout', user);
+					}
 				},
 			});
 			app.use(loginMiddleware);
