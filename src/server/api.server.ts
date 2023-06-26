@@ -143,8 +143,10 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 
 		/**
 		 * _Extension only_<br/>
-		 * Mounts express middleware to the main server express app.
-		 * See the [express docs](http://expressjs.com/en/api.html#app.use) for usage.
+		 * Mounts Express middleware to the main server Express app.
+		 * Middleware mounted using this method comes _after_ all the middlware that NodeCG
+		 * uses internally.
+		 * See the [Express docs](http://expressjs.com/en/api.html#app.use) for usage.
 		 * @function
 		 */
 		mount = mount;
