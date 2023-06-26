@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.10](https://github.com/nodecg/nodecg/compare/v2.1.9...v2.1.10) (2023-06-26)
+
+
+### Bug Fixes
+
+* always emit full user object on `login` event; only emit `login` and `logout` events for allowed users ([#666](https://github.com/nodecg/nodecg/issues/666)) ([9da8b02](https://github.com/nodecg/nodecg/commit/9da8b029a49ddd471774ad8f96ae0d201ad05b09))
+
 ## [2.1.9](https://github.com/nodecg/nodecg/compare/v2.1.8...v2.1.9) (2023-06-24)
 
 
