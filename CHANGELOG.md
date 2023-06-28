@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.11](https://github.com/nodecg/nodecg/compare/v2.1.10...v2.1.11) (2023-06-28)
+
+
+### Bug Fixes
+
+* update better-sqlite3 ([#668](https://github.com/nodecg/nodecg/issues/668)) ([a66c19d](https://github.com/nodecg/nodecg/commit/a66c19d666b0e647d69315a7d55f8699a8b55a07))
+
 ## [2.1.10](https://github.com/nodecg/nodecg/compare/v2.1.9...v2.1.10) (2023-06-26)
 
 
