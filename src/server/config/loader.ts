@@ -223,7 +223,7 @@ function getConfigSchema(userConfig: Record<string, any>) {
 export default function (cfgDirOrFile: string) {
 	let isFile = false;
 	try {
-		isFile = fs.lstatSync(cfgDirOrFile).isFile()
+		isFile = fs.lstatSync(cfgDirOrFile).isFile();
 		// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 	} catch (error: any) {
 		if (error.code !== 'ENOENT') {
