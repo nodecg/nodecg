@@ -5,7 +5,7 @@
 [![Discord](https://img.shields.io/discord/754749209722486814.svg?logo=discord)](https://discord.com/invite/GJ4r8a8)
 [![Build Status](https://github.com/nodecg/nodecg/workflows/CI/badge.svg)](https://github.com/nodecg/nodecg/actions?query=workflow%3ACI)
 [![Coverage Status](https://codecov.io/gh/nodecg/nodecg/branch/master/graph/badge.svg)](https://codecov.io/gh/nodecg/nodecg)
-[![Docker Build Status](https://img.shields.io/docker/build/nodecg/nodecg.svg)](https://hub.docker.com/r/nodecg/nodecg/tags/)
+[![Docker Build Status](https://ghcr-badge.egpl.dev/nodecg/nodecg/latest_tag)](https://ghcr.io/nodecg/nodecg)
 [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/fold_left.svg?style=social&label=Follow%20%40NodeCG)](https://twitter.com/NodeCG)
 
 NodeCG is a broadcast graphics framework and application. It enables you to write complex, dynamic broadcast graphics using the web platform. NodeCG has no graphics or drawing primitives of its own. Instead, NodeCG provides a structure for your code and an API to facilitate moving data between the dashboard, the server, and your graphics. It makes few assumptions about how to best code a graphic, and gives you freedom to use whatever libraries, frameworks, tools, and methodologies you want. As such, NodeCG graphics can be rendered in any environment that can render HTML, including:
