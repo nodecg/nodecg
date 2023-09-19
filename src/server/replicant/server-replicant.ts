@@ -15,7 +15,7 @@ import {
 	AbstractReplicant,
 	type ReplicantValue,
 } from '../../shared/replicants.shared';
-import replaceRefs from './schema-hacks';
+import formatSchema from './schema-hacks';
 import createLogger from '../logger';
 import type { NodeCG } from '../../types/nodecg';
 import { getSchemaDefault } from '../../shared/utils';
@@ -54,7 +54,7 @@ export default class ServerReplicant<
 			if (fs.existsSync(absoluteSchemaPath)) {
 				try {
 					const rawSchema = $RefParser.readSync(absoluteSchemaPath);
-					const parsedSchema = replaceRefs(rawSchema.root, rawSchema.rootFile, rawSchema.files);
+					const parsedSchema = formatSchema(rawSchema.root, rawSchema.rootFile, rawSchema.files);
 					if (!parsedSchema) {
 						throw new Error('parsed schema was unexpectedly undefined');
 					}

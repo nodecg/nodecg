@@ -25,7 +25,7 @@ type PointerReference = { $ref: string } & UnknownObject;
 /**
  * Mutates an object in place, replacing all its JSON Refs with their dereferenced values.
  */
-export default function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): UnknownObject | undefined {
+function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): UnknownObject | undefined {
 	const type = jsonSchemaLibTypeOf(inputObj);
 	if (!type.isPOJO && !type.isArray) {
 		return;
@@ -130,4 +130,19 @@ function resolveFileReference(url: string, file: File): string {
 
 function resolvePointerReference(obj: Record<string, unknown>, ref: string): UnknownObject {
 	return JsonPointer.get(obj, ref) as UnknownObject;
+}
+
+export default function formatSchema(
+	inputObj: unknown,
+	currentFile: File,
+	allFiles: File[],
+): UnknownObject | undefined {
+	const schema = replaceRefs(inputObj, currentFile, allFiles);
+
+	if (schema) {
+		delete schema.tsType;
+		delete schema.tsEnumNames;
+	}
+
+	return schema;
 }
