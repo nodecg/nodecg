@@ -73,8 +73,7 @@ export default function (
 			// We put this at the start and make it async so it loads ASAP.
 			if (!fullbleed) {
 				scripts.unshift(
-					'<script async src="/node_modules/iframe-resizer/js/iframeResizer.contentWindow.min.js">' +
-						'</script>',
+					'<script async src="/node_modules/iframe-resizer/js/iframeResizer.contentWindow.js"></script>',
 				);
 			}
 
