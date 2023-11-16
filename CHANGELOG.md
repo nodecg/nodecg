@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.12](https://github.com/nodecg/nodecg/compare/v2.1.11...v2.1.12) (2023-11-16)
+
+
+### Bug Fixes
+
+* `iframe-resizer` content window injection ([#679](https://github.com/nodecg/nodecg/issues/679)) ([78f80ba](https://github.com/nodecg/nodecg/commit/78f80ba31305d2d982eede8cb7e1b604844a31fb))
+* **config loader:** handle when cfg is symlink ([#670](https://github.com/nodecg/nodecg/issues/670)) ([50f0c11](https://github.com/nodecg/nodecg/commit/50f0c11b4672fe2103cd0e5b343e7559dbf08c68))
+* **replicants:** remove custom schema properties ([#676](https://github.com/nodecg/nodecg/issues/676)) ([6ae4a49](https://github.com/nodecg/nodecg/commit/6ae4a4984d43dc327e85793e27eaffc54323ea69))
+
 ## [2.1.11](https://github.com/nodecg/nodecg/compare/v2.1.10...v2.1.11) (2023-06-28)
 
 
