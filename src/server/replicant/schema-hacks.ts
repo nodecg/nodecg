@@ -139,6 +139,11 @@ export default function formatSchema(
 ): UnknownObject | undefined {
 	const schema = replaceRefs(inputObj, currentFile, allFiles);
 
+	/**
+	 * NodeCG's CLI uses `json-schema-to-typescript` to convert JSON schemas into TypeScript types with the ability to override the generated type (https://github.com/bcherny/json-schema-to-typescript#custom-schema-properties), which can be handy in certain situations.
+		The problem is that these custom properties are not standard, and AJV will throw an error due to their presence.
+		This ensures that the schema will be compliant by removing these custom properties and allowing the schema converter to customize the generated type if needed.
+	 */
 	if (schema) {
 		delete schema.tsType;
 		delete schema.tsEnumNames;
