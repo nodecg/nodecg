@@ -221,9 +221,9 @@ function getConfigSchema(userConfig: Record<string, any>) {
 
 // eslint-disable-next-line complexity
 export default function (cfgDirOrFile: string) {
-	let isDir = false;
+	let isFile = false;
 	try {
-		isDir = fs.lstatSync(cfgDirOrFile).isDirectory();
+		isFile = fs.lstatSync(cfgDirOrFile).isFile();
 		// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 	} catch (error: any) {
 		if (error.code !== 'ENOENT') {
@@ -232,11 +232,11 @@ export default function (cfgDirOrFile: string) {
 		}
 	}
 
-	const cfgDir = isDir ? cfgDirOrFile : path.dirname(cfgDirOrFile);
+	const cfgDir = isFile ? path.dirname(cfgDirOrFile) : cfgDirOrFile;
 	const cc = cosmiconfig('nodecg', {
-		searchPlaces: isDir
-			? ['nodecg.json', 'nodecg.yaml', 'nodecg.yml', 'nodecg.js', 'nodecg.config.js']
-			: [path.basename(cfgDirOrFile)],
+		searchPlaces: isFile
+			? [path.basename(cfgDirOrFile)]
+			: ['nodecg.json', 'nodecg.yaml', 'nodecg.yml', 'nodecg.js', 'nodecg.config.js'],
 		stopDir: cfgDir,
 	});
 	const result = cc.search(cfgDir);
