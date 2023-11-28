@@ -51,9 +51,8 @@ NodeCG's roots are in small broadcasts with no budget. More recently, NodeCG has
 
 ## Maintainers
 
-- [Alex "Lange" Van Camp](https://github.com/alvancamp)
 - [Matt "Bluee" McNamara](https://mattmcn.com/)
-- [Keiichiro "Hoishin" Amemiya](https://hoish.in/)
+- [Keiichiro "Hoishin" Amemiya](https://twitter.com/hoishinxii)
 
 ## Designers
 
