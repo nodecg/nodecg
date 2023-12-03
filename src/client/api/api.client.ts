@@ -13,8 +13,9 @@ type SendMessageCb<T> = (error?: unknown, response?: T) => void;
 
 type ReadReplicantCb<T = unknown> = (value: T | undefined) => void;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type EventMap = {};
+type EventMap = {
+	//
+};
 
 const soundMetadata = new WeakMap<createjs.AbstractSoundInstance, { cueName: string; updateVolume: boolean }>();
 const apiContexts = new Set<NodeCGAPIClient>();
@@ -107,7 +108,6 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 			});
 		}
 	}
-	/* eslint-enable no-dupe-class-members */
 
 	static readReplicant<T = unknown>(name: string, namespace: string, cb: ReadReplicantCb<T>): void {
 		globalThis.socket.emit('replicant:read', { name, namespace }, (error, value?) => {
@@ -175,7 +175,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		this.socket.emit('joinRoom', bundle.name, () => {});
 
-		if (globalThis.window && bundle._hasSounds && window.createjs && window.createjs.Sound) {
+		if (globalThis.window && bundle._hasSounds && window.createjs?.Sound) {
 			const soundCuesRep = new ClientReplicant<NodeCG.SoundCue[]>('soundCues', this.bundleName, {}, socket);
 			this._soundFiles = new ClientReplicant<NodeCG.AssetFile[]>('assets:sounds', this.bundleName, {}, socket);
 			this._bundleVolume = new ClientReplicant<number>(`volume:${this.bundleName}`, '_sounds', {}, socket);
@@ -437,7 +437,6 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 
 		NodeCGAPIClient.readReplicant<T>(name, namespace, cb);
 	}
-	/* eslint-enable no-dupe-class-members */
 
 	protected _replicantFactory = <V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
 		name: string,

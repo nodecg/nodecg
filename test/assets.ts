@@ -29,7 +29,6 @@ const TWITTER_BANNER_PATH = path.join(C.assetsRoot(), 'test-bundle/assets/#twitt
 
 // Doing twice to assert file 'change' event
 for (let i = 0; i < 2; i++) {
-	// eslint-disable-next-line @typescript-eslint/no-loop-func
 	test.serial(`uploading #${i}`, async (t) => {
 		const assetRep = t.context.apis.extension.Replicant('assets:assets');
 

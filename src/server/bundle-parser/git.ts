@@ -28,7 +28,9 @@ export default function (bundleDir: string): NodeCG.Bundle.GitData {
 				shortHash,
 			};
 		}
-	} catch {}
+	} catch {
+		//
+	}
 
 	process.chdir(workingDir);
 	return retValue;

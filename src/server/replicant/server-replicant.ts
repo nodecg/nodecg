@@ -62,7 +62,6 @@ export default class ServerReplicant<
 					this.schema = parsedSchema;
 					this.schemaSum = sha1(JSON.stringify(parsedSchema));
 					this.validate = this._generateValidator();
-					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 				} catch (e: any) {
 					/* istanbul ignore next */
 					if (!process.env.NODECG_TEST) {

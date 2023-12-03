@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-for-of */
-
 // Packages
 import { klona as clone } from 'klona/json';
 import { JsonPointer } from 'json-ptr';
@@ -71,6 +69,7 @@ function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): Un
 
 			// Crawl this POJO or Array, looking for nested JSON References
 			const keys = Object.keys(dereferencedData);
+			// eslint-disable-next-line @typescript-eslint/prefer-for-of
 			for (let i = 0; i < keys.length; i++) {
 				const key = keys[i];
 				const value = obj[key];
@@ -81,6 +80,7 @@ function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): Un
 
 	// Crawl this POJO or Array, looking for nested JSON References
 	const keys = Object.keys(obj);
+	// eslint-disable-next-line @typescript-eslint/prefer-for-of
 	for (let i = 0; i < keys.length; i++) {
 		const key = keys[i];
 		const value = obj[key];

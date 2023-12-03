@@ -33,7 +33,7 @@ export const waitForRegistration = async (page: Puppeteer.Page): Promise<unknown
 	return response;
 };
 
-export const shadowSelector = async <T extends Element>(
+export const shadowSelector = <T extends Element>(
 	page: Puppeteer.Page,
 	...selectors: string[]
 ): Promise<Puppeteer.ElementHandle<T>> =>

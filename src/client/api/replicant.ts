@@ -1,4 +1,3 @@
-/* eslint-disable no-constructor-return */
 // Packages
 import { deepEqual as equal } from 'fast-equals';
 import { klona as clone } from 'klona/json';

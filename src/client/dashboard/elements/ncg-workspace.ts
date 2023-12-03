@@ -1,10 +1,8 @@
 import '@polymer/paper-spinner/paper-spinner.js';
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import * as keep1 from './ncg-dashboard-panel';
 keep1;
-/* eslint-enable @typescript-eslint/no-unused-expressions */
 
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';

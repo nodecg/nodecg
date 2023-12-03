@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-namespace */
 import type * as ExpressCore from 'express-serve-static-core';
 import type express from 'express';

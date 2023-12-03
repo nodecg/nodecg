@@ -39,7 +39,6 @@ export const setup = () => {
 			fs.mkdirSync('.nyc_output');
 		}
 
-		/* eslint-disable no-await-in-loop */
 		for (const page of await browser.pages()) {
 			let coverageObj: Record<string, any>;
 			try {
@@ -61,7 +60,6 @@ export const setup = () => {
 
 			fs.writeFileSync(`.nyc_output/browser-${uuid()}.json`, JSON.stringify(newCoverageObj), 'utf8');
 		}
-		/* eslint-enable no-await-in-loop */
 
 		if (argv.debugTests) {
 			await sleep(99999999);

@@ -7,12 +7,10 @@ import '@polymer/paper-toast/paper-toast.js';
 import '@vaadin/vaadin-upload/vaadin-upload.js';
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import * as keep1 from '../util-scrollable';
 keep1;
 import * as keep2 from './ncg-asset-file';
 keep2;
-/* eslint-enable @typescript-eslint/no-unused-expressions */
 
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';

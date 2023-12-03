@@ -78,6 +78,7 @@ test.serial('should not return a promise if the user provided a callback ', asyn
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
+				// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 				const returnVal = window.dashboardApi.sendMessage('ackPromiseCallback', () => {
 					resolve(returnVal === undefined);
 				});
