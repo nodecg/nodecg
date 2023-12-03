@@ -1,12 +1,13 @@
 {
 	"root": true,
 	"extends": ["eslint:recommended", "prettier"],
-	"parserOptions": {
-		"project": "./tsconfig_base.json"
-	},
 	"overrides": [
 		{
 			"files": ["*.ts", "*.tsx"],
+			"parser": "@typescript-eslint/parser",
+			"parserOptions": {
+				"project": "./tsconfig_base.json"
+			},
 			"extends": [
 				"plugin:@typescript-eslint/strict-type-checked",
 				"plugin:@typescript-eslint/stylistic-type-checked",
