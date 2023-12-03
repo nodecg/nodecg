@@ -1,0 +1,70 @@
+{
+	"root": true,
+	"extends": ["eslint:recommended", "prettier"],
+	"overrides": [
+		{
+			"files": ["*.ts", "*.tsx"],
+			"parser": "@typescript-eslint/parser",
+			"parserOptions": {
+				"project": "./tsconfig_base.json"
+			},
+			"extends": [
+				"plugin:@typescript-eslint/strict-type-checked",
+				"plugin:@typescript-eslint/stylistic-type-checked",
+				"prettier"
+			],
+			"rules": {
+				"@typescript-eslint/no-redundant-type-constituents": "off",
+				"@typescript-eslint/unbound-method": "off",
+				"@typescript-eslint/no-invalid-void-type": "off",
+				"@typescript-eslint/class-literal-property-style": "off",
+				"@typescript-eslint/no-var-requires": "off",
+				"@typescript-eslint/ban-ts-comment": "off",
+				"@typescript-eslint/array-type": "off",
+				"@typescript-eslint/consistent-type-definitions": "off",
+				"@typescript-eslint/no-unnecessary-condition": "off",
+				"@typescript-eslint/no-non-null-assertion": "off",
+				"@typescript-eslint/no-misused-promises": "off",
+				"@typescript-eslint/no-unused-vars": "off",
+				"@typescript-eslint/no-explicit-any": "off",
+				"@typescript-eslint/no-unsafe-argument": "off",
+				"@typescript-eslint/no-unsafe-assignment": "off",
+				"@typescript-eslint/no-unsafe-call": "off",
+				"@typescript-eslint/no-unsafe-member-access": "off",
+				"@typescript-eslint/no-unsafe-return": "off"
+			}
+		},
+		{
+			"files": ["./test/**/*.ts"],
+			"extends": ["plugin:ava/recommended"],
+			"rules": {
+				"ava/no-import-test-files": "off",
+				"ava/use-test": "off"
+			}
+		},
+		{
+			"files": ["./src/types/**/*.ts"],
+			"parserOptions": {
+				"project": "./src/types/tsconfig.json"
+			}
+		},
+		{
+			"files": ["./src/client/**/*.ts"],
+			"parserOptions": {
+				"project": "./src/client/tsconfig.json"
+			}
+		},
+		{
+			"files": ["./src/server/**/*.ts"],
+			"parserOptions": {
+				"project": "./src/server/tsconfig.json"
+			}
+		},
+		{
+			"files": ["./src/shared/**/*.ts"],
+			"parserOptions": {
+				"project": "./src/shared/tsconfig.json"
+			}
+		}
+	]
+}

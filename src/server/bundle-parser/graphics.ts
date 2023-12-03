@@ -64,7 +64,6 @@ export default function (graphicsDir: string, manifest: NodeCG.Manifest): NodeCG
 		const filePath = path.join(graphicsDir, graphic.file);
 
 		// Check that the panel file exists, throws error if it doesn't
-		// eslint-disable-next-line no-bitwise
 		fs.accessSync(filePath, fs.constants.F_OK | fs.constants.R_OK);
 
 		const parsedGraphic: NodeCG.Bundle.Graphic = {

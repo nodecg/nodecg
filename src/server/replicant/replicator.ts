@@ -194,7 +194,6 @@ export default class Replicator {
 						resolve(db.manager);
 					})
 					.catch(reject);
-				// eslint-disable-next-line @typescript-eslint/promise-function-async
 			}).then((manager) => {
 				let repEnt: db.Replicant;
 				const exitingEnt = this._repEntities.find(
@@ -229,7 +228,6 @@ export default class Replicator {
 					manager
 						.save(repEnt)
 						.then(
-							// eslint-disable-next-line @typescript-eslint/promise-function-async
 							() =>
 								new Promise<void>((resolve, reject) => {
 									if (!valueChangedDuringSave) {
@@ -274,12 +272,10 @@ export default class Replicator {
 					schema: replicant.schema,
 					schemaSum: replicant.schemaSum,
 				});
-				// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 			} catch (e: any) {
 				if (e.message.startsWith('Invalid value rejected for replicant')) {
 					cb(e.message, undefined);
 				} else {
-					// eslint-disable-next-line @typescript-eslint/no-throw-literal
 					throw e;
 				}
 			}

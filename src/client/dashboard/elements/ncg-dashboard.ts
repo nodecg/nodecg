@@ -23,7 +23,6 @@ import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
 import * as Polymer from '@polymer/polymer';
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import keep1 from '../css/nodecg-theme';
 keep1;
 import * as keep2 from './assets/ncg-assets';
@@ -38,7 +37,6 @@ import * as keep6 from './ncg-workspace';
 keep6;
 import * as keep7 from './settings/ncg-settings';
 keep7;
-/* eslint-enable @typescript-eslint/no-unused-expressions */
 
 import { timeOut } from '@polymer/polymer/lib/utils/async.js';
 import type { NodeCG } from '../../../types/nodecg';
@@ -640,7 +638,6 @@ function getImageDataURI(
 				image: img,
 				data,
 			});
-			// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 		} catch (e: any) {
 			/* istanbul ignore next: hard-to-test error */
 			cb(e);
@@ -652,7 +649,6 @@ function getImageDataURI(
 	// Load image URL.
 	try {
 		img.src = url;
-		// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 	} catch (e: any) {
 		/* istanbul ignore next: hard-to-test error */
 		cb(e);

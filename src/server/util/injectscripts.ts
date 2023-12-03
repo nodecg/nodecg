@@ -1,4 +1,3 @@
-/* eslint-disable complexity */
 // Native
 import fs from 'fs';
 

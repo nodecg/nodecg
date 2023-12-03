@@ -93,7 +93,6 @@ if (config.login.steam?.enabled) {
 					});
 					done(undefined, user);
 					return;
-					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 				} catch (error: any) {
 					done(error);
 				}
@@ -145,7 +144,6 @@ if (config.login.twitch?.enabled) {
 					});
 					done(undefined, user);
 					return;
-					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 				} catch (error: any) {
 					done(error);
 				}
@@ -330,7 +328,6 @@ if (config.login.local?.enabled) {
 					});
 					done(undefined, user);
 					return;
-					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 				} catch (error: any) {
 					done(error);
 				}

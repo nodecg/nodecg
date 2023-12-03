@@ -71,7 +71,6 @@ export abstract class AbstractReplicant<
 
 	status: 'undeclared' | 'declared' | 'declaring' = 'undeclared';
 
-	// eslint-disable-next-line @typescript-eslint/ban-types
 	validationErrors?: null | ErrorObject[] = [];
 
 	protected _value: ReplicantValue<P, V, O, S> | undefined;

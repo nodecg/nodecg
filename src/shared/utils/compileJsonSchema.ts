@@ -46,7 +46,6 @@ export function compileJsonSchema(schema: Record<any, unknown>): ValidateFunctio
 	throw new Error(`Unsupported JSON Schema version "${schemaVersion}"`);
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 export function formatJsonSchemaErrors(schema: Record<any, unknown>, errors?: ErrorObject[] | null): string {
 	const schemaVersion = extractSchemaVersion(schema);
 	if (schemaVersion.includes('draft-04')) {

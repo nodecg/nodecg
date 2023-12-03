@@ -50,12 +50,12 @@ export function stringifyErrorInner(error: unknown): {
 				// Try to stringify the object:
 				message = JSON.stringify(error);
 			} catch (e: unknown) {
-				// eslint-disable-next-line @typescript-eslint/no-base-to-string
+				// eslint-disable-next-line @typescript-eslint/no-base-to-string,@typescript-eslint/restrict-template-expressions
 				message = `${error} (stringifyError: ${e})`;
 			}
 		}
 	} else {
-		// eslint-disable-next-line @typescript-eslint/no-base-to-string
+		// eslint-disable-next-line @typescript-eslint/no-base-to-string,@typescript-eslint/restrict-template-expressions
 		message = `${error}`;
 	}
 

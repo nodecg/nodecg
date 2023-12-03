@@ -10,10 +10,8 @@ import type { NodeCG as NCGTypes } from '../../../../types/nodecg';
 import type { NcgSoundCue } from './ncg-sound-cue';
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import * as keep1 from './ncg-sound-cue';
 keep1;
-/* eslint-enable @typescript-eslint/no-unused-expressions */
 
 class NcgSounds extends Polymer.PolymerElement {
 	static get template() {

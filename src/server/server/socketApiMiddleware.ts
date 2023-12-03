@@ -8,7 +8,7 @@ import type { TypedServerSocket } from '../../types/socket-protocol';
 
 const log = createLogger('socket-api');
 
-export default async function (socket: TypedServerSocket, next: (err?: ExtendedError) => void): Promise<void> {
+export default function (socket: TypedServerSocket, next: (err?: ExtendedError) => void) {
 	try {
 		log.trace('New socket connection: ID %s with IP %s', socket.id, socket.handshake.address);
 

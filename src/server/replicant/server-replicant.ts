@@ -62,7 +62,6 @@ export default class ServerReplicant<
 					this.schema = parsedSchema;
 					this.schemaSum = sha1(JSON.stringify(parsedSchema));
 					this.validate = this._generateValidator();
-					// eslint-disable-next-line @typescript-eslint/no-implicit-any-catch
 				} catch (e: any) {
 					/* istanbul ignore next */
 					if (!process.env.NODECG_TEST) {
@@ -81,6 +80,7 @@ export default class ServerReplicant<
 
 		// If `opts.persistent` is true and this replicant has a persisted value, try to load that persisted value.
 		// Else, apply `defaultValue`.
+		// eslint-disable-next-line @typescript-eslint/prefer-optional-chain
 		if (opts.persistent && typeof startingValue !== 'undefined' && startingValue !== null) {
 			if (this.validate(startingValue, { throwOnInvalid: false })) {
 				this._value = proxyRecursive(this, startingValue, '/') as any;

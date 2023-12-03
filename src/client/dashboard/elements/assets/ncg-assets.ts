@@ -1,10 +1,8 @@
 import '@polymer/paper-card/paper-card.js';
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import * as keep1 from './ncg-asset-category';
 keep1;
-/* eslint-enable @typescript-eslint/no-unused-expressions */
 
 import * as Polymer from '@polymer/polymer';
 import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';

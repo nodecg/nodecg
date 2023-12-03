@@ -81,13 +81,12 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 		async () =>
 			new Promise<void>((resolve, reject) => {
 				try {
-					// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 					const openDialogButton = document!
 						.querySelector('ncg-dashboard')!
 						.shadowRoot!.querySelector('ncg-workspace')!
 						.shadowRoot!.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')!
 						.querySelector('iframe')!
-						.contentWindow!.document.querySelector('#openDialog')! as HTMLElement;
+						.contentWindow!.document.querySelector('#openDialog')!;
 
 					const dialog = window.dashboardApi.getDialog('test-dialog')!;
 
@@ -97,7 +96,7 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 					};
 
 					dialog.open = stubOpen;
-					openDialogButton.click();
+					(openDialogButton as HTMLElement).click();
 					dialog.open = originalOpen;
 				} catch (error) {
 					reject(error);
@@ -134,14 +133,13 @@ test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is 
 		async () =>
 			new Promise<void>((resolve) => {
 				// Open dialog first
-				// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 				const openDialogButton = document!
 					.querySelector('ncg-dashboard')!
 					.shadowRoot!.querySelector('ncg-workspace')!
 					.shadowRoot!.querySelector('ncg-dashboard-panel[bundle="test-bundle"][panel="test"]')!
 					.querySelector('iframe')!
-					.contentWindow!.document.querySelector('#openDialog')! as HTMLElement;
-				openDialogButton.click();
+					.contentWindow!.document.querySelector('#openDialog')!;
+				(openDialogButton as HTMLElement).click();
 
 				const dialog: any = window.dashboardApi.getDialog('test-dialog');
 				const dialogDocument: any = window.dashboardApi.getDialogDocument('test-dialog');
@@ -158,74 +156,6 @@ test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is 
 	);
 
 	t.pass();
-});
-
-// This got much harder to test after Socket.IO reserved their internal events in v3+.
-// eslint-disable-next-line ava/no-skip-test
-test.serial.skip('connection toasts', async (t) => {
-	// Test the "offline" toast
-	await dashboard.setOfflineMode(true);
-	let ret: any = await dashboard.evaluate(() => {
-		// Used by later test assertions
-		window.socket.io.on('reconnect_attempt', (attempt) => {
-			(window as any)._reconnectAttempt = attempt;
-		});
-
-		const dashboard: any = document.getElementById('nodecg_dashboard');
-		return {
-			toastText: dashboard.$.mainToast.text,
-			toastOpened: dashboard.$.mainToast.opened,
-			disconnected: dashboard.disconnected,
-		};
-	});
-	t.deepEqual(ret, {
-		toastText: 'Lost connection to NodeCG server!',
-		toastOpened: true,
-		disconnected: true,
-	});
-
-	// Test the "reconnecting" toast
-	await dashboard.waitForFunction(() => (window as any)._reconnectAttempt >= 1);
-	ret = await dashboard.evaluate(() => {
-		const dashboard: any = document.getElementById('nodecg_dashboard');
-		return {
-			reconnectToastOpened: dashboard.$.reconnectToast.opened,
-		};
-	});
-	t.deepEqual(ret, {
-		reconnectToastOpened: true,
-	});
-
-	// Test the "reconnect failed" toast
-	// ret = await dashboard.evaluate(() => {
-	// 	const dashboard: any = document.getElementById('nodecg_dashboard');
-	// 	return {
-	// 		toastText: dashboard.$.mainToast.text,
-	// 		toastOpened: dashboard.$.mainToast.opened,
-	// 	};
-	// });
-	// t.deepEqual(ret, {
-	// 	toastText: 'Failed to reconnect to NodeCG server!',
-	// 	toastOpened: true,
-	// });
-
-	// Test the "reconnected" toast
-	await dashboard.setOfflineMode(false);
-	ret = await dashboard.evaluate(() => {
-		const dashboard: any = document.getElementById('nodecg_dashboard');
-		return {
-			toastText: dashboard.$.mainToast.text,
-			toastOpened: dashboard.$.mainToast.opened,
-			reconnectToastOpened: dashboard.$.reconnectToast.opened,
-			disconnected: dashboard.disconnected,
-		};
-	});
-	t.deepEqual(ret, {
-		toastText: 'Reconnected to NodeCG server!',
-		toastOpened: true,
-		reconnectToastOpened: false,
-		disconnected: false,
-	});
 });
 
 test.serial('retrieval - 404', async (t) => {
