@@ -630,7 +630,11 @@ function getImageDataURI(
 		canvas.height = img.height;
 		// Get '2d' context and draw the image.
 		ctx = canvas.getContext('2d');
-		ctx!.drawImage(img, 0, 0);
+		if (!ctx) {
+			cb(new Error('Could not create canvas context'));
+			return;
+		}
+		ctx.drawImage(img, 0, 0);
 		// Get canvas data URL
 		try {
 			data = canvas.toDataURL();
