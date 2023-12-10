@@ -23,7 +23,7 @@ export default class GraphicsLib {
 
 		app.get('/bundles/:bundleName/graphics*', authCheck, (req, res, next) => {
 			const { bundleName } = req.params as Record<string, string>;
-			const bundle = bundleManager.find(bundleName);
+			const bundle = bundleManager.find(bundleName!);
 			if (!bundle) {
 				next();
 				return;
@@ -41,7 +41,7 @@ export default class GraphicsLib {
 			// If the url path has more params beyond just /graphics/,
 			// then the user is trying to resolve an asset and not the index page.
 			if (!req.path.endsWith(`/${bundleName}/graphics/`)) {
-				resName = req.params[0];
+				resName = req.params[0]!;
 			}
 
 			// Set a flag if this graphic is one we should enforce singleInstance behavior on.
@@ -78,14 +78,14 @@ export default class GraphicsLib {
 		// This isn't really a graphics-specific thing, should probably be in the main server lib.
 		app.get('/bundles/:bundleName/:target(bower_components|node_modules)/*', (req, res, next) => {
 			const { bundleName } = req.params;
-			const bundle = bundleManager.find(bundleName);
+			const bundle = bundleManager.find(bundleName!);
 			if (!bundle) {
 				next();
 				return;
 			}
 
-			const resName = req.params[0];
-			const parentDir = path.join(bundle.dir, req.params.target);
+			const resName = req.params[0]!;
+			const parentDir = path.join(bundle.dir, req.params['target']!);
 			const fileLocation = path.join(parentDir, resName);
 			sendFile(parentDir, fileLocation, res, next);
 		});

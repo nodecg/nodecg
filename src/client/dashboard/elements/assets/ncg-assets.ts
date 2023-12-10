@@ -52,11 +52,11 @@ class NcgAssets extends MutableData(Polymer.PolymerElement) {
 		return 'ncg-assets';
 	}
 
-	ready(): void {
+	override ready(): void {
 		super.ready();
 
 		collectionsRep.on('change', (newVal) => {
-			this.collections = newVal;
+			this['collections'] = newVal;
 		});
 	}
 }

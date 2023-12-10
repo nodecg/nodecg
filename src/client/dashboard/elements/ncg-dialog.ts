@@ -101,7 +101,7 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 		};
 	}
 
-	ready(): void {
+	override ready(): void {
 		super.ready();
 
 		this.addEventListener('neon-animation-finish', this._onNeonAnimationFinish);
@@ -132,12 +132,12 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 		});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		const iframe = this.querySelector('iframe')!;
 		iframe.addEventListener('iframe-resized', () => {
-			this.refit();
+			this['refit']();
 		});
 	}
 
@@ -156,26 +156,26 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 	}
 
 	_renderOpened() {
-		if (this.withBackdrop) {
-			this.backdropElement.open();
+		if (this['withBackdrop']) {
+			this['backdropElement'].open();
 		}
 
-		this.playAnimation('entry');
+		this['playAnimation']('entry');
 	}
 
 	_renderClosed() {
-		if (this.withBackdrop) {
-			this.backdropElement.close();
+		if (this['withBackdrop']) {
+			this['backdropElement'].close();
 		}
 
-		this.playAnimation('exit');
+		this['playAnimation']('exit');
 	}
 
 	_onNeonAnimationFinish() {
-		if (this.opened) {
-			this._finishRenderOpened();
+		if (this['opened']) {
+			this['_finishRenderOpened']();
 		} else {
-			this._finishRenderClosed();
+			this['_finishRenderClosed']();
 		}
 	}
 

@@ -227,11 +227,11 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 		};
 	}
 
-	ready(): void {
+	override ready(): void {
 		super.ready();
 
 		afterNextRender(this, async () => {
-			const distributedNodes: HTMLElement[] = this.$.slot.assignedNodes({ flatten: true });
+			const distributedNodes: HTMLElement[] = this.$['slot'].assignedNodes({ flatten: true });
 			const iframe = distributedNodes.find((el) => el.tagName === 'IFRAME') as HTMLIFrameElement;
 
 			// If Sentry is enabled, use it to report errors in panels to Sentry.io.
@@ -245,7 +245,7 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 				});
 			}
 
-			if (!this.fullbleed) {
+			if (!this['fullbleed']) {
 				if (iframe.contentWindow!.document.readyState === 'complete') {
 					this._attachIframeResize(iframe);
 				} else {
@@ -264,7 +264,7 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 				resizeFrom: 'child',
 				heightCalculationMethod: 'documentElementOffset',
 				onResized: (data: any) => {
-					this.$.collapse.updateSize('auto', false);
+					this.$['collapse'].updateSize('auto', false);
 					data.iframe.dispatchEvent(new CustomEvent('iframe-resized'));
 				},
 			},
@@ -272,28 +272,28 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 		);
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
 		const { src } = this.querySelector('iframe')!;
-		this.standaloneUrl = `${src}?standalone=true`;
+		this['standaloneUrl'] = `${src}?standalone=true`;
 	}
 
 	toggleCollapse() {
-		this.$.collapse.toggle();
+		this.$['collapse'].toggle();
 	}
 
 	initializeDefaultOpened() {
-		this.opened = true;
+		this['opened'] = true;
 	}
 
 	_openedChanged(newVal: boolean) {
-		this.$.expandBtn.icon = newVal ? 'unfold-less' : 'unfold-more';
+		this.$['expandBtn'].icon = newVal ? 'unfold-less' : 'unfold-more';
 	}
 
 	_headerColorChanged(newVal: string) {
-		this.$.header.style.backgroundColor = newVal;
-		this.$.buttons.style.background = this._calcLinearGradient(this._hexToRGB(newVal)!);
+		this.$['header'].style.backgroundColor = newVal;
+		this.$['buttons'].style.background = this._calcLinearGradient(this._hexToRGB(newVal)!);
 	}
 
 	computeLocalStorageName(bundle: string, panel: string) {
@@ -313,9 +313,9 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 		const result = HEX_PARSE_REGEX.exec(hex);
 		return result
 			? {
-					r: parseInt(result[1], 16),
-					g: parseInt(result[2], 16),
-					b: parseInt(result[3], 16),
+					r: parseInt(result[1]!, 16),
+					g: parseInt(result[2]!, 16),
+					b: parseInt(result[3]!, 16),
 			  }
 			: null;
 	}

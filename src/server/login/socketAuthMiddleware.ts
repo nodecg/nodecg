@@ -50,7 +50,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 		}
 
 		// But only authed sockets can join the Authed room.
-		const provider = user.identities[0]?.provider_type;
+		const provider = user.identities[0]!.provider_type;
 		const providerAllowed = config.login?.[provider]?.enabled;
 		const allowed = isSuperUser(user) && providerAllowed;
 

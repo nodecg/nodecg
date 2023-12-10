@@ -54,13 +54,13 @@ export default class SoundsLib {
 						// We need to just update a few key properties in the persisted cue.
 						// We leave things like volume as-is.
 						if (existingIndex >= 0) {
-							cuesRep.value[existingIndex].assignable = defaultCue.assignable;
-							cuesRep.value[existingIndex].defaultFile = defaultCue.defaultFile;
+							cuesRep.value[existingIndex]!.assignable = defaultCue.assignable;
+							cuesRep.value[existingIndex]!.defaultFile = defaultCue.defaultFile;
 
 							// If we're updating the cue to not be assignable, then we have to
 							// set the `defaultFile` as the selected `file`.
 							if (!defaultCue.assignable && defaultCue.defaultFile) {
-								cuesRep.value[existingIndex].file = clone(defaultCue.defaultFile);
+								cuesRep.value[existingIndex]!.file = clone(defaultCue.defaultFile);
 							}
 						} else {
 							cuesRep.value.push(defaultCue);
@@ -83,13 +83,13 @@ export default class SoundsLib {
 	}
 
 	private _serveDefault(req: express.Request, res: express.Response, next: express.NextFunction): void {
-		const bundle = this._bundles.find((b) => b.name === req.params.bundleName);
+		const bundle = this._bundles.find((b) => b.name === req.params['bundleName']);
 		if (!bundle) {
 			res.status(404).send(`File not found: ${req.path}`);
 			return;
 		}
 
-		const cue = bundle.soundCues.find((cue) => cue.name === req.params.cueName);
+		const cue = bundle.soundCues.find((cue) => cue.name === req.params['cueName']);
 		if (!cue) {
 			res.status(404).send(`File not found: ${req.path}`);
 			return;

@@ -79,7 +79,7 @@ class NcgMixer extends Polymer.PolymerElement {
 		};
 	}
 
-	ready(): void {
+	override ready(): void {
 		super.ready();
 
 		const { masterFader } = this.$;

@@ -66,13 +66,13 @@ export default class DashboardLib {
 
 		app.get('/bundles/:bundleName/dashboard/*', ncgUtils.authCheck, (req, res, next) => {
 			const { bundleName } = req.params;
-			const bundle = bundleManager.find(bundleName);
+			const bundle = bundleManager.find(bundleName!);
 			if (!bundle) {
 				next();
 				return;
 			}
 
-			const resName = req.params[0];
+			const resName = req.params[0]!;
 			// If the target file is a panel or dialog, inject the appropriate scripts.
 			// Else, serve the file as-is.
 			const panel = bundle.dashboard.panels.find((p) => p.file === resName);
@@ -83,7 +83,7 @@ export default class DashboardLib {
 					resourceType,
 					{
 						createApiInstance: bundle,
-						standalone: Boolean(req.query.standalone),
+						standalone: Boolean(req.query['standalone']),
 						fullbleed: panel.fullbleed,
 					},
 					(html) => res.send(html),

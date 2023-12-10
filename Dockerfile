@@ -7,7 +7,7 @@ COPY scripts ./scripts
 
 RUN npm ci
 
-COPY tsconfig_base.json ./
+COPY tsconfig.json ./
 COPY build-tools ./build-tools
 COPY schemas ./schemas
 COPY src ./src

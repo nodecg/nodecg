@@ -49,7 +49,9 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 			winston.format.colorize(),
 			winston.format.printf(
 				(info) =>
-					`${initialOpts?.console?.timestamps ? `${info.timestamp} - ` : ''}${info.level}: ${info.message}`,
+					`${initialOpts?.console?.timestamps ? `${info['timestamp']} - ` : ''}${info.level}: ${
+						info.message
+					}`,
 			),
 		),
 	});
@@ -63,7 +65,7 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 			winston.format.errors({ stack: true }),
 			winston.format.printf(
 				(info) =>
-					`${initialOpts?.file?.timestamps ? `${info.timestamp} - ` : ''}${info.level}: ${info.message}`,
+					`${initialOpts?.file?.timestamps ? `${info['timestamp']} - ` : ''}${info.level}: ${info.message}`,
 			),
 		),
 	});

@@ -86,15 +86,15 @@ class NcgSounds extends Polymer.PolymerElement {
 		};
 	}
 
-	ready(): void {
+	override ready(): void {
 		super.ready();
 
 		const cueElsByName: Record<string, NcgSoundCue> = {};
-		this.bundleFaderRep = NodeCG.Replicant<number>(`volume:${this.bundleName}`, '_sounds');
-		const cuesRep = NodeCG.Replicant<NCGTypes.SoundCue[]>('soundCues', this.bundleName);
+		this['bundleFaderRep'] = NodeCG.Replicant<number>(`volume:${this['bundleName']}`, '_sounds');
+		const cuesRep = NodeCG.Replicant<NCGTypes.SoundCue[]>('soundCues', this['bundleName']);
 
-		this.bundleFaderRep.on('change', (newVal: number) => {
-			this.$.bundleFader.value = newVal;
+		this['bundleFaderRep'].on('change', (newVal: number) => {
+			this.$['bundleFader'].value = newVal;
 		});
 
 		cuesRep.on('change', (newVal) => {
@@ -106,16 +106,16 @@ class NcgSounds extends Polymer.PolymerElement {
 			newVal.forEach((cue) => {
 				if (!cueElsByName[cue.name]) {
 					cueElsByName[cue.name] = document.createElement('ncg-sound-cue') as NcgSoundCue;
-					this.$.cues.appendChild(cueElsByName[cue.name]);
+					this.$['cues'].appendChild(cueElsByName[cue.name]);
 				}
 
-				cueElsByName[cue.name].name = cue.name;
-				cueElsByName[cue.name].assignable = cue.assignable;
-				cueElsByName[cue.name].defaultFile = cue.defaultFile;
-				cueElsByName[cue.name].file = cue.file;
-				cueElsByName[cue.name].volume = cue.volume;
-				cueElsByName[cue.name]._cueRef = cue;
-				cueElsByName[cue.name].bundleName = this.bundleName; // Must be last
+				cueElsByName[cue.name]!['name'] = cue.name;
+				cueElsByName[cue.name]!['assignable'] = cue.assignable;
+				cueElsByName[cue.name]!['defaultFile'] = cue.defaultFile;
+				cueElsByName[cue.name]!['file'] = cue.file;
+				cueElsByName[cue.name]!['volume'] = cue.volume;
+				cueElsByName[cue.name]!['_cueRef'] = cue;
+				cueElsByName[cue.name]!['bundleName'] = this['bundleName']; // Must be last
 			});
 
 			// Remove cueEls that belong to soundCues that no longer exist.
@@ -124,11 +124,10 @@ class NcgSounds extends Polymer.PolymerElement {
 					continue;
 				}
 
-				const cueEl = cueElsByName[name];
-				const index = newVal.findIndex((cue) => cue.name === cueEl.name);
+				const cueEl = cueElsByName[name]!;
+				const index = newVal.findIndex((cue) => cue.name === cueEl['name']);
 				if (index < 0) {
-					this.$.cues.removeChild(cueEl);
-					// eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+					this.$['cues'].removeChild(cueEl);
 					delete cueElsByName[name];
 				}
 			}
@@ -136,7 +135,7 @@ class NcgSounds extends Polymer.PolymerElement {
 	}
 
 	_onBundleFaderChange(e: any) {
-		this.bundleFaderRep.value = e.target.value;
+		this['bundleFaderRep'].value = e.target.value;
 	}
 }
 

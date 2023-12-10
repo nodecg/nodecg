@@ -47,19 +47,19 @@ class NcgGraphics extends MutableData(Polymer.PolymerElement) {
 		};
 	}
 
-	ready(): void {
+	override ready(): void {
 		super.ready();
 		const instancesRep = NodeCG.Replicant('graphics:instances', 'nodecg');
 
 		instancesRep.on('change', (newVal) => {
-			this._graphicInstances = newVal;
+			this['_graphicInstances'] = newVal;
 		});
 
 		this.addEventListener('url-copy-success', () => {
-			this.$.copyToast.show('Graphic URL copied to clipboard.');
+			this.$['copyToast'].show('Graphic URL copied to clipboard.');
 		});
 		this.addEventListener('url-copy-error', () => {
-			this.$.copyToast.show('Failed to copy graphic URL to clipboard!');
+			this.$['copyToast'].show('Failed to copy graphic URL to clipboard!');
 		});
 	}
 }

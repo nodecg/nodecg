@@ -179,7 +179,6 @@ export default class Replicator {
 			return;
 		}
 
-		let databaseSaveInProgress = false;
 		let valueChangedDuringSave = false;
 
 		// Return the promise so that it can still be awaited
@@ -223,7 +222,6 @@ export default class Replicator {
 					};
 
 					repEnt.value = serializedValue;
-					databaseSaveInProgress = true;
 					replicant.on('change', changeHandler);
 					manager
 						.save(repEnt)
@@ -247,7 +245,6 @@ export default class Replicator {
 						})
 						.catch(reject)
 						.finally(() => {
-							databaseSaveInProgress = false;
 							replicant.off('change', changeHandler);
 						});
 				});

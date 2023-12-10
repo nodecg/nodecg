@@ -97,67 +97,67 @@ export class NcgSoundCue extends Polymer.PolymerElement {
 	}
 
 	_bundleNameChanged(bundleName: string) {
-		if (this._assetsRepInitialized) {
+		if (this['_assetsRepInitialized']) {
 			return;
 		}
 
-		this._assetsRepInitialized = true;
+		this['_assetsRepInitialized'] = true;
 		const assetsRep = NodeCG.Replicant<NCGTypes.AssetFile[]>('assets:sounds', bundleName);
 		assetsRep.setMaxListeners(50);
 		assetsRep.on('change', (newVal) => {
-			if (newVal && this.assignable) {
-				this.soundFiles = newVal;
+			if (newVal && this['assignable']) {
+				this['soundFiles'] = newVal;
 				this._generateOptions(newVal);
 			}
 		});
 	}
 
 	_assignableChanged(newVal: boolean) {
-		this.$.select.style.display = newVal ? 'block' : 'none';
+		this.$['select'].style.display = newVal ? 'block' : 'none';
 	}
 
 	_fileChanged(newVal: NCGTypes.CueFile) {
 		if (newVal) {
 			if (newVal.default) {
-				this.$.select.value = 'default';
+				this.$['select'].value = 'default';
 			} else {
-				this.$.select.value = newVal.base;
+				this.$['select'].value = newVal.base;
 			}
 		} else {
-			this.$.select.value = 'none';
+			this.$['select'].value = 'none';
 		}
 	}
 
 	_volumeChanged(newVal: number) {
-		this.$.slider.value = newVal;
+		this.$['slider'].value = newVal;
 	}
 
 	_generateOptions(soundFiles: NCGTypes.AssetFile[]) {
 		// Remove all existing options
-		while (this.$.select.item(0)) {
-			this.$.select.remove(0);
+		while (this.$['select'].item(0)) {
+			this.$['select'].remove(0);
 		}
 
 		// Create "none" option.
 		const noneOption = document.createElement('option');
 		noneOption.innerText = 'None';
 		noneOption.value = 'none';
-		if (!this.file) {
+		if (!this['file']) {
 			noneOption.setAttribute('selected', 'true');
 		}
 
-		this.$.select.add(noneOption);
+		this.$['select'].add(noneOption);
 
 		// Create "default" option, if applicable.
-		if (this.defaultFile) {
+		if (this['defaultFile']) {
 			const defaultOption = document.createElement('option');
 			defaultOption.value = 'default';
 			defaultOption.innerText = 'Default';
-			if (this.file?.default) {
+			if (this['file']?.default) {
 				defaultOption.setAttribute('selected', 'true');
 			}
 
-			this.$.select.add(defaultOption);
+			this.$['select'].add(defaultOption);
 		}
 
 		// Add options for each uploaded sound file.
@@ -167,28 +167,28 @@ export class NcgSoundCue extends Polymer.PolymerElement {
 				option.value = f.base;
 				option.innerText = f.base;
 				(option as any).replicantIndex = index;
-				if (this.file && f.base === this.file.base) {
+				if (this['file'] && f.base === this['file'].base) {
 					option.setAttribute('selected', 'true');
 				}
 
-				this.$.select.add(option);
+				this.$['select'].add(option);
 			});
 		}
 	}
 
 	_retargetFile() {
-		const selectValue = this.$.select.value;
+		const selectValue = this.$['select'].value;
 		if (selectValue === 'none') {
-			this._cueRef.file = null;
+			this['_cueRef'].file = null;
 		} else if (selectValue === 'default') {
-			this._cueRef.file = this.defaultFile;
+			this['_cueRef'].file = this['defaultFile'];
 		} else {
-			this._cueRef.file = this.soundFiles[this.$.select.selectedOptions[0].replicantIndex];
+			this['_cueRef'].file = this['soundFiles'][this.$['select'].selectedOptions[0].replicantIndex];
 		}
 	}
 
 	_onSliderChange(e: any) {
-		this._cueRef.volume = e.target.value;
+		this['_cueRef'].volume = e.target.value;
 	}
 }
 
