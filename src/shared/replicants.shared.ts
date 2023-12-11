@@ -1,5 +1,4 @@
 // This file contains code that is used in both server-side and client-side replicants.
-/* eslint-disable @typescript-eslint/no-dynamic-delete */
 // Packages
 import type { ErrorObject, ValidateFunction } from 'ajv';
 import { klona as clone } from 'klona/json';

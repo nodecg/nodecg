@@ -169,12 +169,15 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 					return;
 				}
 
-				if (nodecgConfig?.bundles?.disabled?.includes(bundleFolderName)) {
+				if (nodecgConfig?.['bundles']?.disabled?.includes(bundleFolderName)) {
 					log.debug(`Not loading bundle ${bundleFolderName} as it is disabled in config`);
 					return;
 				}
 
-				if (nodecgConfig?.bundles?.enabled && !nodecgConfig.bundles.enabled.includes(bundleFolderName)) {
+				if (
+					nodecgConfig?.['bundles']?.enabled &&
+					!nodecgConfig?.['bundles'].enabled.includes(bundleFolderName)
+				) {
 					log.debug(`Not loading bundle ${bundleFolderName} as it is not enabled in config`);
 					return;
 				}
@@ -258,7 +261,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 				continue;
 			}
 
-			if (bundles[i].name === bundleName) {
+			if (bundles[i]!.name === bundleName) {
 				bundles.splice(i, 1);
 			}
 		}
@@ -344,7 +347,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
  * @private
  */
 function extractBundleName(bundlesPath: string, filePath: string): string {
-	return filePath.replace(bundlesPath, '').split(path.sep)[1];
+	return filePath.replace(bundlesPath, '').split(path.sep)[1]!;
 }
 
 /**

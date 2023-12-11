@@ -116,31 +116,31 @@ class NcgSettings extends Polymer.PolymerElement {
 		return {};
 	}
 
-	ready(): void {
+	override ready(): void {
 		super.ready();
 
 		if (window.ncgConfig.login?.enabled && window.token) {
-			this.$.key.textContent = window.token;
-			this.$.copyKey.setAttribute('data-clipboard-text', window.token);
+			this.$['key'].textContent = window.token;
+			this.$['copyKey'].setAttribute('data-clipboard-text', window.token);
 		}
 
-		const clipboard = new Clipboard(this.$.copyKey);
+		const clipboard = new Clipboard(this.$['copyKey']);
 		clipboard.on(
 			'success',
 			/* istanbul ignore next: hard to test clipboard things */ () => {
-				this.$.settingsToast.show('Key copied to clipboard.');
+				this.$['settingsToast'].show('Key copied to clipboard.');
 			},
 		);
 	}
 
 	/* istanbul ignore next: trivial */
 	openShowKeyDialog() {
-		this.$.showKeyDialog.open();
+		this.$['showKeyDialog'].open();
 	}
 
 	/* istanbul ignore next: trivial */
 	openResetKeyDialog() {
-		this.$.resetKeyDialog.open();
+		this.$['resetKeyDialog'].open();
 	}
 
 	resetKey() {

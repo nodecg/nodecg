@@ -307,9 +307,9 @@ if (config.login.local?.enabled) {
 						let expected = foundUser.password;
 						let actual = password;
 
-						if (match && hashes.includes(match[1])) {
-							expected = match[2];
-							actual = crypto.createHmac(match[1], sessionSecret).update(actual, 'utf8').digest('hex');
+						if (match && hashes.includes(match[1]!)) {
+							expected = match[2]!;
+							actual = crypto.createHmac(match[1]!, sessionSecret).update(actual, 'utf8').digest('hex');
 						}
 
 						if (expected === actual) {
@@ -396,9 +396,9 @@ export async function createMiddleware(callbacks: {
 
 	app.get('/authError', (req, res) => {
 		res.render(path.join(VIEWS_DIR, 'authError.tmpl'), {
-			message: req.query.message,
-			code: req.query.code,
-			viewUrl: req.query.viewUrl,
+			message: req.query['message'],
+			code: req.query['code'],
+			viewUrl: req.query['viewUrl'],
 		});
 	});
 

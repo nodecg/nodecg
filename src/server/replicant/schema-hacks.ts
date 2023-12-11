@@ -58,7 +58,7 @@ function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): Un
 		}
 
 		if (dereferencedData && referenceFile) {
-			delete obj.$ref;
+			delete obj['$ref'];
 			for (const key in dereferencedData) {
 				if (key === '$schema') {
 					continue;
@@ -71,7 +71,7 @@ function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): Un
 			const keys = Object.keys(dereferencedData);
 			// eslint-disable-next-line @typescript-eslint/prefer-for-of
 			for (let i = 0; i < keys.length; i++) {
-				const key = keys[i];
+				const key = keys[i]!;
 				const value = obj[key];
 				replaceRefs(value, referenceFile, allFiles);
 			}
@@ -82,7 +82,7 @@ function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): Un
 	const keys = Object.keys(obj);
 	// eslint-disable-next-line @typescript-eslint/prefer-for-of
 	for (let i = 0; i < keys.length; i++) {
-		const key = keys[i];
+		const key = keys[i]!;
 		const value = obj[key];
 		replaceRefs(value, currentFile, allFiles);
 	}
@@ -98,7 +98,7 @@ function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): Un
  * @returns {boolean}
  */
 function isFileReference(value: UnknownObject): value is FileReference {
-	return typeof value.$ref === 'string' && !value.$ref.startsWith('#');
+	return typeof value['$ref'] === 'string' && !value['$ref'].startsWith('#');
 }
 
 /**
@@ -108,7 +108,7 @@ function isFileReference(value: UnknownObject): value is FileReference {
  * @returns {boolean}
  */
 function isPointerReference(value: UnknownObject): value is PointerReference {
-	return typeof value.$ref === 'string' && value.$ref.startsWith('#');
+	return typeof value['$ref'] === 'string' && value['$ref'].startsWith('#');
 }
 
 /**
@@ -145,8 +145,8 @@ export default function formatSchema(
 		This ensures that the schema will be compliant by removing these custom properties and allowing the schema converter to customize the generated type if needed.
 	 */
 	if (schema) {
-		delete schema.tsType;
-		delete schema.tsEnumNames;
+		delete schema['tsType'];
+		delete schema['tsEnumNames'];
 	}
 
 	return schema;

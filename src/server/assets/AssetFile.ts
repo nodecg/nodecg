@@ -29,8 +29,8 @@ export default class AssetFile implements NodeCG.AssetFile {
 		this.base = parsedPath.base;
 		this.ext = parsedPath.ext;
 		this.name = parsedPath.name;
-		this.namespace = parts[0];
-		this.category = parts[1];
+		this.namespace = parts[0]!;
+		this.category = parts[1]!;
 		this.url = `/assets/${this.namespace}/${this.category}/${encodeURIComponent(this.base)}`;
 	}
 }

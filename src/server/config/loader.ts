@@ -64,18 +64,18 @@ function getConfigSchema(userConfig: Record<string, any>) {
 			enabled: Joi.array()
 				.items(Joi.string())
 				.allow(null)
-				.default(argv.bundlesEnabled ?? null)
+				.default(argv['bundlesEnabled'] ?? null)
 				.description('A whitelist array of bundle names that will be the only ones loaded at startup.'),
 
 			disabled: Joi.array()
 				.items(Joi.string())
 				.allow(null)
-				.default(argv.bundlesDisabled ?? null)
+				.default(argv['bundlesDisabled'] ?? null)
 				.description('A blacklist array of bundle names that will be excluded from loading at startup.'),
 
 			paths: Joi.array()
 				.items(Joi.string())
-				.default(argv.bundlesPaths ?? [])
+				.default(argv['bundlesPaths'] ?? [])
 				.description('An array of additional paths where bundles are located.'),
 		}).default({
 			enabled: null,
@@ -87,7 +87,7 @@ function getConfigSchema(userConfig: Record<string, any>) {
 			enabled: Joi.boolean().default(false).description('Whether to enable login security.'),
 			sessionSecret: Joi.string()
 				// This will throw if the user does not provide a value, but only if login security is enabled.
-				.default(userConfig?.login?.enabled ? null : 'insecureButUnused')
+				.default(userConfig?.['login']?.enabled ? null : 'insecureButUnused')
 				.description('The secret used to salt sessions.'),
 			forceHttpsReturn: Joi.boolean()
 				.default(false)
@@ -98,12 +98,12 @@ function getConfigSchema(userConfig: Record<string, any>) {
 				enabled: Joi.boolean().default(false).description('Whether to enable Steam authentication.'),
 				apiKey: Joi.string()
 					// This will throw if the user does not provide a value, but only if Steam auth is enabled.
-					.default(userConfig?.login?.steam?.enabled ? null : '')
+					.default(userConfig?.['login']?.steam?.enabled ? null : '')
 					.description('A Steam API Key. Obtained from http://steamcommunity.com/dev/apikey'),
 				allowedIds: Joi.array()
 					.items(Joi.string())
 					// This will throw if the user does not provide a value, but only if Steam auth is enabled.
-					.default(userConfig?.login?.steam?.enabled ? null : [])
+					.default(userConfig?.['login']?.steam?.enabled ? null : [])
 					.description('Which 64 bit Steam IDs to allow. Can be obtained from https://steamid.io/'),
 			}),
 
@@ -111,11 +111,11 @@ function getConfigSchema(userConfig: Record<string, any>) {
 				enabled: Joi.boolean().default(false).description('Whether to enable Twitch authentication.'),
 				clientID: Joi.string()
 					// This will throw if the user does not provide a value, but only if Twitch auth is enabled.
-					.default(userConfig?.login?.twitch?.enabled ? null : '')
+					.default(userConfig?.['login']?.twitch?.enabled ? null : '')
 					.description('A Twitch application ClientID http://twitch.tv/kraken/oauth2/clients/new'),
 				clientSecret: Joi.string()
 					// This will throw if the user does not provide a value, but only if Twitch auth is enabled.
-					.default(userConfig?.login?.twitch?.enabled ? null : '')
+					.default(userConfig?.['login']?.twitch?.enabled ? null : '')
 					.description('A Twitch application ClientSecret http://twitch.tv/kraken/oauth2/clients/new'),
 				scope: Joi.string()
 					.default('user_read')
@@ -123,13 +123,17 @@ function getConfigSchema(userConfig: Record<string, any>) {
 				allowedUsernames: Joi.array()
 					.items(Joi.string())
 					// This will throw if the user does not provide a value and is not using allowedIds, but only if Twitch auth is enabled.
-					.default(userConfig?.login?.twitch?.enabled && !userConfig?.login?.twitch?.allowedIds ? null : [])
+					.default(
+						userConfig?.['login']?.twitch?.enabled && !userConfig?.['']?.twitch?.allowedIds ? null : [],
+					)
 					.description('Which Twitch usernames to allow.'),
 				allowedIds: Joi.array()
 					.items(Joi.string())
 					// This will throw if the user does not provide a value and is not using allowedUsernames, but only if Twitch auth is enabled.
 					.default(
-						userConfig?.login?.twitch?.enabled && !userConfig?.login?.twitch?.allowedUsernames ? null : [],
+						userConfig?.['login']?.twitch?.enabled && !userConfig?.['']?.twitch?.allowedUsernames
+							? null
+							: [],
 					)
 					.description(
 						'Which Twitch IDs to allow. Can be obtained from https://twitchinsights.net/checkuser',
@@ -140,11 +144,11 @@ function getConfigSchema(userConfig: Record<string, any>) {
 				enabled: Joi.boolean().default(false).description('Whether to enable Discord authentication.'),
 				clientID: Joi.string()
 					// This will throw if the user does not provide a value, but only if Discord auth is enabled.
-					.default(userConfig?.login?.discord?.enabled ? null : '')
+					.default(userConfig?.['login']?.discord?.enabled ? null : '')
 					.description('A Discord application ClientID https://discord.com/developers/applications'),
 				clientSecret: Joi.string()
 					// This will throw if the user does not provide a value, but only if Discord auth is enabled.
-					.default(userConfig?.login?.discord?.enabled ? null : '')
+					.default(userConfig?.['login']?.discord?.enabled ? null : '')
 					.description('A Discord application ClientSecret https://discord.com/developers/applications'),
 				scope: Joi.string()
 					.default('identify')
@@ -155,7 +159,9 @@ function getConfigSchema(userConfig: Record<string, any>) {
 					.items(Joi.string())
 					// This will throw if the user does not provide a value and is not using allowedGuilds, but only if Discord auth is enabled.
 					.default(
-						userConfig?.login?.discord?.enabled && !userConfig?.login?.discord?.allowedGuilds ? null : [],
+						userConfig?.['login']?.discord?.enabled && !userConfig?.['login']?.discord?.allowedGuilds
+							? null
+							: [],
 					)
 					.description('Which Discord user IDs to allow.'),
 				allowedGuilds: Joi.array()
@@ -173,7 +179,9 @@ function getConfigSchema(userConfig: Record<string, any>) {
 					)
 					// This will throw if the user does not provide a value and is not using allowedUserIDs, but only if Discord auth is enabled.
 					.default(
-						userConfig?.login?.discord?.enabled && !userConfig?.login?.discord?.allowedUserIDs ? null : [],
+						userConfig?.['login']?.discord?.enabled && !userConfig?.['login']?.discord?.allowedUserIDs
+							? null
+							: [],
 					),
 			}),
 
@@ -187,7 +195,7 @@ function getConfigSchema(userConfig: Record<string, any>) {
 						}),
 					)
 					// This will throw if the user does not provide a value, but only if Local auth is enabled.
-					.default(userConfig?.login?.local?.enabled ? null : [])
+					.default(userConfig?.['login']?.local?.enabled ? null : [])
 					.description('Which users can log in.'),
 			}),
 		}).default(),
@@ -199,11 +207,11 @@ function getConfigSchema(userConfig: Record<string, any>) {
 				.description('Whether to allow insecure HTTP connections while SSL is active.'),
 			keyPath: Joi.string()
 				// This will throw if the user does not provide a value, but only if SSL is enabled.
-				.default(userConfig?.ssl?.enabled ? null : '')
+				.default(userConfig?.['ssl']?.enabled ? null : '')
 				.description('The path to an SSL key file.'),
 			certificatePath: Joi.string()
 				// This will throw if the user does not provide a value, but only if SSL is enabled.
-				.default(userConfig?.ssl?.enabled ? null : '')
+				.default(userConfig?.['ssl']?.enabled ? null : '')
 				.description('The path to an SSL certificate file.'),
 			passphrase: Joi.string().description('The passphrase for the provided key file.').optional(),
 		}).optional(),
@@ -212,7 +220,7 @@ function getConfigSchema(userConfig: Record<string, any>) {
 			enabled: Joi.boolean().default(false).description('Whether to enable Sentry error reporting.'),
 			dsn: Joi.string()
 				// This will throw if the user does not provide a value, but only if Sentry is enabled.
-				.default(userConfig?.sentry?.enabled ? null : '')
+				.default(userConfig?.['sentry']?.enabled ? null : '')
 				.description("Your project's DSN, used to route alerts to the correct place."),
 		}).optional(),
 	});
@@ -265,7 +273,7 @@ export default function (cfgDirOrFile: string) {
 			console.error('[nodecg] Config invalid:\n', validationResult.error.annotate());
 		}
 
-		throw new Error(validationResult.error.details[0].message);
+		throw new Error(validationResult.error.details[0]!.message);
 	}
 
 	const config: NodeCG.Config = validationResult.value;

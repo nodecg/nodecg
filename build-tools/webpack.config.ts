@@ -3,9 +3,9 @@ import { createBrowserConfig, createServerConfig, createTypeORMConfig } from '.'
 module.exports = (env: any) => {
 	if (!env) env = {};
 
-	const environment = (process.env.NODE_ENV ?? 'development').trim();
+	const environment = (process.env['NODE_ENV'] ?? 'development').trim();
 	const isProduction = environment === 'production';
-	const instrument = process.env.NODECG_INSTRUMENT?.toLowerCase() === 'true';
+	const instrument = process.env['NODECG_INSTRUMENT']?.toLowerCase() === 'true';
 
 	console.log('Build mode:', isProduction ? 'production' : 'development');
 

@@ -258,67 +258,67 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 		};
 	}
 
-	ready(): void {
+	override ready(): void {
 		super.ready();
 		pulseElement.addEventListener('pulse', (e: any) => {
-			this._pulse = e.detail.timestamp;
+			this['_pulse'] = e.detail.timestamp;
 		});
 
 		const showDiff = () => {
-			clearTimeout(this._offTimeout);
-			this._offTimeout = null;
-			this.statusHover = true;
+			clearTimeout(this['_offTimeout']);
+			this['_offTimeout'] = null;
+			this['statusHover'] = true;
 		};
 
 		const hideDiff = (immediate: boolean) => {
 			if (immediate) {
-				clearTimeout(this._offTimeout);
-				this._offTimeout = null;
-				this.statusHover = false;
-			} else if (!this._offTimeout) {
-				this._offTimeout = setTimeout(() => {
-					clearTimeout(this._offTimeout);
-					this._offTimeout = null;
-					this.statusHover = false;
+				clearTimeout(this['_offTimeout']);
+				this['_offTimeout'] = null;
+				this['statusHover'] = false;
+			} else if (!this['_offTimeout']) {
+				this['_offTimeout'] = setTimeout(() => {
+					clearTimeout(this['_offTimeout']);
+					this['_offTimeout'] = null;
+					this['statusHover'] = false;
 				}, 250);
 			}
 		};
 
-		this.$.indicatorIcon.addEventListener('mouseenter', () => {
-			if (this.responsiveMode === 'narrow') {
+		this.$['indicatorIcon'].addEventListener('mouseenter', () => {
+			if (this['responsiveMode'] === 'narrow') {
 				showDiff();
 			}
 		});
-		this.$.status.addEventListener('mouseenter', showDiff);
-		this.$.diff.addEventListener('mouseenter', showDiff);
+		this.$['status'].addEventListener('mouseenter', showDiff);
+		this.$['diff'].addEventListener('mouseenter', showDiff);
 
-		this.$.indicatorIcon.addEventListener('mouseleave', () => {
-			if (this.responsiveMode === 'narrow') {
+		this.$['indicatorIcon'].addEventListener('mouseleave', () => {
+			if (this['responsiveMode'] === 'narrow') {
 				hideDiff(false);
 			}
 		});
-		this.$.status.addEventListener('mouseleave', () => {
+		this.$['status'].addEventListener('mouseleave', () => {
 			hideDiff(false);
 		});
-		this.$.diff.addEventListener('mouseleave', () => {
+		this.$['diff'].addEventListener('mouseleave', () => {
 			hideDiff(false);
 		});
-		this.$.diff.addEventListener('close', () => {
+		this.$['diff'].addEventListener('close', () => {
 			hideDiff(true);
 		});
 	}
 
 	reload() {
-		this.$.reloadButton.disabled = true;
-		window.socket.emit('graphic:requestRefresh', this.instance, () => {
-			this.$.reloadButton.disabled = false;
+		this.$['reloadButton'].disabled = true;
+		window.socket.emit('graphic:requestRefresh', this['instance'], () => {
+			this.$['reloadButton'].disabled = false;
 		});
 	}
 
 	kill() {
-		this.$.killButton.disabled = true;
-		window.socket.emit('graphic:requestKill', this.instance, () => {
-			this.$.killButton.disabled = false;
+		this.$['killButton'].disabled = true;
+		window.socket.emit('graphic:requestKill', this['instance'], () => {
+			this.$['killButton'].disabled = false;
 		});
 	}
 

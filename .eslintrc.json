@@ -6,7 +6,7 @@
 			"files": ["*.ts", "*.tsx"],
 			"parser": "@typescript-eslint/parser",
 			"parserOptions": {
-				"project": "./tsconfig_base.json"
+				"project": "./tsconfig.json"
 			},
 			"extends": [
 				"plugin:@typescript-eslint/strict-type-checked",
@@ -31,7 +31,9 @@
 				"@typescript-eslint/no-unsafe-assignment": "off",
 				"@typescript-eslint/no-unsafe-call": "off",
 				"@typescript-eslint/no-unsafe-member-access": "off",
-				"@typescript-eslint/no-unsafe-return": "off"
+				"@typescript-eslint/no-unsafe-return": "off",
+				"@typescript-eslint/no-dynamic-delete": "off",
+				"@typescript-eslint/no-unnecessary-type-assertion": "off"
 			}
 		},
 		{

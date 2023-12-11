@@ -53,27 +53,27 @@ export default class ExtensionManager extends EventEmitter {
 			const startLen = allBundles.length;
 			for (let i = 0; i < startLen; i++) {
 				// If this bundle has no dependencies, load it and remove it from the list
-				if (!allBundles[i].bundleDependencies) {
-					log.debug('Bundle %s has no dependencies', allBundles[i].name);
+				if (!allBundles[i]!.bundleDependencies) {
+					log.debug('Bundle %s has no dependencies', allBundles[i]!.name);
 
-					if (allBundles[i].hasExtension) {
-						this._loadExtension(allBundles[i]);
+					if (allBundles[i]!.hasExtension) {
+						this._loadExtension(allBundles[i]!);
 					}
 
-					fullyLoaded.push(allBundles[i]);
+					fullyLoaded.push(allBundles[i]!);
 					allBundles.splice(i, 1);
 					break;
 				}
 
 				// If this bundle has dependencies, and all of them are satisfied, load it and remove it from the list
-				if (this._bundleDepsSatisfied(allBundles[i], fullyLoaded)) {
-					log.debug('Bundle %s has extension with satisfied dependencies', allBundles[i].name);
+				if (this._bundleDepsSatisfied(allBundles[i]!, fullyLoaded)) {
+					log.debug('Bundle %s has extension with satisfied dependencies', allBundles[i]!.name);
 
-					if (allBundles[i].hasExtension) {
-						this._loadExtension(allBundles[i]);
+					if (allBundles[i]!.hasExtension) {
+						this._loadExtension(allBundles[i]!);
 					}
 
-					fullyLoaded.push(allBundles[i]);
+					fullyLoaded.push(allBundles[i]!);
 					allBundles.splice(i, 1);
 					break;
 				}
@@ -171,7 +171,7 @@ export default class ExtensionManager extends EventEmitter {
 			// If so, check if the version loaded satisfies the dependency.
 			const index = unsatisfiedDepNames.indexOf(loadedBundle.name);
 			if (index > -1) {
-				if (semver.satisfies(loadedBundle.version, deps[loadedBundle.name])) {
+				if (semver.satisfies(loadedBundle.version, deps[loadedBundle.name]!)) {
 					arr.push(loadedBundle.name);
 					unsatisfiedDepNames.splice(index, 1);
 				}

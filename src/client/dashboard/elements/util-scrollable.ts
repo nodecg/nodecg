@@ -50,7 +50,7 @@ class UtilScrollable extends Polymer.PolymerElement {
 	 * Returns the scrolling element.
 	 */
 	get scrollTarget() {
-		return this.$.scrollable;
+		return this.$['scrollable'];
 	}
 
 	attached() {

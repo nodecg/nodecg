@@ -66,39 +66,39 @@ class UiSelect extends Polymer.PolymerElement {
 		};
 	}
 
-	ready(): void {
+	override ready(): void {
 		super.ready();
 		['item', 'add', 'remove'].forEach((methodToForward) => {
-			this[methodToForward] = this.$.select[methodToForward].bind(this.$.select);
+			this[methodToForward] = this.$['select'][methodToForward].bind(this.$['select']);
 		});
 	}
 
-	connectedCallback(): void {
+	override connectedCallback(): void {
 		super.connectedCallback();
 
-		if (this.label) {
+		if (this['label']) {
 			const labelOption = document.createElement('option');
-			labelOption.label = `-- Select a ${this.label} --`;
+			labelOption.label = `-- Select a ${this['label']} --`;
 			labelOption.value = '';
-			this.$.select.add(labelOption);
+			this.$['select'].add(labelOption);
 		}
 
 		// Move all Light DOM <option> elements into the local Shadow DOM.
 		const options = this.querySelectorAll('option');
 		options.forEach((option) => {
-			this.$.select.add(option);
+			this.$['select'].add(option);
 		});
 
-		this.$.select.selectedIndex = -1;
+		this.$['select'].selectedIndex = -1;
 	}
 
 	_selectChanged(e: any) {
 		if (!e.target.value) {
-			this.$.select.selectedIndex = -1;
+			this.$['select'].selectedIndex = -1;
 		}
 
-		this.value = this.$.select.value;
-		this.selectedOptions = this.$.select.selectedOptions;
+		this['value'] = this.$['select'].value;
+		this['selectedOptions'] = this.$['select'].selectedOptions;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 }

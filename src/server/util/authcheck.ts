@@ -19,11 +19,11 @@ export default async function (req: express.Request, res: express.Response, next
 		let { user } = req;
 		let isUsingKeyOrSocketToken = false;
 		let keyOrSocketTokenAuthenticated = false;
-		if (req.query.key ?? req.cookies.socketToken) {
+		if (req.query['key'] ?? req.cookies.socketToken) {
 			isUsingKeyOrSocketToken = true;
 			const database = await getConnection();
 			const apiKey = await database.getRepository(ApiKey).findOne({
-				where: { secret_key: req.query.key ?? req.cookies.socketToken },
+				where: { secret_key: req.query['key'] ?? req.cookies.socketToken },
 				relations: ['user'],
 			});
 
@@ -58,7 +58,7 @@ export default async function (req: express.Request, res: express.Response, next
 
 		const allowed = isSuperUser(user);
 		keyOrSocketTokenAuthenticated = isUsingKeyOrSocketToken && allowed;
-		const provider = user.identities[0]?.provider_type;
+		const provider = user.identities[0]!.provider_type;
 		const providerAllowed = config.login?.[provider]?.enabled;
 		if ((keyOrSocketTokenAuthenticated || req.isAuthenticated()) && allowed && providerAllowed) {
 			let apiKey = user.apiKeys[0];

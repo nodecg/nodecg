@@ -216,7 +216,9 @@ export default class AssetManager {
 					// https://github.com/expressjs/multer/issues/1104
 					cb(
 						null,
-						`${p.namespace}/${p.category}/${Buffer.from(file.originalname, 'latin1').toString('utf8')}`,
+						`${p['namespace']}/${p['category']}/${Buffer.from(file.originalname, 'latin1').toString(
+							'utf8',
+						)}`,
 					);
 				},
 			}),
@@ -233,7 +235,12 @@ export default class AssetManager {
 			// Send the file (or an appropriate error).
 			(req, res, next) => {
 				const parentDir = this.assetsRoot;
-				const fullPath = path.join(parentDir, req.params.namespace, req.params.category, req.params.filePath);
+				const fullPath = path.join(
+					parentDir,
+					req.params['namespace']!,
+					req.params['category']!,
+					req.params['filePath']!,
+				);
 				sendFile(parentDir, fullPath, res, next);
 			},
 		);
@@ -278,7 +285,7 @@ export default class AssetManager {
 			// Delete the file (or an send appropriate error).
 			(req, res) => {
 				const { namespace, category, filename } = req.params as Record<string, string>;
-				const fullPath = path.join(this.assetsRoot, namespace, category, filename);
+				const fullPath = path.join(this.assetsRoot, namespace!, category!, filename!);
 
 				fs.unlink(fullPath, (err) => {
 					if (err) {

@@ -125,7 +125,7 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 	}
 
 	showReloadAllConfirmDialog() {
-		this.$.reloadAllConfirmDialog.open();
+		this.$['reloadAllConfirmDialog'].open();
 	}
 
 	_calcGraphicInstances(
@@ -142,9 +142,9 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 
 	_handleReloadAllConfirmDialogClose(e: any) {
 		if (e.detail.confirmed) {
-			this.$.reloadButton.disabled = true;
-			window.socket.emit('graphic:requestBundleRefresh', this.bundle.name, () => {
-				this.$.reloadButton.disabled = false;
+			this.$['reloadButton'].disabled = true;
+			window.socket.emit('graphic:requestBundleRefresh', this['bundle'].name, () => {
+				this.$['reloadButton'].disabled = false;
 			});
 		}
 	}

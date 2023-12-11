@@ -185,7 +185,7 @@ export default class RegistrationCoordinator {
 			return false;
 		}
 
-		return this._instancesRep.value.splice(registrationIndex, 1)[0];
+		return this._instancesRep.value.splice(registrationIndex, 1)[0]!;
 	}
 
 	private _findRegistrationBySocketId(socketId: string): GraphicsInstance | undefined {
