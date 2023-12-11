@@ -9,6 +9,6 @@ module.exports = {
 		TS_NODE_FILES: 'true',
 	},
 	extensions: ['ts'],
-	require: ['ts-node/register'],
+	require: ['ts-node/register/transpile-only'],
 	workerThreads: false, // turning this on causes intermittent node.js crashes
 };
