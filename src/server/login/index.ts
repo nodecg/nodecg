@@ -377,17 +377,14 @@ export async function createMiddleware(callbacks: {
 	app.use(passport.initialize());
 	app.use(passport.session());
 
-	const VIEWS_DIR = path.join(rootPath.path, 'build/server/templates');
-
-	app.use('/login', express.static(path.join(rootPath.path, 'build/client/login')));
-	app.set('views', VIEWS_DIR);
+	app.use('/login', express.static(path.join(rootPath.path, 'dist/login')));
 
 	app.get('/login', (req, res) => {
 		// If the user is already logged in, don't show them the login page again.
 		if (req.user && isSuperUser(req.user)) {
 			res.redirect('/dashboard');
 		} else {
-			res.render(path.join(VIEWS_DIR, 'login.tmpl'), {
+			res.render(path.join(__dirname, 'views/login.tmpl'), {
 				user: req.user,
 				config,
 			});
@@ -395,7 +392,7 @@ export async function createMiddleware(callbacks: {
 	});
 
 	app.get('/authError', (req, res) => {
-		res.render(path.join(VIEWS_DIR, 'authError.tmpl'), {
+		res.render(path.join(__dirname, 'views/authError.tmpl'), {
 			message: req.query['message'],
 			code: req.query['code'],
 			viewUrl: req.query['viewUrl'],

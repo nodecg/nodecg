@@ -8,7 +8,6 @@ COPY scripts ./scripts
 RUN npm ci
 
 COPY tsconfig.json ./
-COPY build-tools ./build-tools
 COPY schemas ./schemas
 COPY src ./src
 

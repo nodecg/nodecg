@@ -2,9 +2,9 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"rootDir": ".",
-		"outDir": "../../build-types/types",
-		"module": "commonjs",
+		"outDir": "../../out/types",
+		"module": "CommonJS",
 		"composite": true
 	},
-	"include": ["./**/*"]
+	"include": ["./**/*.ts"]
 }
