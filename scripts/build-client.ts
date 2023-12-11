@@ -4,12 +4,7 @@ import { copy } from 'esbuild-plugin-copy';
 
 const main = async () => {
 	const isWatch = process.argv.includes('--watch');
-	await fs.rm('dist', { recursive: true }).catch((error) => {
-		if (error instanceof Error && error.message.includes('ENOENT')) {
-			return;
-		}
-		throw error;
-	});
+	await fs.rm('dist', { recursive: true, force: true });
 	const options: esbuild.BuildOptions = {
 		entryPoints: ['src/client/bundles/*.ts'],
 		entryNames: '[name]',
