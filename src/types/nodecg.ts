@@ -216,7 +216,6 @@ export namespace NodeCG {
 		host: string;
 		port: number;
 		baseURL: string;
-		exitOnUncaught: boolean;
 		logging: {
 			console: {
 				enabled: boolean;
