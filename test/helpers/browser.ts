@@ -1,9 +1,3 @@
-// Native
-import * as fs from 'fs';
-import * as path from 'path';
-import { v4 as uuid } from 'uuid';
-
-// Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import * as puppeteer from 'puppeteer';
@@ -25,7 +19,7 @@ export const setup = () => {
 		// The --no-sandbox flag is required to run Headless Chrome on CI
 		const args = isCi ? ['--no-sandbox'] : undefined;
 		browser = await puppeteer.launch({
-			headless: !argv.debugTests,
+			headless: argv['debugTests'] ? false : 'new',
 			args,
 		});
 	});
@@ -35,27 +29,7 @@ export const setup = () => {
 			return;
 		}
 
-		for (const page of await browser.pages()) {
-			let coverageObj: Record<string, any>;
-			try {
-				coverageObj = await page.evaluate(() => window.__coverage__);
-			} catch (_) {
-				continue;
-			}
-
-			if (!coverageObj || typeof coverageObj !== 'object' || Object.keys(coverageObj).length === 0) {
-				continue;
-			}
-
-			const newCoverageObj: typeof coverageObj = {};
-			for (const key of Object.keys(coverageObj)) {
-				const absKey = path.resolve('src/client', key);
-				coverageObj[key].path = absKey;
-				newCoverageObj[absKey] = coverageObj[key];
-			}
-		}
-
-		if (argv.debugTests) {
+		if (argv['debugTests']) {
 			await sleep(99999999);
 		} else {
 			await browser.close();
