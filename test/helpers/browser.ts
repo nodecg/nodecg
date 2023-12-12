@@ -35,10 +35,6 @@ export const setup = () => {
 			return;
 		}
 
-		if (!fs.existsSync('.nyc_output')) {
-			fs.mkdirSync('.nyc_output');
-		}
-
 		for (const page of await browser.pages()) {
 			let coverageObj: Record<string, any>;
 			try {
@@ -57,8 +53,6 @@ export const setup = () => {
 				coverageObj[key].path = absKey;
 				newCoverageObj[absKey] = coverageObj[key];
 			}
-
-			fs.writeFileSync(`.nyc_output/browser-${uuid()}.json`, JSON.stringify(newCoverageObj), 'utf8');
 		}
 
 		if (argv.debugTests) {
