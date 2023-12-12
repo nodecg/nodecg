@@ -1,5 +1,7 @@
 FROM node:18-slim AS build
 
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
 WORKDIR /nodecg
 
 COPY package.json package-lock.json ./
@@ -44,7 +46,8 @@ USER nodecg
 
 COPY --chown=nodecg:nodecg package.json index.js ./
 COPY --chown=nodecg:nodecg --from=npm /nodecg/node_modules ./node_modules
-COPY --chown=nodecg:nodecg --from=build /nodecg/build ./build
+COPY --chown=nodecg:nodecg --from=build /nodecg/dist ./dist
+COPY --chown=nodecg:nodecg --from=build /nodecg/out ./out
 COPY --chown=nodecg:nodecg --from=build /nodecg/scripts ./scripts
 COPY --chown=nodecg:nodecg --from=build /nodecg/schemas ./schemas
 
