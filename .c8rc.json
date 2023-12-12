@@ -1,5 +1,5 @@
 {
 	"all": true,
-	"include": ["scripts", "src/server", "src/shared", "src/types"],
+	"include": ["src/server", "src/shared", "src/types"],
 	"exclude": ["src/server/database/migration", "**/*.d.ts"]
 }
