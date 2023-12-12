@@ -1,0 +1,6 @@
+{
+	"all": true,
+	"src": ["./src/server"],
+	"exclude": ["./src/server/database/migrations"],
+	"extension": [".ts"]
+}
