@@ -103,7 +103,7 @@ jobs:
 
       - run: npm run build
 
-      - run: npm run test
+      - run: npm run test-coverage-ci
 
       - if: runner.os == 'Linux' && matrix.node-version == '18.x'
         uses: codecov/codecov-action@v3
