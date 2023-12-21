@@ -99,23 +99,20 @@ jobs:
           key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
         if: runner.os == 'Windows'
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
-      - name: Build w/ instrumentation for coverage reporting
-        run: |
-          npm run instrument
+      - run: npm run build
 
-      - name: Test
-        run: |
-          npm run test
+      - run: npm run test-coverage-ci
 
-      - name: Create code coverage report
-        run: npx nyc report --reporter=text-lcov --include=\"src/**\" > coverage.lcov
-
-      - name: Send code coverage to Codecov
+      - if: runner.os == 'Linux' && matrix.node-version == '18.x'
         uses: codecov/codecov-action@v3
+
+  dry-run-container-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/build-push-action@v5
         with:
-          file: ./coverage.lcov
-        # Only report once
-        if: runner.os == 'Linux' && matrix.node-version == '18.x'
+          context: .
+          push: false

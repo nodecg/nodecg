@@ -11,9 +11,7 @@ import { config } from '../config';
 import type BundleManager from '../bundle-manager';
 import { authCheck, pjson } from '../util';
 import type { NodeCG } from '../../types/nodecg';
-import rootPath from '../../shared/utils/rootPath';
 
-const VIEWS_PATH = path.join(rootPath.path, 'build/server/templates');
 const baseSentryConfig = {
 	dsn: config.sentry?.dsn,
 	serverName: os.hostname(),
@@ -26,7 +24,6 @@ export default class SentryConfig {
 
 	constructor(bundleManager: BundleManager) {
 		const { app, bundleMetadata } = this;
-		app.set('views', VIEWS_PATH);
 
 		bundleManager.on('ready', () => {
 			Sentry.configureScope((scope) => {
@@ -54,7 +51,7 @@ export default class SentryConfig {
 		// Render a pre-configured Sentry instance for client pages that request it.
 		app.get('/sentry.js', authCheck, (_req, res) => {
 			res.type('.js');
-			res.render(path.join(VIEWS_PATH, 'sentry.js.tmpl'), {
+			res.render(path.join(__dirname, 'sentry.js.tmpl'), {
 				baseSentryConfig,
 				bundleMetadata,
 			});

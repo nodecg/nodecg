@@ -6,12 +6,12 @@
 		"esModuleInterop": false,
 		"allowSyntheticDefaultImports": true,
 		"composite": true,
-		"outDir": "../../build-types/client",
+		"outDir": "../../out/client",
 		"baseUrl": ".",
 		"paths": {
 			"@polymer/polymer": ["./types/polymer-element.d.ts"]
 		}
 	},
-	"include": ["./**/*.ts", "./**/*.js", "../types/stubs.d.ts", "types/augment-window.ts"],
+	"include": ["./**/*.ts", "../types/stubs.d.ts"],
 	"references": [{ "path": "../shared" }, { "path": "../types" }]
 }

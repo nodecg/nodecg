@@ -22,8 +22,7 @@ type DashboardContext = {
 	sentryEnabled: boolean;
 };
 
-const BUILD_PATH = path.join(rootPath.path, 'build/client');
-const VIEWS_PATH = path.join(rootPath.path, 'build/server/templates');
+const BUILD_PATH = path.join(rootPath.path, 'dist');
 
 export default class DashboardLib {
 	app = express();
@@ -32,8 +31,6 @@ export default class DashboardLib {
 
 	constructor(bundleManager: BundleManager) {
 		const { app } = this;
-
-		app.set('views', VIEWS_PATH);
 
 		app.use(express.static(BUILD_PATH));
 
@@ -53,7 +50,7 @@ export default class DashboardLib {
 				this.dashboardContext = getDashboardContext(bundleManager.all());
 			}
 
-			res.render(path.join(VIEWS_PATH, 'dashboard.tmpl'), this.dashboardContext);
+			res.render(path.join(__dirname, 'dashboard.tmpl'), this.dashboardContext);
 		});
 
 		app.get('/nodecg-api.min.js', (_, res) => {

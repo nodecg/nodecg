@@ -1,3 +1,5 @@
+/out
+/dist
 /bundles/
 node_modules
 bower_components

@@ -11,7 +11,7 @@ import cpy from 'cpy';
 const pjsonPath = path.join(appRootPath.path, 'package.json');
 const rootNodeModulesPath = appRootPath.resolve('node_modules');
 const tmpNodeModulesPath = appRootPath.resolve('tmp_node_modules');
-const outputDir = path.resolve(__dirname, '../generated-types');
+const outputDir = appRootPath.resolve('generated-types');
 
 const generate = async () => {
 	const rawContents = fs.readFileSync(pjsonPath, 'utf8');
@@ -41,7 +41,7 @@ const generate = async () => {
 		'winston',
 	];
 
-	mkdirpSync('generated-types');
+	mkdirpSync(outputDir);
 
 	// Generate the package.json for the types package
 	fs.writeFileSync(
@@ -92,9 +92,9 @@ const generate = async () => {
 	// Install dependencies in the types package
 	execSync('npm i', { cwd: outputDir, stdio: 'inherit' });
 
-	// Copy all .d.ts files from the root build-types folder to the types package
+	// Copy all .d.ts files from build output to the types package
 	await cpy(['./**/*.d.ts'], outputDir, {
-		cwd: appRootPath.resolve('./build-types'),
+		cwd: appRootPath.resolve('./out'),
 		parents: true,
 	});
 
@@ -112,7 +112,7 @@ const generate = async () => {
 	fs.writeFileSync(
 		path.join(outputDir, 'augment-window.d.ts'),
 		`import { NodeCGAPIClient } from './client/api/api.client';
-		
+
 declare global {
 	var NodeCG: typeof NodeCGAPIClient;
 	var nodecg: NodeCGAPIClient;

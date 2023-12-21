@@ -2,10 +2,10 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"rootDir": ".",
-		"outDir": "../../build-types/shared",
-		"module": "commonjs",
+		"outDir": "../../out/shared",
+		"module": "CommonJS",
 		"composite": true
 	},
-	"include": ["./**/*", "../types/stubs.d.ts"],
+	"include": ["./**/*.ts", "../types/stubs.d.ts"],
 	"references": [{ "path": "../types" }]
 }

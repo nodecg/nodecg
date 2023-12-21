@@ -6,6 +6,7 @@
 		"experimentalDecorators": true,
 
 		// Module resolution
+		"module": "commonjs",
 		"moduleResolution": "node",
 		"esModuleInterop": true,
 		"resolveJsonModule": true,
@@ -20,6 +21,7 @@
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
 		"noPropertyAccessFromIndexSignature": true,
+		"skipLibCheck": true,
 
 		// Extra output
 		"declaration": true,

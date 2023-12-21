@@ -36,8 +36,7 @@ const dataSource = new DataSource({
 	database: testing ? ':memory:' : dbPath,
 	logging: false,
 	entities: [ApiKey, Identity, Permission, Replicant, Role, Session, User],
-	migrations: [path.join(rootPath.path, 'build/typeorm/migration/**/*.js')],
-	subscribers: [path.join(rootPath.path, 'build/typeorm/subscriber/**/*.js')],
+	migrations: [path.join(rootPath.path, 'out/server/database/migration/*.js')],
 	migrationsRun: true,
 	synchronize: false,
 });
