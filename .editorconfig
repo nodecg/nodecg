@@ -1,19 +1,17 @@
 root = true
 
-charset = utf-8
-
 [*]
-indent_style = tab
-end_of_line = lf
 charset = utf-8
-trim_trailing_whitespace = true
+end_of_line = lf
+indent_size = unset
+indent_style = tab
 insert_final_newline = true
-indent_size = 4
+trim_trailing_whitespace = true
+
 
 [{package.json,*.yml,*.md}]
 indent_style = space
 indent_size = 2
 
-# Don't remove trailing whitespace from Markdown
 [*.md]
 trim_trailing_whitespace = false
