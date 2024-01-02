@@ -187,11 +187,9 @@
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-ava": "^14.0.0",
-    "husky": "^8.0.2",
     "is-builtin-module": "^3.2.0",
     "is-ci": "^3.0.1",
     "is-windows": "^1.0.2",
-    "lint-staged": "^13.0.4",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.0",
     "puppeteer": "^21.6.0",
@@ -204,14 +202,5 @@
     "ts-essentials": "^9.3.0",
     "ts-node": "^10.9.1",
     "typescript": "~5.3.3"
-  },
-  "lint-staged": {
-    "*.{json,md,yml}": [
-      "prettier --write"
-    ],
-    "{src,test}/**/*.{ts}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
   }
 }
