@@ -5,7 +5,7 @@ import * as path from 'path';
 // Packages
 import $RefParser from 'json-schema-lib';
 import { klona as clone } from 'klona/json';
-import sha1 from 'sha1';
+import hasha from 'hasha';
 
 // Ours
 import {
@@ -60,7 +60,7 @@ export default class ServerReplicant<
 					}
 
 					this.schema = parsedSchema;
-					this.schemaSum = sha1(JSON.stringify(parsedSchema));
+					this.schemaSum = hasha(JSON.stringify(parsedSchema), { algorithm: 'sha1' });
 					this.validate = this._generateValidator();
 				} catch (e: any) {
 					/* istanbul ignore next */

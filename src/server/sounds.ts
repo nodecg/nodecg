@@ -1,12 +1,9 @@
-// Native
-import path from 'path';
+import path from 'node:path';
 
-// Packages
 import { klona as clone } from 'klona/json';
 import express from 'express';
-import sha1File from 'sha1-file';
+import hasha from 'hasha';
 
-// Ours
 import type { Replicator } from './replicant';
 import type ServerReplicant from './replicant/server-replicant';
 import { sendFile } from './util';
@@ -111,7 +108,7 @@ export default class SoundsLib {
 				const filepath = path.join(bundle.dir, rawCue.defaultFile);
 				const parsedPath = path.parse(filepath);
 				file = {
-					sum: sha1File.sync(filepath),
+					sum: hasha.fromFileSync(filepath, { algorithm: 'sha1' }),
 					base: parsedPath.base,
 					ext: parsedPath.ext,
 					name: parsedPath.name,

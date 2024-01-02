@@ -4,7 +4,7 @@ import * as path from 'path';
 import express from 'express';
 import chokidar from 'chokidar';
 import multer from 'multer';
-import sha1File from 'sha1-file';
+import hasha from 'hasha';
 import { z } from 'zod';
 
 import { authCheck, debounceName, sendFile } from './util';
@@ -165,7 +165,7 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 		}
 
 		try {
-			const sum = await sha1File(filepath);
+			const sum = await hasha.fromFile(filepath, { algorithm: 'sha1' });
 			const uploadedFile = createAssetFile(filepath, sum);
 			if (deferredFiles) {
 				deferredFiles.set(filepath, uploadedFile);
@@ -192,7 +192,7 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 	watcher.on('change', (filepath) => {
 		debounceName(filepath, async () => {
 			try {
-				const sum = await sha1File(filepath);
+				const sum = await hasha.fromFile(filepath, { algorithm: 'sha1' });
 				const newUploadedFile = createAssetFile(filepath, sum);
 				const rep = getCollectRep(newUploadedFile.namespace, newUploadedFile.category);
 				if (!rep) {
