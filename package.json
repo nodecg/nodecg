@@ -139,8 +139,6 @@
     "AUTHORS"
   ],
   "devDependencies": {
-    "@babel/core": "^7.23.7",
-    "@babel/preset-env": "^7.23.7",
     "@types/app-root-path": "^1.2.8",
     "@types/cheerio": "^0.22.35",
     "@types/clone": "^2.1.4",
