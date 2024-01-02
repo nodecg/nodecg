@@ -1,7 +1,5 @@
-// Native
-import path from 'path';
+import * as path from 'path';
 
-// Packages
 import type express from 'express';
 import isChildOf from './isChildOf';
 

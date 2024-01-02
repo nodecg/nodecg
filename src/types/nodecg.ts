@@ -11,6 +11,7 @@ type Person =
 	  }
 	| string;
 
+// TODO: remove namespace and combine group of types in each modules (breaking change)
 export namespace NodeCG {
 	/**
 	 * A collection of types that represent the raw data from the `nodecg` stanza in a bundle's `package.json`.

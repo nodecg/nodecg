@@ -58,7 +58,7 @@ import GraphicsLib from '../graphics';
 import DashboardLib from '../dashboard';
 import MountsLib from '../mounts';
 import SoundsLib from '../sounds';
-import AssetManager from '../assets';
+import { createAssetsMiddleware } from '../assets.js';
 import SharedSourcesLib from '../shared-sources';
 import ExtensionManager from './extensions';
 import SentryConfig from '../util/sentry-config';
@@ -187,8 +187,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 			app.use(loginMiddleware);
 
 			// convert a connect middleware to a Socket.IO middleware
-			const wrap = (middleware: any) => (socket: SocketIO.Socket, next: any) =>
-				middleware(socket.request, {}, next);
+			const wrap = (middleware: any) => (socket: SocketIO.Socket, next: any) => middleware(socket.request, {}, next);
 
 			io.use(wrap(sessionMiddleware));
 			io.use(wrap(passport.initialize()));
@@ -260,9 +259,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 						return;
 					}
 
-					log.error(
-						`Listen ${config.host}:${config.port} in use, is NodeCG already running? NodeCG will now exit.`,
-					);
+					log.error(`Listen ${config.host}:${config.port} in use, is NodeCG already running? NodeCG will now exit.`);
 					break;
 				default:
 					log.error('Unhandled error!', err);
@@ -293,8 +290,8 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		const sounds = new SoundsLib(bundleManager.all(), replicator);
 		app.use(sounds.app);
 
-		const assets = new AssetManager(bundleManager.all(), replicator);
-		app.use(assets.app);
+		const assets = createAssetsMiddleware(bundleManager.all(), replicator);
+		app.use('/assets', assets);
 
 		const sharedSources = new SharedSourcesLib(bundleManager.all());
 		app.use(sharedSources.app);
