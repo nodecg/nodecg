@@ -107,7 +107,6 @@
     "zod": "^3.22.4"
   },
   "scripts": {
-    "prepare": "(npm ls husky && husky install) || echo \"Skipping husky.\"",
     "start": "node index.js",
     "dev": "del-cli dist out && run-p dev:*",
     "dev:client": "npm run build:client -- --watch",
