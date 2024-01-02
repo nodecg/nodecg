@@ -14,8 +14,8 @@ export type ReplicantValue<P extends NodeCG.Platform, V, O, S extends boolean = 
 	? S extends true
 		? V
 		: O extends { defaultValue: infer D extends V }
-		? D
-		: V | undefined
+			? D
+			: V | undefined
 	: (O extends { defaultValue: infer D extends V } ? D : V) | undefined;
 
 type Events<P extends NodeCG.Platform, V, O, S extends boolean> = {

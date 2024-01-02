@@ -24,7 +24,10 @@ export default class Replicator {
 
 	private readonly _pendingSave = new WeakMap<Replicant<any>, Promise<any>>();
 
-	constructor(public readonly io: RootNS, repEntities: db.Replicant[]) {
+	constructor(
+		public readonly io: RootNS,
+		repEntities: db.Replicant[],
+	) {
 		this.io = io;
 		io.on('connection', (socket) => {
 			this._attachToSocket(socket);
