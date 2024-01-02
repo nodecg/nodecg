@@ -80,7 +80,6 @@ export namespace NodeCG {
 		 */
 		export type UnparsedManifest = {
 			compatibleRange: string;
-			transformBareModuleSpecifiers?: boolean;
 			dashboardPanels?: UnparsedPanel[];
 			graphics?: UnparsedGraphic[];
 			assetCategories?: UnparsedAssetCategory[];
@@ -109,7 +108,7 @@ export namespace NodeCG {
 	 * A _parsed_ bundle manifest as used internally by NodeCG.
 	 */
 	export type Manifest = Omit<PackageJSON, 'nodecg'> &
-		Manifest.UnparsedManifest & { transformBareModuleSpecifiers: boolean };
+		Manifest.UnparsedManifest;
 
 	/**
 	 * A collection of types that comprise a `bundle`.
@@ -182,7 +181,6 @@ export namespace NodeCG {
 		contributors?: Person[];
 		dir: string;
 		git: Bundle.GitData;
-		transformBareModuleSpecifiers: boolean;
 		hasAssignableSoundCues: boolean;
 		hasExtension: boolean;
 		config: Bundle.UnknownConfig;
