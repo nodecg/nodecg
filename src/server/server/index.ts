@@ -37,7 +37,6 @@ import debounce from 'lodash.debounce';
 import express from 'express';
 import template from 'lodash.template';
 import memoize from 'fast-memoize';
-import transformMiddleware from 'express-transform-bare-module-specifiers';
 import compression from 'compression';
 import type { Server } from 'http';
 import SocketIO from 'socket.io';
@@ -226,23 +225,6 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 				handled = true;
 				clearTimeout(timeout);
 				resolve();
-			}
-		});
-
-		bundleManager.all().forEach((bundle) => {
-			// TODO: remove this feature in v3
-			if (bundle.transformBareModuleSpecifiers) {
-				log.warn(
-					`${bundle.name} uses the deprecated "transformBareModuleSpecifiers" feature. ` +
-						'This feature will be removed in NodeCG v3. ' +
-						'Please migrate to using browser-native import maps instead: ' +
-						'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap',
-				);
-				const opts = {
-					rootDir: NODECG_ROOT,
-					modulesUrl: `/bundles/${bundle.name}/node_modules`,
-				};
-				app.use(`/bundles/${bundle.name}/*`, transformMiddleware(opts));
 			}
 		});
 
