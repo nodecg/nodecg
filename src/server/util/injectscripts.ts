@@ -71,9 +71,7 @@ export default function (
 			// Likewise, they both need the contentWindow portion of the iframeResizer.
 			// We put this at the start and make it async so it loads ASAP.
 			if (!fullbleed) {
-				scripts.unshift(
-					'<script async src="/node_modules/iframe-resizer/js/iframeResizer.contentWindow.js"></script>',
-				);
+				scripts.unshift('<script async src="/node_modules/iframe-resizer/js/iframeResizer.contentWindow.js"></script>');
 			}
 
 			// Panels need the default panel styles and the dialog_opener.

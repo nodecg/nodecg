@@ -27,7 +27,12 @@ type Events<P extends NodeCG.Platform, V, O, S extends boolean> = {
 	declared: (
 		data:
 			| { value: ReplicantValue<P, V, O, S>; revision: number }
-			| { value: ReplicantValue<P, V, O, S>; revision: number; schemaSum: string; schema: Record<string, any> },
+			| {
+					value: ReplicantValue<P, V, O, S>;
+					revision: number;
+					schemaSum: string;
+					schema: Record<string, any>;
+			  },
 	) => void;
 	declarationRejected: (rejectReason: string) => void;
 	operations: (params: {
@@ -145,9 +150,8 @@ export abstract class AbstractReplicant<
 		if (ARRAY_MUTATOR_METHODS.includes(operation.method)) {
 			if (typeof this.value !== 'object' || this.value === null) {
 				throw new Error(
-					`expected replicant "${this.namespace}:${
-						this.name
-					}" to have a value with type "object", got "${typeof this.value}" instead`,
+					`expected replicant "${this.namespace}:${this.name}" to have a value with type "object", got "${typeof this
+						.value}" instead`,
 				);
 			}
 
@@ -243,9 +247,7 @@ export abstract class AbstractReplicant<
 			validate = compileJsonSchema(schema);
 		} catch (error: unknown) {
 			throw new Error(
-				`Error compiling JSON Schema for Replicant "${this.namespace}:${this.name}":\n\t${stringifyError(
-					error,
-				)}`,
+				`Error compiling JSON Schema for Replicant "${this.namespace}:${this.name}":\n\t${stringifyError(error)}`,
 			);
 		}
 
@@ -348,7 +350,11 @@ const deleteTrap = function <T>(target: T, prop: keyof T): boolean | void {
 		replicant.validate(valueClone);
 	}
 
-	replicant._addOperation({ path: metadata.path, method: 'delete', args: { prop } });
+	replicant._addOperation({
+		path: metadata.path,
+		method: 'delete',
+		args: { prop },
+	});
 	if (!isBrowser()) {
 		return delete target[prop];
 	}
@@ -667,11 +673,7 @@ function assertSingleOwner(replicant: AbstractReplicant<any, any>, value: any): 
 	if (metadata.replicant !== replicant) {
 		throw new Error(
 			`This object belongs to another Replicant, ${metadata.replicant.namespace}::${metadata.replicant.name}.` +
-				`\nA given object cannot belong to multiple Replicants. Object value:\n${JSON.stringify(
-					value,
-					null,
-					2,
-				)}`,
+				`\nA given object cannot belong to multiple Replicants. Object value:\n${JSON.stringify(value, null, 2)}`,
 		);
 	}
 }

@@ -10,9 +10,7 @@ export default function (manifest: Pick<NodeCG.Manifest, 'mount' | 'name'>): Nod
 	}
 
 	if (!Array.isArray(manifest.mount)) {
-		throw new Error(
-			`${manifest.name} has an invalid "nodecg.mount" property in its package.json, it must be an array`,
-		);
+		throw new Error(`${manifest.name} has an invalid "nodecg.mount" property in its package.json, it must be an array`);
 	}
 
 	manifest.mount.forEach((mount, index) => {

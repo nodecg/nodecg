@@ -41,7 +41,9 @@ export = (nodecg: NodeCG.ServerAPI<BundleConfig>) => {
 	assertTypeOrUndefined<string>(genericallyTypedRep.value);
 
 	// Because a default value is provided, this server-side replicant can never be unexpectedly undefined.
-	const defaultValueRep = nodecg.Replicant('defaultValueRep', { defaultValue: 'foo' });
+	const defaultValueRep = nodecg.Replicant('defaultValueRep', {
+		defaultValue: 'foo',
+	});
 	if (typeof defaultValueRep.value !== 'string') {
 		assertNever(defaultValueRep.value);
 	}

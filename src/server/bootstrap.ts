@@ -90,11 +90,7 @@ fetch('https://registry.npmjs.org/nodecg/latest')
 	.then((res: any) => res.json())
 	.then((body: any) => {
 		if (semver.gt(body.version, pjson.version)) {
-			console.warn(
-				'An update is available for NodeCG: %s (current: %s)',
-				JSON.parse(body).version,
-				pjson.version,
-			);
+			console.warn('An update is available for NodeCG: %s (current: %s)', JSON.parse(body).version, pjson.version);
 		}
 	})
 	.catch(

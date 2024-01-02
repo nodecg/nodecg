@@ -11,16 +11,13 @@ export default function (graphicsDir: string, manifest: NodeCG.Manifest): NodeCG
 	if (fs.existsSync(graphicsDir) && typeof manifest.graphics === 'undefined') {
 		// If the graphics folder exists but the nodecg.graphics property doesn't, throw an error.
 		throw new Error(
-			`${manifest.name} has a "graphics" folder, ` +
-				'but no "nodecg.graphics" property was found in its package.json',
+			`${manifest.name} has a "graphics" folder, ` + 'but no "nodecg.graphics" property was found in its package.json',
 		);
 	}
 
 	// If nodecg.graphics exists but the graphics folder doesn't, throw an error.
 	if (!fs.existsSync(graphicsDir) && typeof manifest.graphics !== 'undefined') {
-		throw new Error(
-			`${manifest.name} has a "nodecg.graphics" property in its package.json, but no "graphics" folder`,
-		);
+		throw new Error(`${manifest.name} has a "nodecg.graphics" property in its package.json, but no "graphics" folder`);
 	}
 
 	// If neither the folder nor the manifest exist, return an empty array.
@@ -56,9 +53,7 @@ export default function (graphicsDir: string, manifest: NodeCG.Manifest): NodeCG
 		// Check if this bundle already has a graphic for this file
 		const dupeFound = graphics.some((g) => g.file === graphic.file);
 		if (dupeFound) {
-			throw new Error(
-				`Graphic #${index} (${graphic.file}) has the same file as another graphic in ${manifest.name}`,
-			);
+			throw new Error(`Graphic #${index} (${graphic.file}) has the same file as another graphic in ${manifest.name}`);
 		}
 
 		const filePath = path.join(graphicsDir, graphic.file);

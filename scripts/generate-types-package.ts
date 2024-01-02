@@ -58,7 +58,10 @@ const generate = async () => {
 				license: pjson.license,
 				keywords: [...pjson.keywords, 'types'],
 				dependencies: TYPES_PACKAGE_DEPENDENCIES.reduce(
-					(obj, name) => ({ ...obj, [name]: pjson.dependencies[name] ?? pjson.devDependencies[name] }),
+					(obj, name) => ({
+						...obj,
+						[name]: pjson.dependencies[name] ?? pjson.devDependencies[name],
+					}),
 					{},
 				),
 				devDependencies: {

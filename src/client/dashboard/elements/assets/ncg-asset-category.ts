@@ -164,9 +164,7 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 
 	override connectedCallback(): void {
 		super.connectedCallback();
-		this.$['uploadDialog'].fitInto = document.body
-			.querySelector('ncg-dashboard')!
-			.shadowRoot!.getElementById('pages');
+		this.$['uploadDialog'].fitInto = document.body.querySelector('ncg-dashboard')!.shadowRoot!.getElementById('pages');
 		this.$['uploadDialog'].resetFit();
 	}
 

@@ -240,9 +240,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 			if (err.type === 'UnauthorizedError') {
 				if (globalThis.window) {
 					const url = [location.protocol, '//', location.host, location.pathname].join('');
-					window.location.href = `/authError?code=${err.code as string}&message=${
-						err.message
-					}&viewUrl=${url}`;
+					window.location.href = `/authError?code=${err.code as string}&message=${err.message}&viewUrl=${url}`;
 				} else {
 					globalThis.close();
 				}
@@ -399,12 +397,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 
 	sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, cb: SendMessageCb<T>): void;
 	sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, data?: unknown): Promise<T>;
-	sendMessageToBundle<T = unknown>(
-		messageName: string,
-		bundleName: string,
-		data: unknown,
-		cb: SendMessageCb<T>,
-	): void;
+	sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, data: unknown, cb: SendMessageCb<T>): void;
 	sendMessageToBundle<T = unknown>(
 		messageName: string,
 		bundleName: string,
