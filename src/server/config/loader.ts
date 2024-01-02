@@ -25,8 +25,6 @@ function getConfigSchema(userConfig: Record<string, any>) {
 					"If you use a reverse proxy, you'll likely need to set this value.",
 			),
 
-		exitOnUncaught: Joi.boolean().default(true).description('Whether or not to exit on uncaught exceptions.'),
-
 		logging: Joi.object({
 			console: Joi.object({
 				enabled: Joi.boolean().default(true).description('Whether to enable console logging.'),

@@ -52,7 +52,7 @@ export const setup = (nodecgConfigName = 'nodecg.json'): void => {
 
 	test.after.always(() => {
 		if (server) {
-			void server.stop();
+			server.stop();
 		}
 	});
 
