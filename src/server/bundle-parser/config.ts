@@ -81,8 +81,6 @@ function _parseSchema(bundleName: string, schemaPath: string): Record<string, an
 	try {
 		return JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf8' }));
 	} catch (_: unknown) {
-		throw new Error(
-			`configschema.json for bundle "${bundleName}" could not be read. Ensure that it is valid JSON.`,
-		);
+		throw new Error(`configschema.json for bundle "${bundleName}" could not be read. Ensure that it is valid JSON.`);
 	}
 }

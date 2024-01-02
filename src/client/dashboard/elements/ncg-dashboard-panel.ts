@@ -231,7 +231,9 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 		super.ready();
 
 		afterNextRender(this, async () => {
-			const distributedNodes: HTMLElement[] = this.$['slot'].assignedNodes({ flatten: true });
+			const distributedNodes: HTMLElement[] = this.$['slot'].assignedNodes({
+				flatten: true,
+			});
 			const iframe = distributedNodes.find((el) => el.tagName === 'IFRAME') as HTMLIFrameElement;
 
 			// If Sentry is enabled, use it to report errors in panels to Sentry.io.

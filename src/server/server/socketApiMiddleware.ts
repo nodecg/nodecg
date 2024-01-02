@@ -21,12 +21,7 @@ export default function (socket: TypedServerSocket, next: (err?: ExtendedError) 
 		});
 
 		socket.on('message', (data) => {
-			log.trace(
-				'Received message %s (sent to bundle %s) with data:',
-				data.messageName,
-				data.bundleName,
-				data.content,
-			);
+			log.trace('Received message %s (sent to bundle %s) with data:', data.messageName, data.bundleName, data.content);
 
 			socket.broadcast.emit('message', data);
 		});

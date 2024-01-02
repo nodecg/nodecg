@@ -56,9 +56,7 @@ test.serial('ncg-dialog - should have the buttons defined in dialogButtons', asy
 			};
 		}
 
-		return Array.from(dialog.querySelector('.buttons')!.querySelectorAll('paper-button')).map(
-			gatherButtonStats as any,
-		);
+		return Array.from(dialog.querySelector('.buttons')!.querySelectorAll('paper-button')).map(gatherButtonStats as any);
 	});
 
 	t.deepEqual(res, [

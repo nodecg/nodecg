@@ -19,7 +19,11 @@ const baseSentryConfig = {
 };
 
 export default class SentryConfig {
-	readonly bundleMetadata: Array<{ name: string; git: NodeCG.Bundle.GitData; version: string }> = [];
+	readonly bundleMetadata: Array<{
+		name: string;
+		git: NodeCG.Bundle.GitData;
+		version: string;
+	}> = [];
 	readonly app = express();
 
 	constructor(bundleManager: BundleManager) {

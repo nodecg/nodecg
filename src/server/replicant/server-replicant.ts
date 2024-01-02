@@ -86,11 +86,7 @@ export default class ServerReplicant<
 				this._value = proxyRecursive(this, startingValue, '/') as any;
 				this.log.replicants('Loaded a persisted value:', startingValue);
 			} else if (this.schema) {
-				this._value = proxyRecursive(
-					this,
-					getSchemaDefault(this.schema, `${this.namespace}:${this.name}`),
-					'/',
-				) as any;
+				this._value = proxyRecursive(this, getSchemaDefault(this.schema, `${this.namespace}:${this.name}`), '/') as any;
 				this.log.replicants(
 					'Discarded persisted value, as it failed schema validation. Replaced with defaults from schema.',
 				);
@@ -104,12 +100,7 @@ export default class ServerReplicant<
 				this.log.replicants('Declared "%s" in namespace "%s"\n', name, namespace);
 			} else {
 				this._value = proxyRecursive(this, clone(defaultValue), '/') as any;
-				this.log.replicants(
-					'Declared "%s" in namespace "%s" with defaultValue:\n',
-					name,
-					namespace,
-					defaultValue,
-				);
+				this.log.replicants('Declared "%s" in namespace "%s" with defaultValue:\n', name, namespace, defaultValue);
 			}
 		}
 	}

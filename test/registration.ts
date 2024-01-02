@@ -53,8 +53,7 @@ test.serial('singleInstance - should redirect to busy.html when the instance is 
 	const page = await initSingleInstance();
 	await page.waitForFunction(
 		(rootUrl: string) =>
-			location.href ===
-			`${rootUrl}instance/busy.html?pathname=/bundles/test-bundle/graphics/single_instance.html`,
+			location.href === `${rootUrl}instance/busy.html?pathname=/bundles/test-bundle/graphics/single_instance.html`,
 		{},
 		C.rootUrl(),
 	);
@@ -87,8 +86,7 @@ test.serial('singleInstance - should redirect to killed.html when the instance i
 
 	await singleInstance.waitForFunction(
 		(rootUrl: string) =>
-			location.href ===
-			`${rootUrl}instance/killed.html?pathname=/bundles/test-bundle/graphics/single_instance.html`,
+			location.href === `${rootUrl}instance/killed.html?pathname=/bundles/test-bundle/graphics/single_instance.html`,
 		{},
 		C.rootUrl(),
 	);

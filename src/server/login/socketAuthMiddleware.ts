@@ -40,12 +40,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 
 		const user = await findUser(apiKey.user.id);
 		if (!user) {
-			next(
-				new UnauthorizedError(
-					UnAuthErrCode.CredentialsRequired,
-					'no user associated with provided credentials',
-				),
-			);
+			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no user associated with provided credentials'));
 			return;
 		}
 
@@ -118,8 +113,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 
 						s.emit(
 							'protocol_error',
-							new UnauthorizedError(UnAuthErrCode.TokenRevoked, 'This token has been invalidated')
-								.serialized,
+							new UnauthorizedError(UnAuthErrCode.TokenRevoked, 'This token has been invalidated').serialized,
 						);
 
 						// We need to wait a bit before disconnecting the socket,

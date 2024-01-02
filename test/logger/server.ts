@@ -16,7 +16,9 @@ const tempFolder = tmp.dirSync().name;
 const logsDir = path.join(tempFolder, 'logs');
 
 // Start up the logger lib
-const Logger = loggerFactory({ file: { path: path.join(logsDir, 'nodecg.log') } });
+const Logger = loggerFactory({
+	file: { path: path.join(logsDir, 'nodecg.log') },
+});
 
 type TestContext = {
 	logger: InstanceType<typeof Logger>;

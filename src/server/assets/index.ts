@@ -57,7 +57,10 @@ export default class AssetManager {
 		this.app = this._setupExpress();
 	}
 
-	private _computeCollections(bundles: NodeCG.Bundle[]): { collections: Collection[]; watchPatterns: Set<string> } {
+	private _computeCollections(bundles: NodeCG.Bundle[]): {
+		collections: Collection[];
+		watchPatterns: Set<string>;
+	} {
 		const watchPatterns = new Set<string>();
 		const collections: Collection[] = [];
 		bundles.forEach((bundle) => {
@@ -214,12 +217,7 @@ export default class AssetManager {
 				filename(req, file, cb) {
 					const p = req.params as Record<string, string>;
 					// https://github.com/expressjs/multer/issues/1104
-					cb(
-						null,
-						`${p['namespace']}/${p['category']}/${Buffer.from(file.originalname, 'latin1').toString(
-							'utf8',
-						)}`,
-					);
+					cb(null, `${p['namespace']}/${p['category']}/${Buffer.from(file.originalname, 'latin1').toString('utf8')}`);
 				},
 			}),
 		});

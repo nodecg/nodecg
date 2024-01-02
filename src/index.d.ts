@@ -11,7 +11,9 @@ import { DeepReadonly } from 'ts-essentials';
 type NodeCGAPIServer<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> = Omit<
 	InstanceType<ReturnType<typeof serverApiFactory>>,
 	'bundleConfig'
-> & { bundleConfig: DeepReadonly<C> };
+> & {
+	bundleConfig: DeepReadonly<C>;
+};
 
 declare module './types/nodecg' {
 	/**

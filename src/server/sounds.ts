@@ -47,9 +47,7 @@ export default class SoundsLib {
 
 					// Add/update any cues in the bundle manifest that aren't in the persisted replicant.
 					defaultCuesRepValue.forEach((defaultCue) => {
-						const existingIndex = cuesRep.value.findIndex(
-							(persistedCue) => persistedCue.name === defaultCue.name,
-						);
+						const existingIndex = cuesRep.value.findIndex((persistedCue) => persistedCue.name === defaultCue.name);
 
 						// We need to just update a few key properties in the persisted cue.
 						// We leave things like volume as-is.

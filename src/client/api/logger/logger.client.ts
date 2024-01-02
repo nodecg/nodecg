@@ -114,9 +114,7 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 					typeof argument === 'object' ? inspect(argument, { depth: null, showProxy: true }) : argument,
 				);
 
-				sentry.captureException(
-					new Error(`[${this.name}] ` + format(formattedArgs[0], ...formattedArgs.slice(1))),
-				);
+				sentry.captureException(new Error(`[${this.name}] ` + format(formattedArgs[0], ...formattedArgs.slice(1))));
 			}
 		}
 
