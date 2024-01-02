@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/nodecg/nodecg/compare/v2.1.12...v3.0.0) (2024-01-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* **bootstrap:** `exitOnUncaught` is removed. Use Node.js `--unhandled-rejections` instead
+
+### Features
+
+* **bootstrap:** remove exitOnUncaught ([#694](https://github.com/nodecg/nodecg/issues/694)) ([ddea6cf](https://github.com/nodecg/nodecg/commit/ddea6cfc25e9cca1efa847eb725cfa5baa717fe7))
+
 ## [2.1.12](https://github.com/nodecg/nodecg/compare/v2.1.11...v2.1.12) (2023-11-16)
 
 
