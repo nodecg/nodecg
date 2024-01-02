@@ -24,7 +24,7 @@ jobs:
         with:
           release-type: node
           package-name: nodecg
-          prerelease: ${{ startsWith('release/', github.ref_name) && 'rc' || false }}
+          prerelease: ${{ startsWith(github.ref_name, 'release/') && 'rc' || false }}
 
   publish:
     runs-on: ubuntu-latest
