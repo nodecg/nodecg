@@ -6,7 +6,6 @@ import { config, filteredConfig } from '../config';
 import '../util/sentry-config';
 import { pjson } from '../util';
 
-global.exitOnUncaught = config.exitOnUncaught;
 if (config.sentry?.enabled) {
 	Sentry.init({
 		dsn: config.sentry.dsn,
@@ -368,16 +367,9 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		});
 	}
 
-	async stop(): Promise<void> {
+	stop() {
 		this._extensionManager?.emitToAllInstances('serverStopping');
 		this._io.disconnectSockets(true);
-
-		await new Promise<void>((resolve) => {
-			// Also closes the underlying HTTP server.
-			this._io.close(() => {
-				resolve();
-			});
-		});
 
 		if (this._replicator) {
 			this._replicator.saveAllReplicants();
