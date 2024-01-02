@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - release/*
 
 permissions:
   contents: write
@@ -23,6 +24,7 @@ jobs:
         with:
           release-type: node
           package-name: nodecg
+          prerelease: ${{ startsWith('release/', github.ref_name) && 'rc' || false }}
 
   publish:
     runs-on: ubuntu-latest
