@@ -58,7 +58,7 @@ import GraphicsLib from '../graphics';
 import DashboardLib from '../dashboard';
 import MountsLib from '../mounts';
 import SoundsLib from '../sounds';
-import AssetManager from '../assets';
+import { createAssetsMiddleware } from '../assets';
 import SharedSourcesLib from '../shared-sources';
 import ExtensionManager from './extensions';
 import SentryConfig from '../util/sentry-config';
@@ -290,8 +290,8 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		const sounds = new SoundsLib(bundleManager.all(), replicator);
 		app.use(sounds.app);
 
-		const assets = new AssetManager(bundleManager.all(), replicator);
-		app.use(assets.app);
+		const assets = createAssetsMiddleware(bundleManager.all(), replicator);
+		app.use('/assets', assets);
 
 		const sharedSources = new SharedSourcesLib(bundleManager.all());
 		app.use(sharedSources.app);
