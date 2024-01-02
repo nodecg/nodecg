@@ -268,7 +268,11 @@ export namespace NodeCG {
 				clientSecret: string;
 				scope: string;
 				allowedUserIDs: string[];
-				allowedGuilds: Array<{ guildID: string; allowedRoleIDs: string[]; guildBotToken: string }>;
+				allowedGuilds: Array<{
+					guildID: string;
+					allowedRoleIDs: string[];
+					guildBotToken: string;
+				}>;
 			};
 		};
 		ssl?: {
@@ -401,7 +405,10 @@ export namespace NodeCG {
 			// Array mutator methods
 			// This whole thing is gross and needs to be removed in v3
 			// It is rife with unsupported cases, very easy to make bugs here
-			| { method: 'copyWithin'; args: { mutatorArgs: Parameters<any[]['copyWithin']> } }
+			| {
+					method: 'copyWithin';
+					args: { mutatorArgs: Parameters<any[]['copyWithin']> };
+			  }
 			| { method: 'fill'; args: { mutatorArgs: Parameters<any[]['fill']> } }
 			| { method: 'pop' }
 			| { method: 'push'; args: { mutatorArgs: Parameters<any[]['push']> } }
@@ -409,7 +416,10 @@ export namespace NodeCG {
 			| { method: 'shift' }
 			| { method: 'sort'; args: { mutatorArgs: Parameters<any[]['sort']> } }
 			| { method: 'splice'; args: { mutatorArgs: Parameters<any[]['splice']> } }
-			| { method: 'unshift'; args: { mutatorArgs: Parameters<any[]['unshift']> } }
+			| {
+					method: 'unshift';
+					args: { mutatorArgs: Parameters<any[]['unshift']> };
+			  }
 		);
 	}
 

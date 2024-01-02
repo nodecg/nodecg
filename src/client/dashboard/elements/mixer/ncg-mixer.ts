@@ -72,9 +72,7 @@ class NcgMixer extends Polymer.PolymerElement {
 		return {
 			bundlesWithSounds: {
 				type: Array,
-				value: window.__renderData__.bundles.filter(
-					(bundle) => bundle.soundCues && bundle.soundCues.length > 0,
-				),
+				value: window.__renderData__.bundles.filter((bundle) => bundle.soundCues && bundle.soundCues.length > 0),
 			},
 		};
 	}

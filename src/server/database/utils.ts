@@ -3,9 +3,11 @@ import { ApiKey } from './entity/ApiKey';
 
 export async function findUser(id: User['id']): Promise<User | null> {
 	const database = await getConnection();
-	return database
-		.getRepository(User)
-		.findOne({ where: { id }, relations: ['roles', 'identities', 'apiKeys'], cache: true });
+	return database.getRepository(User).findOne({
+		where: { id },
+		relations: ['roles', 'identities', 'apiKeys'],
+		cache: true,
+	});
 }
 
 export async function getSuperUserRole(): Promise<Role> {

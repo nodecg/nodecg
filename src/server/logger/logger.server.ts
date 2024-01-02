@@ -48,10 +48,7 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 			winston.format.errors({ stack: true }),
 			winston.format.colorize(),
 			winston.format.printf(
-				(info) =>
-					`${initialOpts?.console?.timestamps ? `${info['timestamp']} - ` : ''}${info.level}: ${
-						info.message
-					}`,
+				(info) => `${initialOpts?.console?.timestamps ? `${info['timestamp']} - ` : ''}${info.level}: ${info.message}`,
 			),
 		),
 	});
@@ -64,8 +61,7 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 			winston.format.timestamp(), // Leave formatting as ISO 8601 UTC for file.
 			winston.format.errors({ stack: true }),
 			winston.format.printf(
-				(info) =>
-					`${initialOpts?.file?.timestamps ? `${info['timestamp']} - ` : ''}${info.level}: ${info.message}`,
+				(info) => `${initialOpts?.file?.timestamps ? `${info['timestamp']} - ` : ''}${info.level}: ${info.message}`,
 			),
 		),
 	});
@@ -163,9 +159,7 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 					typeof argument === 'object' ? inspect(argument, { depth: null, showProxy: true }) : argument,
 				);
 
-				sentry.captureException(
-					new Error(`[${this.name}] ` + format(formattedArgs[0], ...formattedArgs.slice(1))),
-				);
+				sentry.captureException(new Error(`[${this.name}] ` + format(formattedArgs[0], ...formattedArgs.slice(1))));
 			}
 		}
 

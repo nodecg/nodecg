@@ -187,8 +187,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 			app.use(loginMiddleware);
 
 			// convert a connect middleware to a Socket.IO middleware
-			const wrap = (middleware: any) => (socket: SocketIO.Socket, next: any) =>
-				middleware(socket.request, {}, next);
+			const wrap = (middleware: any) => (socket: SocketIO.Socket, next: any) => middleware(socket.request, {}, next);
 
 			io.use(wrap(sessionMiddleware));
 			io.use(wrap(passport.initialize()));
@@ -260,9 +259,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 						return;
 					}
 
-					log.error(
-						`Listen ${config.host}:${config.port} in use, is NodeCG already running? NodeCG will now exit.`,
-					);
+					log.error(`Listen ${config.host}:${config.port} in use, is NodeCG already running? NodeCG will now exit.`);
 					break;
 				default:
 					log.error('Unhandled error!', err);

@@ -45,7 +45,9 @@ test.serial('should only apply defaultValue when first declared', async (t) => {
 	const ret = await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
-				const rep = window.dashboardApi.Replicant('clientTest', { defaultValue: 'bar' });
+				const rep = window.dashboardApi.Replicant('clientTest', {
+					defaultValue: 'bar',
+				});
 				rep.on('declared', () => {
 					resolve(rep.value);
 				});
@@ -91,7 +93,9 @@ test.serial('should be assignable via the ".value" property', async (t) => {
 	const ret = await dashboard.evaluate(
 		async () =>
 			new Promise<{ value: unknown; revision: number }>((resolve) => {
-				const rep = window.dashboardApi.Replicant('clientAssignmentTest', { persistent: false });
+				const rep = window.dashboardApi.Replicant('clientAssignmentTest', {
+					persistent: false,
+				});
 				rep.on('change', (newVal) => {
 					if (newVal === 'assignmentOK') {
 						resolve({
@@ -133,7 +137,9 @@ test.serial(
 		const ret = await dashboard.evaluate(
 			async () =>
 				new Promise<unknown[]>((resolve) => {
-					const rep = window.dashboardApi.Replicant('clientEarlyValueAccess', { persistent: false });
+					const rep = window.dashboardApi.Replicant('clientEarlyValueAccess', {
+						persistent: false,
+					});
 
 					// TODO: Replace this with sinon.
 					const originalWarn = rep.log.warn;
@@ -149,10 +155,7 @@ test.serial(
 				}),
 		);
 
-		t.is(
-			ret[0],
-			'Attempted to get value before Replicant had finished declaring. This will always return undefined.',
-		);
+		t.is(ret[0], 'Attempted to get value before Replicant had finished declaring. This will always return undefined.');
 	},
 );
 
@@ -731,7 +734,9 @@ test.serial('#waitForReplicants', async (t) => {
 });
 
 test.serial('emits assignment in the correct order', async (t) => {
-	const extRep = t.context.apis.extension.Replicant<any[]>('assignment_order', { defaultValue: [] });
+	const extRep = t.context.apis.extension.Replicant<any[]>('assignment_order', {
+		defaultValue: [],
+	});
 
 	await dashboard.evaluate(
 		async () =>

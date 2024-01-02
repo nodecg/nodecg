@@ -228,9 +228,7 @@ if (config.login.discord?.enabled) {
 							if (err) {
 								log.warn(
 									`Got error while trying to get guild ${guildWithRoles.guildID} ` +
-										`(Make sure you're using the correct bot token and guild id): ${JSON.stringify(
-											memberResponse,
-										)}`,
+										`(Make sure you're using the correct bot token and guild id): ${JSON.stringify(memberResponse)}`,
 								);
 								continue;
 							}
@@ -250,20 +248,10 @@ if (config.login.discord?.enabled) {
 
 				const roles: Role[] = [];
 				if (allowed) {
-					log.info(
-						'(Discord) Granting %s#%s (%s) access',
-						profile.username,
-						profile.discriminator,
-						profile.id,
-					);
+					log.info('(Discord) Granting %s#%s (%s) access', profile.username, profile.discriminator, profile.id);
 					roles.push(await getSuperUserRole());
 				} else {
-					log.info(
-						'(Discord) Denying %s#%s (%s) access',
-						profile.username,
-						profile.discriminator,
-						profile.id,
-					);
+					log.info('(Discord) Denying %s#%s (%s) access', profile.username, profile.discriminator, profile.id);
 				}
 
 				const user = await upsertUser({
@@ -297,9 +285,7 @@ if (config.login.local?.enabled) {
 			async (username: string, password: string, done: StrategyDoneCb) => {
 				try {
 					const roles: Role[] = [];
-					const foundUser = allowedUsers?.find(
-						(u: { username: string; password: string }) => u.username === username,
-					);
+					const foundUser = allowedUsers?.find((u: { username: string; password: string }) => u.username === username);
 					let allowed = false;
 
 					if (foundUser) {
@@ -339,7 +325,10 @@ if (config.login.local?.enabled) {
 export async function createMiddleware(callbacks: {
 	onLogin(user: Express.User): void;
 	onLogout(user: Express.User): void;
-}): Promise<{ app: express.Application; sessionMiddleware: express.RequestHandler }> {
+}): Promise<{
+	app: express.Application;
+	sessionMiddleware: express.RequestHandler;
+}> {
 	const database = await getConnection();
 	const sessionRepository = database.getRepository(Session);
 	const app = express();

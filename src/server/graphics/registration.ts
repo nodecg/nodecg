@@ -57,7 +57,10 @@ export default class RegistrationCoordinator {
 					return;
 				}
 
-				const graphicManifest = this._findGraphicManifest({ bundleName, pathName });
+				const graphicManifest = this._findGraphicManifest({
+					bundleName,
+					pathName,
+				});
 
 				/* istanbul ignore if: simple error trapping */
 				if (!graphicManifest) {
@@ -205,7 +208,10 @@ export default class RegistrationCoordinator {
 				return;
 			}
 
-			const graphicManifest = this._findGraphicManifest({ bundleName, pathName });
+			const graphicManifest = this._findGraphicManifest({
+				bundleName,
+				pathName,
+			});
 			/* istanbul ignore next: simple error trapping */
 			if (!graphicManifest) {
 				return;

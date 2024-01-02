@@ -30,7 +30,9 @@ const genericallyTypedRep = nodecg.Replicant<string>('genericallyTypedRep');
 assertTypeOrUndefined<string>(genericallyTypedRep.value);
 
 // Even if a defaultValue is provided, a client-side rep can still be undefined.
-const defaultValueRep = nodecg.Replicant('defaultValueRep', { defaultValue: 'foo' });
+const defaultValueRep = nodecg.Replicant('defaultValueRep', {
+	defaultValue: 'foo',
+});
 assertTypeOrUndefined<string>(defaultValueRep.value);
 
 // This tests the default case that a replicant's value should be unknown.

@@ -217,9 +217,7 @@ export abstract class NodeCGAPIBase<
 		// Find the index of this handler in the array.
 		const index = this._messageHandlers.findIndex(
 			(handler) =>
-				handler.messageName === messageName &&
-				handler.bundleName === bundleName &&
-				handler.func === handlerFunc,
+				handler.messageName === messageName && handler.bundleName === bundleName && handler.func === handlerFunc,
 		);
 
 		// If the handler exists, remove it and return true.

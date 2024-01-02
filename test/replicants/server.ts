@@ -40,7 +40,9 @@ test.serial('should only apply defaultValue when first declared', async (t) => {
 			}),
 	);
 
-	const rep = t.context.apis.extension.Replicant('extensionTest', { defaultValue: 'bar' });
+	const rep = t.context.apis.extension.Replicant('extensionTest', {
+		defaultValue: 'bar',
+	});
 	t.is(rep.value, 'foo');
 });
 
@@ -65,7 +67,9 @@ test.serial('should not explode when schema is invalid', (t) => {
 });
 
 test.serial('should be assignable via the ".value" property', (t) => {
-	const rep = t.context.apis.extension.Replicant('extensionAssignmentTest', { persistent: false });
+	const rep = t.context.apis.extension.Replicant('extensionAssignmentTest', {
+		persistent: false,
+	});
 	rep.value = 'assignmentOK';
 	t.is(rep.value, 'assignmentOK');
 });
@@ -287,7 +291,9 @@ test.serial('dates - should not throw an error', (t) => {
 });
 
 test.serial('persistent - should load persisted values when they exist', async (t) => {
-	const rep = t.context.apis.extension.Replicant('extensionPersistence', { persistenceInterval: 0 });
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
+		persistenceInterval: 0,
+	});
 	t.is(rep.value, 'it work good!');
 	await t.context.server.saveAllReplicantsNow();
 });
@@ -295,7 +301,9 @@ test.serial('persistent - should load persisted values when they exist', async (
 test.serial('persistent - should persist assignment to database', async (t) => {
 	t.plan(1);
 
-	const rep = t.context.apis.extension.Replicant('extensionPersistence', { persistenceInterval: 0 });
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
+		persistenceInterval: 0,
+	});
 	rep.value = { nested: 'hey we assigned!' };
 
 	await t.context.server.saveAllReplicantsNow();
@@ -329,7 +337,9 @@ test.serial('persistent - should persist changes to database', async (t) => {
 test.serial('persistent - should persist top-level string', async (t) => {
 	t.plan(1);
 
-	const rep = t.context.apis.extension.Replicant('extensionPersistence', { persistenceInterval: 0 });
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
+		persistenceInterval: 0,
+	});
 	rep.value = 'lorem';
 
 	await t.context.server.saveAllReplicantsNow();
@@ -345,7 +355,9 @@ test.serial('persistent - should persist top-level string', async (t) => {
 test.serial('persistent - should persist top-level undefined', async (t) => {
 	t.plan(1);
 
-	const rep = t.context.apis.extension.Replicant('extensionPersistence', { persistenceInterval: 0 });
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
+		persistenceInterval: 0,
+	});
 	rep.value = undefined;
 
 	await t.context.server.saveAllReplicantsNow();
@@ -361,7 +373,9 @@ test.serial('persistent - should persist top-level undefined', async (t) => {
 test.serial('persistent - should persist falsey values to disk', async (t) => {
 	t.plan(1);
 
-	const rep = t.context.apis.extension.Replicant('extensionFalseyWrite', { persistenceInterval: 0 });
+	const rep = t.context.apis.extension.Replicant('extensionFalseyWrite', {
+		persistenceInterval: 0,
+	});
 	rep.value = 0;
 
 	await t.context.server.saveAllReplicantsNow();
@@ -375,14 +389,18 @@ test.serial('persistent - should persist falsey values to disk', async (t) => {
 });
 
 test.serial('persistent - should read falsey values from disk', (t) => {
-	const rep = t.context.apis.extension.Replicant('extensionFalseyRead', { persistenceInterval: 0 });
+	const rep = t.context.apis.extension.Replicant('extensionFalseyRead', {
+		persistenceInterval: 0,
+	});
 	t.is(rep.value, 0);
 });
 
 test.serial('transient - should not write their value to disk', async (t) => {
 	t.plan(1);
 
-	const rep = t.context.apis.extension.Replicant('extensionTransience', { persistent: false });
+	const rep = t.context.apis.extension.Replicant('extensionTransience', {
+		persistent: false,
+	});
 	rep.value = 'o no';
 
 	await t.context.server.saveAllReplicantsNow();
@@ -396,7 +414,9 @@ test.serial('transient - should not write their value to disk', async (t) => {
 });
 
 test.serial('should return true when deleting a non-existing property', (t) => {
-	const rep = t.context.apis.extension.Replicant('serverDeleteNonExistent', { defaultValue: {} });
+	const rep = t.context.apis.extension.Replicant('serverDeleteNonExistent', {
+		defaultValue: {},
+	});
 	// @ts-expect-error
 	t.true(delete rep.value.nonExistent);
 });
@@ -409,7 +429,9 @@ test.serial("test that one else path that's hard to hit", (t) => {
 
 test.serial('should leave the default value intact', (t) => {
 	const defaultValue = { lorem: 'ipsum' };
-	const rep = t.context.apis.extension.Replicant('defaultValueIntact', { defaultValue });
+	const rep = t.context.apis.extension.Replicant('defaultValueIntact', {
+		defaultValue,
+	});
 
 	t.is(rep.opts.defaultValue, defaultValue);
 	t.not(rep.value, defaultValue);

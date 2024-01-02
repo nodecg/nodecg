@@ -35,9 +35,7 @@ function getConfigSchema(userConfig: Record<string, any>) {
 					.valid(...Object.values(LogLevel))
 					.default('info'),
 
-				timestamps: Joi.boolean()
-					.default(true)
-					.description('Whether to add timestamps to the console logging.'),
+				timestamps: Joi.boolean().default(true).description('Whether to add timestamps to the console logging.'),
 
 				replicants: Joi.boolean()
 					.default(false)
@@ -123,21 +121,13 @@ function getConfigSchema(userConfig: Record<string, any>) {
 				allowedUsernames: Joi.array()
 					.items(Joi.string())
 					// This will throw if the user does not provide a value and is not using allowedIds, but only if Twitch auth is enabled.
-					.default(
-						userConfig?.['login']?.twitch?.enabled && !userConfig?.['']?.twitch?.allowedIds ? null : [],
-					)
+					.default(userConfig?.['login']?.twitch?.enabled && !userConfig?.['']?.twitch?.allowedIds ? null : [])
 					.description('Which Twitch usernames to allow.'),
 				allowedIds: Joi.array()
 					.items(Joi.string())
 					// This will throw if the user does not provide a value and is not using allowedUsernames, but only if Twitch auth is enabled.
-					.default(
-						userConfig?.['login']?.twitch?.enabled && !userConfig?.['']?.twitch?.allowedUsernames
-							? null
-							: [],
-					)
-					.description(
-						'Which Twitch IDs to allow. Can be obtained from https://twitchinsights.net/checkuser',
-					),
+					.default(userConfig?.['login']?.twitch?.enabled && !userConfig?.['']?.twitch?.allowedUsernames ? null : [])
+					.description('Which Twitch IDs to allow. Can be obtained from https://twitchinsights.net/checkuser'),
 			}),
 
 			discord: Joi.object({
@@ -159,9 +149,7 @@ function getConfigSchema(userConfig: Record<string, any>) {
 					.items(Joi.string())
 					// This will throw if the user does not provide a value and is not using allowedGuilds, but only if Discord auth is enabled.
 					.default(
-						userConfig?.['login']?.discord?.enabled && !userConfig?.['login']?.discord?.allowedGuilds
-							? null
-							: [],
+						userConfig?.['login']?.discord?.enabled && !userConfig?.['login']?.discord?.allowedGuilds ? null : [],
 					)
 					.description('Which Discord user IDs to allow.'),
 				allowedGuilds: Joi.array()
@@ -179,9 +167,7 @@ function getConfigSchema(userConfig: Record<string, any>) {
 					)
 					// This will throw if the user does not provide a value and is not using allowedUserIDs, but only if Discord auth is enabled.
 					.default(
-						userConfig?.['login']?.discord?.enabled && !userConfig?.['login']?.discord?.allowedUserIDs
-							? null
-							: [],
+						userConfig?.['login']?.discord?.enabled && !userConfig?.['login']?.discord?.allowedUserIDs ? null : [],
 					),
 			}),
 
@@ -260,14 +246,19 @@ export default function (cfgDirOrFile: string) {
 	 * We apply defaults, but we need to do that in a separate pass
 	 * before we report validation errors.
 	 */
-	const { value: cfgWithDefaults } = schema.validate(userCfg, { abortEarly: false, allowUnknown: true });
+	const { value: cfgWithDefaults } = schema.validate(userCfg, {
+		abortEarly: false,
+		allowUnknown: true,
+	});
 	cfgWithDefaults.baseURL =
 		cfgWithDefaults.baseURL ||
 		`${cfgWithDefaults.host === '0.0.0.0' ? 'localhost' : String(cfgWithDefaults.host)}:${String(
 			cfgWithDefaults.port,
 		)}`;
 
-	const validationResult = schema.validate(cfgWithDefaults, { noDefaults: true });
+	const validationResult = schema.validate(cfgWithDefaults, {
+		noDefaults: true,
+	});
 	if (validationResult.error) {
 		if (!process.env.NODECG_TEST) {
 			console.error('[nodecg] Config invalid:\n', validationResult.error.annotate());

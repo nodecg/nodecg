@@ -71,9 +71,7 @@ export function getSchemaDefault(schema: Record<any, unknown>, labelForDebugging
 	try {
 		return defaults(schema);
 	} catch (error: unknown) {
-		throw new Error(
-			`Error generating default value(s) for schema "${labelForDebugging}":\n\t${stringifyError(error)}`,
-		);
+		throw new Error(`Error generating default value(s) for schema "${labelForDebugging}":\n\t${stringifyError(error)}`);
 	}
 }
 
