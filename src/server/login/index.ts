@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import express from 'express';
 import expressSession from 'express-session';
 import passport from 'passport';
-import steamStrategy from 'passport-steam';
+import SteamStrategy from 'passport-steam';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { TypeormStore } from 'connect-typeorm';
 import cookieParser from 'cookie-parser';
@@ -68,7 +68,7 @@ passport.deserializeUser<User['id']>(async (id, done) => {
 
 if (config.login.steam?.enabled) {
 	passport.use(
-		steamStrategy(
+		new SteamStrategy(
 			{
 				returnURL: `${protocol}://${config.baseURL}/login/auth/steam`,
 				realm: `${protocol}://${config.baseURL}/login/auth/steam`,
