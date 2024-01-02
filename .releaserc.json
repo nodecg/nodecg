@@ -1,0 +1,17 @@
+{
+	"plugins": [
+		[
+			"@semantic-release/commit-analyzer",
+			{
+				"preset": "conventionalcommits"
+			}
+		],
+		"@semantic-release/npm"
+	],
+	"branches": [
+		{
+			"name": "next",
+			"prerelease": true
+		}
+	]
+}
