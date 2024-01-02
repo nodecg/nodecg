@@ -45,8 +45,7 @@ export default function (graphicsDir: string, manifest: NodeCG.Manifest): NodeCG
 
 		if (missingProps.length) {
 			throw new Error(
-				`Graphic #${index} could not be parsed as it is missing the following properties: ` +
-					`${missingProps.join(', ')}`,
+				`Graphic #${index} could not be parsed as it is missing the following properties: ` + missingProps.join(', '),
 			);
 		}
 

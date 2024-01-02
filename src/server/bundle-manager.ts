@@ -366,7 +366,7 @@ function isManifest(bundleName: string, filePath: string): boolean {
  * @private
  */
 function isGitData(bundleName: string, filePath: string): boolean {
-	const regex = new RegExp(`${bundleName}${'\\'}${path.sep}${'\\'}.git`);
+	const regex = new RegExp(`${bundleName}\\${path.sep}\\.git`);
 	return regex.test(filePath);
 }
 

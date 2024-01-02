@@ -181,7 +181,7 @@ function assertRequiredProps(panel: NodeCG.Manifest.UnparsedPanel, index: number
 
 	if (missingProps.length) {
 		throw new Error(
-			`Panel #${index} could not be parsed as it is missing the following properties: ` + `${missingProps.join(', ')}`,
+			`Panel #${index} could not be parsed as it is missing the following properties: ` + missingProps.join(', '),
 		);
 	}
 }

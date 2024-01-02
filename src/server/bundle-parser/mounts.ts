@@ -26,8 +26,7 @@ export default function (manifest: Pick<NodeCG.Manifest, 'mount' | 'name'>): Nod
 
 		if (missingProps.length > 0) {
 			throw new Error(
-				`Mount #${index} could not be parsed as it is missing the following properties: ` +
-					`${missingProps.join(', ')}`,
+				`Mount #${index} could not be parsed as it is missing the following properties: ` + missingProps.join(', '),
 			);
 		}
 
