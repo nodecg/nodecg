@@ -9,6 +9,7 @@
 		"@semantic-release/npm"
 	],
 	"branches": [
+		"main",
 		{
 			"name": "next",
 			"prerelease": true
