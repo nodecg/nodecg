@@ -36,7 +36,6 @@ export default function (pkg: NodeCG.PackageJSON, bundlePath: string): NodeCG.Ma
 		homepage: pkg.homepage,
 		author: pkg.author,
 		contributors: pkg.contributors,
-		transformBareModuleSpecifiers: Boolean(pkg.nodecg.transformBareModuleSpecifiers),
 	};
 
 	return manifest;
