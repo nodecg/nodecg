@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - next/*
 
 permissions:
   contents: write
@@ -20,6 +21,8 @@ jobs:
     steps:
       - uses: google-github-actions/release-please-action@v4
         id: release
+        with:
+          target-branch: ${{ github.ref_name }}
 
   publish:
     runs-on: ubuntu-latest
