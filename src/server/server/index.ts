@@ -58,7 +58,7 @@ import GraphicsLib from '../graphics';
 import DashboardLib from '../dashboard';
 import MountsLib from '../mounts';
 import SoundsLib from '../sounds';
-import { createAssetsMiddleware } from '../assets.js';
+import { createAssetsMiddleware } from '../assets';
 import SharedSourcesLib from '../shared-sources';
 import ExtensionManager from './extensions';
 import SentryConfig from '../util/sentry-config';
