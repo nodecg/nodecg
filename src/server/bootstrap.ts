@@ -9,52 +9,42 @@
  * over its lifecycle and when the process exits.
  */
 
-// Packages
 import semver from 'semver';
 import fetch from 'node-fetch-commonjs';
-
-// Ours
-import rootPath from '../shared/utils/rootPath';
+import { nodecgRootPath } from '../shared/utils/rootPath';
 
 const cwd = process.cwd();
-if (cwd !== rootPath.path) {
-	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, rootPath.path);
-	process.chdir(rootPath.path);
-	console.info('[nodecg] Changed process.cwd to %s', rootPath.path);
+
+if (cwd !== nodecgRootPath) {
+	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, nodecgRootPath);
+	process.chdir(nodecgRootPath);
+	console.info('[nodecg] Changed process.cwd to %s', nodecgRootPath);
 }
 
-if (!process.env.NODECG_ROOT) {
-	// This must happen before we import any of our other application code.
-	process.env.NODECG_ROOT = process.cwd();
-}
-
-// Ours
 import { pjson, asyncExitHook } from './util';
-import NodeCGServer from './server';
+import { NodeCGServer } from './server';
 import { gracefulExit } from './util/exit-hook';
+import { exitOnUncaught, sentryEnabled } from './config';
 
-process.title = 'NodeCG';
-global.exitOnUncaught = true;
-
-process.title += ` - ${String(pjson.version)}`;
+process.title = `NodeCG - ${pjson.version}`;
 
 process.on('uncaughtException', (err) => {
-	if (!global.sentryEnabled) {
-		if (global.exitOnUncaught) {
+	if (!sentryEnabled) {
+		if (exitOnUncaught) {
 			console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
 		} else {
 			console.error('UNCAUGHT EXCEPTION!');
 		}
 
 		console.error(err);
-		if (global.exitOnUncaught) {
+		if (exitOnUncaught) {
 			gracefulExit(1);
 		}
 	}
 });
 
 process.on('unhandledRejection', (err) => {
-	if (!global.sentryEnabled) {
+	if (!sentryEnabled) {
 		console.error('UNHANDLED PROMISE REJECTION!');
 		console.error(err);
 	}

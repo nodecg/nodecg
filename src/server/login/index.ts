@@ -1,8 +1,6 @@
-// Native
-import path from 'path';
-import crypto from 'crypto';
+import * as path from 'node:path';
+import * as crypto from 'node:crypto';
 
-// Packages
 import express from 'express';
 import expressSession from 'express-session';
 import passport from 'passport';
@@ -12,13 +10,12 @@ import { TypeormStore } from 'connect-typeorm';
 import cookieParser from 'cookie-parser';
 import fetch from 'node-fetch-commonjs';
 
-// Ours
 import { config } from '../config';
 import createLogger from '../logger';
 import type { User, Role } from '../database';
 import { Session, getConnection } from '../database';
 import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/utils';
-import rootPath from '../../shared/utils/rootPath';
+import { nodecgRootPath } from '../../shared/utils/rootPath';
 
 type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
 
@@ -366,7 +363,7 @@ export async function createMiddleware(callbacks: {
 	app.use(passport.initialize());
 	app.use(passport.session());
 
-	app.use('/login', express.static(path.join(rootPath.path, 'dist/login')));
+	app.use('/login', express.static(path.join(nodecgRootPath, 'dist/login')));
 
 	app.get('/login', (req, res) => {
 		// If the user is already logged in, don't show them the login page again.

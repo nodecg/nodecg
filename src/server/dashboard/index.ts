@@ -1,16 +1,13 @@
-// Native
-import path from 'path';
+import * as path from 'node:path';
 
-// Packages
 import { klona as clone } from 'klona/json';
 import express from 'express';
 
-// Ours
-import { config, filteredConfig } from '../config';
+import { config, filteredConfig, sentryEnabled } from '../config';
 import * as ncgUtils from '../util';
 import type BundleManager from '../bundle-manager';
 import type { NodeCG } from '../../types/nodecg';
-import rootPath from '../../shared/utils/rootPath';
+import { nodecgRootPath } from '../../shared/utils/rootPath';
 
 type Workspace = NodeCG.Workspace;
 
@@ -22,9 +19,9 @@ type DashboardContext = {
 	sentryEnabled: boolean;
 };
 
-const BUILD_PATH = path.join(rootPath.path, 'dist');
+const BUILD_PATH = path.join(nodecgRootPath, 'dist');
 
-export default class DashboardLib {
+export class DashboardLib {
 	app = express();
 
 	dashboardContext: DashboardContext | undefined = undefined;
@@ -34,7 +31,7 @@ export default class DashboardLib {
 
 		app.use(express.static(BUILD_PATH));
 
-		app.use('/node_modules', express.static(path.join(rootPath.path, 'node_modules')));
+		app.use('/node_modules', express.static(path.join(nodecgRootPath, 'node_modules')));
 
 		app.get('/', (_, res) => {
 			res.redirect('/dashboard/');
@@ -115,7 +112,7 @@ function getDashboardContext(bundles: NodeCG.Bundle[]): DashboardContext {
 		publicConfig: filteredConfig,
 		privateConfig: config,
 		workspaces: parseWorkspaces(bundles),
-		sentryEnabled: global.sentryEnabled,
+		sentryEnabled,
 	};
 }
 

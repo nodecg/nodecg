@@ -13,6 +13,7 @@ import type Replicator from './replicant/replicator';
 import type ServerReplicant from './replicant/server-replicant';
 import type { NodeCG } from '../types/nodecg';
 import { stringifyError } from '../shared/utils';
+import { NODECG_ROOT } from './nodecg-root';
 
 type Collection = {
 	name: string;
@@ -21,7 +22,7 @@ type Collection = {
 
 const logger = createLogger('assets');
 
-const ASSETS_ROOT = path.join(process.env.NODECG_ROOT, 'assets');
+const ASSETS_ROOT = path.join(NODECG_ROOT, 'assets');
 
 const createAssetFile = (filepath: string, sum: string): NodeCG.AssetFile => {
 	const parsedPath = path.parse(filepath);

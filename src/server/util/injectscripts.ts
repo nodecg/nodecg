@@ -6,7 +6,7 @@ import cheerio from 'cheerio';
 import semver from 'semver';
 
 // Ours
-import { filteredConfig } from '../config';
+import { filteredConfig, sentryEnabled } from '../config';
 import { noop } from '../util';
 import type { NodeCG } from '../../types/nodecg';
 
@@ -93,7 +93,7 @@ export default function (
 				styles.push('<link rel="stylesheet" href="/dashboard/css/dialog-defaults.css">');
 			}
 		} else if (resourceType === 'graphic') {
-			if (global.sentryEnabled) {
+			if (sentryEnabled) {
 				scripts.unshift(
 					'<script src="/node_modules/@sentry/browser/build/bundle.es6.min.js"></script>',
 					'<script src="/sentry.js"></script>',

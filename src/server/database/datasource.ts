@@ -1,12 +1,9 @@
-// Native
-import path from 'path';
+import * as path from 'node:path';
 
-// Packages
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 export * from './entity';
 
-// Ours
 import { User } from './entity/User';
 import { Session } from './entity/Session';
 import { Role } from './entity/Role';
@@ -14,9 +11,9 @@ import { Replicant } from './entity/Replicant';
 import { Permission } from './entity/Permission';
 import { Identity } from './entity/Identity';
 import { ApiKey } from './entity/ApiKey';
-import rootPath from '../../shared/utils/rootPath';
+import { nodecgRootPath } from '../../shared/utils/rootPath';
 
-const dbPath = path.join(rootPath.path, 'db/nodecg.sqlite3');
+const dbPath = path.join(nodecgRootPath, 'db/nodecg.sqlite3');
 export const testing = process.env.NODECG_TEST?.toLowerCase() === 'true';
 
 const dataSource = new DataSource({
@@ -36,7 +33,7 @@ const dataSource = new DataSource({
 	database: testing ? ':memory:' : dbPath,
 	logging: false,
 	entities: [ApiKey, Identity, Permission, Replicant, Role, Session, User],
-	migrations: [path.join(rootPath.path, 'out/server/database/migration/*.js')],
+	migrations: [path.join(nodecgRootPath, 'out/server/database/migration/*.js')],
 	migrationsRun: true,
 	synchronize: false,
 });
