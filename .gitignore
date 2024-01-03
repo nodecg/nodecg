@@ -3,8 +3,8 @@
 .eslintcache
 
 # Node / Bower
-/bower_components
-/node_modules
+bower_components
+node_modules
 npm-debug.log
 yarn-error.log
 
@@ -47,7 +47,10 @@ docs
 # Build artifacts
 /build
 /build-types
-/generated-types
+/generated-types/client
+/generated-types/server
+/generated-types/shared
+/generated-types/types
 
 # Don't ignore .empty_directory files
 !.empty_directory

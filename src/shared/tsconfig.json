@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"rootDir": ".",
 		"outDir": "../../out/shared",
+		"declarationDir": "../../generated-types/shared",
 		"module": "CommonJS",
 		"composite": true
 	},
