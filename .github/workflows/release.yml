@@ -53,10 +53,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish types
-        run: |
-          npm run generate-types-package
-          cd generated-types
-          npm publish --access public
+        working-directory: ./generated-types
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

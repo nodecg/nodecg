@@ -1,6 +1,7 @@
 import type { User as NodeCGUser } from '../database';
 
 declare global {
+	// eslint-disable-next-line @typescript-eslint/no-namespace
 	namespace Express {
 		/**
 		 * This is the idiomatic, intended way of

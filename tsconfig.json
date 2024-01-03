@@ -1,17 +1,14 @@
 {
 	"compilerOptions": {
-		// Output related
 		"target": "ES6",
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 
-		// Module resolution
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"esModuleInterop": true,
 		"resolveJsonModule": true,
 
-		// Type checking
 		"strict": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
@@ -23,10 +20,7 @@
 		"noPropertyAccessFromIndexSignature": true,
 		"skipLibCheck": true,
 
-		// Extra output
 		"declaration": true,
-		"declarationMap": true,
-		"sourceMap": true,
-		"inlineSourceMap": false
+		"sourceMap": true
 	}
 }

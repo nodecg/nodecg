@@ -45,9 +45,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Generate types
-        run: npm run generate-types-package
-
       - name: Test types
         run: npm run test:types
 

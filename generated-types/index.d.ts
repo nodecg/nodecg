@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/triple-slash-reference */
 // This file is for the typings package only.
 /// <reference types="passport" />
 /// <reference path="./server/types/augment-express-user.d.ts" />
@@ -19,6 +20,7 @@ declare module './types/nodecg' {
 	/**
 	 * A collection of types that describe NodeCG's APIs.
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-namespace
 	namespace NodeCG {
 		/**
 		 * The primary interface for the client-side API, used in dashboards and graphics.
