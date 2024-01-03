@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 /**
  * The Socket.IO typedefs leave a lot to be desired,
  * so we augment them a bit here for improved precision
