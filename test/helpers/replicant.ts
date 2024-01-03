@@ -11,7 +11,7 @@ export const readReplicantFromFile = async (namespace: string, name: string) => 
 		`${encodeURIComponent(name)}.json`,
 	);
 
-	const fileHandle = await fs.promises.open(replicantPath, 'r');
+	const fileHandle = await fs.promises.open(replicantPath, 'r+');
 	await fileHandle.datasync(); // Ensure that the file is fully written to disk before reading it
 	const data = await fileHandle.readFile('utf-8');
 	await fileHandle.close();
