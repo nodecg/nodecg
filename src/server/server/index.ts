@@ -27,11 +27,9 @@ if (config.sentry?.enabled) {
 	console.info('[nodecg] Sentry enabled.');
 }
 
-// Native
-import fs = require('fs');
-import path = require('path');
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
-// Packages
 import bodyParser from 'body-parser';
 import { klona as clone } from 'klona/json';
 import debounce from 'lodash.debounce';
@@ -44,13 +42,11 @@ import type { Server } from 'http';
 import SocketIO from 'socket.io';
 import passport from 'passport';
 
-// Ours
 import BundleManager from '../bundle-manager';
 import createLogger from '../logger';
 import socketAuthMiddleware from '../login/socketAuthMiddleware';
 import socketApiMiddleware from './socketApiMiddleware';
-import Replicator from '../replicant/replicator';
-import * as db from '../database';
+import { Replicator } from '../replicant/replicator';
 import type { ClientToServerEvents, ServerToClientEvents, TypedSocketServer } from '../../types/socket-protocol';
 import GraphicsLib from '../graphics';
 import { DashboardLib } from '../dashboard';
@@ -64,6 +60,7 @@ import type { NodeCG } from '../../types/nodecg';
 import { TypedEmitter } from '../../shared/typed-emitter';
 import { nodecgRootPath } from '../../shared/utils/rootPath';
 import { NODECG_ROOT } from '../nodecg-root';
+import { getAllPeristedReplicants } from '../replicant/persister';
 
 const renderTemplate = memoize((content, options) => template(content)(options));
 
@@ -142,7 +139,6 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		const io = this._io.of('/');
 		log.info('Starting NodeCG %s (Running on Node.js %s)', pjson.version, process.version);
 
-		const database = await db.getConnection();
 		if (sentryEnabled) {
 			app.use(Sentry.Handlers.requestHandler());
 		}
@@ -273,7 +269,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			app.use(sentryHelpers.app);
 		}
 
-		const persistedReplicantEntities = await database.getRepository(db.Replicant).find();
+		const persistedReplicantEntities = getAllPeristedReplicants();
 		const replicator = new Replicator(io, persistedReplicantEntities);
 		this._replicator = replicator;
 

@@ -1,13 +1,10 @@
-// Native
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
-// Packages
 import $RefParser from 'json-schema-lib';
 import { klona as clone } from 'klona/json';
 import hasha from 'hasha';
 
-// Ours
 import {
 	proxyRecursive,
 	ignoreProxy,
@@ -26,7 +23,7 @@ import { NODECG_ROOT } from '../nodecg-root';
  * Always use Replicator.declare instead.
  * The Replicator needs to have complete control over the ServerReplicant class.
  */
-export default class ServerReplicant<
+export class ServerReplicant<
 	V,
 	O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
 > extends AbstractReplicant<'server', V, O> {

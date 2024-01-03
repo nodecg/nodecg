@@ -1,9 +1,7 @@
-// Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import type * as puppeteer from 'puppeteer';
 
-// Ours
 import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 import type { AbstractReplicant } from '../../src/shared/replicants.shared';
@@ -12,14 +10,12 @@ const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
-import { getConnection, Replicant } from '../../src/server/database';
 import { sleep, waitOneTick } from '../helpers/utilities';
+import { readReplicantFromFile } from '../helpers/replicant';
 
 let dashboard: puppeteer.Page;
-let database: Awaited<ReturnType<typeof getConnection>>;
 test.before(async () => {
 	dashboard = await initDashboard();
-	database = await getConnection();
 });
 
 test.serial('should return a reference to any already-declared replicant', (t) => {
@@ -270,11 +266,11 @@ test.serial('objects - throw an error when an object is owned by multiple Replic
 	const bar = { bar: 'bar' };
 	rep1.value = {};
 	rep2.value = {};
-	rep1.value.foo = bar;
+	rep1.value['foo'] = bar;
 
 	const error = t.throws(() => {
 		if (rep2.value) {
-			rep2.value.foo = bar;
+			rep2.value['foo'] = bar;
 		}
 	});
 
@@ -308,12 +304,9 @@ test.serial('persistent - should persist assignment to database', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionPersistence',
-	});
+	const fromDb = await readReplicantFromFile('test-bundle', 'extensionPersistence');
 
-	t.is(fromDb.value, '{"nested":"hey we assigned!"}');
+	t.is(fromDb, '{"nested":"hey we assigned!"}');
 });
 
 test.serial('persistent - should persist changes to database', async (t) => {
@@ -322,16 +315,13 @@ test.serial('persistent - should persist changes to database', async (t) => {
 	const rep = t.context.apis.extension.Replicant<Record<string, string>>('extensionPersistence', {
 		persistenceInterval: 0,
 	}) as unknown as AbstractReplicant<'server', Record<string, string>, Record<string, unknown>, true>;
-	rep.value.nested = 'hey we changed!';
+	rep.value['nested'] = 'hey we changed!';
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionPersistence',
-	});
+	const fromDb = await readReplicantFromFile('test-bundle', 'extensionPersistence');
 
-	t.is(fromDb.value, '{"nested":"hey we changed!"}');
+	t.is(fromDb, '{"nested":"hey we changed!"}');
 });
 
 test.serial('persistent - should persist top-level string', async (t) => {
@@ -344,12 +334,9 @@ test.serial('persistent - should persist top-level string', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionPersistence',
-	});
+	const fromDb = await readReplicantFromFile('test-bundle', 'extensionPersistence');
 
-	t.is(fromDb.value, '"lorem"');
+	t.is(fromDb, '"lorem"');
 });
 
 test.serial('persistent - should persist top-level undefined', async (t) => {
@@ -362,12 +349,9 @@ test.serial('persistent - should persist top-level undefined', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionPersistence',
-	});
+	const fromDb = await readReplicantFromFile('test-bundle', 'extensionPersistence');
 
-	t.is(fromDb.value, '');
+	t.is(fromDb, '');
 });
 
 test.serial('persistent - should persist falsey values to disk', async (t) => {
@@ -380,12 +364,9 @@ test.serial('persistent - should persist falsey values to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionFalseyWrite',
-	});
+	const fromDb = await readReplicantFromFile('test-bundle', 'extensionFalseyWrite');
 
-	t.is(fromDb.value, '0');
+	t.is(fromDb, '0');
 });
 
 test.serial('persistent - should read falsey values from disk', (t) => {
@@ -405,12 +386,9 @@ test.serial('transient - should not write their value to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneBy(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionTransience',
+	await t.throwsAsync(async () => {
+		await readReplicantFromFile('test-bundle', 'extensionTransience');
 	});
-
-	t.is(fromDb, null);
 });
 
 test.serial('should return true when deleting a non-existing property', (t) => {
@@ -519,11 +497,21 @@ test.serial('should force persistence after maximumTimeAReplicantCanGoWithoutSav
 
 	// If the Replicant hasn't been able to persist a single time yet,
 	// this call will fail saying it couldn't find it.
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'maximumTimeAReplicantCanGoWithoutSaving',
-	});
+	const fromDb = await readReplicantFromFile('test-bundle', 'maximumTimeAReplicantCanGoWithoutSaving');
 
-	t.true(parseInt(fromDb.value, 10) > 0);
+	t.true(parseInt(fromDb, 10) > 0);
 	clearInterval(interval);
+});
+
+test.serial('empty string should be correctly persisted', async (t) => {
+	t.plan(1);
+
+	const rep = t.context.apis.extension.Replicant('emptyStringPersistence');
+	rep.value = '';
+
+	await t.context.server.saveAllReplicantsNow();
+
+	const fromDb = await readReplicantFromFile('test-bundle', 'emptyStringPersistence');
+
+	t.is(fromDb, '""');
 });
