@@ -5,6 +5,7 @@ import type { ExtendedError } from 'socket.io/dist/namespace';
 // Ours
 import createLogger from '../logger';
 import type { TypedServerSocket } from '../../types/socket-protocol';
+import { sentryEnabled } from '../config';
 
 const log = createLogger('socket-api');
 
@@ -13,7 +14,7 @@ export default function (socket: TypedServerSocket, next: (err?: ExtendedError) 
 		log.trace('New socket connection: ID %s with IP %s', socket.id, socket.handshake.address);
 
 		socket.on('error', (err) => {
-			if (global.sentryEnabled) {
+			if (sentryEnabled) {
 				Sentry.captureException(err);
 			}
 

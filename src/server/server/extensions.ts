@@ -14,6 +14,7 @@ import type { RootNS } from '../../types/socket-protocol';
 import type BundleManager from '../bundle-manager';
 import type { NodeCG } from '../../types/nodecg';
 import { stringifyError } from '../../shared/utils';
+import { sentryEnabled } from '../config';
 
 const log = createLogger('extensions');
 
@@ -147,7 +148,7 @@ export default class ExtensionManager extends EventEmitter {
 		} catch (err: unknown) {
 			this._bundleManager.remove(bundle.name);
 			log.warn('Failed to mount %s extension:\n', bundle.name, stringifyError(err));
-			if (global.sentryEnabled) {
+			if (sentryEnabled) {
 				(err as Error).message = `Failed to mount ${bundle.name} extension: ${
 					// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 					((err as Error)?.message ?? err) as string

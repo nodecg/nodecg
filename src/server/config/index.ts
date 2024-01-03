@@ -1,14 +1,12 @@
-// Native
-import * as path from 'path';
+import * as path from 'node:path';
 
-// Packages
 import * as fs from 'fs-extra';
 import { argv } from 'yargs';
 
-// Ours
 import loadConfig from './loader';
+import { NODECG_ROOT } from '../nodecg-root';
 
-const cfgDirectoryPath = (argv['cfgPath'] as string) ?? path.join(process.env.NODECG_ROOT, 'cfg');
+const cfgDirectoryPath = (argv['cfgPath'] as string) ?? path.join(NODECG_ROOT, 'cfg');
 
 // Make 'cfg' folder if it doesn't exist
 if (!fs.existsSync(cfgDirectoryPath)) {
@@ -17,3 +15,7 @@ if (!fs.existsSync(cfgDirectoryPath)) {
 
 const { config, filteredConfig } = loadConfig(cfgDirectoryPath);
 export { config, filteredConfig };
+
+export const exitOnUncaught = config.exitOnUncaught;
+
+export const sentryEnabled = config.sentry?.enabled;

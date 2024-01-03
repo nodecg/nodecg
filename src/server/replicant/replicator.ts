@@ -1,7 +1,4 @@
-// Packages
 import { klona as clone } from 'klona/json';
-
-// Ours
 import createLogger from '../logger';
 import Replicant from './server-replicant';
 import { throttleName } from '../util';

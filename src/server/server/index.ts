@@ -2,11 +2,10 @@
 import '../../../scripts/warn-engines.js';
 import * as os from 'os';
 import * as Sentry from '@sentry/node';
-import { config, filteredConfig } from '../config';
+import { config, filteredConfig, sentryEnabled } from '../config';
 import '../util/sentry-config';
 import { pjson } from '../util';
 
-global.exitOnUncaught = config.exitOnUncaught;
 if (config.sentry?.enabled) {
 	Sentry.init({
 		dsn: config.sentry.dsn,
@@ -19,7 +18,6 @@ if (config.sentry?.enabled) {
 			nodecgBaseURL: config.baseURL,
 		});
 	});
-	global.sentryEnabled = true;
 
 	process.on('unhandledRejection', (reason, p) => {
 		console.error('Unhandled Rejection at:', p, 'reason:', reason);
@@ -55,7 +53,7 @@ import Replicator from '../replicant/replicator';
 import * as db from '../database';
 import type { ClientToServerEvents, ServerToClientEvents, TypedSocketServer } from '../../types/socket-protocol';
 import GraphicsLib from '../graphics';
-import DashboardLib from '../dashboard';
+import { DashboardLib } from '../dashboard';
 import MountsLib from '../mounts';
 import SoundsLib from '../sounds';
 import { createAssetsMiddleware } from '../assets';
@@ -64,7 +62,8 @@ import ExtensionManager from './extensions';
 import SentryConfig from '../util/sentry-config';
 import type { NodeCG } from '../../types/nodecg';
 import { TypedEmitter } from '../../shared/typed-emitter';
-import rootPath from '../../shared/utils/rootPath';
+import { nodecgRootPath } from '../../shared/utils/rootPath';
+import { NODECG_ROOT } from '../nodecg-root';
 
 const renderTemplate = memoize((content, options) => template(content)(options));
 
@@ -75,7 +74,7 @@ type EventMap = {
 	stopped: () => void;
 };
 
-export default class NodeCGServer extends TypedEmitter<EventMap> {
+export class NodeCGServer extends TypedEmitter<EventMap> {
 	readonly log = createLogger('server');
 
 	private readonly _io: TypedSocketServer;
@@ -128,7 +127,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		this._io = new SocketIO.Server<ClientToServerEvents, ServerToClientEvents>(server);
 		this._io.setMaxListeners(75); // Prevent console warnings when many extensions are installed
 		this._io.on('error', (err) => {
-			if (global.sentryEnabled) {
+			if (sentryEnabled) {
 				Sentry.captureException(err);
 			}
 
@@ -144,7 +143,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		log.info('Starting NodeCG %s (Running on Node.js %s)', pjson.version, process.version);
 
 		const database = await db.getConnection();
-		if (global.sentryEnabled) {
+		if (sentryEnabled) {
 			app.use(Sentry.Handlers.requestHandler());
 		}
 
@@ -202,8 +201,8 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 
 		this._io.use(socketApiMiddleware);
 
-		const bundlesPaths = [path.join(process.env.NODECG_ROOT, 'bundles')].concat(config.bundles?.paths ?? []);
-		const cfgPath = path.join(process.env.NODECG_ROOT, 'cfg');
+		const bundlesPaths = [path.join(NODECG_ROOT, 'bundles')].concat(config.bundles?.paths ?? []);
+		const cfgPath = path.join(NODECG_ROOT, 'cfg');
 		const bundleManager = new BundleManager(bundlesPaths, cfgPath, pjson.version, config);
 
 		// Wait for Chokidar to finish its initial scan.
@@ -241,7 +240,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 						'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap',
 				);
 				const opts = {
-					rootDir: process.env.NODECG_ROOT,
+					rootDir: NODECG_ROOT,
 					modulesUrl: `/bundles/${bundle.name}/node_modules`,
 				};
 				app.use(`/bundles/${bundle.name}/*`, transformMiddleware(opts));
@@ -269,7 +268,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 			this.emit('error', err);
 		});
 
-		if (global.sentryEnabled) {
+		if (sentryEnabled) {
 			const sentryHelpers = new SentryConfig(bundleManager);
 			app.use(sentryHelpers.app);
 		}
@@ -296,7 +295,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		const sharedSources = new SharedSourcesLib(bundleManager.all());
 		app.use(sharedSources.app);
 
-		if (global.sentryEnabled) {
+		if (sentryEnabled) {
 			app.use(Sentry.Handlers.errorHandler());
 		}
 
@@ -304,7 +303,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 		// Taken from https://docs.sentry.io/platforms/node/express/
 		app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
 			res.statusCode = 500;
-			if (global.sentryEnabled) {
+			if (sentryEnabled) {
 				// The error id is attached to `res.sentry` to be returned
 				// and optionally displayed to the user for support.
 				res.end(`Internal error\nSentry issue ID: ${String((res as any).sentry)}\n`);
@@ -317,7 +316,7 @@ export default class NodeCGServer extends TypedEmitter<EventMap> {
 
 		// Set up "bundles" Replicant.
 		const bundlesReplicant = replicator.declare('bundles', 'nodecg', {
-			schemaPath: path.resolve(rootPath.path, 'schemas/bundles.json'),
+			schemaPath: path.resolve(nodecgRootPath, 'schemas/bundles.json'),
 			persistent: false,
 		});
 		const updateBundlesReplicant = debounce(() => {

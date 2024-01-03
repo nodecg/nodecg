@@ -1,4 +1,4 @@
-import path from 'node:path';
+import * as path from 'node:path';
 
 import { klona as clone } from 'klona/json';
 import express from 'express';
@@ -8,7 +8,7 @@ import type { Replicator } from './replicant';
 import type ServerReplicant from './replicant/server-replicant';
 import { sendFile } from './util';
 import type { NodeCG } from '../types/nodecg';
-import rootPath from '../shared/utils/rootPath';
+import { nodecgRootPath } from '../shared/utils/rootPath';
 
 export default class SoundsLib {
 	app = express();
@@ -30,7 +30,7 @@ export default class SoundsLib {
 				const defaultCuesRepValue = this._makeCuesRepDefaultValue(bundle);
 
 				const cuesRep = replicator.declare<NodeCG.SoundCue[]>('soundCues', bundle.name, {
-					schemaPath: path.resolve(rootPath.path, 'schemas/soundCues.json'),
+					schemaPath: path.resolve(nodecgRootPath, 'schemas/soundCues.json'),
 					defaultValue: [],
 				});
 

@@ -1,11 +1,7 @@
-import path from 'path';
-import fs from 'fs';
+import * as path from 'node:path';
+import * as fs from 'node:fs';
 
-const rootPath = {
-	path: findRootPath(__dirname),
-};
-
-function findRootPath(dir: string): string {
+const findNodecgRoot = (dir: string): string => {
 	const filePath = path.join(dir, 'package.json');
 	if (fs.existsSync(filePath)) {
 		return path.dirname(filePath);
@@ -16,7 +12,7 @@ function findRootPath(dir: string): string {
 		return '';
 	}
 
-	return findRootPath(parentDir);
-}
+	return findNodecgRoot(parentDir);
+};
 
-export default rootPath;
+export const nodecgRootPath = findNodecgRoot(__dirname);
