@@ -48,7 +48,7 @@ type DiscordProfile = {
 };
 
 const log = createLogger('login');
-const protocol = config.ssl?.enabled ?? config.login.forceHttpsReturn ? 'https' : 'http';
+const protocol = config.ssl?.enabled ?? (config.login.enabled && config.login.forceHttpsReturn) ? 'https' : 'http';
 
 // Required for persistent login sessions.
 // Passport needs ability to serialize and unserialize users out of session.
@@ -63,18 +63,20 @@ passport.deserializeUser<User['id']>(async (id, done) => {
 	}
 });
 
-if (config.login.steam?.enabled) {
+if (config.login.enabled && config.login.steam?.enabled && config.login.steam.apiKey) {
+	const steamLoginConfig = config.login.steam;
+	const apiKey = config.login.steam.apiKey;
 	passport.use(
 		new SteamStrategy(
 			{
 				returnURL: `${protocol}://${config.baseURL}/login/auth/steam`,
 				realm: `${protocol}://${config.baseURL}/login/auth/steam`,
-				apiKey: config.login.steam.apiKey,
+				apiKey,
 			},
 			async (_: unknown, profile: SteamProfile, done: StrategyDoneCb) => {
 				try {
 					const roles: Role[] = [];
-					const allowed = config.login.steam?.allowedIds?.includes(profile.id);
+					const allowed = steamLoginConfig?.allowedIds?.includes(profile.id);
 					if (allowed) {
 						log.info('(Steam) Granting "%s" (%s) access', profile.id, profile.displayName);
 						roles.push(await getSuperUserRole());
@@ -98,11 +100,12 @@ if (config.login.steam?.enabled) {
 	);
 }
 
-if (config.login.twitch?.enabled) {
+if (config.login.enabled && config.login.twitch?.enabled) {
+	const twitchLoginConfig = config.login.twitch;
 	const TwitchStrategy = require('passport-twitch-helix').Strategy;
 
 	// The "user:read:email" scope is required. Add it if not present.
-	const scopesArray = config.login.twitch.scope.split(' ');
+	const scopesArray = twitchLoginConfig.scope.split(' ');
 	if (!scopesArray.includes('user:read:email')) {
 		scopesArray.push('user:read:email');
 	}
@@ -112,18 +115,18 @@ if (config.login.twitch?.enabled) {
 	passport.use(
 		new TwitchStrategy(
 			{
-				clientID: config.login.twitch.clientID,
-				clientSecret: config.login.twitch.clientSecret,
+				clientID: twitchLoginConfig.clientID,
+				clientSecret: twitchLoginConfig.clientSecret,
 				callbackURL: `${protocol}://${config.baseURL}/login/auth/twitch`,
 				scope: concatScopes,
-				customHeaders: { 'Client-ID': config.login.twitch.clientID },
+				customHeaders: { 'Client-ID': twitchLoginConfig.clientID },
 			},
 			async (accessToken: string, refreshToken: string, profile: TwitchProfile, done: StrategyDoneCb) => {
 				try {
 					const roles: Role[] = [];
 					const allowed =
-						config.login.twitch?.allowedUsernames?.includes(profile.username) ??
-						config.login.twitch?.allowedIds?.includes(profile.id);
+						twitchLoginConfig.allowedUsernames?.includes(profile.username) ??
+						twitchLoginConfig.allowedIds?.includes(profile.id);
 					if (allowed) {
 						log.info('(Twitch) Granting %s access', profile.username);
 						roles.push(await getSuperUserRole());
@@ -167,17 +170,19 @@ async function makeDiscordAPIRequest(
 	return [guild, true, data];
 }
 
-if (config.login.discord?.enabled) {
+if (config.login.enabled && config.login.discord?.enabled) {
+	const discordLoginConfig = config.login.discord;
+
 	const DiscordStrategy = require('passport-discord').Strategy;
 
 	// The "identify" scope is required. Add it if not present.
-	const scopeArray = config.login.discord.scope.split(' ');
+	const scopeArray = discordLoginConfig.scope.split(' ');
 	if (!scopeArray.includes('identify')) {
 		scopeArray.push('identify');
 	}
 
 	// The "guilds" scope is required if allowedGuilds are used. Add it if not present.
-	if (!scopeArray.includes('guilds') && config.login.discord.allowedGuilds) {
+	if (!scopeArray.includes('guilds') && discordLoginConfig.allowedGuilds) {
 		scopeArray.push('guilds');
 	}
 
@@ -185,25 +190,25 @@ if (config.login.discord?.enabled) {
 	passport.use(
 		new DiscordStrategy(
 			{
-				clientID: config.login.discord.clientID,
-				clientSecret: config.login.discord.clientSecret,
+				clientID: discordLoginConfig.clientID,
+				clientSecret: discordLoginConfig.clientSecret,
 				callbackURL: `${protocol}://${config.baseURL}/login/auth/discord`,
 				scope,
 			},
 			async (accessToken: string, refreshToken: string, profile: DiscordProfile, done: StrategyDoneCb) => {
-				if (!config.login.discord) {
+				if (!discordLoginConfig) {
 					// Impossible but TS doesn't know that.
 					done(new Error('Discord login config was impossibly undefined.'));
 					return;
 				}
 
 				let allowed = false;
-				if (config.login.discord.allowedUserIDs?.includes(profile.id)) {
+				if (discordLoginConfig.allowedUserIDs?.includes(profile.id)) {
 					// Users that are on allowedUserIDs are allowed
 					allowed = true;
-				} else if (config.login.discord.allowedGuilds) {
+				} else if (discordLoginConfig.allowedGuilds) {
 					// Get guilds that are specified in the config and that user is in
-					const intersectingGuilds = config.login.discord.allowedGuilds.filter((allowedGuild) =>
+					const intersectingGuilds = discordLoginConfig.allowedGuilds.filter((allowedGuild) =>
 						profile.guilds.some((profileGuild) => profileGuild.id === allowedGuild.guildID),
 					);
 
@@ -265,7 +270,7 @@ if (config.login.discord?.enabled) {
 	);
 }
 
-if (config.login.local?.enabled) {
+if (config.login.enabled && config.login.local?.enabled && config.login.sessionSecret) {
 	const {
 		sessionSecret,
 		local: { allowedUsers },
@@ -337,7 +342,7 @@ export async function createMiddleware(callbacks: {
 		if (req.user) callbacks.onLogin(req.user);
 	};
 
-	if (!config.login.sessionSecret) {
+	if (!config.login.enabled || !config.login.sessionSecret) {
 		throw new Error("no session secret defined, can't salt sessions, not safe, aborting");
 	}
 

@@ -1,11 +1,8 @@
-// Packages
 import sinon from 'sinon';
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
-
-// Ours
 import loggerFactory from '../../src/client/api/logger/logger.client';
-import { LogLevel } from '../../src/shared/logger-interface';
+import { LogLevel } from '../../src/types/logger-interface';
 
 // Start up the logger lib with defaults only
 const Logger = loggerFactory();

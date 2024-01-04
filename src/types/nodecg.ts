@@ -2,6 +2,7 @@
 import type * as ExpressCore from 'express-serve-static-core';
 import type express from 'express';
 import type { ServerToClientEvents, ClientToServerEvents } from './socket-protocol';
+import { NodeCGConfig } from './nodecg-config-schema';
 
 type Person =
 	| {
@@ -212,77 +213,7 @@ export namespace NodeCG {
 	 * Contains sensitive secrets!
 	 * Available to server-side code (extensions) only.
 	 */
-	export type Config = {
-		host: string;
-		port: number;
-		baseURL: string;
-		exitOnUncaught: boolean;
-		logging: {
-			console: {
-				enabled: boolean;
-				level: LogLevel;
-				timestamps: boolean;
-				replicants: boolean;
-			};
-			file: {
-				enabled: boolean;
-				level: LogLevel;
-				path: string;
-				timestamps: boolean;
-				replicants: boolean;
-			};
-		};
-		bundles: {
-			enabled: string[] | null;
-			disabled: string[] | null;
-			paths: string[];
-		};
-		sentry: {
-			enabled: boolean;
-			dsn: string;
-		};
-		login: {
-			enabled: boolean;
-			sessionSecret: string;
-			forceHttpsReturn: boolean;
-			steam?: {
-				enabled: boolean;
-				apiKey: string;
-				allowedIds: string[];
-			};
-			twitch?: {
-				enabled: boolean;
-				clientID: string;
-				clientSecret: string;
-				scope: string;
-				allowedUsernames: string[];
-				allowedIds: string[];
-			};
-			local?: {
-				enabled: boolean;
-				allowedUsers: Array<{ username: string; password: string }>;
-			};
-			discord?: {
-				enabled: boolean;
-				clientID: string;
-				clientSecret: string;
-				scope: string;
-				allowedUserIDs: string[];
-				allowedGuilds: Array<{
-					guildID: string;
-					allowedRoleIDs: string[];
-					guildBotToken: string;
-				}>;
-			};
-		};
-		ssl?: {
-			enabled: boolean;
-			allowHTTP: boolean;
-			keyPath: string;
-			certificatePath: string;
-			passphrase?: string;
-		};
-	};
+	export type Config = NodeCGConfig;
 
 	/**
 	 * The filtered, minimal, parsed NodeCG config (i.e `cfg/nodecg.{json,yaml,js}`).
@@ -309,7 +240,7 @@ export namespace NodeCG {
 		};
 		sentry: {
 			enabled: boolean;
-			dsn: string;
+			dsn?: string;
 		};
 		login: {
 			enabled: boolean;
@@ -318,16 +249,16 @@ export namespace NodeCG {
 			};
 			twitch?: {
 				enabled: boolean;
-				clientID: string;
-				scope: string;
+				clientID?: string;
+				scope?: string;
 			};
 			local?: {
 				enabled: boolean;
 			};
 			discord?: {
 				enabled: boolean;
-				clientID: string;
-				scope: string;
+				clientID?: string;
+				scope?: string;
 			};
 		};
 		ssl?: {
