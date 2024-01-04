@@ -5,7 +5,7 @@
 import type { NodeCG } from './types/nodecg';
 import type { NodeCGAPIClient } from './client/api/api.client';
 import type serverApiFactory from './server/api.server';
-import type * as LoggerStuff from './shared/logger-interface';
+import type * as LoggerStuff from './types/logger-interface';
 import type { AbstractReplicant } from './shared/replicants.shared';
 import { DeepReadonly } from 'ts-essentials';
 
