@@ -1,36 +1,34 @@
 import { klona as clone } from 'klona/json';
 import createLogger from '../logger';
-import Replicant from './server-replicant';
+import { ServerReplicant } from './server-replicant';
 import { throttleName } from '../util';
-import type ServerReplicant from './server-replicant';
 import * as uuid from 'uuid';
-import * as db from '../database';
 import type { TypedServerSocket, ServerToClientEvents, RootNS } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';
 import { stringifyError } from '../../shared/utils';
-import type { EntityManager } from 'typeorm';
+import { ReplicantPersister } from './persister';
 
 const log = createLogger('replicator');
 
-export default class Replicator {
-	readonly declaredReplicants = new Map<string, Map<string, Replicant<any>>>();
+export class Replicator {
+	readonly declaredReplicants = new Map<string, Map<string, ServerReplicant<any>>>();
 
 	private readonly _uuid = uuid.v4();
 
-	private readonly _repEntities: db.Replicant[];
+	private readonly persisters: ReplicantPersister[];
 
-	private readonly _pendingSave = new WeakMap<Replicant<any>, Promise<any>>();
+	private readonly _pendingSave = new WeakMap<ServerReplicant<unknown>, Promise<void>>();
 
 	constructor(
 		public readonly io: RootNS,
-		repEntities: db.Replicant[],
+		persisters: ReplicantPersister[],
 	) {
 		this.io = io;
 		io.on('connection', (socket) => {
 			this._attachToSocket(socket);
 		});
 
-		this._repEntities = repEntities;
+		this.persisters = persisters;
 	}
 
 	/**
@@ -50,17 +48,17 @@ export default class Replicator {
 		name: string,
 		namespace: string,
 		opts?: O,
-	): Replicant<V, O>;
+	): ServerReplicant<V, O>;
 	declare<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
 		name: string,
 		namespace: string,
 		opts?: O,
-	): Replicant<V, O>;
+	): ServerReplicant<V, O>;
 	declare<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
 		name: string,
 		namespace: string,
 		opts?: O,
-	): Replicant<V, O> {
+	): ServerReplicant<V, O> {
 		// If replicant already exists, return that.
 		const nsp = this.declaredReplicants.get(namespace);
 		if (nsp) {
@@ -75,7 +73,7 @@ export default class Replicator {
 
 		// Look up the persisted value, if any.
 		let parsedPersistedValue;
-		const repEnt = this._repEntities.find((re) => re.namespace === namespace && re.name === name);
+		const repEnt = this.persisters.find((re) => re.namespace === namespace && re.name === name);
 		if (repEnt) {
 			try {
 				parsedPersistedValue = repEnt.value === '' ? undefined : JSON.parse(repEnt.value);
@@ -85,7 +83,7 @@ export default class Replicator {
 		}
 
 		// Make the replicant and add it to the declaredReplicants map
-		const rep = new Replicant(name, namespace, opts, parsedPersistedValue);
+		const rep = new ServerReplicant(name, namespace, opts, parsedPersistedValue);
 		this.declaredReplicants.get(namespace)!.set(name, rep);
 
 		// Add persistence hooks
@@ -107,7 +105,7 @@ export default class Replicator {
 	 * @param operations {array} - An array of operations.
 	 */
 	applyOperations<V>(
-		replicant: Replicant<V, NodeCG.Replicant.Options<V>>,
+		replicant: ServerReplicant<V, NodeCG.Replicant.Options<V>>,
 		operations: Array<NodeCG.Replicant.Operation<V>>,
 	): void {
 		const oldValue = clone(replicant.value);
@@ -148,7 +146,7 @@ export default class Replicator {
 	}
 
 	async saveAllReplicantsNow(): Promise<void> {
-		const promises: Array<Promise<void>> = [];
+		const promises: Promise<void>[] = [];
 		for (const replicants of this.declaredReplicants.values()) {
 			for (const replicant of replicants.values()) {
 				promises.push(this._saveReplicant(replicant));
@@ -182,74 +180,54 @@ export default class Replicator {
 		let valueChangedDuringSave = false;
 
 		// Return the promise so that it can still be awaited
-		if (this._pendingSave.has(replicant)) {
-			return this._pendingSave.get(replicant);
+		const pendingSave = this._pendingSave.get(replicant);
+		if (pendingSave) {
+			await pendingSave;
 		}
 
 		try {
-			const promise = new Promise<EntityManager>((resolve, reject) => {
-				db.getConnection()
-					.then((db) => {
-						resolve(db.manager);
-					})
-					.catch(reject);
-			}).then((manager) => {
-				let repEnt: db.Replicant;
-				const exitingEnt = this._repEntities.find(
-					(pv) => pv.namespace === replicant.namespace && pv.name === replicant.name,
+			const promise = (async () => {
+				let persister: ReplicantPersister;
+				const existing = this.persisters.find(
+					(persister) => persister.namespace === replicant.namespace && persister.name === replicant.name,
 				);
-				if (exitingEnt) {
-					repEnt = exitingEnt;
+				if (existing) {
+					persister = existing;
 				} else {
-					repEnt = manager.create(db.Replicant, {
-						namespace: replicant.namespace,
-						name: replicant.name,
-					});
-					this._repEntities.push(repEnt);
+					persister = new ReplicantPersister(replicant.namespace, replicant.name);
+					this.persisters.push(persister);
 				}
 
-				return new Promise<void>((resolve, reject) => {
-					const valueRef = replicant.value;
-					let serializedValue = JSON.stringify(valueRef);
-					if (typeof serializedValue === 'undefined') {
-						serializedValue = '';
+				const valueRef = replicant.value;
+				let serializedValue = JSON.stringify(valueRef);
+				if (typeof serializedValue === 'undefined') {
+					serializedValue = '';
+				}
+				const changeHandler = (newVal: unknown) => {
+					if (newVal !== valueRef && !isNaN(valueRef)) {
+						valueChangedDuringSave = true;
 					}
+				};
+				persister.value = serializedValue;
+				replicant.on('change', changeHandler);
 
-					const changeHandler = (newVal: unknown) => {
-						if (newVal !== valueRef && !isNaN(valueRef)) {
-							valueChangedDuringSave = true;
-						}
-					};
+				try {
+					await persister.save();
 
-					repEnt.value = serializedValue;
-					replicant.on('change', changeHandler);
-					manager
-						.save(repEnt)
-						.then(
-							() =>
-								new Promise<void>((resolve, reject) => {
-									if (!valueChangedDuringSave) {
-										resolve();
-										return;
-									}
+					if (valueChangedDuringSave) {
+						// If we are here, then that means the value changed again during
+						// the save operation, and so we have to do some recursion
+						// to save it again.
+						this._pendingSave.delete(replicant);
+						await this._saveReplicant(replicant);
+					}
+				} finally {
+					replicant.off('change', changeHandler);
+				}
+			})();
 
-									// If we are here, then that means the value changed again during
-									// the save operation, and so we have to do some recursion
-									// to save it again.
-									this._pendingSave.delete(replicant);
-									this._saveReplicant(replicant).then(resolve).catch(reject);
-								}),
-						)
-						.then(() => {
-							resolve();
-						})
-						.catch(reject)
-						.finally(() => {
-							replicant.off('change', changeHandler);
-						});
-				});
-			});
 			this._pendingSave.set(replicant, promise);
+
 			await promise;
 		} catch (error: unknown) {
 			replicant.log.error('Failed to persist value:', stringifyError(error));

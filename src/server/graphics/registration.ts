@@ -1,14 +1,10 @@
-// Native
-import path from 'path';
-import fs from 'fs';
-
-// Packages
+import * as path from 'node:path';
+import * as fs from 'node:fs';
 import express from 'express';
 
-// Ours
 import { injectScripts } from '../util';
-import type { Replicator } from '../replicant';
-import type ServerReplicant from '../replicant/server-replicant';
+import type { Replicator } from '../replicant/replicator';
+import type { ServerReplicant } from '../replicant/server-replicant';
 import type { RootNS, GraphicRegRequest } from '../../types/socket-protocol';
 import type BundleManager from '../bundle-manager';
 import type { NodeCG } from '../../types/nodecg';

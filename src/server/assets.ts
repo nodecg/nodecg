@@ -9,8 +9,8 @@ import { z } from 'zod';
 
 import { authCheck, debounceName, sendFile } from './util';
 import createLogger from './logger';
-import type Replicator from './replicant/replicator';
-import type ServerReplicant from './replicant/server-replicant';
+import type { Replicator } from './replicant/replicator';
+import type { ServerReplicant } from './replicant/server-replicant';
 import type { NodeCG } from '../types/nodecg';
 import { stringifyError } from '../shared/utils';
 import { NODECG_ROOT } from './nodecg-root';

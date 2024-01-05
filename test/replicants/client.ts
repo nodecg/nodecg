@@ -1,13 +1,7 @@
-// Native
-import fs from 'fs';
-import path from 'path';
-
-// Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
 import type * as puppeteer from 'puppeteer';
 
-// Ours
 import * as server from '../helpers/server';
 import * as browser from '../helpers/browser';
 
@@ -15,15 +9,12 @@ const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
-import * as C from '../helpers/test-constants';
 import type { NodeCG } from '../../src/types/nodecg';
-import { getConnection, Replicant } from '../../src/server/database';
+import { readReplicantFromFile } from '../helpers/replicant';
 
 let dashboard: puppeteer.Page;
-let database: Awaited<ReturnType<typeof getConnection>>;
 test.before(async () => {
 	dashboard = await initDashboard();
-	database = await getConnection();
 });
 
 test.serial('should return a reference to any already-declared replicant', async (t) => {
@@ -193,7 +184,7 @@ test.serial('when an array - should react to changes', async (t) => {
 
 				rep.on('declared', () => {
 					rep.on('change', (newVal, oldVal, operations) => {
-						if (newVal && oldVal && operations && operations[0].method === 'push') {
+						if (newVal && oldVal && operations && operations[0]?.method === 'push') {
 							const res = {
 								newVal: JSON.parse(JSON.stringify(newVal)),
 								oldVal,
@@ -282,7 +273,7 @@ test.serial('when an array - should proxy objects added to arrays via array inse
 				return;
 			}
 
-			if (newVal[0].foo === 'bar') {
+			if (newVal[0]?.['foo'] === 'bar') {
 				t.deepEqual(newVal, [{ foo: 'bar' }]);
 				resolve();
 			}
@@ -290,7 +281,7 @@ test.serial('when an array - should proxy objects added to arrays via array inse
 	});
 
 	process.nextTick(() => {
-		rep.value[0].foo = 'bar';
+		rep.value[0]!['foo'] = 'bar';
 	});
 
 	await promise;
@@ -319,11 +310,11 @@ test.serial('when an object - should not cause server-side replicants to lose ob
 							return;
 						}
 
-						if (newVal.foo === 'bar') {
+						if (newVal['foo'] === 'bar') {
 							resolve(JSON.parse(JSON.stringify(newVal)));
 						} else if (!barred) {
 							barred = true;
-							rep.value!.foo = 'bar';
+							rep.value!['foo'] = 'bar';
 						}
 					});
 				}),
@@ -338,14 +329,14 @@ test.serial('when an object - should not cause server-side replicants to lose ob
 						return;
 					}
 
-					if (newVal.foo === 'baz') {
+					if (newVal['foo'] === 'baz') {
 						t.pass();
 						resolve();
 					}
 				});
 			});
 
-			rep.value.foo = 'baz';
+			rep.value['foo'] = 'baz';
 			return promise;
 		})
 		.catch(t.fail);
@@ -373,7 +364,7 @@ test.serial('when an object - should react to changes in nested properties', asy
 
 				rep.on('declared', () => {
 					rep.on('change', (newVal, oldVal, operations) => {
-						if (newVal && oldVal && operations && operations[0].method === 'update') {
+						if (newVal && oldVal && operations && operations[0]?.method === 'update') {
 							resolve({
 								newVal: JSON.parse(JSON.stringify(newVal)),
 								oldVal,
@@ -382,7 +373,7 @@ test.serial('when an object - should react to changes in nested properties', asy
 						}
 					});
 
-					rep.value!.a.b.c = 'nestedChangeOK';
+					rep.value!['a'].b.c = 'nestedChangeOK';
 				});
 			}),
 	);
@@ -533,7 +524,7 @@ test.serial('when an object - should properly proxy new objects assigned to prop
 		defaultValue: { foo: { bar: 'bar' } },
 	});
 
-	rep.value.foo = { baz: 'baz' };
+	rep.value['foo'] = { baz: 'baz' };
 
 	const promise = new Promise<void>((resolve) => {
 		rep.on('change', (newVal) => {
@@ -542,15 +533,15 @@ test.serial('when an object - should properly proxy new objects assigned to prop
 				return;
 			}
 
-			if (newVal.foo.baz === 'bax') {
-				t.is(newVal.foo.baz, 'bax');
+			if (newVal['foo'].baz === 'bax') {
+				t.is(newVal['foo'].baz, 'bax');
 				resolve();
 			}
 		});
 	});
 
 	process.nextTick(() => {
-		rep.value.foo.baz = 'bax';
+		rep.value['foo'].baz = 'bax';
 	});
 
 	await promise;
@@ -611,18 +602,15 @@ test.serial('persistent - should persist assignment to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'clientPersistence',
-	});
+	const fromDb = await readReplicantFromFile('test-bundle', 'clientPersistence');
 
-	t.is(fromDb.value, '{"nested":"hey we assigned!"}');
+	t.is(fromDb, '{"nested":"hey we assigned!"}');
 });
 
 test('persistent - should persist changes to disk', async (t) => {
 	t.plan(1);
 
-	const serverRep = t.context.apis.extension.Replicant('clientChangePersistence', { defaultValue: { nested: '' } });
+	t.context.apis.extension.Replicant('clientChangePersistence', { defaultValue: { nested: '' } });
 
 	await dashboard.evaluate(
 		async () =>
@@ -644,12 +632,9 @@ test('persistent - should persist changes to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'clientPersistence',
-	});
+	const fromDb = await readReplicantFromFile('test-bundle', 'clientPersistence');
 
-	t.is(fromDb.value, '{"nested":"hey we changed!"}');
+	t.is(fromDb, '{"nested":"hey we changed!"}');
 });
 
 test.serial('persistent - should persist falsey values to disk', async (t) => {
@@ -670,12 +655,9 @@ test.serial('persistent - should persist falsey values to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'clientFalseyWrite',
-	});
+	const fromDb = await readReplicantFromFile('test-bundle', 'clientFalseyWrite');
 
-	t.is(fromDb.value, '0');
+	t.is(fromDb, '0');
 });
 
 test.serial('persistent - should read falsey values from disk', async (t) => {
@@ -711,12 +693,9 @@ test.serial('transient - should not write their value to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneBy(Replicant, {
-		namespace: 'test-bundle',
-		name: 'clientTransience',
+	await t.throwsAsync(async () => {
+		await readReplicantFromFile('test-bundle', 'clientTransience');
 	});
-
-	t.is(fromDb, null);
 });
 
 test.serial('#waitForReplicants', async (t) => {

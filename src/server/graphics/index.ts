@@ -1,13 +1,9 @@
-// Native
-import path from 'path';
-
-// Packages
+import * as path from 'node:path';
 import express from 'express';
 
-// Ours
 import { authCheck, injectScripts, sendFile } from '../util';
 import RegistrationCoordinator from './registration';
-import type { Replicator } from '../replicant';
+import type { Replicator } from '../replicant/replicator';
 import type { RootNS } from '../../types/socket-protocol';
 import type BundleManager from '../bundle-manager';
 

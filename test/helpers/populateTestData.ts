@@ -1,4 +1,5 @@
 let populated = false;
+
 export default async function populateTestData(): Promise<void> {
 	if (populated) {
 		return;
@@ -6,111 +7,61 @@ export default async function populateTestData(): Promise<void> {
 
 	populated = true;
 
-	// We need to delay importing this,
-	// so that we have time to set up the temp
-	// process.env.NODECG_ROOT folder.
-	const { getConnection, Replicant } = await import('../../src/server/database');
+	const { ReplicantPersister } = await import('../../src/server/replicant/persister');
 
-	const db = await getConnection();
-	const repo = db.getRepository(Replicant);
+	const populateReplicant = async (namespace: string, name: string, data: unknown) => {
+		const persister = new ReplicantPersister(namespace, name);
+		persister.value = JSON.stringify(data);
+		await persister.save();
+	};
 
-	await repo.insert({
-		namespace: 'add-manifest-cues',
-		name: 'soundCues',
-		value: JSON.stringify([
-			{
-				name: 'persisted-cue-1',
-				assignable: true,
-				file: null,
-				volume: 30,
-			},
-			{
-				name: 'persisted-cue-2',
-				assignable: true,
-				file: null,
-				volume: 30,
-			},
-		]),
-	});
+	await populateReplicant('add-manifest-cues', 'soundCues', [
+		{
+			name: 'persisted-cue-1',
+			assignable: true,
+			file: null,
+			volume: 30,
+		},
+		{
+			name: 'persisted-cue-2',
+			assignable: true,
+			file: null,
+			volume: 30,
+		},
+	]);
 
-	await repo.insert({
-		namespace: 'remove-persisted-cues',
-		name: 'soundCues',
-		value: JSON.stringify([
-			{
-				name: 'persisted-cue-1',
-				assignable: true,
-				file: null,
-				volume: 30,
-			},
-			{
-				name: 'persisted-cue-2',
-				assignable: true,
-				file: null,
-				volume: 30,
-			},
-		]),
-	});
+	await populateReplicant('remove-persisted-cues', 'soundCues', [
+		{
+			name: 'persisted-cue-1',
+			assignable: true,
+			file: null,
+			volume: 30,
+		},
+		{
+			name: 'persisted-cue-2',
+			assignable: true,
+			file: null,
+			volume: 30,
+		},
+	]);
 
-	await repo.insert({
-		namespace: 'update-cues',
-		name: 'soundCues',
-		value: JSON.stringify([
-			{
-				name: 'updated-cue',
-				assignable: true,
-				file: null,
-				volume: 30,
-			},
-		]),
-	});
+	await populateReplicant('update-cues', 'soundCues', [
+		{
+			name: 'updated-cue',
+			assignable: true,
+			file: null,
+			volume: 30,
+		},
+	]);
 
-	await repo.insert([
-		{
-			namespace: 'test-bundle',
-			name: 'client_schemaPersistenceFail',
-			value: JSON.stringify({ string: 0 }),
-		},
-		{
-			namespace: 'test-bundle',
-			name: 'client_schemaPersistencePass',
-			value: JSON.stringify({
-				string: 'foo',
-				object: { numA: 1 },
-			}),
-		},
-		{
-			namespace: 'test-bundle',
-			name: 'clientFalseyRead',
-			value: JSON.stringify(0),
-		},
-		{
-			namespace: 'test-bundle',
-			name: 'clientPersistence',
-			value: 'it work good!',
-		},
-		{
-			namespace: 'test-bundle',
-			name: 'extensionFalseyRead',
-			value: JSON.stringify(0),
-		},
-		{
-			namespace: 'test-bundle',
-			name: 'extensionPersistence',
-			value: 'it work good!',
-		},
-		{
-			namespace: 'test-bundle',
-			name: 'schemaPersistenceFail',
-			value: JSON.stringify({ string: 0 }),
-		},
-		{
-			namespace: 'test-bundle',
-			name: 'schemaPersistencePass',
-			value: JSON.stringify({
-				string: 'foo',
-				object: { numA: 1 },
-			}),
-		},
+	await Promise.all([
+		populateReplicant('test-bundle', 'client_schemaPersistenceFail', { string: 0 }),
+		populateReplicant('test-bundle', 'client_schemaPersistencePass', { string: 'foo', object: { numA: 1 } }),
+		populateReplicant('test-bundle', 'clientFalseyRead', 0),
+		populateReplicant('test-bundle', 'clientPersistence', 'it work good!'),
+		populateReplicant('test-bundle', 'extensionFalseyRead', 0),
+		populateReplicant('test-bundle', 'extensionPersistence', 'it work good!'),
+		populateReplicant('test-bundle', 'schemaPersistenceFail', { string: 0 }),
+		populateReplicant('test-bundle', 'schemaPersistencePass', { string: 'foo', object: { numA: 1 } }),
 	]);
 }

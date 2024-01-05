@@ -1,12 +1,11 @@
-// Packages
 import express from 'express';
 import isError from 'is-error';
 import { serializeError } from 'serialize-error';
 import type { DeepReadonly } from 'ts-essentials';
 
-// Ours
 import { NodeCGAPIBase } from '../shared/api.base';
-import type { Replicator, ServerReplicant } from './replicant';
+import type { Replicator } from './replicant/replicator';
+import type { ServerReplicant } from './replicant/server-replicant';
 import { config } from './config';
 import { Logger } from './logger';
 import * as ncgUtils from './util';
