@@ -125,8 +125,7 @@
     "build:client": "ts-node scripts/build-client.ts",
     "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server",
     "build:types": "ts-node scripts/generate-types-package.ts",
-    "generate-migrations": "cd src/server && typeorm-ts-node-commonjs migration:generate ./database/migration/rename-me -d ./database/datasource.ts",
-    "postinstall": "node scripts/warn-engines.js"
+    "generate-migrations": "cd src/server && typeorm-ts-node-commonjs migration:generate ./database/migration/rename-me -d ./database/datasource.ts"
   },
   "files": [
     "dist",
@@ -190,5 +189,8 @@
     "ts-essentials": "^9.4.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.3.3"
+  },
+  "engines": {
+    "node": "^16.13.0 || ^18.12.0 || ^20.10.0"
   }
 }

@@ -1,5 +1,4 @@
 // Minimal imports for first setup
-import '../../../scripts/warn-engines.js';
 import * as os from 'os';
 import * as Sentry from '@sentry/node';
 import { config, filteredConfig, sentryEnabled } from '../config';
