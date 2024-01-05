@@ -5,7 +5,9 @@ import objectPath from 'object-path';
 import type { LoggerInterface } from '../types/logger-interface';
 import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
-import { compileJsonSchema, formatJsonSchemaErrors, isBrowser, stringifyError } from './utils';
+import { stringifyError } from './utils/errors';
+import { compileJsonSchema, formatJsonSchemaErrors } from './utils/compileJsonSchema';
+import { isBrowser } from './utils/isBrowser';
 
 export type ReplicantValue<P extends NodeCG.Platform, V, O, S extends boolean = false> = P extends 'server'
 	? S extends true

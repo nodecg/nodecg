@@ -1,18 +1,16 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import express from 'express';
 import chokidar from 'chokidar';
 import multer from 'multer';
 import hasha from 'hasha';
 import { z } from 'zod';
-
 import { authCheck, debounceName, sendFile } from './util';
 import createLogger from './logger';
 import type Replicator from './replicant/replicator';
 import type ServerReplicant from './replicant/server-replicant';
 import type { NodeCG } from '../types/nodecg';
-import { stringifyError } from '../shared/utils';
+import { stringifyError } from '../shared/utils/errors';
 import { NODECG_ROOT } from './nodecg-root';
 
 type Collection = {
