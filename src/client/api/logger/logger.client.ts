@@ -1,12 +1,7 @@
-// Native
 import { format, inspect } from 'util';
-
-// Packages
 import type * as Sentry from '@sentry/browser';
-
-// Ours
-import type { LoggerInterface } from '../../../shared/logger-interface';
-import { LogLevel } from '../../../shared/logger-interface';
+import type { LoggerInterface } from '../../../types/logger-interface';
+import { LogLevel } from '../../../types/logger-interface';
 
 const OrderedLogLevels: { [Level in LogLevel]: number } = {
 	verbose: 0,

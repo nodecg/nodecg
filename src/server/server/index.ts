@@ -103,7 +103,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		 */
 		const { _app: app } = this;
 		let server: Server;
-		if (config.ssl?.enabled) {
+		if (config.ssl.enabled && config.ssl.keyPath && config.ssl.certificatePath) {
 			const sslOpts: { key: Buffer; cert: Buffer; passphrase?: string } = {
 				key: fs.readFileSync(config.ssl.keyPath),
 				cert: fs.readFileSync(config.ssl.certificatePath),

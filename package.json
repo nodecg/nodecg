@@ -76,7 +76,6 @@
     "iframe-resizer": "^4.3.9",
     "io-ts": "^2.2.21",
     "is-error": "^2.2.2",
-    "joi": "^17.11.0",
     "json-ptr": "^3.1.1",
     "json-schema-lib": "github:nodecg/json-schema-lib#dcb89d670c2b15cd398916209bb806b2e100f95f",
     "klona": "^2.0.6",

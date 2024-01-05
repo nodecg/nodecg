@@ -1,19 +1,14 @@
-// Native
-import path from 'path';
-import os from 'os';
-
-// Packages
+import * as path from 'node:path';
+import * as os from 'node:os';
 import * as Sentry from '@sentry/node';
 import express from 'express';
-
-// Ours
 import { config } from '../config';
 import type BundleManager from '../bundle-manager';
 import { authCheck, pjson } from '../util';
 import type { NodeCG } from '../../types/nodecg';
 
 const baseSentryConfig = {
-	dsn: config.sentry?.dsn,
+	dsn: config.sentry.enabled ? config.sentry.dsn : '',
 	serverName: os.hostname(),
 	release: pjson.version,
 };

@@ -1,7 +1,4 @@
-// Packages
 import type { ExtendedError } from 'socket.io/dist/namespace';
-
-// Ours
 import { getConnection, ApiKey } from '../database';
 import { isSuperUser, findUser } from '../database/utils';
 import { config } from '../config';
@@ -46,7 +43,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 
 		// But only authed sockets can join the Authed room.
 		const provider = user.identities[0]!.provider_type;
-		const providerAllowed = config.login?.[provider]?.enabled;
+		const providerAllowed = config.login.enabled && config.login?.[provider]?.enabled;
 		const allowed = isSuperUser(user) && providerAllowed;
 
 		if (allowed) {

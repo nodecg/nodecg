@@ -1,11 +1,8 @@
 // This file contains code that is used in both server-side and client-side replicants.
-// Packages
 import type { ErrorObject, ValidateFunction } from 'ajv';
 import { klona as clone } from 'klona/json';
 import objectPath from 'object-path';
-
-// Ours
-import type { LoggerInterface } from './logger-interface';
+import type { LoggerInterface } from '../types/logger-interface';
 import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
 import { compileJsonSchema, formatJsonSchemaErrors, isBrowser, stringifyError } from './utils';

@@ -1,10 +1,7 @@
-// Packages
 import * as Sentry from '@sentry/node';
-
-// Ours
 import { config } from '../config';
 import loggerFactory from './logger.server';
-import type { LoggerInterface } from '../../shared/logger-interface';
+import type { LoggerInterface } from '../../types/logger-interface';
 
 export let Logger: new (name: string) => LoggerInterface;
 if (config.sentry?.enabled) {

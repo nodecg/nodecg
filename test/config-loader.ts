@@ -1,8 +1,5 @@
-// Packages
 import test from 'ava';
-
-// Ours
-const loadConfig = require('../src/server/config/loader').default;
+import { loadConfig } from '../src/server/config/loader';
 
 test('should throw an error when the config file is not valid JSON', (t) => {
 	const error = t.throws(loadConfig.bind(loadConfig, 'test/fixtures/nodecg-core/cfg/invalidJSON.json'));

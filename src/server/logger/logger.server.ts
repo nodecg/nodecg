@@ -1,15 +1,10 @@
-// Native
-import * as path from 'path';
-import { format, inspect } from 'util';
-
-// Packages
+import * as path from 'node:path';
+import { format, inspect } from 'node:util';
 import * as fs from 'fs-extra';
 import winston from 'winston';
 import type * as Sentry from '@sentry/node';
-
-// Ours
-import type { LoggerInterface } from '../../shared/logger-interface';
-import { LogLevel } from '../../shared/logger-interface';
+import type { LoggerInterface } from '../../types/logger-interface';
+import { LogLevel } from '../../types/logger-interface';
 
 type LoggerOptions = {
 	console: Partial<{
