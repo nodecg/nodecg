@@ -1,21 +1,15 @@
-// Packages
 import AjvDraft07, { type ValidateFunction, type Options, type ErrorObject } from 'ajv';
 import AjvDraft04 from 'ajv-draft-04';
 import Ajv2019 from 'ajv/dist/2019';
 import Ajv2020 from 'ajv/dist/2020';
 import addFormats from 'ajv-formats';
 import defaults from '@nodecg/json-schema-defaults';
-import { stringifyError } from '.';
+import { stringifyError } from './errors';
 
 const options: Options = {
 	allErrors: true,
 	verbose: true,
-	strict: undefined,
-	strictSchema: true,
-	strictNumbers: true,
-	strictTypes: true,
-	strictTuples: true,
-	strictRequired: false,
+	strict: 'log',
 };
 
 const ajv = {

@@ -1,15 +1,11 @@
-// Native
-import * as path from 'path';
-import * as fs from 'fs';
-
-// Packages
+import * as path from 'node:path';
+import * as fs from 'node:fs';
 import { klona as clone } from 'klona/json';
 import extend from 'extend';
 import type { NodeCG } from '../../types/nodecg';
 import type { ValidateFunction } from 'ajv';
-
-// Ours
-import { compileJsonSchema, formatJsonSchemaErrors, getSchemaDefault, stringifyError } from '../../shared/utils';
+import { stringifyError } from '../../shared/utils/errors';
+import { compileJsonSchema, getSchemaDefault, formatJsonSchemaErrors } from '../../shared/utils/compileJsonSchema';
 
 export function parse(
 	bundleName: string,

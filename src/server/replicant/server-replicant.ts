@@ -1,13 +1,8 @@
-// Native
-import * as fs from 'fs';
-import * as path from 'path';
-
-// Packages
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import $RefParser from 'json-schema-lib';
 import { klona as clone } from 'klona/json';
 import hasha from 'hasha';
-
-// Ours
 import {
 	proxyRecursive,
 	ignoreProxy,
@@ -18,7 +13,7 @@ import {
 import formatSchema from './schema-hacks';
 import createLogger from '../logger';
 import type { NodeCG } from '../../types/nodecg';
-import { getSchemaDefault } from '../../shared/utils';
+import { getSchemaDefault } from '../../shared/utils/compileJsonSchema';
 import { NODECG_ROOT } from '../nodecg-root';
 
 /**

@@ -7,7 +7,7 @@ import * as uuid from 'uuid';
 import * as db from '../database';
 import type { TypedServerSocket, ServerToClientEvents, RootNS } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';
-import { stringifyError } from '../../shared/utils';
+import { stringifyError } from '../../shared/utils/errors';
 import type { EntityManager } from 'typeorm';
 
 const log = createLogger('replicator');

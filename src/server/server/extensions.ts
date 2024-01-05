@@ -1,19 +1,14 @@
-// Native
-import { EventEmitter } from 'events';
-import path from 'path';
-
-// Packages
+import { EventEmitter } from 'node:events';
+import * as path from 'node:path';
 import semver from 'semver';
 import * as Sentry from '@sentry/node';
-
-// Ours
 import extensionApiClassFactory from '../api.server';
 import createLogger from '../logger';
 import type { Replicator } from '../replicant';
 import type { RootNS } from '../../types/socket-protocol';
 import type BundleManager from '../bundle-manager';
 import type { NodeCG } from '../../types/nodecg';
-import { stringifyError } from '../../shared/utils';
+import { stringifyError } from '../../shared/utils/errors';
 import { sentryEnabled } from '../config';
 
 const log = createLogger('extensions');
