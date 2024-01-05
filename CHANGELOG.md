@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/nodecg/nodecg/compare/v2.1.12...v2.2.0) (2024-01-05)
+
+
+### Features
+
+* **deps:** update dependencies ([eaf0d07](https://github.com/nodecg/nodecg/commit/eaf0d07bbe460461decba9003a663745f2a4f320))
+* **engines:** use package.json for supported Node.js versions ([#723](https://github.com/nodecg/nodecg/issues/723)) ([e27df66](https://github.com/nodecg/nodecg/commit/e27df661fe85235570aeabff87a120899ad6cda0))
+
+
+### Bug Fixes
+
+* **deps:** update typeorm ([#722](https://github.com/nodecg/nodecg/issues/722)) ([3d02d00](https://github.com/nodecg/nodecg/commit/3d02d00f25a15e37e9226dff201da2c21ed24180))
+* **json-schema:** prevent ajv to throw on invalid JSON schema ([#725](https://github.com/nodecg/nodecg/issues/725)) ([9d1af91](https://github.com/nodecg/nodecg/commit/9d1af915aa89e7472008a48386da551fde70db3f))
+* **types:** use declarationDir to generate types ([#716](https://github.com/nodecg/nodecg/issues/716)) ([18b1af2](https://github.com/nodecg/nodecg/commit/18b1af2fa667fc65a6a529b86e084ba92d43426c))
+
 ## [2.1.12](https://github.com/nodecg/nodecg/compare/v2.1.11...v2.1.12) (2023-11-16)
 
 
