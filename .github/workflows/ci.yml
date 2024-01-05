@@ -52,7 +52,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x, 20.x]
+        node-version:
+          - '16.13.0'
+          - '18.12.0'
+          - '20.9.0'
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     runs-on: ${{matrix.os}}
