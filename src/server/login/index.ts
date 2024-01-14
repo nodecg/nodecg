@@ -48,7 +48,7 @@ type DiscordProfile = {
 };
 
 const log = createLogger('login');
-const protocol = config.ssl?.enabled ?? (config.login.enabled && config.login.forceHttpsReturn) ? 'https' : 'http';
+const protocol = config.ssl?.enabled || (config.login.enabled && config.login.forceHttpsReturn) ? 'https' : 'http';
 
 // Required for persistent login sessions.
 // Passport needs ability to serialize and unserialize users out of session.
