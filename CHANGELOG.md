@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.1](https://github.com/nodecg/nodecg/compare/v2.2.0...v2.2.1) (2024-01-14)
+
+
+### Bug Fixes
+
+* **login:** use correct logic for redirect URL protocol ([50551b2](https://github.com/nodecg/nodecg/commit/50551b29e1a6c5cb3a7888e65f29661f01317a6d))
+
 ## [2.2.0](https://github.com/nodecg/nodecg/compare/v2.1.12...v2.2.0) (2024-01-05)
 
 
