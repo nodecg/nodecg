@@ -109,7 +109,7 @@
     "dev": "del-cli dist out && run-p dev:*",
     "dev:client": "npm run build:client -- --watch",
     "dev:build-server": "tsc -b src/server --watch --preserveWatchOutput",
-    "dev:run-server": "node --watch --watch-preserve-output out/server/bootstrap.js",
+    "dev:run-server": "node --watch --watch-preserve-output index.js",
     "test": "ava --config ava.config.js",
     "test-coverage": "c8 ava --config ava.config.js",
     "test-coverage-ci": "c8 --reporter lcov ava --config ava.config.js",
