@@ -61,6 +61,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 	private _ready = false;
 
 	private readonly _cfgPath: string;
+	private readonly _nodecgVersion: string;
 
 	// This is on a debouncer to avoid false-positives that can happen when editing a manifest.
 	private readonly _debouncedManifestDeletionCheck = debounce((bundleName, manifestPath) => {
@@ -91,6 +92,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 		super();
 
 		this._cfgPath = cfgPath;
+		this._nodecgVersion = nodecgVersion;
 
 		const readyTimeout = setTimeout(() => {
 			this._ready = true;
@@ -183,30 +185,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 
 				// Parse each bundle and push the result onto the bundles array
 				const bundle = parseBundle(bundlePath, loadBundleCfg(cfgPath, bundleFolderName));
-
-				// Check if the bundle is compatible with this version of NodeCG
-				if (!semver.satisfies(nodecgVersion, bundle.compatibleRange)) {
-					log.error(
-						'%s requires NodeCG version %s, current version is %s',
-						bundle.name,
-						bundle.compatibleRange,
-						nodecgVersion,
-					);
-					return;
-				}
-
-				bundles.push(bundle);
-
-				// Use `chokidar` to watch for file changes within bundles.
-				// Workaround for https://github.com/paulmillr/chokidar/issues/419
-				// This workaround is necessary to fully support symlinks.
-				// This is applied after the bundle has been validated and loaded.
-				// Bundles that do not properly load upon startup are not recognized for updates.
-				watcher.add([
-					path.join(bundlePath, '.git'), // Watch `.git` directories.
-					path.join(bundlePath, 'dashboard'), // Watch `dashboard` directories.
-					path.join(bundlePath, 'package.json'), // Watch each bundle's `package.json`.
-				]);
+				this.add(bundle);
 			});
 		});
 	}
@@ -238,12 +217,34 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 			return;
 		}
 
+		// Check if the bundle is compatible with this version of NodeCG
+		if (!semver.satisfies(this._nodecgVersion, bundle.compatibleRange)) {
+			log.error(
+				'%s requires NodeCG version %s, current version is %s',
+				bundle.name,
+				bundle.compatibleRange,
+				this._nodecgVersion,
+			);
+			return;
+		}
+
 		// Remove any existing bundles with this name
 		if (this.find(bundle.name)) {
 			this.remove(bundle.name);
 		}
 
 		bundles.push(bundle);
+
+		// Use `chokidar` to watch for file changes within bundles.
+		// Workaround for https://github.com/paulmillr/chokidar/issues/419
+		// This workaround is necessary to fully support symlinks.
+		// This is applied after the bundle has been validated and loaded.
+		// Bundles that do not properly load upon startup are not recognized for updates.
+		watcher.add([
+			path.join(bundle.dir, '.git'), // Watch `.git` directories.
+			path.join(bundle.dir, 'dashboard'), // Watch `dashboard` directories.
+			path.join(bundle.dir, 'package.json'), // Watch each bundle's `package.json`.
+		]);
 	}
 
 	/**
@@ -251,16 +252,16 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 	 * @param bundleName {String}
 	 */
 	remove(bundleName: string): void {
-		const len = bundles.length;
-		for (let i = 0; i < len; i++) {
-			// TODO: this check shouldn't have to happen, idk why things in this array can sometimes be undefined
-			if (!bundles[i]) {
-				continue;
-			}
-
-			if (bundles[i]!.name === bundleName) {
-				bundles.splice(i, 1);
-			}
+		// TODO: this check shouldn't have to happen, idk why things in this array can sometimes be undefined
+		const bundleIdx = bundles.findIndex((b) => b?.name === bundleName);
+		const bundle = bundles[bundleIdx];
+		if (bundle) {
+			bundles.splice(bundleIdx, 1);
+			watcher.unwatch([
+				path.join(bundle.dir, '.git'),
+				path.join(bundle.dir, 'dashboard'),
+				path.join(bundle.dir, 'package.json'),
+			]);
 		}
 	}
 
