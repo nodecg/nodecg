@@ -62,7 +62,8 @@ import SentryConfig from '../util/sentry-config';
 import type { NodeCG } from '../../types/nodecg';
 import { TypedEmitter } from '../../shared/typed-emitter';
 import { nodecgRootPath } from '../../shared/utils/rootPath';
-import { NODECG_ROOT } from '../nodecg-root';
+import { NODECG_ROOT, RUN_MODE } from '../nodecg-root';
+import parseBundle from '../bundle-parser';
 
 const renderTemplate = memoize((content, options) => template(content)(options));
 
@@ -203,6 +204,9 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		const bundlesPaths = [path.join(NODECG_ROOT, 'bundles')].concat(config.bundles?.paths ?? []);
 		const cfgPath = path.join(NODECG_ROOT, 'cfg');
 		const bundleManager = new BundleManager(bundlesPaths, cfgPath, pjson.version, config);
+		if (RUN_MODE === 'module') {
+			bundleManager.add(parseBundle(NODECG_ROOT, cfgPath));
+		}
 
 		// Wait for Chokidar to finish its initial scan.
 		await new Promise<void>((resolve, reject) => {
