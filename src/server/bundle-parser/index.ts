@@ -1,6 +1,7 @@
 // Native
 import * as path from 'path';
 import * as fs from 'fs';
+import { cosmiconfigSync as cosmiconfig } from 'cosmiconfig';
 
 // Ours
 import parsePanels from './panels';
@@ -14,7 +15,33 @@ import parseExtension from './extension';
 import parseGit from './git';
 import type { NodeCG } from '../../types/nodecg';
 
-export default function (bundlePath: string, bundleCfg?: NodeCG.Bundle.UnknownConfig): NodeCG.Bundle {
+/**
+ * Determines which config file to use for a bundle.
+ */
+function loadBundleCfg(cfgDir: string, bundleName: string): NodeCG.Bundle.UnknownConfig | undefined {
+	try {
+		const cc = cosmiconfig('nodecg', {
+			searchPlaces: [
+				`${bundleName}.json`,
+				`${bundleName}.yaml`,
+				`${bundleName}.yml`,
+				`${bundleName}.js`,
+				`${bundleName}.config.js`,
+			],
+			stopDir: cfgDir,
+		});
+		const result = cc.search(cfgDir);
+		return result?.config;
+	} catch (_: unknown) {
+		throw new Error(
+			`Config for bundle "${bundleName}" could not be read. Ensure that it is valid JSON, YAML, or CommonJS.`,
+		);
+	}
+}
+
+export default function (bundlePath: string, cfgDir?: string | NodeCG.Bundle.UnknownConfig): NodeCG.Bundle {
+	const bundleCfg = typeof cfgDir === 'string' ? loadBundleCfg(cfgDir, path.basename(bundlePath)) : cfgDir;
+
 	// Resolve the path to the bundle and its package.json
 	const pkgPath = path.join(bundlePath, 'package.json');
 
