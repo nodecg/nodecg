@@ -23,6 +23,12 @@
 				},
 				"default": {
 					"type": "boolean"
+				},
+				"namespace": {
+					"type": "string"
+				},
+				"category": {
+					"type": "string"
 				}
 			}
 		}
