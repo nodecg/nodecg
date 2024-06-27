@@ -49,6 +49,11 @@ export default function (
 		scripts.push(`<script>globalThis.ncgConfig = ${JSON.stringify(filteredConfig)};</script>`);
 
 		if (resourceType === 'panel' || resourceType === 'dialog') {
+			// If this bundle has sounds, inject SoundJS
+			if (standalone && sound) {
+				scripts.push('<script src="/node_modules/soundjs/lib/soundjs.min.js"></script>');
+			}
+
 			if (standalone) {
 				// Load the API
 				scripts.push('<script src="/nodecg-api.min.js"></script>');
