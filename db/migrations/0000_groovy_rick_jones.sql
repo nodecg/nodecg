@@ -37,9 +37,7 @@ CREATE TABLE `role` (
 --> statement-breakpoint
 CREATE TABLE `session` (
 	`id` text PRIMARY KEY NOT NULL,
-	`expiredAt` integer NOT NULL,
-	`json` text NOT NULL,
-	`destroyedAt` integer
+	`json` text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `user` (
@@ -57,6 +55,5 @@ CREATE TABLE `user_roles_role` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `role_name_unique` ON `role` (`name`);--> statement-breakpoint
-CREATE INDEX `expiredAtIdx` ON `session` (`expiredAt`);--> statement-breakpoint
 CREATE INDEX `userIdIdx` ON `user_roles_role` (`userId`);--> statement-breakpoint
 CREATE INDEX `roleIdIdx` ON `user_roles_role` (`roleId`);

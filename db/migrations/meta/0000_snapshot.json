@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f89463c6-2317-4954-9fde-b9b012dbf4df",
+  "id": "5ce88ffe-717b-4079-ab69-00787dbb8c08",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "api_key": {
@@ -243,37 +243,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "expiredAt": {
-          "name": "expiredAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "json": {
           "name": "json",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "destroyedAt": {
-          "name": "destroyedAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
-      "indexes": {
-        "expiredAtIdx": {
-          "name": "expiredAtIdx",
-          "columns": [
-            "expiredAt"
-          ],
-          "isUnique": false
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}

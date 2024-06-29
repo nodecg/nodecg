@@ -1,14 +1,8 @@
-import { text, sqliteTable, integer, index } from "drizzle-orm/sqlite-core";
+import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 
 export const session = sqliteTable('session', {
 	id: text('id').primaryKey(),
-	expiredAt: integer('expiredAt', { mode: 'timestamp' }).notNull(),
 	json: text('json').notNull(),
-	destroyedAt: integer('destroyedAt', { mode: 'timestamp' })
-}, (table) => {
-	return {
-		expiredAtIdx: index('expiredAtIdx').on(table.expiredAt)
-	}
 });
 
 export type Session = typeof session.$inferSelect;
