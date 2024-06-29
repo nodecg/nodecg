@@ -138,6 +138,7 @@
   ],
   "devDependencies": {
     "@types/app-root-path": "^1.2.8",
+    "@types/better-sqlite3": "^7.6.10",
     "@types/cheerio": "^0.22.35",
     "@types/clone": "^2.1.4",
     "@types/compression": "^1.7.5",
