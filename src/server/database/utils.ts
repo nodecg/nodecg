@@ -1,13 +1,11 @@
-import { getConnection, User, Role, Identity } from '../database';
+import { eq, and } from 'drizzle-orm';
+import { getConnection, user, apiKey, role, User, Role, Identity, identity, userRoles } from '../database';
 import { ApiKey } from './entity/ApiKey';
+import { SUPERUSER_ROLE_ID } from './database';
 
-export async function findUser(id: User['id']): Promise<User | null> {
-	const database = await getConnection();
-	return database.getRepository(User).findOne({
-		where: { id },
-		relations: ['roles', 'identities', 'apiKeys'],
-		cache: true,
-	});
+// TODO: This is duplicated by `findUserById`. Just replace this with `findUserById`.
+export async function findUser(id: User['id']): Promise<User | undefined> {
+	return findUserById(id);
 }
 
 export async function getSuperUserRole(): Promise<Role> {
@@ -32,87 +30,101 @@ export async function upsertUser({
 	provider_hash: Identity['provider_hash'];
 	provider_access_token?: Identity['provider_access_token'];
 	provider_refresh_token?: Identity['provider_refresh_token'];
-	roles: User['roles'];
+	roles: Role[];
 }): Promise<User> {
 	const database = await getConnection();
-	const { manager } = database;
-	let user: User | null = null;
 
-	// Check for ident that matches.
-	// If found, it should have an associated user, so return that.
-	// Else, make an ident and user.
-	const existingIdent = await findIdent(provider_type, provider_hash);
-	if (existingIdent) {
-		existingIdent.provider_access_token = provider_access_token ?? null;
-		existingIdent.provider_refresh_token = provider_refresh_token ?? null;
-		await manager.save(existingIdent);
-		user = await findUserById(existingIdent.user.id);
-	} else {
-		const ident = await createIdentity({
+	// Attempt to insert a new identity, updating any identity that may already exist.
+	const insertedIdentity = (await database.insert(identity)
+		.values({
 			provider_type,
 			provider_hash,
 			provider_access_token: provider_access_token ?? null,
 			provider_refresh_token: provider_refresh_token ?? null,
-		});
-		const apiKey = await createApiKey();
-		user = manager.create(User, {
-			name,
-			identities: [ident],
-			apiKeys: [apiKey],
-		});
+		})
+		.onConflictDoUpdate({
+			target: [identity.provider_type, identity.provider_hash],
+			set: {
+				provider_access_token: provider_access_token ?? null,
+				provider_refresh_token: provider_refresh_token ?? null
+			}
+		})
+		.returning())[0];
+	if (!insertedIdentity) {
+		throw new Error('No identity returned when inserting');
 	}
 
-	if (!user) {
+	// TODO: Rename `placeholder`. This is like this because I can't call this `user`, since that conflicts with the name of the table. I may have to restructure some things so that tables live in their own object and aren't top level variables.
+	let placeholder: User | undefined = undefined;
+
+	// If we have a user associated with this identity, fetch it. If we don't, then create a new user.
+	const userId = insertedIdentity.userId;
+	if (!userId) {
+		placeholder = (await database.insert(user).values({ name: name }).returning())[0];
+		if (!placeholder) {
+			throw new Error('No user returned while inserting');
+		}
+
+		await createApiKeyForUser(placeholder);
+	} else {
+		placeholder = await findUserById(userId);
+	}
+
+	if (!placeholder) {
 		// Something went very wrong.
 		throw new Error('Failed to find user after upserting.');
 	}
 
-	// Always update the roles, regardless of if we are making a new user or updating an existing one.
-	user.roles = roles;
-	return manager.save(user);
+	// Update the user with the given roles by first removing all the roles they currently have, and inserting new roles for the user.
+	await database.transaction(async (tx) => {
+		await tx.delete(userRoles).where(eq(userRoles.userId, placeholder.id));
+		await tx.insert(userRoles).values(
+			roles.map(role => ({ roleId: role.id, userId: placeholder.id }))
+		)
+	});
+
+	return placeholder;
 }
 
-export function isSuperUser(user: User): boolean {
-	return Boolean(user.roles?.find((role) => role.name === 'superuser'));
-}
-
-async function findRole(name: Role['name']): Promise<Role | null> {
+// TODO: This function was not previously async. It is now, since it requires a DB query to check if a user is a super user. Unsure right now if that is a good, bad, or neutral thing.
+export async function isSuperUser(user: User): Promise<boolean> {
 	const database = await getConnection();
-	const { manager } = database;
-	return manager.findOne(Role, { where: { name }, relations: ['permissions'] });
+	return await database.query.userRoles.findFirst({
+		where: and(
+			eq(userRoles.userId, user.id),
+			eq(userRoles.roleId, SUPERUSER_ROLE_ID)
+		)
+	}) != undefined;
 }
 
-async function createIdentity(
-	identInfo: Pick<Identity, 'provider_type' | 'provider_hash' | 'provider_access_token' | 'provider_refresh_token'>,
-): Promise<Identity> {
+async function findRole(name: Role['name']): Promise<Role | undefined> {
 	const database = await getConnection();
-	const { manager } = database;
-	// See https://github.com/typeorm/typeorm/issues/9070
-	const ident = manager.create<Identity>(Identity, identInfo);
-	return manager.save(ident);
-}
-
-async function createApiKey(): Promise<ApiKey> {
-	const database = await getConnection();
-	const { manager } = database;
-	const apiKey = manager.create(ApiKey);
-	return manager.save(apiKey);
-}
-
-async function findIdent(type: Identity['provider_type'], hash: Identity['provider_hash']): Promise<Identity | null> {
-	const database = await getConnection();
-	return database.getRepository(Identity).findOne({
-		where: { provider_hash: hash, provider_type: type },
-		relations: ['user'],
+	return database.query.role.findFirst({
+		where: eq(role.name, name),
+		with: {
+			permissions: true
+		}
 	});
 }
 
-async function findUserById(userId: User['id']): Promise<User | null> {
+async function createApiKeyForUser(user: User): Promise<ApiKey> {
 	const database = await getConnection();
-	return database.getRepository(User).findOne({
-		where: {
-			id: userId,
-		},
-		relations: ['roles', 'identities', 'apiKeys'],
+	const result = (await database.insert(apiKey).values({ userId: user.id }).returning())[0];
+	if (!result) {
+		throw new Error('No API Key returned when inserting.');
+	}
+	return result;
+}
+
+// TODO: The return type isn't correct, as this will only include the fields on User, and none of the relations. Figure out.
+async function findUserById(userId: User['id']): Promise<User | undefined> {
+	const database = await getConnection();
+	return database.query.user.findFirst({
+		where: eq(user.id, userId),
+		with: {
+			roles: true,
+			identities: true,
+			apiKeys: true
+		}
 	});
 }

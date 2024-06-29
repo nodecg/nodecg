@@ -10,7 +10,7 @@ import { Action, permission } from './entity/Permission';
 import { role } from './entity';
 import * as schema from './entity';
 
-const ROLE_ID = '07e18d80-fa74-4d98-ac18-838c745a480f';
+export const SUPERUSER_ROLE_ID = '07e18d80-fa74-4d98-ac18-838c745a480f';
 const PERMISSION_ID = '923561ef-4186-4370-b7df-f12e64fc7bd2';
 
 const log = createLogger('database');
@@ -32,11 +32,11 @@ export async function initialize() {
 
 	migrate(db, { migrationsFolder: migrationsPath });
 
-	await db.insert(role).values({ id: ROLE_ID, name: 'superuser' });
+	await db.insert(role).values({ id: SUPERUSER_ROLE_ID, name: 'superuser' });
 	await db.insert(permission).values({
 		name: 'superuser',
 		id: PERMISSION_ID,
-		roleId: ROLE_ID,
+		roleId: SUPERUSER_ROLE_ID,
 		entityId: '*',
 		actions: Action.READ | Action.WRITE
 	});
