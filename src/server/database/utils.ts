@@ -3,8 +3,11 @@ import { getConnection, user, apiKey, role, User, Role, Identity, identity, user
 import { ApiKey } from './entity/ApiKey';
 import { SUPERUSER_ROLE_ID } from './database';
 
-// TODO: This is duplicated by `findUserById`. Just replace this with `findUserById`.
-export async function findUser(id: User['id']): Promise<User | undefined> {
+export async function findUser(id: User['id'] | null): Promise<User | undefined> {
+	if (!id) {
+		return undefined;
+	}
+
 	return findUserById(id);
 }
 
@@ -65,7 +68,7 @@ export async function upsertUser({
 			throw new Error('No user returned while inserting');
 		}
 
-		await createApiKeyForUser(placeholder);
+		await createApiKeyForUserWithId(placeholder.id);
 	} else {
 		placeholder = await findUserById(userId);
 	}
@@ -86,12 +89,15 @@ export async function upsertUser({
 	return placeholder;
 }
 
-// TODO: This function was not previously async. It is now, since it requires a DB query to check if a user is a super user. Unsure right now if that is a good, bad, or neutral thing.
 export async function isSuperUser(user: User): Promise<boolean> {
+	return isUserIdSuperUser(user.id);
+}
+
+export async function isUserIdSuperUser(userId: User['id']): Promise<boolean> {
 	const database = await getConnection();
 	return await database.query.userRoles.findFirst({
 		where: and(
-			eq(userRoles.userId, user.id),
+			eq(userRoles.userId, userId),
 			eq(userRoles.roleId, SUPERUSER_ROLE_ID)
 		)
 	}) != undefined;
@@ -107,9 +113,9 @@ async function findRole(name: Role['name']): Promise<Role | undefined> {
 	});
 }
 
-async function createApiKeyForUser(user: User): Promise<ApiKey> {
+export async function createApiKeyForUserWithId(userId: User['id']): Promise<ApiKey> {
 	const database = await getConnection();
-	const result = (await database.insert(apiKey).values({ userId: user.id }).returning())[0];
+	const result = (await database.insert(apiKey).values({ userId }).returning())[0];
 	if (!result) {
 		throw new Error('No API Key returned when inserting.');
 	}
