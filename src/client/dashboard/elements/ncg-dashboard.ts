@@ -345,7 +345,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 					<h2 hidden="[[_falsey(dialog.title)]]">[[dialog.title]]</h2>
 
 					<paper-dialog-scrollable>
-						<iframe src="/bundles/[[dialog.bundleName]]/dashboard/[[dialog.file]]" frameborder="0" scrolling="no" id="[[dialog.bundleName]]_[[dialog.name]]_iframe">
+						<iframe src="/bundles/[[dialog.bundleName]]/dashboard/[[dialog.file]]" frameborder="0" scrolling="no" id="[[dialog.bundleName]]_[[dialog.name]]_iframe" loading="lazy">
 						</iframe>
 					</paper-dialog-scrollable>
 
