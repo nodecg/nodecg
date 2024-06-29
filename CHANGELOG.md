@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.2](https://github.com/nodecg/nodecg/compare/v2.2.1...v2.2.2) (2024-06-29)
+
+
+### Bug Fixes
+
+* **dashboard:** iframe lazy loading ([#729](https://github.com/nodecg/nodecg/issues/729)) ([a3dc36c](https://github.com/nodecg/nodecg/commit/a3dc36cec573ced0c82f25e6159a6067bf8ff1a4))
+* ensure assignable sounds are set correctly ([#736](https://github.com/nodecg/nodecg/issues/736)) ([42d41a6](https://github.com/nodecg/nodecg/commit/42d41a6355c23dd2eea035c8594ed90eec20aae9))
+* ensure sounds work on dashboard panels ([#735](https://github.com/nodecg/nodecg/issues/735)) ([f9d346b](https://github.com/nodecg/nodecg/commit/f9d346b3c506d8a0b805c330e050c727c2c13b34))
+* **types:** target ES2015 in generated typings ([#732](https://github.com/nodecg/nodecg/issues/732)) ([fa977b3](https://github.com/nodecg/nodecg/commit/fa977b387e56a49375afb159e356ee64af61f0f9))
+
 ## [2.2.1](https://github.com/nodecg/nodecg/compare/v2.2.0...v2.2.1) (2024-01-14)
 
 
