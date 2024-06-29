@@ -1,3 +1,26 @@
+import { text, sqliteTable } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
+import { v4 as uuidv4 } from "uuid";
+import { user } from './User';
+
+export const identity = sqliteTable('identity', {
+	id: text('id').$defaultFn(() => uuidv4()).primaryKey(),
+	provider_type: text('provider_type', { enum: ['twitch', 'steam', 'local', 'discord'] }).notNull(),
+	provider_hash: text('provider_hash').notNull(),
+	provider_access_token: text('provider_access_token'),
+	provider_refresh_token: text('provider_refresh_token'),
+	userId: text('userId').notNull().references(() => user.id)
+});
+
+export const identityRelations = relations(identity, ({ one }) => {
+	return {
+		user: one(user, {
+			fields: [identity.userId],
+			references: [user.id]
+		})
+	}
+})
+
 import { Entity, ManyToOne, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { User } from './User';
 

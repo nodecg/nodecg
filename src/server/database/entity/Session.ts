@@ -1,3 +1,12 @@
+import { text, sqliteTable, integer } from "drizzle-orm/sqlite-core";
+
+export const session = sqliteTable('session', {
+	id: text('id').primaryKey(),
+	expiredAt: integer('expiredAt', { mode: 'timestamp' }).notNull(),
+	json: text('json').notNull(),
+	destroyedAt: integer('destroyedAt', { mode: 'timestamp' })
+});
+
 import type { ISession } from 'connect-typeorm';
 import { Column, Entity, Index, PrimaryColumn, DeleteDateColumn } from 'typeorm';
 import type { ValueTransformer } from 'typeorm';
