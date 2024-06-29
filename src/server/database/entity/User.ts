@@ -19,29 +19,29 @@ export const userRelations = relations(user, ({ many }) => {
 	};
 });
 
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
-import { Role } from './Role';
-import { Identity } from './Identity';
-import { ApiKey } from './ApiKey';
+// import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+// import { Role } from './Role';
+// import { Identity } from './Identity';
+// import { ApiKey } from './ApiKey';
 
-@Entity()
-export class User {
-	@PrimaryGeneratedColumn('uuid')
-	id!: string;
+// @Entity()
+// export class User {
+// 	@PrimaryGeneratedColumn('uuid')
+// 	id!: string;
 
-	@CreateDateColumn()
-	created_at!: number;
+// 	@CreateDateColumn()
+// 	created_at!: number;
 
-	@Column('text')
-	name!: string;
+// 	@Column('text')
+// 	name!: string;
 
-	@ManyToMany(() => Role)
-	@JoinTable()
-	roles!: Role[];
+// 	@ManyToMany(() => Role)
+// 	@JoinTable()
+// 	roles!: Role[];
 
-	@OneToMany(() => Identity, (identity) => identity.user)
-	identities!: Identity[];
+// 	@OneToMany(() => Identity, (identity) => identity.user)
+// 	identities!: Identity[];
 
-	@OneToMany(() => ApiKey, (apiKey) => apiKey.user)
-	apiKeys!: ApiKey[];
-}
+// 	@OneToMany(() => ApiKey, (apiKey) => apiKey.user)
+// 	apiKeys!: ApiKey[];
+// }

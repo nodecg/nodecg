@@ -17,15 +17,15 @@ export const apiKeyRelations = relations(apiKey, ({ one }) => {
 	}
 })
 
-import { Entity, ManyToOne, Generated, PrimaryColumn } from 'typeorm';
-import { User } from './User';
+// import { Entity, ManyToOne, Generated, PrimaryColumn } from 'typeorm';
+// import { User } from './User';
 
-@Entity()
-export class ApiKey {
-	@PrimaryColumn()
-	@Generated('uuid')
-	secret_key!: string;
+// @Entity()
+// export class ApiKey {
+// 	@PrimaryColumn()
+// 	@Generated('uuid')
+// 	secret_key!: string;
 
-	@ManyToOne(() => User, (user) => user.apiKeys)
-	user!: User;
-}
+// 	@ManyToOne(() => User, (user) => user.apiKeys)
+// 	user!: User;
+// }

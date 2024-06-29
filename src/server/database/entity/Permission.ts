@@ -21,9 +21,8 @@ export const permissionRelations = relations(permission, ({ one }) => {
 	}
 });
 
-
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Role } from './Role';
+// import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+// import { Role } from './Role';
 
 export const enum Action {
 	NONE = 0,
@@ -31,20 +30,20 @@ export const enum Action {
 	WRITE = 1 << 1,
 }
 
-@Entity()
-export class Permission {
-	@PrimaryGeneratedColumn('uuid')
-	id!: string;
+// @Entity()
+// export class Permission {
+// 	@PrimaryGeneratedColumn('uuid')
+// 	id!: string;
 
-	@Column('text')
-	name!: string;
+// 	@Column('text')
+// 	name!: string;
 
-	@ManyToOne(() => Role, (role) => role.permissions)
-	role!: Role;
+// 	@ManyToOne(() => Role, (role) => role.permissions)
+// 	role!: Role;
 
-	@Column('text')
-	entityId!: string;
+// 	@Column('text')
+// 	entityId!: string;
 
-	@Column('int')
-	actions!: number;
-}
+// 	@Column('int')
+// 	actions!: number;
+// }

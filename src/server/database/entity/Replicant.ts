@@ -1,5 +1,3 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
-
 import { text, primaryKey, sqliteTable } from "drizzle-orm/sqlite-core";
 
 export const replicant = sqliteTable('replicant', {
@@ -12,14 +10,16 @@ export const replicant = sqliteTable('replicant', {
 	}
 });
 
-@Entity()
-export class Replicant {
-	@PrimaryColumn('text')
-	namespace!: string;
+// import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-	@PrimaryColumn('text')
-	name!: string;
+// @Entity()
+// export class Replicant {
+// 	@PrimaryColumn('text')
+// 	namespace!: string;
 
-	@Column('text')
-	value!: string;
-}
+// 	@PrimaryColumn('text')
+// 	name!: string;
+
+// 	@Column('text')
+// 	value!: string;
+// }
