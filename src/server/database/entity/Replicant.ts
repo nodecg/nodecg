@@ -10,6 +10,8 @@ export const replicant = sqliteTable('replicant', {
 	}
 });
 
+export type Replicant = typeof replicant.$inferSelect;
+
 // import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 // @Entity()

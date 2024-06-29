@@ -15,7 +15,9 @@ export const apiKeyRelations = relations(apiKey, ({ one }) => {
 			references: [user.id]
 		})
 	}
-})
+});
+
+export type ApiKey = typeof apiKey.$inferSelect;
 
 // import { Entity, ManyToOne, Generated, PrimaryColumn } from 'typeorm';
 // import { User } from './User';

@@ -16,6 +16,8 @@ export const roleRelations = relations(role, ({ many }) => {
 	}
 });
 
+export type Role = typeof role.$inferSelect;
+
 // import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 // import { Permission } from './Permission';
 

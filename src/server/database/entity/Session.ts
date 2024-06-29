@@ -11,6 +11,8 @@ export const session = sqliteTable('session', {
 	}
 });
 
+export type Session = typeof session.$inferSelect;
+
 // import type { ISession } from 'connect-typeorm';
 // import { Column, Entity, Index, PrimaryColumn, DeleteDateColumn } from 'typeorm';
 // import type { ValueTransformer } from 'typeorm';

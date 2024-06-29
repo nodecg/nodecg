@@ -19,6 +19,8 @@ export const userRelations = relations(user, ({ many }) => {
 	};
 });
 
+export type User = typeof user.$inferSelect;
+
 // import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 // import { Role } from './Role';
 // import { Identity } from './Identity';

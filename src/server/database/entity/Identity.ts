@@ -19,7 +19,10 @@ export const identityRelations = relations(identity, ({ one }) => {
 			references: [user.id]
 		})
 	}
-})
+});
+
+export type Identity = typeof identity.$inferSelect;
+export type NewIdentity = typeof identity.$inferInsert;
 
 // import { Entity, ManyToOne, PrimaryGeneratedColumn, Column } from 'typeorm';
 // import { User } from './User';
