@@ -10,7 +10,7 @@ CREATE TABLE `identity` (
 	`provider_hash` text NOT NULL,
 	`provider_access_token` text,
 	`provider_refresh_token` text,
-	`userId` text NOT NULL,
+	`userId` text,
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint

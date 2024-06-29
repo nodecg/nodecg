@@ -9,7 +9,7 @@ export const identity = sqliteTable('identity', {
 	provider_hash: text('provider_hash').notNull(),
 	provider_access_token: text('provider_access_token'),
 	provider_refresh_token: text('provider_refresh_token'),
-	userId: text('userId').notNull().references(() => user.id)
+	userId: text('userId').references(() => user.id)
 });
 
 export const identityRelations = relations(identity, ({ one }) => {

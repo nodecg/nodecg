@@ -1,13 +1,10 @@
-// Packages
-import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-
 // Ours
 import db, { initialize } from './database';
 export * from './entity';
 
 let initialized = false;
 
-export async function getConnection(): Promise<BetterSQLite3Database> {
+export async function getConnection(): Promise<typeof db> {
 	if (!initialized) {
 		await initialize();
 
