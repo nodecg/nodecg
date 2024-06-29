@@ -8,7 +8,6 @@ import * as db from '../database';
 import type { TypedServerSocket, ServerToClientEvents, RootNS } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';
 import { stringifyError } from '../../shared/utils/errors';
-import type { EntityManager } from 'typeorm';
 
 const log = createLogger('replicator');
 
@@ -187,68 +186,72 @@ export default class Replicator {
 		}
 
 		try {
-			const promise = new Promise<EntityManager>((resolve, reject) => {
-				db.getConnection()
-					.then((db) => {
-						resolve(db.manager);
-					})
-					.catch(reject);
-			}).then((manager) => {
-				let repEnt: db.Replicant;
-				const exitingEnt = this._repEntities.find(
-					(pv) => pv.namespace === replicant.namespace && pv.name === replicant.name,
-				);
-				if (exitingEnt) {
-					repEnt = exitingEnt;
-				} else {
-					repEnt = manager.create(db.Replicant, {
-						namespace: replicant.namespace,
-						name: replicant.name,
-					});
-					this._repEntities.push(repEnt);
-				}
-
-				return new Promise<void>((resolve, reject) => {
-					const valueRef = replicant.value;
-					let serializedValue = JSON.stringify(valueRef);
-					if (typeof serializedValue === 'undefined') {
-						serializedValue = '';
+			const promise = db.getConnection()
+				.then((database) => {
+					let repEnt: db.Replicant;
+					const exitingEnt = this._repEntities.find(
+						(pv) => pv.namespace === replicant.namespace && pv.name === replicant.name,
+					);
+					if (exitingEnt) {
+						repEnt = exitingEnt;
+					} else {
+						repEnt = {
+							namespace: replicant.namespace,
+							name: replicant.name,
+							value: ''
+						}
+						this._repEntities.push(repEnt);
 					}
 
-					const changeHandler = (newVal: unknown) => {
-						if (newVal !== valueRef && !isNaN(valueRef)) {
-							valueChangedDuringSave = true;
+					return new Promise<void>((resolve, reject) => {
+						const valueRef = replicant.value;
+						let serializedValue = JSON.stringify(valueRef);
+						if (typeof serializedValue === 'undefined') {
+							serializedValue = '';
 						}
-					};
 
-					repEnt.value = serializedValue;
-					replicant.on('change', changeHandler);
-					manager
-						.save(repEnt)
-						.then(
-							() =>
-								new Promise<void>((resolve, reject) => {
-									if (!valueChangedDuringSave) {
-										resolve();
-										return;
-									}
+						const changeHandler = (newVal: unknown) => {
+							if (newVal !== valueRef && !isNaN(valueRef)) {
+								valueChangedDuringSave = true;
+							}
+						};
 
-									// If we are here, then that means the value changed again during
-									// the save operation, and so we have to do some recursion
-									// to save it again.
-									this._pendingSave.delete(replicant);
-									this._saveReplicant(replicant).then(resolve).catch(reject);
-								}),
-						)
-						.then(() => {
-							resolve();
-						})
-						.catch(reject)
-						.finally(() => {
-							replicant.off('change', changeHandler);
-						});
-				});
-			});
+						// TODO: This probably won't actually save the value in this._repEntities.
+						repEnt.value = serializedValue;
+						replicant.on('change', changeHandler);
+
+						database
+							.insert(db.replicant)
+							.values(repEnt)
+							.onConflictDoUpdate({
+								target: [db.replicant.namespace, db.replicant.name],
+								set: { value: serializedValue }
+							})
+							.then(
+								() =>
+									new Promise<void>((resolve, reject) => {
+										if (!valueChangedDuringSave) {
+											resolve();
+											return;
+										}
+
+										// If we are here, then that means the value changed again during
+										// the save operation, and so we have to do some recursion
+										// to save it again.
+										this._pendingSave.delete(replicant);
+										this._saveReplicant(replicant).then(resolve).catch(reject);
+									}),
+							)
+							.then(() => {
+								resolve();
+							})
+							.catch(reject)
+							.finally(() => {
+								replicant.off('change', changeHandler);
+							});
+					});
+				})
+
 			this._pendingSave.set(replicant, promise);
 			await promise;
 		} catch (error: unknown) {
