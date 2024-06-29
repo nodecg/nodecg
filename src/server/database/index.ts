@@ -1,23 +1,18 @@
 // Packages
-import { type DataSource } from 'typeorm';
+import { type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 
 // Ours
-import createLogger from '../logger';
-import dataSource, { testing } from './datasource';
+import db, { initialize } from './database';
 export * from './entity';
 
-const log = createLogger('database');
 let initialized = false;
 
-export async function getConnection(): Promise<DataSource> {
+export async function getConnection(): Promise<BetterSQLite3Database> {
 	if (!initialized) {
-		if (testing) {
-			log.warn('Using in-memory test database.');
-		}
+		await initialize();
 
-		await dataSource.initialize();
 		initialized = true;
 	}
 
-	return dataSource;
+	return db;
 }
