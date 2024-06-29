@@ -6,7 +6,7 @@ export const replicant = sqliteTable('replicant', {
 	value: text('value', { mode: 'json' }).notNull()
 }, table => {
 	return {
-		pk: primaryKey({ columns: [table.name, table.name]})
+		pk: primaryKey({ columns: [table.namespace, table.name]})
 	}
 });
 

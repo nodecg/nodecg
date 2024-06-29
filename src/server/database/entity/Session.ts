@@ -1,10 +1,14 @@
-import { text, sqliteTable, integer } from "drizzle-orm/sqlite-core";
+import { text, sqliteTable, integer, index } from "drizzle-orm/sqlite-core";
 
 export const session = sqliteTable('session', {
 	id: text('id').primaryKey(),
 	expiredAt: integer('expiredAt', { mode: 'timestamp' }).notNull(),
 	json: text('json').notNull(),
 	destroyedAt: integer('destroyedAt', { mode: 'timestamp' })
+}, (table) => {
+	return {
+		expiredAtIdx: index('expiredAtIdx').on(table.expiredAt)
+	}
 });
 
 // import type { ISession } from 'connect-typeorm';

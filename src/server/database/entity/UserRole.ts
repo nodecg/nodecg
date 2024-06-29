@@ -1,4 +1,4 @@
-import { text, sqliteTable, primaryKey } from "drizzle-orm/sqlite-core";
+import { text, sqliteTable, primaryKey, index } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { role } from './Role';
 import { user } from './User';
@@ -8,7 +8,9 @@ export const userRoles = sqliteTable('user_roles_role', {
 	roleId: text('roleId').notNull().references(() => role.id, { onDelete: 'cascade', onUpdate: 'cascade' })
 }, table => {
 	return {
-		pk: primaryKey({ columns: [table.userId, table.roleId] })
+		pk: primaryKey({ columns: [table.userId, table.roleId] }),
+		userIdIdx: index('userIdIdx').on(table.userId),
+		roleIdIdx: index('roleIdIdx').on(table.roleId)
 	}
 });
 
