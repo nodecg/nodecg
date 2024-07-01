@@ -300,7 +300,7 @@ test.serial('persistent - should load persisted values when they exist', async (
 });
 
 test.serial('persistent - should persist assignment to database', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
 		persistenceInterval: 0,
@@ -322,7 +322,7 @@ test.serial('persistent - should persist assignment to database', async (t) => {
 });
 
 test.serial('persistent - should persist changes to database', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant<Record<string, string>>('extensionPersistence', {
 		persistenceInterval: 0,
@@ -344,7 +344,7 @@ test.serial('persistent - should persist changes to database', async (t) => {
 });
 
 test.serial('persistent - should persist top-level string', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
 		persistenceInterval: 0,
@@ -366,7 +366,7 @@ test.serial('persistent - should persist top-level string', async (t) => {
 });
 
 test.serial('persistent - should persist top-level undefined', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
 		persistenceInterval: 0,
@@ -388,7 +388,7 @@ test.serial('persistent - should persist top-level undefined', async (t) => {
 });
 
 test.serial('persistent - should persist falsey values to disk', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant('extensionFalseyWrite', {
 		persistenceInterval: 0,
@@ -526,7 +526,7 @@ test.serial('should not emit more than one change event on startup when a defaul
 });
 
 test.serial('should force persistence after maximumTimeAReplicantCanGoWithoutSaving', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant('maximumTimeAReplicantCanGoWithoutSaving', {
 		defaultValue: 0,
@@ -554,4 +554,21 @@ test.serial('should force persistence after maximumTimeAReplicantCanGoWithoutSav
 	}
 
 	clearInterval(interval);
+});
+
+test.serial('should provide up-to-date values when creating mulitple references to the same Replicant', async (t) => {
+	t.plan(1);
+
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
+		persistenceInterval: 0,
+	});
+	rep.value = 'lorem';
+
+	await t.context.server.saveAllReplicantsNow();
+
+	const newRep = t.context.apis.extension.Replicant('extensionPersistence', {
+		persistenceInterval: 0,
+	});
+
+	t.is(newRep.value, 'lorem');
 });

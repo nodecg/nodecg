@@ -17,7 +17,8 @@ const { initDashboard } = browser.setup();
 
 import * as C from '../helpers/test-constants';
 import type { NodeCG } from '../../src/types/nodecg';
-import { getConnection, Replicant } from '../../src/server/database';
+import { getConnection, replicant } from '../../src/server/database';
+import { and, eq } from 'drizzle-orm';
 
 let dashboard: puppeteer.Page;
 let database: Awaited<ReturnType<typeof getConnection>>;
@@ -589,7 +590,7 @@ test.serial('persistent - should load persisted values when they exist', async (
 });
 
 test.serial('persistent - should persist assignment to disk', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	await dashboard.evaluate(
 		async () =>
@@ -611,16 +612,20 @@ test.serial('persistent - should persist assignment to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'clientPersistence',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(replicant.namespace, 'test-bundle'),
+			eq(replicant.name, 'clientPersistence')
+		)
 	});
 
-	t.is(fromDb.value, '{"nested":"hey we assigned!"}');
+	if (t.assert(fromDb)) {
+		t.is(fromDb!.value, '{"nested":"hey we assigned!"}');
+	}
 });
 
 test('persistent - should persist changes to disk', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const serverRep = t.context.apis.extension.Replicant('clientChangePersistence', { defaultValue: { nested: '' } });
 
@@ -644,16 +649,20 @@ test('persistent - should persist changes to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'clientPersistence',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(replicant.namespace, 'test-bundle'),
+			eq(replicant.name, 'clientPersistence')
+		)
 	});
 
-	t.is(fromDb.value, '{"nested":"hey we changed!"}');
+	if (t.assert(fromDb)) {
+		t.is(fromDb!.value, '{"nested":"hey we changed!"}');
+	}
 });
 
 test.serial('persistent - should persist falsey values to disk', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	await dashboard.evaluate(
 		async () =>
@@ -670,12 +679,16 @@ test.serial('persistent - should persist falsey values to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'clientFalseyWrite',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(replicant.namespace, 'test-bundle'),
+			eq(replicant.name, 'clientFalseyWrite')
+		)
 	});
 
-	t.is(fromDb.value, '0');
+	if (t.assert(fromDb)) {
+		t.is(fromDb!.value, '0');
+	}
 });
 
 test.serial('persistent - should read falsey values from disk', async (t) => {
@@ -711,12 +724,14 @@ test.serial('transient - should not write their value to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneBy(Replicant, {
-		namespace: 'test-bundle',
-		name: 'clientTransience',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(replicant.namespace, 'test-bundle'),
+			eq(replicant.name, 'clientTransience')
+		)
 	});
 
-	t.is(fromDb, null);
+	t.is(fromDb, undefined);
 });
 
 test.serial('#waitForReplicants', async (t) => {
