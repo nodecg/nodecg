@@ -216,7 +216,6 @@ export default class Replicator {
 							}
 						};
 
-						// TODO: This probably won't actually save the value in this._repEntities.
 						repEnt.value = serializedValue;
 						replicant.on('change', changeHandler);
 
