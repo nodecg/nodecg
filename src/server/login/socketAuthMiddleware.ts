@@ -7,7 +7,7 @@ import type { TypedServerSocket } from '../../types/socket-protocol';
 import { UnAuthErrCode } from '../../types/socket-protocol';
 import createLogger from '../logger';
 import { serializeError } from 'serialize-error';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNotNull } from 'drizzle-orm';
 
 const log = createLogger('socket-auth');
 const socketsByKey = new Map<string, Set<TypedServerSocket>>();
@@ -25,28 +25,24 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 			return;
 		}
 
-		// TODO: This could probably be one query with a bunch of joins.
 		const database = await getConnection();
-		const existingApiKey = await database.query.apiKey.findFirst({
-			where: eq(tables.apiKey.secret_key, token)
-		})
-		if (!existingApiKey) {
+		const result = (await database.select()
+			.from(tables.apiKey)
+			.where(
+				and(
+					eq(tables.apiKey.secret_key, token),
+					isNotNull(tables.apiKey.userId)
+				)
+			)
+			.leftJoin(tables.identity, eq(tables.apiKey.userId, tables.identity.userId))
+			.limit(1))[0];
+
+		if (!result) {
 			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no credentials found'));
 			return;
 		}
 
-		const userId = existingApiKey.userId
-		if (!userId) {
-			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no user associated with provided credentials'));
-			return;
-		}
-
-		const foundIdentity = await database
-			.query
-			.identity
-			.findFirst({
-				where: eq(tables.identity.userId, userId)
-			});
+		const foundIdentity = result.identity
 		if (!foundIdentity) {
 			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no user associated with provided credentials'));
 			return;
@@ -55,7 +51,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 		// But only authed sockets can join the Authed room.
 		const provider = foundIdentity.provider_type;
 		const providerAllowed = config.login.enabled && config.login?.[provider]?.enabled;
-		const allowed = await isUserIdSuperUser(userId) && providerAllowed;
+		const allowed = await isUserIdSuperUser(foundIdentity.userId!) && providerAllowed;
 
 		if (allowed) {
 			if (!socketsByKey.has(token)) {
