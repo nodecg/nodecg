@@ -18,7 +18,7 @@ export const rootUrl = (): string => {
 	return `http://127.0.0.1:${NODECG_TEST_PORT}/`;
 };
 
-export const loginUrl = (): string => `${rootUrl()}login`;
+export const loginUrl = (): string => `${rootUrl()}login/`;
 
 export const dashboardUrl = (): string => `${rootUrl()}dashboard/`;
 
