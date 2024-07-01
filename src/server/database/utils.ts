@@ -112,10 +112,7 @@ export async function isUserIdSuperUser(userId: User['id']): Promise<boolean> {
 async function findRole(name: Role['name']): Promise<Role | undefined> {
 	const database = await getConnection();
 	return database.query.role.findFirst({
-		where: eq(tables.role.name, name),
-		with: {
-			permissions: true
-		}
+		where: eq(tables.role.name, name)
 	});
 }
 
