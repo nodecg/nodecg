@@ -11,7 +11,7 @@ export default async function populateTestData(): Promise<void> {
 	// process.env.NODECG_ROOT folder.
 	const { getConnection, tables } = await import('../../src/server/database');
 
-	const db = await getConnection();
+	const db = getConnection();
 	await db.insert(tables.replicant).values({
 		namespace: 'add-manifest-cues',
 		name: 'soundCues',

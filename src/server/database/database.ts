@@ -9,9 +9,6 @@ import createLogger from '../logger';
 import * as schema from './entity';
 import { DefaultLogger, LogWriter } from 'drizzle-orm';
 
-export const SUPERUSER_ROLE_ID = '07e18d80-fa74-4d98-ac18-838c745a480f';
-const PERMISSION_ID = '923561ef-4186-4370-b7df-f12e64fc7bd2';
-
 const log = createLogger('database');
 
 class NodeCGDrizzleLogger implements LogWriter {
@@ -32,21 +29,12 @@ const db = drizzle(sqlite, {
 	schema: { ...schema.tables, ...schema.relations }
 });
 
-export async function initialize() {
+export function initialize() {
 	if (testing) {
 		log.warn('Using in-memory test database.');
 	}
 
 	migrate(db, { migrationsFolder: migrationsPath });
-
-	await db.insert(schema.tables.role).values({ id: SUPERUSER_ROLE_ID, name: 'superuser' });
-	await db.insert(schema.tables.permission).values({
-		name: 'superuser',
-		id: PERMISSION_ID,
-		roleId: SUPERUSER_ROLE_ID,
-		entityId: '*',
-		actions: schema.Action.READ | schema.Action.WRITE
-	});
 }
 
 export default db;

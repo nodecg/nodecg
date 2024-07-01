@@ -1,7 +1,7 @@
 import { eq, and } from 'drizzle-orm';
 import { getConnection, tables, User, Role, Identity } from '../database';
 import { ApiKey } from './entity/ApiKey';
-import { SUPERUSER_ROLE_ID } from './database';
+import { SUPERUSER_ROLE_ID } from './entity/Role';
 
 export async function findUser(id: User['id'] | null): Promise<User | undefined> {
 	if (!id) {
@@ -35,7 +35,7 @@ export async function upsertUser({
 	provider_refresh_token?: Identity['provider_refresh_token'];
 	roles: Role[];
 }): Promise<User> {
-	const database = await getConnection();
+	const database = getConnection();
 
 	// Attempt to insert a new identity, updating any identity that may already exist.
 	const insertedIdentity = (await database.insert(tables.identity)
@@ -100,7 +100,7 @@ export async function isSuperUser(user: User): Promise<boolean> {
 }
 
 export async function isUserIdSuperUser(userId: User['id']): Promise<boolean> {
-	const database = await getConnection();
+	const database = getConnection();
 	return await database.query.userRoles.findFirst({
 		where: and(
 			eq(tables.userRoles.userId, userId),
@@ -110,14 +110,14 @@ export async function isUserIdSuperUser(userId: User['id']): Promise<boolean> {
 }
 
 async function findRole(name: Role['name']): Promise<Role | undefined> {
-	const database = await getConnection();
+	const database = getConnection();
 	return database.query.role.findFirst({
 		where: eq(tables.role.name, name)
 	});
 }
 
 export async function createApiKeyForUserWithId(userId: User['id']): Promise<ApiKey> {
-	const database = await getConnection();
+	const database = getConnection();
 	const result = (await database.insert(tables.apiKey).values({ userId }).returning())[0];
 	if (!result) {
 		throw new Error('No API Key returned when inserting.');
@@ -126,7 +126,7 @@ export async function createApiKeyForUserWithId(userId: User['id']): Promise<Api
 }
 
 async function findUserById(userId: User['id']): Promise<User | undefined> {
-	const database = await getConnection();
+	const database = getConnection();
 	return database.query.user.findFirst({
 		where: eq(tables.user.id, userId)
 	});

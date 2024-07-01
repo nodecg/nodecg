@@ -24,7 +24,7 @@ let dashboard: puppeteer.Page;
 let database: Awaited<ReturnType<typeof getConnection>>;
 test.before(async () => {
 	dashboard = await initDashboard();
-	database = await getConnection();
+	database = getConnection();
 });
 
 test.serial('should return a reference to any already-declared replicant', async (t) => {

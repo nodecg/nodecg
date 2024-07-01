@@ -22,7 +22,7 @@ export default async function (req: express.Request, res: express.Response, next
 		let keyOrSocketTokenAuthenticated = false;
 		if (req.query['key'] ?? req.cookies.socketToken) {
 			isUsingKeyOrSocketToken = true;
-			const database = await getConnection();
+			const database = getConnection();
 			const foundApiKey = await database.query.apiKey.findFirst({
 				where: eq(tables.apiKey.secret_key, req.query['key'] ?? req.cookies.socketToken),
 				with: {
@@ -62,30 +62,26 @@ export default async function (req: express.Request, res: express.Response, next
 		const allowed = await isSuperUser(user);
 		keyOrSocketTokenAuthenticated = isUsingKeyOrSocketToken && allowed;
 
-		const database = await getConnection()
-		const foundIdentity = await database
-			.query
-			.identity
-			.findFirst({
-				where: eq(tables.identity.userId, user.id)
-			});
+		const database = getConnection()
+		const result = (await database.select()
+			.from(tables.identity)
+			.where(eq(tables.identity.userId, user.id))
+			.leftJoin(tables.apiKey, eq(tables.identity.userId, tables.apiKey.userId))
+			.limit(1))[0];
 
-		if (foundIdentity) {
-			const provider = foundIdentity.provider_type;
+		if (result) {
+			const provider = result.identity.provider_type;
 			const providerAllowed = config.login?.[provider]?.enabled;
 			if ((keyOrSocketTokenAuthenticated || req.isAuthenticated()) && allowed && providerAllowed) {
-				let foundApiKey = await database.query.apiKey.findFirst({
-					where: eq(tables.apiKey.userId, user.id)
-				});
+				let token = result.api_key?.secret_key
 
 				// This should only happen if the database is manually edited, say, in the event of a security breach
 				// that reavealed an API key that needed to be deleted.
-				if (!foundApiKey) {
-					// Make a new api key.
-					foundApiKey = await createApiKeyForUserWithId(user.id);
+				if (!token) {
+					token = (await createApiKeyForUserWithId(user.id)).secret_key
 				}
 
-				if (!foundApiKey) {
+				if (!token) {
 					throw new Error('Expected to have a created API key');
 				}
 
@@ -93,7 +89,7 @@ export default async function (req: express.Request, res: express.Response, next
 				// can also be authenticated.
 				// This is crucial for things like OBS browser sources,
 				// where we don't have a session.
-				res.cookie('socketToken', foundApiKey.secret_key, {
+				res.cookie('socketToken', token, {
 					secure: req.secure,
 					sameSite: req.secure ? 'none' : undefined,
 				});

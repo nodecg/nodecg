@@ -4,9 +4,9 @@ export * from './entity';
 
 let initialized = false;
 
-export async function getConnection(): Promise<typeof db> {
+export function getConnection(): typeof db {
 	if (!initialized) {
-		await initialize();
+		initialize();
 
 		initialized = true;
 	}

@@ -25,7 +25,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 			return;
 		}
 
-		const database = await getConnection();
+		const database = getConnection();
 		const result = (await database.select()
 			.from(tables.apiKey)
 			.where(

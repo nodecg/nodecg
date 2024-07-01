@@ -141,7 +141,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		const io = this._io.of('/');
 		log.info('Starting NodeCG %s (Running on Node.js %s)', pjson.version, process.version);
 
-		const database = await db.getConnection();
+		const database = db.getConnection();
 		if (sentryEnabled) {
 			app.use(Sentry.Handlers.requestHandler());
 		}
@@ -172,7 +172,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 					// with a third-party auth provider but weren't able to
 					// get past the login page because the NodeCG config didn't allow that user.
 					// At this time, we only tell extensions about users that are valid.
-					const database = await db.getConnection()
+					const database = db.getConnection()
 					const rolesCount = (await database.select({ value: count() })
 						.from(db.tables.userRoles)
 						.where(eq(db.tables.userRoles.userId, user.id)))[0]?.value
@@ -182,7 +182,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 					}
 				},
 				onLogout: async (user) => {
-					const database = await db.getConnection()
+					const database = db.getConnection()
 					const rolesCount = (await database.select({ value: count() })
 						.from(db.tables.userRoles)
 						.where(eq(db.tables.userRoles.userId, user.id)))[0]?.value
