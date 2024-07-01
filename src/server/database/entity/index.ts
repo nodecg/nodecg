@@ -34,10 +34,10 @@ export const tables = {
 };
 
 export const relations = {
-	apiKey: apiKeyRelations,
-	identity: identityRelations,
-	permission: permissionRelations,
-	role: roleRelations,
-	user: userRelations,
-	userRoles: userRolesRelations
+	apiKeyRelations,
+	identityRelations,
+	permissionRelations,
+	roleRelations,
+	userRelations,
+	userRolesRelations
 };

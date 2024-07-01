@@ -21,7 +21,7 @@ const testing = process.env.NODECG_TEST?.toLowerCase() === 'true';
 // When testing, we specifically use SQLite's in-memory storage.
 // This allows us to use SQLite as normal when running tests without any data being persisted on disk.
 const sqlite = new Database(testing ? ':memory:' : dbPath);
-const db = drizzle(sqlite, { schema: { ...schema.tables } });
+const db = drizzle(sqlite, { schema: { ...schema.tables, ...schema.relations } });
 
 export async function initialize() {
 	if (testing) {
