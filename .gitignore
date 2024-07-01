@@ -13,6 +13,8 @@ yarn-error.log
 
 # Datastores
 /db/**
+!/db/migrations
+!/db/migrations/**
 
 # Logs
 /logs/**

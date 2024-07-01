@@ -1,12 +1,13 @@
 import type { ExtendedError } from 'socket.io/dist/namespace';
-import { getConnection, ApiKey } from '../database';
-import { isSuperUser, findUser } from '../database/utils';
+import { getConnection, tables } from '../database';
+import { createApiKeyForUserWithId, isUserIdSuperUser } from '../database/utils';
 import { config } from '../config';
 import UnauthorizedError from '../login/UnauthorizedError';
 import type { TypedServerSocket } from '../../types/socket-protocol';
 import { UnAuthErrCode } from '../../types/socket-protocol';
 import createLogger from '../logger';
 import { serializeError } from 'serialize-error';
+import { and, eq, isNotNull } from 'drizzle-orm';
 
 const log = createLogger('socket-auth');
 const socketsByKey = new Map<string, Set<TypedServerSocket>>();
@@ -24,27 +25,33 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 			return;
 		}
 
-		const database = await getConnection();
-		const apiKey = await database.getRepository(ApiKey).findOne({
-			where: { secret_key: token },
-			relations: ['user'],
-		});
+		const database = getConnection();
+		const result = (await database.select()
+			.from(tables.apiKey)
+			.where(
+				and(
+					eq(tables.apiKey.secret_key, token),
+					isNotNull(tables.apiKey.userId)
+				)
+			)
+			.leftJoin(tables.identity, eq(tables.apiKey.userId, tables.identity.userId))
+			.limit(1))[0];
 
-		if (!apiKey) {
+		if (!result) {
 			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no credentials found'));
 			return;
 		}
 
-		const user = await findUser(apiKey.user.id);
-		if (!user) {
+		const foundIdentity = result.identity
+		if (!foundIdentity) {
 			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no user associated with provided credentials'));
 			return;
 		}
 
 		// But only authed sockets can join the Authed room.
-		const provider = user.identities[0]!.provider_type;
+		const provider = foundIdentity.provider_type;
 		const providerAllowed = config.login.enabled && config.login?.[provider]?.enabled;
-		const allowed = isSuperUser(user) && providerAllowed;
+		const allowed = await isUserIdSuperUser(foundIdentity.userId!) && providerAllowed;
 
 		if (allowed) {
 			if (!socketsByKey.has(token)) {
@@ -61,41 +68,31 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 
 			socket.on('regenerateToken', async (cb) => {
 				try {
-					// Lookup the ApiKey for this token we want to revoke.
-					const keyToDelete = await database
-						.getRepository(ApiKey)
-						.findOne({ where: { secret_key: token }, relations: ['user'] });
+					// Delete the key for the token we want to revoke
+					const deletedKey = (await database.delete(tables.apiKey)
+						.where(eq(tables.apiKey.secret_key, token))
+						.returning())[0];
 
-					// If there's a User associated to this key (there should be)
-					// give them a new ApiKey
-					if (keyToDelete) {
-						// Make the new api key
-						const newApiKey = database.manager.create(ApiKey);
-						await database.manager.save(newApiKey);
-
-						// Remove the old key from the user, replace it with the new
-						const user = await findUser(keyToDelete.user.id);
-						if (!user) {
-							throw new Error('should have been a user here');
-						}
-
-						user.apiKeys = user.apiKeys.filter((ak) => ak.secret_key !== token);
-						user.apiKeys.push(newApiKey);
-						await database.manager.save(user);
-
-						// Delete the old key entirely
-						await database.manager.delete(ApiKey, { secret_key: token });
-
-						if (cb) {
-							cb(undefined, undefined);
-						}
-					} else {
-						// Something is weird if we're here, just close the socket.
+					if (!deletedKey) {
+						// Something is weird if we're here, cause we didn't delete an API key, so just close the socket.
 						if (cb) {
 							cb(undefined, undefined);
 						}
 
 						socket.disconnect(true);
+					} else {
+						// Find the user that
+						const userId = deletedKey.userId;
+						if (!userId) {
+							throw new Error('should have been a user here');
+						}
+
+						// Make the new api key
+						await createApiKeyForUserWithId(userId);
+
+						if (cb) {
+							cb(undefined, undefined);
+						}
 					}
 
 					// Close all sockets that are using the invalidated key,

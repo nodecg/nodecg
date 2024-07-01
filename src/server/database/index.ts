@@ -1,23 +1,15 @@
-// Packages
-import { type DataSource } from 'typeorm';
-
 // Ours
-import createLogger from '../logger';
-import dataSource, { testing } from './datasource';
+import db, { initialize } from './database';
 export * from './entity';
 
-const log = createLogger('database');
 let initialized = false;
 
-export async function getConnection(): Promise<DataSource> {
+export function getConnection(): typeof db {
 	if (!initialized) {
-		if (testing) {
-			log.warn('Using in-memory test database.');
-		}
+		initialize();
 
-		await dataSource.initialize();
 		initialized = true;
 	}
 
-	return dataSource;
+	return db;
 }

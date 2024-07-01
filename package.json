@@ -61,6 +61,7 @@
     "cookies-js": "^1.2.3",
     "cosmiconfig": "^8.3.6",
     "draggabilly": "^2.4.1",
+    "drizzle-orm": "^0.31.2",
     "events": "^3.3.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
@@ -124,7 +125,7 @@
     "build:client": "ts-node scripts/build-client.ts",
     "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server",
     "build:types": "ts-node scripts/generate-types-package.ts",
-    "generate-migrations": "cd src/server && typeorm-ts-node-commonjs migration:generate ./database/migration/rename-me -d ./database/datasource.ts"
+    "generate-migrations": "drizzle-kit generate"
   },
   "files": [
     "dist",
@@ -137,6 +138,7 @@
   ],
   "devDependencies": {
     "@types/app-root-path": "^1.2.8",
+    "@types/better-sqlite3": "^7.6.10",
     "@types/cheerio": "^0.22.35",
     "@types/clone": "^2.1.4",
     "@types/compression": "^1.7.5",
@@ -169,6 +171,7 @@
     "cpy-cli": "^5.0.0",
     "cross-env": "^7.0.3",
     "del-cli": "^5.1.0",
+    "drizzle-kit": "^0.22.7",
     "esbuild": "^0.19.11",
     "esbuild-plugin-copy": "^2.1.1",
     "eslint": "^8.56.0",

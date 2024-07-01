@@ -6,14 +6,13 @@ import expressSession from 'express-session';
 import passport from 'passport';
 import SteamStrategy from 'passport-steam';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { TypeormStore } from 'connect-typeorm';
 import cookieParser from 'cookie-parser';
 import fetch from 'node-fetch-commonjs';
 
 import { config } from '../config';
 import createLogger from '../logger';
 import type { User, Role } from '../database';
-import { Session, getConnection } from '../database';
+import DrizzleStore from './DrizzleStore';
 import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/utils';
 import { nodecgRootPath } from '../../shared/utils/rootPath';
 
@@ -324,15 +323,13 @@ if (config.login.enabled && config.login.local?.enabled && config.login.sessionS
 	);
 }
 
-export async function createMiddleware(callbacks: {
+export function createMiddleware(callbacks: {
 	onLogin(user: Express.User): void;
 	onLogout(user: Express.User): void;
-}): Promise<{
+}): {
 	app: express.Application;
 	sessionMiddleware: express.RequestHandler;
-}> {
-	const database = await getConnection();
-	const sessionRepository = database.getRepository(Session);
+} {
 	const app = express();
 	const redirectPostLogin = (req: express.Request, res: express.Response): void => {
 		const url = req.session?.returnTo ?? '/dashboard';
@@ -351,10 +348,7 @@ export async function createMiddleware(callbacks: {
 	const sessionMiddleware = expressSession({
 		resave: false,
 		saveUninitialized: false,
-		store: new TypeormStore({
-			cleanupLimit: 2,
-			ttl: Infinity,
-		}).connect(sessionRepository),
+		store: new DrizzleStore(),
 		secret: config.login.sessionSecret,
 		cookie: {
 			path: '/',
@@ -370,9 +364,9 @@ export async function createMiddleware(callbacks: {
 
 	app.use('/login', express.static(path.join(nodecgRootPath, 'dist/login')));
 
-	app.get('/login', (req, res) => {
+	app.get('/login', async (req, res) => {
 		// If the user is already logged in, don't show them the login page again.
-		if (req.user && isSuperUser(req.user)) {
+		if (req.user && await isSuperUser(req.user)) {
 			res.redirect('/dashboard');
 		} else {
 			res.render(path.join(__dirname, 'views/login.tmpl'), {

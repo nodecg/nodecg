@@ -84,6 +84,10 @@ export abstract class AbstractReplicant<
 
 	protected _pendingOperationFlush = false;
 
+	get hasPendingOperationsToFlush(): boolean {
+		return this._pendingOperationFlush;
+	}
+
 	constructor(name: string, namespace: string, opts: O = {} as Record<any, unknown>) {
 		super();
 

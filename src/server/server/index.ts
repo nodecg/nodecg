@@ -62,6 +62,7 @@ import type { NodeCG } from '../../types/nodecg';
 import { TypedEmitter } from '../../shared/typed-emitter';
 import { nodecgRootPath } from '../../shared/utils/rootPath';
 import { NODECG_ROOT } from '../nodecg-root';
+import { count, eq } from 'drizzle-orm';
 
 const renderTemplate = memoize((content, options) => template(content)(options));
 
@@ -140,7 +141,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		const io = this._io.of('/');
 		log.info('Starting NodeCG %s (Running on Node.js %s)', pjson.version, process.version);
 
-		const database = await db.getConnection();
+		const database = db.getConnection();
 		if (sentryEnabled) {
 			app.use(Sentry.Handlers.requestHandler());
 		}
@@ -165,18 +166,28 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		if (config.login?.enabled) {
 			log.info('Login security enabled');
 			const login = await import('../login');
-			const { app: loginMiddleware, sessionMiddleware } = await login.createMiddleware({
-				onLogin: (user) => {
+			const { app: loginMiddleware, sessionMiddleware } = login.createMiddleware({
+				onLogin: async (user) => {
 					// If the user had no roles, then that means they "logged in"
 					// with a third-party auth provider but weren't able to
 					// get past the login page because the NodeCG config didn't allow that user.
 					// At this time, we only tell extensions about users that are valid.
-					if (user.roles.length > 0) {
+					const database = db.getConnection()
+					const rolesCount = (await database.select({ value: count() })
+						.from(db.tables.userRoles)
+						.where(eq(db.tables.userRoles.userId, user.id)))[0]?.value
+
+					if (rolesCount && rolesCount > 0) {
 						this._extensionManager?.emitToAllInstances('login', user);
 					}
 				},
-				onLogout: (user) => {
-					if (user.roles.length > 0) {
+				onLogout: async (user) => {
+					const database = db.getConnection()
+					const rolesCount = (await database.select({ value: count() })
+						.from(db.tables.userRoles)
+						.where(eq(db.tables.userRoles.userId, user.id)))[0]?.value
+
+					if (rolesCount && rolesCount > 0) {
 						this._extensionManager?.emitToAllInstances('logout', user);
 					}
 				},
@@ -254,7 +265,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			app.use(sentryHelpers.app);
 		}
 
-		const persistedReplicantEntities = await database.getRepository(db.Replicant).find();
+		const persistedReplicantEntities = await database.query.replicant.findMany();
 		const replicator = new Replicator(io, persistedReplicantEntities);
 		this._replicator = replicator;
 

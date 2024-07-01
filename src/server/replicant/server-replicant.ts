@@ -136,6 +136,10 @@ export default class ServerReplicant<
 			this._oldValue = clone(this.value);
 			this._pendingOperationFlush = true;
 			process.nextTick(() => {
+				if (this.name == 'extensionFalseyWrite') {
+					console.log('processing next tick flush')
+				}
+
 				this._flushOperations();
 			});
 		}

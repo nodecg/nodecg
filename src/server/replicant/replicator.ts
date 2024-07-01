@@ -8,7 +8,6 @@ import * as db from '../database';
 import type { TypedServerSocket, ServerToClientEvents, RootNS } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';
 import { stringifyError } from '../../shared/utils/errors';
-import type { EntityManager } from 'typeorm';
 
 const log = createLogger('replicator');
 
@@ -151,7 +150,28 @@ export default class Replicator {
 		const promises: Array<Promise<void>> = [];
 		for (const replicants of this.declaredReplicants.values()) {
 			for (const replicant of replicants.values()) {
-				promises.push(this._saveReplicant(replicant));
+				if (replicant.hasPendingOperationsToFlush) {
+					// If the replicant has pending operations to flush, we know those operations aren't going to be processed until the next tick.
+					// To ensure that those operations are processed as part of this save, we return a promise that waits for a change event on the
+					// replicant, then saves the replicant, ensuring that we get the latest values persisted.
+					promises.push(
+						new Promise((resolve, reject) => {
+							const changeHandler = () => {
+								this._pendingSave.delete(replicant);
+								this._saveReplicant(replicant)
+									.then(resolve)
+									.catch(reject)
+									.finally(() => {
+										replicant.off('change', changeHandler);
+									})
+							};
+
+							replicant.on('change', changeHandler);
+						})
+					)
+				} else {
+					promises.push(this._saveReplicant(replicant));
+				}
 			}
 		}
 
@@ -187,68 +207,71 @@ export default class Replicator {
 		}
 
 		try {
-			const promise = new Promise<EntityManager>((resolve, reject) => {
-				db.getConnection()
-					.then((db) => {
-						resolve(db.manager);
-					})
-					.catch(reject);
-			}).then((manager) => {
-				let repEnt: db.Replicant;
-				const exitingEnt = this._repEntities.find(
-					(pv) => pv.namespace === replicant.namespace && pv.name === replicant.name,
-				);
-				if (exitingEnt) {
-					repEnt = exitingEnt;
-				} else {
-					repEnt = manager.create(db.Replicant, {
-						namespace: replicant.namespace,
-						name: replicant.name,
-					});
-					this._repEntities.push(repEnt);
+			const database = db.getConnection();
+			let repEnt: db.Replicant;
+			const exitingEnt = this._repEntities.find(
+				(pv) => pv.namespace === replicant.namespace && pv.name === replicant.name,
+			);
+
+			if (exitingEnt) {
+				repEnt = exitingEnt;
+			} else {
+				repEnt = {
+					namespace: replicant.namespace,
+					name: replicant.name,
+					value: ''
+				}
+				this._repEntities.push(repEnt);
+			}
+
+			const promise = new Promise<void>((resolve, reject) => {
+				const valueRef = replicant.value;
+				let serializedValue = JSON.stringify(valueRef);
+
+				if (typeof serializedValue === 'undefined') {
+					serializedValue = '';
 				}
 
-				return new Promise<void>((resolve, reject) => {
-					const valueRef = replicant.value;
-					let serializedValue = JSON.stringify(valueRef);
-					if (typeof serializedValue === 'undefined') {
-						serializedValue = '';
+				const changeHandler = (newVal: unknown) => {
+					if (newVal !== valueRef && !isNaN(valueRef)) {
+						valueChangedDuringSave = true;
 					}
+				};
 
-					const changeHandler = (newVal: unknown) => {
-						if (newVal !== valueRef && !isNaN(valueRef)) {
-							valueChangedDuringSave = true;
-						}
-					};
+				repEnt.value = serializedValue;
+				replicant.on('change', changeHandler);
 
-					repEnt.value = serializedValue;
-					replicant.on('change', changeHandler);
-					manager
-						.save(repEnt)
-						.then(
-							() =>
-								new Promise<void>((resolve, reject) => {
-									if (!valueChangedDuringSave) {
-										resolve();
-										return;
-									}
+				database
+					.insert(db.tables.replicant)
+					.values(repEnt)
+					.onConflictDoUpdate({
+						target: [db.tables.replicant.namespace, db.tables.replicant.name],
+						set: { value: serializedValue }
+					})
+					.then(
+						() =>
+							new Promise<void>((resolve, reject) => {
+								if (!valueChangedDuringSave) {
+									resolve();
+									return;
+								}
 
-									// If we are here, then that means the value changed again during
-									// the save operation, and so we have to do some recursion
-									// to save it again.
-									this._pendingSave.delete(replicant);
-									this._saveReplicant(replicant).then(resolve).catch(reject);
-								}),
-						)
-						.then(() => {
-							resolve();
-						})
-						.catch(reject)
-						.finally(() => {
-							replicant.off('change', changeHandler);
-						});
-				});
+								// If we are here, then that means the value changed again during
+								// the save operation, and so we have to do some recursion
+								// to save it again.
+								this._pendingSave.delete(replicant);
+								this._saveReplicant(replicant).then(resolve).catch(reject);
+							}),
+					)
+					.then(() => {
+						resolve();
+					})
+					.catch(reject)
+					.finally(() => {
+						replicant.off('change', changeHandler);
+					});
 			});
+
 			this._pendingSave.set(replicant, promise);
 			await promise;
 		} catch (error: unknown) {

@@ -12,14 +12,15 @@ const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
-import { getConnection, Replicant } from '../../src/server/database';
+import { getConnection, tables } from '../../src/server/database';
 import { sleep, waitOneTick } from '../helpers/utilities';
+import { and, eq } from 'drizzle-orm';
 
 let dashboard: puppeteer.Page;
 let database: Awaited<ReturnType<typeof getConnection>>;
 test.before(async () => {
 	dashboard = await initDashboard();
-	database = await getConnection();
+	database = getConnection();
 });
 
 test.serial('should return a reference to any already-declared replicant', (t) => {
@@ -299,7 +300,7 @@ test.serial('persistent - should load persisted values when they exist', async (
 });
 
 test.serial('persistent - should persist assignment to database', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
 		persistenceInterval: 0,
@@ -308,16 +309,20 @@ test.serial('persistent - should persist assignment to database', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionPersistence',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionPersistence')
+		)
 	});
 
-	t.is(fromDb.value, '{"nested":"hey we assigned!"}');
+	if (t.assert(fromDb)) {
+		t.is(fromDb!.value, '{"nested":"hey we assigned!"}');
+	}
 });
 
 test.serial('persistent - should persist changes to database', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant<Record<string, string>>('extensionPersistence', {
 		persistenceInterval: 0,
@@ -326,16 +331,20 @@ test.serial('persistent - should persist changes to database', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionPersistence',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionPersistence')
+		)
 	});
 
-	t.is(fromDb.value, '{"nested":"hey we changed!"}');
+	if (t.assert(fromDb)) {
+		t.is(fromDb!.value, '{"nested":"hey we changed!"}');
+	}
 });
 
 test.serial('persistent - should persist top-level string', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
 		persistenceInterval: 0,
@@ -344,16 +353,20 @@ test.serial('persistent - should persist top-level string', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionPersistence',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionPersistence')
+		)
 	});
 
-	t.is(fromDb.value, '"lorem"');
+	if (t.assert(fromDb)) {
+		t.is(fromDb!.value, '"lorem"');
+	}
 });
 
 test.serial('persistent - should persist top-level undefined', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
 		persistenceInterval: 0,
@@ -362,16 +375,20 @@ test.serial('persistent - should persist top-level undefined', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionPersistence',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionPersistence')
+		)
 	});
 
-	t.is(fromDb.value, '');
+	if (t.assert(fromDb)) {
+		t.is(fromDb!.value, '');
+	}
 });
 
 test.serial('persistent - should persist falsey values to disk', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant('extensionFalseyWrite', {
 		persistenceInterval: 0,
@@ -380,12 +397,16 @@ test.serial('persistent - should persist falsey values to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionFalseyWrite',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionFalseyWrite')
+		)
 	});
 
-	t.is(fromDb.value, '0');
+	if (t.assert(fromDb)) {
+		t.is(fromDb!.value, '0');
+	}
 });
 
 test.serial('persistent - should read falsey values from disk', (t) => {
@@ -405,12 +426,14 @@ test.serial('transient - should not write their value to disk', async (t) => {
 
 	await t.context.server.saveAllReplicantsNow();
 
-	const fromDb = await database.manager.findOneBy(Replicant, {
-		namespace: 'test-bundle',
-		name: 'extensionTransience',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionTransience')
+		)
 	});
 
-	t.is(fromDb, null);
+	t.is(fromDb, undefined);
 });
 
 test.serial('should return true when deleting a non-existing property', (t) => {
@@ -503,7 +526,7 @@ test.serial('should not emit more than one change event on startup when a defaul
 });
 
 test.serial('should force persistence after maximumTimeAReplicantCanGoWithoutSaving', async (t) => {
-	t.plan(1);
+	t.plan(2);
 
 	const rep = t.context.apis.extension.Replicant('maximumTimeAReplicantCanGoWithoutSaving', {
 		defaultValue: 0,
@@ -519,11 +542,33 @@ test.serial('should force persistence after maximumTimeAReplicantCanGoWithoutSav
 
 	// If the Replicant hasn't been able to persist a single time yet,
 	// this call will fail saying it couldn't find it.
-	const fromDb = await database.manager.findOneByOrFail(Replicant, {
-		namespace: 'test-bundle',
-		name: 'maximumTimeAReplicantCanGoWithoutSaving',
+	const fromDb = await database.query.replicant.findFirst({
+		where: and(
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'maximumTimeAReplicantCanGoWithoutSaving')
+		)
 	});
 
-	t.true(parseInt(fromDb.value, 10) > 0);
+	if (t.assert(fromDb)) {
+		t.true(parseInt(fromDb!.value, 10) > 0);
+	}
+
 	clearInterval(interval);
+});
+
+test.serial('should provide up-to-date values when creating mulitple references to the same Replicant', async (t) => {
+	t.plan(1);
+
+	const rep = t.context.apis.extension.Replicant('extensionPersistence', {
+		persistenceInterval: 0,
+	});
+	rep.value = 'lorem';
+
+	await t.context.server.saveAllReplicantsNow();
+
+	const newRep = t.context.apis.extension.Replicant('extensionPersistence', {
+		persistenceInterval: 0,
+	});
+
+	t.is(newRep.value, 'lorem');
 });

@@ -1,25 +1,8 @@
-import type { ISession } from 'connect-typeorm';
-import { Column, Entity, Index, PrimaryColumn, DeleteDateColumn } from 'typeorm';
-import type { ValueTransformer } from 'typeorm';
+import { text, sqliteTable } from "drizzle-orm/sqlite-core";
 
-// Postgres returns string by default. Return number instead.
-const Bigint: ValueTransformer = {
-	from: (value) => Number(value),
-	to: (value) => (value === Infinity ? '+Infinity' : Number(value)),
-};
+export const session = sqliteTable('session', {
+	id: text('id').primaryKey(),
+	json: text('json').notNull(),
+});
 
-@Entity()
-export class Session implements ISession {
-	@Index()
-	@Column('bigint', { transformer: Bigint })
-	expiredAt = Date.now();
-
-	@PrimaryColumn('varchar', { length: 255 })
-	id = '';
-
-	@Column('text')
-	json = '';
-
-	@DeleteDateColumn()
-	public destroyedAt?: Date;
-}
+export type Session = typeof session.$inferSelect;
