@@ -22,7 +22,6 @@ class NodeCGDrizzleLogger implements LogWriter {
 
 const dbPath = path.join(nodecgRootPath, 'db/nodecg.sqlite3');
 const migrationsPath = path.join(nodecgRootPath, 'db/migrations');
-// TODO: This is a different way of checking if we're in a testing environment than other places. Standardize on an approach, and provide one means of checking if we're in a testing environment.
 const testing = process.env.NODECG_TEST?.toLowerCase() === 'true';
 
 // When testing, we specifically use SQLite's in-memory storage.
