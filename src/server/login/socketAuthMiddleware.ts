@@ -1,5 +1,5 @@
 import type { ExtendedError } from 'socket.io/dist/namespace';
-import { getConnection, apiKey, identity } from '../database';
+import { getConnection, tables } from '../database';
 import { createApiKeyForUserWithId, isUserIdSuperUser } from '../database/utils';
 import { config } from '../config';
 import UnauthorizedError from '../login/UnauthorizedError';
@@ -25,9 +25,10 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 			return;
 		}
 
+		// TODO: This could probably be one query with a bunch of joins.
 		const database = await getConnection();
 		const existingApiKey = await database.query.apiKey.findFirst({
-			where: eq(apiKey.secret_key, token)
+			where: eq(tables.apiKey.secret_key, token)
 		})
 		if (!existingApiKey) {
 			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no credentials found'));
@@ -44,7 +45,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 			.query
 			.identity
 			.findFirst({
-				where: eq(identity.userId, userId)
+				where: eq(tables.identity.userId, userId)
 			});
 		if (!foundIdentity) {
 			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no user associated with provided credentials'));
@@ -72,8 +73,8 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 			socket.on('regenerateToken', async (cb) => {
 				try {
 					// Delete the key for the token we want to revoke
-					const deletedKey = (await database.delete(apiKey)
-						.where(eq(apiKey.secret_key, token))
+					const deletedKey = (await database.delete(tables.apiKey)
+						.where(eq(tables.apiKey.secret_key, token))
 						.returning())[0];
 
 					if (!deletedKey) {

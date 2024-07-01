@@ -220,10 +220,10 @@ export default class Replicator {
 						replicant.on('change', changeHandler);
 
 						database
-							.insert(db.replicant)
+							.insert(db.tables.replicant)
 							.values(repEnt)
 							.onConflictDoUpdate({
-								target: [db.replicant.namespace, db.replicant.name],
+								target: [db.tables.replicant.namespace, db.tables.replicant.name],
 								set: { value: serializedValue }
 							})
 							.then(

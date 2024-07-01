@@ -1,5 +1,5 @@
 import { SessionData, Store } from "express-session";
-import { getConnection, session } from '../database';
+import { getConnection, tables } from '../database';
 import { eq } from "drizzle-orm";
 
 export default class DrizzleStore extends Store {
@@ -7,7 +7,7 @@ export default class DrizzleStore extends Store {
 		getConnection()
 			.then(database => {
 				return database.query.session.findFirst({
-					where: eq(session.id, sid)
+					where: eq(tables.session.id, sid)
 				})
 			})
 			.then(session => {
@@ -27,13 +27,13 @@ export default class DrizzleStore extends Store {
 			.then(database => {
 				const stringifiedSessionData = JSON.stringify(sessionData)
 
-				return database.insert(session)
+				return database.insert(tables.session)
 					.values({
 						id: sid,
 						json: stringifiedSessionData
 					})
 					.onConflictDoUpdate({
-						target: [session.id],
+						target: [tables.session.id],
 						set: {
 							json: stringifiedSessionData
 						}
@@ -54,8 +54,8 @@ export default class DrizzleStore extends Store {
 	override destroy(sid: string, callback?: ((err?: any) => void) | undefined): void {
 		getConnection()
 			.then(database => {
-				return database.delete(session)
-					.where(eq(session.id, sid))
+				return database.delete(tables.session)
+					.where(eq(tables.session.id, sid))
 			})
 			.then(() => {
 				if (callback) {

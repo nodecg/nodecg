@@ -174,8 +174,8 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 					// At this time, we only tell extensions about users that are valid.
 					const database = await db.getConnection()
 					const rolesCount = (await database.select({ value: count() })
-						.from(db.userRoles)
-						.where(eq(db.userRoles.userId, user.id)))[0]?.value
+						.from(db.tables.userRoles)
+						.where(eq(db.tables.userRoles.userId, user.id)))[0]?.value
 
 					if (rolesCount && rolesCount > 0) {
 						this._extensionManager?.emitToAllInstances('login', user);
@@ -184,8 +184,8 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 				onLogout: async (user) => {
 					const database = await db.getConnection()
 					const rolesCount = (await database.select({ value: count() })
-						.from(db.userRoles)
-						.where(eq(db.userRoles.userId, user.id)))[0]?.value
+						.from(db.tables.userRoles)
+						.where(eq(db.tables.userRoles.userId, user.id)))[0]?.value
 
 					if (rolesCount && rolesCount > 0) {
 						this._extensionManager?.emitToAllInstances('logout', user);

@@ -6,8 +6,6 @@ import Database from 'better-sqlite3';
 
 import { nodecgRootPath } from '../../shared/utils/rootPath';
 import createLogger from '../logger';
-import { Action, permission } from './entity/Permission';
-import { role } from './entity';
 import * as schema from './entity';
 
 export const SUPERUSER_ROLE_ID = '07e18d80-fa74-4d98-ac18-838c745a480f';
@@ -23,7 +21,7 @@ const testing = process.env.NODECG_TEST?.toLowerCase() === 'true';
 // When testing, we specifically use SQLite's in-memory storage.
 // This allows us to use SQLite as normal when running tests without any data being persisted on disk.
 const sqlite = new Database(testing ? ':memory:' : dbPath);
-const db = drizzle(sqlite, { schema: { ...schema } });
+const db = drizzle(sqlite, { schema: { ...schema.tables } });
 
 export async function initialize() {
 	if (testing) {
@@ -32,13 +30,13 @@ export async function initialize() {
 
 	migrate(db, { migrationsFolder: migrationsPath });
 
-	await db.insert(role).values({ id: SUPERUSER_ROLE_ID, name: 'superuser' });
-	await db.insert(permission).values({
+	await db.insert(schema.tables.role).values({ id: SUPERUSER_ROLE_ID, name: 'superuser' });
+	await db.insert(schema.tables.permission).values({
 		name: 'superuser',
 		id: PERMISSION_ID,
 		roleId: SUPERUSER_ROLE_ID,
 		entityId: '*',
-		actions: Action.READ | Action.WRITE
+		actions: schema.Action.READ | schema.Action.WRITE
 	});
 }
 

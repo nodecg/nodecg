@@ -1,5 +1,5 @@
 import { eq, and } from 'drizzle-orm';
-import { getConnection, user, apiKey, role, User, Role, Identity, identity, userRoles } from '../database';
+import { getConnection, tables, User, Role, Identity } from '../database';
 import { ApiKey } from './entity/ApiKey';
 import { SUPERUSER_ROLE_ID } from './database';
 
@@ -38,7 +38,7 @@ export async function upsertUser({
 	const database = await getConnection();
 
 	// Attempt to insert a new identity, updating any identity that may already exist.
-	const insertedIdentity = (await database.insert(identity)
+	const insertedIdentity = (await database.insert(tables.identity)
 		.values({
 			provider_type,
 			provider_hash,
@@ -46,7 +46,7 @@ export async function upsertUser({
 			provider_refresh_token: provider_refresh_token ?? null,
 		})
 		.onConflictDoUpdate({
-			target: [identity.provider_type, identity.provider_hash],
+			target: [tables.identity.provider_type, tables.identity.provider_hash],
 			set: {
 				provider_access_token: provider_access_token ?? null,
 				provider_refresh_token: provider_refresh_token ?? null
@@ -57,43 +57,42 @@ export async function upsertUser({
 		throw new Error('No identity returned when inserting');
 	}
 
-	// TODO: Rename `placeholder`. This is like this because I can't call this `user`, since that conflicts with the name of the table. I may have to restructure some things so that tables live in their own object and aren't top level variables.
-	let placeholder: User | undefined = undefined;
+	let user: User | undefined = undefined;
 
 	// If we have a user associated with this identity, fetch it. If we don't, then create a new user.
 	const userId = insertedIdentity.userId;
 	if (!userId) {
-		placeholder = (await database.insert(user).values({ name: name }).returning())[0];
-		if (!placeholder) {
+		user = (await database.insert(tables.user).values({ name: name }).returning())[0];
+		if (!user) {
 			throw new Error('No user returned while inserting');
 		}
 
-		await database.update(identity)
-			.set({ userId: placeholder.id })
-			.where(eq(identity.id, insertedIdentity.id))
+		await database.update(tables.identity)
+			.set({ userId: user.id })
+			.where(eq(tables.identity.id, insertedIdentity.id))
 
-		await createApiKeyForUserWithId(placeholder.id);
+		await createApiKeyForUserWithId(user.id);
 	} else {
-		placeholder = await findUserById(userId);
+		user = await findUserById(userId);
 	}
 
-	if (!placeholder) {
+	if (!user) {
 		// Something went very wrong.
 		throw new Error('Failed to find user after upserting.');
 	}
 
 	// Update the user with the given roles by first removing all the roles they currently have, and inserting new roles for the user.
 	await database.transaction(async (tx) => {
-		await tx.delete(userRoles).where(eq(userRoles.userId, placeholder!.id));
+		await tx.delete(tables.userRoles).where(eq(tables.userRoles.userId, user!.id));
 
 		if (roles.length > 0) {
-			await tx.insert(userRoles).values(
-				roles.map(role => ({ roleId: role.id, userId: placeholder!.id }))
+			await tx.insert(tables.userRoles).values(
+				roles.map(role => ({ roleId: role.id, userId: user!.id }))
 			)
 		}
 	});
 
-	return placeholder;
+	return user;
 }
 
 export async function isSuperUser(user: User): Promise<boolean> {
@@ -104,8 +103,8 @@ export async function isUserIdSuperUser(userId: User['id']): Promise<boolean> {
 	const database = await getConnection();
 	return await database.query.userRoles.findFirst({
 		where: and(
-			eq(userRoles.userId, userId),
-			eq(userRoles.roleId, SUPERUSER_ROLE_ID)
+			eq(tables.userRoles.userId, userId),
+			eq(tables.userRoles.roleId, SUPERUSER_ROLE_ID)
 		)
 	}) != undefined;
 }
@@ -113,7 +112,7 @@ export async function isUserIdSuperUser(userId: User['id']): Promise<boolean> {
 async function findRole(name: Role['name']): Promise<Role | undefined> {
 	const database = await getConnection();
 	return database.query.role.findFirst({
-		where: eq(role.name, name),
+		where: eq(tables.role.name, name),
 		with: {
 			permissions: true
 		}
@@ -122,16 +121,22 @@ async function findRole(name: Role['name']): Promise<Role | undefined> {
 
 export async function createApiKeyForUserWithId(userId: User['id']): Promise<ApiKey> {
 	const database = await getConnection();
-	const result = (await database.insert(apiKey).values({ userId }).returning())[0];
+	const result = (await database.insert(tables.apiKey).values({ userId }).returning())[0];
 	if (!result) {
 		throw new Error('No API Key returned when inserting.');
 	}
 	return result;
 }
 
+// TODO: The return type isn't correct, as this will only include the fields on User, and none of the relations. Figure out.
 async function findUserById(userId: User['id']): Promise<User | undefined> {
 	const database = await getConnection();
 	return database.query.user.findFirst({
-		where: eq(user.id, userId)
+		where: eq(tables.user.id, userId),
+		with: {
+			roles: true,
+			identities: true,
+			apiKeys: true
+		}
 	});
 }
