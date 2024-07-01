@@ -3,7 +3,7 @@ import type express from 'express';
 
 // Ours
 import { getConnection, tables } from '../database';
-import { isSuperUser, findUser, createApiKeyForUserWithId } from '../database/utils';
+import { isSuperUser, createApiKeyForUserWithId } from '../database/utils';
 import { config } from '../config';
 import { eq } from 'drizzle-orm';
 
@@ -24,7 +24,10 @@ export default async function (req: express.Request, res: express.Response, next
 			isUsingKeyOrSocketToken = true;
 			const database = await getConnection();
 			const foundApiKey = await database.query.apiKey.findFirst({
-				where: eq(tables.apiKey.secret_key, req.query['key'] ?? req.cookies.socketToken)
+				where: eq(tables.apiKey.secret_key, req.query['key'] ?? req.cookies.socketToken),
+				with: {
+					user: true
+				}
 			});
 
 			// No record of this API Key found, reject the request.
@@ -44,7 +47,7 @@ export default async function (req: express.Request, res: express.Response, next
 				return;
 			}
 
-			user = (await findUser(foundApiKey.userId)) ?? undefined;
+			user = foundApiKey.user ?? undefined;
 		}
 
 		if (!user) {
