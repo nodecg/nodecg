@@ -2,7 +2,7 @@
 import type express from 'express';
 
 // Ours
-import { getConnection, apiKey, identity } from '../database';
+import { getConnection, tables } from '../database';
 import { isSuperUser, findUser, createApiKeyForUserWithId } from '../database/utils';
 import { config } from '../config';
 import { eq } from 'drizzle-orm';
@@ -24,7 +24,7 @@ export default async function (req: express.Request, res: express.Response, next
 			isUsingKeyOrSocketToken = true;
 			const database = await getConnection();
 			const foundApiKey = await database.query.apiKey.findFirst({
-				where: eq(apiKey.secret_key, req.query['key'] ?? req.cookies.socketToken)
+				where: eq(tables.apiKey.secret_key, req.query['key'] ?? req.cookies.socketToken)
 			});
 
 			// No record of this API Key found, reject the request.
@@ -64,7 +64,7 @@ export default async function (req: express.Request, res: express.Response, next
 			.query
 			.identity
 			.findFirst({
-				where: eq(identity.userId, user.id)
+				where: eq(tables.identity.userId, user.id)
 			});
 
 		if (foundIdentity) {
@@ -72,7 +72,7 @@ export default async function (req: express.Request, res: express.Response, next
 			const providerAllowed = config.login?.[provider]?.enabled;
 			if ((keyOrSocketTokenAuthenticated || req.isAuthenticated()) && allowed && providerAllowed) {
 				let foundApiKey = await database.query.apiKey.findFirst({
-					where: eq(apiKey.userId, user.id)
+					where: eq(tables.apiKey.userId, user.id)
 				});
 
 				// This should only happen if the database is manually edited, say, in the event of a security breach

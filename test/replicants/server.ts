@@ -12,7 +12,7 @@ const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
-import { getConnection, replicant, Replicant } from '../../src/server/database';
+import { getConnection, tables } from '../../src/server/database';
 import { sleep, waitOneTick } from '../helpers/utilities';
 import { and, eq } from 'drizzle-orm';
 
@@ -311,8 +311,8 @@ test.serial('persistent - should persist assignment to database', async (t) => {
 
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'extensionPersistence')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionPersistence')
 		)
 	});
 
@@ -333,8 +333,8 @@ test.serial('persistent - should persist changes to database', async (t) => {
 
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'extensionPersistence')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionPersistence')
 		)
 	});
 
@@ -355,8 +355,8 @@ test.serial('persistent - should persist top-level string', async (t) => {
 
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'extensionPersistence')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionPersistence')
 		)
 	});
 
@@ -377,8 +377,8 @@ test.serial('persistent - should persist top-level undefined', async (t) => {
 
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'extensionPersistence')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionPersistence')
 		)
 	});
 
@@ -399,8 +399,8 @@ test.serial('persistent - should persist falsey values to disk', async (t) => {
 
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'extensionFalseyWrite')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionFalseyWrite')
 		)
 	});
 
@@ -428,8 +428,8 @@ test.serial('transient - should not write their value to disk', async (t) => {
 
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'extensionTransience')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'extensionTransience')
 		)
 	});
 
@@ -544,8 +544,8 @@ test.serial('should force persistence after maximumTimeAReplicantCanGoWithoutSav
 	// this call will fail saying it couldn't find it.
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'maximumTimeAReplicantCanGoWithoutSaving')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'maximumTimeAReplicantCanGoWithoutSaving')
 		)
 	});
 
