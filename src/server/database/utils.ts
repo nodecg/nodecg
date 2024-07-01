@@ -68,6 +68,10 @@ export async function upsertUser({
 			throw new Error('No user returned while inserting');
 		}
 
+		await database.update(identity)
+			.set({ userId: placeholder.id })
+			.where(eq(identity.id, insertedIdentity.id))
+
 		await createApiKeyForUserWithId(placeholder.id);
 	} else {
 		placeholder = await findUserById(userId);
@@ -80,10 +84,13 @@ export async function upsertUser({
 
 	// Update the user with the given roles by first removing all the roles they currently have, and inserting new roles for the user.
 	await database.transaction(async (tx) => {
-		await tx.delete(userRoles).where(eq(userRoles.userId, placeholder.id));
-		await tx.insert(userRoles).values(
-			roles.map(role => ({ roleId: role.id, userId: placeholder.id }))
-		)
+		await tx.delete(userRoles).where(eq(userRoles.userId, placeholder!.id));
+
+		if (roles.length > 0) {
+			await tx.insert(userRoles).values(
+				roles.map(role => ({ roleId: role.id, userId: placeholder!.id }))
+			)
+		}
 	});
 
 	return placeholder;

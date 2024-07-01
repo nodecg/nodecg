@@ -54,6 +54,7 @@ CREATE TABLE `user_roles_role` (
 	FOREIGN KEY (`roleId`) REFERENCES `role`(`id`) ON UPDATE cascade ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `identity_provider_type_provider_hash_unique` ON `identity` (`provider_type`,`provider_hash`);--> statement-breakpoint
 CREATE UNIQUE INDEX `role_name_unique` ON `role` (`name`);--> statement-breakpoint
 CREATE INDEX `userIdIdx` ON `user_roles_role` (`userId`);--> statement-breakpoint
 CREATE INDEX `roleIdIdx` ON `user_roles_role` (`roleId`);

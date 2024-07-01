@@ -1,4 +1,4 @@
-import { text, sqliteTable } from "drizzle-orm/sqlite-core";
+import { text, sqliteTable, unique } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { user } from './User';
@@ -10,6 +10,10 @@ export const identity = sqliteTable('identity', {
 	provider_access_token: text('provider_access_token'),
 	provider_refresh_token: text('provider_refresh_token'),
 	userId: text('userId').references(() => user.id)
+}, (table) => {
+	return {
+		providerIdentity: unique().on(table.provider_type, table.provider_hash)
+	}
 });
 
 export const identityRelations = relations(identity, ({ one }) => {
@@ -22,7 +26,6 @@ export const identityRelations = relations(identity, ({ one }) => {
 });
 
 export type Identity = typeof identity.$inferSelect;
-export type NewIdentity = typeof identity.$inferInsert;
 
 // import { Entity, ManyToOne, PrimaryGeneratedColumn, Column } from 'typeorm';
 // import { User } from './User';

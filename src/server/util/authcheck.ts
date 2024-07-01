@@ -5,7 +5,7 @@ import type express from 'express';
 import { getConnection, apiKey, identity } from '../database';
 import { isSuperUser, findUser, createApiKeyForUserWithId } from '../database/utils';
 import { config } from '../config';
-import { count, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 /**
  * Express middleware that checks if the user is authenticated.
@@ -67,35 +67,37 @@ export default async function (req: express.Request, res: express.Response, next
 				where: eq(identity.userId, user.id)
 			});
 
-		if (!foundIdentity) {
-			throw new Error('');
-		}
+		if (foundIdentity) {
+			const provider = foundIdentity.provider_type;
+			const providerAllowed = config.login?.[provider]?.enabled;
+			if ((keyOrSocketTokenAuthenticated || req.isAuthenticated()) && allowed && providerAllowed) {
+				let foundApiKey = await database.query.apiKey.findFirst({
+					where: eq(apiKey.userId, user.id)
+				});
 
-		const provider = foundIdentity.provider_type;
-		const providerAllowed = config.login?.[provider]?.enabled;
-		if ((keyOrSocketTokenAuthenticated || req.isAuthenticated()) && allowed && providerAllowed) {
-			const apiKeysCount = (await database.select({ value: count() })
-				.from(apiKey)
-				.where(eq(apiKey.userId, user.id)))[0]?.value
+				// This should only happen if the database is manually edited, say, in the event of a security breach
+				// that reavealed an API key that needed to be deleted.
+				if (!foundApiKey) {
+					// Make a new api key.
+					foundApiKey = await createApiKeyForUserWithId(user.id);
+				}
 
-			// This should only happen if the database is manually edited, say, in the event of a security breach
-			// that reavealed an API key that needed to be deleted.
-			if (!apiKeysCount || apiKeysCount == 0) {
-				// Make a new api key.
-				await createApiKeyForUserWithId(user.id);
+				if (!foundApiKey) {
+					throw new Error('Expected to have a created API key');
+				}
+
+				// Set the cookie so that requests to other resources on the page
+				// can also be authenticated.
+				// This is crucial for things like OBS browser sources,
+				// where we don't have a session.
+				res.cookie('socketToken', foundApiKey.secret_key, {
+					secure: req.secure,
+					sameSite: req.secure ? 'none' : undefined,
+				});
+
+				next();
+				return;
 			}
-
-			// Set the cookie so that requests to other resources on the page
-			// can also be authenticated.
-			// This is crucial for things like OBS browser sources,
-			// where we don't have a session.
-			res.cookie('socketToken', apiKey.secret_key, {
-				secure: req.secure,
-				sameSite: req.secure ? 'none' : undefined,
-			});
-
-			next();
-			return;
 		}
 
 		if (req.session) {

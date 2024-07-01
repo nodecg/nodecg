@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5ce88ffe-717b-4079-ab69-00787dbb8c08",
+  "id": "7ab96f46-96bb-4e6b-a0b9-25a383b79893",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "api_key": {
@@ -87,7 +87,16 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "identity_provider_type_provider_hash_unique": {
+          "name": "identity_provider_type_provider_hash_unique",
+          "columns": [
+            "provider_type",
+            "provider_hash"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "identity_userId_user_id_fk": {
           "name": "identity_userId_user_id_fk",
