@@ -15,7 +15,6 @@ import createLogger from '../logger';
 import type { NodeCG } from '../../types/nodecg';
 import { getSchemaDefault } from '../../shared/utils/compileJsonSchema';
 import { NODECG_ROOT } from '../nodecg-root';
-import { isTesting } from '../util';
 
 /**
  * Never instantiate this directly.
@@ -61,7 +60,7 @@ export default class ServerReplicant<
 					this.validate = this._generateValidator();
 				} catch (e: any) {
 					/* istanbul ignore next */
-					if (!isTesting()) {
+					if (!process.env.NODECG_TEST) {
 						this.log.error('Schema could not be loaded, are you sure that it is valid JSON?\n', e.stack);
 					}
 				}

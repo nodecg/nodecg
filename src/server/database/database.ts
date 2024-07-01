@@ -6,7 +6,6 @@ import Database from 'better-sqlite3';
 
 import { nodecgRootPath } from '../../shared/utils/rootPath';
 import createLogger from '../logger';
-import { isTesting } from './../util';
 import * as schema from './entity';
 import { DefaultLogger, LogWriter } from 'drizzle-orm';
 
@@ -23,17 +22,19 @@ class NodeCGDrizzleLogger implements LogWriter {
 
 const dbPath = path.join(nodecgRootPath, 'db/nodecg.sqlite3');
 const migrationsPath = path.join(nodecgRootPath, 'db/migrations');
+// TODO: This is a different way of checking if we're in a testing environment than other places. Standardize on an approach, and provide one means of checking if we're in a testing environment.
+const testing = process.env.NODECG_TEST?.toLowerCase() === 'true';
 
 // When testing, we specifically use SQLite's in-memory storage.
 // This allows us to use SQLite as normal when running tests without any data being persisted on disk.
-const sqlite = new Database(isTesting() ? ':memory:' : dbPath);
+const sqlite = new Database(testing ? ':memory:' : dbPath);
 const db = drizzle(sqlite, {
 	logger: new DefaultLogger({ writer: new NodeCGDrizzleLogger() }),
 	schema: { ...schema.tables, ...schema.relations }
 });
 
 export async function initialize() {
-	if (isTesting()) {
+	if (testing) {
 		log.warn('Using in-memory test database.');
 	}
 

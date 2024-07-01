@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as Sentry from '@sentry/node';
 import { config, filteredConfig, sentryEnabled } from '../config';
 import '../util/sentry-config';
-import { isTesting, pjson } from '../util';
+import { pjson } from '../util';
 
 if (config.sentry?.enabled) {
 	Sentry.init({
@@ -246,7 +246,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		server.on('error', (err) => {
 			switch ((err as any).code) {
 				case 'EADDRINUSE':
-					if (isTesting()) {
+					if (process.env.NODECG_TEST) {
 						return;
 					}
 
@@ -333,10 +333,10 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			server.listen(
 				{
 					host: config.host,
-					port: isTesting() ? undefined : config.port,
+					port: process.env.NODECG_TEST ? undefined : config.port,
 				},
 				() => {
-					if (isTesting()) {
+					if (process.env.NODECG_TEST) {
 						const addrInfo = server.address();
 						if (typeof addrInfo !== 'object' || addrInfo === null) {
 							throw new Error("couldn't get port number");

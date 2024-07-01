@@ -6,4 +6,3 @@ export { default as throttleName } from './throttle-name';
 export { default as pjson } from './pjson';
 export { default as sendFile } from './sendFile';
 export { asyncExitHook } from './exit-hook';
-export { isTesting } from './testing';
