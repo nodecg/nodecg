@@ -17,7 +17,7 @@ const { initDashboard } = browser.setup();
 
 import * as C from '../helpers/test-constants';
 import type { NodeCG } from '../../src/types/nodecg';
-import { getConnection, replicant } from '../../src/server/database';
+import { getConnection, tables } from '../../src/server/database';
 import { and, eq } from 'drizzle-orm';
 
 let dashboard: puppeteer.Page;
@@ -614,8 +614,8 @@ test.serial('persistent - should persist assignment to disk', async (t) => {
 
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'clientPersistence')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'clientPersistence')
 		)
 	});
 
@@ -651,8 +651,8 @@ test('persistent - should persist changes to disk', async (t) => {
 
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'clientPersistence')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'clientPersistence')
 		)
 	});
 
@@ -681,8 +681,8 @@ test.serial('persistent - should persist falsey values to disk', async (t) => {
 
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'clientFalseyWrite')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'clientFalseyWrite')
 		)
 	});
 
@@ -726,8 +726,8 @@ test.serial('transient - should not write their value to disk', async (t) => {
 
 	const fromDb = await database.query.replicant.findFirst({
 		where: and(
-			eq(replicant.namespace, 'test-bundle'),
-			eq(replicant.name, 'clientTransience')
+			eq(tables.replicant.namespace, 'test-bundle'),
+			eq(tables.replicant.name, 'clientTransience')
 		)
 	});
 
