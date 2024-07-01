@@ -128,15 +128,9 @@ export async function createApiKeyForUserWithId(userId: User['id']): Promise<Api
 	return result;
 }
 
-// TODO: The return type isn't correct, as this will only include the fields on User, and none of the relations. Figure out.
 async function findUserById(userId: User['id']): Promise<User | undefined> {
 	const database = await getConnection();
 	return database.query.user.findFirst({
-		where: eq(tables.user.id, userId),
-		with: {
-			roles: true,
-			identities: true,
-			apiKeys: true
-		}
+		where: eq(tables.user.id, userId)
 	});
 }
