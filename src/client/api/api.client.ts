@@ -480,4 +480,6 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	}
 }
 
-(window as any).NodeCG = NodeCGAPIClient;
+if (globalThis.window) {
+	(window as any).NodeCG = NodeCGAPIClient;
+}
