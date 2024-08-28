@@ -56,12 +56,14 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		bundleName: string,
 		data: unknown,
 		cb: SendMessageCb<T>,
+		socket?: TypedClientSocket,
 	): void;
 	static sendMessageToBundle<T = unknown>(
 		messageName: string,
 		bundleName: string,
 		dataOrCb?: unknown,
 		cb?: SendMessageCb<T>,
+		socket?: TypedClientSocket,
 	): void | Promise<T> {
 		let data: any = null;
 		if (typeof dataOrCb === 'function') {
@@ -73,7 +75,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		_forwardMessageToContext(messageName, bundleName, data);
 
 		if (typeof cb === 'function') {
-			globalThis.socket.emit(
+			(socket ?? globalThis.socket).emit(
 				'message',
 				{
 					bundleName,
@@ -90,7 +92,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 			);
 		} else {
 			return new Promise<T>((resolve, reject) => {
-				globalThis.socket.emit(
+				(socket ?? globalThis.socket).emit(
 					'message',
 					{
 						bundleName,
@@ -109,8 +111,13 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		}
 	}
 
-	static readReplicant<T = unknown>(name: string, namespace: string, cb: ReadReplicantCb<T>): void {
-		globalThis.socket.emit('replicant:read', { name, namespace }, (error, value?) => {
+	static readReplicant<T = unknown>(
+		name: string,
+		namespace: string,
+		cb: ReadReplicantCb<T>,
+		socket?: TypedClientSocket,
+	): void {
+		(socket ?? globalThis.socket).emit('replicant:read', { name, namespace }, (error, value?) => {
 			if (error) {
 				console.error(error);
 			} else {
@@ -405,7 +412,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		cb?: SendMessageCb<T>,
 	): void | Promise<T> {
 		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-		return NodeCGAPIClient.sendMessageToBundle(messageName, bundleName, dataOrCb, cb as any);
+		return NodeCGAPIClient.sendMessageToBundle(messageName, bundleName, dataOrCb, cb as any, this.socket);
 	}
 
 	sendMessage<T = unknown>(messageName: string, cb: SendMessageCb<T>): void;
@@ -428,7 +435,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 			cb = nspOrCb;
 		}
 
-		NodeCGAPIClient.readReplicant<T>(name, namespace, cb);
+		NodeCGAPIClient.readReplicant<T>(name, namespace, cb, this.socket);
 	}
 
 	protected _replicantFactory = <V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
