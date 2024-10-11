@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.3](https://github.com/nodecg/nodecg/compare/v2.2.2...v2.2.3) (2024-10-10)
+
+
+### Bug Fixes
+
+* Add '@types/ws' package to fix types package build ([#751](https://github.com/nodecg/nodecg/issues/751)) ([0c71ddd](https://github.com/nodecg/nodecg/commit/0c71dddfe7fe6fe1c8c632cce89272f0428cef86))
+* Set cheerio version to avoid getting breaking changes in 1.0 release ([e069c96](https://github.com/nodecg/nodecg/commit/e069c968b41ae12700b49bdd37e66618f7b906e1))
+
 ## [2.2.2](https://github.com/nodecg/nodecg/compare/v2.2.1...v2.2.2) (2024-06-29)
 
 
