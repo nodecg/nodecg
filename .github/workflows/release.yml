@@ -54,7 +54,7 @@ jobs:
 
       - name: Publish types
         working-directory: ./generated-types
-        run: npm publish --access public
+        run: npx tsx script/sync-version.ts && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
