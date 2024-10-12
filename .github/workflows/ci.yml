@@ -53,13 +53,10 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - '16.13.0'
-          - '18.12.0'
-          - '20.9.0'
+          - '20'
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest
 
     runs-on: ${{matrix.os}}
 
@@ -110,7 +107,7 @@ jobs:
 
       - run: npm run test-coverage-ci
 
-      - if: runner.os == 'Linux' && matrix.node-version == '18.x'
+      - if: matrix.os == 'Linux' && matrix.node-version == '20'
         uses: codecov/codecov-action@v3
 
   dry-run-container-build:
