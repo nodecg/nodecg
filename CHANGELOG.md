@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.4](https://github.com/nodecg/nodecg/compare/v2.2.3...v2.2.4) (2024-10-12)
+
+
+### Bug Fixes
+
+* **release:** correct use of manifest and config ([9eb3df0](https://github.com/nodecg/nodecg/commit/9eb3df0ac2b65b574e43c58bc1b956d2e9c79576))
+* **release:** fix release please manifest ([06272ad](https://github.com/nodecg/nodecg/commit/06272ad58b89796cb95740e5e6cb9a9faacf90c6))
+* **release:** set jsonpath ([c5e50b1](https://github.com/nodecg/nodecg/commit/c5e50b1d63db0c3722e2898a8cfc9431cfa97c41))
+* **release:** update generated-types version ([1baf831](https://github.com/nodecg/nodecg/commit/1baf8311b88a29fba3dfcae56965794f4e0b4f5f))
+* **release:** use extra-files ([7347e3b](https://github.com/nodecg/nodecg/commit/7347e3bbea08f59e428abf9d76e85d932b4b5746))
+* **types-release:** force update package.json version ([5db1c3a](https://github.com/nodecg/nodecg/commit/5db1c3a59c39f03bd9a38981f9dd0e0caab638e5))
+
 ## [2.2.3](https://github.com/nodecg/nodecg/compare/v2.2.2...v2.2.3) (2024-10-10)
 
 
