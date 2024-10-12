@@ -1,6 +1,8 @@
 {
-	"packages": {
-		".": {},
-		"generated-types": {}
-	}
+	"extra-files": [
+		{
+			"type": "json",
+			"path": "generated-types/package.json"
+		}
+	]
 }
