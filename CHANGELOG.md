@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.4](https://github.com/nodecg/nodecg/compare/v2.2.3...v2.2.4) (2024-10-12)
+
+
+### Bug Fixes
+
+* **types-release:** force update package.json version ([5db1c3a](https://github.com/nodecg/nodecg/commit/5db1c3a59c39f03bd9a38981f9dd0e0caab638e5))
+
 ## [2.2.3](https://github.com/nodecg/nodecg/compare/v2.2.2...v2.2.3) (2024-10-10)
 
 
