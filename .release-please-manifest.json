@@ -1,3 +1,1 @@
-{
-	"extra-files": [{ "type": "json", "path": "./generated-types/package.json", "jsonpath": "$.version" }]
-}
+{}
