@@ -10,9 +10,12 @@ import type { Replicator, ServerReplicant } from './replicant';
 import { config } from './config';
 import { Logger } from './logger';
 import * as ncgUtils from './util';
-import type { RootNS } from '../types/socket-protocol';
+import type { RootNS, TypedClientSocket } from '../types/socket-protocol';
 import type { NodeCG } from '../types/nodecg';
 import type { ExtensionEventMap } from './server/extensions';
+
+import { NodeCGAPIClient } from '../client/api/api.client';
+import ioClient from 'socket.io-client';
 
 export default (io: RootNS, replicator: Replicator, extensions: Record<string, unknown>, mount: NodeCG.Middleware) => {
 	const apiContexts = new Set<NodeCGAPIBase<'server', NodeCG.Bundle.UnknownConfig, ExtensionEventMap>>();
@@ -303,6 +306,79 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 			namespace: string,
 			opts: O,
 		): ServerReplicant<V, O> => replicator.declare<V, O>(name, namespace, opts);
+
+		_clients = new Map<string, NodeCGAPIClient>();
+
+		createClient(url: string, bundleNamespace: string): NodeCGAPIClient;
+		createClient(url: string, bundleConfig: NodeCG.Bundle): NodeCGAPIClient;
+		createClient(host: string, port: number, bundleConfig: NodeCG.Bundle): NodeCGAPIClient;
+		createClient(host: string, port: number, bundleNamespace: string): NodeCGAPIClient;
+		createClient(
+			host: string,
+			port?: number | NodeCG.Bundle | string,
+			bundleConfig?: NodeCG.Bundle | string,
+		): NodeCGAPIClient {
+			const url = new URL(host);
+
+			if (!bundleConfig && port) {
+				bundleConfig = port as NodeCG.Bundle | string;
+			} else if (port) {
+				url.port = (port as number) + '';
+			}
+
+			for (const [existingUrl, client] of this._clients) {
+				if (existingUrl === url.toString()) {
+					(client.socket as TypedClientSocket & { count: number }).count++;
+					return client;
+				}
+			}
+
+			const socket = ioClient(url.toString()) as TypedClientSocket & { count: number };
+
+			socket.connect();
+
+			socket.count = 1;
+
+			const config: NodeCG.Bundle =
+				typeof bundleConfig === 'string'
+					? {
+							name: bundleConfig,
+							version: '',
+							dir: '',
+							git: undefined,
+							config: {},
+							hasAssignableSoundCues: false,
+							hasExtension: false,
+							dashboard: {
+								dir: '',
+								panels: [],
+							},
+							graphics: [],
+							mount: [],
+							assetCategories: [],
+							soundCues: [],
+							compatibleRange: '',
+							transformBareModuleSpecifiers: false,
+						}
+					: bundleConfig!;
+
+			const client = new NodeCGAPIClient(config, socket);
+			this._clients.set(url.toString(), client);
+
+			return client;
+		}
+
+		closeClient(client: NodeCGAPIClient) {
+			const socket = client.socket as TypedClientSocket & { count: number };
+			socket.count--;
+			if (socket.count === 0) {
+				socket.close();
+				for (const [url, existingClient] of this._clients) {
+					if (client === existingClient) this._clients.delete(url);
+					return;
+				}
+			}
+		}
 	};
 };
 

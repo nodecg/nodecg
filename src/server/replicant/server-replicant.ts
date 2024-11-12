@@ -39,6 +39,7 @@ export default class ServerReplicant<
 		 * fetched the current value from the server, which is an
 		 * async operation that takes time.
 		 */
+		this.type = 'server';
 		this.status = 'declared';
 		this.log = createLogger(`Replicant/${namespace}.${name}`);
 
