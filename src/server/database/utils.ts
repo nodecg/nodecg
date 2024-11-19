@@ -1,4 +1,4 @@
-import { getConnection, User, Role, Identity } from '../database';
+import { getConnection, Identity, Role, User } from '../database';
 import { ApiKey } from './entity/ApiKey';
 
 export async function findUser(id: User['id']): Promise<User | null> {
@@ -76,7 +76,7 @@ export function isSuperUser(user: User): boolean {
 	return Boolean(user.roles?.find((role) => role.name === 'superuser'));
 }
 
-async function findRole(name: Role['name']): Promise<Role | null> {
+export async function findRole(name: Role['name']): Promise<Role | null> {
 	const database = await getConnection();
 	const { manager } = database;
 	return manager.findOne(Role, { where: { name }, relations: ['permissions'] });

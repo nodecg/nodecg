@@ -165,6 +165,10 @@ export const nodecgConfigSchema = z
 										.array(z.string())
 										.default([])
 										.describe('Additionally require one of the roles on the server to log in.'),
+									externalRoleIDs: z
+										.array(z.string())
+										.default([])
+										.describe('Additionally require one of the roles on the server to log in.'),
 									guildBotToken: z
 										.string()
 										.default('')

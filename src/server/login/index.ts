@@ -14,7 +14,7 @@ import { config } from '../config';
 import createLogger from '../logger';
 import type { User, Role } from '../database';
 import { Session, getConnection } from '../database';
-import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/utils';
+import { findUser, upsertUser, getSuperUserRole, isSuperUser, findRole } from '../database/utils';
 import { nodecgRootPath } from '../../shared/utils/rootPath';
 
 type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
@@ -153,9 +153,9 @@ if (config.login.enabled && config.login.twitch?.enabled) {
 }
 
 async function makeDiscordAPIRequest(
-	guild: { guildID: string; guildBotToken: string; allowedRoleIDs: string[] },
+	guild: { guildID: string; guildBotToken: string; allowedRoleIDs: string[], externalRoleIDs: string[] },
 	userID: string,
-): Promise<[{ guildID: string; guildBotToken: string; allowedRoleIDs: string[] }, boolean, { roles: string[] }]> {
+): Promise<[{ guildID: string; guildBotToken: string; allowedRoleIDs: string[], externalRoleIDs: string[] }, boolean, { roles: string[] }]> {
 	const res = await fetch(`https://discord.com/api/v8/guilds/${guild.guildID}/members/${userID}`, {
 		headers: {
 			Authorization: `Bot ${guild.guildBotToken}`,
@@ -203,6 +203,7 @@ if (config.login.enabled && config.login.discord?.enabled) {
 				}
 
 				let allowed = false;
+				let allowedExternal = false;
 				if (discordLoginConfig.allowedUserIDs?.includes(profile.id)) {
 					// Users that are on allowedUserIDs are allowed
 					allowed = true;
@@ -230,7 +231,7 @@ if (config.login.enabled && config.login.discord?.enabled) {
 							if (err) {
 								log.warn(
 									`Got error while trying to get guild ${guildWithRoles.guildID} ` +
-										`(Make sure you're using the correct bot token and guild id): ${JSON.stringify(memberResponse)}`,
+									`(Make sure you're using the correct bot token and guild id): ${JSON.stringify(memberResponse)}`,
 								);
 								continue;
 							}
@@ -240,7 +241,16 @@ if (config.login.enabled && config.login.discord?.enabled) {
 							);
 							if (intersectingRoles.length > 0) {
 								allowed = true;
-								break;
+								// break;
+							}
+
+							const intersectingExtRoles = guildWithRoles.externalRoleIDs.filter((allowedRole) =>
+								memberResponse.roles.includes(allowedRole),
+							);
+
+							if (intersectingExtRoles.length > 0) {
+								allowedExternal = true;
+								// break;
 							}
 						}
 					}
@@ -254,6 +264,17 @@ if (config.login.enabled && config.login.discord?.enabled) {
 					roles.push(await getSuperUserRole());
 				} else {
 					log.info('(Discord) Denying %s#%s (%s) access', profile.username, profile.discriminator, profile.id);
+				}
+
+				if (allowedExternal) {
+					log.info('(Discord) Granting %s#%s (%s) external access', profile.username, profile.discriminator, profile.id);
+					const role = await findRole("external");
+					if (!role) {
+						throw new Error('external role unexpectedly not found');
+					}
+					roles.push(role);
+				} else {
+					log.info('(Discord) Denying %s#%s (%s) external access', profile.username, profile.discriminator, profile.id);
 				}
 
 				const user = await upsertUser({
