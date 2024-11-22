@@ -14,8 +14,9 @@ export function isRole(user: User, roleName: string): boolean {
 /**
  * Express middleware that checks if the user is authenticated.
  */
-export default function (roleName: string) {
+export default function (roleNames: string[], afterLoginRedirect?: string) {
 	return async function (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+		afterLoginRedirect = afterLoginRedirect ?? req.originalUrl;
 		try {
 			if (!config.login?.enabled) {
 				next();
@@ -45,6 +46,7 @@ export default function (roleName: string) {
 						res.clearCookie('connect.sid', { path: '/' });
 						res.clearCookie('io', { path: '/' });
 
+						res.cookie("returnTo", afterLoginRedirect, { path: "/", maxAge: 1000 * 60 * 5 });
 						res.redirect('/login');
 					});
 					return;
@@ -55,14 +57,15 @@ export default function (roleName: string) {
 
 			if (!user) {
 				if (req.session) {
-					req.session.returnTo = req.url;
+					req.session.returnTo = afterLoginRedirect;
 				}
 
+				res.cookie("returnTo", afterLoginRedirect, { path: "/", maxAge: 1000 * 60 * 5 });
 				res.status(403).redirect('/login');
 				return;
 			}
 
-			const allowed = isSuperUser(user) || isRole(user, roleName);
+			const allowed = isSuperUser(user) || roleNames.some(rn => isRole(user, rn));
 			keyOrSocketTokenAuthenticated = isUsingKeyOrSocketToken && allowed;
 			const provider = user.identities[0]!.provider_type;
 			const providerAllowed = config.login?.[provider]?.enabled;
@@ -96,9 +99,10 @@ export default function (roleName: string) {
 			}
 
 			if (req.session) {
-				req.session.returnTo = req.url;
+				req.session.returnTo = afterLoginRedirect;
 			}
 
+			res.cookie("returnTo", afterLoginRedirect, { path: "/", maxAge: 1000 * 60 * 5 });
 			res.status(403).redirect('/login');
 			return;
 		} catch (error: unknown) {

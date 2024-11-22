@@ -356,8 +356,9 @@ export async function createMiddleware(callbacks: {
 	const sessionRepository = database.getRepository(Session);
 	const app = express();
 	const redirectPostLogin = (req: express.Request, res: express.Response): void => {
-		const url = req.session?.returnTo ?? '/dashboard';
+		const url = req.session?.returnTo ?? req.cookies["returnTo"] ?? '/dashboard';
 		delete req.session.returnTo;
+		res.clearCookie("returnTo", { path: "/" });
 		res.redirect(url);
 		app.emit('login', req.user);
 		if (req.user) callbacks.onLogin(req.user);
