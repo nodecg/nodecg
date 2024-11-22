@@ -113,6 +113,7 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 			 * @param {function} next - The next middleware in the control flow.
 			 */
 			authCheck: ncgUtils.authCheck,
+			authCheckRole: ncgUtils.authCheckRole
 		};
 
 		/**
