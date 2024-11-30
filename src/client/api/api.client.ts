@@ -46,7 +46,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		namespace: string,
 		opts: O = {} as Record<any, unknown>,
 	): ClientReplicant<V, O> {
-		return new ClientReplicant<V, O>(name, namespace, opts, (window as any).socket);
+		return new ClientReplicant<V, O>(name, namespace, opts, (globalThis as any).socket);
 	}
 
 	static sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, cb: SendMessageCb<T>): void;
@@ -438,6 +438,10 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	): ClientReplicant<V, O> => new ClientReplicant<V, O>(name, namespace, opts, this.socket);
 
 	private _registerSounds(): void {
+		if (!globalThis.window) {
+			throw new Error('NodeCG Sound API methods are not available in workers');
+		}
+
 		this._soundCues.forEach((cue) => {
 			if (!cue.file) {
 				return;
@@ -480,4 +484,4 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	}
 }
 
-(window as any).NodeCG = NodeCGAPIClient;
+(globalThis as any).NodeCG = NodeCGAPIClient;
