@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.5](https://github.com/nodecg/nodecg/compare/v2.2.4...v2.2.5) (2024-11-30)
+
+
+### Bug Fixes
+
+* bugs preventing replicants in workers ([#756](https://github.com/nodecg/nodecg/issues/756)) ([824f9a9](https://github.com/nodecg/nodecg/commit/824f9a90bb054c0ff833838d457506e44035ddcf))
+
 ## [2.2.4](https://github.com/nodecg/nodecg/compare/v2.2.3...v2.2.4) (2024-10-12)
 
 
