@@ -1,12 +1,15 @@
-FROM node:18-slim AS build
+FROM node:22-slim AS base
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
+FROM base AS build
 
 WORKDIR /nodecg
 
 COPY package.json package-lock.json ./
 COPY scripts ./scripts
 
+RUN apt-get update && apt-get install -y python3 build-essential
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 RUN npm ci
 
 COPY tsconfig.json ./
@@ -17,17 +20,18 @@ COPY generated-types generated-types
 RUN npm run build
 
 
-FROM node:18-slim AS npm
+FROM base AS npm
 
 WORKDIR /nodecg
 
 COPY package.json package-lock.json ./
 COPY scripts ./scripts
 
+RUN apt-get update && apt-get install -y python3 build-essential
 RUN npm ci --omit=dev
 
 
-FROM node:18-slim AS runtime
+FROM base AS runtime
 
 RUN apt-get update \
 	&& apt-get install -y git \
@@ -35,22 +39,15 @@ RUN apt-get update \
 
 WORKDIR /opt/nodecg
 
-# Sets up the runtime user, makes nodecg-cli available to images which extend this image, and creates the directory structure with the appropriate permissions.
-RUN addgroup --system nodecg \
-	&& adduser --system nodecg --ingroup nodecg \
-	&& npm i -g nodecg-cli \
-	&& mkdir cfg bundles logs db assets \
-	&& chown -R nodecg:nodecg /opt/nodecg
+RUN  npm i -g nodecg-cli \
+	&& mkdir cfg bundles logs db assets
 
-# Switch to the nodecg user
-USER nodecg
-
-COPY --chown=nodecg:nodecg package.json index.js ./
-COPY --chown=nodecg:nodecg --from=npm /nodecg/node_modules ./node_modules
-COPY --chown=nodecg:nodecg --from=build /nodecg/dist ./dist
-COPY --chown=nodecg:nodecg --from=build /nodecg/out ./out
-COPY --chown=nodecg:nodecg --from=build /nodecg/scripts ./scripts
-COPY --chown=nodecg:nodecg --from=build /nodecg/schemas ./schemas
+COPY package.json index.js ./
+COPY --from=npm /nodecg/node_modules ./node_modules
+COPY --from=build /nodecg/dist ./dist
+COPY --from=build /nodecg/out ./out
+COPY --from=build /nodecg/scripts ./scripts
+COPY --from=build /nodecg/schemas ./schemas
 
 # Define directories that should be persisted in a volume
 VOLUME /opt/nodecg/cfg /opt/nodecg/bundles /opt/nodecg/logs /opt/nodecg/db /opt/nodecg/assets

@@ -16,7 +16,8 @@ try {
 	execSync('npm i', { cwd: outputDir, stdio: 'inherit' });
 
 	// Without removing the root node_modules folder, tsc will use it along with the types package's node_modules
-	fs.renameSync(rootNodeModulesPath, tmpNodeModulesPath);
+	fs.cpSync(rootNodeModulesPath, tmpNodeModulesPath, { recursive: true });
+	fs.rmSync(rootNodeModulesPath, { recursive: true });
 
 	// Test that the typings and dependencies are valid
 	execSync('npx tsc', { cwd: outputDir, stdio: 'inherit' });
