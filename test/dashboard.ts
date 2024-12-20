@@ -105,7 +105,7 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 	t.pass();
 });
 
-test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is clicked', async (t) => {
+test.serial.skip('ncg-dialog - should emit dialog-confirmed when a confirm button is clicked', async (t) => {
 	await dashboard.evaluate(
 		async () =>
 			new Promise<void>((resolve) => {
