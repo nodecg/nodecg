@@ -1,6 +1,6 @@
 {
   "name": "nodecg",
-  "version": "2.2.5",
+  "version": "2.3.0",
   "description": "Dynamic broadcast graphics rendered in a browser",
   "keywords": [
     "graphics",
