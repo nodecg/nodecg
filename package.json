@@ -1,15 +1,7 @@
 {
   "name": "nodecg",
-  "description": "Dynamic broadcast graphics rendered in a browser",
-  "main": "index.js",
   "version": "2.2.5",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nodecg/nodecg.git"
-  },
-  "bugs": "https://github.com/nodecg/nodecg/issues",
-  "homepage": "https://nodecg.dev/",
-  "license": "MIT",
+  "description": "Dynamic broadcast graphics rendered in a browser",
   "keywords": [
     "graphics",
     "nodecg",
@@ -17,6 +9,46 @@
     "dynamic",
     "broadcast"
   ],
+  "homepage": "https://nodecg.dev/",
+  "bugs": "https://github.com/nodecg/nodecg/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodecg/nodecg.git"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "files": [
+    "dist",
+    "out",
+    "scripts",
+    "bundles/.empty_directory",
+    "db/.empty_directory",
+    "schemas",
+    "AUTHORS"
+  ],
+  "scripts": {
+    "start": "node index.js",
+    "dev": "del-cli dist out && run-p dev:*",
+    "dev:client": "npm run build:client -- --watch",
+    "dev:build-server": "tsc -b src/server --watch --preserveWatchOutput",
+    "dev:run-server": "node --watch --watch-preserve-output index.js",
+    "test": "ava --config ava.config.js",
+    "test-coverage": "c8 ava --config ava.config.js",
+    "test-coverage-ci": "c8 --reporter lcov ava --config ava.config.js",
+    "test:types": "cd typetest/fake-bundle && npm run build",
+    "lint": "npm-run-all -s lint:*",
+    "lint:prettier": "prettier --check \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
+    "lint:eslint": "eslint --cache \"{src,test}/**/*.ts\"",
+    "fix": "npm-run-all -s fix:*",
+    "fix:prettier": "prettier --write \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
+    "fix:eslint": "npm run lint:eslint -- --fix ",
+    "build": "del-cli \"generated-types/{client,server,shared,types}\" dist out && run-s build:{tsc,client,copy-templates,types}",
+    "build:tsc": "tsc -b src/server src/client",
+    "build:client": "ts-node scripts/build-client.ts",
+    "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server",
+    "build:types": "ts-node scripts/generate-types-package.ts",
+    "generate-migrations": "cd src/server && typeorm-ts-node-commonjs migration:generate ./database/migration/rename-me -d ./database/datasource.ts"
+  },
   "dependencies": {
     "@nodecg/json-schema-defaults": "^1.0.4",
     "@polymer/app-layout": "^3.1.0",
@@ -104,38 +136,6 @@
     "yargs": "^15.4.1",
     "zod": "^3.22.4"
   },
-  "scripts": {
-    "start": "node index.js",
-    "dev": "del-cli dist out && run-p dev:*",
-    "dev:client": "npm run build:client -- --watch",
-    "dev:build-server": "tsc -b src/server --watch --preserveWatchOutput",
-    "dev:run-server": "node --watch --watch-preserve-output index.js",
-    "test": "ava --config ava.config.js",
-    "test-coverage": "c8 ava --config ava.config.js",
-    "test-coverage-ci": "c8 --reporter lcov ava --config ava.config.js",
-    "test:types": "cd typetest/fake-bundle && npm run build",
-    "lint": "npm-run-all -s lint:*",
-    "lint:prettier": "prettier --check \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
-    "lint:eslint": "eslint --cache \"{src,test}/**/*.ts\"",
-    "fix": "npm-run-all -s fix:*",
-    "fix:prettier": "prettier --write \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
-    "fix:eslint": "npm run lint:eslint -- --fix ",
-    "build": "del-cli \"generated-types/{client,server,shared,types}\" dist out && run-s build:{tsc,client,copy-templates,types}",
-    "build:tsc": "tsc -b src/server src/client",
-    "build:client": "ts-node scripts/build-client.ts",
-    "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server",
-    "build:types": "ts-node scripts/generate-types-package.ts",
-    "generate-migrations": "cd src/server && typeorm-ts-node-commonjs migration:generate ./database/migration/rename-me -d ./database/datasource.ts"
-  },
-  "files": [
-    "dist",
-    "out",
-    "scripts",
-    "bundles/.empty_directory",
-    "db/.empty_directory",
-    "schemas",
-    "AUTHORS"
-  ],
   "devDependencies": {
     "@types/app-root-path": "^1.2.8",
     "@types/clone": "^2.1.4",
