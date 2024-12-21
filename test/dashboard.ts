@@ -1,6 +1,5 @@
 // Packages
 import test from 'ava';
-import fetch from 'node-fetch-commonjs';
 import type * as puppeteer from 'puppeteer';
 
 // Ours

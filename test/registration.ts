@@ -4,7 +4,6 @@ import path from 'path';
 
 // Packages
 import test from 'ava';
-import fetch from 'node-fetch-commonjs';
 import { simpleGit } from 'simple-git';
 import { replaceInFile } from 'replace-in-file';
 
@@ -182,7 +181,7 @@ const statusEl = async (page: Page) =>
 
 test.serial('version out of date', async (t) => {
 	await replaceInFile({
-		files: path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle/package.json'),
+		files: path.resolve(process.env['NODECG_ROOT']!, 'bundles/test-bundle/package.json'),
 		from: '"version": "0.0.1"',
 		to: '"version": "0.0.2"',
 	});
@@ -192,7 +191,7 @@ test.serial('version out of date', async (t) => {
 	t.is(text, 'Potentially Out of Date');
 
 	await replaceInFile({
-		files: path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle/package.json'),
+		files: path.resolve(process.env['NODECG_ROOT']!, 'bundles/test-bundle/package.json'),
 		from: '"version": "0.0.2"',
 		to: '"version": "0.0.1"',
 	});
@@ -203,8 +202,8 @@ test.serial('version out of date', async (t) => {
 });
 
 test.serial('git out of date', async (t) => {
-	fs.writeFileSync(path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle/new_file.txt'), 'foo');
-	const git = simpleGit(path.resolve(process.env.NODECG_ROOT, 'bundles/test-bundle'));
+	fs.writeFileSync(path.resolve(process.env['NODECG_ROOT']!, 'bundles/test-bundle/new_file.txt'), 'foo');
+	const git = simpleGit(path.resolve(process.env['NODECG_ROOT']!, 'bundles/test-bundle'));
 	await git.add('./new_file.txt');
 	await git.commit('new commit');
 	await dashboard.waitForTimeout(1500);

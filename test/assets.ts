@@ -5,7 +5,6 @@ import path from 'path';
 // Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
-import fetch from 'node-fetch-commonjs';
 import type * as puppeteer from 'puppeteer';
 
 // Ours

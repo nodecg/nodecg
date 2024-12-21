@@ -4,7 +4,6 @@ import path from 'path';
 
 // Packages
 import test from 'ava';
-import fetch from 'node-fetch-commonjs';
 
 // Ours
 import * as server from './helpers/server';
