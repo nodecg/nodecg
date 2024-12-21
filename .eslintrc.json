@@ -41,7 +41,8 @@
 			"extends": ["plugin:ava/recommended"],
 			"rules": {
 				"ava/no-import-test-files": "off",
-				"ava/use-test": "off"
+				"ava/use-test": "off",
+				"ava/no-skip-test": "off"
 			}
 		},
 		{
