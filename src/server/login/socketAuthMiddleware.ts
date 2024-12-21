@@ -1,6 +1,5 @@
 import type { ExtendedError } from 'socket.io/dist/namespace';
-import { getConnection, ApiKey } from '../database';
-import { isSuperUser, findUser } from '../database/utils';
+import { isSuperUser, findUser, findApiKey, createApiKey, saveUser, deleteSecretKey } from '../database/default/utils';
 import { config } from '../config';
 import UnauthorizedError from '../login/UnauthorizedError';
 import type { TypedServerSocket } from '../../types/socket-protocol';
@@ -24,11 +23,7 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 			return;
 		}
 
-		const database = await getConnection();
-		const apiKey = await database.getRepository(ApiKey).findOne({
-			where: { secret_key: token },
-			relations: ['user'],
-		});
+		const apiKey = await findApiKey(token);
 
 		if (!apiKey) {
 			next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no credentials found'));
@@ -62,16 +57,13 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 			socket.on('regenerateToken', async (cb) => {
 				try {
 					// Lookup the ApiKey for this token we want to revoke.
-					const keyToDelete = await database
-						.getRepository(ApiKey)
-						.findOne({ where: { secret_key: token }, relations: ['user'] });
+					const keyToDelete = await findApiKey(token);
 
 					// If there's a User associated to this key (there should be)
 					// give them a new ApiKey
 					if (keyToDelete) {
 						// Make the new api key
-						const newApiKey = database.manager.create(ApiKey);
-						await database.manager.save(newApiKey);
+						const newApiKey = await createApiKey();
 
 						// Remove the old key from the user, replace it with the new
 						const user = await findUser(keyToDelete.user.id);
@@ -81,10 +73,10 @@ export default async function (socket: TypedServerSocket, next: (err?: ExtendedE
 
 						user.apiKeys = user.apiKeys.filter((ak) => ak.secret_key !== token);
 						user.apiKeys.push(newApiKey);
-						await database.manager.save(user);
+						await saveUser(user);
 
 						// Delete the old key entirely
-						await database.manager.delete(ApiKey, { secret_key: token });
+						await deleteSecretKey(token);
 
 						if (cb) {
 							cb(undefined, undefined);

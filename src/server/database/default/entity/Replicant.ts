@@ -1,7 +1,8 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
+import type { Replicant as ReplicantModel } from '../../models';
 
 @Entity()
-export class Replicant {
+export class Replicant implements ReplicantModel {
 	@PrimaryColumn('text')
 	namespace!: string;
 

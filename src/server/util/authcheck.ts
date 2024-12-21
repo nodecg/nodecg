@@ -1,9 +1,5 @@
-// Packages
 import type express from 'express';
-
-// Ours
-import { getConnection, ApiKey } from '../database';
-import { isSuperUser, findUser } from '../database/utils';
+import { isSuperUser, findUser, findApiKey, createApiKey, saveUser } from '../database/default/utils';
 import { config } from '../config';
 
 /**
@@ -21,11 +17,7 @@ export default async function (req: express.Request, res: express.Response, next
 		let keyOrSocketTokenAuthenticated = false;
 		if (req.query['key'] ?? req.cookies.socketToken) {
 			isUsingKeyOrSocketToken = true;
-			const database = await getConnection();
-			const apiKey = await database.getRepository(ApiKey).findOne({
-				where: { secret_key: req.query['key'] ?? req.cookies.socketToken },
-				relations: ['user'],
-			});
+			const apiKey = await findApiKey(req.query['key'] ?? req.cookies.socketToken);
 
 			// No record of this API Key found, reject the request.
 			if (!apiKey) {
@@ -67,13 +59,11 @@ export default async function (req: express.Request, res: express.Response, next
 			// that reavealed an API key that needed to be deleted.
 			if (!apiKey) {
 				// Make a new api key.
-				const database = await getConnection();
-				apiKey = database.manager.create(ApiKey);
-				await database.manager.save(apiKey);
+				apiKey = await createApiKey();
 
 				// Assign this key to the user.
 				user.apiKeys.push(apiKey);
-				await database.manager.save(user);
+				await saveUser(user);
 			}
 
 			// Set the cookie so that requests to other resources on the page

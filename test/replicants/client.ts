@@ -17,7 +17,7 @@ const { initDashboard } = browser.setup();
 
 import * as C from '../helpers/test-constants';
 import type { NodeCG } from '../../src/types/nodecg';
-import { getConnection, Replicant } from '../../src/server/database';
+import { getConnection, Replicant } from '../../src/server/database/default/connection';
 
 let dashboard: puppeteer.Page;
 let database: Awaited<ReturnType<typeof getConnection>>;
@@ -193,7 +193,7 @@ test.serial('when an array - should react to changes', async (t) => {
 
 				rep.on('declared', () => {
 					rep.on('change', (newVal, oldVal, operations) => {
-						if (newVal && oldVal && operations && operations[0].method === 'push') {
+						if (newVal && oldVal && operations && operations[0]?.method === 'push') {
 							const res = {
 								newVal: JSON.parse(JSON.stringify(newVal)),
 								oldVal,
@@ -282,7 +282,7 @@ test.serial('when an array - should proxy objects added to arrays via array inse
 				return;
 			}
 
-			if (newVal[0].foo === 'bar') {
+			if (newVal[0]?.['foo'] === 'bar') {
 				t.deepEqual(newVal, [{ foo: 'bar' }]);
 				resolve();
 			}

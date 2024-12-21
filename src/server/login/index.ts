@@ -10,8 +10,8 @@ import cookieParser from 'cookie-parser';
 
 import { config } from '../config';
 import createLogger from '../logger';
-import type { User, Role } from '../database';
-import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/utils';
+import type { User, Role } from '../database/models';
+import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/default/utils';
 import { nodecgRootPath } from '../../shared/utils/rootPath';
 
 type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
