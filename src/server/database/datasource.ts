@@ -12,8 +12,9 @@ import { Permission } from './entity/Permission';
 import { Identity } from './entity/Identity';
 import { ApiKey } from './entity/ApiKey';
 import { nodecgRootPath } from '../../shared/utils/rootPath';
+import { NODECG_ROOT } from '../nodecg-root';
 
-const dbPath = path.join(nodecgRootPath, 'db/nodecg.sqlite3');
+const dbPath = path.join(NODECG_ROOT, 'db/nodecg.sqlite3');
 export const testing = process.env.NODECG_TEST?.toLowerCase() === 'true';
 
 const dataSource = new DataSource({

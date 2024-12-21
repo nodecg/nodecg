@@ -12,10 +12,13 @@
 import semver from 'semver';
 import fetch from 'node-fetch-commonjs';
 import { nodecgRootPath } from '../shared/utils/rootPath';
+import { RUN_MODE } from './nodecg-root';
 
 const cwd = process.cwd();
 
-if (cwd !== nodecgRootPath) {
+if (RUN_MODE === 'module') {
+	console.info('[nodecg] Running as a dependency');
+} else if (cwd !== nodecgRootPath) {
 	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, nodecgRootPath);
 	process.chdir(nodecgRootPath);
 	console.info('[nodecg] Changed process.cwd to %s', nodecgRootPath);
