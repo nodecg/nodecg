@@ -166,7 +166,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		if (config.login?.enabled) {
 			log.info('Login security enabled');
 			const login = await import('../login');
-			const { app: loginMiddleware, sessionMiddleware } = await login.createMiddleware({
+			const { app: loginMiddleware, sessionMiddleware } = login.createMiddleware({
 				onLogin: (user) => {
 					// If the user had no roles, then that means they "logged in"
 					// with a third-party auth provider but weren't able to

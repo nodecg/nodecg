@@ -5,7 +5,6 @@ import { DataSource } from 'typeorm';
 export * from './entity';
 
 import { User } from './entity/User';
-import { Session } from './entity/Session';
 import { Role } from './entity/Role';
 import { Replicant } from './entity/Replicant';
 import { Permission } from './entity/Permission';
@@ -32,7 +31,7 @@ const dataSource = new DataSource({
 	 */
 	database: testing ? ':memory:' : dbPath,
 	logging: false,
-	entities: [ApiKey, Identity, Permission, Replicant, Role, Session, User],
+	entities: [ApiKey, Identity, Permission, Replicant, Role, User],
 	migrations: [path.join(nodecgRootPath, 'out/server/database/migration/*.js')],
 	migrationsRun: true,
 	synchronize: false,
