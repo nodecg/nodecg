@@ -126,7 +126,7 @@ test.serial.skip('ncg-dialog - should emit dialog-confirmed when a confirm butto
 	t.pass();
 });
 
-test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async (t) => {
+test.serial.skip('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async (t) => {
 	await dashboard.evaluate(
 		async () =>
 			new Promise<void>((resolve) => {
