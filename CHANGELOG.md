@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/nodecg/nodecg/compare/v2.2.5...v2.3.0) (2024-12-21)
+
+
+### Features
+
+* support nodejs v22 ([#760](https://github.com/nodecg/nodecg/issues/760)) ([b2db7e7](https://github.com/nodecg/nodecg/commit/b2db7e75ebda20bd9e7ca85af9b40735135c27c5))
+* use node 22 for docker image ([e8ff043](https://github.com/nodecg/nodecg/commit/e8ff043b555d744b0b35bf927d05f44e5524f119))
+
+
+### Bug Fixes
+
+* remove Node 16 from supported runtime ([5838cdc](https://github.com/nodecg/nodecg/commit/5838cdc03f837acb8f1e60fd08b4bf38165b9c44))
+* update better-sqlite3 ([8788701](https://github.com/nodecg/nodecg/commit/878870105b7128b38bc797be04c6a854fa88ad36))
+
+
+### Reverts
+
+* update of typeorm ([ad54cb4](https://github.com/nodecg/nodecg/commit/ad54cb4ba4d543ab93d8553b4f8d7c033aa08b70))
+
 ## [2.2.5](https://github.com/nodecg/nodecg/compare/v2.2.4...v2.2.5) (2024-11-30)
 
 
