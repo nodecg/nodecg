@@ -12,7 +12,7 @@ const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
-import { getConnection, Replicant } from '../../src/server/database';
+import { getConnection, Replicant } from '../../src/server/database/default/connection';
 import { sleep, waitOneTick } from '../helpers/utilities';
 
 let dashboard: puppeteer.Page;
@@ -270,11 +270,11 @@ test.serial('objects - throw an error when an object is owned by multiple Replic
 	const bar = { bar: 'bar' };
 	rep1.value = {};
 	rep2.value = {};
-	rep1.value.foo = bar;
+	rep1.value['foo'] = bar;
 
 	const error = t.throws(() => {
 		if (rep2.value) {
-			rep2.value.foo = bar;
+			rep2.value['foo'] = bar;
 		}
 	});
 
@@ -322,7 +322,7 @@ test.serial('persistent - should persist changes to database', async (t) => {
 	const rep = t.context.apis.extension.Replicant<Record<string, string>>('extensionPersistence', {
 		persistenceInterval: 0,
 	}) as unknown as AbstractReplicant<'server', Record<string, string>, Record<string, unknown>, true>;
-	rep.value.nested = 'hey we changed!';
+	rep.value['nested'] = 'hey we changed!';
 
 	await t.context.server.saveAllReplicantsNow();
 

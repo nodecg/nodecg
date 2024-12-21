@@ -2,9 +2,10 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany, J
 import { Role } from './Role';
 import { Identity } from './Identity';
 import { ApiKey } from './ApiKey';
+import type { User as UserModel } from '../../models';
 
 @Entity()
-export class User {
+export class User implements UserModel {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
 
