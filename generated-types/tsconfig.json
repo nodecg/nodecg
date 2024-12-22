@@ -1,12 +1,10 @@
 {
-  "compilerOptions": {
-    "target": "ES2015",
-    "moduleResolution": "node",
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true
-  },
-  "include": [
-    "./**/*.ts"
-  ]
+	"compilerOptions": {
+		"target": "ES2015",
+		"moduleResolution": "node",
+		"strict": true,
+		"noEmit": true,
+		"esModuleInterop": true
+	},
+	"include": ["./**/*.ts"]
 }
