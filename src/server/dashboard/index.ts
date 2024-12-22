@@ -1,13 +1,13 @@
-import * as path from 'node:path';
+import * as path from "node:path";
 
-import { klona as clone } from 'klona/json';
-import express from 'express';
+import { klona as clone } from "klona/json";
+import express from "express";
 
-import { config, filteredConfig, sentryEnabled } from '../config';
-import * as ncgUtils from '../util';
-import type BundleManager from '../bundle-manager';
-import type { NodeCG } from '../../types/nodecg';
-import { nodecgRootPath } from '../../shared/utils/rootPath';
+import { config, filteredConfig, sentryEnabled } from "../config";
+import * as ncgUtils from "../util";
+import type BundleManager from "../bundle-manager";
+import type { NodeCG } from "../../types/nodecg";
+import { nodecgRootPath } from "../../shared/utils/rootPath";
 
 type Workspace = NodeCG.Workspace;
 
@@ -19,7 +19,7 @@ type DashboardContext = {
 	sentryEnabled: boolean;
 };
 
-const BUILD_PATH = path.join(nodecgRootPath, 'dist');
+const BUILD_PATH = path.join(nodecgRootPath, "dist");
 
 export class DashboardLib {
 	app = express();
@@ -31,15 +31,18 @@ export class DashboardLib {
 
 		app.use(express.static(BUILD_PATH));
 
-		app.use('/node_modules', express.static(path.join(nodecgRootPath, 'node_modules')));
+		app.use(
+			"/node_modules",
+			express.static(path.join(nodecgRootPath, "node_modules")),
+		);
 
-		app.get('/', (_, res) => {
-			res.redirect('/dashboard/');
+		app.get("/", (_, res) => {
+			res.redirect("/dashboard/");
 		});
 
-		app.get('/dashboard', ncgUtils.authCheck, (req, res) => {
-			if (!req.url.endsWith('/')) {
-				res.redirect('/dashboard/');
+		app.get("/dashboard", ncgUtils.authCheck, (req, res) => {
+			if (!req.url.endsWith("/")) {
+				res.redirect("/dashboard/");
 				return;
 			}
 
@@ -47,51 +50,55 @@ export class DashboardLib {
 				this.dashboardContext = getDashboardContext(bundleManager.all());
 			}
 
-			res.render(path.join(__dirname, 'dashboard.tmpl'), this.dashboardContext);
+			res.render(path.join(__dirname, "dashboard.tmpl"), this.dashboardContext);
 		});
 
-		app.get('/nodecg-api.min.js', (_, res) => {
-			res.sendFile(path.join(BUILD_PATH, 'api.js'));
+		app.get("/nodecg-api.min.js", (_, res) => {
+			res.sendFile(path.join(BUILD_PATH, "api.js"));
 		});
 
-		app.get('/nodecg-api.min.js.map', (_, res) => {
-			res.sendFile(path.join(BUILD_PATH, 'api.js.map'));
+		app.get("/nodecg-api.min.js.map", (_, res) => {
+			res.sendFile(path.join(BUILD_PATH, "api.js.map"));
 		});
 
-		app.get('/bundles/:bundleName/dashboard/*', ncgUtils.authCheck, (req, res, next) => {
-			const { bundleName } = req.params;
-			const bundle = bundleManager.find(bundleName!);
-			if (!bundle) {
-				next();
-				return;
-			}
+		app.get(
+			"/bundles/:bundleName/dashboard/*",
+			ncgUtils.authCheck,
+			(req, res, next) => {
+				const { bundleName } = req.params;
+				const bundle = bundleManager.find(bundleName!);
+				if (!bundle) {
+					next();
+					return;
+				}
 
-			const resName = req.params[0]!;
-			// If the target file is a panel or dialog, inject the appropriate scripts.
-			// Else, serve the file as-is.
-			const panel = bundle.dashboard.panels.find((p) => p.file === resName);
-			if (panel) {
-				const resourceType = panel.dialog ? 'dialog' : 'panel';
-				ncgUtils.injectScripts(
-					panel.html,
-					resourceType,
-					{
-						createApiInstance: bundle,
-						standalone: Boolean(req.query['standalone']),
-						fullbleed: panel.fullbleed,
-						sound: bundle.soundCues && bundle.soundCues.length > 0,
-					},
-					(html) => res.send(html),
-				);
-			} else {
-				const parentDir = bundle.dashboard.dir;
-				const fileLocation = path.join(parentDir, resName);
-				ncgUtils.sendFile(parentDir, fileLocation, res, next);
-			}
-		});
+				const resName = req.params[0]!;
+				// If the target file is a panel or dialog, inject the appropriate scripts.
+				// Else, serve the file as-is.
+				const panel = bundle.dashboard.panels.find((p) => p.file === resName);
+				if (panel) {
+					const resourceType = panel.dialog ? "dialog" : "panel";
+					ncgUtils.injectScripts(
+						panel.html,
+						resourceType,
+						{
+							createApiInstance: bundle,
+							standalone: Boolean(req.query["standalone"]),
+							fullbleed: panel.fullbleed,
+							sound: bundle.soundCues && bundle.soundCues.length > 0,
+						},
+						(html) => res.send(html),
+					);
+				} else {
+					const parentDir = bundle.dashboard.dir;
+					const fileLocation = path.join(parentDir, resName);
+					ncgUtils.sendFile(parentDir, fileLocation, res, next);
+				}
+			},
+		);
 
 		// When a bundle changes, delete the cached dashboard context
-		bundleManager.on('bundleChanged', () => {
+		bundleManager.on("bundleChanged", () => {
 			this.dashboardContext = undefined;
 		});
 	}
@@ -137,7 +144,7 @@ function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 					route: `fullbleed/${panel.name}`,
 					fullbleed: true,
 				});
-			} else if (panel.workspace === 'default') {
+			} else if (panel.workspace === "default") {
 				defaultWorkspaceHasPanels = true;
 			} else {
 				workspaceNames.add(panel.workspace);
@@ -158,9 +165,9 @@ function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 
 	if (defaultWorkspaceHasPanels || !otherWorkspacesHavePanels) {
 		workspaces.unshift({
-			name: 'default',
-			label: otherWorkspacesHavePanels ? 'Main Workspace' : 'Workspace',
-			route: '',
+			name: "default",
+			label: otherWorkspacesHavePanels ? "Main Workspace" : "Workspace",
+			route: "",
 		});
 	}
 

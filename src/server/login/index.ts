@@ -1,20 +1,28 @@
-import * as path from 'node:path';
-import * as crypto from 'node:crypto';
+import * as path from "node:path";
+import * as crypto from "node:crypto";
 
-import express from 'express';
-import expressSession from 'express-session';
-import passport from 'passport';
-import SteamStrategy from 'passport-steam';
-import { Strategy as LocalStrategy } from 'passport-local';
-import cookieParser from 'cookie-parser';
+import express from "express";
+import expressSession from "express-session";
+import passport from "passport";
+import SteamStrategy from "passport-steam";
+import { Strategy as LocalStrategy } from "passport-local";
+import cookieParser from "cookie-parser";
 
-import { config } from '../config';
-import createLogger from '../logger';
-import type { User, Role } from '../database/models';
-import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/default/utils';
-import { nodecgRootPath } from '../../shared/utils/rootPath';
+import { config } from "../config";
+import createLogger from "../logger";
+import type { User, Role } from "../database/models";
+import {
+	findUser,
+	upsertUser,
+	getSuperUserRole,
+	isSuperUser,
+} from "../database/default/utils";
+import { nodecgRootPath } from "../../shared/utils/rootPath";
 
-type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
+type StrategyDoneCb = (
+	error: NodeJS.ErrnoException | undefined,
+	profile?: User,
+) => void;
 
 /**
  * The "user profile" for Steam-authenticated users, as consumed by Express.
@@ -25,7 +33,7 @@ type SteamProfile = { id: string; displayName: string };
  * The "user profile" for Twitch-authenticated users, as consumed by Express.
  */
 type TwitchProfile = {
-	provider: 'twitch';
+	provider: "twitch";
 	id: string;
 	username: string;
 	displayName: string;
@@ -36,7 +44,7 @@ type TwitchProfile = {
  * The "user profile" for Discord-authenticated users, as consumed by Express.
  */
 type DiscordProfile = {
-	provider: 'discord';
+	provider: "discord";
 	accessToken: string;
 	username: string;
 	discriminator: string;
@@ -44,15 +52,18 @@ type DiscordProfile = {
 	guilds: Array<{ id: string; name: string }>;
 };
 
-const log = createLogger('login');
-const protocol = config.ssl?.enabled || (config.login.enabled && config.login.forceHttpsReturn) ? 'https' : 'http';
+const log = createLogger("login");
+const protocol =
+	config.ssl?.enabled || (config.login.enabled && config.login.forceHttpsReturn)
+		? "https"
+		: "http";
 
 // Required for persistent login sessions.
 // Passport needs ability to serialize and unserialize users out of session.
-passport.serializeUser<User['id']>((user, done) => {
+passport.serializeUser<User["id"]>((user, done) => {
 	done(null, user.id);
 });
-passport.deserializeUser<User['id']>(async (id, done) => {
+passport.deserializeUser<User["id"]>(async (id, done) => {
 	try {
 		done(null, await findUser(id));
 	} catch (error: unknown) {
@@ -60,7 +71,11 @@ passport.deserializeUser<User['id']>(async (id, done) => {
 	}
 });
 
-if (config.login.enabled && config.login.steam?.enabled && config.login.steam.apiKey) {
+if (
+	config.login.enabled &&
+	config.login.steam?.enabled &&
+	config.login.steam.apiKey
+) {
 	const steamLoginConfig = config.login.steam;
 	const apiKey = config.login.steam.apiKey;
 	passport.use(
@@ -75,15 +90,23 @@ if (config.login.enabled && config.login.steam?.enabled && config.login.steam.ap
 					const roles: Role[] = [];
 					const allowed = steamLoginConfig?.allowedIds?.includes(profile.id);
 					if (allowed) {
-						log.info('(Steam) Granting "%s" (%s) access', profile.id, profile.displayName);
+						log.info(
+							'(Steam) Granting "%s" (%s) access',
+							profile.id,
+							profile.displayName,
+						);
 						roles.push(await getSuperUserRole());
 					} else {
-						log.info('(Steam) Denying "%s" (%s) access', profile.id, profile.displayName);
+						log.info(
+							'(Steam) Denying "%s" (%s) access',
+							profile.id,
+							profile.displayName,
+						);
 					}
 
 					const user = await upsertUser({
 						name: profile.displayName,
-						provider_type: 'steam',
+						provider_type: "steam",
 						provider_hash: profile.id,
 						roles,
 					});
@@ -99,15 +122,15 @@ if (config.login.enabled && config.login.steam?.enabled && config.login.steam.ap
 
 if (config.login.enabled && config.login.twitch?.enabled) {
 	const twitchLoginConfig = config.login.twitch;
-	const TwitchStrategy = require('passport-twitch-helix').Strategy;
+	const TwitchStrategy = require("passport-twitch-helix").Strategy;
 
 	// The "user:read:email" scope is required. Add it if not present.
-	const scopesArray = twitchLoginConfig.scope.split(' ');
-	if (!scopesArray.includes('user:read:email')) {
-		scopesArray.push('user:read:email');
+	const scopesArray = twitchLoginConfig.scope.split(" ");
+	if (!scopesArray.includes("user:read:email")) {
+		scopesArray.push("user:read:email");
 	}
 
-	const concatScopes = scopesArray.join(' ');
+	const concatScopes = scopesArray.join(" ");
 
 	passport.use(
 		new TwitchStrategy(
@@ -116,24 +139,29 @@ if (config.login.enabled && config.login.twitch?.enabled) {
 				clientSecret: twitchLoginConfig.clientSecret,
 				callbackURL: `${protocol}://${config.baseURL}/login/auth/twitch`,
 				scope: concatScopes,
-				customHeaders: { 'Client-ID': twitchLoginConfig.clientID },
+				customHeaders: { "Client-ID": twitchLoginConfig.clientID },
 			},
-			async (accessToken: string, refreshToken: string, profile: TwitchProfile, done: StrategyDoneCb) => {
+			async (
+				accessToken: string,
+				refreshToken: string,
+				profile: TwitchProfile,
+				done: StrategyDoneCb,
+			) => {
 				try {
 					const roles: Role[] = [];
 					const allowed =
 						twitchLoginConfig.allowedUsernames?.includes(profile.username) ??
 						twitchLoginConfig.allowedIds?.includes(profile.id);
 					if (allowed) {
-						log.info('(Twitch) Granting %s access', profile.username);
+						log.info("(Twitch) Granting %s access", profile.username);
 						roles.push(await getSuperUserRole());
 					} else {
-						log.info('(Twitch) Denying %s access', profile.username);
+						log.info("(Twitch) Denying %s access", profile.username);
 					}
 
 					const user = await upsertUser({
 						name: profile.displayName,
-						provider_type: 'twitch',
+						provider_type: "twitch",
 						provider_hash: profile.id,
 						provider_access_token: accessToken,
 						provider_refresh_token: refreshToken,
@@ -152,12 +180,21 @@ if (config.login.enabled && config.login.twitch?.enabled) {
 async function makeDiscordAPIRequest(
 	guild: { guildID: string; guildBotToken: string; allowedRoleIDs: string[] },
 	userID: string,
-): Promise<[{ guildID: string; guildBotToken: string; allowedRoleIDs: string[] }, boolean, { roles: string[] }]> {
-	const res = await fetch(`https://discord.com/api/v8/guilds/${guild.guildID}/members/${userID}`, {
-		headers: {
-			Authorization: `Bot ${guild.guildBotToken}`,
+): Promise<
+	[
+		{ guildID: string; guildBotToken: string; allowedRoleIDs: string[] },
+		boolean,
+		{ roles: string[] },
+	]
+> {
+	const res = await fetch(
+		`https://discord.com/api/v8/guilds/${guild.guildID}/members/${userID}`,
+		{
+			headers: {
+				Authorization: `Bot ${guild.guildBotToken}`,
+			},
 		},
-	});
+	);
 
 	const data = (await res.json()) as any;
 	if (res.status === 200) {
@@ -170,20 +207,20 @@ async function makeDiscordAPIRequest(
 if (config.login.enabled && config.login.discord?.enabled) {
 	const discordLoginConfig = config.login.discord;
 
-	const DiscordStrategy = require('passport-discord').Strategy;
+	const DiscordStrategy = require("passport-discord").Strategy;
 
 	// The "identify" scope is required. Add it if not present.
-	const scopeArray = discordLoginConfig.scope.split(' ');
-	if (!scopeArray.includes('identify')) {
-		scopeArray.push('identify');
+	const scopeArray = discordLoginConfig.scope.split(" ");
+	if (!scopeArray.includes("identify")) {
+		scopeArray.push("identify");
 	}
 
 	// The "guilds" scope is required if allowedGuilds are used. Add it if not present.
-	if (!scopeArray.includes('guilds') && discordLoginConfig.allowedGuilds) {
-		scopeArray.push('guilds');
+	if (!scopeArray.includes("guilds") && discordLoginConfig.allowedGuilds) {
+		scopeArray.push("guilds");
 	}
 
-	const scope = scopeArray.join(' ');
+	const scope = scopeArray.join(" ");
 	passport.use(
 		new DiscordStrategy(
 			{
@@ -192,10 +229,15 @@ if (config.login.enabled && config.login.discord?.enabled) {
 				callbackURL: `${protocol}://${config.baseURL}/login/auth/discord`,
 				scope,
 			},
-			async (accessToken: string, refreshToken: string, profile: DiscordProfile, done: StrategyDoneCb) => {
+			async (
+				accessToken: string,
+				refreshToken: string,
+				profile: DiscordProfile,
+				done: StrategyDoneCb,
+			) => {
 				if (!discordLoginConfig) {
 					// Impossible but TS doesn't know that.
-					done(new Error('Discord login config was impossibly undefined.'));
+					done(new Error("Discord login config was impossibly undefined."));
 					return;
 				}
 
@@ -205,19 +247,27 @@ if (config.login.enabled && config.login.discord?.enabled) {
 					allowed = true;
 				} else if (discordLoginConfig.allowedGuilds) {
 					// Get guilds that are specified in the config and that user is in
-					const intersectingGuilds = discordLoginConfig.allowedGuilds.filter((allowedGuild) =>
-						profile.guilds.some((profileGuild) => profileGuild.id === allowedGuild.guildID),
+					const intersectingGuilds = discordLoginConfig.allowedGuilds.filter(
+						(allowedGuild) =>
+							profile.guilds.some(
+								(profileGuild) => profileGuild.id === allowedGuild.guildID,
+							),
 					);
 
 					const guildRequests = [];
 
 					for (const intersectingGuild of intersectingGuilds) {
-						if (!intersectingGuild.allowedRoleIDs || intersectingGuild.allowedRoleIDs.length === 0) {
+						if (
+							!intersectingGuild.allowedRoleIDs ||
+							intersectingGuild.allowedRoleIDs.length === 0
+						) {
 							// If the user matches any guilds that only have member and not role requirements we do not need to make requests to the discord API
 							allowed = true;
 						} else {
 							// Queue up all requests to the Discord API to improve speed
-							guildRequests.push(makeDiscordAPIRequest(intersectingGuild, profile.id));
+							guildRequests.push(
+								makeDiscordAPIRequest(intersectingGuild, profile.id),
+							);
 						}
 					}
 
@@ -232,8 +282,8 @@ if (config.login.enabled && config.login.discord?.enabled) {
 								continue;
 							}
 
-							const intersectingRoles = guildWithRoles.allowedRoleIDs.filter((allowedRole) =>
-								memberResponse.roles.includes(allowedRole),
+							const intersectingRoles = guildWithRoles.allowedRoleIDs.filter(
+								(allowedRole) => memberResponse.roles.includes(allowedRole),
 							);
 							if (intersectingRoles.length > 0) {
 								allowed = true;
@@ -247,15 +297,25 @@ if (config.login.enabled && config.login.discord?.enabled) {
 
 				const roles: Role[] = [];
 				if (allowed) {
-					log.info('(Discord) Granting %s#%s (%s) access', profile.username, profile.discriminator, profile.id);
+					log.info(
+						"(Discord) Granting %s#%s (%s) access",
+						profile.username,
+						profile.discriminator,
+						profile.id,
+					);
 					roles.push(await getSuperUserRole());
 				} else {
-					log.info('(Discord) Denying %s#%s (%s) access', profile.username, profile.discriminator, profile.id);
+					log.info(
+						"(Discord) Denying %s#%s (%s) access",
+						profile.username,
+						profile.discriminator,
+						profile.id,
+					);
 				}
 
 				const user = await upsertUser({
 					name: `${profile.username}#${profile.discriminator}`,
-					provider_type: 'discord',
+					provider_type: "discord",
 					provider_hash: profile.id,
 					provider_access_token: accessToken,
 					provider_refresh_token: refreshToken,
@@ -267,7 +327,11 @@ if (config.login.enabled && config.login.discord?.enabled) {
 	);
 }
 
-if (config.login.enabled && config.login.local?.enabled && config.login.sessionSecret) {
+if (
+	config.login.enabled &&
+	config.login.local?.enabled &&
+	config.login.sessionSecret
+) {
 	const {
 		sessionSecret,
 		local: { allowedUsers },
@@ -277,24 +341,30 @@ if (config.login.enabled && config.login.local?.enabled && config.login.sessionS
 	passport.use(
 		new LocalStrategy(
 			{
-				usernameField: 'username',
-				passwordField: 'password',
+				usernameField: "username",
+				passwordField: "password",
 				session: false,
 			},
 			async (username: string, password: string, done: StrategyDoneCb) => {
 				try {
 					const roles: Role[] = [];
-					const foundUser = allowedUsers?.find((u: { username: string; password: string }) => u.username === username);
+					const foundUser = allowedUsers?.find(
+						(u: { username: string; password: string }) =>
+							u.username === username,
+					);
 					let allowed = false;
 
 					if (foundUser) {
-						const match = /^([^:]+):(.+)$/.exec(foundUser.password ?? '');
+						const match = /^([^:]+):(.+)$/.exec(foundUser.password ?? "");
 						let expected = foundUser.password;
 						let actual = password;
 
 						if (match && hashes.includes(match[1]!)) {
 							expected = match[2]!;
-							actual = crypto.createHmac(match[1]!, sessionSecret).update(actual, 'utf8').digest('hex');
+							actual = crypto
+								.createHmac(match[1]!, sessionSecret)
+								.update(actual, "utf8")
+								.digest("hex");
 						}
 
 						if (expected === actual) {
@@ -303,11 +373,15 @@ if (config.login.enabled && config.login.local?.enabled && config.login.sessionS
 						}
 					}
 
-					log.info('(Local) %s "%s" access', allowed ? 'Granting' : 'Denying', username);
+					log.info(
+						'(Local) %s "%s" access',
+						allowed ? "Granting" : "Denying",
+						username,
+					);
 
 					const user = await upsertUser({
 						name: username,
-						provider_type: 'local',
+						provider_type: "local",
 						provider_hash: username,
 						roles,
 					});
@@ -321,18 +395,26 @@ if (config.login.enabled && config.login.local?.enabled && config.login.sessionS
 	);
 }
 
-export function createMiddleware(callbacks: { onLogin(user: Express.User): void; onLogout(user: Express.User): void }) {
+export function createMiddleware(callbacks: {
+	onLogin(user: Express.User): void;
+	onLogout(user: Express.User): void;
+}) {
 	const app = express();
-	const redirectPostLogin = (req: express.Request, res: express.Response): void => {
-		const url = req.session?.returnTo ?? '/dashboard';
+	const redirectPostLogin = (
+		req: express.Request,
+		res: express.Response,
+	): void => {
+		const url = req.session?.returnTo ?? "/dashboard";
 		delete req.session.returnTo;
 		res.redirect(url);
-		app.emit('login', req.user);
+		app.emit("login", req.user);
 		if (req.user) callbacks.onLogin(req.user);
 	};
 
 	if (!config.login.enabled || !config.login.sessionSecret) {
-		throw new Error("no session secret defined, can't salt sessions, not safe, aborting");
+		throw new Error(
+			"no session secret defined, can't salt sessions, not safe, aborting",
+		);
 	}
 
 	app.use(cookieParser(config.login.sessionSecret));
@@ -342,7 +424,7 @@ export function createMiddleware(callbacks: { onLogin(user: Express.User): void;
 		saveUninitialized: false,
 		secret: config.login.sessionSecret,
 		cookie: {
-			path: '/',
+			path: "/",
 			httpOnly: true,
 			secure: config.ssl?.enabled,
 		},
@@ -353,54 +435,70 @@ export function createMiddleware(callbacks: { onLogin(user: Express.User): void;
 	app.use(passport.initialize());
 	app.use(passport.session());
 
-	app.use('/login', express.static(path.join(nodecgRootPath, 'dist/login')));
+	app.use("/login", express.static(path.join(nodecgRootPath, "dist/login")));
 
-	app.get('/login', (req, res) => {
+	app.get("/login", (req, res) => {
 		// If the user is already logged in, don't show them the login page again.
 		if (req.user && isSuperUser(req.user)) {
-			res.redirect('/dashboard');
+			res.redirect("/dashboard");
 		} else {
-			res.render(path.join(__dirname, 'views/login.tmpl'), {
+			res.render(path.join(__dirname, "views/login.tmpl"), {
 				user: req.user,
 				config,
 			});
 		}
 	});
 
-	app.get('/authError', (req, res) => {
-		res.render(path.join(__dirname, 'views/authError.tmpl'), {
-			message: req.query['message'],
-			code: req.query['code'],
-			viewUrl: req.query['viewUrl'],
+	app.get("/authError", (req, res) => {
+		res.render(path.join(__dirname, "views/authError.tmpl"), {
+			message: req.query["message"],
+			code: req.query["code"],
+			viewUrl: req.query["viewUrl"],
 		});
 	});
 
-	app.get('/login/steam', passport.authenticate('steam'));
+	app.get("/login/steam", passport.authenticate("steam"));
 
-	app.get('/login/auth/steam', passport.authenticate('steam', { failureRedirect: '/login' }), redirectPostLogin);
+	app.get(
+		"/login/auth/steam",
+		passport.authenticate("steam", { failureRedirect: "/login" }),
+		redirectPostLogin,
+	);
 
-	app.get('/login/twitch', passport.authenticate('twitch'));
+	app.get("/login/twitch", passport.authenticate("twitch"));
 
-	app.get('/login/auth/twitch', passport.authenticate('twitch', { failureRedirect: '/login' }), redirectPostLogin);
+	app.get(
+		"/login/auth/twitch",
+		passport.authenticate("twitch", { failureRedirect: "/login" }),
+		redirectPostLogin,
+	);
 
-	app.get('/login/discord', passport.authenticate('discord'));
+	app.get("/login/discord", passport.authenticate("discord"));
 
-	app.get('/login/auth/discord', passport.authenticate('discord', { failureRedirect: '/login' }), redirectPostLogin);
+	app.get(
+		"/login/auth/discord",
+		passport.authenticate("discord", { failureRedirect: "/login" }),
+		redirectPostLogin,
+	);
 
-	app.get('/login/local', passport.authenticate('local'));
+	app.get("/login/local", passport.authenticate("local"));
 
-	app.post('/login/local', passport.authenticate('local', { failureRedirect: '/login' }), redirectPostLogin);
+	app.post(
+		"/login/local",
+		passport.authenticate("local", { failureRedirect: "/login" }),
+		redirectPostLogin,
+	);
 
-	app.get('/logout', (req, res) => {
-		app.emit('logout', req.user);
+	app.get("/logout", (req, res) => {
+		app.emit("logout", req.user);
 		req.session?.destroy(() => {
-			res.clearCookie('connect.sid', { path: '/' });
-			res.clearCookie('io', { path: '/' });
-			res.clearCookie('socketToken', {
+			res.clearCookie("connect.sid", { path: "/" });
+			res.clearCookie("io", { path: "/" });
+			res.clearCookie("socketToken", {
 				secure: req.secure,
-				sameSite: req.secure ? 'none' : undefined,
+				sameSite: req.secure ? "none" : undefined,
 			});
-			res.redirect('/login');
+			res.redirect("/login");
 		});
 		if (req.user) callbacks.onLogout(req.user);
 	});

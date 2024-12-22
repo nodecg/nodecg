@@ -1,13 +1,13 @@
-import '@polymer/paper-card/paper-card.js';
+import "@polymer/paper-card/paper-card.js";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from './ncg-asset-category';
+import * as keep1 from "./ncg-asset-category";
 keep1;
 
-import * as Polymer from '@polymer/polymer';
-import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
+import * as Polymer from "@polymer/polymer";
+import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
 
-const collectionsRep = NodeCG.Replicant('collections', '_assets');
+const collectionsRep = NodeCG.Replicant("collections", "_assets");
 
 class NcgAssets extends MutableData(Polymer.PolymerElement) {
 	static get template() {
@@ -49,16 +49,16 @@ class NcgAssets extends MutableData(Polymer.PolymerElement) {
 	}
 
 	static get is() {
-		return 'ncg-assets';
+		return "ncg-assets";
 	}
 
 	override ready(): void {
 		super.ready();
 
-		collectionsRep.on('change', (newVal) => {
-			this['collections'] = newVal;
+		collectionsRep.on("change", (newVal) => {
+			this["collections"] = newVal;
 		});
 	}
 }
 
-customElements.define('ncg-assets', NcgAssets);
+customElements.define("ncg-assets", NcgAssets);

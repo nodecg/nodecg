@@ -1,13 +1,13 @@
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/paper-dialog/paper-dialog.js';
+import "@polymer/paper-button/paper-button.js";
+import "@polymer/paper-dialog/paper-dialog.js";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from './ncg-graphic';
+import * as keep1 from "./ncg-graphic";
 keep1;
 
-import * as Polymer from '@polymer/polymer';
-import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
-import type { NodeCG } from '../../../../types/nodecg';
+import * as Polymer from "@polymer/polymer";
+import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
+import type { NodeCG } from "../../../../types/nodecg";
 
 /**
  * @customElement
@@ -114,7 +114,7 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 	}
 
 	static get is() {
-		return 'ncg-graphics-bundle';
+		return "ncg-graphics-bundle";
 	}
 
 	static get properties() {
@@ -125,7 +125,7 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 	}
 
 	showReloadAllConfirmDialog() {
-		this.$['reloadAllConfirmDialog'].open();
+		this.$["reloadAllConfirmDialog"].open();
 	}
 
 	_calcGraphicInstances(
@@ -137,15 +137,23 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 			return [];
 		}
 
-		return instances.filter((instance) => instance.bundleName === bundle.name && instance.pathName === graphic.url);
+		return instances.filter(
+			(instance) =>
+				instance.bundleName === bundle.name &&
+				instance.pathName === graphic.url,
+		);
 	}
 
 	_handleReloadAllConfirmDialogClose(e: any) {
 		if (e.detail.confirmed) {
-			this.$['reloadButton'].disabled = true;
-			window.socket.emit('graphic:requestBundleRefresh', this['bundle'].name, () => {
-				this.$['reloadButton'].disabled = false;
-			});
+			this.$["reloadButton"].disabled = true;
+			window.socket.emit(
+				"graphic:requestBundleRefresh",
+				this["bundle"].name,
+				() => {
+					this.$["reloadButton"].disabled = false;
+				},
+			);
 		}
 	}
 }

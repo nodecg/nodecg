@@ -1,8 +1,8 @@
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from './ncg-sounds';
+import * as keep1 from "./ncg-sounds";
 keep1;
 
-import * as Polymer from '@polymer/polymer';
+import * as Polymer from "@polymer/polymer";
 class NcgMixer extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`
@@ -65,14 +65,16 @@ class NcgMixer extends Polymer.PolymerElement {
 	}
 
 	static get is() {
-		return 'ncg-mixer';
+		return "ncg-mixer";
 	}
 
 	static get properties() {
 		return {
 			bundlesWithSounds: {
 				type: Array,
-				value: window.__renderData__.bundles.filter((bundle) => bundle.soundCues && bundle.soundCues.length > 0),
+				value: window.__renderData__.bundles.filter(
+					(bundle) => bundle.soundCues && bundle.soundCues.length > 0,
+				),
 			},
 		};
 	}
@@ -81,16 +83,16 @@ class NcgMixer extends Polymer.PolymerElement {
 		super.ready();
 
 		const { masterFader } = this.$;
-		const masterVolume = NodeCG.Replicant('volume:master', '_sounds');
+		const masterVolume = NodeCG.Replicant("volume:master", "_sounds");
 
-		masterFader.addEventListener('change', (e: any) => {
+		masterFader.addEventListener("change", (e: any) => {
 			masterVolume.value = e.target.value;
 		});
 
-		masterVolume.on('change', (newVal) => {
+		masterVolume.on("change", (newVal) => {
 			masterFader.value = newVal;
 		});
 	}
 }
 
-customElements.define('ncg-mixer', NcgMixer);
+customElements.define("ncg-mixer", NcgMixer);

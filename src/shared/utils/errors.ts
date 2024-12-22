@@ -18,14 +18,17 @@ export function stringifyErrorInner(error: unknown): {
 } {
 	let message: string | undefined;
 	let stack: string | undefined;
-	if (typeof error === 'string') {
+	if (typeof error === "string") {
 		message = error;
 	} else if (error === null) {
-		message = 'null';
+		message = "null";
 	} else if (error === undefined) {
-		message = 'undefined';
-	} else if (error && typeof error === 'object') {
-		if (typeof (error as any).error === 'object' && (error as any).error.message) {
+		message = "undefined";
+	} else if (error && typeof error === "object") {
+		if (
+			typeof (error as any).error === "object" &&
+			(error as any).error.message
+		) {
 			message = (error as any).error.message;
 			stack = (error as any).error.stack;
 		} else if ((error as any).reason) {

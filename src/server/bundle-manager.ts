@@ -1,19 +1,19 @@
 // Native
-import path from 'path';
+import path from "path";
 
 // Packages
-import fs from 'fs-extra';
-import chokidar from 'chokidar';
-import debounce from 'lodash.debounce';
-import semver from 'semver';
-import { cosmiconfigSync as cosmiconfig } from 'cosmiconfig';
+import fs from "fs-extra";
+import chokidar from "chokidar";
+import debounce from "lodash.debounce";
+import semver from "semver";
+import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
 
 // Ours
-import parseBundle from './bundle-parser';
-import parseBundleGit from './bundle-parser/git';
-import createLogger from './logger';
-import type { NodeCG } from '../types/nodecg';
-import { TypedEmitter } from '../shared/typed-emitter';
+import parseBundle from "./bundle-parser";
+import parseBundleGit from "./bundle-parser/git";
+import createLogger from "./logger";
+import type { NodeCG } from "../types/nodecg";
+import { TypedEmitter } from "../shared/typed-emitter";
 
 /**
  * Milliseconds
@@ -24,10 +24,10 @@ const READY_WAIT_THRESHOLD = 1000;
 // We'll add the files we want to watch later, in the init() method.
 const watcher = chokidar.watch(
 	[
-		'!**/*___jb_*___', // Ignore temp files created by JetBrains IDEs
-		'!**/node_modules/**', // Ignore node_modules folders
-		'!**/bower_components/**', // Ignore bower_components folders
-		'!**/*.lock', // Ignore lockfiles
+		"!**/*___jb_*___", // Ignore temp files created by JetBrains IDEs
+		"!**/node_modules/**", // Ignore node_modules folders
+		"!**/bower_components/**", // Ignore bower_components folders
+		"!**/*.lock", // Ignore lockfiles
 	],
 	{
 		persistent: true,
@@ -36,10 +36,10 @@ const watcher = chokidar.watch(
 	},
 );
 
-const blacklistedBundleDirectories = ['node_modules', 'bower_components'];
+const blacklistedBundleDirectories = ["node_modules", "bower_components"];
 
 const bundles: NodeCG.Bundle[] = [];
-const log = createLogger('bundle-manager');
+const log = createLogger("bundle-manager");
 const hasChanged = new Set<string>();
 let backoffTimer: NodeJS.Timeout | undefined;
 
@@ -63,19 +63,22 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 	private readonly _cfgPath: string;
 
 	// This is on a debouncer to avoid false-positives that can happen when editing a manifest.
-	private readonly _debouncedManifestDeletionCheck = debounce((bundleName, manifestPath) => {
-		if (fs.existsSync(manifestPath)) {
-			this.handleChange(bundleName);
-		} else {
-			log.debug('Processing removed event for', bundleName);
-			log.info(
-				"%s's package.json can no longer be found on disk, assuming the bundle has been deleted or moved",
-				bundleName,
-			);
-			this.remove(bundleName);
-			this.emit('bundleRemoved', bundleName);
-		}
-	}, 100);
+	private readonly _debouncedManifestDeletionCheck = debounce(
+		(bundleName, manifestPath) => {
+			if (fs.existsSync(manifestPath)) {
+				this.handleChange(bundleName);
+			} else {
+				log.debug("Processing removed event for", bundleName);
+				log.info(
+					"%s's package.json can no longer be found on disk, assuming the bundle has been deleted or moved",
+					bundleName,
+				);
+				this.remove(bundleName);
+				this.emit("bundleRemoved", bundleName);
+			}
+		},
+		100,
+	);
 
 	private readonly _debouncedGitChangeHandler = debounce((bundleName) => {
 		const bundle = this.find(bundleName);
@@ -84,17 +87,22 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 		}
 
 		bundle.git = parseBundleGit(bundle.dir);
-		this.emit('gitChanged', bundle);
+		this.emit("gitChanged", bundle);
 	}, 250);
 
-	constructor(bundlesPaths: string[], cfgPath: string, nodecgVersion: string, nodecgConfig: Record<string, any>) {
+	constructor(
+		bundlesPaths: string[],
+		cfgPath: string,
+		nodecgVersion: string,
+		nodecgConfig: Record<string, any>,
+	) {
 		super();
 
 		this._cfgPath = cfgPath;
 
 		const readyTimeout = setTimeout(() => {
 			this._ready = true;
-			this.emit('ready');
+			this.emit("ready");
 		}, READY_WAIT_THRESHOLD);
 
 		bundlesPaths.forEach((bundlesPath) => {
@@ -107,7 +115,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 			}
 
 			/* istanbul ignore next */
-			watcher.on('add', (filePath) => {
+			watcher.on("add", (filePath) => {
 				const bundleName = extractBundleName(bundlesPath, filePath);
 
 				// In theory, the bundle parser would have thrown an error long before this block would execute,
@@ -125,17 +133,20 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 				}
 			});
 
-			watcher.on('change', (filePath) => {
+			watcher.on("change", (filePath) => {
 				const bundleName = extractBundleName(bundlesPath, filePath);
 
-				if (isManifest(bundleName, filePath) || this.isPanelHTMLFile(bundleName, filePath)) {
+				if (
+					isManifest(bundleName, filePath) ||
+					this.isPanelHTMLFile(bundleName, filePath)
+				) {
 					this.handleChange(bundleName);
 				} else if (isGitData(bundleName, filePath)) {
 					this._debouncedGitChangeHandler(bundleName);
 				}
 			});
 
-			watcher.on('unlink', (filePath) => {
+			watcher.on("unlink", (filePath) => {
 				const bundleName = extractBundleName(bundlesPath, filePath);
 
 				if (this.isPanelHTMLFile(bundleName, filePath)) {
@@ -150,7 +161,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 			});
 
 			/* istanbul ignore next */
-			watcher.on('error', (error) => {
+			watcher.on("error", (error) => {
 				log.error(error.stack);
 			});
 
@@ -165,29 +176,42 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 				}
 
 				// Prevent attempting to load unwanted directories. Those specified above and all dot-prefixed.
-				if (blacklistedBundleDirectories.includes(bundleFolderName) || bundleFolderName.startsWith('.')) {
+				if (
+					blacklistedBundleDirectories.includes(bundleFolderName) ||
+					bundleFolderName.startsWith(".")
+				) {
 					return;
 				}
 
-				if (nodecgConfig?.['bundles']?.disabled?.includes(bundleFolderName)) {
-					log.debug(`Not loading bundle ${bundleFolderName} as it is disabled in config`);
+				if (nodecgConfig?.["bundles"]?.disabled?.includes(bundleFolderName)) {
+					log.debug(
+						`Not loading bundle ${bundleFolderName} as it is disabled in config`,
+					);
 					return;
 				}
 
-				if (nodecgConfig?.['bundles']?.enabled && !nodecgConfig?.['bundles'].enabled.includes(bundleFolderName)) {
-					log.debug(`Not loading bundle ${bundleFolderName} as it is not enabled in config`);
+				if (
+					nodecgConfig?.["bundles"]?.enabled &&
+					!nodecgConfig?.["bundles"].enabled.includes(bundleFolderName)
+				) {
+					log.debug(
+						`Not loading bundle ${bundleFolderName} as it is not enabled in config`,
+					);
 					return;
 				}
 
 				log.debug(`Loading bundle ${bundleFolderName}`);
 
 				// Parse each bundle and push the result onto the bundles array
-				const bundle = parseBundle(bundlePath, loadBundleCfg(cfgPath, bundleFolderName));
+				const bundle = parseBundle(
+					bundlePath,
+					loadBundleCfg(cfgPath, bundleFolderName),
+				);
 
 				// Check if the bundle is compatible with this version of NodeCG
 				if (!semver.satisfies(nodecgVersion, bundle.compatibleRange)) {
 					log.error(
-						'%s requires NodeCG version %s, current version is %s',
+						"%s requires NodeCG version %s, current version is %s",
 						bundle.name,
 						bundle.compatibleRange,
 						nodecgVersion,
@@ -203,9 +227,9 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 				// This is applied after the bundle has been validated and loaded.
 				// Bundles that do not properly load upon startup are not recognized for updates.
 				watcher.add([
-					path.join(bundlePath, '.git'), // Watch `.git` directories.
-					path.join(bundlePath, 'dashboard'), // Watch `dashboard` directories.
-					path.join(bundlePath, 'package.json'), // Watch each bundle's `package.json`.
+					path.join(bundlePath, ".git"), // Watch `.git` directories.
+					path.join(bundlePath, "dashboard"), // Watch `dashboard` directories.
+					path.join(bundlePath, "package.json"), // Watch each bundle's `package.json`.
 				]);
 			});
 		});
@@ -278,7 +302,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 		backoffTimer = setTimeout(() => {
 			backoffTimer = undefined;
 			for (const bundleName of hasChanged) {
-				log.debug('Backoff finished, emitting change event for', bundleName);
+				log.debug("Backoff finished, emitting change event for", bundleName);
 				this.handleChange(bundleName);
 			}
 
@@ -296,7 +320,9 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 	isPanelHTMLFile(bundleName: string, filePath: string): boolean {
 		const bundle = this.find(bundleName);
 		if (bundle) {
-			return bundle.dashboard.panels.some((panel) => panel.path.endsWith(filePath));
+			return bundle.dashboard.panels.some((panel) =>
+				panel.path.endsWith(filePath),
+			);
 		}
 
 		return false;
@@ -318,20 +344,30 @@ export default class BundleManager extends TypedEmitter<EventMap> {
 		}
 
 		if (backoffTimer) {
-			log.debug('Backoff active, delaying processing of change detected in', bundleName);
+			log.debug(
+				"Backoff active, delaying processing of change detected in",
+				bundleName,
+			);
 			hasChanged.add(bundleName);
 			this.resetBackoffTimer();
 		} else {
-			log.debug('Processing change event for', bundleName);
+			log.debug("Processing change event for", bundleName);
 			this.resetBackoffTimer();
 
 			try {
-				const reparsedBundle = parseBundle(bundle.dir, loadBundleCfg(this._cfgPath, bundle.name));
+				const reparsedBundle = parseBundle(
+					bundle.dir,
+					loadBundleCfg(this._cfgPath, bundle.name),
+				);
 				this.add(reparsedBundle);
-				this.emit('bundleChanged', reparsedBundle);
+				this.emit("bundleChanged", reparsedBundle);
 			} catch (error: any) {
-				log.warn('Unable to handle the bundle "%s" change:\n%s', bundleName, error.stack);
-				this.emit('invalidBundle', bundle, error);
+				log.warn(
+					'Unable to handle the bundle "%s" change:\n%s',
+					bundleName,
+					error.stack,
+				);
+				this.emit("invalidBundle", bundle, error);
 			}
 		}
 	}
@@ -344,7 +380,7 @@ export default class BundleManager extends TypedEmitter<EventMap> {
  * @private
  */
 function extractBundleName(bundlesPath: string, filePath: string): string {
-	return filePath.replace(bundlesPath, '').split(path.sep)[1]!;
+	return filePath.replace(bundlesPath, "").split(path.sep)[1]!;
 }
 
 /**
@@ -355,7 +391,10 @@ function extractBundleName(bundlesPath: string, filePath: string): string {
  * @private
  */
 function isManifest(bundleName: string, filePath: string): boolean {
-	return path.dirname(filePath).endsWith(bundleName) && path.basename(filePath) === 'package.json';
+	return (
+		path.dirname(filePath).endsWith(bundleName) &&
+		path.basename(filePath) === "package.json"
+	);
 }
 
 /**
@@ -373,9 +412,12 @@ function isGitData(bundleName: string, filePath: string): boolean {
 /**
  * Determines which config file to use for a bundle.
  */
-function loadBundleCfg(cfgDir: string, bundleName: string): NodeCG.Bundle.UnknownConfig | undefined {
+function loadBundleCfg(
+	cfgDir: string,
+	bundleName: string,
+): NodeCG.Bundle.UnknownConfig | undefined {
 	try {
-		const cc = cosmiconfig('nodecg', {
+		const cc = cosmiconfig("nodecg", {
 			searchPlaces: [
 				`${bundleName}.json`,
 				`${bundleName}.yaml`,

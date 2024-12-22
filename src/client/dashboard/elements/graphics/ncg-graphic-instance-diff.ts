@@ -1,10 +1,10 @@
-import '@polymer/iron-icons/device-icons.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/paper-icon-button/paper-icon-button.js';
-import * as Polymer from '@polymer/polymer';
-import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
-import type { NodeCG } from '../../../../types/nodecg';
-import type ClientReplicant from '../../../api/replicant';
+import "@polymer/iron-icons/device-icons.js";
+import "@polymer/iron-icons/iron-icons.js";
+import "@polymer/paper-icon-button/paper-icon-button.js";
+import * as Polymer from "@polymer/polymer";
+import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
+import type { NodeCG } from "../../../../types/nodecg";
+import type ClientReplicant from "../../../api/replicant";
 let bundlesRep: ClientReplicant<NodeCG.Bundle[]>;
 
 /**
@@ -64,7 +64,7 @@ class NcgGraphicInstanceDiff extends MutableData(Polymer.PolymerElement) {
 	}
 
 	static get is() {
-		return 'ncg-graphic-instance-diff';
+		return "ncg-graphic-instance-diff";
 	}
 
 	static get properties() {
@@ -74,52 +74,58 @@ class NcgGraphicInstanceDiff extends MutableData(Polymer.PolymerElement) {
 	}
 
 	static get observers() {
-		return ['_updateBundleInfo(instance.bundleName)'];
+		return ["_updateBundleInfo(instance.bundleName)"];
 	}
 
 	override ready(): void {
 		super.ready();
 
 		if (!bundlesRep) {
-			bundlesRep = window.NodeCG.Replicant('bundles', 'nodecg');
+			bundlesRep = window.NodeCG.Replicant("bundles", "nodecg");
 			bundlesRep.setMaxListeners(99);
 		}
 
-		bundlesRep.on('change', () => {
+		bundlesRep.on("change", () => {
 			this._updateBundleInfo();
 		});
 	}
 
 	close() {
-		this.dispatchEvent(new CustomEvent('close'));
+		this.dispatchEvent(new CustomEvent("close"));
 	}
 
 	_updateBundleInfo() {
-		if (!bundlesRep || bundlesRep.status !== 'declared' || !Array.isArray(bundlesRep.value)) {
+		if (
+			!bundlesRep ||
+			bundlesRep.status !== "declared" ||
+			!Array.isArray(bundlesRep.value)
+		) {
 			return;
 		}
 
-		if (!this['instance']?.bundleName) {
+		if (!this["instance"]?.bundleName) {
 			return;
 		}
 
-		const bundle = bundlesRep.value.find((bundle) => bundle.name === this['instance'].bundleName);
+		const bundle = bundlesRep.value.find(
+			(bundle) => bundle.name === this["instance"].bundleName,
+		);
 		if (!bundle) {
 			return;
 		}
 
-		this['_bundleVersion'] = bundle.version;
-		this['_bundleGit'] = bundle.git;
+		this["_bundleVersion"] = bundle.version;
+		this["_bundleGit"] = bundle.git;
 	}
 
 	_formatCommitMessage(message: string) {
 		if (!message) {
-			return '[No commit message.]';
+			return "[No commit message.]";
 		}
 
 		if (message.length > 50) {
 			message = message.slice(0, 50);
-			message += '…';
+			message += "…";
 		}
 
 		return `[${message}]`;

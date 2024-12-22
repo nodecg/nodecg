@@ -1,31 +1,45 @@
 // Packages
-import express from 'express';
-import isError from 'is-error';
-import { serializeError } from 'serialize-error';
-import type { DeepReadonly } from 'ts-essentials';
+import express from "express";
+import isError from "is-error";
+import { serializeError } from "serialize-error";
+import type { DeepReadonly } from "ts-essentials";
 
 // Ours
-import { NodeCGAPIBase } from '../shared/api.base';
-import type { Replicator, ServerReplicant } from './replicant';
-import { config } from './config';
-import { Logger } from './logger';
-import * as ncgUtils from './util';
-import type { RootNS } from '../types/socket-protocol';
-import type { NodeCG } from '../types/nodecg';
-import type { ExtensionEventMap } from './server/extensions';
+import { NodeCGAPIBase } from "../shared/api.base";
+import type { Replicator, ServerReplicant } from "./replicant";
+import { config } from "./config";
+import { Logger } from "./logger";
+import * as ncgUtils from "./util";
+import type { RootNS } from "../types/socket-protocol";
+import type { NodeCG } from "../types/nodecg";
+import type { ExtensionEventMap } from "./server/extensions";
 
-export default (io: RootNS, replicator: Replicator, extensions: Record<string, unknown>, mount: NodeCG.Middleware) => {
-	const apiContexts = new Set<NodeCGAPIBase<'server', NodeCG.Bundle.UnknownConfig, ExtensionEventMap>>();
+export default (
+	io: RootNS,
+	replicator: Replicator,
+	extensions: Record<string, unknown>,
+	mount: NodeCG.Middleware,
+) => {
+	const apiContexts = new Set<
+		NodeCGAPIBase<"server", NodeCG.Bundle.UnknownConfig, ExtensionEventMap>
+	>();
 
 	/**
 	 * This is what enables intra-context messaging.
 	 * I.e., passing messages from one extension to another in the same Node.js context.
 	 */
-	function _forwardMessageToContext(messageName: string, bundleName: string, data: unknown): void {
+	function _forwardMessageToContext(
+		messageName: string,
+		bundleName: string,
+		data: unknown,
+	): void {
 		process.nextTick(() => {
 			apiContexts.forEach((ctx) => {
 				ctx._messageHandlers.forEach((handler) => {
-					if (messageName === handler.messageName && bundleName === handler.bundleName) {
+					if (
+						messageName === handler.messageName &&
+						bundleName === handler.bundleName
+					) {
 						handler.func(data);
 					}
 				});
@@ -33,44 +47,48 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 		});
 	}
 
-	return class NodeCGAPIServer<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> extends NodeCGAPIBase<
-		'server',
-		C,
-		ExtensionEventMap
-	> {
-		static sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): void {
+	return class NodeCGAPIServer<
+		C extends Record<string, any> = NodeCG.Bundle.UnknownConfig,
+	> extends NodeCGAPIBase<"server", C, ExtensionEventMap> {
+		static sendMessageToBundle(
+			messageName: string,
+			bundleName: string,
+			data?: unknown,
+		): void {
 			_forwardMessageToContext(messageName, bundleName, data);
-			io.emit('message', {
+			io.emit("message", {
 				bundleName,
 				messageName,
 				content: data,
 			});
 		}
 
-		static readReplicant<T = unknown>(name: string, namespace: string): T | undefined {
-			if (!name || typeof name !== 'string') {
-				throw new Error('Must supply a name when reading a Replicant');
+		static readReplicant<T = unknown>(
+			name: string,
+			namespace: string,
+		): T | undefined {
+			if (!name || typeof name !== "string") {
+				throw new Error("Must supply a name when reading a Replicant");
 			}
 
-			if (!namespace || typeof namespace !== 'string') {
-				throw new Error('Must supply a namespace when reading a Replicant');
+			if (!namespace || typeof namespace !== "string") {
+				throw new Error("Must supply a namespace when reading a Replicant");
 			}
 
 			const replicant = replicator.declare(name, namespace);
 			return replicant.value as T | undefined;
 		}
 
-		static Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
-			name: string,
-			namespace: string,
-			opts: O,
-		): ServerReplicant<V, O> {
-			if (!name || typeof name !== 'string') {
-				throw new Error('Must supply a name when reading a Replicant');
+		static Replicant<
+			V,
+			O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+		>(name: string, namespace: string, opts: O): ServerReplicant<V, O> {
+			if (!name || typeof name !== "string") {
+				throw new Error("Must supply a name when reading a Replicant");
 			}
 
-			if (!namespace || typeof namespace !== 'string') {
-				throw new Error('Must supply a namespace when reading a Replicant');
+			if (!namespace || typeof namespace !== "string") {
+				throw new Error("Must supply a namespace when reading a Replicant");
 			}
 
 			return replicator.declare(name, namespace, opts);
@@ -156,11 +174,14 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 		constructor(bundle: NodeCG.Bundle) {
 			super(bundle);
 			apiContexts.add(this);
-			io.on('connection', (socket) => {
-				socket.on('message', (data, ack) => {
+			io.on("connection", (socket) => {
+				socket.on("message", (data, ack) => {
 					const wrappedAck = _wrapAcknowledgement(ack);
 					this._messageHandlers.forEach((handler) => {
-						if (data.messageName === handler.messageName && data.bundleName === handler.bundleName) {
+						if (
+							data.messageName === handler.messageName &&
+							data.bundleName === handler.bundleName
+						) {
 							handler.func(data.content, wrappedAck);
 						}
 					});
@@ -187,10 +208,22 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 		 * acknowledgement is an `Error`, otherwise it is resolved with the remaining arguments provided to the acknowledgement.
 		 * But, if a callback was provided, this return value will be `undefined`, and there will be no Promise.
 		 */
-		sendMessageToBundle(messageName: string, bundleName: string, data?: unknown): void {
-			this.log.trace('Sending message %s to bundle %s with data:', messageName, bundleName, data);
-			// eslint-disable-next-line prefer-rest-params,@typescript-eslint/no-confusing-void-expression
-			return NodeCGAPIServer.sendMessageToBundle.apply(NodeCGAPIBase, arguments as any);
+		sendMessageToBundle(
+			messageName: string,
+			bundleName: string,
+			data?: unknown,
+		): void {
+			this.log.trace(
+				"Sending message %s to bundle %s with data:",
+				messageName,
+				bundleName,
+				data,
+			);
+			// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+			return NodeCGAPIServer.sendMessageToBundle.apply(
+				NodeCGAPIBase,
+				arguments as any, // eslint-disable-line prefer-rest-params
+			);
 		}
 
 		/**
@@ -287,18 +320,24 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
 		 *     console.log('myRep has the value '+ value +'!');
 		 * });
 		 */
-		readReplicant<T = unknown>(name: string, param2?: string | NodeCG.Bundle): T | undefined {
+		readReplicant<T = unknown>(
+			name: string,
+			param2?: string | NodeCG.Bundle,
+		): T | undefined {
 			let { bundleName } = this;
-			if (typeof param2 === 'string') {
+			if (typeof param2 === "string") {
 				bundleName = param2;
-			} else if (typeof param2 === 'object' && bundleName in param2) {
+			} else if (typeof param2 === "object" && bundleName in param2) {
 				bundleName = param2.name;
 			}
 
 			return (this.constructor as any).readReplicant(name, bundleName);
 		}
 
-		_replicantFactory = <V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+		_replicantFactory = <
+			V,
+			O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+		>(
 			name: string,
 			namespace: string,
 			opts: O,
@@ -316,11 +355,13 @@ export default (io: RootNS, replicator: Replicator, extensions: Record<string, u
  * @ignore
  * @returns {Function}
  */
-function _wrapAcknowledgement(ack: (err?: any, response?: unknown) => void): NodeCG.Acknowledgement {
+function _wrapAcknowledgement(
+	ack: (err?: any, response?: unknown) => void,
+): NodeCG.Acknowledgement {
 	let handled = false;
 	const wrappedAck = function (firstArg: any, ...restArgs: any[]): void {
 		if (handled) {
-			throw new Error('Acknowledgement already handled');
+			throw new Error("Acknowledgement already handled");
 		}
 
 		handled = true;
@@ -331,7 +372,7 @@ function _wrapAcknowledgement(ack: (err?: any, response?: unknown) => void): Nod
 		ack(firstArg, ...restArgs);
 	};
 
-	Object.defineProperty(wrappedAck, 'handled', {
+	Object.defineProperty(wrappedAck, "handled", {
 		get() {
 			return handled;
 		},

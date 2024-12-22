@@ -1,9 +1,9 @@
 // Minimal imports for first setup
-import * as os from 'os';
-import * as Sentry from '@sentry/node';
-import { config, filteredConfig, sentryEnabled } from '../config';
-import '../util/sentry-config';
-import { pjson } from '../util';
+import * as os from "os";
+import * as Sentry from "@sentry/node";
+import { config, filteredConfig, sentryEnabled } from "../config";
+import "../util/sentry-config";
+import { pjson } from "../util";
 
 if (config.sentry?.enabled) {
 	Sentry.init({
@@ -18,53 +18,59 @@ if (config.sentry?.enabled) {
 		});
 	});
 
-	process.on('unhandledRejection', (reason, p) => {
-		console.error('Unhandled Rejection at:', p, 'reason:', reason);
+	process.on("unhandledRejection", (reason, p) => {
+		console.error("Unhandled Rejection at:", p, "reason:", reason);
 		Sentry.captureException(reason);
 	});
 
-	console.info('[nodecg] Sentry enabled.');
+	console.info("[nodecg] Sentry enabled.");
 }
 
 // Native
-import fs = require('fs');
-import path = require('path');
+import fs = require("fs");
+import path = require("path");
 
 // Packages
-import bodyParser from 'body-parser';
-import { klona as clone } from 'klona/json';
-import debounce from 'lodash.debounce';
-import express from 'express';
-import template from 'lodash.template';
-import memoize from 'fast-memoize';
-import transformMiddleware from 'express-transform-bare-module-specifiers';
-import compression from 'compression';
-import type { Server } from 'http';
-import SocketIO from 'socket.io';
-import passport from 'passport';
+import bodyParser from "body-parser";
+import { klona as clone } from "klona/json";
+import debounce from "lodash.debounce";
+import express from "express";
+import template from "lodash.template";
+import memoize from "fast-memoize";
+import transformMiddleware from "express-transform-bare-module-specifiers";
+import compression from "compression";
+import type { Server } from "http";
+import SocketIO from "socket.io";
+import passport from "passport";
 
 // Ours
-import BundleManager from '../bundle-manager';
-import createLogger from '../logger';
-import socketAuthMiddleware from '../login/socketAuthMiddleware';
-import socketApiMiddleware from './socketApiMiddleware';
-import Replicator from '../replicant/replicator';
-import type { ClientToServerEvents, ServerToClientEvents, TypedSocketServer } from '../../types/socket-protocol';
-import GraphicsLib from '../graphics';
-import { DashboardLib } from '../dashboard';
-import MountsLib from '../mounts';
-import SoundsLib from '../sounds';
-import { createAssetsMiddleware } from '../assets';
-import SharedSourcesLib from '../shared-sources';
-import ExtensionManager from './extensions';
-import SentryConfig from '../util/sentry-config';
-import type { NodeCG } from '../../types/nodecg';
-import { TypedEmitter } from '../../shared/typed-emitter';
-import { nodecgRootPath } from '../../shared/utils/rootPath';
-import { NODECG_ROOT } from '../nodecg-root';
-import { getAllReplicants } from '../database/default/utils';
+import BundleManager from "../bundle-manager";
+import createLogger from "../logger";
+import socketAuthMiddleware from "../login/socketAuthMiddleware";
+import socketApiMiddleware from "./socketApiMiddleware";
+import Replicator from "../replicant/replicator";
+import type {
+	ClientToServerEvents,
+	ServerToClientEvents,
+	TypedSocketServer,
+} from "../../types/socket-protocol";
+import GraphicsLib from "../graphics";
+import { DashboardLib } from "../dashboard";
+import MountsLib from "../mounts";
+import SoundsLib from "../sounds";
+import { createAssetsMiddleware } from "../assets";
+import SharedSourcesLib from "../shared-sources";
+import ExtensionManager from "./extensions";
+import SentryConfig from "../util/sentry-config";
+import type { NodeCG } from "../../types/nodecg";
+import { TypedEmitter } from "../../shared/typed-emitter";
+import { nodecgRootPath } from "../../shared/utils/rootPath";
+import { NODECG_ROOT } from "../nodecg-root";
+import { getAllReplicants } from "../database/default/utils";
 
-const renderTemplate = memoize((content, options) => template(content)(options));
+const renderTemplate = memoize((content, options) =>
+	template(content)(options),
+);
 
 type EventMap = {
 	error: (error: unknown) => void;
@@ -74,7 +80,7 @@ type EventMap = {
 };
 
 export class NodeCGServer extends TypedEmitter<EventMap> {
-	readonly log = createLogger('server');
+	readonly log = createLogger("server");
 
 	private readonly _io: TypedSocketServer;
 
@@ -102,7 +108,11 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		 */
 		const { _app: app } = this;
 		let server: Server;
-		if (config.ssl.enabled && config.ssl.keyPath && config.ssl.certificatePath) {
+		if (
+			config.ssl.enabled &&
+			config.ssl.keyPath &&
+			config.ssl.certificatePath
+		) {
 			const sslOpts: { key: Buffer; cert: Buffer; passphrase?: string } = {
 				key: fs.readFileSync(config.ssl.keyPath),
 				cert: fs.readFileSync(config.ssl.certificatePath),
@@ -114,18 +124,20 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			// If we allow HTTP on the same port, use httpolyglot
 			// otherwise, standard https server
 			server = config.ssl.allowHTTP
-				? require('httpolyglot').createServer(sslOpts, app)
-				: require('https').createServer(sslOpts, app);
+				? require("httpolyglot").createServer(sslOpts, app)
+				: require("https").createServer(sslOpts, app);
 		} else {
-			server = require('http').createServer(app);
+			server = require("http").createServer(app);
 		}
 
 		/**
 		 * Socket.IO server setup.
 		 */
-		this._io = new SocketIO.Server<ClientToServerEvents, ServerToClientEvents>(server);
+		this._io = new SocketIO.Server<ClientToServerEvents, ServerToClientEvents>(
+			server,
+		);
 		this._io.setMaxListeners(75); // Prevent console warnings when many extensions are installed
-		this._io.on('error', (err) => {
+		this._io.on("error", (err) => {
 			if (sentryEnabled) {
 				Sentry.captureException(err);
 			}
@@ -138,8 +150,12 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 
 	async start(): Promise<void> {
 		const { _app: app, _server: server, log } = this;
-		const io = this._io.of('/');
-		log.info('Starting NodeCG %s (Running on Node.js %s)', pjson.version, process.version);
+		const io = this._io.of("/");
+		log.info(
+			"Starting NodeCG %s (Running on Node.js %s)",
+			pjson.version,
+			process.version,
+		);
 
 		if (sentryEnabled) {
 			app.use(Sentry.Handlers.requestHandler());
@@ -150,9 +166,9 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		app.use(bodyParser.json());
 		app.use(bodyParser.urlencoded({ extended: true }));
 
-		app.set('trust proxy', true);
+		app.set("trust proxy", true);
 
-		app.engine('tmpl', (filePath: string, options: any, callback: any) => {
+		app.engine("tmpl", (filePath: string, options: any, callback: any) => {
 			fs.readFile(filePath, (error, content) => {
 				if (error) {
 					return callback(error);
@@ -163,28 +179,30 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		});
 
 		if (config.login?.enabled) {
-			log.info('Login security enabled');
-			const login = await import('../login');
-			const { app: loginMiddleware, sessionMiddleware } = login.createMiddleware({
-				onLogin: (user) => {
-					// If the user had no roles, then that means they "logged in"
-					// with a third-party auth provider but weren't able to
-					// get past the login page because the NodeCG config didn't allow that user.
-					// At this time, we only tell extensions about users that are valid.
-					if (user.roles.length > 0) {
-						this._extensionManager?.emitToAllInstances('login', user);
-					}
-				},
-				onLogout: (user) => {
-					if (user.roles.length > 0) {
-						this._extensionManager?.emitToAllInstances('logout', user);
-					}
-				},
-			});
+			log.info("Login security enabled");
+			const login = await import("../login");
+			const { app: loginMiddleware, sessionMiddleware } =
+				login.createMiddleware({
+					onLogin: (user) => {
+						// If the user had no roles, then that means they "logged in"
+						// with a third-party auth provider but weren't able to
+						// get past the login page because the NodeCG config didn't allow that user.
+						// At this time, we only tell extensions about users that are valid.
+						if (user.roles.length > 0) {
+							this._extensionManager?.emitToAllInstances("login", user);
+						}
+					},
+					onLogout: (user) => {
+						if (user.roles.length > 0) {
+							this._extensionManager?.emitToAllInstances("logout", user);
+						}
+					},
+				});
 			app.use(loginMiddleware);
 
 			// convert a connect middleware to a Socket.IO middleware
-			const wrap = (middleware: any) => (socket: SocketIO.Socket, next: any) => middleware(socket.request, {}, next);
+			const wrap = (middleware: any) => (socket: SocketIO.Socket, next: any) =>
+				middleware(socket.request, {}, next);
 
 			io.use(wrap(sessionMiddleware));
 			io.use(wrap(passport.initialize()));
@@ -192,16 +210,23 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 
 			this._io.use(socketAuthMiddleware);
 		} else {
-			app.get('/login*', (_, res) => {
-				res.redirect('/dashboard');
+			app.get("/login*", (_, res) => {
+				res.redirect("/dashboard");
 			});
 		}
 
 		this._io.use(socketApiMiddleware);
 
-		const bundlesPaths = [path.join(NODECG_ROOT, 'bundles')].concat(config.bundles?.paths ?? []);
-		const cfgPath = path.join(NODECG_ROOT, 'cfg');
-		const bundleManager = new BundleManager(bundlesPaths, cfgPath, pjson.version, config);
+		const bundlesPaths = [path.join(NODECG_ROOT, "bundles")].concat(
+			config.bundles?.paths ?? [],
+		);
+		const cfgPath = path.join(NODECG_ROOT, "cfg");
+		const bundleManager = new BundleManager(
+			bundlesPaths,
+			cfgPath,
+			pjson.version,
+			config,
+		);
 
 		// Wait for Chokidar to finish its initial scan.
 		await new Promise<void>((resolve, reject) => {
@@ -209,13 +234,17 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			const timeout = setTimeout(() => {
 				if (handled) return;
 				handled = true;
-				reject(new Error('Timed out while waiting for the bundle manager to become ready.'));
+				reject(
+					new Error(
+						"Timed out while waiting for the bundle manager to become ready.",
+					),
+				);
 			}, 15000);
 
 			if (bundleManager.ready) {
 				succeed();
 			} else {
-				bundleManager.once('ready', () => {
+				bundleManager.once("ready", () => {
 					succeed();
 				});
 			}
@@ -233,9 +262,9 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			if (bundle.transformBareModuleSpecifiers) {
 				log.warn(
 					`${bundle.name} uses the deprecated "transformBareModuleSpecifiers" feature. ` +
-						'This feature will be removed in NodeCG v3. ' +
-						'Please migrate to using browser-native import maps instead: ' +
-						'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap',
+						"This feature will be removed in NodeCG v3. " +
+						"Please migrate to using browser-native import maps instead: " +
+						"https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap",
 				);
 				const opts = {
 					rootDir: NODECG_ROOT,
@@ -249,21 +278,23 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		this._bundleManager = bundleManager;
 
 		log.trace(`Attempting to listen on ${config.host}:${config.port}`);
-		server.on('error', (err) => {
+		server.on("error", (err) => {
 			switch ((err as any).code) {
-				case 'EADDRINUSE':
+				case "EADDRINUSE":
 					if (process.env.NODECG_TEST) {
 						return;
 					}
 
-					log.error(`Listen ${config.host}:${config.port} in use, is NodeCG already running? NodeCG will now exit.`);
+					log.error(
+						`Listen ${config.host}:${config.port} in use, is NodeCG already running? NodeCG will now exit.`,
+					);
 					break;
 				default:
-					log.error('Unhandled error!', err);
+					log.error("Unhandled error!", err);
 					break;
 			}
 
-			this.emit('error', err);
+			this.emit("error", err);
 		});
 
 		if (sentryEnabled) {
@@ -288,7 +319,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		app.use(sounds.app);
 
 		const assets = createAssetsMiddleware(bundleManager.all(), replicator);
-		app.use('/assets', assets);
+		app.use("/assets", assets);
 
 		const sharedSources = new SharedSourcesLib(bundleManager.all());
 		app.use(sharedSources.app);
@@ -299,37 +330,51 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 
 		// Fallthrough error handler,
 		// Taken from https://docs.sentry.io/platforms/node/express/
-		app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-			res.statusCode = 500;
-			if (sentryEnabled) {
-				// The error id is attached to `res.sentry` to be returned
-				// and optionally displayed to the user for support.
-				res.end(`Internal error\nSentry issue ID: ${String((res as any).sentry)}\n`);
-			} else {
-				res.end('Internal error');
-			}
+		app.use(
+			(
+				err: unknown,
+				_req: express.Request,
+				res: express.Response,
+				_next: express.NextFunction,
+			) => {
+				res.statusCode = 500;
+				if (sentryEnabled) {
+					// The error id is attached to `res.sentry` to be returned
+					// and optionally displayed to the user for support.
+					res.end(
+						`Internal error\nSentry issue ID: ${String((res as any).sentry)}\n`,
+					);
+				} else {
+					res.end("Internal error");
+				}
 
-			this.log.error(err);
-		});
+				this.log.error(err);
+			},
+		);
 
 		// Set up "bundles" Replicant.
-		const bundlesReplicant = replicator.declare('bundles', 'nodecg', {
-			schemaPath: path.resolve(nodecgRootPath, 'schemas/bundles.json'),
+		const bundlesReplicant = replicator.declare("bundles", "nodecg", {
+			schemaPath: path.resolve(nodecgRootPath, "schemas/bundles.json"),
 			persistent: false,
 		});
 		const updateBundlesReplicant = debounce(() => {
 			bundlesReplicant.value = clone(bundleManager.all());
 		}, 100);
-		bundleManager.on('ready', updateBundlesReplicant);
-		bundleManager.on('bundleChanged', updateBundlesReplicant);
-		bundleManager.on('gitChanged', updateBundlesReplicant);
-		bundleManager.on('bundleRemoved', updateBundlesReplicant);
+		bundleManager.on("ready", updateBundlesReplicant);
+		bundleManager.on("bundleChanged", updateBundlesReplicant);
+		bundleManager.on("gitChanged", updateBundlesReplicant);
+		bundleManager.on("bundleRemoved", updateBundlesReplicant);
 		updateBundlesReplicant();
 
-		const extensionManager = new ExtensionManager(io, bundleManager, replicator, this.mount);
+		const extensionManager = new ExtensionManager(
+			io,
+			bundleManager,
+			replicator,
+			this.mount,
+		);
 		this._extensionManager = extensionManager;
-		this.emit('extensionsLoaded');
-		this._extensionManager?.emitToAllInstances('extensionsLoaded');
+		this.emit("extensionsLoaded");
+		this._extensionManager?.emitToAllInstances("extensionsLoaded");
 
 		// We intentionally wait until all bundles and extensions are loaded before starting the server.
 		// This has two benefits:
@@ -344,7 +389,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 				() => {
 					if (process.env.NODECG_TEST) {
 						const addrInfo = server.address();
-						if (typeof addrInfo !== 'object' || addrInfo === null) {
+						if (typeof addrInfo !== "object" || addrInfo === null) {
 							throw new Error("couldn't get port number");
 						}
 
@@ -355,10 +400,10 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 						process.env.NODECG_TEST_PORT = String(port);
 					}
 
-					const protocol = config.ssl?.enabled ? 'https' : 'http';
-					log.info('NodeCG running on %s://%s', protocol, config.baseURL);
-					this.emit('started');
-					this._extensionManager?.emitToAllInstances('serverStarted');
+					const protocol = config.ssl?.enabled ? "https" : "http";
+					log.info("NodeCG running on %s://%s", protocol, config.baseURL);
+					this.emit("started");
+					this._extensionManager?.emitToAllInstances("serverStarted");
 					resolve();
 				},
 			);
@@ -366,7 +411,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 	}
 
 	async stop(): Promise<void> {
-		this._extensionManager?.emitToAllInstances('serverStopping');
+		this._extensionManager?.emitToAllInstances("serverStopping");
 		this._io.disconnectSockets(true);
 
 		await new Promise<void>((resolve) => {
@@ -380,7 +425,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			this._replicator.saveAllReplicants();
 		}
 
-		this.emit('stopped');
+		this.emit("stopped");
 	}
 
 	getExtensions(): Record<string, unknown> {

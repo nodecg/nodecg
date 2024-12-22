@@ -1,13 +1,16 @@
 // Native
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 // Ours
-import type { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from "../../types/nodecg";
 
-export default function (bundleDir: string, manifest: NodeCG.Manifest): boolean {
-	const singleFilePath = path.resolve(bundleDir, 'extension.js');
-	const directoryPath = path.resolve(bundleDir, 'extension');
+export default function (
+	bundleDir: string,
+	manifest: NodeCG.Manifest,
+): boolean {
+	const singleFilePath = path.resolve(bundleDir, "extension.js");
+	const directoryPath = path.resolve(bundleDir, "extension");
 	const singleFileExists = fs.existsSync(singleFilePath);
 	const directoryExists = fs.existsSync(directoryPath);
 
@@ -23,7 +26,7 @@ export default function (bundleDir: string, manifest: NodeCG.Manifest): boolean 
 	if (singleFileExists && directoryExists) {
 		throw new Error(
 			`${manifest.name} has both "extension.js" and a folder named "extension". ` +
-				'There can only be one of these, not both.',
+				"There can only be one of these, not both.",
 		);
 	}
 

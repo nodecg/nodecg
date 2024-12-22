@@ -1,18 +1,18 @@
-import '@polymer/iron-icons/device-icons.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/paper-button/paper-button.js';
+import "@polymer/iron-icons/device-icons.js";
+import "@polymer/iron-icons/iron-icons.js";
+import "@polymer/paper-button/paper-button.js";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from './ncg-graphic-instance-diff';
+import * as keep1 from "./ncg-graphic-instance-diff";
 keep1;
 
-import * as Polymer from '@polymer/polymer';
-import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
-import type { NodeCG } from '../../../../types/nodecg';
-const pulseElement = document.createElement('div');
+import * as Polymer from "@polymer/polymer";
+import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
+import type { NodeCG } from "../../../../types/nodecg";
+const pulseElement = document.createElement("div");
 setInterval(() => {
 	pulseElement.dispatchEvent(
-		new CustomEvent('pulse', {
+		new CustomEvent("pulse", {
 			detail: {
 				timestamp: Date.now(),
 			},
@@ -234,7 +234,7 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 	}
 
 	static get is() {
-		return 'ncg-graphic-instance';
+		return "ncg-graphic-instance";
 	}
 
 	static get properties() {
@@ -248,7 +248,7 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 			status: {
 				type: String,
 				reflectToAttribute: true,
-				computed: '_computeStatus(instance)',
+				computed: "_computeStatus(instance)",
 			},
 			statusHover: {
 				type: Boolean,
@@ -260,101 +260,103 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 
 	override ready(): void {
 		super.ready();
-		pulseElement.addEventListener('pulse', (e: any) => {
-			this['_pulse'] = e.detail.timestamp;
+		pulseElement.addEventListener("pulse", (e: any) => {
+			this["_pulse"] = e.detail.timestamp;
 		});
 
 		const showDiff = () => {
-			clearTimeout(this['_offTimeout']);
-			this['_offTimeout'] = null;
-			this['statusHover'] = true;
+			clearTimeout(this["_offTimeout"]);
+			this["_offTimeout"] = null;
+			this["statusHover"] = true;
 		};
 
 		const hideDiff = (immediate: boolean) => {
 			if (immediate) {
-				clearTimeout(this['_offTimeout']);
-				this['_offTimeout'] = null;
-				this['statusHover'] = false;
-			} else if (!this['_offTimeout']) {
-				this['_offTimeout'] = setTimeout(() => {
-					clearTimeout(this['_offTimeout']);
-					this['_offTimeout'] = null;
-					this['statusHover'] = false;
+				clearTimeout(this["_offTimeout"]);
+				this["_offTimeout"] = null;
+				this["statusHover"] = false;
+			} else if (!this["_offTimeout"]) {
+				this["_offTimeout"] = setTimeout(() => {
+					clearTimeout(this["_offTimeout"]);
+					this["_offTimeout"] = null;
+					this["statusHover"] = false;
 				}, 250);
 			}
 		};
 
-		this.$['indicatorIcon'].addEventListener('mouseenter', () => {
-			if (this['responsiveMode'] === 'narrow') {
+		this.$["indicatorIcon"].addEventListener("mouseenter", () => {
+			if (this["responsiveMode"] === "narrow") {
 				showDiff();
 			}
 		});
-		this.$['status'].addEventListener('mouseenter', showDiff);
-		this.$['diff'].addEventListener('mouseenter', showDiff);
+		this.$["status"].addEventListener("mouseenter", showDiff);
+		this.$["diff"].addEventListener("mouseenter", showDiff);
 
-		this.$['indicatorIcon'].addEventListener('mouseleave', () => {
-			if (this['responsiveMode'] === 'narrow') {
+		this.$["indicatorIcon"].addEventListener("mouseleave", () => {
+			if (this["responsiveMode"] === "narrow") {
 				hideDiff(false);
 			}
 		});
-		this.$['status'].addEventListener('mouseleave', () => {
+		this.$["status"].addEventListener("mouseleave", () => {
 			hideDiff(false);
 		});
-		this.$['diff'].addEventListener('mouseleave', () => {
+		this.$["diff"].addEventListener("mouseleave", () => {
 			hideDiff(false);
 		});
-		this.$['diff'].addEventListener('close', () => {
+		this.$["diff"].addEventListener("close", () => {
 			hideDiff(true);
 		});
 	}
 
 	reload() {
-		this.$['reloadButton'].disabled = true;
-		window.socket.emit('graphic:requestRefresh', this['instance'], () => {
-			this.$['reloadButton'].disabled = false;
+		this.$["reloadButton"].disabled = true;
+		window.socket.emit("graphic:requestRefresh", this["instance"], () => {
+			this.$["reloadButton"].disabled = false;
 		});
 	}
 
 	kill() {
-		this.$['killButton'].disabled = true;
-		window.socket.emit('graphic:requestKill', this['instance'], () => {
-			this.$['killButton'].disabled = false;
+		this.$["killButton"].disabled = true;
+		window.socket.emit("graphic:requestKill", this["instance"], () => {
+			this.$["killButton"].disabled = false;
 		});
 	}
 
 	_computeStatus(instance?: NodeCG.GraphicsInstance) {
 		if (!instance) {
-			return '';
+			return "";
 		}
 
 		if (!instance.open) {
-			return 'closed';
+			return "closed";
 		}
 
-		return instance.potentiallyOutOfDate ? 'out-of-date' : 'nominal';
+		return instance.potentiallyOutOfDate ? "out-of-date" : "nominal";
 	}
 
 	_calcIndicatorIcon(status: string) {
 		switch (status) {
-			case 'nominal':
-				return 'check';
-			case 'out-of-date':
-				return 'warning';
+			case "nominal":
+				return "check";
+			case "out-of-date":
+				return "warning";
 			default:
-				return 'close';
+				return "close";
 		}
 	}
 
 	_calcStatusMessage(status: string, responsiveMode: string) {
 		switch (status) {
-			case 'nominal':
-				return 'Latest';
-			case 'out-of-date':
-				return responsiveMode === 'wide' ? 'Potentially Out of Date' : 'Out of Date';
-			case 'closed':
-				return 'Closed';
+			case "nominal":
+				return "Latest";
+			case "out-of-date":
+				return responsiveMode === "wide"
+					? "Potentially Out of Date"
+					: "Out of Date";
+			case "closed":
+				return "Closed";
 			default:
-				return 'Error';
+				return "Error";
 		}
 	}
 

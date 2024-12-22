@@ -1,7 +1,7 @@
-import { format, inspect } from 'util';
-import type * as Sentry from '@sentry/browser';
-import type { LoggerInterface } from '../../../types/logger-interface';
-import { LogLevel } from '../../../types/logger-interface';
+import { format, inspect } from "util";
+import type * as Sentry from "@sentry/browser";
+import type { LoggerInterface } from "../../../types/logger-interface";
+import { LogLevel } from "../../../types/logger-interface";
 
 const OrderedLogLevels: { [Level in LogLevel]: number } = {
 	verbose: 0,
@@ -26,7 +26,10 @@ type LoggerOptions = {
  * @returns  A constructor used to create discrete logger instances.
  */
 
-export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeof Sentry | undefined = undefined) {
+export default function (
+	initialOpts: Partial<LoggerOptions> = {},
+	sentry: typeof Sentry | undefined = undefined,
+) {
 	/**
 	 * Constructs a new Logger instance that prefixes all output with the given name.
 	 * @param name {String} - The label to prefix all output of this logger with.
@@ -106,10 +109,17 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 
 			if (sentry) {
 				const formattedArgs = args.map((argument) =>
-					typeof argument === 'object' ? inspect(argument, { depth: null, showProxy: true }) : argument,
+					typeof argument === "object"
+						? inspect(argument, { depth: null, showProxy: true })
+						: argument,
 				);
 
-				sentry.captureException(new Error(`[${this.name}] ` + format(formattedArgs[0], ...formattedArgs.slice(1))));
+				sentry.captureException(
+					new Error(
+						`[${this.name}] ` +
+							format(formattedArgs[0], ...formattedArgs.slice(1)),
+					),
+				);
 			}
 		}
 

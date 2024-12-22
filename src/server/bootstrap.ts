@@ -9,30 +9,30 @@
  * over its lifecycle and when the process exits.
  */
 
-import semver from 'semver';
-import { nodecgRootPath } from '../shared/utils/rootPath';
+import semver from "semver";
+import { nodecgRootPath } from "../shared/utils/rootPath";
 
 const cwd = process.cwd();
 
 if (cwd !== nodecgRootPath) {
-	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, nodecgRootPath);
+	console.warn("[nodecg] process.cwd is %s, expected %s", cwd, nodecgRootPath);
 	process.chdir(nodecgRootPath);
-	console.info('[nodecg] Changed process.cwd to %s', nodecgRootPath);
+	console.info("[nodecg] Changed process.cwd to %s", nodecgRootPath);
 }
 
-import { pjson, asyncExitHook } from './util';
-import { NodeCGServer } from './server';
-import { gracefulExit } from './util/exit-hook';
-import { exitOnUncaught, sentryEnabled } from './config';
+import { pjson, asyncExitHook } from "./util";
+import { NodeCGServer } from "./server";
+import { gracefulExit } from "./util/exit-hook";
+import { exitOnUncaught, sentryEnabled } from "./config";
 
 process.title = `NodeCG - ${pjson.version}`;
 
-process.on('uncaughtException', (err) => {
+process.on("uncaughtException", (err) => {
 	if (!sentryEnabled) {
 		if (exitOnUncaught) {
-			console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
+			console.error("UNCAUGHT EXCEPTION! NodeCG will now exit.");
 		} else {
-			console.error('UNCAUGHT EXCEPTION!');
+			console.error("UNCAUGHT EXCEPTION!");
 		}
 
 		console.error(err);
@@ -42,18 +42,18 @@ process.on('uncaughtException', (err) => {
 	}
 });
 
-process.on('unhandledRejection', (err) => {
+process.on("unhandledRejection", (err) => {
 	if (!sentryEnabled) {
-		console.error('UNHANDLED PROMISE REJECTION!');
+		console.error("UNHANDLED PROMISE REJECTION!");
 		console.error(err);
 	}
 });
 
 const server = new NodeCGServer();
-server.on('error', () => {
+server.on("error", () => {
 	gracefulExit(1);
 });
-server.on('stopped', () => {
+server.on("stopped", () => {
 	if (!process.exitCode) {
 		gracefulExit(0);
 	}
@@ -75,11 +75,15 @@ asyncExitHook(
 );
 
 // Check for updates
-fetch('https://registry.npmjs.org/nodecg/latest')
+fetch("https://registry.npmjs.org/nodecg/latest")
 	.then((res: any) => res.json())
 	.then((body: any) => {
 		if (semver.gt(body.version, pjson.version)) {
-			console.warn('An update is available for NodeCG: %s (current: %s)', JSON.parse(body).version, pjson.version);
+			console.warn(
+				"An update is available for NodeCG: %s (current: %s)",
+				JSON.parse(body).version,
+				pjson.version,
+			);
 		}
 	})
 	.catch(

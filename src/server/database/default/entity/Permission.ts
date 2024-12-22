@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/prefer-literal-enum-member */
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Role } from './Role';
-import type { Permission as PermissionModel } from '../../models';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Role } from "./Role";
+import type { Permission as PermissionModel } from "../../models";
 
 export const enum Action {
 	NONE = 0,
@@ -11,18 +11,18 @@ export const enum Action {
 
 @Entity()
 export class Permission implements PermissionModel {
-	@PrimaryGeneratedColumn('uuid')
+	@PrimaryGeneratedColumn("uuid")
 	id!: string;
 
-	@Column('text')
+	@Column("text")
 	name!: string;
 
 	@ManyToOne(() => Role, (role) => role.permissions)
 	role!: Role;
 
-	@Column('text')
+	@Column("text")
 	entityId!: string;
 
-	@Column('int')
+	@Column("int")
 	actions!: number;
 }

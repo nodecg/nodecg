@@ -15,7 +15,7 @@ export type Role = {
 
 export type Identity = {
 	id: string;
-	provider_type: 'twitch' | 'steam' | 'local' | 'discord';
+	provider_type: "twitch" | "steam" | "local" | "discord";
 	provider_hash: string;
 	provider_access_token: string | null;
 	provider_refresh_token: string | null;

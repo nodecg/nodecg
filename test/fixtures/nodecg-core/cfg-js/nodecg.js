@@ -1,3 +1,3 @@
 module.exports = {
-	host: 'js-config',
+	host: "js-config",
 };
