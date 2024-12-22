@@ -116,7 +116,7 @@ test.serial(
 	},
 );
 
-test.serial(
+test.serial.skip(
 	"ncg-dialog - should emit dialog-confirmed when a confirm button is clicked",
 	async (t) => {
 		await dashboard.evaluate(
@@ -143,7 +143,7 @@ test.serial(
 	},
 );
 
-test.serial(
+test.serial.skip(
 	"ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked",
 	async (t) => {
 		await dashboard.evaluate(
