@@ -207,7 +207,7 @@ test.serial('git out of date', async (t) => {
 	const git = simpleGit(path.resolve(process.env['NODECG_ROOT']!, 'bundles/test-bundle'));
 	await git.add('./new_file.txt');
 	await git.commit('new commit');
-	await setTimeout(1500)
+	await setTimeout(1500);
 
 	const text = await dashboard.evaluate((el) => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
