@@ -470,19 +470,10 @@ class NcgDashboard extends Polymer.PolymerElement {
 			}
 		});
 
-		window.socket.on("disconnect", (reason) => {
+		window.socket.on("disconnect", () => {
 			this.$["mainToast"].show("Lost connection to NodeCG server!");
 			notified = false;
 			this["disconnected"] = true;
-
-			if (reason === "io server disconnect") {
-				// The server forcibly closed the socket.
-				// In this case, the client won't automatically reconnect.
-				// So, we manually do it here:
-				socket.connect();
-			} else {
-				console.log("Socket disconnect reason:", reason);
-			}
 		});
 
 		window.socket.io.on("reconnect_attempt", (attempts) => {

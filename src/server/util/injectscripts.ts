@@ -65,7 +65,7 @@ export default function (
 
 			if (standalone) {
 				// Load the API
-				scripts.push('<script src="/nodecg-api.min.js"></script>');
+				scripts.push('<script src="/api.js"></script>');
 			} else {
 				// Panels and dialogs can grab the API from the dashboard
 				scripts.push("<script>window.NodeCG = window.top.NodeCG</script>");
@@ -139,7 +139,7 @@ export default function (
 			}
 
 			// Graphics must include the API script themselves before attempting to make an instance of it
-			scripts.push('<script src="/nodecg-api.min.js"></script>');
+			scripts.push('<script src="/api.js"></script>');
 		}
 
 		// Inject a small script to create a NodeCG API instance, if requested.

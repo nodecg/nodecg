@@ -53,14 +53,6 @@ export class DashboardLib {
 			res.render(path.join(__dirname, "dashboard.tmpl"), this.dashboardContext);
 		});
 
-		app.get("/nodecg-api.min.js", (_, res) => {
-			res.sendFile(path.join(BUILD_PATH, "api.js"));
-		});
-
-		app.get("/nodecg-api.min.js.map", (_, res) => {
-			res.sendFile(path.join(BUILD_PATH, "api.js.map"));
-		});
-
 		app.get(
 			"/bundles/:bundleName/dashboard/*",
 			ncgUtils.authCheck,
