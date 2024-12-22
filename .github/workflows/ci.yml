@@ -99,7 +99,7 @@ jobs:
 
       - run: npm run test-coverage-ci
 
-      - if: matrix.os == 'Linux' && matrix.node-version == '20'
+      - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '22'
         uses: codecov/codecov-action@v3
 
   dry-run-container-build:
