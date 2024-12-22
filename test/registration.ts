@@ -14,11 +14,11 @@ import * as browser from "./helpers/browser";
 server.setup();
 const { initSingleInstance, initDashboard, initGraphic } = browser.setup();
 
-import * as C from './helpers/test-constants';
-import * as util from './helpers/utilities';
-import type { Page } from 'puppeteer';
-import { sleep } from './helpers/utilities';
-import { setTimeout } from 'timers/promises';
+import * as C from "./helpers/test-constants";
+import * as util from "./helpers/utilities";
+import type { Page } from "puppeteer";
+import { sleep } from "./helpers/utilities";
+import { setTimeout } from "timers/promises";
 
 let singleInstance: Page;
 let dashboard: Page;
@@ -238,11 +238,19 @@ test.serial("version out of date", async (t) => {
 	t.is(text, "Latest");
 });
 
-test.serial('git out of date', async (t) => {
-	fs.writeFileSync(path.resolve(process.env['NODECG_ROOT']!, 'bundles/test-bundle/new_file.txt'), 'foo');
-	const git = simpleGit(path.resolve(process.env['NODECG_ROOT']!, 'bundles/test-bundle'));
-	await git.add('./new_file.txt');
-	await git.commit('new commit');
+test.serial("git out of date", async (t) => {
+	fs.writeFileSync(
+		path.resolve(
+			process.env["NODECG_ROOT"]!,
+			"bundles/test-bundle/new_file.txt",
+		),
+		"foo",
+	);
+	const git = simpleGit(
+		path.resolve(process.env["NODECG_ROOT"]!, "bundles/test-bundle"),
+	);
+	await git.add("./new_file.txt");
+	await git.commit("new commit");
 	await setTimeout(1500);
 
 	const text = await dashboard.evaluate(
@@ -328,5 +336,6 @@ test.serial(
 
 		await dashboard.bringToFront();
 
-	await setTimeout(200);
-});
+		await setTimeout(200);
+	},
+);
