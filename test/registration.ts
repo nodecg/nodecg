@@ -18,6 +18,7 @@ import * as C from './helpers/test-constants';
 import * as util from './helpers/utilities';
 import type { Page } from 'puppeteer';
 import { sleep } from './helpers/utilities';
+import { setTimeout } from 'timers/promises';
 
 let singleInstance: Page;
 let dashboard: Page;
@@ -185,7 +186,7 @@ test.serial('version out of date', async (t) => {
 		from: '"version": "0.0.1"',
 		to: '"version": "0.0.2"',
 	});
-	await dashboard.waitForTimeout(1500);
+	await setTimeout(1500);
 
 	let text = await dashboard.evaluate((el) => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
@@ -195,7 +196,7 @@ test.serial('version out of date', async (t) => {
 		from: '"version": "0.0.2"',
 		to: '"version": "0.0.1"',
 	});
-	await dashboard.waitForTimeout(1500);
+	await setTimeout(1500);
 
 	text = await dashboard.evaluate((el) => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Latest');
@@ -206,7 +207,7 @@ test.serial('git out of date', async (t) => {
 	const git = simpleGit(path.resolve(process.env['NODECG_ROOT']!, 'bundles/test-bundle'));
 	await git.add('./new_file.txt');
 	await git.commit('new commit');
-	await dashboard.waitForTimeout(1500);
+	await setTimeout(1500)
 
 	const text = await dashboard.evaluate((el) => el.textContent, await statusEl(dashboard));
 	t.is(text, 'Potentially Out of Date');
@@ -297,5 +298,5 @@ test.serial('dragging the graphic generates the correct url for obs', async (t) 
 	// Dragstart event should be called during this
 	await dashboard.mouse.move(0, 0, { steps: 10 });
 
-	await dashboard.waitForTimeout(200);
+	await setTimeout(200);
 });
