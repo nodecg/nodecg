@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.1](https://github.com/nodecg/nodecg/compare/v2.3.0...v2.3.1) (2024-12-22)
+
+
+### Bug Fixes
+
+* remove node-fetch ([38da784](https://github.com/nodecg/nodecg/commit/38da7842ad7d46df7c6d9505a14d16f998ecc931))
+* security updates for dependencies ([#766](https://github.com/nodecg/nodecg/issues/766)) ([c62337d](https://github.com/nodecg/nodecg/commit/c62337d76dc21a9d6df15ff527443a96998d625b))
+
 ## [2.3.0](https://github.com/nodecg/nodecg/compare/v2.2.5...v2.3.0) (2024-12-21)
 
 
