@@ -88,9 +88,9 @@ export default class ServerReplicant<
 
 		// If `opts.persistent` is true and this replicant has a persisted value, try to load that persisted value.
 		// Else, apply `defaultValue`.
-		// eslint-disable-next-line @typescript-eslint/prefer-optional-chain
 		if (
 			opts.persistent &&
+			// eslint-disable-next-line @typescript-eslint/prefer-optional-chain
 			typeof startingValue !== "undefined" &&
 			startingValue !== null
 		) {
