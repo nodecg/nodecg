@@ -46,7 +46,7 @@ import passport from 'passport';
 // Ours
 import BundleManager from '../bundle-manager';
 import createLogger from '../logger';
-import socketAuthMiddleware from '../login/socketAuthMiddleware';
+import { createSocketAuthMiddleware } from '../login/socketAuthMiddleware';
 import socketApiMiddleware from './socketApiMiddleware';
 import Replicator from '../replicant/replicator';
 import type { ClientToServerEvents, ServerToClientEvents, TypedSocketServer } from '../../types/socket-protocol';
@@ -62,7 +62,7 @@ import type { NodeCG } from '../../types/nodecg';
 import { TypedEmitter } from '../../shared/typed-emitter';
 import { nodecgRootPath } from '../../shared/utils/rootPath';
 import { NODECG_ROOT } from '../nodecg-root';
-import { getAllReplicants } from '../database/default/utils';
+import { defaultAdapter } from '../database/default/database-adapter';
 
 const renderTemplate = memoize((content, options) => template(content)(options));
 
@@ -162,10 +162,32 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			});
 		});
 
+		const bundlesPaths = [path.join(NODECG_ROOT, 'bundles')].concat(config.bundles?.paths ?? []);
+		const cfgPath = path.join(NODECG_ROOT, 'cfg');
+		const bundleManager = new BundleManager(bundlesPaths, cfgPath, pjson.version, config);
+
+		let databaseAdapter = defaultAdapter;
+		let databaseAdapterExists = false;
+		for (const bundle of bundleManager.all()) {
+			if (bundle.nodecgBundleConfig.databaseAdapter) {
+				log.warn('`databaseAdapter` is an experimental feature and may be changed without major version bump.');
+				if (databaseAdapterExists) {
+					throw new Error('Multiple bundles are attempting to set the database adapter.');
+				}
+				databaseAdapter = bundle.nodecgBundleConfig.databaseAdapter;
+				databaseAdapterExists = true;
+			}
+		}
+
+		this._app.use((_, res, next) => {
+			res.locals.databaseAdapter = databaseAdapter;
+			next();
+		});
+
 		if (config.login?.enabled) {
 			log.info('Login security enabled');
 			const login = await import('../login');
-			const { app: loginMiddleware, sessionMiddleware } = login.createMiddleware({
+			const { app: loginMiddleware, sessionMiddleware } = login.createMiddleware(databaseAdapter, {
 				onLogin: (user) => {
 					// If the user had no roles, then that means they "logged in"
 					// with a third-party auth provider but weren't able to
@@ -190,7 +212,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			io.use(wrap(passport.initialize()));
 			io.use(wrap(passport.session()));
 
-			this._io.use(socketAuthMiddleware);
+			this._io.use(createSocketAuthMiddleware(databaseAdapter));
 		} else {
 			app.get('/login*', (_, res) => {
 				res.redirect('/dashboard');
@@ -198,10 +220,6 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		}
 
 		this._io.use(socketApiMiddleware);
-
-		const bundlesPaths = [path.join(NODECG_ROOT, 'bundles')].concat(config.bundles?.paths ?? []);
-		const cfgPath = path.join(NODECG_ROOT, 'cfg');
-		const bundleManager = new BundleManager(bundlesPaths, cfgPath, pjson.version, config);
 
 		// Wait for Chokidar to finish its initial scan.
 		await new Promise<void>((resolve, reject) => {
@@ -271,8 +289,8 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			app.use(sentryHelpers.app);
 		}
 
-		const persistedReplicantEntities = await getAllReplicants();
-		const replicator = new Replicator(io, persistedReplicantEntities);
+		const persistedReplicantEntities = await databaseAdapter.getAllReplicants();
+		const replicator = new Replicator(io, databaseAdapter, persistedReplicantEntities);
 		this._replicator = replicator;
 
 		const graphics = new GraphicsLib(io, bundleManager, replicator);

@@ -1,7 +1,8 @@
-import { getConnection, User, Role, Identity, ApiKey, Replicant } from './connection';
-import { ServerReplicant } from '../../replicant';
+import { getConnection } from './connection';
+import { User, Role, Identity, ApiKey, Replicant } from './entity';
+import type { DatabaseAdapter } from '../../../types/database-adapter';
 
-export async function findUser(id: User['id']): Promise<User | null> {
+async function findUser(id: User['id']): Promise<User | null> {
 	const database = await getConnection();
 	return database.getRepository(User).findOne({
 		where: { id },
@@ -10,7 +11,7 @@ export async function findUser(id: User['id']): Promise<User | null> {
 	});
 }
 
-export async function getSuperUserRole(): Promise<Role> {
+async function getSuperUserRole(): Promise<Role> {
 	const superUserRole = await findRole('superuser');
 	if (!superUserRole) {
 		throw new Error('superuser role unexpectedly not found');
@@ -19,7 +20,7 @@ export async function getSuperUserRole(): Promise<Role> {
 	return superUserRole;
 }
 
-export async function upsertUser({
+async function upsertUser({
 	name,
 	provider_type,
 	provider_hash,
@@ -72,7 +73,7 @@ export async function upsertUser({
 	return manager.save(user);
 }
 
-export function isSuperUser(user: User): boolean {
+function isSuperUser(user: User): boolean {
 	return Boolean(user.roles?.find((role) => role.name === 'superuser'));
 }
 
@@ -92,7 +93,7 @@ async function createIdentity(
 	return manager.save(ident);
 }
 
-export async function createApiKey(): Promise<ApiKey> {
+async function createApiKey(): Promise<ApiKey> {
 	const database = await getConnection();
 	const { manager } = database;
 	const apiKey = manager.create(ApiKey);
@@ -118,7 +119,7 @@ async function findUserById(userId: User['id']): Promise<User | null> {
 	});
 }
 
-export async function findApiKey(token: string) {
+async function findApiKey(token: string) {
 	const database = await getConnection();
 	return database.getRepository(ApiKey).findOne({
 		where: { secret_key: token },
@@ -126,19 +127,25 @@ export async function findApiKey(token: string) {
 	});
 }
 
-export async function saveUser(user: User) {
+async function saveUser(user: User) {
 	const database = await getConnection();
 	await database.manager.save(user);
 }
 
-export async function deleteSecretKey(token: string) {
+async function deleteSecretKey(token: string) {
 	const database = await getConnection();
 	await database.manager.delete(ApiKey, { secret_key: token });
 }
 
 const repEntities: Replicant[] = [];
 
-export async function saveReplicant(replicant: ServerReplicant<any>) {
+async function saveReplicant(replicant: {
+	namespace: string;
+	name: string;
+	value: any;
+	on: (event: 'change', handler: (newVal: unknown) => void) => void;
+	off: (event: 'change', handler: (newVal: unknown) => void) => void;
+}) {
 	let valueChangedDuringSave = false;
 
 	const connection = await getConnection();
@@ -186,7 +193,20 @@ export async function saveReplicant(replicant: ServerReplicant<any>) {
 	}
 }
 
-export async function getAllReplicants() {
+async function getAllReplicants() {
 	const connection = await getConnection();
 	return connection.getRepository(Replicant).find();
 }
+
+export const defaultAdapter: DatabaseAdapter = {
+	findUser,
+	getSuperUserRole,
+	upsertUser,
+	isSuperUser,
+	createApiKey,
+	findApiKey,
+	saveUser,
+	deleteSecretKey,
+	saveReplicant,
+	getAllReplicants,
+};

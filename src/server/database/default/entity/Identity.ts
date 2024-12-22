@@ -1,6 +1,6 @@
 import { Entity, ManyToOne, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { User } from './User';
-import type { Identity as IdentityModel } from '../../models';
+import type { Identity as IdentityModel } from '../../../../types/models';
 
 @Entity()
 export class Identity implements IdentityModel {

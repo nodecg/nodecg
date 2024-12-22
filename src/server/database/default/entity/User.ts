@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany, J
 import { Role } from './Role';
 import { Identity } from './Identity';
 import { ApiKey } from './ApiKey';
-import type { User as UserModel } from '../../models';
+import type { User as UserModel } from '../../../../types/models';
 
 @Entity()
 export class User implements UserModel {

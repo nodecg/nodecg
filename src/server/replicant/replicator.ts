@@ -7,8 +7,8 @@ import * as uuid from 'uuid';
 import type { TypedServerSocket, ServerToClientEvents, RootNS } from '../../types/socket-protocol';
 import type { NodeCG } from '../../types/nodecg';
 import { stringifyError } from '../../shared/utils/errors';
-import { saveReplicant } from '../database/default/utils';
-import type { Replicant as ReplicantModel } from '../database/models';
+import type { Replicant as ReplicantModel } from '../../types/models';
+import type { DatabaseAdapter } from '../../types/database-adapter';
 
 const log = createLogger('replicator');
 
@@ -23,6 +23,7 @@ export default class Replicator {
 
 	constructor(
 		public readonly io: RootNS,
+		private readonly db: DatabaseAdapter,
 		repEntities: ReplicantModel[],
 	) {
 		this.io = io;
@@ -185,7 +186,7 @@ export default class Replicator {
 		}
 
 		try {
-			const promise = saveReplicant(replicant);
+			const promise = this.db.saveReplicant(replicant);
 			this._pendingSave.set(replicant, promise);
 			await promise;
 		} catch (error: unknown) {
