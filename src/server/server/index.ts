@@ -33,9 +33,8 @@ import path = require("path");
 // Packages
 import bodyParser from "body-parser";
 import { klona as clone } from "klona/json";
-import debounce from "lodash.debounce";
+import { debounce, template } from "lodash";
 import express from "express";
-import template from "lodash.template";
 import memoize from "fast-memoize";
 import transformMiddleware from "express-transform-bare-module-specifiers";
 import compression from "compression";
