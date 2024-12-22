@@ -1,10 +1,39 @@
-// Packages
 import { klona as clone } from "klona/json";
 import { JsonPointer } from "json-ptr";
 
-// Crimes
-import jsonSchemaLibTypeOf = require("json-schema-lib/lib/util/typeOf");
-import jsonSchemaStripHash = require("json-schema-lib/lib/util/stripHash");
+function stripHash(url: string) {
+	const hashIndex = url.indexOf("#");
+	if (hashIndex >= 0) {
+		return url.slice(0, hashIndex);
+	}
+	return url;
+}
+
+function typeOf(value: unknown) {
+	const type = {
+		hasValue: false,
+		isArray: false,
+		isPOJO: false,
+		isNumber: false,
+	};
+
+	if (typeof value !== undefined && value !== null) {
+		type.hasValue = true;
+
+		if (typeof value === "number") {
+			type.isNumber = !isNaN(value);
+		} else if (Array.isArray(value)) {
+			type.isArray = true;
+		} else {
+			type.isPOJO =
+				typeof value === "object" &&
+				!(value instanceof RegExp) &&
+				!(value instanceof Date);
+		}
+	}
+
+	return type;
+}
 
 type File = {
 	url: string;
@@ -28,7 +57,7 @@ function replaceRefs(
 	currentFile: File,
 	allFiles: File[],
 ): UnknownObject | undefined {
-	const type = jsonSchemaLibTypeOf(inputObj);
+	const type = typeOf(inputObj);
 	if (!type.isPOJO && !type.isArray) {
 		return;
 	}
@@ -126,7 +155,7 @@ function resolveFileReference(url: string, file: File): string {
 	const { schema } = file;
 
 	// Remove any hash from the URL, since this URL represents the WHOLE file, not a fragment of it
-	url = jsonSchemaStripHash(url);
+	url = stripHash(url);
 
 	// Resolve the new file's absolute URL
 	return schema.plugins.resolveURL({ from: file.url, to: url });

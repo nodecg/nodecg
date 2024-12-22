@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "@nodecg/json-schema-defaults": "^1.0.4",
+    "@nodecg/json-schema-lib": "0.1.0",
     "@polymer/app-layout": "^3.1.0",
     "@polymer/app-route": "^3.0.2",
     "@polymer/iron-collapse": "^3.0.1",
@@ -109,7 +110,6 @@
     "io-ts": "^2.2.21",
     "is-error": "^2.2.2",
     "json-ptr": "^3.1.1",
-    "json-schema-lib": "github:nodecg/json-schema-lib#dcb89d670c2b15cd398916209bb806b2e100f95f",
     "klona": "^2.0.6",
     "lodash": "^4.17.21",
     "multer": "^1.4.5-lts.1",
@@ -188,10 +188,10 @@
     "ts-node": "^10.9.2",
     "typescript": "~5.3.3"
   },
-  "overrides": {
-    "better-sqlite3": "$better-sqlite3"
-  },
   "engines": {
     "node": "^18.12.0 || ^20.9.0 || ^22.11.0"
+  },
+  "overrides": {
+    "better-sqlite3": "$better-sqlite3"
   }
 }
