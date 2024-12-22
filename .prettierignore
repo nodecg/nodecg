@@ -12,7 +12,11 @@
 /media
 /node_modules
 /build-types
-/generated-types
+/generated-types/*
+!/generated-types/index.d.ts
+!/generated-types/augment-window.d.ts
+!/generated-types/package.json
+!/generated-types/tsconfig.json
 .env
 package-lock.json
 CHANGELOG.md
