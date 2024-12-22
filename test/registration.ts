@@ -1,6 +1,7 @@
 // Native
 import fs from "fs";
 import path from "path";
+import { setTimeout } from "node:timers/promises";
 
 // Packages
 import test from "ava";
@@ -212,7 +213,7 @@ test.serial("version out of date", async (t) => {
 		from: '"version": "0.0.1"',
 		to: '"version": "0.0.2"',
 	});
-	await dashboard.waitForTimeout(1500);
+	await setTimeout(1500);
 
 	let text = await dashboard.evaluate(
 		(el) => el.textContent,
@@ -228,7 +229,7 @@ test.serial("version out of date", async (t) => {
 		from: '"version": "0.0.2"',
 		to: '"version": "0.0.1"',
 	});
-	await dashboard.waitForTimeout(1500);
+	await setTimeout(1500);
 
 	text = await dashboard.evaluate(
 		(el) => el.textContent,
@@ -250,7 +251,7 @@ test.serial("git out of date", async (t) => {
 	);
 	await git.add("./new_file.txt");
 	await git.commit("new commit");
-	await dashboard.waitForTimeout(1500);
+	await setTimeout(1500);
 
 	const text = await dashboard.evaluate(
 		(el) => el.textContent,
@@ -356,6 +357,6 @@ test.serial(
 		// Dragstart event should be called during this
 		await dashboard.mouse.move(0, 0, { steps: 10 });
 
-		await dashboard.waitForTimeout(200);
+		await setTimeout(200);
 	},
 );
