@@ -415,7 +415,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 
 		await new Promise<void>((resolve) => {
 			// Also closes the underlying HTTP server.
-			this._io.close(() => {
+			void this._io.close(() => {
 				resolve();
 			});
 		});
