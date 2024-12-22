@@ -1,6 +1,7 @@
 // Native
 import fs from "fs";
 import path from "path";
+import { setTimeout } from "node:timers/promises";
 
 // Packages
 import test from "ava";
@@ -18,7 +19,6 @@ import * as C from "./helpers/test-constants";
 import * as util from "./helpers/utilities";
 import type { Page } from "puppeteer";
 import { sleep } from "./helpers/utilities";
-import { setTimeout } from "timers/promises";
 
 let singleInstance: Page;
 let dashboard: Page;
@@ -335,6 +335,27 @@ test.serial(
 		}
 
 		await dashboard.bringToFront();
+
+		// Move mouse to centre of link and start dragging
+		await dashboard.mouse.move(
+			linkBoundingBox.x + linkBoundingBox.width / 2,
+			linkBoundingBox.y + linkBoundingBox.height / 2,
+		);
+		await dashboard.mouse.down();
+
+		dashboard.on("console", (msg) => {
+			// This allows other console messages to come through while the test is running, as long as the required message comes through eventually
+			if (
+				msg.text() ===
+				`${C.rootUrl()}bundles/test-bundle/graphics/index.html?layer-name=index&layer-height=720&layer-width=1280`
+			) {
+				t.pass();
+			}
+		});
+
+		// Move to top left of screen over 10 ticks
+		// Dragstart event should be called during this
+		await dashboard.mouse.move(0, 0, { steps: 10 });
 
 		await setTimeout(200);
 	},
