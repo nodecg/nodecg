@@ -17,7 +17,7 @@ function typeOf(value: unknown) {
 		isNumber: false,
 	};
 
-	if (typeof value !== undefined && value !== null) {
+	if (typeof value !== "undefined" && value !== null) {
 		type.hasValue = true;
 
 		if (typeof value === "number") {
