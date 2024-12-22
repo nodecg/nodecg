@@ -1,4 +1,4 @@
-import { DatabaseAdapter } from '../../types/database-adapter';
+import { DatabaseAdapter } from "../../types/database-adapter";
 
 declare global {
 	// eslint-disable-next-line @typescript-eslint/no-namespace

@@ -1,19 +1,19 @@
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/paper-card/paper-card.js';
-import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
-import '@polymer/paper-dialog/paper-dialog.js';
-import '@polymer/paper-toast/paper-toast.js';
-import '@vaadin/vaadin-upload/vaadin-upload.js';
+import "@polymer/iron-flex-layout/iron-flex-layout.js";
+import "@polymer/iron-icons/iron-icons.js";
+import "@polymer/paper-card/paper-card.js";
+import "@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js";
+import "@polymer/paper-dialog/paper-dialog.js";
+import "@polymer/paper-toast/paper-toast.js";
+import "@vaadin/vaadin-upload/vaadin-upload.js";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from '../util-scrollable';
+import * as keep1 from "../util-scrollable";
 keep1;
-import * as keep2 from './ncg-asset-file';
+import * as keep2 from "./ncg-asset-file";
 keep2;
 
-import * as Polymer from '@polymer/polymer';
-import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
+import * as Polymer from "@polymer/polymer";
+import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
 
 class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 	static get template(): HTMLTemplateElement {
@@ -125,7 +125,7 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 	}
 
 	static get is(): string {
-		return 'ncg-asset-category';
+		return "ncg-asset-category";
 	}
 
 	static get properties() {
@@ -139,11 +139,11 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 			categoryName: {
 				type: String,
 				reflectToAttribute: true,
-				computed: '_computeCategoryName(category.name)',
+				computed: "_computeCategoryName(category.name)",
 			},
 			acceptsMsg: {
 				type: String,
-				computed: '_computeAcceptsMsg(category.allowedTypes)',
+				computed: "_computeAcceptsMsg(category.allowedTypes)",
 			},
 			_successfulUploads: {
 				type: Number,
@@ -157,90 +157,96 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 
 	static get observers(): string[] {
 		return [
-			'_onAllowedTypesChanged(category.allowedTypes)',
-			'_computeAssetCategoryReplicant(category.name, collectionName)',
+			"_onAllowedTypesChanged(category.allowedTypes)",
+			"_computeAssetCategoryReplicant(category.name, collectionName)",
 		];
 	}
 
 	override connectedCallback(): void {
 		super.connectedCallback();
-		this.$['uploadDialog'].fitInto = document.body.querySelector('ncg-dashboard')!.shadowRoot!.getElementById('pages');
-		this.$['uploadDialog'].resetFit();
+		this.$["uploadDialog"].fitInto = document.body
+			.querySelector("ncg-dashboard")!
+			.shadowRoot!.getElementById("pages");
+		this.$["uploadDialog"].resetFit();
 	}
 
 	refitUploadDialog(): void {
-		this.$['uploadDialog'].refit();
+		this.$["uploadDialog"].refit();
 	}
 
 	_onAllowedTypesChanged(allowedTypes: string[]): void {
-		const prefixed = allowedTypes.map((type) => '.' + type);
-		this.$['uploader'].accept = prefixed.join(',');
+		const prefixed = allowedTypes.map((type) => "." + type);
+		this.$["uploader"].accept = prefixed.join(",");
 	}
 
 	_computeAcceptsMsg(allowedTypes: string[]): string {
-		let msg = 'Accepts ';
+		let msg = "Accepts ";
 		allowedTypes.forEach((type, index) => {
 			type = type.toUpperCase();
 			if (index === 0) {
 				msg += type;
 			} else if (index === allowedTypes.length - 1) {
 				if (index === 1) {
-					msg += ' and ' + type;
+					msg += " and " + type;
 				} else {
-					msg += ', and ' + type;
+					msg += ", and " + type;
 				}
 			} else {
-				msg += ', ' + type;
+				msg += ", " + type;
 			}
 		});
 		return msg;
 	}
 
 	_handleDeleted(e: any): void {
-		this.$['toast'].text = `Deleted ${e.target.file.base}`;
-		this.$['toast'].show();
+		this.$["toast"].text = `Deleted ${e.target.file.base}`;
+		this.$["toast"].show();
 	}
 
 	_handleDeletionFailed(e: any): void {
-		this.$['toast'].text = `Failed to delete ${e.target.file.base}`;
-		this.$['toast'].show();
+		this.$["toast"].text = `Failed to delete ${e.target.file.base}`;
+		this.$["toast"].show();
 	}
 
 	openUploadDialog(): void {
-		this.$['uploadDialog'].open();
+		this.$["uploadDialog"].open();
 		this.refitUploadDialog();
 	}
 
 	_onFileReject(event: any): void {
 		this.refitUploadDialog();
-		this.$['toast'].text = `${event.detail.file.name} error: ${event.detail.error}`;
-		this.$['toast'].open();
+		this.$["toast"].text =
+			`${event.detail.file.name} error: ${event.detail.error}`;
+		this.$["toast"].open();
 	}
 
 	_onUploadSuccess(): void {
-		this['_successfulUploads']++;
+		this["_successfulUploads"]++;
 	}
 
 	_computeCategoryName(categoryName: string): string {
 		return categoryName;
 	}
 
-	_computeAssetCategoryReplicant(categoryName: string, collectionName: string): void {
+	_computeAssetCategoryReplicant(
+		categoryName: string,
+		collectionName: string,
+	): void {
 		const newRep = NodeCG.Replicant(`assets:${categoryName}`, collectionName);
-		const oldRep = this['_assetCategoryReplicant'];
+		const oldRep = this["_assetCategoryReplicant"];
 		if (oldRep) {
-			oldRep.removeEventListener('change');
+			oldRep.removeEventListener("change");
 		}
 
-		newRep.on('change', (newVal) => {
-			this['files'] = newVal;
+		newRep.on("change", (newVal) => {
+			this["files"] = newVal;
 			if (Array.isArray(newVal) && newVal.length > 0) {
-				this.$['empty'].style.display = 'none';
+				this.$["empty"].style.display = "none";
 			} else {
-				this.$['empty'].style.display = 'block';
+				this.$["empty"].style.display = "block";
 			}
 		});
-		this['_assetCategoryReplicant'] = newRep;
+		this["_assetCategoryReplicant"] = newRep;
 	}
 }
 

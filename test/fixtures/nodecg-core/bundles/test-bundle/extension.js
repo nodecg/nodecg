@@ -1,5 +1,5 @@
 /* istanbul ignore next */
-'use strict';
+"use strict";
 
 module.exports = function (nodecg) {
 	return nodecg;

@@ -1,29 +1,38 @@
-import * as path from 'node:path';
-import * as fs from 'node:fs';
-import { klona as clone } from 'klona/json';
-import extend from 'extend';
-import type { NodeCG } from '../../types/nodecg';
-import type { ValidateFunction } from 'ajv';
-import { stringifyError } from '../../shared/utils/errors';
-import { compileJsonSchema, getSchemaDefault, formatJsonSchemaErrors } from '../../shared/utils/compileJsonSchema';
+import * as path from "node:path";
+import * as fs from "node:fs";
+import { klona as clone } from "klona/json";
+import extend from "extend";
+import type { NodeCG } from "../../types/nodecg";
+import type { ValidateFunction } from "ajv";
+import { stringifyError } from "../../shared/utils/errors";
+import {
+	compileJsonSchema,
+	getSchemaDefault,
+	formatJsonSchemaErrors,
+} from "../../shared/utils/compileJsonSchema";
 
 export function parse(
 	bundleName: string,
 	bundleDir: string,
 	userConfig: NodeCG.Bundle.UnknownConfig,
 ): NodeCG.Bundle.UnknownConfig {
-	const cfgSchemaPath = path.resolve(bundleDir, 'configschema.json');
+	const cfgSchemaPath = path.resolve(bundleDir, "configschema.json");
 	if (!fs.existsSync(cfgSchemaPath)) {
 		return userConfig;
 	}
 
 	const schema = _parseSchema(bundleName, cfgSchemaPath);
-	const defaultConfig = getSchemaDefault(schema, bundleName) as NodeCG.Bundle.UnknownConfig;
+	const defaultConfig = getSchemaDefault(
+		schema,
+		bundleName,
+	) as NodeCG.Bundle.UnknownConfig;
 	let validateUserConfig: ValidateFunction;
 	try {
 		validateUserConfig = compileJsonSchema(schema);
 	} catch (error: unknown) {
-		throw new Error(`Error compiling JSON Schema for bundle config "${bundleName}":\n\t${stringifyError(error)}`);
+		throw new Error(
+			`Error compiling JSON Schema for bundle config "${bundleName}":\n\t${stringifyError(error)}`,
+		);
 	}
 
 	const userConfigValid = validateUserConfig(userConfig);
@@ -43,7 +52,11 @@ export function parse(
 			const _foo: Record<string, any> = {};
 			_foo[key] = defaultConfig[key];
 
-			const _tempMerged: Record<string, any> = extend(true, _foo, clone(finalConfig));
+			const _tempMerged: Record<string, any> = extend(
+				true,
+				_foo,
+				clone(finalConfig),
+			);
 			const result = validateUserConfig(_tempMerged);
 			if (result) {
 				finalConfig = _tempMerged;
@@ -63,8 +76,11 @@ export function parse(
 	);
 }
 
-export function parseDefaults(bundleName: string, bundleDir: string): Record<string, any> {
-	const cfgSchemaPath = path.resolve(bundleDir, 'configschema.json');
+export function parseDefaults(
+	bundleName: string,
+	bundleDir: string,
+): Record<string, any> {
+	const cfgSchemaPath = path.resolve(bundleDir, "configschema.json");
 	if (fs.existsSync(cfgSchemaPath)) {
 		const schema = _parseSchema(bundleName, cfgSchemaPath);
 		return getSchemaDefault(schema, bundleName) as Record<string, any>;
@@ -73,10 +89,15 @@ export function parseDefaults(bundleName: string, bundleDir: string): Record<str
 	return {};
 }
 
-function _parseSchema(bundleName: string, schemaPath: string): Record<string, any> {
+function _parseSchema(
+	bundleName: string,
+	schemaPath: string,
+): Record<string, any> {
 	try {
-		return JSON.parse(fs.readFileSync(schemaPath, { encoding: 'utf8' }));
+		return JSON.parse(fs.readFileSync(schemaPath, { encoding: "utf8" }));
 	} catch (_: unknown) {
-		throw new Error(`configschema.json for bundle "${bundleName}" could not be read. Ensure that it is valid JSON.`);
+		throw new Error(
+			`configschema.json for bundle "${bundleName}" could not be read. Ensure that it is valid JSON.`,
+		);
 	}
 }

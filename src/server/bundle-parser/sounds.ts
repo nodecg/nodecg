@@ -1,13 +1,13 @@
 // Native
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 // Ours
-import type { NodeCG } from '../../types/nodecg';
+import type { NodeCG } from "../../types/nodecg";
 
 export default function (
 	bundlePath: string,
-	manifest: Pick<NodeCG.Manifest, 'soundCues' | 'name'>,
+	manifest: Pick<NodeCG.Manifest, "soundCues" | "name">,
 ): { soundCues: NodeCG.Bundle.SoundCue[]; hasAssignableSoundCues: boolean } {
 	if (!manifest.soundCues) {
 		return { soundCues: [], hasAssignableSoundCues: false };
@@ -19,15 +19,17 @@ export default function (
 
 	let hasAssignable = false;
 	const parsedCues = manifest.soundCues.map((unparsedCue, index) => {
-		if (typeof unparsedCue.name !== 'string') {
-			throw new Error(`nodecg.soundCues[${index}] in bundle ${manifest.name} lacks a "name" property`);
+		if (typeof unparsedCue.name !== "string") {
+			throw new Error(
+				`nodecg.soundCues[${index}] in bundle ${manifest.name} lacks a "name" property`,
+			);
 		}
 
 		const parsedCue = {
 			...unparsedCue,
 		};
 
-		if (typeof parsedCue.assignable === 'undefined') {
+		if (typeof parsedCue.assignable === "undefined") {
 			parsedCue.assignable = true;
 		}
 
@@ -45,7 +47,9 @@ export default function (
 		if (parsedCue.defaultFile) {
 			const defaultFilePath = path.join(bundlePath, parsedCue.defaultFile);
 			if (!fs.existsSync(defaultFilePath)) {
-				throw new Error(`nodecg.soundCues[${index}].defaultFile in bundle ${manifest.name} does not exist`);
+				throw new Error(
+					`nodecg.soundCues[${index}].defaultFile in bundle ${manifest.name} does not exist`,
+				);
 			}
 		}
 

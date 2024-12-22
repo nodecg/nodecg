@@ -1,11 +1,11 @@
-import { Entity, ManyToOne, Generated, PrimaryColumn } from 'typeorm';
-import { User } from './User';
-import type { ApiKey as ApiKeyModel } from '../../../../types/models';
+import { Entity, ManyToOne, Generated, PrimaryColumn } from "typeorm";
+import { User } from "./User";
+import type { ApiKey as ApiKeyModel } from "../../../../types/models";
 
 @Entity()
 export class ApiKey implements ApiKeyModel {
 	@PrimaryColumn()
-	@Generated('uuid')
+	@Generated("uuid")
 	secret_key!: string;
 
 	@ManyToOne(() => User, (user) => user.apiKeys)

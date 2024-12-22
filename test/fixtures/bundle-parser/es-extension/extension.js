@@ -1,12 +1,12 @@
 /* istanbul ignore next */
-'use strict';
+"use strict";
 
-Object.defineProperty(module, '__esModule', {
+Object.defineProperty(module, "__esModule", {
 	value: true,
 });
 
 module.exports.default = function () {
 	return {
-		lorem: 'ipsum',
+		lorem: "ipsum",
 	};
 };

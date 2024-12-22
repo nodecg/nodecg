@@ -1,11 +1,11 @@
 // Packages
-import type { TestFn } from 'ava';
-import anyTest from 'ava';
-import type * as puppeteer from 'puppeteer';
+import type { TestFn } from "ava";
+import anyTest from "ava";
+import type * as puppeteer from "puppeteer";
 
 // Ours
-import * as server from '../helpers/server';
-import * as browser from '../helpers/browser';
+import * as server from "../helpers/server";
+import * as browser from "../helpers/browser";
 
 const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
@@ -16,126 +16,154 @@ test.before(async () => {
 	dashboard = await initDashboard();
 });
 
-test.serial('should create a default value based on the schema, if none is provided', async (t) => {
-	const res = await dashboard.evaluate(
-		async () =>
-			new Promise((resolve) => {
-				const rep = window.dashboardApi.Replicant('client_schemaDefaults');
-				rep.on('declared', () => {
-					resolve(JSON.parse(JSON.stringify(rep.value)));
-				});
-			}),
-	);
+test.serial(
+	"should create a default value based on the schema, if none is provided",
+	async (t) => {
+		const res = await dashboard.evaluate(
+			async () =>
+				new Promise((resolve) => {
+					const rep = window.dashboardApi.Replicant("client_schemaDefaults");
+					rep.on("declared", () => {
+						resolve(JSON.parse(JSON.stringify(rep.value)));
+					});
+				}),
+		);
 
-	t.deepEqual(res, {
-		string: '',
-		object: {
-			numA: 0,
-		},
-	});
-});
+		t.deepEqual(res, {
+			string: "",
+			object: {
+				numA: 0,
+			},
+		});
+	},
+);
 
-test.serial('should accept the defaultValue when it passes validation', async (t) => {
-	const res = await dashboard.evaluate(
-		async () =>
-			new Promise((resolve) => {
-				const rep = window.dashboardApi.Replicant('client_schemaDefaultValuePass', {
-					defaultValue: {
-						string: 'foo',
-						object: {
-							numA: 1,
+test.serial(
+	"should accept the defaultValue when it passes validation",
+	async (t) => {
+		const res = await dashboard.evaluate(
+			async () =>
+				new Promise((resolve) => {
+					const rep = window.dashboardApi.Replicant(
+						"client_schemaDefaultValuePass",
+						{
+							defaultValue: {
+								string: "foo",
+								object: {
+									numA: 1,
+								},
+							},
 						},
-					},
-				});
-				rep.on('declared', () => {
-					resolve(JSON.parse(JSON.stringify(rep.value)));
-				});
-			}),
-	);
+					);
+					rep.on("declared", () => {
+						resolve(JSON.parse(JSON.stringify(rep.value)));
+					});
+				}),
+		);
 
-	t.deepEqual(res, {
-		string: 'foo',
-		object: {
-			numA: 1,
-		},
-	});
-});
+		t.deepEqual(res, {
+			string: "foo",
+			object: {
+				numA: 1,
+			},
+		});
+	},
+);
 
-test.serial('should throw when defaultValue fails validation', async (t) => {
+test.serial("should throw when defaultValue fails validation", async (t) => {
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise<string>((resolve) => {
-				const rep = window.dashboardApi.Replicant('client_schemaDefaultValueFail', {
-					defaultValue: {
-						string: 0,
+				const rep = window.dashboardApi.Replicant(
+					"client_schemaDefaultValueFail",
+					{
+						defaultValue: {
+							string: 0,
+						},
 					},
-				});
+				);
 
-				rep.once('declarationRejected', (reason) => {
+				rep.once("declarationRejected", (reason) => {
 					resolve(reason);
 				});
 			}),
 	);
 
-	t.true(res.startsWith('Invalid value rejected for replicant "client_schemaDefaultValueFail"'));
-});
-
-test.serial('should accept the persisted value when it passes validation', async (t) => {
-	// Persisted value is already preloaded into the test database
-	const res = await dashboard.evaluate(
-		async () =>
-			new Promise((resolve, reject) => {
-				const rep = window.dashboardApi.Replicant('client_schemaPersistencePass');
-				rep.on('declarationRejected', reject);
-				rep.on('declared', () => {
-					resolve(JSON.parse(JSON.stringify(rep.value)));
-				});
-			}),
+	t.true(
+		res.startsWith(
+			'Invalid value rejected for replicant "client_schemaDefaultValueFail"',
+		),
 	);
-
-	t.deepEqual(res, {
-		string: 'foo',
-		object: {
-			numA: 1,
-		},
-	});
 });
 
-test.serial('should reject the persisted value when it fails validation, replacing with schemaDefaults', async (t) => {
-	// Persisted value is copied from fixtures
+test.serial(
+	"should accept the persisted value when it passes validation",
+	async (t) => {
+		// Persisted value is already preloaded into the test database
+		const res = await dashboard.evaluate(
+			async () =>
+				new Promise((resolve, reject) => {
+					const rep = window.dashboardApi.Replicant(
+						"client_schemaPersistencePass",
+					);
+					rep.on("declarationRejected", reject);
+					rep.on("declared", () => {
+						resolve(JSON.parse(JSON.stringify(rep.value)));
+					});
+				}),
+		);
+
+		t.deepEqual(res, {
+			string: "foo",
+			object: {
+				numA: 1,
+			},
+		});
+	},
+);
+
+test.serial(
+	"should reject the persisted value when it fails validation, replacing with schemaDefaults",
+	async (t) => {
+		// Persisted value is copied from fixtures
+		const res = await dashboard.evaluate(
+			async () =>
+				new Promise((resolve) => {
+					const rep = window.dashboardApi.Replicant(
+						"client_schemaPersistenceFail",
+					);
+					rep.on("declared", () => {
+						resolve(JSON.parse(JSON.stringify(rep.value)));
+					});
+				}),
+		);
+
+		t.deepEqual(res, {
+			string: "",
+			object: {
+				numA: 0,
+			},
+		});
+	},
+);
+
+test.serial("should accept valid assignment", async (t) => {
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
-				const rep = window.dashboardApi.Replicant('client_schemaPersistenceFail');
-				rep.on('declared', () => {
-					resolve(JSON.parse(JSON.stringify(rep.value)));
-				});
-			}),
-	);
-
-	t.deepEqual(res, {
-		string: '',
-		object: {
-			numA: 0,
-		},
-	});
-});
-
-test.serial('should accept valid assignment', async (t) => {
-	const res = await dashboard.evaluate(
-		async () =>
-			new Promise((resolve) => {
-				const rep = window.dashboardApi.Replicant<any>('client_schemaAssignPass');
-				rep.once('declared', () => {
+				const rep = window.dashboardApi.Replicant<any>(
+					"client_schemaAssignPass",
+				);
+				rep.once("declared", () => {
 					rep.value = {
-						string: 'foo',
+						string: "foo",
 						object: {
 							numA: 1,
 						},
 					};
 
-					rep.on('change', (newVal) => {
-						if (newVal.string === 'foo') {
+					rep.on("change", (newVal) => {
+						if (newVal.string === "foo") {
 							resolve(JSON.parse(JSON.stringify(rep.value)));
 						}
 					});
@@ -144,19 +172,19 @@ test.serial('should accept valid assignment', async (t) => {
 	);
 
 	t.deepEqual(res, {
-		string: 'foo',
+		string: "foo",
 		object: {
 			numA: 1,
 		},
 	});
 });
 
-test.serial('should throw on invalid assignment', async (t) => {
+test.serial("should throw on invalid assignment", async (t) => {
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise<string>((resolve) => {
-				const rep = window.dashboardApi.Replicant('client_schemaAssignFail');
-				rep.once('declared', () => {
+				const rep = window.dashboardApi.Replicant("client_schemaAssignFail");
+				rep.once("declared", () => {
 					try {
 						rep.value = {
 							string: 0,
@@ -168,17 +196,23 @@ test.serial('should throw on invalid assignment', async (t) => {
 			}),
 	);
 
-	t.true(res.startsWith('Invalid value rejected for replicant "client_schemaAssignFail"'));
+	t.true(
+		res.startsWith(
+			'Invalid value rejected for replicant "client_schemaAssignFail"',
+		),
+	);
 });
 
-test.serial('should accept valid property deletion', async (t) => {
+test.serial("should accept valid property deletion", async (t) => {
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
-				const rep = window.dashboardApi.Replicant<any>('client_schemaDeletionPass');
-				rep.once('declared', () => {
+				const rep = window.dashboardApi.Replicant<any>(
+					"client_schemaDeletionPass",
+				);
+				rep.once("declared", () => {
 					delete rep.value.object.numB;
-					rep.on('change', (newVal) => {
+					rep.on("change", (newVal) => {
 						if (!newVal.object.numB) {
 							resolve(JSON.parse(JSON.stringify(rep.value)));
 						}
@@ -188,19 +222,21 @@ test.serial('should accept valid property deletion', async (t) => {
 	);
 
 	t.deepEqual(res, {
-		string: '',
+		string: "",
 		object: {
 			numA: 0,
 		},
 	});
 });
 
-test.serial('should throw on invalid property deletion', async (t) => {
+test.serial("should throw on invalid property deletion", async (t) => {
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise<string>((resolve) => {
-				const rep = window.dashboardApi.Replicant<any>('client_schemaDeletionFail');
-				rep.once('declared', () => {
+				const rep = window.dashboardApi.Replicant<any>(
+					"client_schemaDeletionFail",
+				);
+				rep.once("declared", () => {
 					try {
 						delete rep.value.object.numA;
 					} catch (e: any) {
@@ -210,18 +246,78 @@ test.serial('should throw on invalid property deletion', async (t) => {
 			}),
 	);
 
-	t.true(res.startsWith('Invalid value rejected for replicant "client_schemaDeletionFail"'));
+	t.true(
+		res.startsWith(
+			'Invalid value rejected for replicant "client_schemaDeletionFail"',
+		),
+	);
 });
 
-test.serial('should accept valid array mutation via array mutator methods', async (t) => {
+test.serial(
+	"should accept valid array mutation via array mutator methods",
+	async (t) => {
+		const res = await dashboard.evaluate(
+			async () =>
+				new Promise((resolve) => {
+					const rep = window.dashboardApi.Replicant<any>(
+						"client_schemaArrayMutatorPass",
+					);
+					rep.once("declared", () => {
+						rep.value.array.push("foo");
+						rep.on("change", (newVal) => {
+							if (newVal.array.length === 1) {
+								resolve(JSON.parse(JSON.stringify(rep.value)));
+							}
+						});
+					});
+				}),
+		);
+
+		t.deepEqual(res, {
+			string: "",
+			array: ["foo"],
+		});
+	},
+);
+
+test.serial(
+	"should throw on invalid array mutation via array mutator methods",
+	async (t) => {
+		const res = await dashboard.evaluate(
+			async () =>
+				new Promise<string>((resolve) => {
+					const rep = window.dashboardApi.Replicant<any>(
+						"client_schemaArrayMutatorFail",
+					);
+					rep.once("declared", () => {
+						try {
+							rep.value.array.push(0);
+						} catch (e: any) {
+							resolve(e.message);
+						}
+					});
+				}),
+		);
+
+		t.true(
+			res.startsWith(
+				'Invalid value rejected for replicant "client_schemaArrayMutatorFail"',
+			),
+		);
+	},
+);
+
+test.serial("should accept valid property changes to arrays", async (t) => {
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
-				const rep = window.dashboardApi.Replicant<any>('client_schemaArrayMutatorPass');
-				rep.once('declared', () => {
-					rep.value.array.push('foo');
-					rep.on('change', (newVal) => {
-						if (newVal.array.length === 1) {
+				const rep = window.dashboardApi.Replicant<any>(
+					"client_schemaArrayChangePass",
+				);
+				rep.once("declared", () => {
+					rep.value.array[0] = "bar";
+					rep.on("change", (newVal) => {
+						if (newVal.array[0] === "bar") {
 							resolve(JSON.parse(JSON.stringify(rep.value)));
 						}
 					});
@@ -230,57 +326,19 @@ test.serial('should accept valid array mutation via array mutator methods', asyn
 	);
 
 	t.deepEqual(res, {
-		string: '',
-		array: ['foo'],
+		string: "",
+		array: ["bar"],
 	});
 });
 
-test.serial('should throw on invalid array mutation via array mutator methods', async (t) => {
+test.serial("should throw on invalid property changes to arrays", async (t) => {
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise<string>((resolve) => {
-				const rep = window.dashboardApi.Replicant<any>('client_schemaArrayMutatorFail');
-				rep.once('declared', () => {
-					try {
-						rep.value.array.push(0);
-					} catch (e: any) {
-						resolve(e.message);
-					}
-				});
-			}),
-	);
-
-	t.true(res.startsWith('Invalid value rejected for replicant "client_schemaArrayMutatorFail"'));
-});
-
-test.serial('should accept valid property changes to arrays', async (t) => {
-	const res = await dashboard.evaluate(
-		async () =>
-			new Promise((resolve) => {
-				const rep = window.dashboardApi.Replicant<any>('client_schemaArrayChangePass');
-				rep.once('declared', () => {
-					rep.value.array[0] = 'bar';
-					rep.on('change', (newVal) => {
-						if (newVal.array[0] === 'bar') {
-							resolve(JSON.parse(JSON.stringify(rep.value)));
-						}
-					});
-				});
-			}),
-	);
-
-	t.deepEqual(res, {
-		string: '',
-		array: ['bar'],
-	});
-});
-
-test.serial('should throw on invalid property changes to arrays', async (t) => {
-	const res = await dashboard.evaluate(
-		async () =>
-			new Promise<string>((resolve) => {
-				const rep = window.dashboardApi.Replicant<any>('client_schemaArrayChangeFail');
-				rep.once('declared', () => {
+				const rep = window.dashboardApi.Replicant<any>(
+					"client_schemaArrayChangeFail",
+				);
+				rep.once("declared", () => {
 					try {
 						rep.value.array[0] = 0;
 					} catch (e: any) {
@@ -290,17 +348,23 @@ test.serial('should throw on invalid property changes to arrays', async (t) => {
 			}),
 	);
 
-	t.true(res.startsWith('Invalid value rejected for replicant "client_schemaArrayChangeFail"'));
+	t.true(
+		res.startsWith(
+			'Invalid value rejected for replicant "client_schemaArrayChangeFail"',
+		),
+	);
 });
 
-test.serial('should accept valid property changes to objects', async (t) => {
+test.serial("should accept valid property changes to objects", async (t) => {
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
-				const rep = window.dashboardApi.Replicant<any>('client_schemaObjectChangePass');
-				rep.once('declared', () => {
+				const rep = window.dashboardApi.Replicant<any>(
+					"client_schemaObjectChangePass",
+				);
+				rep.once("declared", () => {
 					rep.value.object.numA = 1;
-					rep.on('change', (newVal) => {
+					rep.on("change", (newVal) => {
 						if (newVal.object.numA === 1) {
 							resolve(JSON.parse(JSON.stringify(rep.value)));
 						}
@@ -310,81 +374,100 @@ test.serial('should accept valid property changes to objects', async (t) => {
 	);
 
 	t.deepEqual(res, {
-		string: '',
+		string: "",
 		object: {
 			numA: 1,
 		},
 	});
 });
 
-test.serial('should throw on invalid property changes to objects', async (t) => {
-	const res = await dashboard.evaluate(
-		async () =>
-			new Promise<string>((resolve) => {
-				const rep = window.dashboardApi.Replicant<any>('client_schemaObjectChangeFail');
-				rep.once('declared', () => {
-					try {
-						rep.value.object.numA = 'foo';
-					} catch (e: any) {
-						resolve(e.message);
-					}
-				});
-			}),
-	);
+test.serial(
+	"should throw on invalid property changes to objects",
+	async (t) => {
+		const res = await dashboard.evaluate(
+			async () =>
+				new Promise<string>((resolve) => {
+					const rep = window.dashboardApi.Replicant<any>(
+						"client_schemaObjectChangeFail",
+					);
+					rep.once("declared", () => {
+						try {
+							rep.value.object.numA = "foo";
+						} catch (e: any) {
+							resolve(e.message);
+						}
+					});
+				}),
+		);
 
-	t.true(res.startsWith('Invalid value rejected for replicant "client_schemaObjectChangeFail"'));
-});
+		t.true(
+			res.startsWith(
+				'Invalid value rejected for replicant "client_schemaObjectChangeFail"',
+			),
+		);
+	},
+);
 
-test.serial('should reject assignment if it was validated against a different version of the schema', async (t) => {
-	const res = await dashboard.evaluate(
-		async () =>
-			new Promise<string>((resolve) => {
-				const rep = window.dashboardApi.Replicant('client_schemaAssignMismatch');
-				rep.once('declared', () => {
-					rep.schemaSum = 'baz';
-					try {
-						rep.value = {
-							string: 'foo',
-							object: {
-								numA: 1,
-							},
-						};
-					} catch (e: any) {
-						resolve(e.message);
-					}
-				});
+test.serial(
+	"should reject assignment if it was validated against a different version of the schema",
+	async (t) => {
+		const res = await dashboard.evaluate(
+			async () =>
+				new Promise<string>((resolve) => {
+					const rep = window.dashboardApi.Replicant(
+						"client_schemaAssignMismatch",
+					);
+					rep.once("declared", () => {
+						rep.schemaSum = "baz";
+						try {
+							rep.value = {
+								string: "foo",
+								object: {
+									numA: 1,
+								},
+							};
+						} catch (e: any) {
+							resolve(e.message);
+						}
+					});
 
-				rep.once('operationsRejected', (reason) => {
-					resolve(reason);
-				});
-			}),
-	);
+					rep.once("operationsRejected", (reason) => {
+						resolve(reason);
+					});
+				}),
+		);
 
-	t.true(res.startsWith('Mismatched schema version, assignment rejected'));
-});
+		t.true(res.startsWith("Mismatched schema version, assignment rejected"));
+	},
+);
 
-test.serial('should reject mutations if they were validated against a different version of the schema', async (t) => {
-	const res = await dashboard.evaluate(
-		async () =>
-			new Promise<string>((resolve) => {
-				const rep = window.dashboardApi.Replicant<any>('client_schemaOperationMismatch');
-				rep.once('declared', () => {
-					rep.schemaSum = 'baz';
-					try {
-						rep.value.object.numA = 1;
-					} catch (e: any) {
-						resolve(e.message);
-					}
-				});
+test.serial(
+	"should reject mutations if they were validated against a different version of the schema",
+	async (t) => {
+		const res = await dashboard.evaluate(
+			async () =>
+				new Promise<string>((resolve) => {
+					const rep = window.dashboardApi.Replicant<any>(
+						"client_schemaOperationMismatch",
+					);
+					rep.once("declared", () => {
+						rep.schemaSum = "baz";
+						try {
+							rep.value.object.numA = 1;
+						} catch (e: any) {
+							resolve(e.message);
+						}
+					});
 
-				rep.once('operationsRejected', (reason) => {
-					resolve(reason);
-				});
-			}),
-	);
+					rep.once("operationsRejected", (reason) => {
+						resolve(reason);
+					});
+				}),
+		);
 
-	t.true(res.startsWith('Mismatched schema version, assignment rejected'));
-});
+		t.true(res.startsWith("Mismatched schema version, assignment rejected"));
+	},
+);
 
 // This isn't _actually_ testing schemas, it's just a bug that is easiest to detect when using a schema.
 // The problem was that certain cases were assigning incorrect paths to the metadataMap.
@@ -396,11 +479,22 @@ test.serial("shouldn't fuck up", async (t) => {
 	const res = await dashboard.evaluate(
 		async () =>
 			new Promise((resolve) => {
-				const rep = window.dashboardApi.Replicant<{ matchMap: boolean[] }>('schedule:state');
-				rep.once('declared', () => {
-					rep.value!.matchMap = [false, false, false, false, false, false, false, false];
+				const rep = window.dashboardApi.Replicant<{ matchMap: boolean[] }>(
+					"schedule:state",
+				);
+				rep.once("declared", () => {
+					rep.value!.matchMap = [
+						false,
+						false,
+						false,
+						false,
+						false,
+						false,
+						false,
+						false,
+					];
 
-					rep.on('change', (newVal) => {
+					rep.on("change", (newVal) => {
 						if (!newVal?.matchMap.includes(true)) {
 							try {
 								rep.value!.matchMap[6] = true;

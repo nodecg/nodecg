@@ -1,13 +1,13 @@
-import type { ExtendedError } from 'socket.io/dist/namespace';
-import { config } from '../config';
-import UnauthorizedError from '../login/UnauthorizedError';
-import type { TypedServerSocket } from '../../types/socket-protocol';
-import { UnAuthErrCode } from '../../types/socket-protocol';
-import createLogger from '../logger';
-import { serializeError } from 'serialize-error';
-import { DatabaseAdapter } from '../../types/database-adapter';
+import type { ExtendedError } from "socket.io/dist/namespace";
+import { config } from "../config";
+import UnauthorizedError from "../login/UnauthorizedError";
+import type { TypedServerSocket } from "../../types/socket-protocol";
+import { UnAuthErrCode } from "../../types/socket-protocol";
+import createLogger from "../logger";
+import { serializeError } from "serialize-error";
+import { DatabaseAdapter } from "../../types/database-adapter";
 
-const log = createLogger('socket-auth');
+const log = createLogger("socket-auth");
 const socketsByKey = new Map<string, Set<TypedServerSocket>>();
 
 export const createSocketAuthMiddleware = (db: DatabaseAdapter) => {
@@ -18,31 +18,52 @@ export const createSocketAuthMiddleware = (db: DatabaseAdapter) => {
 		try {
 			const { token } = socket.handshake.query;
 			if (!token) {
-				next(new UnauthorizedError(UnAuthErrCode.InvalidToken, 'no token provided'));
+				next(
+					new UnauthorizedError(
+						UnAuthErrCode.InvalidToken,
+						"no token provided",
+					),
+				);
 				return;
 			}
 
 			if (Array.isArray(token)) {
-				next(new UnauthorizedError(UnAuthErrCode.InvalidToken, 'more than one token provided'));
+				next(
+					new UnauthorizedError(
+						UnAuthErrCode.InvalidToken,
+						"more than one token provided",
+					),
+				);
 				return;
 			}
 
 			const apiKey = await db.findApiKey(token);
 
 			if (!apiKey) {
-				next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no credentials found'));
+				next(
+					new UnauthorizedError(
+						UnAuthErrCode.CredentialsRequired,
+						"no credentials found",
+					),
+				);
 				return;
 			}
 
 			const user = await db.findUser(apiKey.user.id);
 			if (!user) {
-				next(new UnauthorizedError(UnAuthErrCode.CredentialsRequired, 'no user associated with provided credentials'));
+				next(
+					new UnauthorizedError(
+						UnAuthErrCode.CredentialsRequired,
+						"no user associated with provided credentials",
+					),
+				);
 				return;
 			}
 
 			// But only authed sockets can join the Authed room.
 			const provider = user.identities[0]!.provider_type;
-			const providerAllowed = config.login.enabled && config.login?.[provider]?.enabled;
+			const providerAllowed =
+				config.login.enabled && config.login?.[provider]?.enabled;
 			const allowed = db.isSuperUser(user) && providerAllowed;
 
 			if (allowed) {
@@ -53,12 +74,12 @@ export const createSocketAuthMiddleware = (db: DatabaseAdapter) => {
 				const socketSet = socketsByKey.get(token);
 				/* istanbul ignore next: should be impossible */
 				if (!socketSet) {
-					throw new Error('socketSet was somehow falsey');
+					throw new Error("socketSet was somehow falsey");
 				}
 
 				socketSet.add(socket);
 
-				socket.on('regenerateToken', async (cb) => {
+				socket.on("regenerateToken", async (cb) => {
 					try {
 						// Lookup the ApiKey for this token we want to revoke.
 						const keyToDelete = await db.findApiKey(token);
@@ -72,10 +93,12 @@ export const createSocketAuthMiddleware = (db: DatabaseAdapter) => {
 							// Remove the old key from the user, replace it with the new
 							const user = await db.findUser(keyToDelete.user.id);
 							if (!user) {
-								throw new Error('should have been a user here');
+								throw new Error("should have been a user here");
 							}
 
-							user.apiKeys = user.apiKeys.filter((ak) => ak.secret_key !== token);
+							user.apiKeys = user.apiKeys.filter(
+								(ak) => ak.secret_key !== token,
+							);
 							user.apiKeys.push(newApiKey);
 							await db.saveUser(user);
 
@@ -105,8 +128,11 @@ export const createSocketAuthMiddleware = (db: DatabaseAdapter) => {
 							}
 
 							s.emit(
-								'protocol_error',
-								new UnauthorizedError(UnAuthErrCode.TokenRevoked, 'This token has been invalidated').serialized,
+								"protocol_error",
+								new UnauthorizedError(
+									UnAuthErrCode.TokenRevoked,
+									"This token has been invalidated",
+								).serialized,
 							);
 
 							// We need to wait a bit before disconnecting the socket,
@@ -127,7 +153,7 @@ export const createSocketAuthMiddleware = (db: DatabaseAdapter) => {
 				});
 
 				// Don't leak memory by retaining references to all sockets indefinitely
-				socket.on('disconnect', () => {
+				socket.on("disconnect", () => {
 					socketSet.delete(socket);
 				});
 			}
@@ -135,7 +161,12 @@ export const createSocketAuthMiddleware = (db: DatabaseAdapter) => {
 			if (allowed) {
 				next(undefined);
 			} else {
-				next(new UnauthorizedError(UnAuthErrCode.InvalidToken, 'user is not allowed'));
+				next(
+					new UnauthorizedError(
+						UnAuthErrCode.InvalidToken,
+						"user is not allowed",
+					),
+				);
 			}
 		} catch (error: unknown) {
 			next(error as any);

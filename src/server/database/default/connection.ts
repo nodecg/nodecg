@@ -1,5 +1,5 @@
-import { dataSource } from './datasource';
-export * from './entity';
+import { dataSource } from "./datasource";
+export * from "./entity";
 
 let initialized = false;
 

@@ -1,17 +1,17 @@
-import '@polymer/iron-collapse/iron-collapse.js';
-import '@polymer/iron-icons/hardware-icons.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/iron-media-query/iron-media-query.js';
-import '@polymer/paper-button/paper-button.js';
+import "@polymer/iron-collapse/iron-collapse.js";
+import "@polymer/iron-icons/hardware-icons.js";
+import "@polymer/iron-icons/iron-icons.js";
+import "@polymer/iron-media-query/iron-media-query.js";
+import "@polymer/paper-button/paper-button.js";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from './ncg-graphic-instance';
+import * as keep1 from "./ncg-graphic-instance";
 keep1;
 
-import * as Polymer from '@polymer/polymer';
-import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
-import Clipboard from 'clipboard';
-import type { NodeCG } from '../../../../types/nodecg';
+import * as Polymer from "@polymer/polymer";
+import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
+import Clipboard from "clipboard";
+import type { NodeCG } from "../../../../types/nodecg";
 
 /**
  * @customElement
@@ -237,7 +237,7 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 	}
 
 	static get is() {
-		return 'ncg-graphic';
+		return "ncg-graphic";
 	}
 
 	static get properties() {
@@ -251,12 +251,12 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 			worstStatus: {
 				type: String,
 				reflectToAttribute: true,
-				computed: '_computeWorstStatus(instances)',
+				computed: "_computeWorstStatus(instances)",
 			},
 			responsiveMode: {
 				type: String,
 				reflectToAttribute: true,
-				computed: '_computeResponsiveMode(_wide, _medium, _narrow)',
+				computed: "_computeResponsiveMode(_wide, _medium, _narrow)",
 			},
 			_collapseOpened: {
 				type: Boolean,
@@ -276,57 +276,61 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 	override ready(): void {
 		super.ready();
 
-		const clipboard = new Clipboard(this.$['copyButton']);
+		const clipboard = new Clipboard(this.$["copyButton"]);
 		this._initClipboard(clipboard);
-		this.$['url'].addEventListener('dragstart', this._onDrag.bind(this));
+		this.$["url"].addEventListener("dragstart", this._onDrag.bind(this));
 	}
 
 	reloadAll() {
-		this.$['reloadButton'].disabled = true;
-		window.socket.emit('graphic:requestRefreshAll', this['graphic'], () => {
-			this.$['reloadButton'].disabled = false;
+		this.$["reloadButton"].disabled = true;
+		window.socket.emit("graphic:requestRefreshAll", this["graphic"], () => {
+			this.$["reloadButton"].disabled = false;
 		});
 	}
 
 	toggleCollapse() {
-		this.$['instancesCollapse'].toggle();
+		this.$["instancesCollapse"].toggle();
 	}
 
 	/* istanbul ignore next: we dont currently test responsiveness */
 	_computeResponsiveMode(_wide: boolean, _medium: boolean, _narrow: boolean) {
 		if (_wide) {
-			return 'wide';
+			return "wide";
 		}
 
 		if (_medium) {
-			return 'medium';
+			return "medium";
 		}
 
 		if (_narrow) {
-			return 'narrow';
+			return "narrow";
 		}
 
-		return '';
+		return "";
 	}
 
 	_initClipboard(clipboard: Clipboard) {
 		/* istanbul ignore next: cant figure out how to test these */
-		clipboard.on('success', () => {
-			this.dispatchEvent(new CustomEvent('url-copy-success', { bubbles: true, composed: true }));
+		clipboard.on("success", () => {
+			this.dispatchEvent(
+				new CustomEvent("url-copy-success", { bubbles: true, composed: true }),
+			);
 		});
 		/* istanbul ignore next: cant figure out how to test these */
-		clipboard.on('error', (e: ClipboardJS.Event) => {
-			this.dispatchEvent(new CustomEvent('url-copy-error', { bubbles: true, composed: true }));
+		clipboard.on("error", (e: ClipboardJS.Event) => {
+			this.dispatchEvent(
+				new CustomEvent("url-copy-error", { bubbles: true, composed: true }),
+			);
 			console.error(e);
 		});
 	}
 
 	_calcShortUrl(graphicUrl: string) {
-		return graphicUrl.split('/').slice(4).join('/');
+		return graphicUrl.split("/").slice(4).join("/");
 	}
 
 	_computeFullGraphicUrl(url: string) {
-		const a = document.createElement('a');
+		const a = document.createElement("a");
 		a.href = url;
 		let absUrl = a.href;
 
@@ -339,28 +343,30 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 
 	_computeWorstStatus(instances?: NodeCG.GraphicsInstance[]) {
 		if (!instances) {
-			return 'none';
+			return "none";
 		}
 
 		const openInstances = instances.filter((instance) => instance.open);
 		if (openInstances.length <= 0) {
-			return 'none';
+			return "none";
 		}
 
-		const outOfDateInstance = openInstances.find((instance) => instance.potentiallyOutOfDate);
-		return outOfDateInstance ? 'out-of-date' : 'nominal';
+		const outOfDateInstance = openInstances.find(
+			(instance) => instance.potentiallyOutOfDate,
+		);
+		return outOfDateInstance ? "out-of-date" : "nominal";
 	}
 
 	_calcCount(singleInstance: boolean, instances?: NodeCG.GraphicsInstance[]) {
 		if (singleInstance) {
-			return 'S';
+			return "S";
 		}
 
-		return instances?.filter((instance) => instance.open).length ?? '?';
+		return instances?.filter((instance) => instance.open).length ?? "?";
 	}
 
 	_computeCollapseIcon(_collapseOpened: boolean) {
-		return _collapseOpened ? 'unfold-less' : 'unfold-more';
+		return _collapseOpened ? "unfold-less" : "unfold-more";
 	}
 
 	_calcReloadAllDisabled(instances?: NodeCG.GraphicsInstance[]) {
@@ -380,11 +386,11 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 			obsURL = `${dragged.href}?`;
 		}
 
-		obsURL += `layer-name=${this['graphic'].file.replace('.html', '')}&layer-height=${
-			this['graphic'].height
-		}&layer-width=${this['graphic'].width}`;
+		obsURL += `layer-name=${this["graphic"].file.replace(".html", "")}&layer-height=${
+			this["graphic"].height
+		}&layer-width=${this["graphic"].width}`;
 
-		event.dataTransfer.setData('text/uri-list', obsURL);
+		event.dataTransfer.setData("text/uri-list", obsURL);
 	}
 }
 

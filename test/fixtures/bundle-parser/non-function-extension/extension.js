@@ -1,6 +1,6 @@
 /* istanbul ignore next */
-'use strict';
+"use strict";
 
 module.exports = {
-	lorem: 'ipsum',
+	lorem: "ipsum",
 };

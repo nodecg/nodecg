@@ -1,4 +1,4 @@
-import * as Polymer from '@polymer/polymer';
+import * as Polymer from "@polymer/polymer";
 class UiSelect extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`
@@ -51,7 +51,7 @@ class UiSelect extends Polymer.PolymerElement {
 	}
 
 	static get is() {
-		return 'ui-select';
+		return "ui-select";
 	}
 
 	static get properties() {
@@ -68,39 +68,43 @@ class UiSelect extends Polymer.PolymerElement {
 
 	override ready(): void {
 		super.ready();
-		['item', 'add', 'remove'].forEach((methodToForward) => {
-			this[methodToForward] = this.$['select'][methodToForward].bind(this.$['select']);
+		["item", "add", "remove"].forEach((methodToForward) => {
+			this[methodToForward] = this.$["select"][methodToForward].bind(
+				this.$["select"],
+			);
 		});
 	}
 
 	override connectedCallback(): void {
 		super.connectedCallback();
 
-		if (this['label']) {
-			const labelOption = document.createElement('option');
-			labelOption.label = `-- Select a ${this['label']} --`;
-			labelOption.value = '';
-			this.$['select'].add(labelOption);
+		if (this["label"]) {
+			const labelOption = document.createElement("option");
+			labelOption.label = `-- Select a ${this["label"]} --`;
+			labelOption.value = "";
+			this.$["select"].add(labelOption);
 		}
 
 		// Move all Light DOM <option> elements into the local Shadow DOM.
-		const options = this.querySelectorAll('option');
+		const options = this.querySelectorAll("option");
 		options.forEach((option) => {
-			this.$['select'].add(option);
+			this.$["select"].add(option);
 		});
 
-		this.$['select'].selectedIndex = -1;
+		this.$["select"].selectedIndex = -1;
 	}
 
 	_selectChanged(e: any) {
 		if (!e.target.value) {
-			this.$['select'].selectedIndex = -1;
+			this.$["select"].selectedIndex = -1;
 		}
 
-		this['value'] = this.$['select'].value;
-		this['selectedOptions'] = this.$['select'].selectedOptions;
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		this["value"] = this.$["select"].value;
+		this["selectedOptions"] = this.$["select"].selectedOptions;
+		this.dispatchEvent(
+			new CustomEvent("change", { bubbles: true, composed: true }),
+		);
 	}
 }
 
-customElements.define('ui-select', UiSelect);
+customElements.define("ui-select", UiSelect);

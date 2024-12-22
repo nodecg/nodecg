@@ -15,7 +15,11 @@
 		"rootDir": ".",
 		"module": "commonjs"
 	},
-	"references": [{ "path": "../src/types" }, { "path": "../src/client" }, { "path": "../src/server" }],
+	"references": [
+		{ "path": "../src/types" },
+		{ "path": "../src/client" },
+		{ "path": "../src/server" }
+	],
 	"include": [
 		"./**/*.ts",
 

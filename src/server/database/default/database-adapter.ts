@@ -1,19 +1,26 @@
-import { getConnection, User, Role, Identity, ApiKey, Replicant } from './connection';
-import type { DatabaseAdapter } from '../../../types/database-adapter';
+import {
+	getConnection,
+	User,
+	Role,
+	Identity,
+	ApiKey,
+	Replicant,
+} from "./connection";
+import type { DatabaseAdapter } from "../../../types/database-adapter";
 
-async function findUser(id: User['id']): Promise<User | null> {
+async function findUser(id: User["id"]): Promise<User | null> {
 	const database = await getConnection();
 	return database.getRepository(User).findOne({
 		where: { id },
-		relations: ['roles', 'identities', 'apiKeys'],
+		relations: ["roles", "identities", "apiKeys"],
 		cache: true,
 	});
 }
 
 async function getSuperUserRole(): Promise<Role> {
-	const superUserRole = await findRole('superuser');
+	const superUserRole = await findRole("superuser");
 	if (!superUserRole) {
-		throw new Error('superuser role unexpectedly not found');
+		throw new Error("superuser role unexpectedly not found");
 	}
 
 	return superUserRole;
@@ -27,12 +34,12 @@ async function upsertUser({
 	provider_refresh_token,
 	roles,
 }: {
-	name: User['name'];
-	provider_type: Identity['provider_type'];
-	provider_hash: Identity['provider_hash'];
-	provider_access_token?: Identity['provider_access_token'];
-	provider_refresh_token?: Identity['provider_refresh_token'];
-	roles: User['roles'];
+	name: User["name"];
+	provider_type: Identity["provider_type"];
+	provider_hash: Identity["provider_hash"];
+	provider_access_token?: Identity["provider_access_token"];
+	provider_refresh_token?: Identity["provider_refresh_token"];
+	roles: User["roles"];
 }): Promise<User> {
 	const database = await getConnection();
 	const { manager } = database;
@@ -64,7 +71,7 @@ async function upsertUser({
 
 	if (!user) {
 		// Something went very wrong.
-		throw new Error('Failed to find user after upserting.');
+		throw new Error("Failed to find user after upserting.");
 	}
 
 	// Always update the roles, regardless of if we are making a new user or updating an existing one.
@@ -73,17 +80,23 @@ async function upsertUser({
 }
 
 function isSuperUser(user: User): boolean {
-	return Boolean(user.roles?.find((role) => role.name === 'superuser'));
+	return Boolean(user.roles?.find((role) => role.name === "superuser"));
 }
 
-async function findRole(name: Role['name']): Promise<Role | null> {
+async function findRole(name: Role["name"]): Promise<Role | null> {
 	const database = await getConnection();
 	const { manager } = database;
-	return manager.findOne(Role, { where: { name }, relations: ['permissions'] });
+	return manager.findOne(Role, { where: { name }, relations: ["permissions"] });
 }
 
 async function createIdentity(
-	identInfo: Pick<Identity, 'provider_type' | 'provider_hash' | 'provider_access_token' | 'provider_refresh_token'>,
+	identInfo: Pick<
+		Identity,
+		| "provider_type"
+		| "provider_hash"
+		| "provider_access_token"
+		| "provider_refresh_token"
+	>,
 ): Promise<Identity> {
 	const database = await getConnection();
 	const { manager } = database;
@@ -100,21 +113,24 @@ async function createApiKey(): Promise<ApiKey> {
 	return apiKey;
 }
 
-async function findIdent(type: Identity['provider_type'], hash: Identity['provider_hash']): Promise<Identity | null> {
+async function findIdent(
+	type: Identity["provider_type"],
+	hash: Identity["provider_hash"],
+): Promise<Identity | null> {
 	const database = await getConnection();
 	return database.getRepository(Identity).findOne({
 		where: { provider_hash: hash, provider_type: type },
-		relations: ['user'],
+		relations: ["user"],
 	});
 }
 
-async function findUserById(userId: User['id']): Promise<User | null> {
+async function findUserById(userId: User["id"]): Promise<User | null> {
 	const database = await getConnection();
 	return database.getRepository(User).findOne({
 		where: {
 			id: userId,
 		},
-		relations: ['roles', 'identities', 'apiKeys'],
+		relations: ["roles", "identities", "apiKeys"],
 	});
 }
 
@@ -122,7 +138,7 @@ async function findApiKey(token: string) {
 	const database = await getConnection();
 	return database.getRepository(ApiKey).findOne({
 		where: { secret_key: token },
-		relations: ['user'],
+		relations: ["user"],
 	});
 }
 
@@ -142,8 +158,8 @@ async function saveReplicant(replicant: {
 	namespace: string;
 	name: string;
 	value: any;
-	on: (event: 'change', handler: (newVal: unknown) => void) => void;
-	off: (event: 'change', handler: (newVal: unknown) => void) => void;
+	on: (event: "change", handler: (newVal: unknown) => void) => void;
+	off: (event: "change", handler: (newVal: unknown) => void) => void;
 }) {
 	let valueChangedDuringSave = false;
 
@@ -151,7 +167,9 @@ async function saveReplicant(replicant: {
 	const manager = connection.manager;
 
 	let repEnt: Replicant;
-	const existingEnt = repEntities.find((pv) => pv.namespace === replicant.namespace && pv.name === replicant.name);
+	const existingEnt = repEntities.find(
+		(pv) => pv.namespace === replicant.namespace && pv.name === replicant.name,
+	);
 	if (existingEnt) {
 		repEnt = existingEnt;
 	} else {
@@ -164,8 +182,8 @@ async function saveReplicant(replicant: {
 
 	const valueRef = replicant.value;
 	let serializedValue = JSON.stringify(valueRef);
-	if (typeof serializedValue === 'undefined') {
-		serializedValue = '';
+	if (typeof serializedValue === "undefined") {
+		serializedValue = "";
 	}
 
 	const changeHandler = (newVal: unknown) => {
@@ -177,7 +195,7 @@ async function saveReplicant(replicant: {
 	repEnt.value = serializedValue;
 
 	try {
-		replicant.on('change', changeHandler);
+		replicant.on("change", changeHandler);
 		await manager.save(repEnt);
 		if (!valueChangedDuringSave) {
 			return;
@@ -188,7 +206,7 @@ async function saveReplicant(replicant: {
 		// to save it again.
 		await saveReplicant(replicant);
 	} finally {
-		replicant.off('change', changeHandler);
+		replicant.off("change", changeHandler);
 	}
 }
 

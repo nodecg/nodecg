@@ -1,16 +1,20 @@
-import { klona as clone } from 'klona/json';
-import createLogger from '../logger';
-import Replicant from './server-replicant';
-import { throttleName } from '../util';
-import type ServerReplicant from './server-replicant';
-import * as uuid from 'uuid';
-import type { TypedServerSocket, ServerToClientEvents, RootNS } from '../../types/socket-protocol';
-import type { NodeCG } from '../../types/nodecg';
-import { stringifyError } from '../../shared/utils/errors';
-import type { Replicant as ReplicantModel } from '../../types/models';
-import type { DatabaseAdapter } from '../../types/database-adapter';
+import { klona as clone } from "klona/json";
+import createLogger from "../logger";
+import Replicant from "./server-replicant";
+import { throttleName } from "../util";
+import type ServerReplicant from "./server-replicant";
+import * as uuid from "uuid";
+import type {
+	TypedServerSocket,
+	ServerToClientEvents,
+	RootNS,
+} from "../../types/socket-protocol";
+import type { NodeCG } from "../../types/nodecg";
+import { stringifyError } from "../../shared/utils/errors";
+import type { Replicant as ReplicantModel } from "../../types/models";
+import type { DatabaseAdapter } from "../../types/database-adapter";
 
-const log = createLogger('replicator');
+const log = createLogger("replicator");
 
 export default class Replicator {
 	readonly declaredReplicants = new Map<string, Map<string, Replicant<any>>>();
@@ -27,7 +31,7 @@ export default class Replicator {
 		repEntities: ReplicantModel[],
 	) {
 		this.io = io;
-		io.on('connection', (socket) => {
+		io.on("connection", (socket) => {
 			this._attachToSocket(socket);
 		});
 
@@ -47,27 +51,28 @@ export default class Replicator {
 	 * Defaults to `nodecg/bundles/${bundleName}/schemas/${replicantName}.json`.
 	 * @returns {object}
 	 */
-	declare<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
-		name: string,
-		namespace: string,
-		opts?: O,
-	): Replicant<V, O>;
-	declare<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
-		name: string,
-		namespace: string,
-		opts?: O,
-	): Replicant<V, O>;
-	declare<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
-		name: string,
-		namespace: string,
-		opts?: O,
-	): Replicant<V, O> {
+	declare<
+		V,
+		O extends
+			NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>,
+	>(name: string, namespace: string, opts?: O): Replicant<V, O>;
+	declare<
+		V,
+		O extends
+			NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault,
+	>(name: string, namespace: string, opts?: O): Replicant<V, O>;
+	declare<
+		V,
+		O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+	>(name: string, namespace: string, opts?: O): Replicant<V, O> {
 		// If replicant already exists, return that.
 		const nsp = this.declaredReplicants.get(namespace);
 		if (nsp) {
 			const existing = nsp.get(name);
 			if (existing) {
-				existing.log.replicants('Existing replicant found, returning that instead of creating a new one.');
+				existing.log.replicants(
+					"Existing replicant found, returning that instead of creating a new one.",
+				);
 				return existing as any;
 			}
 		} else {
@@ -76,10 +81,13 @@ export default class Replicator {
 
 		// Look up the persisted value, if any.
 		let parsedPersistedValue;
-		const repEnt = this._repEntities.find((re) => re.namespace === namespace && re.name === name);
+		const repEnt = this._repEntities.find(
+			(re) => re.namespace === namespace && re.name === name,
+		);
 		if (repEnt) {
 			try {
-				parsedPersistedValue = repEnt.value === '' ? undefined : JSON.parse(repEnt.value);
+				parsedPersistedValue =
+					repEnt.value === "" ? undefined : JSON.parse(repEnt.value);
 			} catch (_: unknown) {
 				parsedPersistedValue = repEnt.value;
 			}
@@ -90,13 +98,13 @@ export default class Replicator {
 		this.declaredReplicants.get(namespace)!.set(name, rep);
 
 		// Add persistence hooks
-		rep.on('change', () => {
+		rep.on("change", () => {
 			this.saveReplicant(rep);
 		});
 
 		// Listen for server-side operations
-		rep.on('operations', (data) => {
-			this.emitToClients(rep, 'replicant:operations', data);
+		rep.on("operations", (data) => {
+			this.emitToClients(rep, "replicant:operations", data);
 		});
 
 		return rep;
@@ -114,8 +122,8 @@ export default class Replicator {
 		const oldValue = clone(replicant.value);
 		operations.forEach((operation) => replicant._applyOperation(operation));
 		replicant.revision++;
-		replicant.emit('change', replicant.value, oldValue, operations);
-		this.emitToClients(replicant, 'replicant:operations', {
+		replicant.emit("change", replicant.value, oldValue, operations);
+		this.emitToClients(replicant, "replicant:operations", {
 			name: replicant.name,
 			namespace: replicant.namespace,
 			revision: replicant.revision,
@@ -136,7 +144,12 @@ export default class Replicator {
 	): void {
 		// Emit to clients (in the given namespace's room) using Socket.IO
 		const namespace = `replicant:${replicant.namespace}:${replicant.name}`;
-		log.replicants('emitting %s to %s:', eventName, namespace, JSON.stringify(data, undefined, 2));
+		log.replicants(
+			"emitting %s to %s:",
+			eventName,
+			namespace,
+			JSON.stringify(data, undefined, 2),
+		);
 		(this.io as any).to(namespace).emit(eventName, data); // TODO: figure out how to type this properly
 	}
 
@@ -168,7 +181,7 @@ export default class Replicator {
 			`${this._uuid}:${replicant.namespace}:${replicant.name}`,
 			() => {
 				this._saveReplicant(replicant).catch((error) => {
-					log.error('Error saving replicant:', error);
+					log.error("Error saving replicant:", error);
 				});
 			},
 			replicant.opts.persistenceInterval,
@@ -190,15 +203,18 @@ export default class Replicator {
 			this._pendingSave.set(replicant, promise);
 			await promise;
 		} catch (error: unknown) {
-			replicant.log.error('Failed to persist value:', stringifyError(error));
+			replicant.log.error("Failed to persist value:", stringifyError(error));
 		} finally {
 			this._pendingSave.delete(replicant);
 		}
 	}
 
 	private _attachToSocket(socket: TypedServerSocket): void {
-		socket.on('replicant:declare', (data, cb) => {
-			log.replicants('received replicant:declare', JSON.stringify(data, undefined, 2));
+		socket.on("replicant:declare", (data, cb) => {
+			log.replicants(
+				"received replicant:declare",
+				JSON.stringify(data, undefined, 2),
+			);
 			try {
 				const replicant = this.declare(data.name, data.namespace, data.opts);
 				cb(undefined, {
@@ -208,7 +224,7 @@ export default class Replicator {
 					schemaSum: replicant.schemaSum,
 				});
 			} catch (e: any) {
-				if (e.message.startsWith('Invalid value rejected for replicant')) {
+				if (e.message.startsWith("Invalid value rejected for replicant")) {
 					cb(e.message, undefined);
 				} else {
 					throw e;
@@ -216,18 +232,28 @@ export default class Replicator {
 			}
 		});
 
-		socket.on('replicant:proposeOperations', (data, cb) => {
-			log.replicants('received replicant:proposeOperations', JSON.stringify(data, undefined, 2));
-			const serverReplicant = this.declare(data.name, data.namespace, data.opts);
-			if (serverReplicant.schema && (!('schemaSum' in data) || data.schemaSum !== serverReplicant.schemaSum)) {
+		socket.on("replicant:proposeOperations", (data, cb) => {
+			log.replicants(
+				"received replicant:proposeOperations",
+				JSON.stringify(data, undefined, 2),
+			);
+			const serverReplicant = this.declare(
+				data.name,
+				data.namespace,
+				data.opts,
+			);
+			if (
+				serverReplicant.schema &&
+				(!("schemaSum" in data) || data.schemaSum !== serverReplicant.schemaSum)
+			) {
 				log.replicants(
-					'Change request %s:%s had mismatched schema sum (ours %s, theirs %s), invoking callback with new schema and fullupdate',
+					"Change request %s:%s had mismatched schema sum (ours %s, theirs %s), invoking callback with new schema and fullupdate",
 					data.namespace,
 					data.name,
 					serverReplicant.schemaSum,
-					'schemaSum' in data ? data.schemaSum : '(no schema)',
+					"schemaSum" in data ? data.schemaSum : "(no schema)",
 				);
-				cb('Mismatched schema version, assignment rejected', {
+				cb("Mismatched schema version, assignment rejected", {
 					schema: serverReplicant.schema,
 					schemaSum: serverReplicant.schemaSum,
 					value: serverReplicant.value,
@@ -235,13 +261,13 @@ export default class Replicator {
 				});
 			} else if (serverReplicant.revision !== data.revision) {
 				log.replicants(
-					'Change request %s:%s had mismatched revision (ours %s, theirs %s), invoking callback with fullupdate',
+					"Change request %s:%s had mismatched revision (ours %s, theirs %s), invoking callback with fullupdate",
 					data.namespace,
 					data.name,
 					serverReplicant.revision,
 					data.revision,
 				);
-				cb('Mismatched revision number, assignment rejected', {
+				cb("Mismatched revision number, assignment rejected", {
 					value: serverReplicant.value,
 					revision: serverReplicant.revision,
 				});
@@ -250,10 +276,10 @@ export default class Replicator {
 			this.applyOperations(serverReplicant, data.operations);
 		});
 
-		socket.on('replicant:read', (data, cb) => {
-			log.replicants('replicant:read', JSON.stringify(data, undefined, 2));
+		socket.on("replicant:read", (data, cb) => {
+			log.replicants("replicant:read", JSON.stringify(data, undefined, 2));
 			const replicant = this.declare(data.name, data.namespace);
-			if (typeof cb === 'function') {
+			if (typeof cb === "function") {
 				if (replicant) {
 					cb(undefined, replicant.value);
 				} else {

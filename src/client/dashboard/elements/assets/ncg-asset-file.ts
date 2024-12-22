@@ -1,8 +1,8 @@
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/paper-spinner/paper-spinner-lite.js';
-import * as Polymer from '@polymer/polymer';
+import "@polymer/iron-flex-layout/iron-flex-layout.js";
+import "@polymer/iron-icons/iron-icons.js";
+import "@polymer/paper-button/paper-button.js";
+import "@polymer/paper-spinner/paper-spinner-lite.js";
+import * as Polymer from "@polymer/polymer";
 class NcgAssetFile extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`
@@ -46,40 +46,44 @@ class NcgAssetFile extends Polymer.PolymerElement {
 	}
 
 	static get is() {
-		return 'ncg-asset-file';
+		return "ncg-asset-file";
 	}
 
 	static get properties() {
 		return {
 			deleting: {
 				type: Boolean,
-				observer: '_deletingChanged',
+				observer: "_deletingChanged",
 				value: false,
 			},
 		};
 	}
 
 	_deletingChanged(newVal: string) {
-		this.$['spinner'].style.display = newVal ? 'block' : 'none';
-		this.$['delete'].style.visibility = newVal ? 'hidden' : 'visible';
+		this.$["spinner"].style.display = newVal ? "block" : "none";
+		this.$["delete"].style.visibility = newVal ? "hidden" : "visible";
 	}
 
 	_handleDeleteClick() {
-		this['deleting'] = true;
+		this["deleting"] = true;
 
-		void fetch(this['file'].url, {
-			method: 'DELETE',
-			credentials: 'include',
+		void fetch(this["file"].url, {
+			method: "DELETE",
+			credentials: "include",
 		}).then((response) => {
 			if (response.status === 410 || response.status === 200) {
-				this.dispatchEvent(new CustomEvent('deleted', { bubbles: true, composed: true }));
+				this.dispatchEvent(
+					new CustomEvent("deleted", { bubbles: true, composed: true }),
+				);
 			} else {
-				this.dispatchEvent(new CustomEvent('deletion-failed', { bubbles: true, composed: true }));
+				this.dispatchEvent(
+					new CustomEvent("deletion-failed", { bubbles: true, composed: true }),
+				);
 			}
 
-			this['deleting'] = false;
+			this["deleting"] = false;
 		});
 	}
 }
 
-customElements.define('ncg-asset-file', NcgAssetFile);
+customElements.define("ncg-asset-file", NcgAssetFile);

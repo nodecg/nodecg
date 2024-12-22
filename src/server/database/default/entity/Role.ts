@@ -1,14 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Permission } from './Permission';
-import type { Role as RoleModel } from '../../../../types/models';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Permission } from "./Permission";
+import type { Role as RoleModel } from "../../../../types/models";
 
 @Entity()
 export class Role implements RoleModel {
-	@PrimaryGeneratedColumn('uuid')
+	@PrimaryGeneratedColumn("uuid")
 	id!: string;
 
 	@Column({
-		type: 'text',
+		type: "text",
 		unique: true,
 	})
 	name!: string;

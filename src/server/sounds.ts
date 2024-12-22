@@ -1,27 +1,30 @@
-import * as path from 'node:path';
+import * as path from "node:path";
 
-import { klona as clone } from 'klona/json';
-import express from 'express';
-import hasha from 'hasha';
+import { klona as clone } from "klona/json";
+import express from "express";
+import hasha from "hasha";
 
-import type { Replicator } from './replicant';
-import type ServerReplicant from './replicant/server-replicant';
-import { sendFile } from './util';
-import type { NodeCG } from '../types/nodecg';
-import { nodecgRootPath } from '../shared/utils/rootPath';
+import type { Replicator } from "./replicant";
+import type ServerReplicant from "./replicant/server-replicant";
+import { sendFile } from "./util";
+import type { NodeCG } from "../types/nodecg";
+import { nodecgRootPath } from "../shared/utils/rootPath";
 
 export default class SoundsLib {
 	app = express();
 
 	private readonly _bundles: NodeCG.Bundle[];
 
-	private readonly _cueRepsByBundle = new Map<string, ServerReplicant<NodeCG.SoundCue[]>>();
+	private readonly _cueRepsByBundle = new Map<
+		string,
+		ServerReplicant<NodeCG.SoundCue[]>
+	>();
 
 	constructor(bundles: NodeCG.Bundle[], replicator: Replicator) {
 		this._bundles = bundles;
 
 		// Create the replicant for the "Master Fader"
-		replicator.declare('volume:master', '_sounds', { defaultValue: 100 });
+		replicator.declare("volume:master", "_sounds", { defaultValue: 100 });
 
 		bundles.forEach((bundle) => {
 			// If this bundle has sounds
@@ -29,33 +32,44 @@ export default class SoundsLib {
 				// Create an array replicant that will hold all this bundle's sound cues.
 				const defaultCuesRepValue = this._makeCuesRepDefaultValue(bundle);
 
-				const cuesRep = replicator.declare<NodeCG.SoundCue[]>('soundCues', bundle.name, {
-					schemaPath: path.resolve(nodecgRootPath, 'schemas/soundCues.json'),
-					defaultValue: [],
-				});
+				const cuesRep = replicator.declare<NodeCG.SoundCue[]>(
+					"soundCues",
+					bundle.name,
+					{
+						schemaPath: path.resolve(nodecgRootPath, "schemas/soundCues.json"),
+						defaultValue: [],
+					},
+				);
 
 				this._cueRepsByBundle.set(bundle.name, cuesRep);
 
 				if (cuesRep.value.length > 0) {
 					// Remove any persisted cues that are no longer in the bundle manifest.
 					cuesRep.value = cuesRep.value.filter((persistedCue) =>
-						defaultCuesRepValue.find((defaultCue) => defaultCue.name === persistedCue.name),
+						defaultCuesRepValue.find(
+							(defaultCue) => defaultCue.name === persistedCue.name,
+						),
 					);
 
 					// Add/update any cues in the bundle manifest that aren't in the persisted replicant.
 					defaultCuesRepValue.forEach((defaultCue) => {
-						const existingIndex = cuesRep.value.findIndex((persistedCue) => persistedCue.name === defaultCue.name);
+						const existingIndex = cuesRep.value.findIndex(
+							(persistedCue) => persistedCue.name === defaultCue.name,
+						);
 
 						// We need to just update a few key properties in the persisted cue.
 						// We leave things like volume as-is.
 						if (existingIndex >= 0) {
 							cuesRep.value[existingIndex]!.assignable = defaultCue.assignable;
-							cuesRep.value[existingIndex]!.defaultFile = defaultCue.defaultFile;
+							cuesRep.value[existingIndex]!.defaultFile =
+								defaultCue.defaultFile;
 
 							// If we're updating the cue to not be assignable, then we have to
 							// set the `defaultFile` as the selected `file`.
 							if (!defaultCue.assignable && defaultCue.defaultFile) {
-								cuesRep.value[existingIndex]!.file = clone(defaultCue.defaultFile);
+								cuesRep.value[existingIndex]!.file = clone(
+									defaultCue.defaultFile,
+								);
 							}
 						} else {
 							cuesRep.value.push(defaultCue);
@@ -67,24 +81,38 @@ export default class SoundsLib {
 				}
 
 				// Create this bundle's "Bundle Fader"
-				replicator.declare(`volume:${bundle.name}`, '_sounds', {
+				replicator.declare(`volume:${bundle.name}`, "_sounds", {
 					defaultValue: 100,
 				});
 			}
 		});
 
-		this.app.get('/sound/:bundleName/:cueName/default.mp3', this._serveDefault.bind(this));
-		this.app.get('/sound/:bundleName/:cueName/default.ogg', this._serveDefault.bind(this));
+		this.app.get(
+			"/sound/:bundleName/:cueName/default.mp3",
+			this._serveDefault.bind(this),
+		);
+		this.app.get(
+			"/sound/:bundleName/:cueName/default.ogg",
+			this._serveDefault.bind(this),
+		);
 	}
 
-	private _serveDefault(req: express.Request, res: express.Response, next: express.NextFunction): void {
-		const bundle = this._bundles.find((b) => b.name === req.params['bundleName']);
+	private _serveDefault(
+		req: express.Request,
+		res: express.Response,
+		next: express.NextFunction,
+	): void {
+		const bundle = this._bundles.find(
+			(b) => b.name === req.params["bundleName"],
+		);
 		if (!bundle) {
 			res.status(404).send(`File not found: ${req.path}`);
 			return;
 		}
 
-		const cue = bundle.soundCues.find((cue) => cue.name === req.params['cueName']);
+		const cue = bundle.soundCues.find(
+			(cue) => cue.name === req.params["cueName"],
+		);
 		if (!cue) {
 			res.status(404).send(`File not found: ${req.path}`);
 			return;
@@ -108,7 +136,7 @@ export default class SoundsLib {
 				const filepath = path.join(bundle.dir, rawCue.defaultFile);
 				const parsedPath = path.parse(filepath);
 				file = {
-					sum: hasha.fromFileSync(filepath, { algorithm: 'sha1' }),
+					sum: hasha.fromFileSync(filepath, { algorithm: "sha1" }),
 					base: parsedPath.base,
 					ext: parsedPath.ext,
 					name: parsedPath.name,
@@ -123,7 +151,7 @@ export default class SoundsLib {
 				volume: rawCue.defaultVolume ?? 30,
 			};
 
-			if ('defaultVolume' in rawCue) {
+			if ("defaultVolume" in rawCue) {
 				formatted.defaultVolume = rawCue.defaultVolume;
 			}
 

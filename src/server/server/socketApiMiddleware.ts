@@ -1,19 +1,26 @@
 // Packages
-import * as Sentry from '@sentry/node';
-import type { ExtendedError } from 'socket.io/dist/namespace';
+import * as Sentry from "@sentry/node";
+import type { ExtendedError } from "socket.io/dist/namespace";
 
 // Ours
-import createLogger from '../logger';
-import type { TypedServerSocket } from '../../types/socket-protocol';
-import { sentryEnabled } from '../config';
+import createLogger from "../logger";
+import type { TypedServerSocket } from "../../types/socket-protocol";
+import { sentryEnabled } from "../config";
 
-const log = createLogger('socket-api');
+const log = createLogger("socket-api");
 
-export default function (socket: TypedServerSocket, next: (err?: ExtendedError) => void) {
+export default function (
+	socket: TypedServerSocket,
+	next: (err?: ExtendedError) => void,
+) {
 	try {
-		log.trace('New socket connection: ID %s with IP %s', socket.id, socket.handshake.address);
+		log.trace(
+			"New socket connection: ID %s with IP %s",
+			socket.id,
+			socket.handshake.address,
+		);
 
-		socket.on('error', (err) => {
+		socket.on("error", (err) => {
 			if (sentryEnabled) {
 				Sentry.captureException(err);
 			}
@@ -21,20 +28,25 @@ export default function (socket: TypedServerSocket, next: (err?: ExtendedError) 
 			log.error(err);
 		});
 
-		socket.on('message', (data) => {
-			log.trace('Received message %s (sent to bundle %s) with data:', data.messageName, data.bundleName, data.content);
+		socket.on("message", (data) => {
+			log.trace(
+				"Received message %s (sent to bundle %s) with data:",
+				data.messageName,
+				data.bundleName,
+				data.content,
+			);
 
-			socket.broadcast.emit('message', data);
+			socket.broadcast.emit("message", data);
 		});
 
-		socket.on('joinRoom', async (room, cb) => {
-			if (typeof room !== 'string') {
-				cb('Room must be a string', undefined);
+		socket.on("joinRoom", async (room, cb) => {
+			if (typeof room !== "string") {
+				cb("Room must be a string", undefined);
 				return;
 			}
 
 			if (!Object.keys(socket.rooms).includes(room)) {
-				log.trace('Socket %s joined room:', socket.id, room);
+				log.trace("Socket %s joined room:", socket.id, room);
 				await socket.join(room);
 			}
 

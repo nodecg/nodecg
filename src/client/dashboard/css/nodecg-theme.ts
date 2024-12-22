@@ -1,4 +1,4 @@
-const $documentContainer = document.createElement('template');
+const $documentContainer = document.createElement("template");
 
 $documentContainer.innerHTML = `<dom-module id="nodecg-theme">
 	<template>
@@ -148,5 +148,5 @@ $documentContainer.innerHTML = `<dom-module id="nodecg-theme">
 document.head.appendChild($documentContainer.content);
 
 // Force this file to be identified as a module so that TS can compile it.
-const hack = 'hack';
+const hack = "hack";
 export default hack;

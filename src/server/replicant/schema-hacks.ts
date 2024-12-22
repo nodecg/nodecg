@@ -1,10 +1,10 @@
 // Packages
-import { klona as clone } from 'klona/json';
-import { JsonPointer } from 'json-ptr';
+import { klona as clone } from "klona/json";
+import { JsonPointer } from "json-ptr";
 
 // Crimes
-import jsonSchemaLibTypeOf = require('json-schema-lib/lib/util/typeOf');
-import jsonSchemaStripHash = require('json-schema-lib/lib/util/stripHash');
+import jsonSchemaLibTypeOf = require("json-schema-lib/lib/util/typeOf");
+import jsonSchemaStripHash = require("json-schema-lib/lib/util/stripHash");
 
 type File = {
 	url: string;
@@ -23,7 +23,11 @@ type PointerReference = { $ref: string } & UnknownObject;
 /**
  * Mutates an object in place, replacing all its JSON Refs with their dereferenced values.
  */
-function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): UnknownObject | undefined {
+function replaceRefs(
+	inputObj: unknown,
+	currentFile: File,
+	allFiles: File[],
+): UnknownObject | undefined {
 	const type = jsonSchemaLibTypeOf(inputObj);
 	if (!type.isPOJO && !type.isArray) {
 		return;
@@ -47,7 +51,7 @@ function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): Un
 			// If this file reference also has a local reference appended to it,
 			// we need to resolve that local reference within the file we just dereferenced.
 			// Example: schemaRefTargetWithDef.json#/definitions/exampleDef
-			const hashIndex = obj.$ref.indexOf('#');
+			const hashIndex = obj.$ref.indexOf("#");
 			if (hashIndex >= 0) {
 				const hashPath = obj.$ref.slice(hashIndex);
 				dereferencedData = resolvePointerReference(dereferencedData, hashPath);
@@ -58,9 +62,9 @@ function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): Un
 		}
 
 		if (dereferencedData && referenceFile) {
-			delete obj['$ref'];
+			delete obj["$ref"];
 			for (const key in dereferencedData) {
-				if (key === '$schema') {
+				if (key === "$schema") {
 					continue;
 				}
 
@@ -98,7 +102,7 @@ function replaceRefs(inputObj: unknown, currentFile: File, allFiles: File[]): Un
  * @returns {boolean}
  */
 function isFileReference(value: UnknownObject): value is FileReference {
-	return typeof value['$ref'] === 'string' && !value['$ref'].startsWith('#');
+	return typeof value["$ref"] === "string" && !value["$ref"].startsWith("#");
 }
 
 /**
@@ -108,7 +112,7 @@ function isFileReference(value: UnknownObject): value is FileReference {
  * @returns {boolean}
  */
 function isPointerReference(value: UnknownObject): value is PointerReference {
-	return typeof value['$ref'] === 'string' && value['$ref'].startsWith('#');
+	return typeof value["$ref"] === "string" && value["$ref"].startsWith("#");
 }
 
 /**
@@ -128,7 +132,10 @@ function resolveFileReference(url: string, file: File): string {
 	return schema.plugins.resolveURL({ from: file.url, to: url });
 }
 
-function resolvePointerReference(obj: Record<string, unknown>, ref: string): UnknownObject {
+function resolvePointerReference(
+	obj: Record<string, unknown>,
+	ref: string,
+): UnknownObject {
 	return JsonPointer.get(obj, ref) as UnknownObject;
 }
 
@@ -145,8 +152,8 @@ export default function formatSchema(
 		This ensures that the schema will be compliant by removing these custom properties and allowing the schema converter to customize the generated type if needed.
 	 */
 	if (schema) {
-		delete schema['tsType'];
-		delete schema['tsEnumNames'];
+		delete schema["tsType"];
+		delete schema["tsEnumNames"];
 	}
 
 	return schema;
