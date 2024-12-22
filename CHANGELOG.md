@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.2](https://github.com/nodecg/nodecg/compare/v2.3.1...v2.3.2) (2024-12-22)
+
+
+### Bug Fixes
+
+* reconnect socket in standalone dashboard ([#769](https://github.com/nodecg/nodecg/issues/769)) ([d171e87](https://github.com/nodecg/nodecg/commit/d171e87642485ef6f3cf0989e54b90362ae69c86))
+
 ## [2.3.1](https://github.com/nodecg/nodecg/compare/v2.3.0...v2.3.1) (2024-12-22)
 
 
