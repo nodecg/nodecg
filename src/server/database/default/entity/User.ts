@@ -1,18 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
-import { Role } from './Role';
-import { Identity } from './Identity';
-import { ApiKey } from './ApiKey';
-import type { User as UserModel } from '../../models';
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	CreateDateColumn,
+	ManyToMany,
+	JoinTable,
+	OneToMany,
+} from "typeorm";
+import { Role } from "./Role";
+import { Identity } from "./Identity";
+import { ApiKey } from "./ApiKey";
+import type { User as UserModel } from "../../models";
 
 @Entity()
 export class User implements UserModel {
-	@PrimaryGeneratedColumn('uuid')
+	@PrimaryGeneratedColumn("uuid")
 	id!: string;
 
 	@CreateDateColumn()
 	created_at!: number;
 
-	@Column('text')
+	@Column("text")
 	name!: string;
 
 	@ManyToMany(() => Role)

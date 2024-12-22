@@ -1,9 +1,9 @@
 // Ours
-import type { NodeCG } from './nodecg';
+import type { NodeCG } from "./nodecg";
 
 // Packages
-import type { Namespace, Server, Socket as ServerSocket } from 'socket.io';
-import type { Socket as ClientSocket } from 'socket.io-client';
+import type { Namespace, Server, Socket as ServerSocket } from "socket.io";
+import type { Socket as ClientSocket } from "socket.io-client";
 
 interface NodeCallback<T = undefined> {
 	(err: string, response: undefined): void;
@@ -11,12 +11,12 @@ interface NodeCallback<T = undefined> {
 }
 
 export enum UnAuthErrCode {
-	CredentialsBadFormat = 'credentials_bad_format',
-	CredentialsRequired = 'credentials_required',
-	InternalError = 'internal_error',
-	InvalidToken = 'invalid_token',
-	TokenRevoked = 'token_invalidated',
-	InvalidSession = 'invalid_session',
+	CredentialsBadFormat = "credentials_bad_format",
+	CredentialsRequired = "credentials_required",
+	InternalError = "internal_error",
+	InvalidToken = "invalid_token",
+	TokenRevoked = "token_invalidated",
+	InvalidSession = "invalid_session",
 }
 
 export type ProtocolError = {
@@ -35,28 +35,50 @@ export type GraphicRegRequest = {
 
 export interface ServerToClientEvents {
 	protocol_error: (error: ProtocolError) => void;
-	'graphic:bundleRefresh': (bundleName: string) => void;
-	'graphic:refreshAll': (graphic: NodeCG.Bundle.Graphic) => void;
-	'graphic:refresh': (graphicInstance: NodeCG.GraphicsInstance) => void;
-	'graphic:kill': (graphicInstance: NodeCG.GraphicsInstance) => void;
-	'replicant:operations': (data: {
+	"graphic:bundleRefresh": (bundleName: string) => void;
+	"graphic:refreshAll": (graphic: NodeCG.Bundle.Graphic) => void;
+	"graphic:refresh": (graphicInstance: NodeCG.GraphicsInstance) => void;
+	"graphic:kill": (graphicInstance: NodeCG.GraphicsInstance) => void;
+	"replicant:operations": (data: {
 		name: string;
 		namespace: string;
 		revision: number;
 		operations: Array<NodeCG.Replicant.Operation<any>>;
 	}) => void;
-	message: (data: { messageName: string; bundleName: string; content: unknown }) => void;
+	message: (data: {
+		messageName: string;
+		bundleName: string;
+		content: unknown;
+	}) => void;
 }
 
 export interface ClientToServerEvents {
 	regenerateToken: (callback: NodeCallback) => Promise<void>;
-	'graphic:registerSocket': (request: GraphicRegRequest, callback: NodeCallback<boolean>) => void;
-	'graphic:queryAvailability': (request: string, callback: NodeCallback<boolean>) => void;
-	'graphic:requestBundleRefresh': (request: string, callback: NodeCallback) => void;
-	'graphic:requestRefreshAll': (request: NodeCG.Bundle.Graphic, callback: NodeCallback) => void;
-	'graphic:requestRefresh': (request: NodeCG.GraphicsInstance, callback: NodeCallback) => void;
-	'graphic:requestKill': (request: NodeCG.GraphicsInstance, callback: NodeCallback) => void;
-	'replicant:declare': (
+	"graphic:registerSocket": (
+		request: GraphicRegRequest,
+		callback: NodeCallback<boolean>,
+	) => void;
+	"graphic:queryAvailability": (
+		request: string,
+		callback: NodeCallback<boolean>,
+	) => void;
+	"graphic:requestBundleRefresh": (
+		request: string,
+		callback: NodeCallback,
+	) => void;
+	"graphic:requestRefreshAll": (
+		request: NodeCG.Bundle.Graphic,
+		callback: NodeCallback,
+	) => void;
+	"graphic:requestRefresh": (
+		request: NodeCG.GraphicsInstance,
+		callback: NodeCallback,
+	) => void;
+	"graphic:requestKill": (
+		request: NodeCG.GraphicsInstance,
+		callback: NodeCallback,
+	) => void;
+	"replicant:declare": (
 		request: {
 			name: string;
 			namespace: string;
@@ -75,7 +97,7 @@ export interface ClientToServerEvents {
 			  }
 		>,
 	) => void;
-	'replicant:proposeOperations': (
+	"replicant:proposeOperations": (
 		request:
 			| {
 					name: string;
@@ -103,7 +125,7 @@ export interface ClientToServerEvents {
 			},
 		) => void,
 	) => void;
-	'replicant:read': (
+	"replicant:read": (
 		request: {
 			name: string;
 			namespace: string;
@@ -121,7 +143,16 @@ export interface ClientToServerEvents {
 	joinRoom: (request: string, callback: NodeCallback) => void;
 }
 
-export type TypedClientSocket = ClientSocket<ServerToClientEvents, ClientToServerEvents>;
-export type TypedSocketServer = Server<ClientToServerEvents, ServerToClientEvents>;
+export type TypedClientSocket = ClientSocket<
+	ServerToClientEvents,
+	ClientToServerEvents
+>;
+export type TypedSocketServer = Server<
+	ClientToServerEvents,
+	ServerToClientEvents
+>;
 export type RootNS = Namespace<ClientToServerEvents, ServerToClientEvents>;
-export type TypedServerSocket = ServerSocket<ClientToServerEvents, ServerToClientEvents>;
+export type TypedServerSocket = ServerSocket<
+	ClientToServerEvents,
+	ServerToClientEvents
+>;

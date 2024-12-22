@@ -1,7 +1,7 @@
 // Packages
-import type { ExecutionContext } from 'ava';
-import type * as Puppeteer from 'puppeteer';
-import type { NodeCG } from '../../src/types/nodecg';
+import type { ExecutionContext } from "ava";
+import type * as Puppeteer from "puppeteer";
+import type { NodeCG } from "../../src/types/nodecg";
 
 export const sleep = async (milliseconds: number): Promise<void> =>
 	new Promise((resolve) => {
@@ -13,19 +13,21 @@ export const waitOneTick = async (): Promise<void> =>
 		process.nextTick(resolve);
 	});
 
-export const waitForRegistration = async (page: Puppeteer.Page): Promise<unknown> => {
+export const waitForRegistration = async (
+	page: Puppeteer.Page,
+): Promise<unknown> => {
 	const response = await page.evaluate(
 		async () =>
 			new Promise((resolve) => {
 				if ((window as any).__nodecgRegistrationAccepted__) {
 					finish();
 				} else {
-					window.addEventListener('nodecg-registration-accepted', finish);
+					window.addEventListener("nodecg-registration-accepted", finish);
 				}
 
 				function finish(): void {
 					resolve((window as any).__refreshMarker__);
-					(window as any).__refreshMarker__ = '__refreshMarker__';
+					(window as any).__refreshMarker__ = "__refreshMarker__";
 				}
 			}),
 	);
@@ -51,14 +53,18 @@ export const shadowSelector = <T extends Element>(
 		return foundDom;
 	}, selectors) as any;
 
-export function invokeAck(t: ExecutionContext, ack?: NodeCG.Acknowledgement, ...args: any[]): void {
+export function invokeAck(
+	t: ExecutionContext,
+	ack?: NodeCG.Acknowledgement,
+	...args: any[]
+): void {
 	if (!ack) {
-		t.fail('no callback provided');
+		t.fail("no callback provided");
 		return;
 	}
 
 	if (ack.handled) {
-		t.fail('cb already handled');
+		t.fail("cb already handled");
 		return;
 	}
 

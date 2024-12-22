@@ -1,1 +1,1 @@
-import '../instance/client_registration';
+import "../instance/client_registration";

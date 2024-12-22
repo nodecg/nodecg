@@ -1,30 +1,32 @@
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-import express from 'express';
-import chokidar from 'chokidar';
-import multer from 'multer';
-import hasha from 'hasha';
-import { z } from 'zod';
-import { authCheck, debounceName, sendFile } from './util';
-import createLogger from './logger';
-import type Replicator from './replicant/replicator';
-import type ServerReplicant from './replicant/server-replicant';
-import type { NodeCG } from '../types/nodecg';
-import { stringifyError } from '../shared/utils/errors';
-import { NODECG_ROOT } from './nodecg-root';
+import * as fs from "node:fs";
+import * as path from "node:path";
+import express from "express";
+import chokidar from "chokidar";
+import multer from "multer";
+import hasha from "hasha";
+import { z } from "zod";
+import { authCheck, debounceName, sendFile } from "./util";
+import createLogger from "./logger";
+import type Replicator from "./replicant/replicator";
+import type ServerReplicant from "./replicant/server-replicant";
+import type { NodeCG } from "../types/nodecg";
+import { stringifyError } from "../shared/utils/errors";
+import { NODECG_ROOT } from "./nodecg-root";
 
 type Collection = {
 	name: string;
 	categories: NodeCG.Bundle.AssetCategory[];
 };
 
-const logger = createLogger('assets');
+const logger = createLogger("assets");
 
-const ASSETS_ROOT = path.join(NODECG_ROOT, 'assets');
+const ASSETS_ROOT = path.join(NODECG_ROOT, "assets");
 
 const createAssetFile = (filepath: string, sum: string): NodeCG.AssetFile => {
 	const parsedPath = path.parse(filepath);
-	const parts = parsedPath.dir.replace(ASSETS_ROOT + path.sep, '').split(path.sep);
+	const parts = parsedPath.dir
+		.replace(ASSETS_ROOT + path.sep, "")
+		.split(path.sep);
 
 	return {
 		sum,
@@ -49,14 +51,22 @@ const prepareNamespaceAssetsPath = (namespace: string) => {
 
 const repsByNamespace = new Map<
 	string,
-	Map<string, ServerReplicant<NodeCG.AssetFile[], NodeCG.Replicant.OptionsWithDefault<NodeCG.AssetFile[]>>>
+	Map<
+		string,
+		ServerReplicant<
+			NodeCG.AssetFile[],
+			NodeCG.Replicant.OptionsWithDefault<NodeCG.AssetFile[]>
+		>
+	>
 >();
 
 const getCollectRep = (namespace: string, category: string) => {
 	return repsByNamespace.get(namespace)?.get(category);
 };
 
-const resolveDeferreds = (deferredFiles: Map<string, NodeCG.AssetFile | undefined>) => {
+const resolveDeferreds = (
+	deferredFiles: Map<string, NodeCG.AssetFile | undefined>,
+) => {
 	let foundNull = false;
 	deferredFiles.forEach((uf) => {
 		if (uf === null) {
@@ -79,29 +89,39 @@ const resolveDeferreds = (deferredFiles: Map<string, NodeCG.AssetFile | undefine
 	}
 };
 
-export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Replicator) => {
+export const createAssetsMiddleware = (
+	bundles: NodeCG.Bundle[],
+	replicator: Replicator,
+) => {
 	if (!fs.existsSync(ASSETS_ROOT)) {
 		fs.mkdirSync(ASSETS_ROOT);
 	}
 
-	const collectionsRep = replicator.declare<Collection[]>('collections', '_assets', {
-		defaultValue: [],
-		persistent: false,
-	});
+	const collectionsRep = replicator.declare<Collection[]>(
+		"collections",
+		"_assets",
+		{
+			defaultValue: [],
+			persistent: false,
+		},
+	);
 
 	const collections: Collection[] = [];
 
 	for (const bundle of bundles) {
-		if (!bundle.hasAssignableSoundCues && (!bundle.assetCategories || bundle.assetCategories.length <= 0)) {
+		if (
+			!bundle.hasAssignableSoundCues &&
+			(!bundle.assetCategories || bundle.assetCategories.length <= 0)
+		) {
 			continue;
 		}
 
 		// If this bundle has sounds && at least one of those sounds is assignable, create the assets:sounds replicant.
 		if (bundle.hasAssignableSoundCues) {
 			bundle.assetCategories.unshift({
-				name: 'sounds',
-				title: 'Sounds',
-				allowedTypes: ['mp3', 'ogg'],
+				name: "sounds",
+				title: "Sounds",
+				allowedTypes: ["mp3", "ogg"],
 			});
 		}
 
@@ -117,10 +137,16 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 		const namespacedAssetsPath = prepareNamespaceAssetsPath(collection.name);
 		const collectionReps = new Map<
 			string,
-			ServerReplicant<NodeCG.AssetFile[], NodeCG.Replicant.OptionsWithDefault<NodeCG.AssetFile[]>>
+			ServerReplicant<
+				NodeCG.AssetFile[],
+				NodeCG.Replicant.OptionsWithDefault<NodeCG.AssetFile[]>
+			>
 		>();
 		repsByNamespace.set(collection.name, collectionReps);
-		collectionsRep.value.push({ name: collection.name, categories: collection.categories });
+		collectionsRep.value.push({
+			name: collection.name,
+			categories: collection.categories,
+		});
 
 		for (const category of collection.categories) {
 			const categoryPath = path.join(namespacedAssetsPath, category.name);
@@ -130,10 +156,14 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 
 			collectionReps.set(
 				category.name,
-				replicator.declare<NodeCG.AssetFile[]>(`assets:${category.name}`, collection.name, {
-					defaultValue: [],
-					persistent: false,
-				}),
+				replicator.declare<NodeCG.AssetFile[]>(
+					`assets:${category.name}`,
+					collection.name,
+					{
+						defaultValue: [],
+						persistent: false,
+					},
+				),
 			);
 
 			if (category.allowedTypes && category.allowedTypes.length > 0) {
@@ -147,8 +177,10 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 	}
 
 	// Chokidar does not accept Windows-style path separators when using globs
-	const fixedPaths = Array.from(watchPatterns).map((pattern) => pattern.replace(/\\/g, '/'));
-	const watcher = chokidar.watch(fixedPaths, { ignored: '**/.*' });
+	const fixedPaths = Array.from(watchPatterns).map((pattern) =>
+		pattern.replace(/\\/g, "/"),
+	);
+	const watcher = chokidar.watch(fixedPaths, { ignored: "**/.*" });
 
 	/**
 	 * When the Chokidar watcher first starts up, it will fire an 'add' event for each file found.
@@ -158,19 +190,22 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 	 */
 	let ready = false;
 	const deferredFiles = new Map<string, NodeCG.AssetFile | undefined>();
-	watcher.on('add', async (filepath) => {
+	watcher.on("add", async (filepath) => {
 		if (!ready) {
 			deferredFiles.set(filepath, undefined);
 		}
 
 		try {
-			const sum = await hasha.fromFile(filepath, { algorithm: 'sha1' });
+			const sum = await hasha.fromFile(filepath, { algorithm: "sha1" });
 			const uploadedFile = createAssetFile(filepath, sum);
 			if (deferredFiles) {
 				deferredFiles.set(filepath, uploadedFile);
 				resolveDeferreds(deferredFiles);
 			} else {
-				const rep = getCollectRep(uploadedFile.namespace, uploadedFile.category);
+				const rep = getCollectRep(
+					uploadedFile.namespace,
+					uploadedFile.category,
+				);
 				if (rep) {
 					rep.value.push(uploadedFile);
 				}
@@ -184,21 +219,26 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 		}
 	});
 
-	watcher.on('ready', () => {
+	watcher.on("ready", () => {
 		ready = true;
 	});
 
-	watcher.on('change', (filepath) => {
+	watcher.on("change", (filepath) => {
 		debounceName(filepath, async () => {
 			try {
-				const sum = await hasha.fromFile(filepath, { algorithm: 'sha1' });
+				const sum = await hasha.fromFile(filepath, { algorithm: "sha1" });
 				const newUploadedFile = createAssetFile(filepath, sum);
-				const rep = getCollectRep(newUploadedFile.namespace, newUploadedFile.category);
+				const rep = getCollectRep(
+					newUploadedFile.namespace,
+					newUploadedFile.category,
+				);
 				if (!rep) {
-					throw new Error('should have had a replicant here');
+					throw new Error("should have had a replicant here");
 				}
 
-				const index = rep.value.findIndex((uf) => uf.url === newUploadedFile.url);
+				const index = rep.value.findIndex(
+					(uf) => uf.url === newUploadedFile.url,
+				);
 				if (index > -1) {
 					rep.value.splice(index, 1, newUploadedFile);
 				} else {
@@ -210,8 +250,8 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 		});
 	});
 
-	watcher.on('unlink', (filepath) => {
-		const deletedFile = createAssetFile(filepath, 'temp');
+	watcher.on("unlink", (filepath) => {
+		const deletedFile = createAssetFile(filepath, "temp");
 		const rep = getCollectRep(deletedFile.namespace, deletedFile.category);
 		if (!rep) {
 			return;
@@ -228,7 +268,7 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 		});
 	});
 
-	watcher.on('error', (e) => {
+	watcher.on("error", (e) => {
 		logger.error(e.stack);
 	});
 
@@ -241,12 +281,12 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 				const params = req.params;
 				cb(
 					null,
-					`${params['namespace']}/${params['category']}/${Buffer.from(file.originalname, 'latin1').toString('utf8')}`,
+					`${params["namespace"]}/${params["category"]}/${Buffer.from(file.originalname, "latin1").toString("utf8")}`,
 				);
 			},
 		}),
 	});
-	const uploader = upload.array('file', 64);
+	const uploader = upload.array("file", 64);
 
 	// Retrieving existing files
 	const getParamsSchema = z.object({
@@ -255,7 +295,7 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 		filePath: z.string(),
 	});
 	assetsRouter.get(
-		'/:namespace/:category/:filePath',
+		"/:namespace/:category/:filePath",
 
 		// Check if the user is authorized.
 		authCheck,
@@ -264,14 +304,19 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 		(req, res, next) => {
 			const params = getParamsSchema.parse(req.params);
 			const parentDir = ASSETS_ROOT;
-			const fullPath = path.join(parentDir, params.namespace, params.category, params.filePath);
+			const fullPath = path.join(
+				parentDir,
+				params.namespace,
+				params.category,
+				params.filePath,
+			);
 			sendFile(parentDir, fullPath, res, next);
 		},
 	);
 
 	// Upload new files
 	assetsRouter.post(
-		'/:namespace/:category',
+		"/:namespace/:category",
 
 		// Check if the user is authorized.
 		authCheck,
@@ -292,9 +337,9 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 		// Then send a response.
 		(req, res) => {
 			if (req.files) {
-				res.status(200).send('Success');
+				res.status(200).send("Success");
 			} else {
-				res.status(400).send('Bad Request');
+				res.status(400).send("Bad Request");
 			}
 		},
 	);
@@ -306,7 +351,7 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 		filename: z.string(),
 	});
 	assetsRouter.delete(
-		'/:namespace/:category/:filename',
+		"/:namespace/:category/:filename",
 
 		// Check if the user is authorized.
 		authCheck,
@@ -314,16 +359,25 @@ export const createAssetsMiddleware = (bundles: NodeCG.Bundle[], replicator: Rep
 		// Delete the file (or an send appropriate error).
 		(req, res) => {
 			const params = deleteParamsSchema.parse(req.params);
-			const fullPath = path.join(ASSETS_ROOT, params.namespace, params.category, params.filename);
+			const fullPath = path.join(
+				ASSETS_ROOT,
+				params.namespace,
+				params.category,
+				params.filename,
+			);
 
 			fs.unlink(fullPath, (err) => {
 				if (err) {
-					if (err.code === 'ENOENT') {
-						return res.status(410).send(`The file to delete does not exist: ${params.filename}`);
+					if (err.code === "ENOENT") {
+						return res
+							.status(410)
+							.send(`The file to delete does not exist: ${params.filename}`);
 					}
 
 					logger.error(`Failed to delete file ${fullPath}`, err);
-					return res.status(500).send(`Failed to delete file: ${params.filename}`);
+					return res
+						.status(500)
+						.send(`Failed to delete file: ${params.filename}`);
 				}
 
 				return res.sendStatus(200);

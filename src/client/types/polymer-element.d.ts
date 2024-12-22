@@ -1,6 +1,6 @@
-import { ElementMixin } from './element-mixin';
+import { ElementMixin } from "./element-mixin";
 
-export { html } from '@polymer/polymer/lib/utils/html-tag.js';
+export { html } from "@polymer/polymer/lib/utils/html-tag.js";
 
 export { PolymerElement };
 

@@ -1,5 +1,5 @@
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import * as Polymer from '@polymer/polymer';
+import "@polymer/iron-flex-layout/iron-flex-layout.js";
+import * as Polymer from "@polymer/polymer";
 class UtilScrollable extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`
@@ -43,14 +43,14 @@ class UtilScrollable extends Polymer.PolymerElement {
 	}
 
 	static get is() {
-		return 'util-scrollable';
+		return "util-scrollable";
 	}
 
 	/**
 	 * Returns the scrolling element.
 	 */
 	get scrollTarget() {
-		return this.$['scrollable'];
+		return this.$["scrollable"];
 	}
 
 	attached() {
@@ -58,14 +58,18 @@ class UtilScrollable extends Polymer.PolymerElement {
 	}
 
 	updateScrollState() {
-		this.classList.toggle('is-scrolled', this.scrollTarget.scrollTop > 0);
-		this.classList.toggle('can-scroll', this.scrollTarget.offsetHeight < this.scrollTarget.scrollHeight);
+		this.classList.toggle("is-scrolled", this.scrollTarget.scrollTop > 0);
 		this.classList.toggle(
-			'scrolled-to-bottom',
+			"can-scroll",
+			this.scrollTarget.offsetHeight < this.scrollTarget.scrollHeight,
+		);
+		this.classList.toggle(
+			"scrolled-to-bottom",
 
-			this.scrollTarget.scrollTop + this.scrollTarget.offsetHeight >= this.scrollTarget.scrollHeight,
+			this.scrollTarget.scrollTop + this.scrollTarget.offsetHeight >=
+				this.scrollTarget.scrollHeight,
 		);
 	}
 }
 
-customElements.define('util-scrollable', UtilScrollable);
+customElements.define("util-scrollable", UtilScrollable);

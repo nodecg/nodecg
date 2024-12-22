@@ -1,10 +1,10 @@
-import * as path from 'node:path';
-import { format, inspect } from 'node:util';
-import * as fs from 'fs-extra';
-import winston from 'winston';
-import type * as Sentry from '@sentry/node';
-import type { LoggerInterface } from '../../types/logger-interface';
-import { LogLevel } from '../../types/logger-interface';
+import * as path from "node:path";
+import { format, inspect } from "node:util";
+import * as fs from "fs-extra";
+import winston from "winston";
+import type * as Sentry from "@sentry/node";
+import type { LoggerInterface } from "../../types/logger-interface";
+import { LogLevel } from "../../types/logger-interface";
 
 type LoggerOptions = {
 	console: Partial<{
@@ -28,22 +28,26 @@ type LoggerOptions = {
  * @returns A constructor used to create discrete logger instances.
  */
 
-export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeof Sentry | undefined = undefined) {
+export default function (
+	initialOpts: Partial<LoggerOptions> = {},
+	sentry: typeof Sentry | undefined = undefined,
+) {
 	initialOpts = initialOpts || {};
 	initialOpts.console = initialOpts.console ?? {};
 	initialOpts.file = initialOpts.file ?? {};
-	initialOpts.file.path = initialOpts.file.path ?? 'logs/nodecg.log';
+	initialOpts.file.path = initialOpts.file.path ?? "logs/nodecg.log";
 
 	const consoleTransport = new winston.transports.Console({
 		level: initialOpts.console.level ?? LogLevel.Info,
 		silent: !initialOpts.console.enabled,
-		stderrLevels: ['warn', 'error'],
+		stderrLevels: ["warn", "error"],
 		format: winston.format.combine(
-			winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), // Format local time for console.
+			winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Format local time for console.
 			winston.format.errors({ stack: true }),
 			winston.format.colorize(),
 			winston.format.printf(
-				(info) => `${initialOpts?.console?.timestamps ? `${info['timestamp']} - ` : ''}${info.level}: ${info.message}`,
+				(info) =>
+					`${initialOpts?.console?.timestamps ? `${info["timestamp"]} - ` : ""}${info.level}: ${info.message}`,
 			),
 		),
 	});
@@ -56,12 +60,13 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 			winston.format.timestamp(), // Leave formatting as ISO 8601 UTC for file.
 			winston.format.errors({ stack: true }),
 			winston.format.printf(
-				(info) => `${initialOpts?.file?.timestamps ? `${info['timestamp']} - ` : ''}${info.level}: ${info.message}`,
+				(info) =>
+					`${initialOpts?.file?.timestamps ? `${info["timestamp"]} - ` : ""}${info.level}: ${info.message}`,
 			),
 		),
 	});
 
-	if (typeof initialOpts.file.path !== 'undefined') {
+	if (typeof initialOpts.file.path !== "undefined") {
 		fileTransport.filename = initialOpts.file.path;
 
 		// Make logs folder if it does not exist.
@@ -71,11 +76,11 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 	}
 
 	winston.addColors({
-		verbose: 'green',
-		debug: 'cyan',
-		info: 'white',
-		warn: 'yellow',
-		error: 'red',
+		verbose: "green",
+		debug: "cyan",
+		info: "white",
+		warn: "yellow",
+		error: "red",
 	});
 
 	const consoleLogger = winston.createLogger({
@@ -113,7 +118,9 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 		static readonly _fileLogger = fileLogger;
 
 		// A messy bit of internal state used to determine if the special-case "replicants" logging level is active.
-		static _shouldConsoleLogReplicants = Boolean(initialOpts.console?.replicants);
+		static _shouldConsoleLogReplicants = Boolean(
+			initialOpts.console?.replicants,
+		);
 		static _shouldFileLogReplicants = Boolean(initialOpts.file?.replicants);
 
 		constructor(public name: string) {
@@ -151,16 +158,25 @@ export default function (initialOpts: Partial<LoggerOptions> = {}, sentry: typeo
 
 			if (sentry) {
 				const formattedArgs = args.map((argument) =>
-					typeof argument === 'object' ? inspect(argument, { depth: null, showProxy: true }) : argument,
+					typeof argument === "object"
+						? inspect(argument, { depth: null, showProxy: true })
+						: argument,
 				);
 
-				sentry.captureException(new Error(`[${this.name}] ` + format(formattedArgs[0], ...formattedArgs.slice(1))));
+				sentry.captureException(
+					new Error(
+						`[${this.name}] ` +
+							format(formattedArgs[0], ...formattedArgs.slice(1)),
+					),
+				);
 			}
 		}
 
 		replicants(...args: any[]): void {
 			if (Logger._shouldConsoleLogReplicants) {
-				consoleLogger.info(`[${this.name}] ${format(args[0], ...args.slice(1))}`);
+				consoleLogger.info(
+					`[${this.name}] ${format(args[0], ...args.slice(1))}`,
+				);
 			}
 
 			if (Logger._shouldFileLogReplicants) {

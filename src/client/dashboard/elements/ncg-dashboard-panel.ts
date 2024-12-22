@@ -1,11 +1,11 @@
-import '@polymer/iron-collapse/iron-collapse.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-localstorage/iron-localstorage.js';
-import '@polymer/paper-styles/element-styles/paper-material-styles.js';
-import '@polymer/paper-styles/typography.js';
-import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
-import * as Polymer from '@polymer/polymer';
-import { iframeResizer } from 'iframe-resizer';
+import "@polymer/iron-collapse/iron-collapse.js";
+import "@polymer/iron-flex-layout/iron-flex-layout.js";
+import "@polymer/iron-localstorage/iron-localstorage.js";
+import "@polymer/paper-styles/element-styles/paper-material-styles.js";
+import "@polymer/paper-styles/typography.js";
+import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
+import * as Polymer from "@polymer/polymer";
+import { iframeResizer } from "iframe-resizer";
 
 const HEX_PARSE_SHORTHAND_REGEX = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 const HEX_PARSE_REGEX = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
@@ -185,7 +185,7 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 	}
 
 	static get is() {
-		return 'ncg-dashboard-panel';
+		return "ncg-dashboard-panel";
 	}
 
 	static get properties() {
@@ -205,12 +205,12 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 			opened: {
 				type: Boolean,
 				reflectToAttribute: true,
-				observer: '_openedChanged',
+				observer: "_openedChanged",
 			},
 			headerColor: {
 				type: String,
 				reflectToAttribute: true,
-				observer: '_headerColorChanged',
+				observer: "_headerColorChanged",
 			},
 			width: {
 				type: Number,
@@ -231,27 +231,29 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 		super.ready();
 
 		afterNextRender(this, async () => {
-			const distributedNodes: HTMLElement[] = this.$['slot'].assignedNodes({
+			const distributedNodes: HTMLElement[] = this.$["slot"].assignedNodes({
 				flatten: true,
 			});
-			const iframe = distributedNodes.find((el) => el.tagName === 'IFRAME') as HTMLIFrameElement;
+			const iframe = distributedNodes.find(
+				(el) => el.tagName === "IFRAME",
+			) as HTMLIFrameElement;
 
 			// If Sentry is enabled, use it to report errors in panels to Sentry.io.
 			if (window.ncgConfig.sentry.enabled) {
-				const Sentry = await import('@sentry/browser');
-				iframe.contentWindow!.addEventListener('error', (event) => {
+				const Sentry = await import("@sentry/browser");
+				iframe.contentWindow!.addEventListener("error", (event) => {
 					Sentry.captureException(event.error);
 				});
-				iframe.contentWindow!.addEventListener('unhandledrejection', (err) => {
+				iframe.contentWindow!.addEventListener("unhandledrejection", (err) => {
 					Sentry.captureException(err.reason);
 				});
 			}
 
-			if (!this['fullbleed']) {
-				if (iframe.contentWindow!.document.readyState === 'complete') {
+			if (!this["fullbleed"]) {
+				if (iframe.contentWindow!.document.readyState === "complete") {
 					this._attachIframeResize(iframe);
 				} else {
-					iframe.addEventListener('load', () => {
+					iframe.addEventListener("load", () => {
 						this._attachIframeResize(iframe);
 					});
 				}
@@ -263,11 +265,11 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 		iframeResizer(
 			{
 				log: false,
-				resizeFrom: 'child',
-				heightCalculationMethod: 'documentElementOffset',
+				resizeFrom: "child",
+				heightCalculationMethod: "documentElementOffset",
 				onResized: (data: any) => {
-					this.$['collapse'].updateSize('auto', false);
-					data.iframe.dispatchEvent(new CustomEvent('iframe-resized'));
+					this.$["collapse"].updateSize("auto", false);
+					data.iframe.dispatchEvent(new CustomEvent("iframe-resized"));
 				},
 			},
 			iframe,
@@ -277,29 +279,31 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 	override connectedCallback(): void {
 		super.connectedCallback();
 
-		const { src } = this.querySelector('iframe')!;
-		this['standaloneUrl'] = `${src}?standalone=true`;
+		const { src } = this.querySelector("iframe")!;
+		this["standaloneUrl"] = `${src}?standalone=true`;
 	}
 
 	toggleCollapse() {
-		this.$['collapse'].toggle();
+		this.$["collapse"].toggle();
 	}
 
 	initializeDefaultOpened() {
-		this['opened'] = true;
+		this["opened"] = true;
 	}
 
 	_openedChanged(newVal: boolean) {
-		this.$['expandBtn'].icon = newVal ? 'unfold-less' : 'unfold-more';
+		this.$["expandBtn"].icon = newVal ? "unfold-less" : "unfold-more";
 	}
 
 	_headerColorChanged(newVal: string) {
-		this.$['header'].style.backgroundColor = newVal;
-		this.$['buttons'].style.background = this._calcLinearGradient(this._hexToRGB(newVal)!);
+		this.$["header"].style.backgroundColor = newVal;
+		this.$["buttons"].style.background = this._calcLinearGradient(
+			this._hexToRGB(newVal)!,
+		);
 	}
 
 	computeLocalStorageName(bundle: string, panel: string) {
-		return [bundle, panel, 'opened'].join('.');
+		return [bundle, panel, "opened"].join(".");
 	}
 
 	_calcLinearGradient(rgb: { r: number; g: number; b: number }) {
@@ -310,7 +314,10 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 	/* istanbul ignore next: tseems to confuse coverage */
 	_hexToRGB(hex: string) {
 		// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-		hex = hex.replace(HEX_PARSE_SHORTHAND_REGEX, (_m, r, g, b) => r + r + g + g + b + b);
+		hex = hex.replace(
+			HEX_PARSE_SHORTHAND_REGEX,
+			(_m, r, g, b) => r + r + g + g + b + b,
+		);
 
 		const result = HEX_PARSE_REGEX.exec(hex);
 		return result
@@ -323,4 +330,4 @@ export default class NcgDashboardPanel extends Polymer.PolymerElement {
 	}
 }
 
-customElements.define('ncg-dashboard-panel', NcgDashboardPanel);
+customElements.define("ncg-dashboard-panel", NcgDashboardPanel);

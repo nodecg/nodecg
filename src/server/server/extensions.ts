@@ -1,21 +1,21 @@
-import { EventEmitter } from 'node:events';
-import * as path from 'node:path';
-import semver from 'semver';
-import * as Sentry from '@sentry/node';
-import extensionApiClassFactory from '../api.server';
-import createLogger from '../logger';
-import type { Replicator } from '../replicant';
-import type { RootNS } from '../../types/socket-protocol';
-import type BundleManager from '../bundle-manager';
-import type { NodeCG } from '../../types/nodecg';
-import { stringifyError } from '../../shared/utils/errors';
-import { sentryEnabled } from '../config';
+import { EventEmitter } from "node:events";
+import * as path from "node:path";
+import semver from "semver";
+import * as Sentry from "@sentry/node";
+import extensionApiClassFactory from "../api.server";
+import createLogger from "../logger";
+import type { Replicator } from "../replicant";
+import type { RootNS } from "../../types/socket-protocol";
+import type BundleManager from "../bundle-manager";
+import type { NodeCG } from "../../types/nodecg";
+import { stringifyError } from "../../shared/utils/errors";
+import { sentryEnabled } from "../config";
 
-const log = createLogger('extensions');
+const log = createLogger("extensions");
 
 export type ExtensionEventMap = {
-	login: (user: Express.Request['user']) => void;
-	logout: (user: Express.Request['user']) => void;
+	login: (user: Express.Request["user"]) => void;
+	logout: (user: Express.Request["user"]) => void;
 	extensionsLoaded: () => void;
 	serverStarted: () => void;
 	serverStopping: () => void;
@@ -30,14 +30,26 @@ export default class ExtensionManager extends EventEmitter {
 
 	private readonly _bundleManager: BundleManager;
 
-	private readonly _apiInstances = new Set<InstanceType<ReturnType<typeof extensionApiClassFactory>>>();
+	private readonly _apiInstances = new Set<
+		InstanceType<ReturnType<typeof extensionApiClassFactory>>
+	>();
 
-	constructor(io: RootNS, bundleManager: BundleManager, replicator: Replicator, mount: NodeCG.Middleware) {
+	constructor(
+		io: RootNS,
+		bundleManager: BundleManager,
+		replicator: Replicator,
+		mount: NodeCG.Middleware,
+	) {
 		super();
 
-		log.trace('Starting extension mounting');
+		log.trace("Starting extension mounting");
 		this._bundleManager = bundleManager;
-		this._ExtensionApi = extensionApiClassFactory(io, replicator, this.extensions, mount);
+		this._ExtensionApi = extensionApiClassFactory(
+			io,
+			replicator,
+			this.extensions,
+			mount,
+		);
 
 		// Prevent us from messing with other listeners of this event
 		const allBundles = bundleManager.all();
@@ -50,7 +62,7 @@ export default class ExtensionManager extends EventEmitter {
 			for (let i = 0; i < startLen; i++) {
 				// If this bundle has no dependencies, load it and remove it from the list
 				if (!allBundles[i]!.bundleDependencies) {
-					log.debug('Bundle %s has no dependencies', allBundles[i]!.name);
+					log.debug("Bundle %s has no dependencies", allBundles[i]!.name);
 
 					if (allBundles[i]!.hasExtension) {
 						this._loadExtension(allBundles[i]!);
@@ -63,7 +75,10 @@ export default class ExtensionManager extends EventEmitter {
 
 				// If this bundle has dependencies, and all of them are satisfied, load it and remove it from the list
 				if (this._bundleDepsSatisfied(allBundles[i]!, fullyLoaded)) {
-					log.debug('Bundle %s has extension with satisfied dependencies', allBundles[i]!.name);
+					log.debug(
+						"Bundle %s has extension with satisfied dependencies",
+						allBundles[i]!.name,
+					);
 
 					if (allBundles[i]!.hasExtension) {
 						this._loadExtension(allBundles[i]!);
@@ -101,17 +116,20 @@ export default class ExtensionManager extends EventEmitter {
 					log.error(
 						'Bundle "%s" can not be loaded, as it has unsatisfied dependencies:\n',
 						bundle.name,
-						unsatisfiedDeps.join(', '),
+						unsatisfiedDeps.join(", "),
 					);
 					bundleManager.remove(bundle.name);
 				});
 
-				log.error('%d bundle(s) can not be loaded because they have unsatisfied dependencies', endLen);
+				log.error(
+					"%d bundle(s) can not be loaded because they have unsatisfied dependencies",
+					endLen,
+				);
 				break;
 			}
 		}
 
-		log.trace('Completed extension mounting');
+		log.trace("Completed extension mounting");
 	}
 
 	public emitToAllInstances<K extends keyof ExtensionEventMap>(
@@ -125,7 +143,7 @@ export default class ExtensionManager extends EventEmitter {
 
 	private _loadExtension(bundle: NodeCG.Bundle): void {
 		const ExtensionApi = this._ExtensionApi;
-		const extPath = path.join(bundle.dir, 'extension');
+		const extPath = path.join(bundle.dir, "extension");
 		try {
 			const requireFunc = process.env.NODECG_TEST ? require : module.require;
 			let mod = requireFunc(extPath);
@@ -138,11 +156,15 @@ export default class ExtensionManager extends EventEmitter {
 			const apiInstance = new ExtensionApi(bundle);
 			this._apiInstances.add(apiInstance);
 			const extension = mod(apiInstance);
-			log.info('Mounted %s extension', bundle.name);
+			log.info("Mounted %s extension", bundle.name);
 			this.extensions[bundle.name] = extension;
 		} catch (err: unknown) {
 			this._bundleManager.remove(bundle.name);
-			log.warn('Failed to mount %s extension:\n', bundle.name, stringifyError(err));
+			log.warn(
+				"Failed to mount %s extension:\n",
+				bundle.name,
+				stringifyError(err),
+			);
 			if (sentryEnabled) {
 				(err as Error).message = `Failed to mount ${bundle.name} extension: ${
 					// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
@@ -153,7 +175,10 @@ export default class ExtensionManager extends EventEmitter {
 		}
 	}
 
-	private _bundleDepsSatisfied(bundle: NodeCG.Bundle, loadedBundles: NodeCG.Bundle[]): boolean {
+	private _bundleDepsSatisfied(
+		bundle: NodeCG.Bundle,
+		loadedBundles: NodeCG.Bundle[],
+	): boolean {
 		const deps = bundle.bundleDependencies;
 		if (!deps) {
 			return true;

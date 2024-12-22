@@ -1,4 +1,4 @@
 /* eslint-env browser */
-'use strict';
+"use strict";
 
 window.parent.dashboardApi = window.nodecg;

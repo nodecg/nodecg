@@ -1,1 +1,1 @@
-export * from '../dashboard/js/dialog_opener';
+export * from "../dashboard/js/dialog_opener";

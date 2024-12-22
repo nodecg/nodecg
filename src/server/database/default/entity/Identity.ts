@@ -1,31 +1,31 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { User } from './User';
-import type { Identity as IdentityModel } from '../../models';
+import { Entity, ManyToOne, PrimaryGeneratedColumn, Column } from "typeorm";
+import { User } from "./User";
+import type { Identity as IdentityModel } from "../../models";
 
 @Entity()
 export class Identity implements IdentityModel {
-	@PrimaryGeneratedColumn('uuid')
+	@PrimaryGeneratedColumn("uuid")
 	id!: string;
 
-	@Column('text')
-	provider_type!: 'twitch' | 'steam' | 'local' | 'discord';
+	@Column("text")
+	provider_type!: "twitch" | "steam" | "local" | "discord";
 
 	/**
 	 * Hashed password for local, auth token from twitch, etc.
 	 */
-	@Column('text')
+	@Column("text")
 	provider_hash!: string;
 
 	/**
 	 * Only used by Twitch and Discord providers.
 	 */
-	@Column('text', { nullable: true })
+	@Column("text", { nullable: true })
 	provider_access_token: string | null = null;
 
 	/**
 	 * Only used by Twitch and Discord providers.
 	 */
-	@Column('text', { nullable: true })
+	@Column("text", { nullable: true })
 	provider_refresh_token: string | null = null;
 
 	@ManyToOne(() => User, (user) => user.identities)
