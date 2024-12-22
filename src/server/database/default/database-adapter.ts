@@ -1,5 +1,4 @@
-import { getConnection } from './connection';
-import { User, Role, Identity, ApiKey, Replicant } from './entity';
+import { getConnection, User, Role, Identity, ApiKey, Replicant } from './connection';
 import type { DatabaseAdapter } from '../../../types/database-adapter';
 
 async function findUser(id: User['id']): Promise<User | null> {

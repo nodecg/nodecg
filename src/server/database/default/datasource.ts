@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import path from 'node:path';
 import { DataSource } from 'typeorm';
+export * from './entity';
 import { ApiKey, Identity, Permission, Replicant, Role, User } from './entity';
 import { nodecgRootPath } from '../../../shared/utils/rootPath';
 import { testing } from './connection';
