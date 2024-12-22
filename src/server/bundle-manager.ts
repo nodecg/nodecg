@@ -4,7 +4,7 @@ import path from "path";
 // Packages
 import fs from "fs-extra";
 import chokidar from "chokidar";
-import debounce from "lodash.debounce";
+import { debounce } from "lodash";
 import semver from "semver";
 import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
 
