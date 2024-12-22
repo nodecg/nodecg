@@ -1,4 +1,4 @@
-import type { User as UserModel } from "../database/models";
+import type { User as UserModel } from "../../types/models";
 
 declare global {
 	// eslint-disable-next-line @typescript-eslint/no-namespace

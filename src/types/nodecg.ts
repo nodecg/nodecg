@@ -6,6 +6,7 @@ import type {
 	ClientToServerEvents,
 } from "./socket-protocol";
 import { NodeCGConfig } from "./nodecg-config-schema";
+import { DatabaseAdapter } from "./database-adapter";
 
 type Person =
 	| {
@@ -172,6 +173,10 @@ export namespace NodeCG {
 		export type UnknownConfig = Record<string, unknown>;
 	}
 
+	export type NodecgBundleConfig = {
+		databaseAdapter?: DatabaseAdapter;
+	};
+
 	/**
 	 * The actual type of a `bundle`.
 	 */
@@ -199,6 +204,7 @@ export namespace NodeCG {
 		soundCues: Bundle.SoundCue[];
 		compatibleRange: string;
 		bundleDependencies?: Bundle.BundleDependencies;
+		nodecgBundleConfig: NodecgBundleConfig;
 	};
 
 	/**

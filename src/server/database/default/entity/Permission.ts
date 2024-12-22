@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/prefer-literal-enum-member */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Role } from "./Role";
-import type { Permission as PermissionModel } from "../../models";
+import type { Permission as PermissionModel } from "../../../../types/models";
 
 export const enum Action {
 	NONE = 0,

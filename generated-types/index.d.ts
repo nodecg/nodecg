@@ -2,21 +2,20 @@
 // This file is for the typings package only.
 /// <reference types="passport" />
 /// <reference path="./server/types/augment-express-user.d.ts" />
-import type { NodeCG } from './types/nodecg';
-import type { NodeCGAPIClient } from './client/api/api.client';
-import type serverApiFactory from './server/api.server';
-import type * as LoggerStuff from './types/logger-interface';
-import type { AbstractReplicant } from './shared/replicants.shared';
-import { DeepReadonly } from 'ts-essentials';
+import type { NodeCG } from "./types/nodecg";
+import type { NodeCGAPIClient } from "./client/api/api.client";
+import type serverApiFactory from "./server/api.server";
+import type * as LoggerStuff from "./types/logger-interface";
+import type { AbstractReplicant } from "./shared/replicants.shared";
+import { DeepReadonly } from "ts-essentials";
 
-type NodeCGAPIServer<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> = Omit<
-	InstanceType<ReturnType<typeof serverApiFactory>>,
-	'bundleConfig'
-> & {
+type NodeCGAPIServer<
+	C extends Record<string, any> = NodeCG.Bundle.UnknownConfig,
+> = Omit<InstanceType<ReturnType<typeof serverApiFactory>>, "bundleConfig"> & {
 	bundleConfig: DeepReadonly<C>;
 };
 
-declare module './types/nodecg' {
+declare module "./types/nodecg" {
 	/**
 	 * A collection of types that describe NodeCG's APIs.
 	 */
@@ -26,13 +25,17 @@ declare module './types/nodecg' {
 		 * The primary interface for the client-side API, used in dashboards and graphics.
 		 * Use Intellisense (aka autocomplete) to explore the avaiable properties and methods.
 		 */
-		export type ClientAPI<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> = NodeCGAPIClient<C>;
+		export type ClientAPI<
+			C extends Record<string, any> = NodeCG.Bundle.UnknownConfig,
+		> = NodeCGAPIClient<C>;
 
 		/**
 		 * The primary interface for the server-side API, used in extensions.
 		 * Use Intellisense (aka autocomplete) to explore the avaiable properties and methods.
 		 */
-		export type ServerAPI<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> = NodeCGAPIServer<C>;
+		export type ServerAPI<
+			C extends Record<string, any> = NodeCG.Bundle.UnknownConfig,
+		> = NodeCGAPIServer<C>;
 
 		/**
 		 * A Replicant used in client-side (dashboard, graphic) code.
@@ -40,7 +43,7 @@ declare module './types/nodecg' {
 		export type ClientReplicant<
 			V,
 			O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
-		> = AbstractReplicant<'client', V, O>;
+		> = AbstractReplicant<"client", V, O>;
 
 		/**
 		 * A Replicant used in server-side (extension) code.
@@ -48,7 +51,7 @@ declare module './types/nodecg' {
 		export type ServerReplicant<
 			V,
 			O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
-		> = AbstractReplicant<'server', V, O>;
+		> = AbstractReplicant<"server", V, O>;
 
 		/**
 		 * A Replicant used in server-side (extension) code with an assertion that it will have a default value provided by its schema.
@@ -56,8 +59,9 @@ declare module './types/nodecg' {
 		 */
 		export type ServerReplicantWithSchemaDefault<
 			V,
-			O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault,
-		> = AbstractReplicant<'server', V, O, true>;
+			O extends
+				NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault,
+		> = AbstractReplicant<"server", V, O, true>;
 
 		/**
 		 * An interface represting a NodeCG.Logger instance.

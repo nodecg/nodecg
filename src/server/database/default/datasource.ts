@@ -1,21 +1,14 @@
-import * as path from "node:path";
-
 import "reflect-metadata";
+
+import path from "node:path";
 import { DataSource } from "typeorm";
 export * from "./entity";
-
-import { User } from "./entity/User";
-import { Role } from "./entity/Role";
-import { Replicant } from "./entity/Replicant";
-import { Permission } from "./entity/Permission";
-import { Identity } from "./entity/Identity";
-import { ApiKey } from "./entity/ApiKey";
+import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
 import { nodecgRootPath } from "../../../shared/utils/rootPath";
 
-const dbPath = path.join(nodecgRootPath, "db/nodecg.sqlite3");
-export const testing = process.env.NODECG_TEST?.toLowerCase() === "true";
+const testing = process.env.NODECG_TEST?.toLowerCase() === "true";
 
-const dataSource = new DataSource({
+export const dataSource = new DataSource({
 	type: "better-sqlite3",
 
 	/**
@@ -29,7 +22,9 @@ const dataSource = new DataSource({
 	 * But, bad docs aside, it is still useful
 	 * and we use it for tests.
 	 */
-	database: testing ? ":memory:" : dbPath,
+	database: testing
+		? ":memory:"
+		: path.join(nodecgRootPath, "db/nodecg.sqlite3"),
 	logging: false,
 	entities: [ApiKey, Identity, Permission, Replicant, Role, User],
 	migrations: [
@@ -38,5 +33,3 @@ const dataSource = new DataSource({
 	migrationsRun: true,
 	synchronize: false,
 });
-
-export default dataSource;
