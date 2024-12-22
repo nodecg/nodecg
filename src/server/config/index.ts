@@ -1,10 +1,11 @@
-import * as path from 'node:path';
-import * as fs from 'node:fs';
-import { argv } from 'yargs';
-import { loadConfig } from './loader';
-import { NODECG_ROOT } from '../nodecg-root';
+import * as path from "node:path";
+import * as fs from "node:fs";
+import { argv } from "yargs";
+import { loadConfig } from "./loader";
+import { NODECG_ROOT } from "../nodecg-root";
 
-const cfgDirectoryPath = (argv['cfgPath'] as string) ?? path.join(NODECG_ROOT, 'cfg');
+const cfgDirectoryPath =
+	(argv["cfgPath"] as string) ?? path.join(NODECG_ROOT, "cfg");
 
 // Make 'cfg' folder if it doesn't exist
 if (!fs.existsSync(cfgDirectoryPath)) {

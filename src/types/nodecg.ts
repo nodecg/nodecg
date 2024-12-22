@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import type * as ExpressCore from 'express-serve-static-core';
-import type express from 'express';
-import type { ServerToClientEvents, ClientToServerEvents } from './socket-protocol';
-import { NodeCGConfig } from './nodecg-config-schema';
+import type * as ExpressCore from "express-serve-static-core";
+import type express from "express";
+import type {
+	ServerToClientEvents,
+	ClientToServerEvents,
+} from "./socket-protocol";
+import { NodeCGConfig } from "./nodecg-config-schema";
 
 type Person =
 	| {
@@ -38,7 +41,7 @@ export namespace NodeCG {
 			fullbleed?: boolean;
 			workspace?: string;
 			dialog?: boolean;
-			dialogButtons?: Array<{ name: string; type: 'dismiss' | 'confirm' }>;
+			dialogButtons?: Array<{ name: string; type: "dismiss" | "confirm" }>;
 			width?: number;
 		};
 
@@ -108,7 +111,7 @@ export namespace NodeCG {
 	/**
 	 * A _parsed_ bundle manifest as used internally by NodeCG.
 	 */
-	export type Manifest = Omit<PackageJSON, 'nodecg'> &
+	export type Manifest = Omit<PackageJSON, "nodecg"> &
 		Manifest.UnparsedManifest & { transformBareModuleSpecifiers: boolean };
 
 	/**
@@ -328,28 +331,28 @@ export namespace NodeCG {
 		export type Operation<T> = {
 			path: string;
 		} & ( // Objects and arrays
-			| { method: 'overwrite'; args: { newValue: T | undefined } }
-			| { method: 'delete'; args: { prop: string | number | symbol } }
-			| { method: 'add'; args: { prop: string; newValue: any } }
-			| { method: 'update'; args: { prop: string; newValue: any } }
+			| { method: "overwrite"; args: { newValue: T | undefined } }
+			| { method: "delete"; args: { prop: string | number | symbol } }
+			| { method: "add"; args: { prop: string; newValue: any } }
+			| { method: "update"; args: { prop: string; newValue: any } }
 
 			// Array mutator methods
 			// This whole thing is gross and needs to be removed in v3
 			// It is rife with unsupported cases, very easy to make bugs here
 			| {
-					method: 'copyWithin';
-					args: { mutatorArgs: Parameters<any[]['copyWithin']> };
+					method: "copyWithin";
+					args: { mutatorArgs: Parameters<any[]["copyWithin"]> };
 			  }
-			| { method: 'fill'; args: { mutatorArgs: Parameters<any[]['fill']> } }
-			| { method: 'pop' }
-			| { method: 'push'; args: { mutatorArgs: Parameters<any[]['push']> } }
-			| { method: 'reverse' }
-			| { method: 'shift' }
-			| { method: 'sort'; args: { mutatorArgs: Parameters<any[]['sort']> } }
-			| { method: 'splice'; args: { mutatorArgs: Parameters<any[]['splice']> } }
+			| { method: "fill"; args: { mutatorArgs: Parameters<any[]["fill"]> } }
+			| { method: "pop" }
+			| { method: "push"; args: { mutatorArgs: Parameters<any[]["push"]> } }
+			| { method: "reverse" }
+			| { method: "shift" }
+			| { method: "sort"; args: { mutatorArgs: Parameters<any[]["sort"]> } }
+			| { method: "splice"; args: { mutatorArgs: Parameters<any[]["splice"]> } }
 			| {
-					method: 'unshift';
-					args: { mutatorArgs: Parameters<any[]['unshift']> };
+					method: "unshift";
+					args: { mutatorArgs: Parameters<any[]["unshift"]> };
 			  }
 		);
 	}
@@ -357,7 +360,8 @@ export namespace NodeCG {
 	/**
 	 * Express middleware that can be mounted to NodeCG's webserver via `nodecg.mount`.
 	 */
-	export type Middleware = ExpressCore.ApplicationRequestHandler<express.Application>;
+	export type Middleware =
+		ExpressCore.ApplicationRequestHandler<express.Application>;
 
 	/**
 	 * A description of an instance of a currently-open graphic.
@@ -407,7 +411,9 @@ export namespace NodeCG {
 	/**
 	 * A `listenFor` acknowledgement, sent from client to server.
 	 */
-	export type Acknowledgement = HandledAcknowledgement | UnhandledAcknowledgement;
+	export type Acknowledgement =
+		| HandledAcknowledgement
+		| UnhandledAcknowledgement;
 
 	/**
 	 * A `listenFor` handler function/callback.
@@ -431,17 +437,17 @@ export namespace NodeCG {
 	 * The logging levels available to NodeCG.
 	 */
 	export enum LogLevel {
-		Trace = 'verbose',
-		Debug = 'debug',
-		Info = 'info',
-		Warn = 'warn',
-		Error = 'error',
-		Silent = 'silent',
+		Trace = "verbose",
+		Debug = "debug",
+		Info = "info",
+		Warn = "warn",
+		Error = "error",
+		Silent = "silent",
 	}
 
 	/**
 	 * A description of which platform/environment an instance of the NodeCG API is being used in.
 	 * It should not be necessary to ever use this type directly in your bundle's code.
 	 */
-	export type Platform = 'server' | 'client';
+	export type Platform = "server" | "client";
 }

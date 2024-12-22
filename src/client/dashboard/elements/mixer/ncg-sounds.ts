@@ -1,16 +1,16 @@
-import '@polymer/paper-card/paper-card.js';
-import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
-import '@polymer/paper-dialog/paper-dialog.js';
-import '@polymer/paper-toast/paper-toast.js';
-import '@polymer/paper-slider/paper-slider.js';
-import * as Polymer from '@polymer/polymer';
-import type { NodeCG as NCGTypes } from '../../../../types/nodecg';
+import "@polymer/paper-card/paper-card.js";
+import "@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js";
+import "@polymer/paper-dialog/paper-dialog.js";
+import "@polymer/paper-toast/paper-toast.js";
+import "@polymer/paper-slider/paper-slider.js";
+import * as Polymer from "@polymer/polymer";
+import type { NodeCG as NCGTypes } from "../../../../types/nodecg";
 
 // This just imports the type at build time, no compile output.
-import type { NcgSoundCue } from './ncg-sound-cue';
+import type { NcgSoundCue } from "./ncg-sound-cue";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from './ncg-sound-cue';
+import * as keep1 from "./ncg-sound-cue";
 keep1;
 
 class NcgSounds extends Polymer.PolymerElement {
@@ -73,7 +73,7 @@ class NcgSounds extends Polymer.PolymerElement {
 	}
 
 	static get is() {
-		return 'ncg-sounds';
+		return "ncg-sounds";
 	}
 
 	static get properties() {
@@ -90,14 +90,20 @@ class NcgSounds extends Polymer.PolymerElement {
 		super.ready();
 
 		const cueElsByName: Record<string, NcgSoundCue> = {};
-		this['bundleFaderRep'] = NodeCG.Replicant<number>(`volume:${this['bundleName']}`, '_sounds');
-		const cuesRep = NodeCG.Replicant<NCGTypes.SoundCue[]>('soundCues', this['bundleName']);
+		this["bundleFaderRep"] = NodeCG.Replicant<number>(
+			`volume:${this["bundleName"]}`,
+			"_sounds",
+		);
+		const cuesRep = NodeCG.Replicant<NCGTypes.SoundCue[]>(
+			"soundCues",
+			this["bundleName"],
+		);
 
-		this['bundleFaderRep'].on('change', (newVal: number) => {
-			this.$['bundleFader'].value = newVal;
+		this["bundleFaderRep"].on("change", (newVal: number) => {
+			this.$["bundleFader"].value = newVal;
 		});
 
-		cuesRep.on('change', (newVal) => {
+		cuesRep.on("change", (newVal) => {
 			if (!newVal) {
 				return;
 			}
@@ -105,17 +111,19 @@ class NcgSounds extends Polymer.PolymerElement {
 			// Update (or create) the ncg-sound-cue element for every cue in the Replicant.
 			newVal.forEach((cue) => {
 				if (!cueElsByName[cue.name]) {
-					cueElsByName[cue.name] = document.createElement('ncg-sound-cue') as NcgSoundCue;
-					this.$['cues'].appendChild(cueElsByName[cue.name]);
+					cueElsByName[cue.name] = document.createElement(
+						"ncg-sound-cue",
+					) as NcgSoundCue;
+					this.$["cues"].appendChild(cueElsByName[cue.name]);
 				}
 
-				cueElsByName[cue.name]!['name'] = cue.name;
-				cueElsByName[cue.name]!['assignable'] = cue.assignable;
-				cueElsByName[cue.name]!['defaultFile'] = cue.defaultFile;
-				cueElsByName[cue.name]!['file'] = cue.file;
-				cueElsByName[cue.name]!['volume'] = cue.volume;
-				cueElsByName[cue.name]!['_cueRef'] = cue;
-				cueElsByName[cue.name]!['bundleName'] = this['bundleName']; // Must be last
+				cueElsByName[cue.name]!["name"] = cue.name;
+				cueElsByName[cue.name]!["assignable"] = cue.assignable;
+				cueElsByName[cue.name]!["defaultFile"] = cue.defaultFile;
+				cueElsByName[cue.name]!["file"] = cue.file;
+				cueElsByName[cue.name]!["volume"] = cue.volume;
+				cueElsByName[cue.name]!["_cueRef"] = cue;
+				cueElsByName[cue.name]!["bundleName"] = this["bundleName"]; // Must be last
 			});
 
 			// Remove cueEls that belong to soundCues that no longer exist.
@@ -125,9 +133,9 @@ class NcgSounds extends Polymer.PolymerElement {
 				}
 
 				const cueEl = cueElsByName[name]!;
-				const index = newVal.findIndex((cue) => cue.name === cueEl['name']);
+				const index = newVal.findIndex((cue) => cue.name === cueEl["name"]);
 				if (index < 0) {
-					this.$['cues'].removeChild(cueEl);
+					this.$["cues"].removeChild(cueEl);
 					delete cueElsByName[name];
 				}
 			}
@@ -135,8 +143,8 @@ class NcgSounds extends Polymer.PolymerElement {
 	}
 
 	_onBundleFaderChange(e: any) {
-		this['bundleFaderRep'].value = e.target.value;
+		this["bundleFaderRep"].value = e.target.value;
 	}
 }
 
-customElements.define('ncg-sounds', NcgSounds);
+customElements.define("ncg-sounds", NcgSounds);

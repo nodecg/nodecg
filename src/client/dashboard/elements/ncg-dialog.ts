@@ -9,15 +9,18 @@ is the only thing I could come up with. Let us never speak of this again.
 
 Lange - 1/28/2016
 */
-import { NeonAnimationRunnerBehavior } from '@polymer/neon-animation/neon-animation-runner-behavior.js';
-import { PaperDialogBehavior } from '@polymer/paper-dialog-behavior/paper-dialog-behavior.js';
-import '@polymer/paper-dialog-behavior/paper-dialog-shared-styles.js';
-import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
-import { mixinBehaviors } from '@polymer/polymer/lib/legacy/class.js';
-import * as Polymer from '@polymer/polymer';
-import { iframeResizer } from 'iframe-resizer';
+import { NeonAnimationRunnerBehavior } from "@polymer/neon-animation/neon-animation-runner-behavior.js";
+import { PaperDialogBehavior } from "@polymer/paper-dialog-behavior/paper-dialog-behavior.js";
+import "@polymer/paper-dialog-behavior/paper-dialog-shared-styles.js";
+import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
+import { mixinBehaviors } from "@polymer/polymer/lib/legacy/class.js";
+import * as Polymer from "@polymer/polymer";
+import { iframeResizer } from "iframe-resizer";
 
-class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialogBehavior], Polymer.PolymerElement) {
+class NcgDialog extends mixinBehaviors(
+	[NeonAnimationRunnerBehavior, PaperDialogBehavior],
+	Polymer.PolymerElement,
+) {
 	static get template() {
 		return Polymer.html`
 		<style include="nodecg-theme paper-dialog-shared-styles">
@@ -81,7 +84,7 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 	}
 
 	static get is() {
-		return 'ncg-dialog';
+		return "ncg-dialog";
 	}
 
 	static get properties() {
@@ -104,28 +107,31 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 	override ready(): void {
 		super.ready();
 
-		this.addEventListener('neon-animation-finish', this._onNeonAnimationFinish);
-		this.addEventListener('iron-overlay-opened', this._onIronOverlayOpened);
-		this.addEventListener('iron-overlay-closed', this._onIronOverlayClosed);
+		this.addEventListener("neon-animation-finish", this._onNeonAnimationFinish);
+		this.addEventListener("iron-overlay-opened", this._onIronOverlayOpened);
+		this.addEventListener("iron-overlay-closed", this._onIronOverlayClosed);
 
 		afterNextRender(this, async () => {
-			const iframe = this.querySelector('iframe')!;
+			const iframe = this.querySelector("iframe")!;
 
 			// If Sentry is enabled, use it to report errors in panels to Sentry.io.
 			if (window.ncgConfig.sentry.enabled) {
-				const Sentry = await import('@sentry/browser');
-				iframe.contentWindow!.addEventListener('error', (event: any) => {
+				const Sentry = await import("@sentry/browser");
+				iframe.contentWindow!.addEventListener("error", (event: any) => {
 					Sentry.captureException(event.error);
 				});
-				iframe.contentWindow!.addEventListener('unhandledrejection', (err: any) => {
-					Sentry.captureException(err.reason);
-				});
+				iframe.contentWindow!.addEventListener(
+					"unhandledrejection",
+					(err: any) => {
+						Sentry.captureException(err.reason);
+					},
+				);
 			}
 
-			if (iframe.contentWindow!.document.readyState === 'complete') {
+			if (iframe.contentWindow!.document.readyState === "complete") {
 				this._attachIframeResize(iframe);
 			} else {
-				iframe.addEventListener('load', () => {
+				iframe.addEventListener("load", () => {
 					this._attachIframeResize(iframe);
 				});
 			}
@@ -135,9 +141,9 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 	override connectedCallback(): void {
 		super.connectedCallback();
 
-		const iframe = this.querySelector('iframe')!;
-		iframe.addEventListener('iframe-resized', () => {
-			this['refit']();
+		const iframe = this.querySelector("iframe")!;
+		iframe.addEventListener("iframe-resized", () => {
+			this["refit"]();
 		});
 	}
 
@@ -145,10 +151,10 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 		iframeResizer(
 			{
 				log: false,
-				resizeFrom: 'child',
-				heightCalculationMethod: 'documentElementOffset',
+				resizeFrom: "child",
+				heightCalculationMethod: "documentElementOffset",
 				onResized(data: any) {
-					data.iframe.dispatchEvent(new CustomEvent('iframe-resized'));
+					data.iframe.dispatchEvent(new CustomEvent("iframe-resized"));
 				},
 			},
 			iframe,
@@ -156,42 +162,42 @@ class NcgDialog extends mixinBehaviors([NeonAnimationRunnerBehavior, PaperDialog
 	}
 
 	_renderOpened() {
-		if (this['withBackdrop']) {
-			this['backdropElement'].open();
+		if (this["withBackdrop"]) {
+			this["backdropElement"].open();
 		}
 
-		this['playAnimation']('entry');
+		this["playAnimation"]("entry");
 	}
 
 	_renderClosed() {
-		if (this['withBackdrop']) {
-			this['backdropElement'].close();
+		if (this["withBackdrop"]) {
+			this["backdropElement"].close();
 		}
 
-		this['playAnimation']('exit');
+		this["playAnimation"]("exit");
 	}
 
 	_onNeonAnimationFinish() {
-		if (this['opened']) {
-			this['_finishRenderOpened']();
+		if (this["opened"]) {
+			this["_finishRenderOpened"]();
 		} else {
-			this['_finishRenderClosed']();
+			this["_finishRenderClosed"]();
 		}
 	}
 
 	_onIronOverlayOpened() {
-		const iframeDocument = this.querySelector('iframe')!.contentDocument!;
-		iframeDocument.dispatchEvent(new CustomEvent('dialog-opened'));
+		const iframeDocument = this.querySelector("iframe")!.contentDocument!;
+		iframeDocument.dispatchEvent(new CustomEvent("dialog-opened"));
 	}
 
 	_onIronOverlayClosed(e: any) {
-		const iframeDocument = this.querySelector('iframe')!.contentDocument!;
+		const iframeDocument = this.querySelector("iframe")!.contentDocument!;
 		if (e.detail.confirmed && !e.detail.canceled) {
-			iframeDocument.dispatchEvent(new CustomEvent('dialog-confirmed'));
+			iframeDocument.dispatchEvent(new CustomEvent("dialog-confirmed"));
 		} else {
-			iframeDocument.dispatchEvent(new CustomEvent('dialog-dismissed'));
+			iframeDocument.dispatchEvent(new CustomEvent("dialog-dismissed"));
 		}
 	}
 }
 
-customElements.define('ncg-dialog', NcgDialog as any);
+customElements.define("ncg-dialog", NcgDialog as any);

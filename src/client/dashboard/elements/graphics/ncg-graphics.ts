@@ -1,11 +1,11 @@
-import '@polymer/paper-toast/paper-toast.js';
+import "@polymer/paper-toast/paper-toast.js";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from './ncg-graphics-bundle';
+import * as keep1 from "./ncg-graphics-bundle";
 keep1;
 
-import * as Polymer from '@polymer/polymer';
-import { MutableData } from '@polymer/polymer/lib/mixins/mutable-data';
+import * as Polymer from "@polymer/polymer";
+import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
 
 /**
  * @customElement
@@ -34,14 +34,16 @@ class NcgGraphics extends MutableData(Polymer.PolymerElement) {
 	}
 
 	static get is() {
-		return 'ncg-graphics';
+		return "ncg-graphics";
 	}
 
 	static get properties() {
 		return {
 			bundlesWithGraphics: {
 				type: Array,
-				value: window.__renderData__.bundles.filter((bundle) => bundle.graphics && bundle.graphics.length > 0),
+				value: window.__renderData__.bundles.filter(
+					(bundle) => bundle.graphics && bundle.graphics.length > 0,
+				),
 			},
 			_graphicInstances: Array,
 		};
@@ -49,19 +51,19 @@ class NcgGraphics extends MutableData(Polymer.PolymerElement) {
 
 	override ready(): void {
 		super.ready();
-		const instancesRep = NodeCG.Replicant('graphics:instances', 'nodecg');
+		const instancesRep = NodeCG.Replicant("graphics:instances", "nodecg");
 
-		instancesRep.on('change', (newVal) => {
-			this['_graphicInstances'] = newVal;
+		instancesRep.on("change", (newVal) => {
+			this["_graphicInstances"] = newVal;
 		});
 
-		this.addEventListener('url-copy-success', () => {
-			this.$['copyToast'].show('Graphic URL copied to clipboard.');
+		this.addEventListener("url-copy-success", () => {
+			this.$["copyToast"].show("Graphic URL copied to clipboard.");
 		});
-		this.addEventListener('url-copy-error', () => {
-			this.$['copyToast'].show('Failed to copy graphic URL to clipboard!');
+		this.addEventListener("url-copy-error", () => {
+			this.$["copyToast"].show("Failed to copy graphic URL to clipboard!");
 		});
 	}
 }
 
-customElements.define('ncg-graphics', NcgGraphics);
+customElements.define("ncg-graphics", NcgGraphics);

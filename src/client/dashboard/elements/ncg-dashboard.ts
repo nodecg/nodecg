@@ -1,45 +1,45 @@
-import '@webcomponents/webcomponentsjs/webcomponents-loader';
-import '@webcomponents/shadycss/apply-shim.min.js';
-import '@polymer/app-layout/app-layout.js';
-import '@polymer/app-route/app-location.js';
-import '@polymer/app-route/app-route.js';
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-icons/av-icons.js';
-import '@polymer/iron-icons/communication-icons.js';
-import '@polymer/iron-icons/image-icons.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/iron-image/iron-image.js';
-import '@polymer/iron-media-query/iron-media-query.js';
-import '@polymer/iron-pages/iron-pages.js';
-import '@polymer/iron-selector/iron-selector.js';
-import '@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js';
-import '@polymer/paper-dialog/paper-dialog.js';
-import '@polymer/paper-icon-button/paper-icon-button.js';
-import '@polymer/paper-item/paper-icon-item.js';
-import '@polymer/paper-tabs/paper-tabs.js';
-import '@polymer/paper-toast/paper-toast.js';
-import '@polymer/polymer/lib/elements/custom-style.js';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
-import * as Polymer from '@polymer/polymer';
+import "@webcomponents/webcomponentsjs/webcomponents-loader";
+import "@webcomponents/shadycss/apply-shim.min.js";
+import "@polymer/app-layout/app-layout.js";
+import "@polymer/app-route/app-location.js";
+import "@polymer/app-route/app-route.js";
+import "@polymer/iron-flex-layout/iron-flex-layout.js";
+import "@polymer/iron-icons/av-icons.js";
+import "@polymer/iron-icons/communication-icons.js";
+import "@polymer/iron-icons/image-icons.js";
+import "@polymer/iron-icons/iron-icons.js";
+import "@polymer/iron-image/iron-image.js";
+import "@polymer/iron-media-query/iron-media-query.js";
+import "@polymer/iron-pages/iron-pages.js";
+import "@polymer/iron-selector/iron-selector.js";
+import "@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js";
+import "@polymer/paper-dialog/paper-dialog.js";
+import "@polymer/paper-icon-button/paper-icon-button.js";
+import "@polymer/paper-item/paper-icon-item.js";
+import "@polymer/paper-tabs/paper-tabs.js";
+import "@polymer/paper-toast/paper-toast.js";
+import "@polymer/polymer/lib/elements/custom-style.js";
+import { Debouncer } from "@polymer/polymer/lib/utils/debounce.js";
+import * as Polymer from "@polymer/polymer";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import keep1 from '../css/nodecg-theme';
+import keep1 from "../css/nodecg-theme";
 keep1;
-import * as keep2 from './assets/ncg-assets';
+import * as keep2 from "./assets/ncg-assets";
 keep2;
-import * as keep3 from './graphics/ncg-graphics';
+import * as keep3 from "./graphics/ncg-graphics";
 keep3;
-import * as keep4 from './mixer/ncg-mixer';
+import * as keep4 from "./mixer/ncg-mixer";
 keep4;
-import * as keep5 from './ncg-dialog';
+import * as keep5 from "./ncg-dialog";
 keep5;
-import * as keep6 from './ncg-workspace';
+import * as keep6 from "./ncg-workspace";
 keep6;
-import * as keep7 from './settings/ncg-settings';
+import * as keep7 from "./settings/ncg-settings";
 keep7;
 
-import { timeOut } from '@polymer/polymer/lib/utils/async.js';
-import type { NodeCG } from '../../../types/nodecg';
+import { timeOut } from "@polymer/polymer/lib/utils/async.js";
+import type { NodeCG } from "../../../types/nodecg";
 
 class NcgDashboard extends Polymer.PolymerElement {
 	static get template() {
@@ -368,18 +368,18 @@ class NcgDashboard extends Polymer.PolymerElement {
 	}
 
 	static get is() {
-		return 'ncg-dashboard';
+		return "ncg-dashboard";
 	}
 
 	static get properties() {
 		return {
 			route: {
 				type: Object,
-				observer: '_routeChanged',
+				observer: "_routeChanged",
 			},
 			smallScreen: {
 				type: Boolean,
-				observer: '_smallScreenChanged',
+				observer: "_smallScreenChanged",
 			},
 			loginDisabled: {
 				type: Boolean,
@@ -395,26 +395,26 @@ class NcgDashboard extends Polymer.PolymerElement {
 			},
 			dialogs: {
 				type: Array,
-				computed: '_computeDialogs(bundles)',
+				computed: "_computeDialogs(bundles)",
 			},
 			pages: {
 				type: Array,
 				value() {
 					const pages = [
 						{
-							name: 'Graphics',
-							route: 'graphics',
-							icon: 'visibility',
+							name: "Graphics",
+							route: "graphics",
+							icon: "visibility",
 						},
 						{
-							name: 'Mixer',
-							route: 'mixer',
-							icon: 'av:volume-up',
+							name: "Mixer",
+							route: "mixer",
+							icon: "av:volume-up",
 						},
 						{
-							name: 'Assets',
-							route: 'assets',
-							icon: 'file-upload',
+							name: "Assets",
+							route: "assets",
+							icon: "file-upload",
 						},
 					];
 
@@ -422,9 +422,9 @@ class NcgDashboard extends Polymer.PolymerElement {
 					// when login security is enabled.
 					if (window.ncgConfig.login?.enabled) {
 						pages.push({
-							name: 'Settings',
-							route: 'settings',
-							icon: 'settings',
+							name: "Settings",
+							route: "settings",
+							icon: "settings",
 						});
 					}
 
@@ -442,7 +442,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 		let SUCCESS_URI: string;
 		let notified = false;
 
-		getImageDataURI('img/notifications/standard/fail.png', (err, result) => {
+		getImageDataURI("img/notifications/standard/fail.png", (err, result) => {
 			/* istanbul ignore if: hard-to-hit error */
 			if (err) {
 				console.error(err);
@@ -451,7 +451,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 			}
 		});
 
-		getImageDataURI('img/notifications/standard/success.png', (err, result) => {
+		getImageDataURI("img/notifications/standard/success.png", (err, result) => {
 			/* istanbul ignore if: hard-to-hit error */
 			if (err) {
 				console.error(err);
@@ -460,67 +460,67 @@ class NcgDashboard extends Polymer.PolymerElement {
 			}
 		});
 
-		window.socket.on('protocol_error', (err) => {
+		window.socket.on("protocol_error", (err) => {
 			/* istanbul ignore next: coverage is buggy here */
-			if (err.type === 'UnauthorizedError') {
+			if (err.type === "UnauthorizedError") {
 				window.location.href = `/authError?code=${err.code}&message=${err.message}`;
 			} else {
-				console.error('Unhandled socket error:', err);
-				this.$['mainToast'].show('Unhandled socket error!');
+				console.error("Unhandled socket error:", err);
+				this.$["mainToast"].show("Unhandled socket error!");
 			}
 		});
 
-		window.socket.on('disconnect', (reason) => {
-			this.$['mainToast'].show('Lost connection to NodeCG server!');
+		window.socket.on("disconnect", (reason) => {
+			this.$["mainToast"].show("Lost connection to NodeCG server!");
 			notified = false;
-			this['disconnected'] = true;
+			this["disconnected"] = true;
 
-			if (reason === 'io server disconnect') {
+			if (reason === "io server disconnect") {
 				// The server forcibly closed the socket.
 				// In this case, the client won't automatically reconnect.
 				// So, we manually do it here:
 				socket.connect();
 			} else {
-				console.log('Socket disconnect reason:', reason);
+				console.log("Socket disconnect reason:", reason);
 			}
 		});
 
-		window.socket.io.on('reconnect_attempt', (attempts) => {
-			if (!this.$['reconnectToast'].opened) {
-				this.$['reconnectToast'].open();
+		window.socket.io.on("reconnect_attempt", (attempts) => {
+			if (!this.$["reconnectToast"].opened) {
+				this.$["reconnectToast"].open();
 			}
 
 			if (attempts >= 3 && !notified) {
 				notified = true;
-				notify('Disconnected', {
-					body: 'The dashboard has lost connection with NodeCG.',
+				notify("Disconnected", {
+					body: "The dashboard has lost connection with NodeCG.",
 					icon: FAIL_URI,
-					tag: 'disconnect',
+					tag: "disconnect",
 				});
 			}
 		});
 
-		window.socket.io.on('reconnect', (attempts) => {
-			this.$['mainToast'].show('Reconnected to NodeCG server!');
-			this.$['reconnectToast'].hide();
-			this['disconnected'] = false;
+		window.socket.io.on("reconnect", (attempts) => {
+			this.$["mainToast"].show("Reconnected to NodeCG server!");
+			this.$["reconnectToast"].hide();
+			this["disconnected"] = false;
 
 			if (attempts >= 3) {
-				notify('Reconnected', {
+				notify("Reconnected", {
 					body: `Successfully reconnected on attempt # ${attempts}`,
 					icon: SUCCESS_URI,
-					tag: 'reconnect',
+					tag: "reconnect",
 				});
 			}
 		});
 
-		window.socket.io.on('reconnect_failed', () => {
-			this.$['mainToast'].show('Failed to reconnect to NodeCG server!');
+		window.socket.io.on("reconnect_failed", () => {
+			this.$["mainToast"].show("Failed to reconnect to NodeCG server!");
 
-			notify('Reconnection Failed', {
-				body: 'Could not reconnect to NodeCG after the maximum number of attempts.',
+			notify("Reconnection Failed", {
+				body: "Could not reconnect to NodeCG after the maximum number of attempts.",
 				icon: FAIL_URI,
-				tag: 'reconnect_failed',
+				tag: "reconnect_failed",
 			});
 		});
 	}
@@ -530,16 +530,19 @@ class NcgDashboard extends Polymer.PolymerElement {
 
 		// If the default workspace is hidden (due to it having no panels),
 		// show the next workspace by default.
-		if (this['route'].path === '' && window.__renderData__.workspaces[0]!.route !== '') {
+		if (
+			this["route"].path === "" &&
+			window.__renderData__.workspaces[0]!.route !== ""
+		) {
 			window.location.hash = window.__renderData__.workspaces[0]!.route;
 		}
 
-		if (!this['routeData']) {
-			this['routeData'] = {};
+		if (!this["routeData"]) {
+			this["routeData"] = {};
 		}
 
-		if (!this['routeData'].page) {
-			this.set('routeData.page', '');
+		if (!this["routeData"].page) {
+			this.set("routeData.page", "");
 		}
 
 		this._fixTabs();
@@ -547,11 +550,11 @@ class NcgDashboard extends Polymer.PolymerElement {
 
 	/* istanbul ignore next: can't cover since it navigates the page */
 	logout() {
-		window.location.href = '/logout';
+		window.location.href = "/logout";
 	}
 
 	closeDrawer() {
-		this.$['drawer'].close();
+		this.$["drawer"].close();
 	}
 
 	_smallScreenChanged(newVal: boolean) {
@@ -565,13 +568,13 @@ class NcgDashboard extends Polymer.PolymerElement {
 	}
 
 	_selectRoute(e: any) {
-		window.location.hash = e.target.closest('paper-tab').route;
+		window.location.hash = e.target.closest("paper-tab").route;
 	}
 
 	_routeChanged() {
 		this._fixTabs();
-		this['_fixPathDebounce'] = Debouncer.debounce(
-			this['_fixPathDebounce'],
+		this["_fixPathDebounce"] = Debouncer.debounce(
+			this["_fixPathDebounce"],
 			timeOut.after(100),
 			this._fixPath.bind(this),
 		);
@@ -580,11 +583,11 @@ class NcgDashboard extends Polymer.PolymerElement {
 	_fixTabs() {
 		// For some reason, our paper-tabs elements need a little help
 		// to know when the route has changed and when they should deselect their tabs.
-		const tabs = this.shadowRoot!.querySelectorAll('paper-tabs');
+		const tabs = this.shadowRoot!.querySelectorAll("paper-tabs");
 		if (tabs) {
 			tabs.forEach((tabSet) => {
-				if (tabSet.selected !== this['route'].path) {
-					tabSet.selected = this['route'].path;
+				if (tabSet.selected !== this["route"].path) {
+					tabSet.selected = this["route"].path;
 				}
 			});
 		}
@@ -593,7 +596,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 	_fixPath() {
 		// If the current hash points to a route that doesn't exist, (such as
 		// after a refresh which removed a workspace), default to the first workspace.
-		if (!this.$['pages'].selectedItem) {
+		if (!this.$["pages"].selectedItem) {
 			window.location.hash = window.__renderData__.workspaces[0]!.route;
 		}
 	}
@@ -615,13 +618,16 @@ class NcgDashboard extends Polymer.PolymerElement {
 	}
 
 	_calcButtonClass(buttonType: string) {
-		return buttonType === 'confirm' ? 'nodecg-accept' : 'nodecg-reject';
+		return buttonType === "confirm" ? "nodecg-accept" : "nodecg-reject";
 	}
 }
 
 function getImageDataURI(
 	url: string,
-	cb: (error: NodeJS.ErrnoException | undefined, result?: { image: HTMLImageElement; data: string }) => void,
+	cb: (
+		error: NodeJS.ErrnoException | undefined,
+		result?: { image: HTMLImageElement; data: string },
+	) => void,
 ) {
 	let data;
 	let canvas;
@@ -629,13 +635,13 @@ function getImageDataURI(
 	const img = new Image();
 	img.onload = function () {
 		// Create the canvas element.
-		canvas = document.createElement('canvas');
+		canvas = document.createElement("canvas");
 		canvas.width = img.width;
 		canvas.height = img.height;
 		// Get '2d' context and draw the image.
-		ctx = canvas.getContext('2d');
+		ctx = canvas.getContext("2d");
 		if (!ctx) {
-			cb(new Error('Could not create canvas context'));
+			cb(new Error("Could not create canvas context"));
 			return;
 		}
 		ctx.drawImage(img, 0, 0);
@@ -663,9 +669,12 @@ function getImageDataURI(
 	}
 }
 
-function notify(title: string, options: { body?: string; icon?: string; tag?: string } = {}) {
+function notify(
+	title: string,
+	options: { body?: string; icon?: string; tag?: string } = {},
+) {
 	// Let's check if the browser supports notifications
-	if (!('Notification' in window)) {
+	if (!("Notification" in window)) {
 		return;
 	}
 
@@ -673,16 +682,16 @@ function notify(title: string, options: { body?: string; icon?: string; tag?: st
 	// Otherwise, we need to ask the user for permission.
 	// Note, Chrome does not implement the permission static property.
 	// So we have to check for NOT 'denied' instead of 'default'.
-	if (window.Notification.permission === 'granted') {
+	if (window.Notification.permission === "granted") {
 		// If it's okay let's create a notification
 		const notification = new window.Notification(title, options);
 		setTimeout(() => {
 			notification.close();
 		}, 5000);
-	} else if (window.Notification.permission !== 'denied') {
+	} else if (window.Notification.permission !== "denied") {
 		void window.Notification.requestPermission((permission) => {
 			// If the user is okay, let's create a notification
-			if (permission === 'granted') {
+			if (permission === "granted") {
 				const notification = new window.Notification(title, options);
 				setTimeout(
 					(n) => {
@@ -699,4 +708,4 @@ function notify(title: string, options: { body?: string; icon?: string; tag?: st
 	// want to be respectful there is no need to bother them any more.
 }
 
-customElements.define('ncg-dashboard', NcgDashboard);
+customElements.define("ncg-dashboard", NcgDashboard);

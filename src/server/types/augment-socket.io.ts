@@ -10,5 +10,8 @@ declare namespace SocketIO {
 	 */
 	export type NextFunction = (err?: NodeJS.ErrnoException | undefined) => void;
 
-	export type Acknowledgement = (err?: NodeJS.ErrnoException | undefined, data?: any) => void;
+	export type Acknowledgement = (
+		err?: NodeJS.ErrnoException | undefined,
+		data?: any,
+	) => void;
 }

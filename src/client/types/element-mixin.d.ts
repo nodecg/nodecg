@@ -2,17 +2,17 @@
  * Lange's edit
  */
 
-import '@polymer/polymer/lib/utils/mixin.js';
+import "@polymer/polymer/lib/utils/mixin.js";
 
-import '@polymer/polymer/lib/utils/style-gather.js';
+import "@polymer/polymer/lib/utils/style-gather.js";
 
-import '@polymer/polymer/lib/utils/resolve-url.js';
+import "@polymer/polymer/lib/utils/resolve-url.js";
 
-import '@polymer/polymer/lib/elements/dom-module.js';
+import "@polymer/polymer/lib/elements/dom-module.js";
 
-import type { PropertyEffects } from '@polymer/polymer/lib/mixins/property-effects.js';
+import type { PropertyEffects } from "@polymer/polymer/lib/mixins/property-effects.js";
 
-import type { PropertiesMixin } from '@polymer/polymer/lib/mixins/properties-mixin.js';
+import type { PropertiesMixin } from "@polymer/polymer/lib/mixins/properties-mixin.js";
 
 export { ElementMixin };
 
@@ -82,21 +82,24 @@ declare function ElementMixin<T extends new (...args: any[]) => {}>(
 	PropertiesChangedConstructor &
 	PropertiesMixinConstructor;
 
-import type { PropertyEffectsConstructor } from '@polymer/polymer/lib/mixins/property-effects.js';
+import type { PropertyEffectsConstructor } from "@polymer/polymer/lib/mixins/property-effects.js";
 
-import type { TemplateStampConstructor, TemplateStamp } from '@polymer/polymer/lib/mixins/template-stamp.js';
+import type {
+	TemplateStampConstructor,
+	TemplateStamp,
+} from "@polymer/polymer/lib/mixins/template-stamp.js";
 
 import type {
 	PropertyAccessorsConstructor,
 	PropertyAccessors,
-} from '@polymer/polymer/lib/mixins/property-accessors.js';
+} from "@polymer/polymer/lib/mixins/property-accessors.js";
 
 import type {
 	PropertiesChangedConstructor,
 	PropertiesChanged,
-} from '@polymer/polymer/lib/mixins/properties-changed.js';
+} from "@polymer/polymer/lib/mixins/properties-changed.js";
 
-import type { PropertiesMixinConstructor } from '@polymer/polymer/lib/mixins/properties-mixin.js';
+import type { PropertiesMixinConstructor } from "@polymer/polymer/lib/mixins/properties-mixin.js";
 
 export type ElementMixinConstructor = {
 	new (...args: any[]): ElementMixin;
@@ -112,7 +115,11 @@ export type ElementMixinConstructor = {
 	 * @param nodeInfo Node metadata for current template.
 	 * @returns .
 	 */
-	_parseTemplateContent(template: HTMLTemplateElement, templateInfo: TemplateInfo, nodeInfo: NodeInfo): boolean;
+	_parseTemplateContent(
+		template: HTMLTemplateElement,
+		templateInfo: TemplateInfo,
+		nodeInfo: NodeInfo,
+	): boolean;
 
 	/**
 	 * Override of PropertiesChanged createProperties to create accessors
@@ -300,10 +307,12 @@ export { updateStyles };
  *
  * These properties are retained unless a value of `null` is set.
  */
-declare function updateStyles(props?: Record<string, unknown> | undefined): void;
+declare function updateStyles(
+	props?: Record<string, unknown> | undefined,
+): void;
 
-import type { TemplateInfo } from '@polymer/polymer/interfaces';
+import type { TemplateInfo } from "@polymer/polymer/interfaces";
 
-import type { NodeInfo } from '@polymer/polymer/interfaces';
+import type { NodeInfo } from "@polymer/polymer/interfaces";
 
-import type { StampedTemplate } from '@polymer/polymer/interfaces';
+import type { StampedTemplate } from "@polymer/polymer/interfaces";

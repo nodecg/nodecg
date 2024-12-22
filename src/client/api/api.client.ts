@@ -1,13 +1,13 @@
 // Packages
-import type { DeepReadonly } from 'ts-essentials';
+import type { DeepReadonly } from "ts-essentials";
 
 // Ours
-import { NodeCGAPIBase } from '../../shared/api.base';
-import ClientReplicant from './replicant';
-import { filteredConfig } from './config';
-import { Logger } from './logger';
-import type { TypedClientSocket } from '../../types/socket-protocol';
-import type { NodeCG } from '../../types/nodecg';
+import { NodeCGAPIBase } from "../../shared/api.base";
+import ClientReplicant from "./replicant";
+import { filteredConfig } from "./config";
+import { Logger } from "./logger";
+import type { TypedClientSocket } from "../../types/socket-protocol";
+import type { NodeCG } from "../../types/nodecg";
 
 type SendMessageCb<T> = (error?: unknown, response?: T) => void;
 
@@ -17,18 +17,28 @@ type EventMap = {
 	//
 };
 
-const soundMetadata = new WeakMap<createjs.AbstractSoundInstance, { cueName: string; updateVolume: boolean }>();
+const soundMetadata = new WeakMap<
+	createjs.AbstractSoundInstance,
+	{ cueName: string; updateVolume: boolean }
+>();
 const apiContexts = new Set<NodeCGAPIClient>();
 
 /**
  * This is what enables intra-context messaging.
  * I.e., passing messages from one extension to another in the same Node.js context.
  */
-function _forwardMessageToContext(messageName: string, bundleName: string, data: unknown): void {
+function _forwardMessageToContext(
+	messageName: string,
+	bundleName: string,
+	data: unknown,
+): void {
 	setTimeout(() => {
 		apiContexts.forEach((ctx) => {
 			ctx._messageHandlers.forEach((handler) => {
-				if (messageName === handler.messageName && bundleName === handler.bundleName) {
+				if (
+					messageName === handler.messageName &&
+					bundleName === handler.bundleName
+				) {
 					handler.func(data);
 				}
 			});
@@ -36,21 +46,35 @@ function _forwardMessageToContext(messageName: string, bundleName: string, data:
 	}, 0);
 }
 
-export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.UnknownConfig> extends NodeCGAPIBase<
-	'client',
-	C,
-	EventMap
-> {
-	static Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+export class NodeCGAPIClient<
+	C extends Record<string, any> = NodeCG.Bundle.UnknownConfig,
+> extends NodeCGAPIBase<"client", C, EventMap> {
+	static Replicant<
+		V,
+		O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+	>(
 		name: string,
 		namespace: string,
 		opts: O = {} as Record<any, unknown>,
 	): ClientReplicant<V, O> {
-		return new ClientReplicant<V, O>(name, namespace, opts, (globalThis as any).socket);
+		return new ClientReplicant<V, O>(
+			name,
+			namespace,
+			opts,
+			(globalThis as any).socket,
+		);
 	}
 
-	static sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, cb: SendMessageCb<T>): void;
-	static sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, data?: unknown): Promise<T>;
+	static sendMessageToBundle<T = unknown>(
+		messageName: string,
+		bundleName: string,
+		cb: SendMessageCb<T>,
+	): void;
+	static sendMessageToBundle<T = unknown>(
+		messageName: string,
+		bundleName: string,
+		data?: unknown,
+	): Promise<T>;
 	static sendMessageToBundle<T = unknown>(
 		messageName: string,
 		bundleName: string,
@@ -64,7 +88,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		cb?: SendMessageCb<T>,
 	): void | Promise<T> {
 		let data: any = null;
-		if (typeof dataOrCb === 'function') {
+		if (typeof dataOrCb === "function") {
 			cb = dataOrCb as SendMessageCb<T>;
 		} else {
 			data = dataOrCb;
@@ -72,9 +96,9 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 
 		_forwardMessageToContext(messageName, bundleName, data);
 
-		if (typeof cb === 'function') {
+		if (typeof cb === "function") {
 			globalThis.socket.emit(
-				'message',
+				"message",
 				{
 					bundleName,
 					messageName,
@@ -91,7 +115,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		} else {
 			return new Promise<T>((resolve, reject) => {
 				globalThis.socket.emit(
-					'message',
+					"message",
 					{
 						bundleName,
 						messageName,
@@ -109,14 +133,22 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		}
 	}
 
-	static readReplicant<T = unknown>(name: string, namespace: string, cb: ReadReplicantCb<T>): void {
-		globalThis.socket.emit('replicant:read', { name, namespace }, (error, value?) => {
-			if (error) {
-				console.error(error);
-			} else {
-				cb(value as T | undefined);
-			}
-		});
+	static readReplicant<T = unknown>(
+		name: string,
+		namespace: string,
+		cb: ReadReplicantCb<T>,
+	): void {
+		globalThis.socket.emit(
+			"replicant:read",
+			{ name, namespace },
+			(error, value?) => {
+				if (error) {
+					console.error(error);
+				} else {
+					cb(value as T | undefined);
+				}
+			},
+		);
 	}
 
 	get Logger(): new (name: string) => NodeCG.Logger {
@@ -153,16 +185,19 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 
 	private _memoizedLogger?: NodeCG.Logger;
 
-	constructor(bundle: NodeCG.Bundle & { _hasSounds?: boolean }, socket: TypedClientSocket) {
+	constructor(
+		bundle: NodeCG.Bundle & { _hasSounds?: boolean },
+		socket: TypedClientSocket,
+	) {
 		super(bundle);
 		apiContexts.add(this);
 
 		// If title isn't set, set it to the bundle name
 		if (globalThis.document) {
 			document.addEventListener(
-				'DOMContentLoaded',
+				"DOMContentLoaded",
 				() => {
-					if (document.title === '') {
+					if (document.title === "") {
 						document.title = this.bundleName;
 					}
 				},
@@ -173,18 +208,38 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		// Make socket accessible to public methods
 		this.socket = socket;
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		this.socket.emit('joinRoom', bundle.name, () => {});
+		this.socket.emit("joinRoom", bundle.name, () => {});
 
 		if (globalThis.window && bundle._hasSounds && window.createjs?.Sound) {
-			const soundCuesRep = new ClientReplicant<NodeCG.SoundCue[]>('soundCues', this.bundleName, {}, socket);
-			this._soundFiles = new ClientReplicant<NodeCG.AssetFile[]>('assets:sounds', this.bundleName, {}, socket);
-			this._bundleVolume = new ClientReplicant<number>(`volume:${this.bundleName}`, '_sounds', {}, socket);
-			this._masterVolume = new ClientReplicant<number>('volume:master', '_sounds', {}, socket);
+			const soundCuesRep = new ClientReplicant<NodeCG.SoundCue[]>(
+				"soundCues",
+				this.bundleName,
+				{},
+				socket,
+			);
+			this._soundFiles = new ClientReplicant<NodeCG.AssetFile[]>(
+				"assets:sounds",
+				this.bundleName,
+				{},
+				socket,
+			);
+			this._bundleVolume = new ClientReplicant<number>(
+				`volume:${this.bundleName}`,
+				"_sounds",
+				{},
+				socket,
+			);
+			this._masterVolume = new ClientReplicant<number>(
+				"volume:master",
+				"_sounds",
+				{},
+				socket,
+			);
 
 			this._soundCues = [];
 
 			const loadedSums = new Set();
-			window.createjs.Sound.on('fileload', (e: any) => {
+			window.createjs.Sound.on("fileload", (e: any) => {
 				if (this.soundsReady || !e.data.sum) {
 					return;
 				}
@@ -199,7 +254,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 				});
 				if (!foundUnloaded && !this.soundsReady) {
 					this.soundsReady = true;
-					window.dispatchEvent(new CustomEvent('ncgSoundsReady'));
+					window.dispatchEvent(new CustomEvent("ncgSoundsReady"));
 				}
 			});
 
@@ -209,43 +264,55 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 				this._registerSounds();
 			};
 
-			soundCuesRep.on('change', handleAnyCuesRepChange);
+			soundCuesRep.on("change", handleAnyCuesRepChange);
 
-			this._soundFiles.on('change', () => this._registerSounds.bind(this));
-			this._bundleVolume.on('change', () => this._updateInstanceVolumes.bind(this));
-			this._masterVolume.on('change', () => this._updateInstanceVolumes.bind(this));
+			this._soundFiles.on("change", () => this._registerSounds.bind(this));
+			this._bundleVolume.on("change", () =>
+				this._updateInstanceVolumes.bind(this),
+			);
+			this._masterVolume.on("change", () =>
+				this._updateInstanceVolumes.bind(this),
+			);
 		}
 
 		// Upon receiving a message, execute any handlers for it
-		socket.on('message', (data) => {
+		socket.on("message", (data) => {
 			this.log.trace(
-				'Received message %s (sent to bundle %s) with data:',
+				"Received message %s (sent to bundle %s) with data:",
 				data.messageName,
 				data.bundleName,
 				data.content,
 			);
 
 			this._messageHandlers.forEach((handler) => {
-				if (data.messageName === handler.messageName && data.bundleName === handler.bundleName) {
+				if (
+					data.messageName === handler.messageName &&
+					data.bundleName === handler.bundleName
+				) {
 					handler.func(data.content);
 				}
 			});
 		});
 
-		socket.io.on('error', (err) => {
-			this.log.warn('Unhandled socket connection error:', err);
+		socket.io.on("error", (err) => {
+			this.log.warn("Unhandled socket connection error:", err);
 		});
 
-		socket.on('protocol_error', (err) => {
-			if (err.type === 'UnauthorizedError') {
+		socket.on("protocol_error", (err) => {
+			if (err.type === "UnauthorizedError") {
 				if (globalThis.window) {
-					const url = [location.protocol, '//', location.host, location.pathname].join('');
+					const url = [
+						location.protocol,
+						"//",
+						location.host,
+						location.pathname,
+					].join("");
 					window.location.href = `/authError?code=${err.code as string}&message=${err.message}&viewUrl=${url}`;
 				} else {
 					globalThis.close();
 				}
 			} else {
-				this.log.error('Unhandled socket protocol error:', err);
+				this.log.error("Unhandled socket protocol error:", err);
 			}
 		});
 	}
@@ -277,7 +344,9 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 			return undefined;
 		}
 
-		const dialog = topDoc.querySelector('ncg-dashboard')?.shadowRoot?.querySelector(`#dialogs #${bundle}_${name}`);
+		const dialog = topDoc
+			.querySelector("ncg-dashboard")
+			?.shadowRoot?.querySelector(`#dialogs #${bundle}_${name}`);
 		return (dialog as any) ?? undefined;
 	}
 
@@ -294,7 +363,8 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		}
 
 		bundle = bundle ?? this.bundleName;
-		return this.getDialog(name, bundle)?.querySelector('iframe')?.contentWindow?.document;
+		return this.getDialog(name, bundle)?.querySelector("iframe")?.contentWindow
+			?.document;
 	}
 
 	/**
@@ -319,7 +389,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		{ updateVolume = true }: { updateVolume: boolean } = { updateVolume: true },
 	): createjs.AbstractSoundInstance {
 		if (!globalThis.window) {
-			throw new Error('NodeCG Sound API methods are not available in workers');
+			throw new Error("NodeCG Sound API methods are not available in workers");
 		}
 
 		if (!this._soundCues) {
@@ -328,11 +398,15 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 
 		const cue = this.findCue(cueName);
 		if (!cue) {
-			throw new Error(`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`);
+			throw new Error(
+				`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`,
+			);
 		}
 
 		if (!window.createjs?.Sound) {
-			throw new Error("NodeCG Sound API methods are not available when SoundJS isn't present");
+			throw new Error(
+				"NodeCG Sound API methods are not available when SoundJS isn't present",
+			);
 		}
 
 		if (!cue.file) {
@@ -355,7 +429,7 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	 */
 	stopSound(cueName: string): void {
 		if (!globalThis.window) {
-			throw new Error('NodeCG Sound API methods are not available in workers');
+			throw new Error("NodeCG Sound API methods are not available in workers");
 		}
 
 		if (!this._soundCues) {
@@ -363,14 +437,19 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		}
 
 		if (!this._soundCues.find((cue) => cue.name === cueName)) {
-			throw new Error(`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`);
+			throw new Error(
+				`Cue "${cueName}" does not exist in bundle "${this.bundleName}"`,
+			);
 		}
 
 		if (!window.createjs?.Sound) {
-			throw new Error("NodeCG Sound API methods are not available when SoundJS isn't present");
+			throw new Error(
+				"NodeCG Sound API methods are not available when SoundJS isn't present",
+			);
 		}
 
-		const instancesArr = (window.createjs.Sound as any)._instances as createjs.AbstractSoundInstance[];
+		const instancesArr = (window.createjs.Sound as any)
+			._instances as createjs.AbstractSoundInstance[];
 		for (let i = instancesArr.length - 1; i >= 0; i--) {
 			const instance = instancesArr[i]!;
 			const meta = soundMetadata.get(instance);
@@ -385,19 +464,34 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 	 */
 	stopAllSounds(): void {
 		if (!globalThis.window) {
-			throw new Error('NodeCG Sound API methods are not available in workers');
+			throw new Error("NodeCG Sound API methods are not available in workers");
 		}
 
 		if (!window.createjs?.Sound) {
-			throw new Error("NodeCG Sound API methods are not available when SoundJS isn't present");
+			throw new Error(
+				"NodeCG Sound API methods are not available when SoundJS isn't present",
+			);
 		}
 
 		window.createjs.Sound.stop();
 	}
 
-	sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, cb: SendMessageCb<T>): void;
-	sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, data?: unknown): Promise<T>;
-	sendMessageToBundle<T = unknown>(messageName: string, bundleName: string, data: unknown, cb: SendMessageCb<T>): void;
+	sendMessageToBundle<T = unknown>(
+		messageName: string,
+		bundleName: string,
+		cb: SendMessageCb<T>,
+	): void;
+	sendMessageToBundle<T = unknown>(
+		messageName: string,
+		bundleName: string,
+		data?: unknown,
+	): Promise<T>;
+	sendMessageToBundle<T = unknown>(
+		messageName: string,
+		bundleName: string,
+		data: unknown,
+		cb: SendMessageCb<T>,
+	): void;
 	sendMessageToBundle<T = unknown>(
 		messageName: string,
 		bundleName: string,
@@ -405,23 +499,49 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		cb?: SendMessageCb<T>,
 	): void | Promise<T> {
 		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-		return NodeCGAPIClient.sendMessageToBundle(messageName, bundleName, dataOrCb, cb as any);
+		return NodeCGAPIClient.sendMessageToBundle(
+			messageName,
+			bundleName,
+			dataOrCb,
+			cb as any,
+		);
 	}
 
 	sendMessage<T = unknown>(messageName: string, cb: SendMessageCb<T>): void;
 	sendMessage<T = unknown>(messageName: string, data?: unknown): Promise<T>;
-	sendMessage<T = unknown>(messageName: string, data: unknown, cb: SendMessageCb<T>): void;
-	sendMessage<T = unknown>(messageName: string, dataOrCb?: unknown, cb?: SendMessageCb<T>): void | Promise<T> {
+	sendMessage<T = unknown>(
+		messageName: string,
+		data: unknown,
+		cb: SendMessageCb<T>,
+	): void;
+	sendMessage<T = unknown>(
+		messageName: string,
+		dataOrCb?: unknown,
+		cb?: SendMessageCb<T>,
+	): void | Promise<T> {
 		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-		return this.sendMessageToBundle(messageName, this.bundleName, dataOrCb, cb as any);
+		return this.sendMessageToBundle(
+			messageName,
+			this.bundleName,
+			dataOrCb,
+			cb as any,
+		);
 	}
 
 	readReplicant<T = unknown>(name: string, cb: ReadReplicantCb<T>): void;
-	readReplicant<T = unknown>(name: string, namespace: string, cb: ReadReplicantCb<T>): void;
-	readReplicant<T = unknown>(name: string, nspOrCb: string | ReadReplicantCb<T>, maybeCb?: ReadReplicantCb<T>): void {
+	readReplicant<T = unknown>(
+		name: string,
+		namespace: string,
+		cb: ReadReplicantCb<T>,
+	): void;
+	readReplicant<T = unknown>(
+		name: string,
+		nspOrCb: string | ReadReplicantCb<T>,
+		maybeCb?: ReadReplicantCb<T>,
+	): void {
 		let namespace = this.bundleName;
 		let cb: ReadReplicantCb<T>;
-		if (typeof nspOrCb === 'string') {
+		if (typeof nspOrCb === "string") {
 			namespace = nspOrCb;
 			cb = maybeCb!;
 		} else {
@@ -431,15 +551,19 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 		NodeCGAPIClient.readReplicant<T>(name, namespace, cb);
 	}
 
-	protected _replicantFactory = <V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+	protected _replicantFactory = <
+		V,
+		O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+	>(
 		name: string,
 		namespace: string,
 		opts: O,
-	): ClientReplicant<V, O> => new ClientReplicant<V, O>(name, namespace, opts, this.socket);
+	): ClientReplicant<V, O> =>
+		new ClientReplicant<V, O>(name, namespace, opts, this.socket);
 
 	private _registerSounds(): void {
 		if (!globalThis.window) {
-			throw new Error('NodeCG Sound API methods are not available in workers');
+			throw new Error("NodeCG Sound API methods are not available in workers");
 		}
 
 		this._soundCues.forEach((cue) => {
@@ -447,30 +571,41 @@ export class NodeCGAPIClient<C extends Record<string, any> = NodeCG.Bundle.Unkno
 				return;
 			}
 
-			window.createjs.Sound.registerSound(`${cue.file.url}?sum=${cue.file.sum}`, cue.name, {
-				channels: typeof cue.channels === 'undefined' ? 100 : cue.channels,
-				sum: cue.file.sum,
-			});
+			window.createjs.Sound.registerSound(
+				`${cue.file.url}?sum=${cue.file.sum}`,
+				cue.name,
+				{
+					channels: typeof cue.channels === "undefined" ? 100 : cue.channels,
+					sum: cue.file.sum,
+				},
+			);
 		});
 	}
 
-	private _setInstanceVolume(instance: createjs.AbstractSoundInstance, cue: NodeCG.SoundCue): void {
+	private _setInstanceVolume(
+		instance: createjs.AbstractSoundInstance,
+		cue: NodeCG.SoundCue,
+	): void {
 		if (
-			this._masterVolume?.status !== 'declared' ||
-			typeof this._masterVolume.value !== 'number' ||
-			this._bundleVolume?.status !== 'declared' ||
-			typeof this._bundleVolume.value !== 'number'
+			this._masterVolume?.status !== "declared" ||
+			typeof this._masterVolume.value !== "number" ||
+			this._bundleVolume?.status !== "declared" ||
+			typeof this._bundleVolume.value !== "number"
 		) {
 			return;
 		}
 
-		const volume = (this._masterVolume.value / 100) * (this._bundleVolume.value / 100) * (cue.volume / 100);
+		const volume =
+			(this._masterVolume.value / 100) *
+			(this._bundleVolume.value / 100) *
+			(cue.volume / 100);
 		// Volue value must be finite or SoundJS throws error
 		instance.volume = isFinite(volume) ? volume : 0;
 	}
 
 	private _updateInstanceVolumes(): void {
-		const instancesArr = (window.createjs.Sound as any)._instances as createjs.AbstractSoundInstance[];
+		const instancesArr = (window.createjs.Sound as any)
+			._instances as createjs.AbstractSoundInstance[];
 
 		// Update the volume of any playing instances that haven't opted out of automatic volume updates.
 		this._soundCues.forEach((cue) => {

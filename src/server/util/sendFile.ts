@@ -1,7 +1,7 @@
-import * as path from 'path';
+import * as path from "path";
 
-import type express from 'express';
-import isChildOf from './isChildOf';
+import type express from "express";
+import isChildOf from "./isChildOf";
 
 export default (
 	directoryToPreventTraversalOutOf: string,
@@ -12,7 +12,7 @@ export default (
 	if (isChildOf(directoryToPreventTraversalOutOf, fileLocation)) {
 		res.sendFile(fileLocation, (err: NodeJS.ErrnoException) => {
 			if (err) {
-				if (err.code === 'ENOENT') {
+				if (err.code === "ENOENT") {
 					return res.type(path.extname(fileLocation)).sendStatus(404);
 				}
 

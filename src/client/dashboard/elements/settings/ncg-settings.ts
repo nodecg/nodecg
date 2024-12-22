@@ -1,11 +1,11 @@
-import '@polymer/iron-flex-layout/iron-flex-layout.js';
-import '@polymer/iron-icons/iron-icons.js';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/paper-card/paper-card.js';
-import '@polymer/paper-dialog/paper-dialog.js';
-import '@polymer/paper-toast/paper-toast.js';
-import * as Polymer from '@polymer/polymer';
-import Clipboard from 'clipboard';
+import "@polymer/iron-flex-layout/iron-flex-layout.js";
+import "@polymer/iron-icons/iron-icons.js";
+import "@polymer/paper-button/paper-button.js";
+import "@polymer/paper-card/paper-card.js";
+import "@polymer/paper-dialog/paper-dialog.js";
+import "@polymer/paper-toast/paper-toast.js";
+import * as Polymer from "@polymer/polymer";
+import Clipboard from "clipboard";
 class NcgSettings extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`
@@ -109,7 +109,7 @@ class NcgSettings extends Polymer.PolymerElement {
 	}
 
 	static get is() {
-		return 'ncg-settings';
+		return "ncg-settings";
 	}
 
 	static get properties() {
@@ -120,32 +120,32 @@ class NcgSettings extends Polymer.PolymerElement {
 		super.ready();
 
 		if (window.ncgConfig.login?.enabled && window.token) {
-			this.$['key'].textContent = window.token;
-			this.$['copyKey'].setAttribute('data-clipboard-text', window.token);
+			this.$["key"].textContent = window.token;
+			this.$["copyKey"].setAttribute("data-clipboard-text", window.token);
 		}
 
-		const clipboard = new Clipboard(this.$['copyKey']);
+		const clipboard = new Clipboard(this.$["copyKey"]);
 		clipboard.on(
-			'success',
+			"success",
 			/* istanbul ignore next: hard to test clipboard things */ () => {
-				this.$['settingsToast'].show('Key copied to clipboard.');
+				this.$["settingsToast"].show("Key copied to clipboard.");
 			},
 		);
 	}
 
 	/* istanbul ignore next: trivial */
 	openShowKeyDialog() {
-		this.$['showKeyDialog'].open();
+		this.$["showKeyDialog"].open();
 	}
 
 	/* istanbul ignore next: trivial */
 	openResetKeyDialog() {
-		this.$['resetKeyDialog'].open();
+		this.$["resetKeyDialog"].open();
 	}
 
 	resetKey() {
 		window.socket.emit(
-			'regenerateToken',
+			"regenerateToken",
 			/* istanbul ignore next */ (err) => {
 				if (err) {
 					console.error(err);
@@ -158,4 +158,4 @@ class NcgSettings extends Polymer.PolymerElement {
 	}
 }
 
-customElements.define('ncg-settings', NcgSettings);
+customElements.define("ncg-settings", NcgSettings);

@@ -1,14 +1,14 @@
-import * as path from 'node:path';
-import * as os from 'node:os';
-import * as Sentry from '@sentry/node';
-import express from 'express';
-import { config } from '../config';
-import type BundleManager from '../bundle-manager';
-import { authCheck, pjson } from '../util';
-import type { NodeCG } from '../../types/nodecg';
+import * as path from "node:path";
+import * as os from "node:os";
+import * as Sentry from "@sentry/node";
+import express from "express";
+import { config } from "../config";
+import type BundleManager from "../bundle-manager";
+import { authCheck, pjson } from "../util";
+import type { NodeCG } from "../../types/nodecg";
 
 const baseSentryConfig = {
-	dsn: config.sentry.enabled ? config.sentry.dsn : '',
+	dsn: config.sentry.enabled ? config.sentry.dsn : "",
 	serverName: os.hostname(),
 	release: pjson.version,
 };
@@ -24,7 +24,7 @@ export default class SentryConfig {
 	constructor(bundleManager: BundleManager) {
 		const { app, bundleMetadata } = this;
 
-		bundleManager.on('ready', () => {
+		bundleManager.on("ready", () => {
 			Sentry.configureScope((scope) => {
 				bundleManager.all().forEach((bundle) => {
 					bundleMetadata.push({
@@ -33,12 +33,14 @@ export default class SentryConfig {
 						version: bundle.version,
 					});
 				});
-				scope.setExtra('bundles', bundleMetadata);
+				scope.setExtra("bundles", bundleMetadata);
 			});
 		});
 
-		bundleManager.on('gitChanged', (bundle) => {
-			const metadataToUpdate = bundleMetadata.find((data) => data.name === bundle.name);
+		bundleManager.on("gitChanged", (bundle) => {
+			const metadataToUpdate = bundleMetadata.find(
+				(data) => data.name === bundle.name,
+			);
 			if (!metadataToUpdate) {
 				return;
 			}
@@ -48,9 +50,9 @@ export default class SentryConfig {
 		});
 
 		// Render a pre-configured Sentry instance for client pages that request it.
-		app.get('/sentry.js', authCheck, (_req, res) => {
-			res.type('.js');
-			res.render(path.join(__dirname, 'sentry.js.tmpl'), {
+		app.get("/sentry.js", authCheck, (_req, res) => {
+			res.type(".js");
+			res.render(path.join(__dirname, "sentry.js.tmpl"), {
 				baseSentryConfig,
 				bundleMetadata,
 			});

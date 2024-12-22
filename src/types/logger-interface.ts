@@ -8,15 +8,22 @@ export type LoggerInterface = {
 	replicants: (...args: any[]) => void;
 };
 
-export const LogLevels = ['verbose', 'debug', 'info', 'warn', 'error', 'silent'] as const;
+export const LogLevels = [
+	"verbose",
+	"debug",
+	"info",
+	"warn",
+	"error",
+	"silent",
+] as const;
 
 export const LogLevel = {
-	Trace: 'verbose',
-	Debug: 'debug',
-	Info: 'info',
-	Warn: 'warn',
-	Error: 'error',
-	Silent: 'silent',
+	Trace: "verbose",
+	Debug: "debug",
+	Info: "info",
+	Warn: "warn",
+	Error: "error",
+	Silent: "silent",
 } satisfies Record<string, (typeof LogLevels)[number]>;
 
 export type LogLevel = (typeof LogLevels)[number];

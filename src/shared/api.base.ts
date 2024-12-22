@@ -1,11 +1,11 @@
 // Packages
-import type { DeepReadonly } from 'ts-essentials';
+import type { DeepReadonly } from "ts-essentials";
 
 // Ours
-const { version } = require('../../package.json');
-import type { AbstractReplicant } from './replicants.shared';
-import type { NodeCG } from '../types/nodecg';
-import { TypedEmitter, type EventMap } from './typed-emitter';
+const { version } = require("../../package.json");
+import type { AbstractReplicant } from "./replicants.shared";
+import type { NodeCG } from "../types/nodecg";
+import { TypedEmitter, type EventMap } from "./typed-emitter";
 
 type MessageHandler = {
 	messageName: string;
@@ -24,7 +24,10 @@ export abstract class NodeCGAPIBase<
 	 * An object containing references to all Replicants that have been declared in this `window`, sorted by bundle.
 	 * E.g., `NodeCG.declaredReplicants.myBundle.myRep`
 	 */
-	static declaredReplicants: Map<string, Map<string, AbstractReplicant<'client', any>>>;
+	static declaredReplicants: Map<
+		string,
+		Map<string, AbstractReplicant<"client", any>>
+	>;
 
 	/**
 	 * Lets you easily wait for a group of Replicants to finish declaring.
@@ -49,12 +52,14 @@ export abstract class NodeCGAPIBase<
 	 *     console.log('rep1 and rep2 are fully declared and ready to use!');
 	 * });
 	 */
-	static async waitForReplicants(...replicants: Array<AbstractReplicant<'client', any>>): Promise<void> {
+	static async waitForReplicants(
+		...replicants: Array<AbstractReplicant<"client", any>>
+	): Promise<void> {
 		return new Promise((resolve) => {
 			const numReplicants = replicants.length;
 			let declaredReplicants = 0;
 			replicants.forEach((replicant) => {
-				replicant.once('change', () => {
+				replicant.once("change", () => {
 					declaredReplicants++;
 					if (declaredReplicants >= numReplicants) {
 						resolve();
@@ -150,25 +155,35 @@ export abstract class NodeCGAPIBase<
 	 * });
 	 */
 	listenFor(messageName: string, handlerFunc: NodeCG.ListenHandler): void;
-	listenFor(messageName: string, bundleName: string, handlerFunc: NodeCG.ListenHandler): void;
+	listenFor(
+		messageName: string,
+		bundleName: string,
+		handlerFunc: NodeCG.ListenHandler,
+	): void;
 	listenFor(
 		messageName: string,
 		bundleNameOrHandlerFunc: string | NodeCG.ListenHandler,
 		handlerFunc?: NodeCG.ListenHandler,
 	): void {
 		let bundleName: string;
-		if (typeof bundleNameOrHandlerFunc === 'string') {
+		if (typeof bundleNameOrHandlerFunc === "string") {
 			bundleName = bundleNameOrHandlerFunc;
 		} else {
 			bundleName = this.bundleName;
 			handlerFunc = bundleNameOrHandlerFunc;
 		}
 
-		if (typeof handlerFunc !== 'function') {
-			throw new Error(`argument "handler" must be a function, but you provided a(n) ${typeof handlerFunc}`);
+		if (typeof handlerFunc !== "function") {
+			throw new Error(
+				`argument "handler" must be a function, but you provided a(n) ${typeof handlerFunc}`,
+			);
 		}
 
-		this.log.trace('Listening for %s from bundle %s', messageName, bundleNameOrHandlerFunc);
+		this.log.trace(
+			"Listening for %s from bundle %s",
+			messageName,
+			bundleNameOrHandlerFunc,
+		);
 		this._messageHandlers.push({
 			messageName,
 			bundleName,
@@ -194,7 +209,11 @@ export abstract class NodeCGAPIBase<
 	 * nodecg.unlisten('printMessage', 'another-bundle', someFunctionName);
 	 */
 	unlisten(messageName: string, handlerFunc: NodeCG.ListenHandler): boolean;
-	unlisten(messageName: string, bundleName: string, handlerFunc: NodeCG.ListenHandler): boolean;
+	unlisten(
+		messageName: string,
+		bundleName: string,
+		handlerFunc: NodeCG.ListenHandler,
+	): boolean;
 	unlisten(
 		messageName: string,
 		bundleNameOrHandler: string | NodeCG.ListenHandler,
@@ -202,22 +221,31 @@ export abstract class NodeCGAPIBase<
 	): boolean {
 		let { bundleName } = this;
 		let handlerFunc = maybeHandler;
-		if (typeof bundleNameOrHandler === 'string') {
+		if (typeof bundleNameOrHandler === "string") {
 			bundleName = bundleNameOrHandler;
 		} else {
 			handlerFunc = bundleNameOrHandler;
 		}
 
-		if (typeof handlerFunc !== 'function') {
-			throw new Error(`argument "handler" must be a function, but you provided a(n) ${typeof handlerFunc}`);
+		if (typeof handlerFunc !== "function") {
+			throw new Error(
+				`argument "handler" must be a function, but you provided a(n) ${typeof handlerFunc}`,
+			);
 		}
 
-		this.log.trace('[%s] Removing listener for %s from bundle %s', this.bundleName, messageName, bundleName);
+		this.log.trace(
+			"[%s] Removing listener for %s from bundle %s",
+			this.bundleName,
+			messageName,
+			bundleName,
+		);
 
 		// Find the index of this handler in the array.
 		const index = this._messageHandlers.findIndex(
 			(handler) =>
-				handler.messageName === messageName && handler.bundleName === bundleName && handler.func === handlerFunc,
+				handler.messageName === messageName &&
+				handler.bundleName === bundleName &&
+				handler.func === handlerFunc,
 		);
 
 		// If the handler exists, remove it and return true.
@@ -274,62 +302,74 @@ export abstract class NodeCGAPIBase<
 	 * myRep.value = {objects: {can: {be: 'nested!'}}};
 	 * myRep.value = ['Even', 'arrays', 'work!'];
 	 */
-	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
-		name: string,
-		namespace: string,
-		opts?: O,
-	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
-		name: string,
-		opts?: O,
-	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(
-		name: string,
-		namespaceOrOpts?: string | O,
-		opts?: O,
-	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
-		name: string,
-		namespace: string,
-		opts?: O,
-	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
-		name: string,
-		opts?: O,
-	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(
+	Replicant<
+		V,
+		O extends
+			NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault,
+	>(name: string, namespace: string, opts?: O): AbstractReplicant<P, V, O>;
+	Replicant<
+		V,
+		O extends
+			NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault,
+	>(name: string, opts?: O): AbstractReplicant<P, V, O>;
+	Replicant<
+		V,
+		O extends
+			NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault,
+	>(
 		name: string,
 		namespaceOrOpts?: string | O,
 		opts?: O,
 	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+	Replicant<
+		V,
+		O extends
+			NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>,
+	>(name: string, namespace: string, opts?: O): AbstractReplicant<P, V, O>;
+	Replicant<
+		V,
+		O extends
+			NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>,
+	>(name: string, opts?: O): AbstractReplicant<P, V, O>;
+	Replicant<
+		V,
+		O extends
+			NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>,
+	>(
 		name: string,
-		namespace: string,
+		namespaceOrOpts?: string | O,
 		opts?: O,
 	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
-		name: string,
-		opts?: O,
-	): AbstractReplicant<P, V, O>;
-	Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(
+	Replicant<
+		V,
+		O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+	>(name: string, namespace: string, opts?: O): AbstractReplicant<P, V, O>;
+	Replicant<
+		V,
+		O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+	>(name: string, opts?: O): AbstractReplicant<P, V, O>;
+	Replicant<
+		V,
+		O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+	>(
 		name: string,
 		namespaceOrOpts?: string | O,
 		opts?: O,
 	): AbstractReplicant<P, V, O> {
 		let namespace: string;
-		if (typeof namespaceOrOpts === 'string') {
+		if (typeof namespaceOrOpts === "string") {
 			namespace = namespaceOrOpts;
 		} else {
 			namespace = this.bundleName;
 		}
 
-		if (typeof namespaceOrOpts !== 'string') {
+		if (typeof namespaceOrOpts !== "string") {
 			opts = namespaceOrOpts;
 		}
 
 		const defaultOpts: Record<any, unknown> = {};
 		opts = opts ?? defaultOpts;
-		if (typeof opts.schemaPath === 'undefined') {
+		if (typeof opts.schemaPath === "undefined") {
 			opts.schemaPath = `bundles/${encodeURIComponent(namespace)}/schemas/${encodeURIComponent(name)}.json`;
 		}
 

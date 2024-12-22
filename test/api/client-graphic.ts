@@ -1,11 +1,11 @@
 // Packages
-import type { TestFn } from 'ava';
-import anyTest from 'ava';
-import type * as puppeteer from 'puppeteer';
+import type { TestFn } from "ava";
+import anyTest from "ava";
+import type * as puppeteer from "puppeteer";
 
 // Ours
-import * as server from '../helpers/server';
-import * as browser from '../helpers/browser';
+import * as server from "../helpers/server";
+import * as browser from "../helpers/browser";
 
 server.setup();
 const { initGraphic } = browser.setup();
@@ -18,16 +18,16 @@ test.before(async () => {
 
 // The graphic and dashboard APIs use the same file
 // If dashboard API passes all its tests, we just need to make sure that the socket works
-test.serial('should receive messages', async (t) => {
+test.serial("should receive messages", async (t) => {
 	await graphic.evaluate(() => {
 		(window as any).serverToGraphicReceived = false;
-		window.graphicApi.listenFor('serverToGraphic', () => {
+		window.graphicApi.listenFor("serverToGraphic", () => {
 			(window as any).serverToGraphicReceived = true;
 		});
 	});
 
 	const sendMessageInterval = setInterval(() => {
-		t.context.apis.extension.sendMessage('serverToGraphic');
+		t.context.apis.extension.sendMessage("serverToGraphic");
 	}, 500);
 
 	await graphic.evaluate(
@@ -46,32 +46,32 @@ test.serial('should receive messages', async (t) => {
 	t.pass();
 });
 
-test.serial('should send messages', async (t) => {
+test.serial("should send messages", async (t) => {
 	t.plan(1);
 	const promise = new Promise<void>((resolve) => {
-		t.context.apis.extension.listenFor('graphicToServer', () => {
+		t.context.apis.extension.listenFor("graphicToServer", () => {
 			t.pass();
 			resolve();
 		});
 	});
 	void graphic.evaluate(() => {
-		void window.graphicApi.sendMessage('graphicToServer');
+		void window.graphicApi.sendMessage("graphicToServer");
 	});
 	return promise;
 });
 
-test.serial('#bundleVersion', async (t) => {
+test.serial("#bundleVersion", async (t) => {
 	const res = await graphic.evaluate(() => window.graphicApi.bundleVersion);
-	t.is(res, '0.0.1');
+	t.is(res, "0.0.1");
 });
 
-test.serial('#bundleGit', async (t) => {
+test.serial("#bundleGit", async (t) => {
 	const res = await graphic.evaluate(() => window.graphicApi.bundleGit);
 	t.deepEqual(res, {
-		branch: 'master',
-		date: '2018-07-13T17:09:29.000Z',
-		hash: '6262681c7f35eccd7293d57a50bdd25e4cd90684',
-		message: 'Initial commit',
-		shortHash: '6262681',
+		branch: "master",
+		date: "2018-07-13T17:09:29.000Z",
+		hash: "6262681c7f35eccd7293d57a50bdd25e4cd90684",
+		message: "Initial commit",
+		shortHash: "6262681",
 	});
 });

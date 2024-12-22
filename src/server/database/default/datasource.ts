@@ -1,22 +1,22 @@
-import * as path from 'node:path';
+import * as path from "node:path";
 
-import 'reflect-metadata';
-import { DataSource } from 'typeorm';
-export * from './entity';
+import "reflect-metadata";
+import { DataSource } from "typeorm";
+export * from "./entity";
 
-import { User } from './entity/User';
-import { Role } from './entity/Role';
-import { Replicant } from './entity/Replicant';
-import { Permission } from './entity/Permission';
-import { Identity } from './entity/Identity';
-import { ApiKey } from './entity/ApiKey';
-import { nodecgRootPath } from '../../../shared/utils/rootPath';
+import { User } from "./entity/User";
+import { Role } from "./entity/Role";
+import { Replicant } from "./entity/Replicant";
+import { Permission } from "./entity/Permission";
+import { Identity } from "./entity/Identity";
+import { ApiKey } from "./entity/ApiKey";
+import { nodecgRootPath } from "../../../shared/utils/rootPath";
 
-const dbPath = path.join(nodecgRootPath, 'db/nodecg.sqlite3');
-export const testing = process.env.NODECG_TEST?.toLowerCase() === 'true';
+const dbPath = path.join(nodecgRootPath, "db/nodecg.sqlite3");
+export const testing = process.env.NODECG_TEST?.toLowerCase() === "true";
 
 const dataSource = new DataSource({
-	type: 'better-sqlite3',
+	type: "better-sqlite3",
 
 	/**
 	 * TypeORM has this special :memory: key which indicates
@@ -29,10 +29,12 @@ const dataSource = new DataSource({
 	 * But, bad docs aside, it is still useful
 	 * and we use it for tests.
 	 */
-	database: testing ? ':memory:' : dbPath,
+	database: testing ? ":memory:" : dbPath,
 	logging: false,
 	entities: [ApiKey, Identity, Permission, Replicant, Role, User],
-	migrations: [path.join(nodecgRootPath, 'out/server/database/default/migration/*.js')],
+	migrations: [
+		path.join(nodecgRootPath, "out/server/database/default/migration/*.js"),
+	],
 	migrationsRun: true,
 	synchronize: false,
 });
