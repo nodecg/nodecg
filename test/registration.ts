@@ -48,7 +48,7 @@ test("singleInstance - scripts get injected into /instance/*.html routes", async
 	const response = await fetch(`${C.rootUrl()}instance/killed.html`);
 	t.is(response.status, 200);
 	const body = await response.text();
-	t.true(body.includes('<script src="/nodecg-api.min.js">'));
+	t.true(body.includes('<script src="/api.js">'));
 	t.true(body.includes('<script src="/socket.io/socket.io.js"></script>'));
 });
 
