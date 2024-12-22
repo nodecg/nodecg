@@ -18,7 +18,7 @@ jobs:
       release_name: ${{ steps.release.outputs.name }}
 
     steps:
-      - uses: google-github-actions/release-please-action@v4
+      - uses: googleapis/release-please-action@v4
         id: release
         with:
           release-type: node
@@ -33,7 +33,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
 
@@ -52,8 +52,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish types
-        working-directory: ./generated-types
+      - run: npx tsx scripts/sync-version.ts
+      - working-directory: ./generated-types
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

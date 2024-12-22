@@ -2,7 +2,7 @@
 import { type DataSource } from 'typeorm';
 
 // Ours
-import createLogger from '../logger';
+import createLogger from '../../logger';
 import dataSource, { testing } from './datasource';
 export * from './entity';
 

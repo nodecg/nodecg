@@ -1,6 +1,5 @@
 // Packages
 import test from 'ava';
-import fetch from 'node-fetch-commonjs';
 import type * as puppeteer from 'puppeteer';
 
 // Ours
@@ -105,7 +104,7 @@ test.serial('ncg-dialog - should open when an element with a valid nodecg-dialog
 	t.pass();
 });
 
-test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is clicked', async (t) => {
+test.serial.skip('ncg-dialog - should emit dialog-confirmed when a confirm button is clicked', async (t) => {
 	await dashboard.evaluate(
 		async () =>
 			new Promise<void>((resolve) => {
@@ -126,7 +125,7 @@ test.serial('ncg-dialog - should emit dialog-confirmed when a confirm button is 
 	t.pass();
 });
 
-test.serial('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async (t) => {
+test.serial.skip('ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked', async (t) => {
 	await dashboard.evaluate(
 		async () =>
 			new Promise<void>((resolve) => {

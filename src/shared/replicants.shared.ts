@@ -7,7 +7,7 @@ import type { NodeCG } from '../types/nodecg';
 import { TypedEmitter } from '../shared/typed-emitter';
 import { stringifyError } from './utils/errors';
 import { compileJsonSchema, formatJsonSchemaErrors } from './utils/compileJsonSchema';
-import { isBrowser } from './utils/isBrowser';
+import { isBrowser, isWorker } from './utils/isBrowser';
 
 export type ReplicantValue<P extends NodeCG.Platform, V, O, S extends boolean = false> = P extends 'server'
 	? S extends true
@@ -174,7 +174,7 @@ export abstract class AbstractReplicant<
 			switch (operation.method) {
 				case 'overwrite': {
 					const { newValue } = operation.args;
-					this[isBrowser() ? 'value' : '_value'] = proxyRecursive(this, newValue as any, operation.path);
+					this[isBrowser() || isWorker() ? 'value' : '_value'] = proxyRecursive(this, newValue as any, operation.path);
 					result = true;
 					break;
 				}
@@ -354,7 +354,7 @@ const deleteTrap = function <T>(target: T, prop: keyof T): boolean | void {
 		method: 'delete',
 		args: { prop },
 	});
-	if (!isBrowser()) {
+	if (!isBrowser() && !isWorker()) {
 		return delete target[prop];
 	}
 };
@@ -386,7 +386,7 @@ const CHILD_ARRAY_HANDLER = {
 					replicant.validate(valueClone);
 				}
 
-				if (isBrowser()) {
+				if (isBrowser() || isWorker()) {
 					metadata.replicant._addOperation({
 						path: metadata.path,
 						method: prop as any,
@@ -464,7 +464,7 @@ const CHILD_ARRAY_HANDLER = {
 		}
 
 		// If this Replicant is running in the server context, immediately apply the value.
-		if (!isBrowser()) {
+		if (!isBrowser() && !isWorker()) {
 			target[prop] = proxyRecursive(metadata.replicant, newValue, joinPathParts(metadata.path, prop as string));
 		}
 
@@ -536,7 +536,7 @@ const CHILD_OBJECT_HANDLER = {
 		}
 
 		// If this Replicant is running in the server context, immediately apply the value.
-		if (!isBrowser()) {
+		if (!isBrowser() && !isWorker()) {
 			target[prop] = proxyRecursive(metadata.replicant, newValue, joinPathParts(metadata.path, prop as string));
 		}
 

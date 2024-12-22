@@ -2,6 +2,64 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/nodecg/nodecg/compare/v2.2.5...v2.3.0) (2024-12-21)
+
+
+### Features
+
+* support nodejs v22 ([#760](https://github.com/nodecg/nodecg/issues/760)) ([b2db7e7](https://github.com/nodecg/nodecg/commit/b2db7e75ebda20bd9e7ca85af9b40735135c27c5))
+* use node 22 for docker image ([e8ff043](https://github.com/nodecg/nodecg/commit/e8ff043b555d744b0b35bf927d05f44e5524f119))
+
+
+### Bug Fixes
+
+* remove Node 16 from supported runtime ([5838cdc](https://github.com/nodecg/nodecg/commit/5838cdc03f837acb8f1e60fd08b4bf38165b9c44))
+* update better-sqlite3 ([8788701](https://github.com/nodecg/nodecg/commit/878870105b7128b38bc797be04c6a854fa88ad36))
+
+
+### Reverts
+
+* update of typeorm ([ad54cb4](https://github.com/nodecg/nodecg/commit/ad54cb4ba4d543ab93d8553b4f8d7c033aa08b70))
+
+## [2.2.5](https://github.com/nodecg/nodecg/compare/v2.2.4...v2.2.5) (2024-11-30)
+
+
+### Bug Fixes
+
+* bugs preventing replicants in workers ([#756](https://github.com/nodecg/nodecg/issues/756)) ([824f9a9](https://github.com/nodecg/nodecg/commit/824f9a90bb054c0ff833838d457506e44035ddcf))
+
+## [2.2.4](https://github.com/nodecg/nodecg/compare/v2.2.3...v2.2.4) (2024-10-12)
+
+
+### Bug Fixes
+
+* **types-release:** force update package.json version ([5db1c3a](https://github.com/nodecg/nodecg/commit/5db1c3a59c39f03bd9a38981f9dd0e0caab638e5))
+
+## [2.2.3](https://github.com/nodecg/nodecg/compare/v2.2.2...v2.2.3) (2024-10-10)
+
+
+### Bug Fixes
+
+* Add '@types/ws' package to fix types package build ([#751](https://github.com/nodecg/nodecg/issues/751)) ([0c71ddd](https://github.com/nodecg/nodecg/commit/0c71dddfe7fe6fe1c8c632cce89272f0428cef86))
+* Set cheerio version to avoid getting breaking changes in 1.0 release ([e069c96](https://github.com/nodecg/nodecg/commit/e069c968b41ae12700b49bdd37e66618f7b906e1))
+
+## [2.2.2](https://github.com/nodecg/nodecg/compare/v2.2.1...v2.2.2) (2024-06-29)
+
+
+### Bug Fixes
+
+* **dashboard:** iframe lazy loading ([#729](https://github.com/nodecg/nodecg/issues/729)) ([a3dc36c](https://github.com/nodecg/nodecg/commit/a3dc36cec573ced0c82f25e6159a6067bf8ff1a4))
+* ensure assignable sounds are set correctly ([#736](https://github.com/nodecg/nodecg/issues/736)) ([42d41a6](https://github.com/nodecg/nodecg/commit/42d41a6355c23dd2eea035c8594ed90eec20aae9))
+* ensure sounds work on dashboard panels ([#735](https://github.com/nodecg/nodecg/issues/735)) ([f9d346b](https://github.com/nodecg/nodecg/commit/f9d346b3c506d8a0b805c330e050c727c2c13b34))
+* **types:** target ES2015 in generated typings ([#732](https://github.com/nodecg/nodecg/issues/732)) ([fa977b3](https://github.com/nodecg/nodecg/commit/fa977b387e56a49375afb159e356ee64af61f0f9))
+
+## [2.2.1](https://github.com/nodecg/nodecg/compare/v2.2.0...v2.2.1) (2024-01-14)
+
+
+### Bug Fixes
+
+* **login:** use correct logic for redirect URL protocol ([50551b2](https://github.com/nodecg/nodecg/commit/50551b29e1a6c5cb3a7888e65f29661f01317a6d))
+
 ## [2.2.0](https://github.com/nodecg/nodecg/compare/v2.1.12...v2.2.0) (2024-01-05)
 
 

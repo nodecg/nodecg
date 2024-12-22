@@ -1,8 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Permission } from './Permission';
+import type { Role as RoleModel } from '../../models';
 
 @Entity()
-export class Role {
+export class Role implements RoleModel {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
 

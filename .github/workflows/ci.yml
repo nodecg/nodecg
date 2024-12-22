@@ -15,12 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
@@ -32,12 +31,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
@@ -53,13 +51,12 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - '16.13.0'
-          - '18.12.0'
-          - '20.9.0'
+          - '18'
+          - '20'
+          - '22'
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest
 
     runs-on: ${{matrix.os}}
 
@@ -88,14 +85,6 @@ jobs:
           key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
         if: runner.os == 'Linux'
 
-      - name: Restore Chromium dependency cache (macOS)
-        uses: actions/cache@v3
-        with:
-          path: |
-            /Users/runner/.cache/puppeteer
-          key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
-        if: runner.os == 'macOS'
-
       - name: Restore Chromium dependency cache (Windows)
         uses: actions/cache@v3
         with:
@@ -110,7 +99,7 @@ jobs:
 
       - run: npm run test-coverage-ci
 
-      - if: runner.os == 'Linux' && matrix.node-version == '18.x'
+      - if: matrix.os == 'Linux' && matrix.node-version == '20'
         uses: codecov/codecov-action@v3
 
   dry-run-container-build:

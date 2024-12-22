@@ -1,7 +1,6 @@
 // Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
-import fetch from 'node-fetch-commonjs';
 import express from 'express';
 import type * as puppeteer from 'puppeteer';
 

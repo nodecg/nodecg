@@ -1,15 +1,7 @@
 {
   "name": "nodecg",
+  "version": "2.3.0",
   "description": "Dynamic broadcast graphics rendered in a browser",
-  "main": "index.js",
-  "version": "2.2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nodecg/nodecg.git"
-  },
-  "bugs": "https://github.com/nodecg/nodecg/issues",
-  "homepage": "https://nodecg.dev/",
-  "license": "MIT",
   "keywords": [
     "graphics",
     "nodecg",
@@ -17,6 +9,47 @@
     "dynamic",
     "broadcast"
   ],
+  "homepage": "https://nodecg.dev/",
+  "bugs": "https://github.com/nodecg/nodecg/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodecg/nodecg.git"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "files": [
+    "dist",
+    "out",
+    "scripts",
+    "bundles/.empty_directory",
+    "db/.empty_directory",
+    "schemas",
+    "AUTHORS"
+  ],
+  "scripts": {
+    "start": "node index.js",
+    "dev": "del-cli dist out && run-p dev:*",
+    "dev:client": "npm run build:client -- --watch",
+    "dev:build-server": "tsc -b src/server --watch --preserveWatchOutput",
+    "dev:run-server": "node --watch --watch-preserve-output index.js",
+    "dev:copy-templates": "onchange \"src/server/**/*.tmpl\" -i -- cpy \"src/server/**/*.tmpl\" out/server",
+    "test": "ava --config ava.config.js",
+    "test-coverage": "c8 ava --config ava.config.js",
+    "test-coverage-ci": "c8 --reporter lcov ava --config ava.config.js",
+    "test:types": "cd typetest/fake-bundle && npm run build",
+    "lint": "npm-run-all -s lint:*",
+    "lint:prettier": "prettier --check \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
+    "lint:eslint": "eslint --cache \"{src,test}/**/*.ts\"",
+    "fix": "npm-run-all -s fix:*",
+    "fix:prettier": "prettier --write \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
+    "fix:eslint": "npm run lint:eslint -- --fix ",
+    "build": "del-cli \"generated-types/{client,server,shared,types}\" dist out && run-s build:{tsc,client,copy-templates,types}",
+    "build:tsc": "tsc -b src/server src/client",
+    "build:client": "ts-node scripts/build-client.ts",
+    "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server",
+    "build:types": "ts-node scripts/generate-types-package.ts",
+    "generate-migrations": "cd src/server && typeorm-ts-node-commonjs migration:generate ./database/migration/rename-me -d ./database/datasource.ts"
+  },
   "dependencies": {
     "@nodecg/json-schema-defaults": "^1.0.4",
     "@polymer/app-layout": "^3.1.0",
@@ -50,13 +83,12 @@
     "ajv-draft-04": "^1.0.0",
     "ajv-formats": "^2.1.1",
     "app-root-path": "^3.1.0",
-    "better-sqlite3": "^8.7.0",
+    "better-sqlite3": "^11.7.0",
     "body-parser": "^1.20.2",
-    "cheerio": "^1.0.0-rc.2",
+    "cheerio": "1.0.0-rc.12",
     "chokidar": "^3.5.3",
     "clipboard": "^2.0.11",
     "compression": "^1.7.4",
-    "connect-typeorm": "^2.0.0",
     "cookie-parser": "^1.4.6",
     "cookies-js": "^1.2.3",
     "cosmiconfig": "^8.3.6",
@@ -81,7 +113,6 @@
     "lodash.debounce": "^4.0.8",
     "lodash.template": "^4.5.0",
     "multer": "^1.4.5-lts.1",
-    "node-fetch-commonjs": "^3.3.2",
     "object-path": "^0.11.8",
     "packery": "^2.1.2",
     "passport": "^0.6.0",
@@ -92,6 +123,7 @@
     "process": "^0.11.10",
     "semver": "^7.5.4",
     "serialize-error": "^8.1.0",
+    "session-file-store": "^1.5.0",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
     "soundjs": "^1.0.1",
@@ -103,41 +135,8 @@
     "yargs": "^15.4.1",
     "zod": "^3.22.4"
   },
-  "scripts": {
-    "start": "node index.js",
-    "dev": "del-cli dist out && run-p dev:*",
-    "dev:client": "npm run build:client -- --watch",
-    "dev:build-server": "tsc -b src/server --watch --preserveWatchOutput",
-    "dev:run-server": "node --watch --watch-preserve-output out/server/bootstrap.js",
-    "test": "ava --config ava.config.js",
-    "test-coverage": "c8 ava --config ava.config.js",
-    "test-coverage-ci": "c8 --reporter lcov ava --config ava.config.js",
-    "test:types": "cd typetest/fake-bundle && npm run build",
-    "lint": "npm-run-all -s lint:*",
-    "lint:prettier": "prettier --check \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
-    "lint:eslint": "eslint --cache \"{src,test}/**/*.ts\"",
-    "fix": "npm-run-all -s fix:*",
-    "fix:prettier": "prettier --write \"**/*.{json,md,yml,ts,tsx,js,jsx}\"",
-    "fix:eslint": "npm run lint:eslint -- --fix ",
-    "build": "del-cli \"generated-types/{client,server,shared,types}\" dist out && run-s build:{tsc,client,copy-templates,types}",
-    "build:tsc": "tsc -b src/server src/client",
-    "build:client": "ts-node scripts/build-client.ts",
-    "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server",
-    "build:types": "ts-node scripts/generate-types-package.ts",
-    "generate-migrations": "cd src/server && typeorm-ts-node-commonjs migration:generate ./database/migration/rename-me -d ./database/datasource.ts"
-  },
-  "files": [
-    "dist",
-    "out",
-    "scripts",
-    "bundles/.empty_directory",
-    "db/.empty_directory",
-    "schemas",
-    "AUTHORS"
-  ],
   "devDependencies": {
     "@types/app-root-path": "^1.2.8",
-    "@types/cheerio": "^0.22.35",
     "@types/clone": "^2.1.4",
     "@types/compression": "^1.7.5",
     "@types/cookie-parser": "^1.4.6",
@@ -158,6 +157,7 @@
     "@types/passport-local": "^1.0.38",
     "@types/passport-steam": "^1.0.5",
     "@types/semver": "^7.5.6",
+    "@types/session-file-store": "^1.2.5",
     "@types/sinon": "^10.0.20",
     "@types/soundjs": "^0.6.31",
     "@types/uuid": "^8.3.4",
@@ -178,6 +178,7 @@
     "is-ci": "^3.0.1",
     "is-windows": "^1.0.2",
     "npm-run-all": "^4.1.5",
+    "onchange": "^7.1.0",
     "prettier": "^3.1.1",
     "puppeteer": "^21.6.1",
     "replace-in-file": "^6.3.5",
@@ -188,7 +189,10 @@
     "ts-node": "^10.9.2",
     "typescript": "~5.3.3"
   },
+  "overrides": {
+    "better-sqlite3": "$better-sqlite3"
+  },
   "engines": {
-    "node": "^16.13.0 || ^18.12.0 || ^20.9.0"
+    "node": "^18.12.0 || ^20.9.0 || ^22.11.0"
   }
 }

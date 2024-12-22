@@ -1,8 +1,9 @@
 import { Entity, ManyToOne, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { User } from './User';
+import type { Identity as IdentityModel } from '../../models';
 
 @Entity()
-export class Identity {
+export class Identity implements IdentityModel {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
 

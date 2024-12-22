@@ -1,7 +1,6 @@
 // Packages
 import type { TestFn } from 'ava';
 import anyTest from 'ava';
-import fetch from 'node-fetch-commonjs';
 
 // Ours
 import * as server from './helpers/server';

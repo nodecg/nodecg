@@ -79,6 +79,7 @@ export class DashboardLib {
 						createApiInstance: bundle,
 						standalone: Boolean(req.query['standalone']),
 						fullbleed: panel.fullbleed,
+						sound: bundle.soundCues && bundle.soundCues.length > 0,
 					},
 					(html) => res.send(html),
 				);

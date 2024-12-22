@@ -1,5 +1,5 @@
-import { getConnection, User, Role, Identity } from '../database';
-import { ApiKey } from './entity/ApiKey';
+import { getConnection, User, Role, Identity, ApiKey, Replicant } from './connection';
+import { ServerReplicant } from '../../replicant';
 
 export async function findUser(id: User['id']): Promise<User | null> {
 	const database = await getConnection();
@@ -92,11 +92,12 @@ async function createIdentity(
 	return manager.save(ident);
 }
 
-async function createApiKey(): Promise<ApiKey> {
+export async function createApiKey(): Promise<ApiKey> {
 	const database = await getConnection();
 	const { manager } = database;
 	const apiKey = manager.create(ApiKey);
-	return manager.save(apiKey);
+	await manager.save(apiKey);
+	return apiKey;
 }
 
 async function findIdent(type: Identity['provider_type'], hash: Identity['provider_hash']): Promise<Identity | null> {
@@ -115,4 +116,77 @@ async function findUserById(userId: User['id']): Promise<User | null> {
 		},
 		relations: ['roles', 'identities', 'apiKeys'],
 	});
+}
+
+export async function findApiKey(token: string) {
+	const database = await getConnection();
+	return database.getRepository(ApiKey).findOne({
+		where: { secret_key: token },
+		relations: ['user'],
+	});
+}
+
+export async function saveUser(user: User) {
+	const database = await getConnection();
+	await database.manager.save(user);
+}
+
+export async function deleteSecretKey(token: string) {
+	const database = await getConnection();
+	await database.manager.delete(ApiKey, { secret_key: token });
+}
+
+const repEntities: Replicant[] = [];
+
+export async function saveReplicant(replicant: ServerReplicant<any>) {
+	let valueChangedDuringSave = false;
+
+	const connection = await getConnection();
+	const manager = connection.manager;
+
+	let repEnt: Replicant;
+	const existingEnt = repEntities.find((pv) => pv.namespace === replicant.namespace && pv.name === replicant.name);
+	if (existingEnt) {
+		repEnt = existingEnt;
+	} else {
+		repEnt = manager.create(Replicant, {
+			namespace: replicant.namespace,
+			name: replicant.name,
+		});
+		repEntities.push(repEnt);
+	}
+
+	const valueRef = replicant.value;
+	let serializedValue = JSON.stringify(valueRef);
+	if (typeof serializedValue === 'undefined') {
+		serializedValue = '';
+	}
+
+	const changeHandler = (newVal: unknown) => {
+		if (newVal !== valueRef && !isNaN(valueRef)) {
+			valueChangedDuringSave = true;
+		}
+	};
+
+	repEnt.value = serializedValue;
+
+	try {
+		replicant.on('change', changeHandler);
+		await manager.save(repEnt);
+		if (!valueChangedDuringSave) {
+			return;
+		}
+
+		// If we are here, then that means the value changed again during
+		// the save operation, and so we have to do some recursion
+		// to save it again.
+		await saveReplicant(replicant);
+	} finally {
+		replicant.off('change', changeHandler);
+	}
+}
+
+export async function getAllReplicants() {
+	const connection = await getConnection();
+	return connection.getRepository(Replicant).find();
 }

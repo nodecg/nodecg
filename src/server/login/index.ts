@@ -6,15 +6,12 @@ import expressSession from 'express-session';
 import passport from 'passport';
 import SteamStrategy from 'passport-steam';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { TypeormStore } from 'connect-typeorm';
 import cookieParser from 'cookie-parser';
-import fetch from 'node-fetch-commonjs';
 
 import { config } from '../config';
 import createLogger from '../logger';
-import type { User, Role } from '../database';
-import { Session, getConnection } from '../database';
-import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/utils';
+import type { User, Role } from '../database/models';
+import { findUser, upsertUser, getSuperUserRole, isSuperUser } from '../database/default/utils';
 import { nodecgRootPath } from '../../shared/utils/rootPath';
 
 type StrategyDoneCb = (error: NodeJS.ErrnoException | undefined, profile?: User) => void;
@@ -48,7 +45,7 @@ type DiscordProfile = {
 };
 
 const log = createLogger('login');
-const protocol = config.ssl?.enabled ?? (config.login.enabled && config.login.forceHttpsReturn) ? 'https' : 'http';
+const protocol = config.ssl?.enabled || (config.login.enabled && config.login.forceHttpsReturn) ? 'https' : 'http';
 
 // Required for persistent login sessions.
 // Passport needs ability to serialize and unserialize users out of session.
@@ -324,15 +321,7 @@ if (config.login.enabled && config.login.local?.enabled && config.login.sessionS
 	);
 }
 
-export async function createMiddleware(callbacks: {
-	onLogin(user: Express.User): void;
-	onLogout(user: Express.User): void;
-}): Promise<{
-	app: express.Application;
-	sessionMiddleware: express.RequestHandler;
-}> {
-	const database = await getConnection();
-	const sessionRepository = database.getRepository(Session);
+export function createMiddleware(callbacks: { onLogin(user: Express.User): void; onLogout(user: Express.User): void }) {
 	const app = express();
 	const redirectPostLogin = (req: express.Request, res: express.Response): void => {
 		const url = req.session?.returnTo ?? '/dashboard';
@@ -351,10 +340,6 @@ export async function createMiddleware(callbacks: {
 	const sessionMiddleware = expressSession({
 		resave: false,
 		saveUninitialized: false,
-		store: new TypeormStore({
-			cleanupLimit: 2,
-			ttl: Infinity,
-		}).connect(sessionRepository),
 		secret: config.login.sessionSecret,
 		cookie: {
 			path: '/',

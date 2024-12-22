@@ -10,7 +10,6 @@
  */
 
 import semver from 'semver';
-import fetch from 'node-fetch-commonjs';
 import { nodecgRootPath } from '../shared/utils/rootPath';
 
 const cwd = process.cwd();
