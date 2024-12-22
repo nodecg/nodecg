@@ -64,8 +64,8 @@ test('should return the expected data when "nodecg" property does exist', (t) =>
 			),
 			file: "panel.html",
 			html:
-				"<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test panel!</p>\n<script>" +
-				"\n    window.parent.dashboardApi = window.nodecg;\n</script>\n</body></html>",
+				"<!DOCTYPE html><html><head></head>\n<body>\n\t<p>This is a test panel!</p>\n\t<script>" +
+				"\n\t\twindow.parent.dashboardApi = window.nodecg;\n\t</script>\n</body></html>",
 			dialog: false,
 			bundleName: "good-bundle",
 			workspace: "default",
@@ -82,7 +82,7 @@ test('should return the expected data when "nodecg" property does exist', (t) =>
 			),
 			file: "workspace-panel.html",
 			html:
-				"<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test panel that goes into a test " +
+				"<!DOCTYPE html><html><head></head>\n<body>\n\t<p>This is a test panel that goes into a test " +
 				"workspace!</p>\n</body></html>",
 			dialog: false,
 			bundleName: "good-bundle",
@@ -98,7 +98,7 @@ test('should return the expected data when "nodecg" property does exist', (t) =>
 				"../fixtures/bundle-parser/good-bundle/dashboard/fullbleed-panel.html",
 			),
 			file: "fullbleed-panel.html",
-			html: "<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test fullbleed panel!</p>\n</body></html>",
+			html: "<!DOCTYPE html><html><head></head>\n<body>\n\t<p>This is a test fullbleed panel!</p>\n</body></html>",
 			dialog: false,
 			bundleName: "good-bundle",
 			fullbleed: true,
@@ -114,7 +114,7 @@ test('should return the expected data when "nodecg" property does exist', (t) =>
 				"../fixtures/bundle-parser/good-bundle/dashboard/dialog.html",
 			),
 			file: "dialog.html",
-			html: "<!DOCTYPE html><html><head></head>\n<body>\n<p>This is a test dialog!</p>\n</body></html>",
+			html: "<!DOCTYPE html><html><head></head>\n<body>\n\t<p>This is a test dialog!</p>\n</body></html>",
 			dialog: true,
 			dialogButtons: undefined,
 			bundleName: "good-bundle",
