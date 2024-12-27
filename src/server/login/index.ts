@@ -85,14 +85,12 @@ export function createMiddleware(
 	passport.serializeUser<User["id"]>((user, done) => {
 		done(null, user.id);
 	});
-	passport.deserializeUser<User["id"]>((id, done) => {
-		void (async () => {
-			try {
-				done(null, await db.findUser(id));
-			} catch (error: unknown) {
-				done(error);
-			}
-		})();
+	passport.deserializeUser<User["id"]>(async (id, done) => {
+		try {
+			done(null, await db.findUser(id));
+		} catch (error: unknown) {
+			done(error);
+		}
 	});
 
 	if (
@@ -334,53 +332,51 @@ export function createMiddleware(
 					passwordField: "password",
 					session: false,
 				},
-				(username: string, password: string, done: StrategyDoneCb) => {
-					void (async () => {
-						try {
-							const roles: Role[] = [];
-							const foundUser = allowedUsers?.find(
-								(u: { username: string; password: string }) =>
-									u.username === username,
-							);
-							let allowed = false;
+				async (username: string, password: string, done: StrategyDoneCb) => {
+					try {
+						const roles: Role[] = [];
+						const foundUser = allowedUsers?.find(
+							(u: { username: string; password: string }) =>
+								u.username === username,
+						);
+						let allowed = false;
 
-							if (foundUser) {
-								const match = /^([^:]+):(.+)$/.exec(foundUser.password ?? "");
-								let expected = foundUser.password;
-								let actual = password;
+						if (foundUser) {
+							const match = /^([^:]+):(.+)$/.exec(foundUser.password ?? "");
+							let expected = foundUser.password;
+							let actual = password;
 
-								if (match && hashes.includes(match[1]!)) {
-									expected = match[2]!;
-									actual = crypto
-										.createHmac(match[1]!, sessionSecret)
-										.update(actual, "utf8")
-										.digest("hex");
-								}
-
-								if (expected === actual) {
-									allowed = true;
-									roles.push(await db.getSuperUserRole());
-								}
+							if (match && hashes.includes(match[1]!)) {
+								expected = match[2]!;
+								actual = crypto
+									.createHmac(match[1]!, sessionSecret)
+									.update(actual, "utf8")
+									.digest("hex");
 							}
 
-							log.info(
-								'(Local) %s "%s" access',
-								allowed ? "Granting" : "Denying",
-								username,
-							);
-
-							const user = await db.upsertUser({
-								name: username,
-								provider_type: "local",
-								provider_hash: username,
-								roles,
-							});
-							done(undefined, user);
-							return;
-						} catch (error: any) {
-							done(error);
+							if (expected === actual) {
+								allowed = true;
+								roles.push(await db.getSuperUserRole());
+							}
 						}
-					})();
+
+						log.info(
+							'(Local) %s "%s" access',
+							allowed ? "Granting" : "Denying",
+							username,
+						);
+
+						const user = await db.upsertUser({
+							name: username,
+							provider_type: "local",
+							provider_hash: username,
+							roles,
+						});
+						done(undefined, user);
+						return;
+					} catch (error: any) {
+						done(error);
+					}
 				},
 			),
 		);
