@@ -10,7 +10,7 @@ import { iframeResizer } from "iframe-resizer";
 const HEX_PARSE_SHORTHAND_REGEX = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 const HEX_PARSE_REGEX = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
 
-class NcgDashboardPanel extends Polymer.PolymerElement {
+export class NcgDashboardPanel extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`
 		<style include="nodecg-theme paper-material-styles">

@@ -10,7 +10,7 @@ import { timeOut } from "@polymer/polymer/lib/utils/async.js";
 import * as Polymer from "@polymer/polymer";
 import Draggabilly from "draggabilly";
 import Packery from "packery";
-import type NcgDashboardPanel from "./ncg-dashboard-panel";
+import type { NcgDashboardPanel } from "./ncg-dashboard-panel";
 import type { NodeCG } from "../../../types/nodecg";
 
 class NcgWorkspace extends Polymer.PolymerElement {
