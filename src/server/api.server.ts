@@ -220,7 +220,7 @@ export function serverApiFactory(
 				bundleName,
 				data,
 			);
-			// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+			 
 			return NodeCGAPIServer.sendMessageToBundle.apply(
 				NodeCGAPIBase,
 				arguments as any, // eslint-disable-line prefer-rest-params

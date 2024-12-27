@@ -6,7 +6,7 @@ import type * as Sentry from "@sentry/node";
 import type { LoggerInterface } from "../../types/logger-interface";
 import { LogLevel } from "../../types/logger-interface";
 
-type LoggerOptions = {
+interface LoggerOptions {
 	console: Partial<{
 		enabled: boolean;
 		timestamps: boolean;
@@ -20,7 +20,7 @@ type LoggerOptions = {
 		path: string;
 		replicants: boolean;
 	}>;
-};
+}
 
 /**
  * A factory that configures and returns a Logger constructor.

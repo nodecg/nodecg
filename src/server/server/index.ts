@@ -71,12 +71,12 @@ const renderTemplate = memoize((content, options) =>
 	template(content)(options),
 );
 
-type EventMap = {
+interface EventMap {
 	error: (error: unknown) => void;
 	extensionsLoaded: () => void;
 	started: () => void;
 	stopped: () => void;
-};
+}
 
 export class NodeCGServer extends TypedEmitter<EventMap> {
 	readonly log = createLogger("server");

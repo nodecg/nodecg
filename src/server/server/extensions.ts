@@ -13,13 +13,13 @@ import { sentryEnabled } from "../config";
 
 const log = createLogger("extensions");
 
-export type ExtensionEventMap = {
+export interface ExtensionEventMap {
 	login: (user: Express.Request["user"]) => void;
 	logout: (user: Express.Request["user"]) => void;
 	extensionsLoaded: () => void;
 	serverStarted: () => void;
 	serverStopping: () => void;
-};
+}
 
 export class ExtensionManager extends EventEmitter {
 	readonly extensions: Record<string, unknown> = {};

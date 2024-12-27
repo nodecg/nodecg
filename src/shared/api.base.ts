@@ -7,11 +7,11 @@ import type { AbstractReplicant } from "./replicants.shared";
 import type { NodeCG } from "../types/nodecg";
 import { TypedEmitter, type EventMap } from "./typed-emitter";
 
-type MessageHandler = {
+interface MessageHandler {
 	messageName: string;
 	bundleName: string;
 	func: NodeCG.ListenHandler;
-};
+}
 
 export abstract class NodeCGAPIBase<
 	P extends NodeCG.Platform,
@@ -53,7 +53,7 @@ export abstract class NodeCGAPIBase<
 	 * });
 	 */
 	static async waitForReplicants(
-		...replicants: Array<AbstractReplicant<"client", any>>
+		...replicants: AbstractReplicant<"client", any>[]
 	): Promise<void> {
 		return new Promise((resolve) => {
 			const numReplicants = replicants.length;

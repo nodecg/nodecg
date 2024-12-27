@@ -1,4 +1,4 @@
-export type LoggerInterface = {
+export interface LoggerInterface {
 	name: string;
 	trace: (...args: any[]) => void;
 	debug: (...args: any[]) => void;
@@ -6,7 +6,7 @@ export type LoggerInterface = {
 	warn: (...args: any[]) => void;
 	error: (...args: any[]) => void;
 	replicants: (...args: any[]) => void;
-};
+}
 
 export const LogLevels = [
 	"verbose",

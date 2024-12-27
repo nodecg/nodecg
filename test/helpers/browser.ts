@@ -8,9 +8,9 @@ import isCi from "is-ci";
 import * as C from "./test-constants";
 import { sleep } from "./utilities";
 
-export type BrowserContext = {
+export interface BrowserContext {
 	browser: puppeteer.Browser;
-};
+}
 const test = anyTest as TestFn<BrowserContext>;
 
 export const setup = () => {
@@ -19,7 +19,7 @@ export const setup = () => {
 		// The --no-sandbox flag is required to run Headless Chrome on CI
 		const args = isCi ? ["--no-sandbox"] : undefined;
 		browser = await puppeteer.launch({
-			headless: argv["debugTests"] ? false : true,
+			headless: argv.debugTests ? false : true,
 			args,
 		});
 	});
@@ -29,7 +29,7 @@ export const setup = () => {
 			return;
 		}
 
-		if (argv["debugTests"]) {
+		if (argv.debugTests) {
 			await sleep(99999999);
 		} else {
 			await browser.close();

@@ -17,11 +17,11 @@ const Logger = loggerFactory({
 	file: { path: path.join(logsDir, "nodecg.log") },
 });
 
-type TestContext = {
+interface TestContext {
 	logger: InstanceType<typeof Logger>;
 	SentryMock: any;
 	sentryLogger: InstanceType<typeof Logger>;
-};
+}
 
 const test = anyTest as TestFn<TestContext>;
 

@@ -10,12 +10,12 @@ import { filteredConfig, sentryEnabled } from "../config";
 import { noop } from "./noop";
 import type { NodeCG } from "../../types/nodecg";
 
-type Options = {
+interface Options {
 	standalone?: boolean;
 	createApiInstance?: NodeCG.Bundle;
 	sound?: boolean;
 	fullbleed?: boolean;
-};
+}
 
 /**
  * Injects the appropriate assets into a panel, dialog, or graphic.
