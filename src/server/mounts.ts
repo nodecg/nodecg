@@ -3,10 +3,11 @@ import path from "path";
 
 // Packages
 import express from "express";
-import { authCheck, sendFile } from "./util";
+import { authCheck } from "./util/authcheck";
+import { sendFile } from "./util/sendFile";
 import type { NodeCG } from "../types/nodecg";
 
-export default class MountsLib {
+export class MountsLib {
 	app = express();
 
 	constructor(bundles: NodeCG.Bundle[]) {

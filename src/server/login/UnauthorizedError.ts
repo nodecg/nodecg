@@ -1,6 +1,6 @@
 import type { UnAuthErrCode } from "../../types/socket-protocol";
 
-export default class UnauthorizedError extends Error {
+export class UnauthorizedError extends Error {
 	serialized: {
 		message: string;
 		code: UnAuthErrCode;

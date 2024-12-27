@@ -3,7 +3,7 @@ import * as os from "os";
 import * as Sentry from "@sentry/node";
 import { config, filteredConfig, sentryEnabled } from "../config";
 import "../util/sentry-config";
-import { pjson } from "../util";
+import { pjson } from "../util/pjson";
 
 if (config.sentry?.enabled) {
 	Sentry.init({
@@ -43,24 +43,24 @@ import SocketIO from "socket.io";
 import passport from "passport";
 
 // Ours
-import BundleManager from "../bundle-manager";
-import createLogger from "../logger";
+import { BundleManager } from "../bundle-manager";
+import { createLogger } from "../logger";
 import { createSocketAuthMiddleware } from "../login/socketAuthMiddleware";
-import socketApiMiddleware from "./socketApiMiddleware";
-import Replicator from "../replicant/replicator";
+import { socketApiMiddleware } from "./socketApiMiddleware";
+import { Replicator } from "../replicant/replicator";
 import type {
 	ClientToServerEvents,
 	ServerToClientEvents,
 	TypedSocketServer,
 } from "../../types/socket-protocol";
-import GraphicsLib from "../graphics";
+import { GraphicsLib } from "../graphics";
 import { DashboardLib } from "../dashboard";
-import MountsLib from "../mounts";
-import SoundsLib from "../sounds";
+import { MountsLib } from "../mounts";
+import { SoundsLib } from "../sounds";
 import { createAssetsMiddleware } from "../assets";
-import SharedSourcesLib from "../shared-sources";
-import ExtensionManager from "./extensions";
-import SentryConfig from "../util/sentry-config";
+import { SharedSourcesLib } from "../shared-sources";
+import { ExtensionManager } from "./extensions";
+import { SentryConfig } from "../util/sentry-config";
 import type { NodeCG } from "../../types/nodecg";
 import { TypedEmitter } from "../../shared/typed-emitter";
 import { nodecgRootPath } from "../../shared/utils/rootPath";

@@ -1,7 +1,7 @@
 // Ours
 import type { NodeCG } from "../../types/nodecg";
 
-export default function (
+export function parseMounts(
 	manifest: Pick<NodeCG.Manifest, "mount" | "name">,
 ): NodeCG.Bundle.Mount[] {
 	const mounts: NodeCG.Bundle.Mount[] = [];

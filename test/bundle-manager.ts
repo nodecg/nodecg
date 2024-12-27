@@ -1,15 +1,12 @@
-// Native
-import fs from "fs";
-import path from "path";
-import os from "os";
+import fs from "node:fs";
+import path from "node:path";
+import os from "node:os";
 
-// Packages
 import fse from "fs-extra";
 import tmp from "tmp-promise";
 import test from "ava";
 
-// Ours
-import type BundleManagerTypeOnly from "../src/server/bundle-manager";
+import type { BundleManager as BundleManagerTypeOnly } from "../src/server/bundle-manager";
 import { sleep } from "./helpers/utilities";
 
 tmp.setGracefulCleanup();
@@ -38,9 +35,7 @@ test.before(async () => {
 	/**
 	 * Delay import so that we have time to set process.env.NODECG_ROOT first.
 	 */
-	const { default: BundleManager } = await import(
-		"../src/server/bundle-manager"
-	);
+	const { BundleManager } = await import("../src/server/bundle-manager");
 	bundleManager = new BundleManager(
 		[path.join(tempFolder, "bundles"), path.join(tempFolder, "custom-bundles")],
 		path.join(tempFolder, "cfg"),

@@ -1,8 +1,3 @@
-// Native
-import fs from "fs";
-import path from "path";
-
-// Packages
 import type { TestFn } from "ava";
 import anyTest from "ava";
 import type * as puppeteer from "puppeteer";
@@ -15,7 +10,6 @@ const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
-import * as C from "../helpers/test-constants";
 import type { NodeCG } from "../../src/types/nodecg";
 import {
 	getConnection,
@@ -702,10 +696,9 @@ test.serial("persistent - should persist assignment to disk", async (t) => {
 test("persistent - should persist changes to disk", async (t) => {
 	t.plan(1);
 
-	const serverRep = t.context.apis.extension.Replicant(
-		"clientChangePersistence",
-		{ defaultValue: { nested: "" } },
-	);
+	t.context.apis.extension.Replicant("clientChangePersistence", {
+		defaultValue: { nested: "" },
+	});
 
 	await dashboard.evaluate(
 		async () =>

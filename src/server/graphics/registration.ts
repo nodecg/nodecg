@@ -6,20 +6,20 @@ import fs from "fs";
 import express from "express";
 
 // Ours
-import { injectScripts } from "../util";
-import type { Replicator } from "../replicant";
-import type ServerReplicant from "../replicant/server-replicant";
+import { injectScripts } from "../util/injectscripts";
+import type { Replicator } from "../replicant/replicator";
+import type { ServerReplicant } from "../replicant/server-replicant";
 import type { RootNS, GraphicRegRequest } from "../../types/socket-protocol";
-import type BundleManager from "../bundle-manager";
+import type { BundleManager } from "../bundle-manager";
 import type { NodeCG } from "../../types/nodecg";
-import isChildOf from "../util/isChildOf";
+import { isChildOf } from "../util/isChildOf";
 import { nodecgRootPath } from "../../shared/utils/rootPath";
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 
 const BUILD_PATH = path.join(nodecgRootPath, "dist/instance");
 
-export default class RegistrationCoordinator {
+export class RegistrationCoordinator {
 	app = express();
 
 	private readonly _instancesRep: ServerReplicant<

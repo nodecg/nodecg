@@ -9,7 +9,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import cookieParser from "cookie-parser";
 
 import { config } from "../config";
-import createLogger from "../logger";
+import { createLogger } from "../logger";
 import type { User, Role } from "../../types/models";
 import { nodecgRootPath } from "../../shared/utils/rootPath";
 import { DatabaseAdapter } from "../../types/database-adapter";

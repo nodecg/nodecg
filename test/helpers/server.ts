@@ -13,8 +13,8 @@ import * as C from "./test-constants";
 // This import is ONLY for a type.
 // The import for the value is later in this file.
 import type { NodeCGServer } from "../../src/server/server";
-import type serverApiFactory from "../../src/server/api.server";
-import populateTestData from "./populateTestData";
+import type { serverApiFactory } from "../../src/server/api.server";
+import { populateTestData } from "./populateTestData";
 
 export type ServerContext = {
 	server: NodeCGServer;

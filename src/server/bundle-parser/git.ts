@@ -4,7 +4,7 @@ import * as git from "git-rev-sync";
 // Ours
 import type { NodeCG } from "../../types/nodecg";
 
-export default function (bundleDir: string): NodeCG.Bundle.GitData {
+export function parseGit(bundleDir: string): NodeCG.Bundle.GitData {
 	const workingDir = process.cwd();
 	let retValue: NodeCG.Bundle.GitData;
 	try {

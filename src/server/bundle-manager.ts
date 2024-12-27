@@ -9,9 +9,9 @@ import semver from "semver";
 import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
 
 // Ours
-import parseBundle from "./bundle-parser";
-import parseBundleGit from "./bundle-parser/git";
-import createLogger from "./logger";
+import { parseBundle } from "./bundle-parser";
+import { parseGit as parseBundleGit } from "./bundle-parser/git";
+import { createLogger } from "./logger";
 import type { NodeCG } from "../types/nodecg";
 import { TypedEmitter } from "../shared/typed-emitter";
 
@@ -51,7 +51,7 @@ type EventMap = {
 	ready: () => void;
 };
 
-export default class BundleManager extends TypedEmitter<EventMap> {
+export class BundleManager extends TypedEmitter<EventMap> {
 	bundles: NodeCG.Bundle[] = [];
 
 	get ready() {

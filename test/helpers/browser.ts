@@ -19,7 +19,7 @@ export const setup = () => {
 		// The --no-sandbox flag is required to run Headless Chrome on CI
 		const args = isCi ? ["--no-sandbox"] : undefined;
 		browser = await puppeteer.launch({
-			headless: argv["debugTests"] ? false : "new",
+			headless: argv["debugTests"] ? false : true,
 			args,
 		});
 	});

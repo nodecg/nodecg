@@ -20,7 +20,8 @@ if (cwd !== nodecgRootPath) {
 	console.info("[nodecg] Changed process.cwd to %s", nodecgRootPath);
 }
 
-import { pjson, asyncExitHook } from "./util";
+import { asyncExitHook } from "./util/exit-hook";
+import { pjson } from "./util/pjson";
 import { NodeCGServer } from "./server";
 import { gracefulExit } from "./util/exit-hook";
 import { exitOnUncaught, sentryEnabled } from "./config";

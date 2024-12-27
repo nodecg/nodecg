@@ -5,10 +5,11 @@ import path from "path";
 import express from "express";
 
 // Ours
-import { authCheck, sendFile } from "./util";
+import { authCheck } from "./util/authcheck";
+import { sendFile } from "./util/sendFile";
 import type { NodeCG } from "../types/nodecg";
 
-export default class SharedSourcesLib {
+export class SharedSourcesLib {
 	app = express();
 
 	constructor(bundles: NodeCG.Bundle[]) {

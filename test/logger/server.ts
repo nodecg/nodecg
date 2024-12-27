@@ -1,15 +1,12 @@
-// Native
 import path from "path";
 
-// Packages
 import fs from "fs-extra";
 import sinon from "sinon";
 import type { TestFn } from "ava";
 import anyTest from "ava";
 import tmp from "tmp-promise";
 
-// Ours
-import loggerFactory from "../../src/server/logger/logger.server";
+import { loggerFactory } from "../../src/server/logger/logger.server";
 
 tmp.setGracefulCleanup();
 const tempFolder = tmp.dirSync().name;

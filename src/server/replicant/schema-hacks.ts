@@ -168,7 +168,7 @@ function resolvePointerReference(
 	return JsonPointer.get(obj, ref) as UnknownObject;
 }
 
-export default function formatSchema(
+export function formatSchema(
 	inputObj: unknown,
 	currentFile: File,
 	allFiles: File[],

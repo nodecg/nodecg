@@ -6,20 +6,21 @@ import type { DeepReadonly } from "ts-essentials";
 
 // Ours
 import { NodeCGAPIBase } from "../shared/api.base";
-import type { Replicator, ServerReplicant } from "./replicant";
+import type { Replicator } from "./replicant/replicator";
+import type { ServerReplicant } from "./replicant/server-replicant";
 import { config } from "./config";
 import { Logger } from "./logger";
-import * as ncgUtils from "./util";
 import type { RootNS } from "../types/socket-protocol";
 import type { NodeCG } from "../types/nodecg";
 import type { ExtensionEventMap } from "./server/extensions";
+import { authCheck } from "./util/authcheck";
 
-export default (
+export function serverApiFactory(
 	io: RootNS,
 	replicator: Replicator,
 	extensions: Record<string, unknown>,
 	mount: NodeCG.Middleware,
-) => {
+) {
 	const apiContexts = new Set<
 		NodeCGAPIBase<"server", NodeCG.Bundle.UnknownConfig, ExtensionEventMap>
 	>();
@@ -130,7 +131,7 @@ export default (
 			 * @param {object} res - A HTTP response.
 			 * @param {function} next - The next middleware in the control flow.
 			 */
-			authCheck: ncgUtils.authCheck,
+			authCheck: authCheck,
 		};
 
 		/**
@@ -343,7 +344,7 @@ export default (
 			opts: O,
 		): ServerReplicant<V, O> => replicator.declare<V, O>(name, namespace, opts);
 	};
-};
+}
 
 /**
  * By default, Errors get serialized to empty objects when run through JSON.stringify.

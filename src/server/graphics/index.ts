@@ -5,13 +5,15 @@ import path from "path";
 import express from "express";
 
 // Ours
-import { authCheck, injectScripts, sendFile } from "../util";
-import RegistrationCoordinator from "./registration";
-import type { Replicator } from "../replicant";
+import { authCheck } from "../util/authcheck";
+import { injectScripts } from "../util/injectscripts";
+import { sendFile } from "../util/sendFile";
+import { RegistrationCoordinator } from "./registration";
+import type { Replicator } from "../replicant/replicator";
 import type { RootNS } from "../../types/socket-protocol";
-import type BundleManager from "../bundle-manager";
+import type { BundleManager } from "../bundle-manager";
 
-export default class GraphicsLib {
+export class GraphicsLib {
 	app = express();
 
 	constructor(

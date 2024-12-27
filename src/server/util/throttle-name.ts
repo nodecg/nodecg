@@ -4,7 +4,7 @@ const queued = new Set<string>();
 /**
  * A standard throttle, but uses a string `name` as the key instead of the callback.
  */
-export default function (
+export function throttleName(
 	name: string,
 	callback: () => void,
 	duration = 500,

@@ -5,7 +5,7 @@ import * as path from "path";
 // Ours
 import type { NodeCG } from "../../types/nodecg";
 
-export default function (
+export function parseSounds(
 	bundlePath: string,
 	manifest: Pick<NodeCG.Manifest, "soundCues" | "name">,
 ): { soundCues: NodeCG.Bundle.SoundCue[]; hasAssignableSoundCues: boolean } {

@@ -26,7 +26,7 @@ type LoggerOptions = {
  * @returns  A constructor used to create discrete logger instances.
  */
 
-export default function (
+export function loggerFactory(
 	initialOpts: Partial<LoggerOptions> = {},
 	sentry: typeof Sentry | undefined = undefined,
 ) {

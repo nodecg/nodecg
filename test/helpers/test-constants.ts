@@ -4,10 +4,10 @@ import path from "path";
 export const bundleName = (): string => "test-bundle";
 
 export const replicantsRoot = (): string =>
-	path.join(process.env.NODECG_ROOT, "db/replicants");
+	path.join(process.env.NODECG_ROOT!, "db/replicants");
 
 export const assetsRoot = (): string =>
-	path.join(process.env.NODECG_ROOT, "assets");
+	path.join(process.env.NODECG_ROOT!, "assets");
 
 export const rootUrl = (): string => {
 	const { NODECG_TEST_PORT } = process.env;

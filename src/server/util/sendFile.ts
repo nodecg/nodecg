@@ -1,14 +1,14 @@
 import * as path from "path";
 
 import type express from "express";
-import isChildOf from "./isChildOf";
+import { isChildOf } from "./isChildOf";
 
-export default (
+export function sendFile(
 	directoryToPreventTraversalOutOf: string,
 	fileLocation: string,
 	res: express.Response,
 	next: express.NextFunction,
-): void => {
+): void {
 	if (isChildOf(directoryToPreventTraversalOutOf, fileLocation)) {
 		res.sendFile(fileLocation, (err: NodeJS.ErrnoException) => {
 			if (err) {
@@ -27,4 +27,4 @@ export default (
 	} else {
 		res.sendStatus(404);
 	}
-};
+}

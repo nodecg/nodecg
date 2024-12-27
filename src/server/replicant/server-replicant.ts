@@ -10,8 +10,8 @@ import {
 	AbstractReplicant,
 	type ReplicantValue,
 } from "../../shared/replicants.shared";
-import formatSchema from "./schema-hacks";
-import createLogger from "../logger";
+import { formatSchema } from "./schema-hacks";
+import { createLogger } from "../logger";
 import type { NodeCG } from "../../types/nodecg";
 import { getSchemaDefault } from "../../shared/utils/compileJsonSchema";
 import { NODECG_ROOT } from "../nodecg-root";
@@ -21,7 +21,7 @@ import { NODECG_ROOT } from "../nodecg-root";
  * Always use Replicator.declare instead.
  * The Replicator needs to have complete control over the ServerReplicant class.
  */
-export default class ServerReplicant<
+export class ServerReplicant<
 	V,
 	O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
 > extends AbstractReplicant<"server", V, O> {

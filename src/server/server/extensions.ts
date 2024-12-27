@@ -2,11 +2,11 @@ import { EventEmitter } from "node:events";
 import * as path from "node:path";
 import semver from "semver";
 import * as Sentry from "@sentry/node";
-import extensionApiClassFactory from "../api.server";
-import createLogger from "../logger";
-import type { Replicator } from "../replicant";
+import { serverApiFactory } from "../api.server";
+import { createLogger } from "../logger";
+import type { Replicator } from "../replicant/replicator";
 import type { RootNS } from "../../types/socket-protocol";
-import type BundleManager from "../bundle-manager";
+import type { BundleManager } from "../bundle-manager";
 import type { NodeCG } from "../../types/nodecg";
 import { stringifyError } from "../../shared/utils/errors";
 import { sentryEnabled } from "../config";
@@ -21,17 +21,17 @@ export type ExtensionEventMap = {
 	serverStopping: () => void;
 };
 
-export default class ExtensionManager extends EventEmitter {
+export class ExtensionManager extends EventEmitter {
 	readonly extensions: Record<string, unknown> = {};
 
 	private readonly _satisfiedDepNames = new WeakMap<NodeCG.Bundle, string[]>();
 
-	private readonly _ExtensionApi: ReturnType<typeof extensionApiClassFactory>;
+	private readonly _ExtensionApi: ReturnType<typeof serverApiFactory>;
 
 	private readonly _bundleManager: BundleManager;
 
 	private readonly _apiInstances = new Set<
-		InstanceType<ReturnType<typeof extensionApiClassFactory>>
+		InstanceType<ReturnType<typeof serverApiFactory>>
 	>();
 
 	constructor(
@@ -44,7 +44,7 @@ export default class ExtensionManager extends EventEmitter {
 
 		log.trace("Starting extension mounting");
 		this._bundleManager = bundleManager;
-		this._ExtensionApi = extensionApiClassFactory(
+		this._ExtensionApi = serverApiFactory(
 			io,
 			replicator,
 			this.extensions,

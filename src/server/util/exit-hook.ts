@@ -119,7 +119,7 @@ function addHook(options: {
 	};
 }
 
-export default function exitHook(onExit: syncExitFn) {
+export function exitHook(onExit: syncExitFn) {
 	if (typeof onExit !== "function") {
 		throw new TypeError("onExit must be a function");
 	}

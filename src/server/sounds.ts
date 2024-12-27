@@ -4,13 +4,13 @@ import { klona as clone } from "klona/json";
 import express from "express";
 import hasha from "hasha";
 
-import type { Replicator } from "./replicant";
-import type ServerReplicant from "./replicant/server-replicant";
-import { sendFile } from "./util";
+import type { Replicator } from "./replicant/replicator";
+import type { ServerReplicant } from "./replicant/server-replicant";
+import { sendFile } from "./util/sendFile";
 import type { NodeCG } from "../types/nodecg";
 import { nodecgRootPath } from "../shared/utils/rootPath";
 
-export default class SoundsLib {
+export class SoundsLib {
 	app = express();
 
 	private readonly _bundles: NodeCG.Bundle[];

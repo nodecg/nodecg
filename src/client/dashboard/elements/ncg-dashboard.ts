@@ -23,7 +23,7 @@ import { Debouncer } from "@polymer/polymer/lib/utils/debounce.js";
 import * as Polymer from "@polymer/polymer";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import keep1 from "../css/nodecg-theme";
+import * as keep1 from "../css/nodecg-theme";
 keep1;
 import * as keep2 from "./assets/ncg-assets";
 keep2;

@@ -7,7 +7,7 @@ import semver from "semver";
 
 // Ours
 import { filteredConfig, sentryEnabled } from "../config";
-import { noop } from "../util";
+import { noop } from "./noop";
 import type { NodeCG } from "../../types/nodecg";
 
 type Options = {
@@ -20,7 +20,7 @@ type Options = {
 /**
  * Injects the appropriate assets into a panel, dialog, or graphic.
  */
-export default function (
+export function injectScripts(
 	pathOrHtml: string,
 	resourceType: "panel" | "dialog" | "graphic",
 	{
