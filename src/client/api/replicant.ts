@@ -8,7 +8,7 @@ import {
 	isIgnoringProxy,
 	type ReplicantValue,
 } from "../../shared/replicants.shared";
-import createLogger from "./logger";
+import { createLogger } from "./logger";
 import type { TypedClientSocket } from "../../types/socket-protocol";
 import type { NodeCG } from "../../types/nodecg";
 
@@ -51,7 +51,7 @@ const REPLICANT_HANDLER = {
 	},
 };
 
-export default class ClientReplicant<
+export class ClientReplicant<
 	V,
 	O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
 > extends AbstractReplicant<"client", V, O> {

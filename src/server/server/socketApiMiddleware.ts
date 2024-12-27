@@ -3,13 +3,13 @@ import * as Sentry from "@sentry/node";
 import type { ExtendedError } from "socket.io/dist/namespace";
 
 // Ours
-import createLogger from "../logger";
+import {createLogger} from "../logger";
 import type { TypedServerSocket } from "../../types/socket-protocol";
 import { sentryEnabled } from "../config";
 
 const log = createLogger("socket-api");
 
-export default function (
+export function socketApiMiddleware(
 	socket: TypedServerSocket,
 	next: (err?: ExtendedError) => void,
 ) {

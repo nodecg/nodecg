@@ -1,8 +1,8 @@
 import { klona as clone } from "klona/json";
-import createLogger from "../logger";
-import Replicant from "./server-replicant";
-import { throttleName } from "../util";
-import type ServerReplicant from "./server-replicant";
+import { createLogger } from "../logger";
+import { ServerReplicant as Replicant } from "./server-replicant";
+import { throttleName } from "../util/throttle-name";
+import type { ServerReplicant } from "./server-replicant";
 import * as uuid from "uuid";
 import type {
 	TypedServerSocket,
@@ -16,7 +16,7 @@ import type { DatabaseAdapter } from "../../types/database-adapter";
 
 const log = createLogger("replicator");
 
-export default class Replicator {
+export class Replicator {
 	readonly declaredReplicants = new Map<string, Map<string, Replicant<any>>>();
 
 	private readonly _uuid = uuid.v4();

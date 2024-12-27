@@ -1,9 +1,9 @@
 import type { ExtendedError } from "socket.io/dist/namespace";
 import { config } from "../config";
-import UnauthorizedError from "../login/UnauthorizedError";
+import {UnauthorizedError} from "../login/UnauthorizedError";
 import type { TypedServerSocket } from "../../types/socket-protocol";
 import { UnAuthErrCode } from "../../types/socket-protocol";
-import createLogger from "../logger";
+import {createLogger} from "../logger";
 import { serializeError } from "serialize-error";
 import { DatabaseAdapter } from "../../types/database-adapter";
 

@@ -5,7 +5,7 @@ import * as path from "path";
 // Ours
 import type { NodeCG } from "../../types/nodecg";
 
-export default function (
+export function parseGraphics(
 	graphicsDir: string,
 	manifest: NodeCG.Manifest,
 ): NodeCG.Bundle.Graphic[] {

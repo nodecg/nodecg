@@ -1,18 +1,18 @@
 import * as path from "path";
 import * as fs from "fs";
 
-import parsePanels from "./panels";
-import parseMounts from "./mounts";
-import parseGraphics from "./graphics";
-import parseManifest from "./manifest";
-import parseAssets from "./assets";
-import parseSounds from "./sounds";
+import { parsePanels } from "./panels";
+import { parseMounts } from "./mounts";
+import { parseGraphics } from "./graphics";
+import { parseManifest } from "./manifest";
+import { parseAssets } from "./assets";
+import { parseSounds } from "./sounds";
 import * as config from "./config";
-import parseExtension from "./extension";
-import parseGit from "./git";
+import { parseExtension } from "./extension";
+import { parseGit } from "./git";
 import type { NodeCG } from "../../types/nodecg";
 
-export default function (
+export function parseBundle(
 	bundlePath: string,
 	bundleCfg?: NodeCG.Bundle.UnknownConfig,
 ): NodeCG.Bundle {

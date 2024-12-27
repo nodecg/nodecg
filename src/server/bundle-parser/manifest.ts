@@ -7,7 +7,7 @@ import * as semver from "semver";
 // Ours
 import type { NodeCG } from "../../types/nodecg";
 
-export default function (
+export function parseManifest(
 	pkg: NodeCG.PackageJSON,
 	bundlePath: string,
 ): NodeCG.Manifest {

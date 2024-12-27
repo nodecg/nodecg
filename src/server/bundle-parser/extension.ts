@@ -5,7 +5,7 @@ import * as path from "path";
 // Ours
 import type { NodeCG } from "../../types/nodecg";
 
-export default function (
+export function parseExtension(
 	bundleDir: string,
 	manifest: NodeCG.Manifest,
 ): boolean {

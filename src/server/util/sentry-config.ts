@@ -3,8 +3,9 @@ import * as os from "node:os";
 import * as Sentry from "@sentry/node";
 import express from "express";
 import { config } from "../config";
-import type BundleManager from "../bundle-manager";
-import { authCheck, pjson } from "../util";
+import type { BundleManager } from "../bundle-manager";
+import { authCheck } from "../util/authcheck";
+import { pjson } from "./pjson";
 import type { NodeCG } from "../../types/nodecg";
 
 const baseSentryConfig = {
@@ -13,7 +14,7 @@ const baseSentryConfig = {
 	release: pjson.version,
 };
 
-export default class SentryConfig {
+export class SentryConfig {
 	readonly bundleMetadata: Array<{
 		name: string;
 		git: NodeCG.Bundle.GitData;

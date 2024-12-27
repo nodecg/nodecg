@@ -3,7 +3,7 @@ import type { DeepReadonly } from "ts-essentials";
 
 // Ours
 import { NodeCGAPIBase } from "../../shared/api.base";
-import ClientReplicant from "./replicant";
+import { ClientReplicant } from "./replicant";
 import { filteredConfig } from "./config";
 import { Logger } from "./logger";
 import type { TypedClientSocket } from "../../types/socket-protocol";

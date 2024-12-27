@@ -1,5 +1,5 @@
 let populated = false;
-export default async function populateTestData(): Promise<void> {
+export async function populateTestData(): Promise<void> {
 	if (populated) {
 		return;
 	}

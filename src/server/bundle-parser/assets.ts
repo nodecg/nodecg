@@ -1,7 +1,7 @@
 // Ours
 import type { NodeCG } from "../../types/nodecg";
 
-export default function (
+export function parseAssets(
 	manifest: Pick<NodeCG.Manifest, "assetCategories" | "name">,
 ): NodeCG.Bundle.AssetCategory[] {
 	if (!manifest.assetCategories) {

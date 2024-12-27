@@ -8,7 +8,7 @@ import cheerio from "cheerio";
 // Ours
 import type { NodeCG } from "../../types/nodecg";
 
-export default function (
+export function parsePanels(
 	dashboardDir: string,
 	manifest: NodeCG.Manifest,
 ): NodeCG.Bundle.Panel[] {
