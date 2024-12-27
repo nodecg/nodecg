@@ -48,7 +48,6 @@ jobs:
 
   build-test:
     strategy:
-      fail-fast: false
       matrix:
         node-version:
           - "18"
