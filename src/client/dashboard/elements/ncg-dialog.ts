@@ -9,12 +9,14 @@ is the only thing I could come up with. Let us never speak of this again.
 
 Lange - 1/28/2016
 */
+
+import "@polymer/paper-dialog-behavior/paper-dialog-shared-styles.js";
+
 import { NeonAnimationRunnerBehavior } from "@polymer/neon-animation/neon-animation-runner-behavior.js";
 import { PaperDialogBehavior } from "@polymer/paper-dialog-behavior/paper-dialog-behavior.js";
-import "@polymer/paper-dialog-behavior/paper-dialog-shared-styles.js";
-import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
-import { mixinBehaviors } from "@polymer/polymer/lib/legacy/class.js";
 import * as Polymer from "@polymer/polymer";
+import { mixinBehaviors } from "@polymer/polymer/lib/legacy/class.js";
+import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
 import { iframeResizer } from "iframe-resizer";
 
 class NcgDialog extends mixinBehaviors(

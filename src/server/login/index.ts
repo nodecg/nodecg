@@ -1,20 +1,20 @@
-import * as path from "node:path";
 import * as crypto from "node:crypto";
+import * as path from "node:path";
 
+import cookieParser from "cookie-parser";
 import express from "express";
 import expressSession from "express-session";
 import passport from "passport";
-import SteamStrategy from "passport-steam";
-import { Strategy as LocalStrategy } from "passport-local";
-import cookieParser from "cookie-parser";
 import { Strategy as DiscordStrategy } from "passport-discord";
+import { Strategy as LocalStrategy } from "passport-local";
+import SteamStrategy from "passport-steam";
 import { Strategy as TwitchStrategy } from "passport-twitch-helix";
 
-import { config } from "../config";
-import { createLogger } from "../logger";
-import type { User, Role } from "../../types/models";
 import { nodecgRootPath } from "../../shared/utils/rootPath";
 import { DatabaseAdapter } from "../../types/database-adapter";
+import type { Role,User } from "../../types/models";
+import { config } from "../config";
+import { createLogger } from "../logger";
 
 type StrategyDoneCb = (
 	error: NodeJS.ErrnoException | undefined,

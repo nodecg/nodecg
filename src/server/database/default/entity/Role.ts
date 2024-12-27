@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { Permission } from "./Permission";
+import { Column, Entity, OneToMany,PrimaryGeneratedColumn } from "typeorm";
+
 import type { Role as RoleModel } from "../../../../types/models";
+import { Permission } from "./Permission";
 
 @Entity()
 export class Role implements RoleModel {

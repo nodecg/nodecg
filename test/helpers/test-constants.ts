@@ -1,4 +1,3 @@
-// Native
 import path from "path";
 
 export const bundleName = (): string => "test-bundle";

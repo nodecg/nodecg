@@ -11,6 +11,7 @@ keep1;
 import * as Polymer from "@polymer/polymer";
 import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
 import Clipboard from "clipboard";
+
 import type { NodeCG } from "../../../../types/nodecg";
 
 /**

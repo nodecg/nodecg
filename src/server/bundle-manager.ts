@@ -1,19 +1,15 @@
-// Native
-import path from "path";
-
-// Packages
-import fs from "fs-extra";
 import chokidar from "chokidar";
-import { debounce } from "lodash";
-import semver from "semver";
 import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
+import fs from "fs-extra";
+import { debounce } from "lodash";
+import path from "path";
+import semver from "semver";
 
-// Ours
+import { TypedEmitter } from "../shared/typed-emitter";
+import type { NodeCG } from "../types/nodecg";
 import { parseBundle } from "./bundle-parser";
 import { parseGit as parseBundleGit } from "./bundle-parser/git";
 import { createLogger } from "./logger";
-import type { NodeCG } from "../types/nodecg";
-import { TypedEmitter } from "../shared/typed-emitter";
 
 /**
  * Milliseconds

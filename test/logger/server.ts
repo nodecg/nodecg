@@ -1,9 +1,8 @@
-import path from "path";
-
-import fs from "fs-extra";
-import sinon from "sinon";
 import type { TestFn } from "ava";
 import anyTest from "ava";
+import fs from "fs-extra";
+import path from "path";
+import sinon from "sinon";
 import tmp from "tmp-promise";
 
 import { loggerFactory } from "../../src/server/logger/logger.server";

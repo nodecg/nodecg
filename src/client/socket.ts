@@ -1,5 +1,6 @@
 import Cookies from "cookies-js";
 import io from "socket.io-client";
+
 import type { TypedClientSocket } from "../types/socket-protocol";
 
 const params = new URLSearchParams(location.search);

@@ -1,16 +1,16 @@
-import * as path from "path";
 import * as fs from "fs";
+import * as path from "path";
 
-import { parsePanels } from "./panels";
-import { parseMounts } from "./mounts";
-import { parseGraphics } from "./graphics";
-import { parseManifest } from "./manifest";
+import type { NodeCG } from "../../types/nodecg";
 import { parseAssets } from "./assets";
-import { parseSounds } from "./sounds";
 import * as config from "./config";
 import { parseExtension } from "./extension";
 import { parseGit } from "./git";
-import type { NodeCG } from "../../types/nodecg";
+import { parseGraphics } from "./graphics";
+import { parseManifest } from "./manifest";
+import { parseMounts } from "./mounts";
+import { parsePanels } from "./panels";
+import { parseSounds } from "./sounds";
 
 export function parseBundle(
 	bundlePath: string,

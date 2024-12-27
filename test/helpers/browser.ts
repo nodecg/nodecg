@@ -1,10 +1,9 @@
 import type { TestFn } from "ava";
 import anyTest from "ava";
+import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
 import { argv } from "yargs";
-import isCi from "is-ci";
 
-// Ours
 import * as C from "./test-constants";
 import { sleep } from "./utilities";
 

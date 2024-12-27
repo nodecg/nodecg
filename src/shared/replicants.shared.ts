@@ -2,14 +2,15 @@
 import type { ErrorObject, ValidateFunction } from "ajv";
 import { klona as clone } from "klona/json";
 import objectPath from "object-path";
+
+import { TypedEmitter } from "../shared/typed-emitter";
 import type { LoggerInterface } from "../types/logger-interface";
 import type { NodeCG } from "../types/nodecg";
-import { TypedEmitter } from "../shared/typed-emitter";
-import { stringifyError } from "./utils/errors";
 import {
 	compileJsonSchema,
 	formatJsonSchemaErrors,
 } from "./utils/compileJsonSchema";
+import { stringifyError } from "./utils/errors";
 import { isBrowser, isWorker } from "./utils/isBrowser";
 
 export type ReplicantValue<

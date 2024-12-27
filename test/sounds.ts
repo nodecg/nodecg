@@ -1,21 +1,18 @@
-// Native
-import path from "path";
-
-// Packages
-import fs from "fs-extra";
 import type { TestFn } from "ava";
 import anyTest from "ava";
+import fs from "fs-extra";
+import path from "path";
 
-// Ours
-import * as server from "./helpers/server";
 import * as browser from "./helpers/browser";
+import * as server from "./helpers/server";
 
 const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard, initGraphic } = browser.setup();
 
-import * as C from "./helpers/test-constants";
 import type { Page } from "puppeteer";
+
+import * as C from "./helpers/test-constants";
 
 let dashboard: Page;
 let graphic: Page;

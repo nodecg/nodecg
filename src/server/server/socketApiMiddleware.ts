@@ -1,11 +1,9 @@
-// Packages
 import * as Sentry from "@sentry/node";
 import type { ExtendedError } from "socket.io/dist/namespace";
 
-// Ours
-import { createLogger } from "../logger";
 import type { TypedServerSocket } from "../../types/socket-protocol";
 import { sentryEnabled } from "../config";
+import { createLogger } from "../logger";
 
 const log = createLogger("socket-api");
 

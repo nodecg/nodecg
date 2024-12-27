@@ -1,17 +1,15 @@
-// Packages
 import express from "express";
 import isError from "is-error";
 import { serializeError } from "serialize-error";
 import type { DeepReadonly } from "ts-essentials";
 
-// Ours
 import { NodeCGAPIBase } from "../shared/api.base";
-import type { Replicator } from "./replicant/replicator";
-import type { ServerReplicant } from "./replicant/server-replicant";
+import type { NodeCG } from "../types/nodecg";
+import type { RootNS } from "../types/socket-protocol";
 import { config } from "./config";
 import { Logger } from "./logger";
-import type { RootNS } from "../types/socket-protocol";
-import type { NodeCG } from "../types/nodecg";
+import type { Replicator } from "./replicant/replicator";
+import type { ServerReplicant } from "./replicant/server-replicant";
 import type { ExtensionEventMap } from "./server/extensions";
 import { authCheck } from "./util/authcheck";
 

@@ -1,18 +1,19 @@
 import { klona as clone } from "klona/json";
+import * as uuid from "uuid";
+
+import { stringifyError } from "../../shared/utils/errors";
+import type { DatabaseAdapter } from "../../types/database-adapter";
+import type { Replicant as ReplicantModel } from "../../types/models";
+import type { NodeCG } from "../../types/nodecg";
+import type {
+	RootNS,
+	ServerToClientEvents,
+	TypedServerSocket,
+} from "../../types/socket-protocol";
 import { createLogger } from "../logger";
-import { ServerReplicant as Replicant } from "./server-replicant";
 import { throttleName } from "../util/throttle-name";
 import type { ServerReplicant } from "./server-replicant";
-import * as uuid from "uuid";
-import type {
-	TypedServerSocket,
-	ServerToClientEvents,
-	RootNS,
-} from "../../types/socket-protocol";
-import type { NodeCG } from "../../types/nodecg";
-import { stringifyError } from "../../shared/utils/errors";
-import type { Replicant as ReplicantModel } from "../../types/models";
-import type { DatabaseAdapter } from "../../types/database-adapter";
+import { ServerReplicant as Replicant } from "./server-replicant";
 
 const log = createLogger("replicator");
 

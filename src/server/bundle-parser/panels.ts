@@ -1,11 +1,7 @@
-// Native
-import * as path from "path";
-import * as fs from "fs";
-
-// Packages
 import cheerio from "cheerio";
+import * as fs from "fs";
+import * as path from "path";
 
-// Ours
 import type { NodeCG } from "../../types/nodecg";
 
 export function parsePanels(

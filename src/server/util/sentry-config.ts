@@ -1,12 +1,14 @@
-import * as path from "node:path";
 import * as os from "node:os";
+import * as path from "node:path";
+
 import * as Sentry from "@sentry/node";
 import express from "express";
-import { config } from "../config";
+
+import type { NodeCG } from "../../types/nodecg";
 import type { BundleManager } from "../bundle-manager";
+import { config } from "../config";
 import { authCheck } from "../util/authcheck";
 import { pjson } from "./pjson";
-import type { NodeCG } from "../../types/nodecg";
 
 const baseSentryConfig = {
 	dsn: config.sentry.enabled ? config.sentry.dsn : "",

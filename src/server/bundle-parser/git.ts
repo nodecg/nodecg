@@ -1,7 +1,5 @@
-// Packages
 import * as git from "git-rev-sync";
 
-// Ours
 import type { NodeCG } from "../../types/nodecg";
 
 export function parseGit(bundleDir: string): NodeCG.Bundle.GitData {

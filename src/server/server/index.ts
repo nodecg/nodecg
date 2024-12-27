@@ -1,8 +1,10 @@
 // Minimal imports for first setup
-import * as os from "os";
-import * as Sentry from "@sentry/node";
-import { config, filteredConfig, sentryEnabled } from "../config";
 import "../util/sentry-config";
+
+import * as Sentry from "@sentry/node";
+import * as os from "os";
+
+import { config, filteredConfig, sentryEnabled } from "../config";
 import { pjson } from "../util/pjson";
 
 if (config.sentry?.enabled) {
@@ -26,46 +28,43 @@ if (config.sentry?.enabled) {
 	console.info("[nodecg] Sentry enabled.");
 }
 
-// Native
 import fs = require("fs");
 import path = require("path");
 
-// Packages
 import bodyParser from "body-parser";
+import compression from "compression";
+import express from "express";
+import transformMiddleware from "express-transform-bare-module-specifiers";
+import memoize from "fast-memoize";
+import type { Server } from "http";
 import { klona as clone } from "klona/json";
 import { debounce, template } from "lodash";
-import express from "express";
-import memoize from "fast-memoize";
-import transformMiddleware from "express-transform-bare-module-specifiers";
-import compression from "compression";
-import type { Server } from "http";
-import SocketIO from "socket.io";
 import passport from "passport";
+import SocketIO from "socket.io";
 
-// Ours
-import { BundleManager } from "../bundle-manager";
-import { createLogger } from "../logger";
-import { createSocketAuthMiddleware } from "../login/socketAuthMiddleware";
-import { socketApiMiddleware } from "./socketApiMiddleware";
-import { Replicator } from "../replicant/replicator";
+import { TypedEmitter } from "../../shared/typed-emitter";
+import { nodecgRootPath } from "../../shared/utils/rootPath";
+import type { NodeCG } from "../../types/nodecg";
 import type {
 	ClientToServerEvents,
 	ServerToClientEvents,
 	TypedSocketServer,
 } from "../../types/socket-protocol";
-import { GraphicsLib } from "../graphics";
-import { DashboardLib } from "../dashboard";
-import { MountsLib } from "../mounts";
-import { SoundsLib } from "../sounds";
 import { createAssetsMiddleware } from "../assets";
-import { SharedSourcesLib } from "../shared-sources";
-import { ExtensionManager } from "./extensions";
-import { SentryConfig } from "../util/sentry-config";
-import type { NodeCG } from "../../types/nodecg";
-import { TypedEmitter } from "../../shared/typed-emitter";
-import { nodecgRootPath } from "../../shared/utils/rootPath";
-import { NODECG_ROOT } from "../nodecg-root";
+import { BundleManager } from "../bundle-manager";
+import { DashboardLib } from "../dashboard";
 import { defaultAdapter } from "../database/default/database-adapter";
+import { GraphicsLib } from "../graphics";
+import { createLogger } from "../logger";
+import { createSocketAuthMiddleware } from "../login/socketAuthMiddleware";
+import { MountsLib } from "../mounts";
+import { NODECG_ROOT } from "../nodecg-root";
+import { Replicator } from "../replicant/replicator";
+import { SharedSourcesLib } from "../shared-sources";
+import { SoundsLib } from "../sounds";
+import { SentryConfig } from "../util/sentry-config";
+import { ExtensionManager } from "./extensions";
+import { socketApiMiddleware } from "./socketApiMiddleware";
 
 const renderTemplate = memoize((content, options) =>
 	template(content)(options),

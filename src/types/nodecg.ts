@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import type * as ExpressCore from "express-serve-static-core";
 import type express from "express";
-import type {
-	ServerToClientEvents,
-	ClientToServerEvents,
-} from "./socket-protocol";
-import { NodeCGConfig } from "./nodecg-config-schema";
+import type * as ExpressCore from "express-serve-static-core";
+
 import { DatabaseAdapter } from "./database-adapter";
+import { NodeCGConfig } from "./nodecg-config-schema";
+import type {
+	ClientToServerEvents,
+	ServerToClientEvents,
+} from "./socket-protocol";
 
 type Person =
 	| {

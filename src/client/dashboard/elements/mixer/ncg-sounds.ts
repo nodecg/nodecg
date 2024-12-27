@@ -3,12 +3,12 @@ import "@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js";
 import "@polymer/paper-dialog/paper-dialog.js";
 import "@polymer/paper-toast/paper-toast.js";
 import "@polymer/paper-slider/paper-slider.js";
-import * as Polymer from "@polymer/polymer";
-import type { NodeCG as NCGTypes } from "../../../../types/nodecg";
 
+import * as Polymer from "@polymer/polymer";
+
+import type { NodeCG as NCGTypes } from "../../../../types/nodecg";
 // This just imports the type at build time, no compile output.
 import type { NcgSoundCue } from "./ncg-sound-cue";
-
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
 import * as keep1 from "./ncg-sound-cue";
 keep1;

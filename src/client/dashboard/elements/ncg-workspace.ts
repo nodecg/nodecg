@@ -4,14 +4,15 @@ import "@polymer/paper-spinner/paper-spinner.js";
 import * as keep1 from "./ncg-dashboard-panel";
 keep1;
 
-import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
-import { Debouncer } from "@polymer/polymer/lib/utils/debounce.js";
-import { timeOut } from "@polymer/polymer/lib/utils/async.js";
 import * as Polymer from "@polymer/polymer";
+import { timeOut } from "@polymer/polymer/lib/utils/async.js";
+import { Debouncer } from "@polymer/polymer/lib/utils/debounce.js";
+import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
 import Draggabilly from "draggabilly";
 import Packery from "packery";
-import type { NcgDashboardPanel } from "./ncg-dashboard-panel";
+
 import type { NodeCG } from "../../../types/nodecg";
+import type { NcgDashboardPanel } from "./ncg-dashboard-panel";
 
 class NcgWorkspace extends Polymer.PolymerElement {
 	static get template() {

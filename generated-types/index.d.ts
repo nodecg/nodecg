@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/triple-slash-reference */
 // This file is for the typings package only.
+
 /// <reference types="passport" />
 /// <reference path="./server/types/augment-express-user.d.ts" />
-import type { NodeCG } from "./types/nodecg";
+
+import { DeepReadonly } from "ts-essentials";
+
 import type { NodeCGAPIClient } from "./client/api/api.client";
 import type { serverApiFactory } from "./server/api.server";
-import type * as LoggerStuff from "./types/logger-interface";
 import type { AbstractReplicant } from "./shared/replicants.shared";
-import { DeepReadonly } from "ts-essentials";
+import type * as LoggerStuff from "./types/logger-interface";
+import type { NodeCG } from "./types/nodecg";
 
 type NodeCGAPIServer<
 	C extends Record<string, any> = NodeCG.Bundle.UnknownConfig,

@@ -1,10 +1,9 @@
-// Packages
 import test from "ava";
 
-// Ours
 import * as server from "./helpers/server";
-server.setup();
 import * as C from "./helpers/test-constants";
+
+server.setup();
 
 test("should redirect /graphics to /graphics/", async (t) => {
 	const response = await fetch(C.graphicUrl().slice(0, -1));

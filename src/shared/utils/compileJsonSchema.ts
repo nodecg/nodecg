@@ -1,13 +1,14 @@
+import defaults from "@nodecg/json-schema-defaults";
 import AjvDraft07, {
-	type ValidateFunction,
-	type Options,
 	type ErrorObject,
+	type Options,
+	type ValidateFunction,
 } from "ajv";
-import AjvDraft04 from "ajv-draft-04";
 import Ajv2019 from "ajv/dist/2019";
 import Ajv2020 from "ajv/dist/2020";
+import AjvDraft04 from "ajv-draft-04";
 import addFormats from "ajv-formats";
-import defaults from "@nodecg/json-schema-defaults";
+
 import { stringifyError } from "./errors";
 
 const options: Options = {

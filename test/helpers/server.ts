@@ -1,20 +1,13 @@
-// Native
-import path from "path";
-
-// Packages
 import type { TestFn } from "ava";
 import anyTest from "ava";
 import fse from "fs-extra";
+import path from "path";
 import tmp from "tmp-promise";
 
-// Ours
-import * as C from "./test-constants";
-// Doing some tricks here:
-// This import is ONLY for a type.
-// The import for the value is later in this file.
-import type { NodeCGServer } from "../../src/server/server";
 import type { serverApiFactory } from "../../src/server/api.server";
+import type { NodeCGServer } from "../../src/server/server";
 import { populateTestData } from "./populateTestData";
+import * as C from "./test-constants";
 
 export interface ServerContext {
 	server: NodeCGServer;

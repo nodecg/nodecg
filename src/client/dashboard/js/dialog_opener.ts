@@ -1,7 +1,5 @@
-// Packages
 import type { PaperDialogElement } from "@polymer/paper-dialog";
 
-// Ours
 import type { NodeCGAPIClient } from "../../api/api.client";
 
 document.addEventListener(

@@ -1,14 +1,11 @@
-// Native
+import test from "ava";
 import fs from "fs";
 import path from "path";
 
-// Packages
-import test from "ava";
-
-// Ours
 import * as server from "./helpers/server";
-server.setup();
 import * as C from "./helpers/test-constants";
+
+server.setup();
 
 test("serves files from custom mountpoints", async (t) => {
 	const response = await fetch(

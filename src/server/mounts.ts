@@ -1,11 +1,9 @@
-// Native
+import express from "express";
 import path from "path";
 
-// Packages
-import express from "express";
+import type { NodeCG } from "../types/nodecg";
 import { authCheck } from "./util/authcheck";
 import { sendFile } from "./util/sendFile";
-import type { NodeCG } from "../types/nodecg";
 
 export class MountsLib {
 	app = express();

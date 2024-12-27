@@ -3,16 +3,12 @@
  */
 
 import "@polymer/polymer/lib/utils/mixin.js";
-
 import "@polymer/polymer/lib/utils/style-gather.js";
-
 import "@polymer/polymer/lib/utils/resolve-url.js";
-
 import "@polymer/polymer/lib/elements/dom-module.js";
 
-import type { PropertyEffects } from "@polymer/polymer/lib/mixins/property-effects.js";
-
 import type { PropertiesMixin } from "@polymer/polymer/lib/mixins/properties-mixin.js";
+import type { PropertyEffects } from "@polymer/polymer/lib/mixins/property-effects.js";
 
 export { ElementMixin };
 
@@ -81,24 +77,20 @@ declare function ElementMixin<T extends new (...args: any[]) => void>(
 	PropertiesChangedConstructor &
 	PropertiesMixinConstructor;
 
-import type { PropertyEffectsConstructor } from "@polymer/polymer/lib/mixins/property-effects.js";
-
 import type {
-	TemplateStampConstructor,
-	TemplateStamp,
-} from "@polymer/polymer/lib/mixins/template-stamp.js";
-
-import type {
-	PropertyAccessorsConstructor,
-	PropertyAccessors,
-} from "@polymer/polymer/lib/mixins/property-accessors.js";
-
-import type {
-	PropertiesChangedConstructor,
 	PropertiesChanged,
+	PropertiesChangedConstructor,
 } from "@polymer/polymer/lib/mixins/properties-changed.js";
-
 import type { PropertiesMixinConstructor } from "@polymer/polymer/lib/mixins/properties-mixin.js";
+import type {
+	PropertyAccessors,
+	PropertyAccessorsConstructor,
+} from "@polymer/polymer/lib/mixins/property-accessors.js";
+import type { PropertyEffectsConstructor } from "@polymer/polymer/lib/mixins/property-effects.js";
+import type {
+	TemplateStamp,
+	TemplateStampConstructor,
+} from "@polymer/polymer/lib/mixins/template-stamp.js";
 
 export interface ElementMixinConstructor {
 	new (...args: any[]): ElementMixin;
@@ -309,7 +301,5 @@ export { updateStyles };
 declare function updateStyles(props?: Record<string, unknown>): void;
 
 import type { TemplateInfo } from "@polymer/polymer/interfaces";
-
 import type { NodeInfo } from "@polymer/polymer/interfaces";
-
 import type { StampedTemplate } from "@polymer/polymer/interfaces";

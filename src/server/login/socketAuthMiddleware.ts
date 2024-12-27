@@ -1,11 +1,12 @@
+import { serializeError } from "serialize-error";
 import type { ExtendedError } from "socket.io/dist/namespace";
-import { config } from "../config";
-import { UnauthorizedError } from "../login/UnauthorizedError";
+
+import { DatabaseAdapter } from "../../types/database-adapter";
 import type { TypedServerSocket } from "../../types/socket-protocol";
 import { UnAuthErrCode } from "../../types/socket-protocol";
+import { config } from "../config";
 import { createLogger } from "../logger";
-import { serializeError } from "serialize-error";
-import { DatabaseAdapter } from "../../types/database-adapter";
+import { UnauthorizedError } from "../login/UnauthorizedError";
 
 const log = createLogger("socket-auth");
 const socketsByKey = new Map<string, Set<TypedServerSocket>>();

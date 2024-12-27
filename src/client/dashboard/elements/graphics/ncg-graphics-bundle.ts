@@ -7,6 +7,7 @@ keep1;
 
 import * as Polymer from "@polymer/polymer";
 import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
+
 import type { NodeCG } from "../../../../types/nodecg";
 
 /**

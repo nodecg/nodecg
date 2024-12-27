@@ -7,6 +7,7 @@ import * as keep1 from "../ui/ui-select";
 keep1;
 
 import * as Polymer from "@polymer/polymer";
+
 import type { NodeCG as NCGTypes } from "../../../../types/nodecg";
 export class NcgSoundCue extends Polymer.PolymerElement {
 	static get template() {

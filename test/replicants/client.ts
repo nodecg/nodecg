@@ -2,19 +2,18 @@ import type { TestFn } from "ava";
 import anyTest from "ava";
 import type * as puppeteer from "puppeteer";
 
-// Ours
-import * as server from "../helpers/server";
 import * as browser from "../helpers/browser";
+import * as server from "../helpers/server";
 
 const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
-import type { NodeCG } from "../../src/types/nodecg";
 import {
 	getConnection,
 	Replicant,
 } from "../../src/server/database/default/connection";
+import type { NodeCG } from "../../src/types/nodecg";
 
 let dashboard: puppeteer.Page;
 let database: Awaited<ReturnType<typeof getConnection>>;

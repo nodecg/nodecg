@@ -1,7 +1,8 @@
+import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
+
 import appRootPath from "app-root-path";
-import { execSync } from "child_process";
 
 const rootNodeModulesPath = appRootPath.resolve("node_modules");
 const tmpNodeModulesPath = appRootPath.resolve("tmp_node_modules");

@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import tseslint from "typescript-eslint";
 import configPrettier from "eslint-config-prettier";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 
 export default tseslint.config(
 	eslint.configs.recommended,
@@ -40,6 +41,15 @@ export default tseslint.config(
 				projectService: true,
 				tsconfigRootDir: path.dirname(fileURLToPath(import.meta.url)),
 			},
+		},
+	},
+	{
+		plugins: {
+			"simple-import-sort": simpleImportSort,
+		},
+		rules: {
+			"simple-import-sort/imports": "warn",
+			"simple-import-sort/exports": "warn",
 		},
 	},
 	configPrettier,

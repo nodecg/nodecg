@@ -1,4 +1,5 @@
 import test from "ava";
+
 import { loadConfig } from "../src/server/config/loader";
 
 test("should throw an error when the config file is not valid JSON", (t) => {

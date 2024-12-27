@@ -1,10 +1,11 @@
 import "reflect-metadata";
 
 import path from "node:path";
+
 import { DataSource } from "typeorm";
 export * from "./entity";
-import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
 import { nodecgRootPath } from "../../../shared/utils/rootPath";
+import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
 
 const testing = process.env.NODECG_TEST?.toLowerCase() === "true";
 
