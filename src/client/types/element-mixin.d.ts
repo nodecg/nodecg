@@ -71,8 +71,7 @@ export { ElementMixin };
  *   `observedAttributes` implementation will automatically return an array
  *   of dash-cased attributes based on `properties`)
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
-declare function ElementMixin<T extends new (...args: any[]) => {}>(
+declare function ElementMixin<T extends new (...args: any[]) => void>(
 	base: T,
 ): T &
 	ElementMixinConstructor &
@@ -101,7 +100,7 @@ import type {
 
 import type { PropertiesMixinConstructor } from "@polymer/polymer/lib/mixins/properties-mixin.js";
 
-export type ElementMixinConstructor = {
+export interface ElementMixinConstructor {
 	new (...args: any[]): ElementMixin;
 
 	/**
@@ -140,7 +139,7 @@ export type ElementMixinConstructor = {
 	_addTemplatePropertyEffect(
 		templateInfo: Record<string, unknown> | undefined,
 		prop: string,
-		effect?: Record<string, unknown> | undefined,
+		effect?: Record<string, unknown>  ,
 	): void;
 
 	/**
@@ -182,7 +181,7 @@ export type ElementMixinConstructor = {
 	 * @param is Tag name (or type extension name) for this element
 	 */
 	_finalizeTemplate(is: string): void;
-};
+}
 
 type ElementMixin = {
 	/**
@@ -268,7 +267,7 @@ type ElementMixin = {
 	 * @param properties Bag of custom property key/values to
 	 *   apply to this element.
 	 */
-	updateStyles(properties?: Record<string, unknown> | undefined): void;
+	updateStyles(properties?: Record<string, unknown>  ): void;
 
 	/**
 	 * Rewrites a given URL relative to a base URL. The base URL defaults to
@@ -308,7 +307,7 @@ export { updateStyles };
  * These properties are retained unless a value of `null` is set.
  */
 declare function updateStyles(
-	props?: Record<string, unknown> | undefined,
+	props?: Record<string, unknown>  ,
 ): void;
 
 import type { TemplateInfo } from "@polymer/polymer/interfaces";

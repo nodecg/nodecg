@@ -198,7 +198,7 @@ test.serial("when an array - should react to changes", async (t) => {
 			new Promise<{
 				newVal: unknown[];
 				oldVal: unknown[];
-				operations: Array<NodeCG.Replicant.Operation<unknown[]>>;
+				operations: NodeCG.Replicant.Operation<unknown[]>[];
 			}>((resolve) => {
 				const rep = window.dashboardApi.Replicant("clientArrTest", {
 					persistent: false,
@@ -248,7 +248,7 @@ test.serial(
 				new Promise<{
 					newVal: unknown[];
 					oldVal: unknown[];
-					operations: Array<NodeCG.Replicant.Operation<unknown[]>>;
+					operations: NodeCG.Replicant.Operation<unknown[]>[];
 				}>((resolve, reject) => {
 					const rep = window.dashboardApi.Replicant<unknown[]>(
 						"clientArrayDelete",
@@ -266,6 +266,7 @@ test.serial(
 						}
 
 						if (newVal[0] === "foo" && !deleted) {
+							// eslint-disable-next-line @typescript-eslint/no-array-delete
 							delete rep.value![0];
 							deleted = true;
 						} else if (newVal[0] === undefined) {
@@ -298,7 +299,7 @@ test.serial(
 	"when an array - should proxy objects added to arrays via array insertion methods",
 	async (t) => {
 		const rep = t.context.apis.extension.Replicant<
-			Array<Record<string, string>>
+			Record<string, string>[]
 		>("serverArrInsertObj", {
 			defaultValue: [],
 		});
@@ -311,7 +312,7 @@ test.serial(
 					return;
 				}
 
-				if (newVal[0]?.["foo"] === "bar") {
+				if (newVal[0]?.foo === "bar") {
 					t.deepEqual(newVal, [{ foo: "bar" }]);
 					resolve();
 				}
@@ -398,7 +399,7 @@ test.serial(
 				new Promise<{
 					newVal: RepType;
 					oldVal: RepType;
-					operations: Array<NodeCG.Replicant.Operation<RepType>>;
+					operations: NodeCG.Replicant.Operation<RepType>[];
 				}>((resolve) => {
 					const rep = window.dashboardApi.Replicant<RepType>("clientObjTest", {
 						persistent: false,
@@ -463,7 +464,7 @@ test.serial(
 test.serial(
 	"when an object - should react to server-side changes of array properties",
 	async (t) => {
-		type RepType = { arr: any[] };
+		interface RepType { arr: any[] }
 		const serverRep = t.context.apis.extension.Replicant<RepType>(
 			"s2c_nestedArrTest",
 			{
@@ -505,7 +506,7 @@ test.serial(
 		const retJson: {
 			newVal: RepType;
 			oldVal: RepType;
-			operations: Array<NodeCG.Replicant.Operation<RepType>>;
+			operations: NodeCG.Replicant.Operation<RepType>[];
 		} = await ret.jsonValue();
 
 		t.deepEqual(retJson.newVal, { arr: ["test"] });
@@ -525,17 +526,17 @@ test.serial(
 test.serial(
 	'when an object - should support the "delete" operator',
 	async (t) => {
-		type RepType = {
+		interface RepType {
 			foo?: string;
 			bar: string;
-		};
+		}
 
 		const ret = await dashboard.evaluate(
 			async () =>
 				new Promise<{
 					newVal: RepType;
 					oldVal: RepType;
-					operations: Array<NodeCG.Replicant.Operation<RepType>>;
+					operations: NodeCG.Replicant.Operation<RepType>[];
 				}>((resolve, reject) => {
 					const rep = window.dashboardApi.Replicant<RepType>(
 						"clientObjectDelete",

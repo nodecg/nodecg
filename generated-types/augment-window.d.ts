@@ -1,3 +1,5 @@
+/* eslint-disable no-var */
+
 import { NodeCGAPIClient } from "./client/api/api.client";
 
 declare global {

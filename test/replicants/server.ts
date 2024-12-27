@@ -249,6 +249,7 @@ test.serial('arrays - should support the "delete" operator', async (t) => {
 	});
 
 	process.nextTick(() => {
+		// eslint-disable-next-line @typescript-eslint/no-array-delete
 		delete rep.value[0];
 		deleted = true;
 	});
@@ -304,11 +305,11 @@ test.serial(
 		const bar = { bar: "bar" };
 		rep1.value = {};
 		rep2.value = {};
-		rep1.value["foo"] = bar;
+		rep1.value.foo = bar;
 
 		const error = t.throws(() => {
 			if (rep2.value) {
-				rep2.value["foo"] = bar;
+				rep2.value.foo = bar;
 			}
 		});
 
@@ -370,7 +371,7 @@ test.serial("persistent - should persist changes to database", async (t) => {
 		Record<string, unknown>,
 		true
 	>;
-	rep.value["nested"] = "hey we changed!";
+	rep.value.nested = "hey we changed!";
 
 	await t.context.server.saveAllReplicantsNow();
 

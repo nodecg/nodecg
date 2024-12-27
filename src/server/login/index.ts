@@ -7,6 +7,8 @@ import passport from "passport";
 import SteamStrategy from "passport-steam";
 import { Strategy as LocalStrategy } from "passport-local";
 import cookieParser from "cookie-parser";
+import { Strategy as DiscordStrategy } from "passport-discord";
+import { Strategy as TwitchStrategy } from "passport-twitch-helix";
 
 import { config } from "../config";
 import { createLogger } from "../logger";
@@ -22,30 +24,21 @@ type StrategyDoneCb = (
 /**
  * The "user profile" for Steam-authenticated users, as consumed by Express.
  */
-type SteamProfile = { id: string; displayName: string };
+interface SteamProfile {
+	id: string;
+	displayName: string;
+}
 
 /**
  * The "user profile" for Twitch-authenticated users, as consumed by Express.
  */
-type TwitchProfile = {
+interface TwitchProfile {
 	provider: "twitch";
 	id: string;
 	username: string;
 	displayName: string;
 	email: string;
-};
-
-/**
- * The "user profile" for Discord-authenticated users, as consumed by Express.
- */
-type DiscordProfile = {
-	provider: "discord";
-	accessToken: string;
-	username: string;
-	discriminator: string;
-	id: string;
-	guilds: Array<{ id: string; name: string }>;
-};
+}
 
 const log = createLogger("login");
 const protocol =
@@ -72,7 +65,7 @@ async function makeDiscordAPIRequest(
 		},
 	);
 
-	const data = (await res.json()) as any;
+	const data = await res.json();
 	if (res.status === 200) {
 		return [guild, false, data];
 	}
@@ -92,12 +85,14 @@ export function createMiddleware(
 	passport.serializeUser<User["id"]>((user, done) => {
 		done(null, user.id);
 	});
-	passport.deserializeUser<User["id"]>(async (id, done) => {
-		try {
-			done(null, await db.findUser(id));
-		} catch (error: unknown) {
-			done(error);
-		}
+	passport.deserializeUser<User["id"]>((id, done) => {
+		void (async () => {
+			try {
+				done(null, await db.findUser(id));
+			} catch (error: unknown) {
+				done(error);
+			}
+		})();
 	});
 
 	if (
@@ -151,7 +146,6 @@ export function createMiddleware(
 
 	if (config.login.enabled && config.login.twitch?.enabled) {
 		const twitchLoginConfig = config.login.twitch;
-		const TwitchStrategy = require("passport-twitch-helix").Strategy;
 
 		// The "user:read:email" scope is required. Add it if not present.
 		const scopesArray = twitchLoginConfig.scope.split(" ");
@@ -209,8 +203,6 @@ export function createMiddleware(
 	if (config.login.enabled && config.login.discord?.enabled) {
 		const discordLoginConfig = config.login.discord;
 
-		const DiscordStrategy = require("passport-discord").Strategy;
-
 		// The "identify" scope is required. Add it if not present.
 		const scopeArray = discordLoginConfig.scope.split(" ");
 		if (!scopeArray.includes("identify")) {
@@ -226,17 +218,12 @@ export function createMiddleware(
 		passport.use(
 			new DiscordStrategy(
 				{
-					clientID: discordLoginConfig.clientID,
-					clientSecret: discordLoginConfig.clientSecret,
+					clientID: discordLoginConfig.clientID!,
+					clientSecret: discordLoginConfig.clientSecret!,
 					callbackURL: `${protocol}://${config.baseURL}/login/auth/discord`,
 					scope,
 				},
-				async (
-					accessToken: string,
-					refreshToken: string,
-					profile: DiscordProfile,
-					done: StrategyDoneCb,
-				) => {
+				async (accessToken, refreshToken, profile, done) => {
 					if (!discordLoginConfig) {
 						// Impossible but TS doesn't know that.
 						done(new Error("Discord login config was impossibly undefined."));
@@ -251,7 +238,7 @@ export function createMiddleware(
 						// Get guilds that are specified in the config and that user is in
 						const intersectingGuilds = discordLoginConfig.allowedGuilds.filter(
 							(allowedGuild) =>
-								profile.guilds.some(
+								profile.guilds?.some(
 									(profileGuild) => profileGuild.id === allowedGuild.guildID,
 								),
 						);
@@ -347,51 +334,53 @@ export function createMiddleware(
 					passwordField: "password",
 					session: false,
 				},
-				async (username: string, password: string, done: StrategyDoneCb) => {
-					try {
-						const roles: Role[] = [];
-						const foundUser = allowedUsers?.find(
-							(u: { username: string; password: string }) =>
-								u.username === username,
-						);
-						let allowed = false;
+				(username: string, password: string, done: StrategyDoneCb) => {
+					void (async () => {
+						try {
+							const roles: Role[] = [];
+							const foundUser = allowedUsers?.find(
+								(u: { username: string; password: string }) =>
+									u.username === username,
+							);
+							let allowed = false;
 
-						if (foundUser) {
-							const match = /^([^:]+):(.+)$/.exec(foundUser.password ?? "");
-							let expected = foundUser.password;
-							let actual = password;
+							if (foundUser) {
+								const match = /^([^:]+):(.+)$/.exec(foundUser.password ?? "");
+								let expected = foundUser.password;
+								let actual = password;
 
-							if (match && hashes.includes(match[1]!)) {
-								expected = match[2]!;
-								actual = crypto
-									.createHmac(match[1]!, sessionSecret)
-									.update(actual, "utf8")
-									.digest("hex");
+								if (match && hashes.includes(match[1]!)) {
+									expected = match[2]!;
+									actual = crypto
+										.createHmac(match[1]!, sessionSecret)
+										.update(actual, "utf8")
+										.digest("hex");
+								}
+
+								if (expected === actual) {
+									allowed = true;
+									roles.push(await db.getSuperUserRole());
+								}
 							}
 
-							if (expected === actual) {
-								allowed = true;
-								roles.push(await db.getSuperUserRole());
-							}
+							log.info(
+								'(Local) %s "%s" access',
+								allowed ? "Granting" : "Denying",
+								username,
+							);
+
+							const user = await db.upsertUser({
+								name: username,
+								provider_type: "local",
+								provider_hash: username,
+								roles,
+							});
+							done(undefined, user);
+							return;
+						} catch (error: any) {
+							done(error);
 						}
-
-						log.info(
-							'(Local) %s "%s" access',
-							allowed ? "Granting" : "Denying",
-							username,
-						);
-
-						const user = await db.upsertUser({
-							name: username,
-							provider_type: "local",
-							provider_hash: username,
-							roles,
-						});
-						done(undefined, user);
-						return;
-					} catch (error: any) {
-						done(error);
-					}
+					})();
 				},
 			),
 		);

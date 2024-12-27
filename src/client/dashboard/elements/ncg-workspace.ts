@@ -236,8 +236,8 @@ class NcgWorkspace extends Polymer.PolymerElement {
 			// Overwrite packery item order
 			len = removededOld.length;
 			for (i = 0; i < len; i++) {
-				panelName = removededOld[i];
-				packery.items[i] = itemsByFullName[panelName!];
+				panelName = removededOld[i]!;
+				packery.items[i] = itemsByFullName[panelName];
 			}
 		}
 
