@@ -30,7 +30,7 @@
     "start": "node index.js",
     "dev": "del-cli dist out && run-p dev:*",
     "dev:client": "npm run build:client -- --watch",
-    "dev:tsc": "tsc -b src/server src/client --watch --preserveWatchOutput",
+    "dev:tsc": "tsc -b src/server src/client test --watch --preserveWatchOutput",
     "dev:server": "node --watch --watch-preserve-output index.js",
     "dev:copy-templates": "onchange \"src/server/**/*.tmpl\" -i -- cpy \"src/server/**/*.tmpl\" out/server",
     "test": "ava --config ava.config.js",

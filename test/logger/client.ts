@@ -1,7 +1,7 @@
 import sinon from "sinon";
 import type { TestFn } from "ava";
 import anyTest from "ava";
-import loggerFactory from "../../src/client/api/logger/logger.client";
+import { loggerFactory } from "../../src/client/api/logger/logger.client";
 import { LogLevel } from "../../src/types/logger-interface";
 
 // Start up the logger lib with defaults only

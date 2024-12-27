@@ -1,8 +1,6 @@
-// Packages
 import test from "ava";
 
-// Ours
-import parseBundle from "../../src/server/bundle-parser";
+import { parseBundle } from "../../src/server/bundle-parser";
 
 test('when there is no "dashboard" folder, assign an empty array to bundle.dashboard.panels', (t) => {
 	const parsedBundle = parseBundle("./test/fixtures/bundle-parser/no-panels");

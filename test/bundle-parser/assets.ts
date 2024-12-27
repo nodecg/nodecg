@@ -1,8 +1,6 @@
-// Packages
 import test from "ava";
 
-// Ours
-import parseAssets from "../../src/server/bundle-parser/assets";
+import { parseAssets } from "../../src/server/bundle-parser/assets";
 
 test("should return the validated assetCategories", (t) => {
 	const categories = [

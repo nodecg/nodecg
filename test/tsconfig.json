@@ -13,7 +13,9 @@
 		"target": "ES2017",
 		"noEmit": true,
 		"rootDir": ".",
-		"module": "commonjs"
+		"module": "commonjs",
+		"noUncheckedIndexedAccess": false,
+		"noPropertyAccessFromIndexSignature": false
 	},
 	"references": [
 		{ "path": "../src/types" },

@@ -1,11 +1,8 @@
-// Native
-import path from "path";
+import path from "node:path";
 
-// Packages
 import test from "ava";
 
-// Ours
-import parseBundle from "../../src/server/bundle-parser";
+import { parseBundle } from "../../src/server/bundle-parser";
 
 test("should error when package.json does not exist", (t) => {
 	const error = t.throws(parseBundle.bind(parseBundle, "./test"));
