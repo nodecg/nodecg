@@ -1,7 +1,7 @@
 // Native
 import { EventEmitter } from "events";
 
-interface Builtins {
+export interface Builtins {
 	newListener(event: string, listener: EventReceiver<unknown>): void;
 }
 

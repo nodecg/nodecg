@@ -7,7 +7,7 @@ import type { AbstractReplicant } from "./replicants.shared";
 import type { NodeCG } from "../types/nodecg";
 import { TypedEmitter, type EventMap } from "./typed-emitter";
 
-interface MessageHandler {
+export interface MessageHandler {
 	messageName: string;
 	bundleName: string;
 	func: NodeCG.ListenHandler;

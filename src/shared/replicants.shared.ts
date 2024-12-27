@@ -88,7 +88,9 @@ export abstract class AbstractReplicant<
 
 	protected _oldValue: ReplicantValue<P, V, O, S> | undefined;
 
-	protected _operationQueue: NodeCG.Replicant.Operation<ReplicantValue<P, V, O, S>>[] = [];
+	protected _operationQueue: NodeCG.Replicant.Operation<
+		ReplicantValue<P, V, O, S>
+	>[] = [];
 
 	protected _pendingOperationFlush = false;
 
@@ -128,7 +130,6 @@ export abstract class AbstractReplicant<
 				return;
 			}
 
-			 
 			return originalOnce(event as any, listener);
 		};
 

@@ -298,11 +298,12 @@ test.serial(
 test.serial(
 	"when an array - should proxy objects added to arrays via array insertion methods",
 	async (t) => {
-		const rep = t.context.apis.extension.Replicant<
-			Record<string, string>[]
-		>("serverArrInsertObj", {
-			defaultValue: [],
-		});
+		const rep = t.context.apis.extension.Replicant<Record<string, string>[]>(
+			"serverArrInsertObj",
+			{
+				defaultValue: [],
+			},
+		);
 		rep.value.push({ foo: "foo" });
 
 		const promise = new Promise<void>((resolve) => {
@@ -464,7 +465,9 @@ test.serial(
 test.serial(
 	"when an object - should react to server-side changes of array properties",
 	async (t) => {
-		interface RepType { arr: any[] }
+		interface RepType {
+			arr: any[];
+		}
 		const serverRep = t.context.apis.extension.Replicant<RepType>(
 			"s2c_nestedArrTest",
 			{

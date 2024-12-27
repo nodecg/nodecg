@@ -499,7 +499,6 @@ export class NodeCGAPIClient<
 		dataOrCb?: unknown,
 		cb?: SendMessageCb<T>,
 	): void | Promise<T> {
-
 		return NodeCGAPIClient.sendMessageToBundle(
 			messageName,
 			bundleName,
@@ -520,7 +519,6 @@ export class NodeCGAPIClient<
 		dataOrCb?: unknown,
 		cb?: SendMessageCb<T>,
 	): void | Promise<T> {
-
 		return this.sendMessageToBundle(
 			messageName,
 			this.bundleName,

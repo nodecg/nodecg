@@ -90,7 +90,6 @@ export class ServerReplicant<
 		// Else, apply `defaultValue`.
 		if (
 			opts.persistent &&
-			 
 			typeof startingValue !== "undefined" &&
 			startingValue !== null
 		) {

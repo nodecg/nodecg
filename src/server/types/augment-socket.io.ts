@@ -8,10 +8,10 @@ declare namespace SocketIO {
 	/**
 	 * Lange: I'm actually upset at how poorly documented this part of Socket.IO is lmao
 	 */
-	export type NextFunction = (err?: NodeJS.ErrnoException  ) => void;
+	export type NextFunction = (err?: NodeJS.ErrnoException) => void;
 
 	export type Acknowledgement = (
-		err?: NodeJS.ErrnoException  ,
+		err?: NodeJS.ErrnoException,
 		data?: any,
 	) => void;
 }

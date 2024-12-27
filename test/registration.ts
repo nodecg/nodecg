@@ -240,10 +240,7 @@ test.serial("version out of date", async (t) => {
 
 test.serial("git out of date", async (t) => {
 	fs.writeFileSync(
-		path.resolve(
-			process.env.NODECG_ROOT!,
-			"bundles/test-bundle/new_file.txt",
-		),
+		path.resolve(process.env.NODECG_ROOT!, "bundles/test-bundle/new_file.txt"),
 		"foo",
 	);
 	const git = simpleGit(

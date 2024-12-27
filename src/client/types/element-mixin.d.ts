@@ -139,7 +139,7 @@ export interface ElementMixinConstructor {
 	_addTemplatePropertyEffect(
 		templateInfo: Record<string, unknown> | undefined,
 		prop: string,
-		effect?: Record<string, unknown>  ,
+		effect?: Record<string, unknown>,
 	): void;
 
 	/**
@@ -267,7 +267,7 @@ type ElementMixin = {
 	 * @param properties Bag of custom property key/values to
 	 *   apply to this element.
 	 */
-	updateStyles(properties?: Record<string, unknown>  ): void;
+	updateStyles(properties?: Record<string, unknown>): void;
 
 	/**
 	 * Rewrites a given URL relative to a base URL. The base URL defaults to
@@ -306,9 +306,7 @@ export { updateStyles };
  *
  * These properties are retained unless a value of `null` is set.
  */
-declare function updateStyles(
-	props?: Record<string, unknown>  ,
-): void;
+declare function updateStyles(props?: Record<string, unknown>): void;
 
 import type { TemplateInfo } from "@polymer/polymer/interfaces";
 

@@ -84,7 +84,6 @@ test.serial(
 		const res = await dashboard.evaluate(
 			async () =>
 				new Promise((resolve) => {
-					 
 					const returnVal = window.dashboardApi.sendMessage(
 						"ackPromiseCallback",
 						() => {

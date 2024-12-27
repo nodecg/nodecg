@@ -45,7 +45,10 @@ interface File {
 	};
 }
 
-interface UnknownObject { [k: string]: unknown; [k: number]: unknown }
+interface UnknownObject {
+	[k: string]: unknown;
+	[k: number]: unknown;
+}
 type FileReference = { $ref: string } & UnknownObject;
 type PointerReference = { $ref: string } & UnknownObject;
 
