@@ -87,7 +87,7 @@ test.serial(
 			async () =>
 				new Promise<void>((resolve, reject) => {
 					try {
-						const openDialogButton = document!
+						const openDialogButton = document
 							.querySelector("ncg-dashboard")!
 							.shadowRoot!.querySelector("ncg-workspace")!
 							.shadowRoot!.querySelector(
@@ -150,7 +150,7 @@ test.serial.skip(
 			async () =>
 				new Promise<void>((resolve) => {
 					// Open dialog first
-					const openDialogButton = document!
+					const openDialogButton = document
 						.querySelector("ncg-dashboard")!
 						.shadowRoot!.querySelector("ncg-workspace")!
 						.shadowRoot!.querySelector(

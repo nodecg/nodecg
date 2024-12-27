@@ -16,10 +16,10 @@ import type { NodeCGServer } from "../../src/server/server";
 import type { serverApiFactory } from "../../src/server/api.server";
 import { populateTestData } from "./populateTestData";
 
-export type ServerContext = {
+export interface ServerContext {
 	server: NodeCGServer;
 	apis: { extension: InstanceType<ReturnType<typeof serverApiFactory>> };
-};
+}
 
 const test = anyTest as TestFn<ServerContext>;
 

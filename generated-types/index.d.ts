@@ -19,7 +19,6 @@ declare module "./types/nodecg" {
 	/**
 	 * A collection of types that describe NodeCG's APIs.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-namespace
 	namespace NodeCG {
 		/**
 		 * The primary interface for the client-side API, used in dashboards and graphics.

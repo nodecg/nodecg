@@ -25,11 +25,11 @@ export type ReplicantValue<
 			: V | undefined
 	: (O extends { defaultValue: infer D extends V } ? D : V) | undefined;
 
-type Events<P extends NodeCG.Platform, V, O, S extends boolean> = {
+interface Events<P extends NodeCG.Platform, V, O, S extends boolean> {
 	change: (
 		newVal: ReplicantValue<P, V, O, S>,
 		oldVal: ReplicantValue<P, V, O, S> | undefined,
-		operations: Array<NodeCG.Replicant.Operation<ReplicantValue<P, V, O, S>>>,
+		operations: NodeCG.Replicant.Operation<ReplicantValue<P, V, O, S>>[],
 	) => void;
 	declared: (
 		data:
@@ -45,12 +45,12 @@ type Events<P extends NodeCG.Platform, V, O, S extends boolean> = {
 	operations: (params: {
 		name: string;
 		namespace: string;
-		operations: Array<NodeCG.Replicant.Operation<ReplicantValue<P, V, O, S>>>;
+		operations: NodeCG.Replicant.Operation<ReplicantValue<P, V, O, S>>[];
 		revision: number;
 	}) => void;
 	operationsRejected: (rejectReason: string) => void;
 	fullUpdate: (data: ReplicantValue<P, V, O, S>) => void;
-};
+}
 
 /**
  * If you're wondering why some things are prefixed with "_",
@@ -88,9 +88,9 @@ export abstract class AbstractReplicant<
 
 	protected _oldValue: ReplicantValue<P, V, O, S> | undefined;
 
-	protected _operationQueue: Array<
-		NodeCG.Replicant.Operation<ReplicantValue<P, V, O, S>>
-	> = [];
+	protected _operationQueue: NodeCG.Replicant.Operation<
+		ReplicantValue<P, V, O, S>
+	>[] = [];
 
 	protected _pendingOperationFlush = false;
 
@@ -130,7 +130,6 @@ export abstract class AbstractReplicant<
 				return;
 			}
 
-			// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 			return originalOnce(event as any, listener);
 		};
 
@@ -304,18 +303,18 @@ export abstract class AbstractReplicant<
 	}
 }
 
-type Metadata<
+interface Metadata<
 	V,
 	O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
-> = {
+> {
 	replicant: AbstractReplicant<any, V, O>;
 	path: string;
 	proxy: unknown;
-};
+}
 
-export type ValidatorOptions = {
+export interface ValidatorOptions {
 	throwOnInvalid?: boolean;
-};
+}
 
 export type Validator = (newValue: any, opts?: ValidatorOptions) => boolean;
 

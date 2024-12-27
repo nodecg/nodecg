@@ -1,42 +1,42 @@
-export type User = {
+export interface User {
 	id: string;
 	created_at: number;
 	name: string;
 	roles: Role[];
 	identities: Identity[];
 	apiKeys: ApiKey[];
-};
+}
 
-export type Role = {
+export interface Role {
 	id: string;
 	name: string;
 	permissions: Permission[];
-};
+}
 
-export type Identity = {
+export interface Identity {
 	id: string;
 	provider_type: "twitch" | "steam" | "local" | "discord";
 	provider_hash: string;
 	provider_access_token: string | null;
 	provider_refresh_token: string | null;
 	user: User;
-};
+}
 
-export type ApiKey = {
+export interface ApiKey {
 	secret_key: string;
 	user: User;
-};
+}
 
-export type Permission = {
+export interface Permission {
 	id: string;
 	name: string;
 	role: Role;
 	entityId: string;
 	actions: number;
-};
+}
 
-export type Replicant = {
+export interface Replicant {
 	namespace: string;
 	name: string;
 	value: string;
-};
+}

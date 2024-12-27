@@ -219,7 +219,7 @@ test.serial(
 	"client api - #playSound should return a playing AbstractAudioInstance",
 	async (t) => {
 		const ret = await graphic.evaluate(
-			() => window.graphicApi.playSound("default-file")!.playState,
+			() => window.graphicApi.playSound("default-file").playState,
 		);
 
 		t.is(ret, "playSucceeded");

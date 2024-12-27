@@ -25,16 +25,16 @@ export namespace NodeCG {
 		/**
 		 * An unparsed `assetCategory` from a bundle's `package.json`.
 		 */
-		export type UnparsedAssetCategory = {
+		export interface UnparsedAssetCategory {
 			name: string;
 			title: string;
 			allowedTypes?: string[];
-		};
+		}
 
 		/**
 		 * An unparsed `panel` from a bundle's `package.json`.
 		 */
-		export type UnparsedPanel = {
+		export interface UnparsedPanel {
 			name: string;
 			title: string;
 			file: string;
@@ -42,37 +42,37 @@ export namespace NodeCG {
 			fullbleed?: boolean;
 			workspace?: string;
 			dialog?: boolean;
-			dialogButtons?: Array<{ name: string; type: "dismiss" | "confirm" }>;
+			dialogButtons?: { name: string; type: "dismiss" | "confirm" }[];
 			width?: number;
-		};
+		}
 
 		/**
 		 * An unparsed `graphic` from a bundle's `package.json`.
 		 */
-		export type UnparsedGraphic = {
+		export interface UnparsedGraphic {
 			file: string;
 			width: number;
 			height: number;
 			singleInstance?: boolean;
-		};
+		}
 
 		/**
 		 * An unparsed `mount` configuration from a bundle's `package.json`.
 		 */
-		export type UnparsedMount = {
+		export interface UnparsedMount {
 			directory: string;
 			endpoint: string;
-		};
+		}
 
 		/**
 		 * An unparsed `soundCue` from a bundle's `package.json`.
 		 */
-		export type UnparsedSoundCue = {
+		export interface UnparsedSoundCue {
 			name: string;
 			assignable?: boolean;
 			defaultVolume?: number;
 			defaultFile?: string;
-		};
+		}
 
 		/**
 		 * An unparsed record of `bundleDependencies` from a bundle's `package.json`.
@@ -82,7 +82,7 @@ export namespace NodeCG {
 		/**
 		 * The actual structure of a bundle's `nodecg` stanza from it's `package.json`.
 		 */
-		export type UnparsedManifest = {
+		export interface UnparsedManifest {
 			compatibleRange: string;
 			transformBareModuleSpecifiers?: boolean;
 			dashboardPanels?: UnparsedPanel[];
@@ -91,14 +91,14 @@ export namespace NodeCG {
 			mount?: UnparsedMount[];
 			soundCues?: UnparsedSoundCue[];
 			bundleDependencies?: UnparsedBundleDependencies;
-		};
+		}
 	}
 
 	/**
 	 * The rough structure of a bundle's `package.json`.
 	 * Only includes types that NodeCG cares about.
 	 */
-	export type PackageJSON = {
+	export interface PackageJSON {
 		name: string;
 		version: string;
 		license?: string;
@@ -107,7 +107,7 @@ export namespace NodeCG {
 		author?: Person;
 		contributors?: Person[];
 		nodecg: Manifest.UnparsedManifest;
-	};
+	}
 
 	/**
 	 * A _parsed_ bundle manifest as used internally by NodeCG.
@@ -173,14 +173,14 @@ export namespace NodeCG {
 		export type UnknownConfig = Record<string, unknown>;
 	}
 
-	export type NodecgBundleConfig = {
+	export interface NodecgBundleConfig {
 		databaseAdapter?: DatabaseAdapter;
-	};
+	}
 
 	/**
 	 * The actual type of a `bundle`.
 	 */
-	export type Bundle = {
+	export interface Bundle {
 		name: string;
 		version: string;
 		license?: string;
@@ -205,17 +205,17 @@ export namespace NodeCG {
 		compatibleRange: string;
 		bundleDependencies?: Bundle.BundleDependencies;
 		nodecgBundleConfig: NodecgBundleConfig;
-	};
+	}
 
 	/**
 	 * NodeCG's socket protocol.
 	 * It is unikely that you will need to use this directly.
 	 * Does not include builtin Socket.IO events such as `connect`, `disconnect`, etc.
 	 */
-	export type SocketProtocol = {
+	export interface SocketProtocol {
 		serverToClient: ServerToClientEvents;
 		clientToServer: ClientToServerEvents;
-	};
+	}
 
 	/**
 	 * The full, parsed NodeCG config (i.e `cfg/nodecg.{json,yaml,js}`).
@@ -229,7 +229,7 @@ export namespace NodeCG {
 	 * Does not contain any sensitive secrets.
 	 * Available to client-side code (dashboard, graphics) only.
 	 */
-	export type FilteredConfig = {
+	export interface FilteredConfig {
 		host: string;
 		port: number;
 		baseURL: string;
@@ -273,24 +273,24 @@ export namespace NodeCG {
 		ssl?: {
 			enabled: boolean;
 		};
-	};
+	}
 
 	/**
 	 * A sound cue `file`, as used in sound cue Replicants.
 	 */
-	export type CueFile = {
+	export interface CueFile {
 		sum: string;
 		base: string;
 		ext: string;
 		name: string;
 		url: string;
 		default: boolean;
-	};
+	}
 
 	/**
 	 * A sound cue definition, as used in sound cue Replicants.
 	 */
-	export type SoundCue = {
+	export interface SoundCue {
 		name: string;
 		volume: number;
 		file?: CueFile;
@@ -299,12 +299,12 @@ export namespace NodeCG {
 		bundleName?: TemplateStringsArray;
 		defaultVolume?: number | undefined;
 		defaultFile?: CueFile;
-	};
+	}
 
 	/**
 	 * An asset file, as used in assets Replicants.
 	 */
-	export type AssetFile = {
+	export interface AssetFile {
 		sum: string;
 		base: string;
 		ext: string;
@@ -312,7 +312,7 @@ export namespace NodeCG {
 		namespace: string;
 		category: string;
 		url: string;
-	};
+	}
 
 	/**
 	 * A namespace containing various types used in the Replicant system.
@@ -321,18 +321,18 @@ export namespace NodeCG {
 	export namespace Replicant {
 		export type Options<D> = OptionsNoDefault | OptionsWithDefault<D>;
 
-		export type OptionsNoDefault = {
+		export interface OptionsNoDefault {
 			persistent?: boolean;
 			persistenceInterval?: number;
 			schemaPath?: string;
-		};
+		}
 
-		export type OptionsWithDefault<D> = {
+		export interface OptionsWithDefault<D> {
 			persistent?: boolean;
 			persistenceInterval?: number;
 			schemaPath?: string;
 			defaultValue: D;
-		};
+		}
 
 		export type Operation<T> = {
 			path: string;
@@ -373,7 +373,7 @@ export namespace NodeCG {
 	 * A description of an instance of a currently-open graphic.
 	 * It is unlikely that you will need to use this type directly.
 	 */
-	export type GraphicsInstance = {
+	export interface GraphicsInstance {
 		ipv4: string;
 		timestamp: number;
 		bundleName: string;
@@ -384,35 +384,35 @@ export namespace NodeCG {
 		socketId: string;
 		open: boolean;
 		potentiallyOutOfDate: boolean;
-	};
+	}
 
 	/**
 	 * A description of a dashboard workspace.
 	 * It is unlikely that you will need to use this type directly.
 	 */
-	export type Workspace = {
+	export interface Workspace {
 		name: string;
 		label: string;
 		route: string;
 		fullbleed?: boolean;
-	};
+	}
 
 	/**
 	 * A handled `listenFor` acknowledgement.
 	 * Attempting to call/invoke a handled acknowledgement will throw an error.
 	 */
-	export type HandledAcknowledgement = {
+	export interface HandledAcknowledgement {
 		handled: true;
-	};
+	}
 
 	/**
 	 * An unhandled `listenFor` acknowledgement.
 	 * It can safely be called/invoked.
 	 */
-	export type UnhandledAcknowledgement = {
+	export interface UnhandledAcknowledgement {
 		handled: false;
 		(err?: any, response?: unknown): void;
-	};
+	}
 
 	/**
 	 * A `listenFor` acknowledgement, sent from client to server.
@@ -429,7 +429,7 @@ export namespace NodeCG {
 	/**
 	 * A description of NodeCG's logger interface.
 	 */
-	export type Logger = {
+	export interface Logger {
 		name: string;
 		trace: (...args: any[]) => void;
 		debug: (...args: any[]) => void;
@@ -437,7 +437,7 @@ export namespace NodeCG {
 		warn: (...args: any[]) => void;
 		error: (...args: any[]) => void;
 		replicants: (...args: any[]) => void;
-	};
+	}
 
 	/**
 	 * The logging levels available to NodeCG.

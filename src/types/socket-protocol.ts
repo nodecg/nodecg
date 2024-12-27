@@ -19,19 +19,19 @@ export enum UnAuthErrCode {
 	InvalidSession = "invalid_session",
 }
 
-export type ProtocolError = {
+export interface ProtocolError {
 	message: string;
 	code: UnAuthErrCode;
 	type: string;
-};
+}
 
-export type GraphicRegRequest = {
+export interface GraphicRegRequest {
 	timestamp: number;
 	pathName: string;
 	bundleName: string;
 	bundleVersion: string;
 	bundleGit: NodeCG.Bundle.GitData;
-};
+}
 
 export interface ServerToClientEvents {
 	protocol_error: (error: ProtocolError) => void;
@@ -43,7 +43,7 @@ export interface ServerToClientEvents {
 		name: string;
 		namespace: string;
 		revision: number;
-		operations: Array<NodeCG.Replicant.Operation<any>>;
+		operations: NodeCG.Replicant.Operation<any>[];
 	}) => void;
 	message: (data: {
 		messageName: string;
@@ -102,14 +102,14 @@ export interface ClientToServerEvents {
 			| {
 					name: string;
 					namespace: string;
-					operations: Array<NodeCG.Replicant.Operation<any>>;
+					operations: NodeCG.Replicant.Operation<any>[];
 					opts: NodeCG.Replicant.Options<any>;
 					revision: number;
 			  }
 			| {
 					name: string;
 					namespace: string;
-					operations: Array<NodeCG.Replicant.Operation<any>>;
+					operations: NodeCG.Replicant.Operation<any>[];
 					opts: NodeCG.Replicant.Options<any>;
 					revision: number;
 					schema: Record<string, any>;

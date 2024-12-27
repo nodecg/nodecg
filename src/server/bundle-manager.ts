@@ -43,13 +43,13 @@ const log = createLogger("bundle-manager");
 const hasChanged = new Set<string>();
 let backoffTimer: NodeJS.Timeout | undefined;
 
-type EventMap = {
+interface EventMap {
 	bundleRemoved: (bundleName: string) => void;
 	gitChanged: (bundle: NodeCG.Bundle) => void;
 	bundleChanged: (reparsedBundle: NodeCG.Bundle) => void;
 	invalidBundle: (bundle: NodeCG.Bundle, error: Error) => void;
 	ready: () => void;
-};
+}
 
 export class BundleManager extends TypedEmitter<EventMap> {
 	bundles: NodeCG.Bundle[] = [];

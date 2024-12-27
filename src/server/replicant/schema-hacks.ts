@@ -35,7 +35,7 @@ function typeOf(value: unknown) {
 	return type;
 }
 
-type File = {
+interface File {
 	url: string;
 	data: UnknownObject;
 	schema: {
@@ -43,9 +43,12 @@ type File = {
 			resolveURL(paths: { from: string; to: string }): string;
 		};
 	};
-};
+}
 
-type UnknownObject = { [k: string]: unknown; [k: number]: unknown };
+interface UnknownObject {
+	[k: string]: unknown;
+	[k: number]: unknown;
+}
 type FileReference = { $ref: string } & UnknownObject;
 type PointerReference = { $ref: string } & UnknownObject;
 

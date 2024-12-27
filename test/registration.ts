@@ -207,7 +207,7 @@ const statusEl = async (page: Page) =>
 test.serial("version out of date", async (t) => {
 	await replaceInFile({
 		files: path.resolve(
-			process.env["NODECG_ROOT"]!,
+			process.env.NODECG_ROOT!,
 			"bundles/test-bundle/package.json",
 		),
 		from: '"version": "0.0.1"',
@@ -223,7 +223,7 @@ test.serial("version out of date", async (t) => {
 
 	await replaceInFile({
 		files: path.resolve(
-			process.env["NODECG_ROOT"]!,
+			process.env.NODECG_ROOT!,
 			"bundles/test-bundle/package.json",
 		),
 		from: '"version": "0.0.2"',
@@ -240,14 +240,11 @@ test.serial("version out of date", async (t) => {
 
 test.serial("git out of date", async (t) => {
 	fs.writeFileSync(
-		path.resolve(
-			process.env["NODECG_ROOT"]!,
-			"bundles/test-bundle/new_file.txt",
-		),
+		path.resolve(process.env.NODECG_ROOT!, "bundles/test-bundle/new_file.txt"),
 		"foo",
 	);
 	const git = simpleGit(
-		path.resolve(process.env["NODECG_ROOT"]!, "bundles/test-bundle"),
+		path.resolve(process.env.NODECG_ROOT!, "bundles/test-bundle"),
 	);
 	await git.add("./new_file.txt");
 	await git.commit("new commit");

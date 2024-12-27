@@ -7,11 +7,11 @@ import { LogLevel } from "../../src/types/logger-interface";
 // Start up the logger lib with defaults only
 const Logger = loggerFactory();
 
-type TestContext = {
+interface TestContext {
 	logger: InstanceType<typeof Logger>;
 	SentryMock: any;
 	sentryLogger: InstanceType<typeof Logger>;
-};
+}
 
 const test = anyTest as TestFn<TestContext>;
 

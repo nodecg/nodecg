@@ -15,10 +15,10 @@ import type { NodeCG } from "../types/nodecg";
 import { stringifyError } from "../shared/utils/errors";
 import { NODECG_ROOT } from "./nodecg-root";
 
-type Collection = {
+interface Collection {
 	name: string;
 	categories: NodeCG.Bundle.AssetCategory[];
-};
+}
 
 const logger = createLogger("assets");
 

@@ -3,7 +3,7 @@ import type * as Sentry from "@sentry/browser";
 import type { LoggerInterface } from "../../../types/logger-interface";
 import { LogLevel } from "../../../types/logger-interface";
 
-const OrderedLogLevels: { [Level in LogLevel]: number } = {
+const OrderedLogLevels: Record<LogLevel, number> = {
 	verbose: 0,
 	debug: 1,
 	info: 2,
@@ -12,13 +12,13 @@ const OrderedLogLevels: { [Level in LogLevel]: number } = {
 	silent: 5,
 };
 
-type LoggerOptions = {
+interface LoggerOptions {
 	console: {
 		enabled: boolean;
 		level?: LogLevel;
 		replicants?: boolean;
 	};
-};
+}
 
 /**
  * A factory that configures and returns a Logger constructor.

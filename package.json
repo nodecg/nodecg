@@ -39,7 +39,7 @@
     "test:types": "cd typetest/fake-bundle && npm run build",
     "lint": "npm-run-all -s lint:*",
     "lint:prettier": "prettier --check .",
-    "lint:eslint": "eslint --cache --ext .ts src test",
+    "lint:eslint": "eslint --cache",
     "fix": "npm-run-all -s fix:*",
     "fix:prettier": "prettier --write .",
     "fix:eslint": "npm run lint:eslint -- --fix ",
@@ -136,6 +136,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
     "@types/app-root-path": "^1.2.8",
     "@types/clone": "^2.1.4",
     "@types/compression": "^1.7.5",
@@ -153,6 +154,7 @@
     "@types/node": "~18.11.19",
     "@types/object-path": "^0.11.4",
     "@types/passport": "^1.0.16",
+    "@types/passport-discord": "^0.1.14",
     "@types/passport-local": "^1.0.38",
     "@types/passport-steam": "^1.0.5",
     "@types/semver": "^7.5.6",
@@ -161,8 +163,6 @@
     "@types/soundjs": "^0.6.31",
     "@types/uuid": "^8.3.4",
     "@types/yargs": "^15.0.19",
-    "@typescript-eslint/eslint-plugin": "^6.17.0",
-    "@typescript-eslint/parser": "^6.17.0",
     "ava": "^5.3.1",
     "c8": "^8.0.1",
     "cpy-cli": "^5.0.0",
@@ -170,9 +170,8 @@
     "del-cli": "^5.1.0",
     "esbuild": "^0.19.11",
     "esbuild-plugin-copy": "^2.1.1",
-    "eslint": "^8.56.0",
+    "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-ava": "^14.0.0",
     "is-builtin-module": "^3.2.1",
     "is-ci": "^3.0.1",
     "is-windows": "^1.0.2",
@@ -186,7 +185,8 @@
     "tmp-promise": "^3.0.3",
     "ts-essentials": "^9.4.1",
     "ts-node": "^10.9.2",
-    "typescript": "~5.3.3"
+    "typescript": "~5.3.3",
+    "typescript-eslint": "^8.18.2"
   },
   "engines": {
     "node": "^18.12.0 || ^20.9.0 || ^22.11.0"

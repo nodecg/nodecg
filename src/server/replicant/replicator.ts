@@ -117,7 +117,7 @@ export class Replicator {
 	 */
 	applyOperations<V>(
 		replicant: Replicant<V, NodeCG.Replicant.Options<V>>,
-		operations: Array<NodeCG.Replicant.Operation<V>>,
+		operations: NodeCG.Replicant.Operation<V>[],
 	): void {
 		const oldValue = clone(replicant.value);
 		operations.forEach((operation) => replicant._applyOperation(operation));
@@ -162,7 +162,7 @@ export class Replicator {
 	}
 
 	async saveAllReplicantsNow(): Promise<void> {
-		const promises: Array<Promise<void>> = [];
+		const promises: Promise<void>[] = [];
 		for (const replicants of this.declaredReplicants.values()) {
 			for (const replicant of replicants.values()) {
 				promises.push(this._saveReplicant(replicant));

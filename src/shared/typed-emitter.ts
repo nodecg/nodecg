@@ -1,9 +1,9 @@
 // Native
 import { EventEmitter } from "events";
 
-type Builtins = {
+export interface Builtins {
 	newListener(event: string, listener: EventReceiver<unknown>): void;
-};
+}
 
 export type EventMap = Record<string, any>;
 export type EventKey<T extends EventMap> = string & keyof T;
@@ -64,7 +64,7 @@ export class TypedEmitter<T extends EventMap> {
 
 	listeners<K extends EventKey<T & Builtins>>(
 		eventName: K,
-	): Array<(T & Builtins)[K]> {
+	): (T & Builtins)[K][] {
 		return this._emitter.listeners(eventName) as any;
 	}
 

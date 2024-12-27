@@ -90,7 +90,6 @@ export class ServerReplicant<
 		// Else, apply `defaultValue`.
 		if (
 			opts.persistent &&
-			// eslint-disable-next-line @typescript-eslint/prefer-optional-chain
 			typeof startingValue !== "undefined" &&
 			startingValue !== null
 		) {

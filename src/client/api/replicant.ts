@@ -62,8 +62,7 @@ export class ClientReplicant<
 	 * and the replicant is fully declared before running any additional commands.
 	 * After this time, commands do not need to be added to the queue and are simply executed immediately.
 	 */
-	private _actionQueue: Array<{ fn: (...args: any[]) => void; args?: any[] }> =
-		[];
+	private _actionQueue: { fn: (...args: any[]) => void; args?: any[] }[] = [];
 
 	private readonly _socket!: TypedClientSocket;
 
@@ -100,9 +99,9 @@ export class ClientReplicant<
 		socket.on("replicant:operations", (data) => {
 			this._handleOperations({
 				...data,
-				operations: data.operations as Array<
-					NodeCG.Replicant.Operation<ReplicantValue<"client", V, O>>
-				>,
+				operations: data.operations as NodeCG.Replicant.Operation<
+					ReplicantValue<"client", V, O>
+				>[],
 			});
 		});
 
@@ -342,9 +341,7 @@ export class ClientReplicant<
 		name: string;
 		namespace: string;
 		revision: number;
-		operations: Array<
-			NodeCG.Replicant.Operation<ReplicantValue<"client", V, O>>
-		>;
+		operations: NodeCG.Replicant.Operation<ReplicantValue<"client", V, O>>[];
 	}): void {
 		if (this.status !== "declared") {
 			return;

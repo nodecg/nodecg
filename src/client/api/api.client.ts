@@ -13,9 +13,10 @@ type SendMessageCb<T> = (error?: unknown, response?: T) => void;
 
 type ReadReplicantCb<T = unknown> = (value: T | undefined) => void;
 
-type EventMap = {
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface EventMap {
 	//
-};
+}
 
 const soundMetadata = new WeakMap<
 	createjs.AbstractSoundInstance,
@@ -498,7 +499,6 @@ export class NodeCGAPIClient<
 		dataOrCb?: unknown,
 		cb?: SendMessageCb<T>,
 	): void | Promise<T> {
-		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 		return NodeCGAPIClient.sendMessageToBundle(
 			messageName,
 			bundleName,
@@ -519,7 +519,6 @@ export class NodeCGAPIClient<
 		dataOrCb?: unknown,
 		cb?: SendMessageCb<T>,
 	): void | Promise<T> {
-		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 		return this.sendMessageToBundle(
 			messageName,
 			this.bundleName,

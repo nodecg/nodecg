@@ -13,13 +13,13 @@ import { sendFile } from "../util/sendFile";
 
 type Workspace = NodeCG.Workspace;
 
-type DashboardContext = {
+interface DashboardContext {
 	bundles: NodeCG.Bundle[];
 	publicConfig: typeof filteredConfig;
 	privateConfig: typeof config;
 	workspaces: Workspace[];
 	sentryEnabled: boolean;
-};
+}
 
 const BUILD_PATH = path.join(nodecgRootPath, "dist");
 
