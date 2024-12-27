@@ -4,7 +4,7 @@ import path from "path";
 
 import { nodecgRootPath } from "../../shared/utils/rootPath";
 import type { NodeCG } from "../../types/nodecg";
-import type { GraphicRegRequest,RootNS } from "../../types/socket-protocol";
+import type { GraphicRegRequest, RootNS } from "../../types/socket-protocol";
 import type { BundleManager } from "../bundle-manager";
 import type { Replicator } from "../replicant/replicator";
 import type { ServerReplicant } from "../replicant/server-replicant";

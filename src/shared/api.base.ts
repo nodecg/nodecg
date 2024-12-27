@@ -3,7 +3,7 @@ import type { DeepReadonly } from "ts-essentials";
 const { version } = require("../../package.json");
 import type { NodeCG } from "../types/nodecg";
 import type { AbstractReplicant } from "./replicants.shared";
-import { type EventMap,TypedEmitter } from "./typed-emitter";
+import { type EventMap, TypedEmitter } from "./typed-emitter";
 
 export interface MessageHandler {
 	messageName: string;

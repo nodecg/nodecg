@@ -7,10 +7,9 @@ import "@polymer/paper-slider/paper-slider.js";
 import * as Polymer from "@polymer/polymer";
 
 import type { NodeCG as NCGTypes } from "../../../../types/nodecg";
-// This just imports the type at build time, no compile output.
 import type { NcgSoundCue } from "./ncg-sound-cue";
-// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
 import * as keep1 from "./ncg-sound-cue";
+
 keep1;
 
 class NcgSounds extends Polymer.PolymerElement {

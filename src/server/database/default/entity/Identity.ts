@@ -1,4 +1,4 @@
-import { Column,Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import type { Identity as IdentityModel } from "../../../../types/models";
 import { User } from "./User";

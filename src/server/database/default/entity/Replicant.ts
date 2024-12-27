@@ -1,4 +1,4 @@
-import { Column,Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 import type { Replicant as ReplicantModel } from "../../../../types/models";
 

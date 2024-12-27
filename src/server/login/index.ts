@@ -12,7 +12,7 @@ import { Strategy as TwitchStrategy } from "passport-twitch-helix";
 
 import { nodecgRootPath } from "../../shared/utils/rootPath";
 import { DatabaseAdapter } from "../../types/database-adapter";
-import type { Role,User } from "../../types/models";
+import type { Role, User } from "../../types/models";
 import { config } from "../config";
 import { createLogger } from "../logger";
 

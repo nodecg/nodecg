@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne,PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import type { Permission as PermissionModel } from "../../../../types/models";
 import { Role } from "./Role";
