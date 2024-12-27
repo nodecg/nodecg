@@ -1,21 +1,10 @@
 import type express from "express";
-import {
-	isSuperUser,
-	findUser,
-	findApiKey,
-	createApiKey,
-	saveUser,
-} from "../database/default/utils";
 import { config } from "../config";
 
 /**
  * Express middleware that checks if the user is authenticated.
  */
-export default async function (
-	req: express.Request,
-	res: express.Response,
-	next: express.NextFunction,
-): Promise<void> {
+export const authCheck: express.RequestHandler = async (req, res, next) => {
 	try {
 		if (!config.login?.enabled) {
 			next();
@@ -27,7 +16,7 @@ export default async function (
 		let keyOrSocketTokenAuthenticated = false;
 		if (req.query["key"] ?? req.cookies.socketToken) {
 			isUsingKeyOrSocketToken = true;
-			const apiKey = await findApiKey(
+			const apiKey = await res.locals.databaseAdapter.findApiKey(
 				req.query["key"] ?? req.cookies.socketToken,
 			);
 
@@ -48,7 +37,9 @@ export default async function (
 				return;
 			}
 
-			user = (await findUser(apiKey.user.id)) ?? undefined;
+			user =
+				(await res.locals.databaseAdapter.findUser(apiKey.user.id)) ??
+				undefined;
 		}
 
 		if (!user) {
@@ -60,7 +51,7 @@ export default async function (
 			return;
 		}
 
-		const allowed = isSuperUser(user);
+		const allowed = res.locals.databaseAdapter.isSuperUser(user);
 		keyOrSocketTokenAuthenticated = isUsingKeyOrSocketToken && allowed;
 		const provider = user.identities[0]!.provider_type;
 		const providerAllowed = config.login?.[provider]?.enabled;
@@ -75,11 +66,11 @@ export default async function (
 			// that reavealed an API key that needed to be deleted.
 			if (!apiKey) {
 				// Make a new api key.
-				apiKey = await createApiKey();
+				apiKey = await res.locals.databaseAdapter.createApiKey();
 
 				// Assign this key to the user.
 				user.apiKeys.push(apiKey);
-				await saveUser(user);
+				await res.locals.databaseAdapter.saveUser(user);
 			}
 
 			// Set the cookie so that requests to other resources on the page
@@ -104,4 +95,4 @@ export default async function (
 	} catch (error: unknown) {
 		next(error);
 	}
-}
+};

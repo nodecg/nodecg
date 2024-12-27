@@ -1,8 +1,6 @@
-// Native
 import * as path from "path";
 import * as fs from "fs";
 
-// Ours
 import parsePanels from "./panels";
 import parseMounts from "./mounts";
 import parseGraphics from "./graphics";
@@ -40,6 +38,18 @@ export default function (
 	const dashboardDir = path.resolve(bundlePath, "dashboard");
 	const graphicsDir = path.resolve(bundlePath, "graphics");
 	const manifest = parseManifest(pkg, bundlePath);
+
+	let nodecgBundleConfig: NodeCG.NodecgBundleConfig;
+	try {
+		const importedConfig = require(path.join(bundlePath, "nodecg.config.js"));
+		nodecgBundleConfig = importedConfig.default || importedConfig;
+	} catch {
+		nodecgBundleConfig = {};
+	}
+	if (typeof nodecgBundleConfig !== "object") {
+		throw new Error("nodecg.config.js must export an object");
+	}
+
 	const bundle: NodeCG.Bundle = {
 		...manifest,
 		dir: bundlePath,
@@ -60,6 +70,8 @@ export default function (
 		hasExtension: parseExtension(bundlePath, manifest),
 		git: parseGit(bundlePath),
 		...parseSounds(bundlePath, manifest),
+
+		nodecgBundleConfig,
 	};
 
 	return bundle;
