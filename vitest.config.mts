@@ -17,9 +17,6 @@ export default defineConfig({
 		}),
 	],
 	test: {
-		coverage: {
-			enabled: true,
-		},
 		env: {
 			test: "true",
 			NODECG_TEST: "true",
