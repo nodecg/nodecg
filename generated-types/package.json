@@ -28,12 +28,11 @@
     "@types/node": "~18.11.19",
     "@types/passport": "^1.0.16",
     "@types/soundjs": "^0.6.31",
-    "@types/ws": "^8.5.12",
     "ajv": "^8.12.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "ts-essentials": "^9.4.1",
-    "typeorm": "0.3.11",
+    "typeorm": "0.3.19",
     "winston": "^3.11.0",
     "zod": "^3.22.4"
   },
