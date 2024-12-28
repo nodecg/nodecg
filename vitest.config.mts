@@ -17,6 +17,7 @@ export default defineConfig({
 		}),
 	],
 	test: {
+		testTimeout: 15_000,
 		env: {
 			test: "true",
 			NODECG_TEST: "true",
