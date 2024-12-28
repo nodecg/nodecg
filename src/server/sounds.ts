@@ -1,14 +1,14 @@
 import * as path from "node:path";
 
-import { klona as clone } from "klona/json";
 import express from "express";
 import hasha from "hasha";
+import { klona as clone } from "klona/json";
 
+import { nodecgRootPath } from "../shared/utils/rootPath";
+import type { NodeCG } from "../types/nodecg";
 import type { Replicator } from "./replicant/replicator";
 import type { ServerReplicant } from "./replicant/server-replicant";
 import { sendFile } from "./util/sendFile";
-import type { NodeCG } from "../types/nodecg";
-import { nodecgRootPath } from "../shared/utils/rootPath";
 
 export class SoundsLib {
 	app = express();

@@ -1,9 +1,7 @@
-// Ours
-import type { NodeCG } from "./nodecg";
-
-// Packages
 import type { Namespace, Server, Socket as ServerSocket } from "socket.io";
 import type { Socket as ClientSocket } from "socket.io-client";
+
+import type { NodeCG } from "./nodecg";
 
 interface NodeCallback<T = undefined> {
 	(err: string, response: undefined): void;

@@ -1,23 +1,21 @@
-// Native
-import fs from "fs";
-import path from "path";
 import { setTimeout } from "node:timers/promises";
 
-// Packages
 import test from "ava";
-import { simpleGit } from "simple-git";
+import fs from "fs";
+import path from "path";
 import { replaceInFile } from "replace-in-file";
+import { simpleGit } from "simple-git";
 
-// Ours
-import * as server from "./helpers/server";
 import * as browser from "./helpers/browser";
+import * as server from "./helpers/server";
 
 server.setup();
 const { initSingleInstance, initDashboard, initGraphic } = browser.setup();
 
+import type { Page } from "puppeteer";
+
 import * as C from "./helpers/test-constants";
 import * as util from "./helpers/utilities";
-import type { Page } from "puppeteer";
 import { sleep } from "./helpers/utilities";
 
 let singleInstance: Page;

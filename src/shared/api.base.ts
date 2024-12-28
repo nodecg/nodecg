@@ -1,11 +1,9 @@
-// Packages
 import type { DeepReadonly } from "ts-essentials";
 
-// Ours
 const { version } = require("../../package.json");
-import type { AbstractReplicant } from "./replicants.shared";
 import type { NodeCG } from "../types/nodecg";
-import { TypedEmitter, type EventMap } from "./typed-emitter";
+import type { AbstractReplicant } from "./replicants.shared";
+import { type EventMap, TypedEmitter } from "./typed-emitter";
 
 export interface MessageHandler {
 	messageName: string;

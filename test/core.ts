@@ -1,12 +1,10 @@
-// Packages
 import test from "ava";
 
-// Ours
-import * as server from "./helpers/server";
-server.setup();
-
-import * as C from "./helpers/test-constants";
 import type { NodeCG } from "../src/types/nodecg";
+import * as server from "./helpers/server";
+import * as C from "./helpers/test-constants";
+
+server.setup();
 
 test("should load bundles which have satisfied bundle dependencies", (t) => {
 	const allBundles: NodeCG.Bundle[] = (

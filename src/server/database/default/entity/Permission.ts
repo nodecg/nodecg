@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { Role } from "./Role";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+
 import type { Permission as PermissionModel } from "../../../../types/models";
+import { Role } from "./Role";
 
 export const enum Action {
 	NONE = 0,

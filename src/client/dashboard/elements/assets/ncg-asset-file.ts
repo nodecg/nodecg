@@ -2,7 +2,9 @@ import "@polymer/iron-flex-layout/iron-flex-layout.js";
 import "@polymer/iron-icons/iron-icons.js";
 import "@polymer/paper-button/paper-button.js";
 import "@polymer/paper-spinner/paper-spinner-lite.js";
+
 import * as Polymer from "@polymer/polymer";
+
 class NcgAssetFile extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`

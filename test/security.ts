@@ -1,8 +1,6 @@
-// Packages
 import type { TestFn } from "ava";
 import anyTest from "ava";
 
-// Ours
 import * as server from "./helpers/server";
 
 const test = anyTest as TestFn<server.ServerContext>;

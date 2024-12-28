@@ -19,8 +19,9 @@ import "@polymer/paper-item/paper-icon-item.js";
 import "@polymer/paper-tabs/paper-tabs.js";
 import "@polymer/paper-toast/paper-toast.js";
 import "@polymer/polymer/lib/elements/custom-style.js";
-import { Debouncer } from "@polymer/polymer/lib/utils/debounce.js";
+
 import * as Polymer from "@polymer/polymer";
+import { Debouncer } from "@polymer/polymer/lib/utils/debounce.js";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
 import * as keep1 from "../css/nodecg-theme";
@@ -39,6 +40,7 @@ import * as keep7 from "./settings/ncg-settings";
 keep7;
 
 import { timeOut } from "@polymer/polymer/lib/utils/async.js";
+
 import type { NodeCG } from "../../../types/nodecg";
 
 class NcgDashboard extends Polymer.PolymerElement {

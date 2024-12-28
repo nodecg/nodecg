@@ -1,16 +1,17 @@
 import {
-	Entity,
-	PrimaryGeneratedColumn,
 	Column,
 	CreateDateColumn,
-	ManyToMany,
+	Entity,
 	JoinTable,
+	ManyToMany,
 	OneToMany,
+	PrimaryGeneratedColumn,
 } from "typeorm";
-import { Role } from "./Role";
-import { Identity } from "./Identity";
-import { ApiKey } from "./ApiKey";
+
 import type { User as UserModel } from "../../../../types/models";
+import { ApiKey } from "./ApiKey";
+import { Identity } from "./Identity";
+import { Role } from "./Role";
 
 @Entity()
 export class User implements UserModel {

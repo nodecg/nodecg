@@ -1,6 +1,6 @@
-// Packages
 import type { ExecutionContext } from "ava";
 import type * as Puppeteer from "puppeteer";
+
 import type { NodeCG } from "../../src/types/nodecg";
 
 export const sleep = async (milliseconds: number): Promise<void> =>

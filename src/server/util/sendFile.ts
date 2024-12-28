@@ -1,6 +1,6 @@
+import type express from "express";
 import * as path from "path";
 
-import type express from "express";
 import { isChildOf } from "./isChildOf";
 
 export function sendFile(

@@ -1,7 +1,8 @@
 import * as Sentry from "@sentry/browser";
+
+import type { LoggerInterface } from "../../../types/logger-interface";
 import { filteredConfig } from "../config";
 import { loggerFactory } from "./logger.client";
-import type { LoggerInterface } from "../../../types/logger-interface";
 
 export let Logger: new (name: string) => LoggerInterface;
 if (filteredConfig.sentry.enabled) {

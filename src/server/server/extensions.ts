@@ -1,15 +1,17 @@
 import { EventEmitter } from "node:events";
 import * as path from "node:path";
-import semver from "semver";
+
 import * as Sentry from "@sentry/node";
+import semver from "semver";
+
+import { stringifyError } from "../../shared/utils/errors";
+import type { NodeCG } from "../../types/nodecg";
+import type { RootNS } from "../../types/socket-protocol";
 import { serverApiFactory } from "../api.server";
+import type { BundleManager } from "../bundle-manager";
+import { sentryEnabled } from "../config";
 import { createLogger } from "../logger";
 import type { Replicator } from "../replicant/replicator";
-import type { RootNS } from "../../types/socket-protocol";
-import type { BundleManager } from "../bundle-manager";
-import type { NodeCG } from "../../types/nodecg";
-import { stringifyError } from "../../shared/utils/errors";
-import { sentryEnabled } from "../config";
 
 const log = createLogger("extensions");
 

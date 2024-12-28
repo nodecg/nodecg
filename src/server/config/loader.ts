@@ -1,7 +1,9 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { klona as clone } from "klona/json";
+
 import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
+import { klona as clone } from "klona/json";
+
 import type { NodeCG } from "../../types/nodecg";
 import { nodecgConfigSchema } from "../../types/nodecg-config-schema";
 

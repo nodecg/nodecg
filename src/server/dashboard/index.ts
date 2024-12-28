@@ -1,12 +1,12 @@
 import * as path from "node:path";
 
-import { klona as clone } from "klona/json";
 import express from "express";
+import { klona as clone } from "klona/json";
 
-import { config, filteredConfig, sentryEnabled } from "../config";
-import type { BundleManager } from "../bundle-manager";
-import type { NodeCG } from "../../types/nodecg";
 import { nodecgRootPath } from "../../shared/utils/rootPath";
+import type { NodeCG } from "../../types/nodecg";
+import type { BundleManager } from "../bundle-manager";
+import { config, filteredConfig, sentryEnabled } from "../config";
 import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
 import { sendFile } from "../util/sendFile";

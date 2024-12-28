@@ -1,13 +1,11 @@
-// Packages
 import type { DeepReadonly } from "ts-essentials";
 
-// Ours
 import { NodeCGAPIBase } from "../../shared/api.base";
-import { ClientReplicant } from "./replicant";
+import type { NodeCG } from "../../types/nodecg";
+import type { TypedClientSocket } from "../../types/socket-protocol";
 import { filteredConfig } from "./config";
 import { Logger } from "./logger";
-import type { TypedClientSocket } from "../../types/socket-protocol";
-import type { NodeCG } from "../../types/nodecg";
+import { ClientReplicant } from "./replicant";
 
 type SendMessageCb<T> = (error?: unknown, response?: T) => void;
 

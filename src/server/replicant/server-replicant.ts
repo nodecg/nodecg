@@ -1,20 +1,22 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+
 import $RefParser from "@nodecg/json-schema-lib";
-import { klona as clone } from "klona/json";
 import hasha from "hasha";
+import { klona as clone } from "klona/json";
+
 import {
-	proxyRecursive,
-	ignoreProxy,
-	resumeProxy,
 	AbstractReplicant,
+	ignoreProxy,
+	proxyRecursive,
 	type ReplicantValue,
+	resumeProxy,
 } from "../../shared/replicants.shared";
-import { formatSchema } from "./schema-hacks";
-import { createLogger } from "../logger";
-import type { NodeCG } from "../../types/nodecg";
 import { getSchemaDefault } from "../../shared/utils/compileJsonSchema";
+import type { NodeCG } from "../../types/nodecg";
+import { createLogger } from "../logger";
 import { NODECG_ROOT } from "../nodecg-root";
+import { formatSchema } from "./schema-hacks";
 
 /**
  * Never instantiate this directly.

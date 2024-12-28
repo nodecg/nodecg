@@ -1,14 +1,13 @@
-// Packages
 import test from "ava";
 import type * as puppeteer from "puppeteer";
 
-// Ours
-import * as server from "./helpers/server";
 import * as browser from "./helpers/browser";
-server.setup();
-const { initDashboard, initStandalone } = browser.setup();
-
+import * as server from "./helpers/server";
 import * as C from "./helpers/test-constants";
+
+server.setup();
+
+const { initDashboard, initStandalone } = browser.setup();
 
 let dashboard: puppeteer.Page;
 let standalone: puppeteer.Page;

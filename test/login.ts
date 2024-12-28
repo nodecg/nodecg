@@ -1,12 +1,10 @@
-// Packages
-import type { TestFn, ExecutionContext } from "ava";
+import type { ExecutionContext, TestFn } from "ava";
 import anyTest from "ava";
+import type { Page } from "puppeteer";
 import socketIoClient from "socket.io-client";
 
-// Ours
-import * as server from "./helpers/server";
 import * as browser from "./helpers/browser";
-import type { Page } from "puppeteer";
+import * as server from "./helpers/server";
 
 const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup("nodecg-login.json");

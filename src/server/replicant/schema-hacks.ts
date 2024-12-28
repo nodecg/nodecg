@@ -1,5 +1,5 @@
-import { klona as clone } from "klona/json";
 import { JsonPointer } from "json-ptr";
+import { klona as clone } from "klona/json";
 
 function stripHash(url: string) {
 	const hashIndex = url.indexOf("#");

@@ -10,6 +10,7 @@
  */
 
 import semver from "semver";
+
 import { nodecgRootPath } from "../shared/utils/rootPath";
 
 const cwd = process.cwd();
@@ -20,11 +21,11 @@ if (cwd !== nodecgRootPath) {
 	console.info("[nodecg] Changed process.cwd to %s", nodecgRootPath);
 }
 
-import { asyncExitHook } from "./util/exit-hook";
-import { pjson } from "./util/pjson";
-import { NodeCGServer } from "./server";
-import { gracefulExit } from "./util/exit-hook";
 import { exitOnUncaught, sentryEnabled } from "./config";
+import { NodeCGServer } from "./server";
+import { asyncExitHook } from "./util/exit-hook";
+import { gracefulExit } from "./util/exit-hook";
+import { pjson } from "./util/pjson";
 
 process.title = `NodeCG - ${pjson.version}`;
 

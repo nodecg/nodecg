@@ -1,10 +1,8 @@
-// Packages
 import test from "ava";
 import type * as puppeteer from "puppeteer";
 
-// Ours
-import * as server from "../helpers/server";
 import * as browser from "../helpers/browser";
+import * as server from "../helpers/server";
 
 server.setup();
 const { initDashboard } = browser.setup();

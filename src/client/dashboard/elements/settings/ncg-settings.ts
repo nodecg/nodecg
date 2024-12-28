@@ -4,6 +4,7 @@ import "@polymer/paper-button/paper-button.js";
 import "@polymer/paper-card/paper-card.js";
 import "@polymer/paper-dialog/paper-dialog.js";
 import "@polymer/paper-toast/paper-toast.js";
+
 import * as Polymer from "@polymer/polymer";
 import Clipboard from "clipboard";
 class NcgSettings extends Polymer.PolymerElement {

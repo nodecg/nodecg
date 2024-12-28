@@ -1,20 +1,18 @@
-// Packages
 import type { TestFn } from "ava";
 import anyTest from "ava";
 import express from "express";
 import type * as puppeteer from "puppeteer";
 
-// Ours
-import * as server from "../helpers/server";
 import * as browser from "../helpers/browser";
+import * as server from "../helpers/server";
 import { invokeAck } from "../helpers/utilities";
 
 const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();
 const { initDashboard } = browser.setup();
 
-import * as C from "../helpers/test-constants";
 import type { NodeCG } from "../../src/types/nodecg";
+import * as C from "../helpers/test-constants";
 
 let dashboard: puppeteer.Page;
 test.before(async () => {

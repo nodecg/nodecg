@@ -1,10 +1,6 @@
-// Native
 import * as path from "path";
-
-// Packages
 import * as semver from "semver";
 
-// Ours
 import type { NodeCG } from "../../types/nodecg";
 
 export function parseManifest(

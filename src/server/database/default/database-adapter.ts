@@ -1,12 +1,12 @@
-import {
-	getConnection,
-	User,
-	Role,
-	Identity,
-	ApiKey,
-	Replicant,
-} from "./connection";
 import type { DatabaseAdapter } from "../../../types/database-adapter";
+import {
+	ApiKey,
+	getConnection,
+	Identity,
+	Replicant,
+	Role,
+	User,
+} from "./connection";
 
 async function findUser(id: User["id"]): Promise<User | null> {
 	const database = await getConnection();

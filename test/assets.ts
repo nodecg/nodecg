@@ -1,15 +1,11 @@
-// Native
-import fs from "fs";
-import path from "path";
-
-// Packages
 import type { TestFn } from "ava";
 import anyTest from "ava";
+import fs from "fs";
+import path from "path";
 import type * as puppeteer from "puppeteer";
 
-// Ours
-import * as server from "./helpers/server";
 import * as browser from "./helpers/browser";
+import * as server from "./helpers/server";
 
 const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
 server.setup();

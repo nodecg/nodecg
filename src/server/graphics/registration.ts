@@ -1,19 +1,15 @@
-// Native
-import path from "path";
-import fs from "fs";
-
-// Packages
 import express from "express";
+import fs from "fs";
+import path from "path";
 
-// Ours
-import { injectScripts } from "../util/injectscripts";
+import { nodecgRootPath } from "../../shared/utils/rootPath";
+import type { NodeCG } from "../../types/nodecg";
+import type { GraphicRegRequest, RootNS } from "../../types/socket-protocol";
+import type { BundleManager } from "../bundle-manager";
 import type { Replicator } from "../replicant/replicator";
 import type { ServerReplicant } from "../replicant/server-replicant";
-import type { RootNS, GraphicRegRequest } from "../../types/socket-protocol";
-import type { BundleManager } from "../bundle-manager";
-import type { NodeCG } from "../../types/nodecg";
+import { injectScripts } from "../util/injectscripts";
 import { isChildOf } from "../util/isChildOf";
-import { nodecgRootPath } from "../../shared/utils/rootPath";
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 

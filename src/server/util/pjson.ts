@@ -1,5 +1,6 @@
-import * as path from "node:path";
 import * as fs from "node:fs";
+import * as path from "node:path";
+
 import { nodecgRootPath } from "../../shared/utils/rootPath";
 
 const pjsonPath = path.join(nodecgRootPath, "package.json");

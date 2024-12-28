@@ -1,16 +1,14 @@
-// Packages
 import { deepEqual as equal } from "fast-equals";
 import { klona as clone } from "klona/json";
 
-// Ours
 import {
 	AbstractReplicant,
 	isIgnoringProxy,
 	type ReplicantValue,
 } from "../../shared/replicants.shared";
-import { createLogger } from "./logger";
-import type { TypedClientSocket } from "../../types/socket-protocol";
 import type { NodeCG } from "../../types/nodecg";
+import type { TypedClientSocket } from "../../types/socket-protocol";
+import { createLogger } from "./logger";
 
 const declaredReplicants = new Map<string, Map<string, ClientReplicant<any>>>();
 

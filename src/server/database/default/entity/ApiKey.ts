@@ -1,6 +1,7 @@
-import { Entity, ManyToOne, Generated, PrimaryColumn } from "typeorm";
-import { User } from "./User";
+import { Entity, Generated, ManyToOne, PrimaryColumn } from "typeorm";
+
 import type { ApiKey as ApiKeyModel } from "../../../../types/models";
+import { User } from "./User";
 
 @Entity()
 export class ApiKey implements ApiKeyModel {

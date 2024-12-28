@@ -1,19 +1,21 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import express from "express";
+
 import chokidar from "chokidar";
-import multer from "multer";
+import express from "express";
 import hasha from "hasha";
+import multer from "multer";
 import { z } from "zod";
+
+import { stringifyError } from "../shared/utils/errors";
+import type { NodeCG } from "../types/nodecg";
+import { createLogger } from "./logger";
+import { NODECG_ROOT } from "./nodecg-root";
+import type { Replicator } from "./replicant/replicator";
+import type { ServerReplicant } from "./replicant/server-replicant";
 import { authCheck } from "./util/authcheck";
 import { debounceName } from "./util/debounce-name";
 import { sendFile } from "./util/sendFile";
-import { createLogger } from "./logger";
-import type { Replicator } from "./replicant/replicator";
-import type { ServerReplicant } from "./replicant/server-replicant";
-import type { NodeCG } from "../types/nodecg";
-import { stringifyError } from "../shared/utils/errors";
-import { NODECG_ROOT } from "./nodecg-root";
 
 interface Collection {
 	name: string;

@@ -1,4 +1,3 @@
-// Native
 import { EventEmitter } from "events";
 
 export interface Builtins {

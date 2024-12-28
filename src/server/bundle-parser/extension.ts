@@ -1,8 +1,6 @@
-// Native
 import * as fs from "fs";
 import * as path from "path";
 
-// Ours
 import type { NodeCG } from "../../types/nodecg";
 
 export function parseExtension(

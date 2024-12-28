@@ -1,11 +1,7 @@
-// Native
-import path from "path";
-
-// Packages
 import type { TestFn } from "ava";
 import anyTest from "ava";
+import path from "path";
 
-// Ours
 import * as server from "../helpers/server";
 
 const test = anyTest as TestFn<server.ServerContext>;

@@ -1,8 +1,10 @@
-import * as path from "node:path";
 import * as fs from "node:fs";
+import * as path from "node:path";
+
 import { argv } from "yargs";
-import { loadConfig } from "./loader";
+
 import { NODECG_ROOT } from "../nodecg-root";
+import { loadConfig } from "./loader";
 
 const cfgDirectoryPath =
 	(argv["cfgPath"] as string) ?? path.join(NODECG_ROOT, "cfg");

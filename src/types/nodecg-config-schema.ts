@@ -1,5 +1,6 @@
-import { z } from "zod";
 import { argv } from "yargs";
+import { z } from "zod";
+
 import { LogLevels } from "./logger-interface";
 
 const argvSchema = z.object({

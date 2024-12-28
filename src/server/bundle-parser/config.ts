@@ -1,15 +1,17 @@
-import * as path from "node:path";
 import * as fs from "node:fs";
-import { klona as clone } from "klona/json";
-import extend from "extend";
-import type { NodeCG } from "../../types/nodecg";
+import * as path from "node:path";
+
 import type { ValidateFunction } from "ajv";
-import { stringifyError } from "../../shared/utils/errors";
+import extend from "extend";
+import { klona as clone } from "klona/json";
+
 import {
 	compileJsonSchema,
-	getSchemaDefault,
 	formatJsonSchemaErrors,
+	getSchemaDefault,
 } from "../../shared/utils/compileJsonSchema";
+import { stringifyError } from "../../shared/utils/errors";
+import type { NodeCG } from "../../types/nodecg";
 
 export function parse(
 	bundleName: string,

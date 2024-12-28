@@ -1,10 +1,10 @@
 import fs from "node:fs";
-import path from "node:path";
 import os from "node:os";
+import path from "node:path";
 
+import test from "ava";
 import fse from "fs-extra";
 import tmp from "tmp-promise";
-import test from "ava";
 
 import type { BundleManager as BundleManagerTypeOnly } from "../src/server/bundle-manager";
 import { sleep } from "./helpers/utilities";

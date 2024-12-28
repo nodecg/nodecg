@@ -1,4 +1,3 @@
-// Ours
 import type { NodeCG } from "../../types/nodecg";
 
 export function parseAssets(

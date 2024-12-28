@@ -1,14 +1,10 @@
-// Native
-import fs from "fs";
-
-// Packages
 import cheerio from "cheerio";
+import fs from "fs";
 import semver from "semver";
 
-// Ours
+import type { NodeCG } from "../../types/nodecg";
 import { filteredConfig, sentryEnabled } from "../config";
 import { noop } from "./noop";
-import type { NodeCG } from "../../types/nodecg";
 
 interface Options {
 	standalone?: boolean;
