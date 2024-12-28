@@ -1,4 +1,3 @@
-import type { ExecutionContext } from "ava";
 import type * as Puppeteer from "puppeteer";
 
 import type { NodeCG } from "../../src/types/nodecg";
