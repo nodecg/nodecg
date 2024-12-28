@@ -1,15 +1,15 @@
-import type { TestFn } from "ava";
-import anyTest from "ava";
 import path from "path";
+import { expect } from "vitest";
 
-import * as server from "../helpers/server";
+import { setupTest } from "../helpers/setup";
 
-const test = anyTest as TestFn<server.ServerContext>;
-server.setup();
+const test = await setupTest();
 
-test("should create a default value based on the schema, if none is provided", (t) => {
-	const rep = t.context.apis.extension.Replicant("schema1");
-	t.deepEqual(rep.value, {
+test("should create a default value based on the schema, if none is provided", ({
+	apis,
+}) => {
+	const rep = apis.extension.Replicant("schema1");
+	expect(rep.value).toEqual({
 		string: "",
 		object: {
 			numA: 0,
@@ -17,9 +17,9 @@ test("should create a default value based on the schema, if none is provided", (
 	});
 });
 
-test("should accept the defaultValue when it passes validation", (t) => {
-	t.notThrows(() => {
-		t.context.apis.extension.Replicant("schema2", {
+test("should accept the defaultValue when it passes validation", ({ apis }) => {
+	expect(() => {
+		apis.extension.Replicant("schema2", {
 			defaultValue: {
 				string: "foo",
 				object: {
@@ -27,26 +27,28 @@ test("should accept the defaultValue when it passes validation", (t) => {
 				},
 			},
 		});
-	});
+	}).not.toThrow();
 });
 
-test("should throw when defaultValue fails validation", (t) => {
-	const error = t.throws(() => {
-		t.context.apis.extension.Replicant("schema3", {
+test("should throw when defaultValue fails validation", ({ apis }) => {
+	expect(() => {
+		apis.extension.Replicant("schema3", {
 			defaultValue: {
 				string: 0,
 			},
 		});
-	});
-
-	if (!error) return t.fail();
-	return t.true(error.message.includes("Invalid value rejected for replicant"));
+	}).toThrowErrorMatchingInlineSnapshot(`
+		[Error: Invalid value rejected for replicant "schema3" in namespace "test-bundle":
+		string must be string]
+	`);
 });
 
-test("should accept the persisted value when it passes validation", (t) => {
+test("should accept the persisted value when it passes validation", ({
+	apis,
+}) => {
 	// Persisted value is copied from fixtures
-	const rep = t.context.apis.extension.Replicant("schemaPersistencePass");
-	t.deepEqual(rep.value, {
+	const rep = apis.extension.Replicant("schemaPersistencePass");
+	expect(rep.value).toEqual({
 		string: "foo",
 		object: {
 			numA: 1,
@@ -54,10 +56,12 @@ test("should accept the persisted value when it passes validation", (t) => {
 	});
 });
 
-test("should reject the persisted value when it fails validation, replacing with schemaDefaults", (t) => {
+test("should reject the persisted value when it fails validation, replacing with schemaDefaults", ({
+	apis,
+}) => {
 	// Persisted value is copied from fixtures
-	const rep = t.context.apis.extension.Replicant("schemaPersistenceFail");
-	t.deepEqual(rep.value, {
+	const rep = apis.extension.Replicant("schemaPersistenceFail");
+	expect(rep.value).toEqual({
 		string: "",
 		object: {
 			numA: 0,
@@ -65,119 +69,113 @@ test("should reject the persisted value when it fails validation, replacing with
 	});
 });
 
-test("should accept valid assignment", (t) => {
-	t.notThrows(() => {
-		const rep = t.context.apis.extension.Replicant("schemaAssignPass");
+test("should accept valid assignment", ({ apis }) => {
+	expect(() => {
+		const rep = apis.extension.Replicant("schemaAssignPass");
 		rep.value = {
 			string: "foo",
 			object: {
 				numA: 1,
 			},
 		};
-	});
+	}).not.toThrow();
 });
 
-test("should throw on invalid assignment", (t) => {
-	const error = t.throws(() => {
-		const rep = t.context.apis.extension.Replicant("schemaAssignFail");
+test("should throw on invalid assignment", ({ apis }) => {
+	expect(() => {
+		const rep = apis.extension.Replicant("schemaAssignFail");
 		rep.value = {
 			string: 0,
 		};
-	});
-
-	if (!error) return t.fail();
-	return t.true(error.message.includes("Invalid value rejected for replicant"));
+	}).toThrowErrorMatchingInlineSnapshot(`
+		[Error: Invalid value rejected for replicant "schemaAssignFail" in namespace "test-bundle":
+		string must be string]
+	`);
 });
 
-test("should accept valid property deletion", (t) => {
-	t.notThrows(() => {
-		const rep = t.context.apis.extension.Replicant<any>("schemaDeletionPass");
+test("should accept valid property deletion", ({ apis }) => {
+	expect(() => {
+		const rep = apis.extension.Replicant<any>("schemaDeletionPass");
 		delete rep.value.object.numB;
-	});
+	}).not.toThrow();
 });
 
-test("should throw on invalid property deletion", (t) => {
-	const error = t.throws(() => {
-		const rep = t.context.apis.extension.Replicant<any>("schemaDeletionFail");
+test("should throw on invalid property deletion", ({ apis }) => {
+	expect(() => {
+		const rep = apis.extension.Replicant<any>("schemaDeletionFail");
 		delete rep.value.object.numA;
-	});
-
-	if (!error) return t.fail();
-	return t.true(error.message.includes("Invalid value rejected for replicant"));
+	}).toThrowErrorMatchingInlineSnapshot(`
+		[Error: Invalid value rejected for replicant "schemaDeletionFail" in namespace "test-bundle":
+		object must have required property 'numA']
+	`);
 });
 
-test("should accept valid array mutation via array mutator methods", (t) => {
-	t.notThrows(() => {
-		const rep = t.context.apis.extension.Replicant<any>(
-			"schemaArrayMutatorPass",
-		);
+test("should accept valid array mutation via array mutator methods", ({
+	apis,
+}) => {
+	expect(() => {
+		const rep = apis.extension.Replicant<any>("schemaArrayMutatorPass");
 		rep.value.array.push("foo");
-	});
+	}).not.toThrow();
 });
 
-test("should throw on invalid array mutation via array mutator methods", (t) => {
-	const error = t.throws(() => {
-		const rep = t.context.apis.extension.Replicant<any>(
-			"schemaArrayMutatorFail",
-		);
+test("should throw on invalid array mutation via array mutator methods", ({
+	apis,
+}) => {
+	expect(() => {
+		const rep = apis.extension.Replicant<any>("schemaArrayMutatorFail");
 		rep.value.array.push(0);
-	});
-
-	if (!error) return t.fail();
-	return t.true(error.message.includes("Invalid value rejected for replicant"));
+	}).toThrowErrorMatchingInlineSnapshot(`
+		[Error: Invalid value rejected for replicant "schemaArrayMutatorFail" in namespace "test-bundle":
+		array/0 must be string]
+	`);
 });
 
-test("should accept valid property changes to arrays", (t) => {
-	t.notThrows(() => {
-		const rep = t.context.apis.extension.Replicant<any>(
-			"schemaArrayChangePass",
-		);
+test("should accept valid property changes to arrays", ({ apis }) => {
+	expect(() => {
+		const rep = apis.extension.Replicant<any>("schemaArrayChangePass");
 		rep.value.array[0] = "bar";
-	});
+	}).not.toThrow();
 });
 
-test("should throw on invalid property changes to arrays", (t) => {
-	const error = t.throws(() => {
-		const rep = t.context.apis.extension.Replicant<any>(
-			"schemaArrayChangeFail",
-		);
+test("should throw on invalid property changes to arrays", ({ apis }) => {
+	expect(() => {
+		const rep = apis.extension.Replicant<any>("schemaArrayChangeFail");
 		rep.value.array[0] = 0;
-	});
-
-	if (!error) return t.fail();
-	return t.true(error.message.includes("Invalid value rejected for replicant"));
+	}).toThrowErrorMatchingInlineSnapshot(`
+		[Error: Invalid value rejected for replicant "schemaArrayChangeFail" in namespace "test-bundle":
+		array/0 must be string]
+	`);
 });
 
-test("should accept valid property changes to objects", (t) => {
-	t.notThrows(() => {
-		const rep = t.context.apis.extension.Replicant<any>(
-			"schemaObjectChangePass",
-		);
+test("should accept valid property changes to objects", ({ apis }) => {
+	expect(() => {
+		const rep = apis.extension.Replicant<any>("schemaObjectChangePass");
 		rep.value.object.numA = 1;
-	});
+	}).not.toThrow();
 });
 
-test("should throw on invalid property changes to objects", (t) => {
-	const error = t.throws(() => {
-		const rep = t.context.apis.extension.Replicant<any>(
-			"schemaObjectChangeFail",
-		);
+test("should throw on invalid property changes to objects", ({ apis }) => {
+	expect(() => {
+		const rep = apis.extension.Replicant<any>("schemaObjectChangeFail");
 		rep.value.object.numA = "foo";
-	});
-
-	if (!error) return t.fail();
-	return t.true(error.message.includes("Invalid value rejected for replicant"));
+	}).toThrowErrorMatchingInlineSnapshot(`
+		[Error: Invalid value rejected for replicant "schemaObjectChangeFail" in namespace "test-bundle":
+		object/numA must be number]
+	`);
 });
 
-test("should properly load schemas provided with an absolute path", (t) => {
-	const rep = t.context.apis.extension.Replicant("schemaAbsolutePath", {
+test("should properly load schemas provided with an absolute path", ({
+	apis,
+}) => {
+	const rep = apis.extension.Replicant("schemaAbsolutePath", {
 		schemaPath: path.resolve(
 			__dirname,
 			"../fixtures/nodecg-core/absolute-path-schemas/schemaAbsolutePath.json",
 		),
 	});
 
-	t.deepEqual(rep.value, {
+	expect(rep.schema).toEqual({
 		string: "",
 		object: {
 			numA: 0,
@@ -185,87 +183,94 @@ test("should properly load schemas provided with an absolute path", (t) => {
 	});
 });
 
-test("supports local file $refs", (t) => {
-	const rep = t.context.apis.extension.Replicant("schemaWithRef");
-	t.deepEqual(rep.schema, {
-		$schema: "http://json-schema.org/draft-07/schema",
-		type: "object",
-		properties: {
-			string: {
-				type: "string",
-				default: "",
-			},
-			object: {
-				type: "object",
-				additionalProperties: false,
-				properties: {
-					numA: {
-						type: "number",
-						default: 0,
-					},
-					hasDeepRef: {
-						type: "object",
-						properties: {
-							numA: {
-								type: "number",
-								default: 0,
-							},
-						},
-					},
-					hasFileRefThenDefRef: {
-						type: "string",
-						enum: ["foo", "bar"],
-					},
-				},
-			},
-		},
-	});
+test("supports local file $refs", ({ apis }) => {
+	const rep = apis.extension.Replicant("schemaWithRef");
+	expect(rep.schema).toMatchInlineSnapshot(`
+		{
+		  "$schema": "http://json-schema.org/draft-07/schema",
+		  "properties": {
+		    "object": {
+		      "additionalProperties": false,
+		      "properties": {
+		        "hasDeepRef": {
+		          "properties": {
+		            "numA": {
+		              "default": 0,
+		              "type": "number",
+		            },
+		          },
+		          "type": "object",
+		        },
+		        "hasFileRefThenDefRef": {
+		          "enum": [
+		            "foo",
+		            "bar",
+		          ],
+		          "type": "string",
+		        },
+		        "numA": {
+		          "default": 0,
+		          "type": "number",
+		        },
+		      },
+		      "type": "object",
+		    },
+		    "string": {
+		      "default": "",
+		      "type": "string",
+		    },
+		  },
+		  "type": "object",
+		}
+	`);
 });
 
-test("supports internal $refs", (t) => {
-	const rep = t.context.apis.extension.Replicant("schemaWithInternalRef");
-	t.deepEqual(rep.schema, {
-		$schema: "http://json-schema.org/draft-07/schema",
-		definitions: {
-			numA: {
-				type: "number",
-				default: 0,
-			},
-			hasDeepRef: {
-				type: "object",
-				properties: {
-					numA: {
-						type: "number",
-						default: 0,
-					},
-				},
-			},
-		},
-		type: "object",
-		properties: {
-			string: {
-				type: "string",
-				default: "",
-			},
-			object: {
-				type: "object",
-				additionalProperties: false,
-				properties: {
-					numA: {
-						type: "number",
-						default: 0,
-					},
-					hasDeepRef: {
-						type: "object",
-						properties: {
-							numA: {
-								type: "number",
-								default: 0,
-							},
-						},
-					},
-				},
-			},
-		},
-	});
+test("supports internal $refs", ({ apis }) => {
+	const rep = apis.extension.Replicant("schemaWithInternalRef");
+	expect(rep.schema).toMatchInlineSnapshot(`
+		{
+		  "$schema": "http://json-schema.org/draft-07/schema",
+		  "definitions": {
+		    "hasDeepRef": {
+		      "properties": {
+		        "numA": {
+		          "default": 0,
+		          "type": "number",
+		        },
+		      },
+		      "type": "object",
+		    },
+		    "numA": {
+		      "default": 0,
+		      "type": "number",
+		    },
+		  },
+		  "properties": {
+		    "object": {
+		      "additionalProperties": false,
+		      "properties": {
+		        "hasDeepRef": {
+		          "properties": {
+		            "numA": {
+		              "default": 0,
+		              "type": "number",
+		            },
+		          },
+		          "type": "object",
+		        },
+		        "numA": {
+		          "default": 0,
+		          "type": "number",
+		        },
+		      },
+		      "type": "object",
+		    },
+		    "string": {
+		      "default": "",
+		      "type": "string",
+		    },
+		  },
+		  "type": "object",
+		}
+	`);
 });
