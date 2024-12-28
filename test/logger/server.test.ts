@@ -1,9 +1,8 @@
-import type { TestFn } from "ava";
-import anyTest from "ava";
+import path from "node:path";
+
 import fs from "fs-extra";
-import path from "path";
-import sinon from "sinon";
 import tmp from "tmp-promise";
+import { expect, Mock, test as baseTest, vi } from "vitest";
 
 import { loggerFactory } from "../../src/server/logger/logger.server";
 
@@ -16,82 +15,90 @@ const Logger = loggerFactory({
 	file: { path: path.join(logsDir, "nodecg.log") },
 });
 
-interface TestContext {
-	logger: InstanceType<typeof Logger>;
-	SentryMock: any;
-	sentryLogger: InstanceType<typeof Logger>;
-}
+const test = baseTest
+	.extend<{
+		logger: InstanceType<typeof Logger>;
+		SentryMock: { captureException: Mock };
+	}>({
+		logger: async ({}, use) => {
+			const logger = new Logger("testServer");
+			await use(logger);
+		},
+		SentryMock: async ({}, use) => {
+			const SentryMock = {
+				captureException: vi.fn(),
+			};
+			await use(SentryMock);
+		},
+	})
+	.extend<{ sentryLogger: InstanceType<typeof Logger> }>({
+		sentryLogger: async ({ SentryMock }, use) => {
+			const SentryLogger = loggerFactory(
+				{ file: { path: path.join(logsDir, "sentry.log") } },
+				SentryMock as any,
+			);
+			await use(new SentryLogger("sentryServer"));
+		},
+	});
 
-const test = anyTest as TestFn<TestContext>;
-
-test.beforeEach((t) => {
-	t.context.logger = new Logger("testServer");
-
-	const SentryMock: any = {
-		captureException: sinon.stub(),
-	};
-	const sentryLogger = loggerFactory(
-		{ file: { path: path.join(logsDir, "sentry.log") } },
-		SentryMock,
-	);
-	t.context.SentryMock = SentryMock;
-	t.context.sentryLogger = new sentryLogger("sentryServer");
+test("console - should default to being silent", () => {
+	expect(Logger._consoleLogger.transports[0].silent).toBe(true);
 });
 
-test("console - should default to being silent", (t) => {
-	t.is(Logger._consoleLogger.transports[0].silent, true);
+test('console - should default to level "info"', () => {
+	expect(Logger._consoleLogger.transports[0].level).toBe("info");
 });
 
-test('console - should default to level "info"', (t) => {
-	t.is(Logger._consoleLogger.transports[0].level, "info");
+test("file - should default to being silent", () => {
+	expect(Logger._fileLogger.transports[0].silent).toBe(true);
 });
 
-test("file - should default to being silent", (t) => {
-	t.is(Logger._fileLogger.transports[0].silent, true);
+test('file - should default to level "info"', () => {
+	expect(Logger._fileLogger.transports[0].level).toBe("info");
 });
 
-test('file - should default to level "info"', (t) => {
-	t.is(Logger._fileLogger.transports[0].level, "info");
+test("file - should make the logs folder", () => {
+	expect(fs.existsSync(logsDir)).toBe(true);
 });
 
-test("file - should make the logs folder", (t) => {
-	t.is(fs.existsSync(logsDir), true);
+test("replicant - should default to false", () => {
+	expect(Logger._shouldConsoleLogReplicants).toBe(false);
+	expect(Logger._shouldFileLogReplicants).toBe(false);
 });
 
-test("replicant - should default to false", (t) => {
-	t.is(Logger._shouldConsoleLogReplicants, false);
-	t.is(Logger._shouldFileLogReplicants, false);
+test("replicant - should do nothing when Logger._shouldLogReplicants is false", ({
+	logger,
+}) => {
+	const consoleInfo = vi.spyOn(Logger._consoleLogger, "info");
+
+	logger.replicants("replicants");
+	expect(consoleInfo).not.toBeCalled();
+	consoleInfo.mockRestore();
+
+	const fileInfo = vi.spyOn(Logger._fileLogger, "info");
+	logger.replicants("replicants");
+	expect(fileInfo).not.toBeCalled();
+	fileInfo.mockRestore();
 });
 
-test("replicant - should do nothing when Logger._shouldLogReplicants is false", (t) => {
-	let info = sinon.spy(Logger._consoleLogger, "info");
-	t.context.logger.replicants("replicants");
-	t.is(info.called, false);
-	info.restore();
-
-	info = sinon.spy(Logger._fileLogger, "info");
-	t.context.logger.replicants("replicants");
-	t.is(info.called, false);
-	info.restore();
+test("Sentry - should log errors to Sentry when global.sentryEnabled is true", ({
+	sentryLogger,
+	SentryMock,
+}) => {
+	sentryLogger.error("error message");
+	expect(SentryMock.captureException).toBeCalledTimes(1);
+	expect(SentryMock.captureException.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  [Error: [sentryServer] error message],
+		]
+	`);
 });
 
-test("Sentry - should log errors to Sentry when global.sentryEnabled is true", (t) => {
-	t.context.sentryLogger.error("error message");
-	t.true(t.context.SentryMock.captureException.calledOnce);
-	t.true(
-		t.context.SentryMock.captureException.firstCall.args[0] instanceof Error,
-		"first arg is Error",
-	);
-	t.is(
-		t.context.SentryMock.captureException.firstCall.args[0].message,
-		"[sentryServer] error message",
-	);
-});
-
-test("Sentry - should prettyprint objects", (t) => {
-	t.context.sentryLogger.error("error message:", { foo: { bar: "baz" } });
-	t.is(
-		t.context.SentryMock.captureException.firstCall.args[0].message,
-		"[sentryServer] error message: { foo: { bar: 'baz' } }",
-	);
+test("Sentry - should prettyprint objects", ({ sentryLogger, SentryMock }) => {
+	sentryLogger.error("error message:", { foo: { bar: "baz" } });
+	expect(SentryMock.captureException.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  [Error: [sentryServer] error message: { foo: { bar: 'baz' } }],
+		]
+	`);
 });
