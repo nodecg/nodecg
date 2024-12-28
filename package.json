@@ -33,10 +33,7 @@
     "dev:tsc": "tsc -b src/server src/client test --watch --preserveWatchOutput",
     "dev:server": "node --watch --watch-preserve-output index.js",
     "dev:copy-templates": "onchange \"src/server/**/*.tmpl\" -i -- cpy \"src/server/**/*.tmpl\" out/server",
-    "test": "ava --config ava.config.js",
-    "test-coverage": "c8 ava --config ava.config.js",
-    "test-coverage-ci": "c8 --reporter lcov ava --config ava.config.js",
-    "test:types": "cd typetest/fake-bundle && npm run build",
+    "test": "vitest",
     "lint": "npm-run-all -s lint:*",
     "lint:prettier": "prettier --check .",
     "lint:eslint": "eslint --cache",
@@ -163,6 +160,7 @@
     "@types/soundjs": "^0.6.31",
     "@types/uuid": "^8.3.4",
     "@types/yargs": "^15.0.19",
+    "@vitest/coverage-v8": "^2.1.8",
     "ava": "^5.3.1",
     "c8": "^8.0.1",
     "cpy-cli": "^5.0.0",
@@ -187,7 +185,9 @@
     "ts-essentials": "^9.4.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.3.3",
-    "typescript-eslint": "^8.18.2"
+    "typescript-eslint": "^8.18.2",
+    "vite-plugin-swc-transform": "^1.0.1",
+    "vitest": "^2.1.8"
   },
   "engines": {
     "node": "^18.12.0 || ^20.9.0 || ^22.11.0"

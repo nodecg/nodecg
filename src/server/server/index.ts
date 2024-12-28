@@ -40,7 +40,7 @@ import type { Server } from "http";
 import { klona as clone } from "klona/json";
 import { debounce, template } from "lodash";
 import passport from "passport";
-import SocketIO from "socket.io";
+import * as SocketIO from "socket.io";
 
 import { TypedEmitter } from "../../shared/typed-emitter";
 import { nodecgRootPath } from "../../shared/utils/rootPath";
