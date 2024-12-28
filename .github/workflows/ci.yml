@@ -96,7 +96,7 @@ jobs:
 
       - run: npm run build
 
-      - run: npm run test-coverage-ci
+      - run: npm run test -- --coverage
 
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '22'
         uses: codecov/codecov-action@v3
