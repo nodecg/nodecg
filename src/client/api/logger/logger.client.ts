@@ -1,6 +1,5 @@
-import { format, inspect } from "node:util";
-
 import type * as Sentry from "@sentry/browser";
+import { format, inspect } from "util";
 
 import type { LoggerInterface } from "../../../types/logger-interface";
 import { LogLevel } from "../../../types/logger-interface";
