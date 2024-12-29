@@ -73,20 +73,19 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 
 	let browser: puppeteer.Browser | null = null;
 
+	let dashboard: puppeteer.Page | null = null;
+	let standalone: puppeteer.Page | null = null;
+	let graphic: puppeteer.Page | null = null;
+	let singleInstance: puppeteer.Page | null = null;
+	let loginPage: puppeteer.Page | null = null;
+
 	afterAll(async () => {
-		console.log(
-			"####################################################################################################",
-		);
-		// await server.stop();
-		// console.log("after server.stop()");
 		fse.removeSync(tempFolder);
 		console.log("after fse.removeSync(tempFolder)");
 
 		if (browser) {
 			await browser.close();
-			console.log("after browser.close()");
 		}
-		console.log("done");
 	});
 
 	return test
@@ -120,54 +119,64 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 			>
 		>({
 			dashboard: async ({ browser }, use) => {
-				const page = await browser.newPage();
-				await page.goto(C.dashboardUrl());
-				await page.waitForFunction(
-					() => typeof window.dashboardApi !== "undefined",
-				);
-				await page.waitForFunction(() => window.WebComponentsReady);
-				await use(page);
-				await page.close();
+				if (!dashboard) {
+					const page = await browser.newPage();
+					await page.goto(C.dashboardUrl());
+					await page.waitForFunction(
+						() => typeof window.dashboardApi !== "undefined",
+					);
+					await page.waitForFunction(() => window.WebComponentsReady);
+					dashboard = page;
+				}
+				await use(dashboard);
 			},
 			standalone: async ({ browser }, use) => {
-				const page = await browser.newPage();
-				await page.goto(`${C.testPanelUrl()}?standalone=true`);
-				await page.waitForFunction(
-					() => typeof window.dashboardApi !== "undefined",
-				);
-				await use(page);
-				await page.close();
+				if (!standalone) {
+					const page = await browser.newPage();
+					await page.goto(`${C.testPanelUrl()}?standalone=true`);
+					await page.waitForFunction(
+						() => typeof window.dashboardApi !== "undefined",
+					);
+					standalone = page;
+				}
+				await use(standalone);
 			},
 			graphic: async ({ browser }, use) => {
-				const page = await browser.newPage();
-				await page.goto(C.graphicUrl());
-				await page.waitForFunction(
-					() => typeof window.graphicApi !== "undefined",
-				);
-				await use(page);
-				await page.close();
+				if (!graphic) {
+					const page = await browser.newPage();
+					await page.goto(C.graphicUrl());
+					await page.waitForFunction(
+						() => typeof window.graphicApi !== "undefined",
+					);
+					graphic = page;
+				}
+				await use(graphic);
 			},
 			singleInstance: async ({ browser }, use) => {
-				const page = await browser.newPage();
-				await page.goto(C.singleInstanceUrl());
-				await page.waitForFunction(() => {
-					if (window.location.pathname.endsWith("busy.html")) {
-						return true;
-					}
-					if (window.location.pathname.endsWith("killed.html")) {
-						return true;
-					}
-					return typeof window.singleInstanceApi !== "undefined";
-				});
-				await setTimeout(500);
-				await use(page);
-				await page.close();
+				if (!singleInstance) {
+					const page = await browser.newPage();
+					await page.goto(C.singleInstanceUrl());
+					await page.waitForFunction(() => {
+						if (window.location.pathname.endsWith("busy.html")) {
+							return true;
+						}
+						if (window.location.pathname.endsWith("killed.html")) {
+							return true;
+						}
+						return typeof window.singleInstanceApi !== "undefined";
+					});
+					await setTimeout(500);
+					singleInstance = page;
+				}
+				await use(singleInstance);
 			},
 			loginPage: async ({ browser }, use) => {
-				const page = await browser.newPage();
-				await page.goto(C.loginUrl());
-				await use(page);
-				await page.close();
+				if (!loginPage) {
+					const page = await browser.newPage();
+					await page.goto(C.loginUrl());
+					loginPage = page;
+				}
+				await use(loginPage);
 			},
 		})
 		.extend<Pick<SetupContext, "database">>({

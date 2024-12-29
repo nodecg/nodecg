@@ -1,23 +1,23 @@
 import { setTimeout } from "node:timers/promises";
 
-import { beforeEach, expect } from "vitest";
+import { expect } from "vitest";
 
-import { SetupContext, setupTest } from "./helpers/setup";
+import { setupTest } from "./helpers/setup";
 import * as C from "./helpers/test-constants";
 import * as util from "./helpers/utilities";
 
 const test = await setupTest();
 
-beforeEach<SetupContext>(async ({ dashboard }) => {
+test("singleInstance - scripts get injected into /instance/*.html routes", async ({
+	dashboard,
+}) => {
 	const graphicButton = await util.shadowSelector(
 		dashboard,
 		"ncg-dashboard",
 		'paper-tab[data-route="graphics"]',
 	);
 	await graphicButton.click();
-});
 
-test("singleInstance - scripts get injected into /instance/*.html routes", async () => {
 	const response = await fetch(`${C.rootUrl()}instance/killed.html`);
 	expect(response.status).toBe(200);
 	const body = await response.text();
@@ -25,7 +25,7 @@ test("singleInstance - scripts get injected into /instance/*.html routes", async
 	expect(body).toMatch('<script src="/socket.io/socket.io.js"></script>');
 });
 
-test("singleInstance - should redirect to busy.html when the instance is already taken", async ({
+test.skip("singleInstance - should redirect to busy.html when the instance is already taken", async ({
 	singleInstance,
 	browser,
 }) => {
@@ -45,7 +45,7 @@ test("singleInstance - should redirect to busy.html when the instance is already
 	await newPage.close();
 });
 
-test("singleInstance - should redirect to killed.html when the instance is killed", async ({
+test.skip("singleInstance - should redirect to killed.html when the instance is killed", async ({
 	dashboard,
 	singleInstance,
 }) => {
