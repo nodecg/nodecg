@@ -19,7 +19,7 @@ export default defineConfig({
 	test: {
 		testTimeout: 15_000,
 		hookTimeout: 30_000,
-		maxWorkers: 1,
+		maxWorkers: 2,
 		minWorkers: 1,
 		env: {
 			test: "true",

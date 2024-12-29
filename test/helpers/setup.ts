@@ -4,7 +4,6 @@ import os from "node:os";
 import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 
-import fse from "fs-extra";
 import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
 import { afterAll, test } from "vitest";
@@ -42,24 +41,29 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 	// may have. We don't want to touch any existing user data!
 	process.env.NODECG_ROOT = tempFolder;
 
-	fse.copySync(
+	fs.cpSync(
 		"test/fixtures/nodecg-core/assets",
 		path.join(tempFolder, "assets"),
+		{ recursive: true },
 	);
-	fse.copySync(
+	fs.cpSync(
 		"test/fixtures/nodecg-core/bundles",
 		path.join(tempFolder, "bundles"),
+		{ recursive: true },
 	);
-	fse.moveSync(
+	fs.renameSync(
 		path.join(tempFolder, "bundles/test-bundle/git"),
 		path.join(tempFolder, "bundles/test-bundle/.git"),
 	);
-	fse.copySync("test/fixtures/nodecg-core/cfg", path.join(tempFolder, "cfg"));
-	fse.copySync(
+	fs.cpSync("test/fixtures/nodecg-core/cfg", path.join(tempFolder, "cfg"), {
+		recursive: true,
+	});
+	fs.cpSync(
 		`test/fixtures/nodecg-core/cfg/${nodecgConfigName}`,
 		path.join(tempFolder, "cfg/nodecg.json"),
+		{ recursive: true },
 	);
-	fse.writeFileSync(
+	fs.writeFileSync(
 		path.join(tempFolder, "should-be-forbidden.txt"),
 		"exploit succeeded",
 		"utf-8",
@@ -80,7 +84,7 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 	let loginPage: puppeteer.Page | null = null;
 
 	afterAll(async () => {
-		fse.removeSync(tempFolder);
+		fs.rmSync(tempFolder, { recursive: true, force: true });
 		console.log("after fse.removeSync(tempFolder)");
 
 		if (browser) {
