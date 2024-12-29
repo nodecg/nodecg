@@ -19,10 +19,6 @@ export default defineConfig({
 	test: {
 		testTimeout: 15_000,
 		hookTimeout: 15_000,
-		coverage: {
-			enabled: true,
-			provider: "istanbul",
-		},
 		env: {
 			test: "true",
 			NODECG_TEST: "true",
