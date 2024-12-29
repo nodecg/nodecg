@@ -10,6 +10,7 @@ import * as puppeteer from "puppeteer";
 import { afterAll, test } from "vitest";
 
 import type { serverApiFactory } from "../../src/server/api.server";
+import { getConnection } from "../../src/server/database/default/connection";
 import type { NodeCGServer } from "../../src/server/server";
 import { populateTestData } from "./populateTestData";
 import * as C from "./test-constants";
@@ -31,6 +32,7 @@ export interface SetupContext {
 	graphic: puppeteer.Page;
 	singleInstance: puppeteer.Page;
 	loginPage: puppeteer.Page;
+	database: Awaited<ReturnType<typeof getConnection>>;
 }
 
 export async function setupTest(nodecgConfigName = "nodecg.json") {
@@ -159,6 +161,12 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 				await page.goto(C.loginUrl());
 				await use(page);
 				await page.close();
+			},
+		})
+		.extend<Pick<SetupContext, "database">>({
+			database: async ({}, use) => {
+				const database = await getConnection();
+				await use(database);
 			},
 		});
 }
