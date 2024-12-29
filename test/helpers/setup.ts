@@ -77,8 +77,8 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 		console.log(
 			"####################################################################################################",
 		);
-		await server.stop();
-		console.log("after server.stop()");
+		// await server.stop();
+		// console.log("after server.stop()");
 		fse.removeSync(tempFolder);
 		console.log("after fse.removeSync(tempFolder)");
 
