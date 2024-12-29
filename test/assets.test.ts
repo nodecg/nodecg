@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import { beforeEach } from "node:test";
 import { setTimeout } from "node:timers/promises";
 
 import type * as puppeteer from "puppeteer";
@@ -118,7 +117,7 @@ test("deletion - 200", async ({ dashboard }) => {
 	)) as any;
 
 	await deleteButton.click();
-	await util.sleep(500);
+	await setTimeout(500);
 	expect(fs.existsSync(TWITTER_BANNER_PATH)).toBe(false);
 });
 

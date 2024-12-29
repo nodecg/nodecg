@@ -2,11 +2,6 @@ import type * as Puppeteer from "puppeteer";
 
 import type { NodeCG } from "../../src/types/nodecg";
 
-export const sleep = async (milliseconds: number): Promise<void> =>
-	new Promise((resolve) => {
-		setTimeout(resolve, milliseconds);
-	});
-
 export const waitOneTick = async (): Promise<void> =>
 	new Promise((resolve) => {
 		process.nextTick(resolve);
