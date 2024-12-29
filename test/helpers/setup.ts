@@ -85,7 +85,6 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 
 	afterAll(async () => {
 		fs.rmSync(tempFolder, { recursive: true, force: true });
-		console.log("after fse.removeSync(tempFolder)");
 
 		if (browser) {
 			await browser.close();
