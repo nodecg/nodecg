@@ -29,8 +29,8 @@ test("should error when package.json is not valid JSON", () => {
 			parseBundle,
 			"./test/fixtures/bundle-parser/invalid-manifest-json",
 		),
-	).toThrowErrorMatchingInlineSnapshot(
-		`[Error: test/fixtures/bundle-parser/invalid-manifest-json/package.json is not valid JSON, please check it against a validator such as jsonlint.com]`,
+	).toThrowError(
+		/package\.json is not valid JSON, please check it against a validator such as jsonlint\.com/,
 	);
 });
 
