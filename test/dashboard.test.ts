@@ -95,64 +95,68 @@ test("ncg-dialog - should open when an element with a valid nodecg-dialog attrib
 	);
 });
 
-test.skip("ncg-dialog - should emit dialog-confirmed when a confirm button is clicked", async ({
-	dashboard,
-}) => {
-	await dashboard.evaluate(
-		async () =>
-			new Promise<void>((resolve) => {
-				const dialog: any = window.dashboardApi.getDialog("test-dialog");
-				const dialogDocument: any =
-					window.dashboardApi.getDialogDocument("test-dialog");
-				const confirmButton: any = dialog.querySelector(
-					"paper-button[dialog-confirm]",
-				);
-				dialogDocument.addEventListener(
-					"dialog-confirmed",
-					() => {
-						resolve();
-					},
-					{ once: true, passive: true },
-				);
-				confirmButton.click();
-			}),
-	);
-});
+test(
+	"ncg-dialog - should emit dialog-confirmed when a confirm button is clicked",
+	{ skip: true },
+	async ({ dashboard }) => {
+		await dashboard.evaluate(
+			async () =>
+				new Promise<void>((resolve) => {
+					const dialog: any = window.dashboardApi.getDialog("test-dialog");
+					const dialogDocument: any =
+						window.dashboardApi.getDialogDocument("test-dialog");
+					const confirmButton: any = dialog.querySelector(
+						"paper-button[dialog-confirm]",
+					);
+					dialogDocument.addEventListener(
+						"dialog-confirmed",
+						() => {
+							resolve();
+						},
+						{ once: true, passive: true },
+					);
+					confirmButton.click();
+				}),
+		);
+	},
+);
 
-test.skip("ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked", async ({
-	dashboard,
-}) => {
-	await dashboard.evaluate(
-		async () =>
-			new Promise<void>((resolve) => {
-				// Open dialog first
-				const openDialogButton = document
-					.querySelector("ncg-dashboard")!
-					.shadowRoot!.querySelector("ncg-workspace")!
-					.shadowRoot!.querySelector(
-						'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]',
-					)!
-					.querySelector("iframe")!
-					.contentWindow!.document.querySelector("#openDialog")!;
-				(openDialogButton as HTMLElement).click();
+test(
+	"ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked",
+	{ skip: true },
+	async ({ dashboard }) => {
+		await dashboard.evaluate(
+			async () =>
+				new Promise<void>((resolve) => {
+					// Open dialog first
+					const openDialogButton = document
+						.querySelector("ncg-dashboard")!
+						.shadowRoot!.querySelector("ncg-workspace")!
+						.shadowRoot!.querySelector(
+							'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]',
+						)!
+						.querySelector("iframe")!
+						.contentWindow!.document.querySelector("#openDialog")!;
+					(openDialogButton as HTMLElement).click();
 
-				const dialog: any = window.dashboardApi.getDialog("test-dialog");
-				const dialogDocument: any =
-					window.dashboardApi.getDialogDocument("test-dialog");
-				const dismissButton: any = dialog.querySelector(
-					"paper-button[dialog-dismiss]",
-				);
-				dialogDocument.addEventListener(
-					"dialog-dismissed",
-					() => {
-						resolve();
-					},
-					{ once: true, passive: true },
-				);
-				dismissButton.click();
-			}),
-	);
-});
+					const dialog: any = window.dashboardApi.getDialog("test-dialog");
+					const dialogDocument: any =
+						window.dashboardApi.getDialogDocument("test-dialog");
+					const dismissButton: any = dialog.querySelector(
+						"paper-button[dialog-dismiss]",
+					);
+					dialogDocument.addEventListener(
+						"dialog-dismissed",
+						() => {
+							resolve();
+						},
+						{ once: true, passive: true },
+					);
+					dismissButton.click();
+				}),
+		);
+	},
+);
 
 test("retrieval - 404", async () => {
 	const response = await fetch(

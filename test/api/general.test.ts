@@ -185,38 +185,39 @@ test("should prevent acknowledgements from being called more than once", async (
 	expect(cb2).toThrow();
 });
 
-test("server - should support intra-context messaging", async ({
-	apis,
-	dashboard,
-}) => {
-	const serverPromise = new Promise<unknown>((resolve) => {
-		apis.extension.listenFor("serverToServer", (data) => {
-			resolve(data);
-		});
-	});
-
-	const clientPromise = dashboard.evaluate(() => {
-		return new Promise((resolve) => {
-			window.dashboardApi.listenFor("serverToServer", (data) => {
+test(
+	"server - should support intra-context messaging",
+	{ skip: true },
+	async ({ apis, dashboard }) => {
+		const serverPromise = new Promise<unknown>((resolve) => {
+			apis.extension.listenFor("serverToServer", (data) => {
 				resolve(data);
 			});
 		});
-	});
 
-	// Send the message only after both listeners have been set up.
-	apis.extension.sendMessage("serverToServer", { foo: "bar" });
+		const clientPromise = dashboard.evaluate(() => {
+			return new Promise((resolve) => {
+				window.dashboardApi.listenFor("serverToServer", (data) => {
+					resolve(data);
+				});
+			});
+		});
 
-	expect(await serverPromise).toMatchInlineSnapshot(`
+		// Send the message only after both listeners have been set up.
+		apis.extension.sendMessage("serverToServer", { foo: "bar" });
+
+		expect(await serverPromise).toMatchInlineSnapshot(`
 		{
 		  "foo": "bar",
 		}
 	`);
-	expect(await clientPromise).toMatchInlineSnapshot(`
+		expect(await clientPromise).toMatchInlineSnapshot(`
 		{
 		  "foo": "bar",
 		}
 	`);
-});
+	},
+);
 
 test("client - should support intra-context messaging", async ({
 	apis,

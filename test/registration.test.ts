@@ -25,65 +25,67 @@ test("singleInstance - scripts get injected into /instance/*.html routes", async
 	expect(body).toMatch('<script src="/socket.io/socket.io.js"></script>');
 });
 
-test.skip("singleInstance - should redirect to busy.html when the instance is already taken", async ({
-	singleInstance,
-	browser,
-}) => {
-	expect(singleInstance.url()).toMatch(
-		"/bundles/test-bundle/graphics/single_instance.html",
-	);
-	const newPage = await browser.newPage();
-	await newPage.goto(C.singleInstanceUrl());
-	await newPage.waitForNetworkIdle();
-	expect(newPage.url()).toMatch("/instance/busy.html");
+test(
+	"singleInstance - should redirect to busy.html when the instance is already taken",
+	{ skip: true },
+	async ({ singleInstance, browser }) => {
+		expect(singleInstance.url()).toMatch(
+			"/bundles/test-bundle/graphics/single_instance.html",
+		);
+		const newPage = await browser.newPage();
+		await newPage.goto(C.singleInstanceUrl());
+		await newPage.waitForNetworkIdle();
+		expect(newPage.url()).toMatch("/instance/busy.html");
 
-	await singleInstance.goto("https://example.com");
-	await newPage.goto(C.singleInstanceUrl());
-	await newPage.waitForNetworkIdle();
-	expect(newPage.url()).toBe(C.singleInstanceUrl());
+		await singleInstance.goto("https://example.com");
+		await newPage.goto(C.singleInstanceUrl());
+		await newPage.waitForNetworkIdle();
+		expect(newPage.url()).toBe(C.singleInstanceUrl());
 
-	await newPage.close();
-});
+		await newPage.close();
+	},
+);
 
-test.skip("singleInstance - should redirect to killed.html when the instance is killed", async ({
-	dashboard,
-	singleInstance,
-}) => {
-	const graphicBoard = await util.shadowSelector(
-		dashboard,
-		"ncg-dashboard",
-		"ncg-graphics",
-		"ncg-graphics-bundle",
-		"ncg-graphic:nth-of-type(2)",
-	);
+test(
+	"singleInstance - should redirect to killed.html when the instance is killed",
+	{ skip: true },
+	async ({ dashboard, singleInstance }) => {
+		const graphicBoard = await util.shadowSelector(
+			dashboard,
+			"ncg-dashboard",
+			"ncg-graphics",
+			"ncg-graphics-bundle",
+			"ncg-graphic:nth-of-type(2)",
+		);
 
-	await dashboard.bringToFront();
-	const expandButton: any = await dashboard.evaluateHandle(
-		(el: any) => el.shadowRoot.querySelector("paper-button#collapseButton"),
-		graphicBoard,
-	);
-	await expandButton.click();
+		await dashboard.bringToFront();
+		const expandButton: any = await dashboard.evaluateHandle(
+			(el: any) => el.shadowRoot.querySelector("paper-button#collapseButton"),
+			graphicBoard,
+		);
+		await expandButton.click();
 
-	const button: any = await dashboard.evaluateHandle(
-		(el: any) =>
-			el.shadowRoot.querySelector("ncg-graphic-instance").$.killButton,
-		graphicBoard,
-	);
-	await button.click();
+		const button: any = await dashboard.evaluateHandle(
+			(el: any) =>
+				el.shadowRoot.querySelector("ncg-graphic-instance").$.killButton,
+			graphicBoard,
+		);
+		await button.click();
 
-	await singleInstance.bringToFront();
+		await singleInstance.bringToFront();
 
-	await singleInstance.waitForFunction(
-		(rootUrl: string) =>
-			location.href ===
-			`${rootUrl}instance/killed.html?pathname=/bundles/test-bundle/graphics/single_instance.html`,
-		{},
-		C.rootUrl(),
-	);
+		await singleInstance.waitForFunction(
+			(rootUrl: string) =>
+				location.href ===
+				`${rootUrl}instance/killed.html?pathname=/bundles/test-bundle/graphics/single_instance.html`,
+			{},
+			C.rootUrl(),
+		);
 
-	// wait for the registration system to clear the socket out, takes a second or so
-	await setTimeout(2500);
-});
+		// wait for the registration system to clear the socket out, takes a second or so
+		await setTimeout(2500);
+	},
+);
 
 test("refresh all instances in a bundle", async ({ graphic, dashboard }) => {
 	await util.waitForRegistration(graphic);
