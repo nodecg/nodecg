@@ -74,12 +74,19 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 	let browser: puppeteer.Browser | null = null;
 
 	afterAll(async () => {
+		console.log(
+			"####################################################################################################",
+		);
 		await server.stop();
+		console.log("after server.stop()");
 		fse.removeSync(tempFolder);
+		console.log("after fse.removeSync(tempFolder)");
 
 		if (browser) {
 			await browser.close();
+			console.log("after browser.close()");
 		}
+		console.log("done");
 	});
 
 	return test
