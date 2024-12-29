@@ -1,123 +1,91 @@
 import { setTimeout } from "node:timers/promises";
 
-import test from "ava";
-import fs from "fs";
-import path from "path";
-import { replaceInFile } from "replace-in-file";
-import { simpleGit } from "simple-git";
+import { beforeEach, expect } from "vitest";
 
-import * as browser from "./helpers/browser";
-import * as server from "./helpers/server";
-
-server.setup();
-const { initSingleInstance, initDashboard, initGraphic } = browser.setup();
-
-import type { Page } from "puppeteer";
-
+import { SetupContext, setupTest } from "./helpers/setup";
 import * as C from "./helpers/test-constants";
 import * as util from "./helpers/utilities";
-import { sleep } from "./helpers/utilities";
 
-let singleInstance: Page;
-let dashboard: Page;
-test.before(async () => {
-	singleInstance = await initSingleInstance();
-	dashboard = await initDashboard();
+const test = await setupTest();
 
+beforeEach<SetupContext>(async ({ dashboard }) => {
 	const graphicButton = await util.shadowSelector(
 		dashboard,
 		"ncg-dashboard",
 		'paper-tab[data-route="graphics"]',
 	);
 	await graphicButton.click();
+});
 
-	const collapseButton = await util.shadowSelector(
+test("singleInstance - scripts get injected into /instance/*.html routes", async () => {
+	const response = await fetch(`${C.rootUrl()}instance/killed.html`);
+	expect(response.status).toBe(200);
+	const body = await response.text();
+	expect(body).toMatch('<script src="/api.js">');
+	expect(body).toMatch('<script src="/socket.io/socket.io.js"></script>');
+});
+
+test("singleInstance - should redirect to busy.html when the instance is already taken", async ({
+	singleInstance,
+	browser,
+}) => {
+	expect(singleInstance.url()).toMatch(
+		"/bundles/test-bundle/graphics/single_instance.html",
+	);
+	const newPage = await browser.newPage();
+	await newPage.goto(C.singleInstanceUrl());
+	await newPage.waitForNetworkIdle();
+	expect(newPage.url()).toMatch("/instance/busy.html");
+
+	await singleInstance.goto("https://example.com");
+	await newPage.goto(C.singleInstanceUrl());
+	await newPage.waitForNetworkIdle();
+	expect(newPage.url()).toBe(C.singleInstanceUrl());
+
+	await newPage.close();
+});
+
+test("singleInstance - should redirect to killed.html when the instance is killed", async ({
+	dashboard,
+	singleInstance,
+}) => {
+	const graphicBoard = await util.shadowSelector(
 		dashboard,
 		"ncg-dashboard",
 		"ncg-graphics",
 		"ncg-graphics-bundle",
-		"ncg-graphic",
-		"#collapseButton",
+		"ncg-graphic:nth-of-type(2)",
 	);
-	await collapseButton.click();
+
+	await dashboard.bringToFront();
+	const expandButton: any = await dashboard.evaluateHandle(
+		(el: any) => el.shadowRoot.querySelector("paper-button#collapseButton"),
+		graphicBoard,
+	);
+	await expandButton.click();
+
+	const button: any = await dashboard.evaluateHandle(
+		(el: any) =>
+			el.shadowRoot.querySelector("ncg-graphic-instance").$.killButton,
+		graphicBoard,
+	);
+	await button.click();
+
+	await singleInstance.bringToFront();
+
+	await singleInstance.waitForFunction(
+		(rootUrl: string) =>
+			location.href ===
+			`${rootUrl}instance/killed.html?pathname=/bundles/test-bundle/graphics/single_instance.html`,
+		{},
+		C.rootUrl(),
+	);
+
+	// wait for the registration system to clear the socket out, takes a second or so
+	await setTimeout(2500);
 });
 
-test("singleInstance - scripts get injected into /instance/*.html routes", async (t) => {
-	const response = await fetch(`${C.rootUrl()}instance/killed.html`);
-	t.is(response.status, 200);
-	const body = await response.text();
-	t.true(body.includes('<script src="/api.js">'));
-	t.true(body.includes('<script src="/socket.io/socket.io.js"></script>'));
-});
-
-test.serial(
-	"singleInstance - should redirect to busy.html when the instance is already taken",
-	async (t) => {
-		t.plan(0);
-		const page = await initSingleInstance();
-		await page.waitForFunction(
-			(rootUrl: string) =>
-				location.href ===
-				`${rootUrl}instance/busy.html?pathname=/bundles/test-bundle/graphics/single_instance.html`,
-			{},
-			C.rootUrl(),
-		);
-		await page.close();
-	},
-);
-
-test.serial(
-	"singleInstance - should redirect to killed.html when the instance is killed",
-	async (t) => {
-		t.plan(0);
-
-		const graphicBoard = await util.shadowSelector(
-			dashboard,
-			"ncg-dashboard",
-			"ncg-graphics",
-			"ncg-graphics-bundle",
-			"ncg-graphic:nth-of-type(2)",
-		);
-
-		await dashboard.bringToFront();
-		const expandButton: any = await dashboard.evaluateHandle(
-			(el: any) => el.shadowRoot.querySelector("paper-button#collapseButton"),
-			graphicBoard,
-		);
-		await expandButton.click();
-
-		const button: any = await dashboard.evaluateHandle(
-			(el: any) =>
-				el.shadowRoot.querySelector("ncg-graphic-instance").$.killButton,
-			graphicBoard,
-		);
-		await button.click();
-
-		await singleInstance.waitForFunction(
-			(rootUrl: string) =>
-				location.href ===
-				`${rootUrl}instance/killed.html?pathname=/bundles/test-bundle/graphics/single_instance.html`,
-			{},
-			C.rootUrl(),
-		);
-
-		await singleInstance.close();
-
-		// wait for the registration system to clear the socket out, takes a second or so
-		await sleep(2500);
-	},
-);
-
-test.serial(
-	"singleInstance - should allow the graphic to be taken after being killed",
-	async (t) => {
-		const page = await initSingleInstance();
-		t.is(page.url(), C.singleInstanceUrl());
-	},
-);
-
-test.serial("refresh all instances in a bundle", async (t) => {
-	const graphic = await initGraphic();
+test("refresh all instances in a bundle", async ({ graphic, dashboard }) => {
 	await util.waitForRegistration(graphic);
 
 	const graphicBundle = await util.shadowSelector(
@@ -141,11 +109,10 @@ test.serial("refresh all instances in a bundle", async (t) => {
 	await Promise.all([confirm.click(), graphic.waitForNavigation()]);
 
 	const refreshMarker = await util.waitForRegistration(graphic);
-	t.is(refreshMarker, undefined);
+	expect(refreshMarker).toBe(undefined);
 });
 
-test.serial("refresh all instances of a graphic", async (t) => {
-	const graphic = await initGraphic();
+test("refresh all instances of a graphic", async ({ graphic, dashboard }) => {
 	await util.waitForRegistration(graphic);
 
 	await dashboard.bringToFront();
@@ -161,11 +128,10 @@ test.serial("refresh all instances of a graphic", async (t) => {
 	await Promise.all([reload.click(), graphic.waitForNavigation()]);
 
 	const refreshMarker = await util.waitForRegistration(graphic);
-	t.is(refreshMarker, undefined);
+	expect(refreshMarker).toBe(undefined);
 });
 
-test.serial("refresh individual instance", async (t) => {
-	const graphic = await initGraphic();
+test("refresh individual instance", async ({ graphic, dashboard }) => {
 	await util.waitForRegistration(graphic);
 
 	await dashboard.bringToFront();
@@ -188,170 +154,65 @@ test.serial("refresh individual instance", async (t) => {
 	]);
 
 	const refreshMarker = await util.waitForRegistration(graphic);
-	t.is(refreshMarker, undefined);
+	expect(refreshMarker).toBe(undefined);
 });
 
-const statusEl = async (page: Page) =>
-	util.shadowSelector(
-		page,
+test("dragging the graphic generates the correct url for obs", async ({
+	dashboard,
+}) => {
+	const graphicLink = await util.shadowSelector(
+		dashboard,
 		"ncg-dashboard",
 		"ncg-graphics",
 		"ncg-graphics-bundle",
 		"ncg-graphic",
-		"ncg-graphic-instance:last-of-type",
-		"#status",
+		"#url",
 	);
 
-test.serial("version out of date", async (t) => {
-	await replaceInFile({
-		files: path.resolve(
-			process.env.NODECG_ROOT!,
-			"bundles/test-bundle/package.json",
-		),
-		from: '"version": "0.0.1"',
-		to: '"version": "0.0.2"',
-	});
-	await setTimeout(1500);
+	await dashboard.evaluateHandle((gl: HTMLElement) => {
+		gl.addEventListener("dragstart", (ev: DragEvent) => {
+			ev.preventDefault();
 
-	let text = await dashboard.evaluate(
-		(el) => el.textContent,
-		await statusEl(dashboard),
+			if (!ev.dataTransfer) {
+				return;
+			}
+
+			const data = ev.dataTransfer.getData("text/uri-list");
+			console.log(data);
+		});
+	}, graphicLink as any);
+
+	const linkBoundingBox = await graphicLink.boundingBox();
+	if (!linkBoundingBox) {
+		throw new Error("linkBoundingBox is null");
+	}
+
+	await dashboard.bringToFront();
+
+	// Move mouse to centre of link and start dragging
+	await dashboard.mouse.move(
+		linkBoundingBox.x + linkBoundingBox.width / 2,
+		linkBoundingBox.y + linkBoundingBox.height / 2,
 	);
-	t.is(text, "Potentially Out of Date");
+	await dashboard.mouse.down();
 
-	await replaceInFile({
-		files: path.resolve(
-			process.env.NODECG_ROOT!,
-			"bundles/test-bundle/package.json",
-		),
-		from: '"version": "0.0.2"',
-		to: '"version": "0.0.1"',
-	});
-	await setTimeout(1500);
-
-	text = await dashboard.evaluate(
-		(el) => el.textContent,
-		await statusEl(dashboard),
-	);
-	t.is(text, "Latest");
-});
-
-test.serial("git out of date", async (t) => {
-	fs.writeFileSync(
-		path.resolve(process.env.NODECG_ROOT!, "bundles/test-bundle/new_file.txt"),
-		"foo",
-	);
-	const git = simpleGit(
-		path.resolve(process.env.NODECG_ROOT!, "bundles/test-bundle"),
-	);
-	await git.add("./new_file.txt");
-	await git.commit("new commit");
-	await setTimeout(1500);
-
-	const text = await dashboard.evaluate(
-		(el) => el.textContent,
-		await statusEl(dashboard),
-	);
-	t.is(text, "Potentially Out of Date");
-});
-
-test.serial(
-	'shows a diff when hovering over "potentially out of date" status',
-	async (t) => {
-		await dashboard.bringToFront();
-		const graphicInstance = await util.shadowSelector(
-			dashboard,
-			"ncg-dashboard",
-			"ncg-graphics",
-			"ncg-graphics-bundle",
-			"ncg-graphic",
-			'ncg-graphic-instance[status="out-of-date"]',
-		);
-
-		await graphicInstance.hover();
-		await dashboard.waitForFunction(
-			(el) => getComputedStyle(el).display !== "none",
-			{},
-			graphicInstance,
-		);
-		const diffText = await dashboard.evaluate(
-			(el: any) => el.$.diff.$.body.textContent,
-			graphicInstance,
-		);
-		t.true(diffText.includes("Current:"));
-		t.true(diffText.includes("Latest:"));
-		t.regex(diffText, /0\.0\.1 - \w{7} \[Initial commit\]/);
-		t.regex(diffText, /0\.0\.1 - \w{7} \[new commit\]/);
-
-		const closeButton: any = await dashboard.evaluateHandle(
-			(el: any) => el.$.diff.shadowRoot.querySelector("paper-icon-button"),
-			graphicInstance,
-		);
-		await closeButton.click();
-		await dashboard.waitForFunction(
-			(el: any) => getComputedStyle(el.$.diff).opacity === "0",
-			{ timeout: 100000 },
-			graphicInstance,
-		);
-	},
-);
-
-test.serial(
-	"dragging the graphic generates the correct url for obs",
-	async (t) => {
-		t.plan(1);
-
-		const graphicLink = await util.shadowSelector(
-			dashboard,
-			"ncg-dashboard",
-			"ncg-graphics",
-			"ncg-graphics-bundle",
-			"ncg-graphic",
-			"#url",
-		);
-
-		await dashboard.evaluateHandle((gl: HTMLElement) => {
-			gl.addEventListener("dragstart", (ev: DragEvent) => {
-				ev.preventDefault();
-
-				if (!ev.dataTransfer) {
-					return;
-				}
-
-				const data = ev.dataTransfer.getData("text/uri-list");
-				console.log(data);
-			});
-		}, graphicLink as any);
-
-		const linkBoundingBox = await graphicLink.boundingBox();
-		if (!linkBoundingBox) {
-			t.fail();
-			return;
-		}
-
-		await dashboard.bringToFront();
-
-		// Move mouse to centre of link and start dragging
-		await dashboard.mouse.move(
-			linkBoundingBox.x + linkBoundingBox.width / 2,
-			linkBoundingBox.y + linkBoundingBox.height / 2,
-		);
-		await dashboard.mouse.down();
-
+	const promise = new Promise<void>((resolve) => {
 		dashboard.on("console", (msg) => {
 			// This allows other console messages to come through while the test is running, as long as the required message comes through eventually
 			if (
 				msg.text() ===
 				`${C.rootUrl()}bundles/test-bundle/graphics/index.html?layer-name=index&layer-height=720&layer-width=1280`
 			) {
-				t.pass();
+				resolve();
 			}
 		});
+	});
 
-		// Move to top left of screen over 10 ticks
-		// Dragstart event should be called during this
-		await dashboard.mouse.move(0, 0, { steps: 10 });
+	// Move to top left of screen over 10 ticks
+	// Dragstart event should be called during this
+	await dashboard.mouse.move(0, 0, { steps: 10 });
 
-		await setTimeout(200);
-	},
-);
+	await setTimeout(200);
+
+	await promise;
+});

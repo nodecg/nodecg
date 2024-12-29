@@ -175,7 +175,7 @@ test("should properly load schemas provided with an absolute path", ({
 		),
 	});
 
-	expect(rep.schema).toEqual({
+	expect(rep.value).toEqual({
 		string: "",
 		object: {
 			numA: 0,

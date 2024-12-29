@@ -22,6 +22,17 @@ function createTmpDir() {
 	return dir;
 }
 
+export interface SetupContext {
+	server: NodeCGServer;
+	apis: { extension: InstanceType<ReturnType<typeof serverApiFactory>> };
+	browser: puppeteer.Browser;
+	dashboard: puppeteer.Page;
+	standalone: puppeteer.Page;
+	graphic: puppeteer.Page;
+	singleInstance: puppeteer.Page;
+	loginPage: puppeteer.Page;
+}
+
 export async function setupTest(nodecgConfigName = "nodecg.json") {
 	const tempFolder = createTmpDir();
 
@@ -70,10 +81,7 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 	});
 
 	return test
-		.extend<{
-			server: NodeCGServer;
-			apis: { extension: InstanceType<ReturnType<typeof serverApiFactory>> };
-		}>({
+		.extend<Pick<SetupContext, "server" | "apis">>({
 			server,
 			apis: {
 				extension: server.getExtensions()[C.bundleName()] as InstanceType<
@@ -81,7 +89,7 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 				>,
 			},
 		})
-		.extend<{ browser: puppeteer.Browser }>({
+		.extend<Pick<SetupContext, "browser">>({
 			browser: async ({}, use) => {
 				if (browser) {
 					await use(browser);
@@ -96,13 +104,12 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 				}
 			},
 		})
-		.extend<{
-			dashboard: puppeteer.Page;
-			standalone: puppeteer.Page;
-			graphic: puppeteer.Page;
-			singleInstance: puppeteer.Page;
-			login: puppeteer.Page;
-		}>({
+		.extend<
+			Pick<
+				SetupContext,
+				"dashboard" | "standalone" | "graphic" | "singleInstance" | "loginPage"
+			>
+		>({
 			dashboard: async ({ browser }, use) => {
 				const page = await browser.newPage();
 				await page.goto(C.dashboardUrl());
@@ -147,7 +154,7 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 				await use(page);
 				await page.close();
 			},
-			login: async ({ browser }, use) => {
+			loginPage: async ({ browser }, use) => {
 				const page = await browser.newPage();
 				await page.goto(C.loginUrl());
 				await use(page);
