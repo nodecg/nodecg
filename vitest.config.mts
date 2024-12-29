@@ -18,8 +18,7 @@ export default defineConfig({
 	],
 	test: {
 		testTimeout: 15_000,
-		hookTimeout: 15_000,
-		maxWorkers: 1,
+		hookTimeout: 30_000,
 		coverage: {
 			enabled: true,
 			provider: "istanbul",
