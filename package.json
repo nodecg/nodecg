@@ -34,6 +34,7 @@
     "dev:server": "node --watch --watch-preserve-output index.js",
     "dev:copy-templates": "onchange \"src/server/**/*.tmpl\" -i -- cpy \"src/server/**/*.tmpl\" out/server",
     "test": "vitest",
+    "typetest": "cd typetest/fake-bundle && npm run build",
     "lint": "npm-run-all -s lint:*",
     "lint:prettier": "prettier --check .",
     "lint:eslint": "eslint --cache",
