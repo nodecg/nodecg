@@ -84,11 +84,15 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 	let loginPage: puppeteer.Page | null = null;
 
 	afterAll(async () => {
-		fs.rmSync(tempFolder, { recursive: true, force: true });
-
-		if (browser) {
-			await browser.close();
-		}
+		await Promise.all([
+			fs.promises
+				.rm(tempFolder, { recursive: true, force: true })
+				.catch((error) => {
+					// Ignore errors when cleaning up the temp folder
+					console.error(error);
+				}),
+			browser?.close(),
+		]);
 	});
 
 	return test
