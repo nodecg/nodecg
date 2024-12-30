@@ -34,89 +34,85 @@ export interface SetupContext {
 	database: Awaited<ReturnType<typeof getConnection>>;
 }
 
-export async function setupTest(nodecgConfigName = "nodecg.json") {
-	const tempFolder = createTmpDir();
-
-	// Tell NodeCG to look in our new temp folder for bundles, cfg, db, and assets, rather than whatever ones the user
-	// may have. We don't want to touch any existing user data!
-	process.env.NODECG_ROOT = tempFolder;
-
-	fs.cpSync(
-		"test/fixtures/nodecg-core/assets",
-		path.join(tempFolder, "assets"),
-		{ recursive: true },
-	);
-	fs.cpSync(
-		"test/fixtures/nodecg-core/bundles",
-		path.join(tempFolder, "bundles"),
-		{ recursive: true },
-	);
-	fs.renameSync(
-		path.join(tempFolder, "bundles/test-bundle/git"),
-		path.join(tempFolder, "bundles/test-bundle/.git"),
-	);
-	fs.cpSync("test/fixtures/nodecg-core/cfg", path.join(tempFolder, "cfg"), {
-		recursive: true,
-	});
-	fs.cpSync(
-		`test/fixtures/nodecg-core/cfg/${nodecgConfigName}`,
-		path.join(tempFolder, "cfg/nodecg.json"),
-		{ recursive: true },
-	);
-	fs.writeFileSync(
-		path.join(tempFolder, "should-be-forbidden.txt"),
-		"exploit succeeded",
-		"utf-8",
-	);
-
-	const { NodeCGServer } = await import("../../src/server/server");
-	const server = new NodeCGServer();
-
-	await populateTestData();
-	await server.start();
-
-	let browser: puppeteer.Browser | null = null;
-
-	let dashboard: puppeteer.Page | null = null;
-	let standalone: puppeteer.Page | null = null;
-	let graphic: puppeteer.Page | null = null;
-	let singleInstance: puppeteer.Page | null = null;
-	let loginPage: puppeteer.Page | null = null;
-
-	afterAll(async () => {
-		await Promise.all([
-			fs.promises
-				.rm(tempFolder, { recursive: true, force: true })
-				.catch((error) => {
-					// Ignore errors when cleaning up the temp folder
-					console.error(error);
-				}),
-			browser?.close(),
-		]);
-	});
-
+export function setupTest(nodecgConfigName = "nodecg.json") {
 	return test
-		.extend<Pick<SetupContext, "server" | "apis">>({
-			server,
-			apis: {
-				extension: server.getExtensions()[C.bundleName()] as InstanceType<
-					ReturnType<typeof serverApiFactory>
-				>,
+		.extend<Pick<SetupContext, "server">>({
+			server: [
+				async ({}, use) => {
+					const tempFolder = createTmpDir();
+
+					// Tell NodeCG to look in our new temp folder for bundles, cfg, db, and assets, rather than whatever ones the user
+					// may have. We don't want to touch any existing user data!
+					process.env.NODECG_ROOT = tempFolder;
+
+					fs.cpSync(
+						"test/fixtures/nodecg-core/assets",
+						path.join(tempFolder, "assets"),
+						{ recursive: true },
+					);
+					fs.cpSync(
+						"test/fixtures/nodecg-core/bundles",
+						path.join(tempFolder, "bundles"),
+						{ recursive: true },
+					);
+					fs.renameSync(
+						path.join(tempFolder, "bundles/test-bundle/git"),
+						path.join(tempFolder, "bundles/test-bundle/.git"),
+					);
+					fs.cpSync(
+						"test/fixtures/nodecg-core/cfg",
+						path.join(tempFolder, "cfg"),
+						{
+							recursive: true,
+						},
+					);
+					fs.cpSync(
+						`test/fixtures/nodecg-core/cfg/${nodecgConfigName}`,
+						path.join(tempFolder, "cfg/nodecg.json"),
+						{ recursive: true },
+					);
+					fs.writeFileSync(
+						path.join(tempFolder, "should-be-forbidden.txt"),
+						"exploit succeeded",
+						"utf-8",
+					);
+
+					const { NodeCGServer } = await import("../../src/server/server");
+					const server = new NodeCGServer();
+
+					await populateTestData();
+					await server.start();
+
+					await use(server);
+
+					try {
+						fs.rmSync(tempFolder, { recursive: true, force: true });
+					} catch (error) {
+						console.error(error);
+					}
+				},
+				{ auto: true },
+			],
+		})
+		.extend<Pick<SetupContext, "apis">>({
+			apis: async ({ server }, use) => {
+				await use({
+					extension: server.getExtensions()[C.bundleName()] as InstanceType<
+						ReturnType<typeof serverApiFactory>
+					>,
+				});
 			},
 		})
 		.extend<Pick<SetupContext, "browser">>({
 			browser: async ({}, use) => {
-				if (browser) {
-					await use(browser);
-				} else {
-					const args = isCi ? ["--no-sandbox"] : undefined;
-					browser = await puppeteer.launch({
-						headless: true,
-						args,
-					});
+				const args = isCi ? ["--no-sandbox"] : undefined;
+				const browser = await puppeteer.launch({
+					headless: true,
+					args,
+				});
 
-					await use(browser);
-				}
+				await use(browser);
+				await browser.close();
 			},
 		})
 		.extend<
@@ -126,64 +122,49 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 			>
 		>({
 			dashboard: async ({ browser }, use) => {
-				if (!dashboard) {
-					const page = await browser.newPage();
-					await page.goto(C.dashboardUrl());
-					await page.waitForFunction(
-						() => typeof window.dashboardApi !== "undefined",
-					);
-					await page.waitForFunction(() => window.WebComponentsReady);
-					dashboard = page;
-				}
-				await use(dashboard);
+				const page = await browser.newPage();
+				await page.goto(C.dashboardUrl());
+				await page.waitForFunction(
+					() => typeof window.dashboardApi !== "undefined",
+				);
+				await page.waitForFunction(() => window.WebComponentsReady);
+				await use(page);
 			},
 			standalone: async ({ browser }, use) => {
-				if (!standalone) {
-					const page = await browser.newPage();
-					await page.goto(`${C.testPanelUrl()}?standalone=true`);
-					await page.waitForFunction(
-						() => typeof window.dashboardApi !== "undefined",
-					);
-					standalone = page;
-				}
-				await use(standalone);
+				const page = await browser.newPage();
+				await page.goto(`${C.testPanelUrl()}?standalone=true`);
+				await page.waitForFunction(
+					() => typeof window.dashboardApi !== "undefined",
+				);
+				await use(page);
 			},
 			graphic: async ({ browser }, use) => {
-				if (!graphic) {
-					const page = await browser.newPage();
-					await page.goto(C.graphicUrl());
-					await page.waitForFunction(
-						() => typeof window.graphicApi !== "undefined",
-					);
-					graphic = page;
-				}
-				await use(graphic);
+				const page = await browser.newPage();
+				await page.goto(C.graphicUrl());
+				await page.waitForFunction(
+					() => typeof window.graphicApi !== "undefined",
+				);
+				await use(page);
 			},
 			singleInstance: async ({ browser }, use) => {
-				if (!singleInstance) {
-					const page = await browser.newPage();
-					await page.goto(C.singleInstanceUrl());
-					await page.waitForFunction(() => {
-						if (window.location.pathname.endsWith("busy.html")) {
-							return true;
-						}
-						if (window.location.pathname.endsWith("killed.html")) {
-							return true;
-						}
-						return typeof window.singleInstanceApi !== "undefined";
-					});
-					await setTimeout(500);
-					singleInstance = page;
-				}
-				await use(singleInstance);
+				const page = await browser.newPage();
+				await page.goto(C.singleInstanceUrl());
+				await page.waitForFunction(() => {
+					if (window.location.pathname.endsWith("busy.html")) {
+						return true;
+					}
+					if (window.location.pathname.endsWith("killed.html")) {
+						return true;
+					}
+					return typeof window.singleInstanceApi !== "undefined";
+				});
+				await setTimeout(500);
+				await use(page);
 			},
 			loginPage: async ({ browser }, use) => {
-				if (!loginPage) {
-					const page = await browser.newPage();
-					await page.goto(C.loginUrl());
-					loginPage = page;
-				}
-				await use(loginPage);
+				const page = await browser.newPage();
+				await page.goto(C.loginUrl());
+				await use(page);
 			},
 		})
 		.extend<Pick<SetupContext, "database">>({
