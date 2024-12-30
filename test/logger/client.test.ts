@@ -1,6 +1,4 @@
-import type { TestFn } from "ava";
-import anyTest from "ava";
-import sinon from "sinon";
+import { expect, Mock, test as baseTest, vi } from "vitest";
 
 import { loggerFactory } from "../../src/client/api/logger/logger.client";
 import { LogLevel } from "../../src/types/logger-interface";
@@ -8,187 +6,197 @@ import { LogLevel } from "../../src/types/logger-interface";
 // Start up the logger lib with defaults only
 const Logger = loggerFactory();
 
-interface TestContext {
-	logger: InstanceType<typeof Logger>;
-	SentryMock: any;
-	sentryLogger: InstanceType<typeof Logger>;
-}
-
-const test = anyTest as TestFn<TestContext>;
-
-test.beforeEach((t) => {
-	t.context.logger = new Logger("testClient");
-
-	const SentryMock: any = {
-		captureException: sinon.stub(),
-	};
-	const SentryLogger = loggerFactory(
-		{
-			console: {
-				enabled: true,
-			},
+const test = baseTest
+	.extend<{
+		logger: InstanceType<typeof Logger>;
+		SentryMock: { captureException: Mock };
+	}>({
+		logger: async ({}, use) => {
+			const logger = new Logger("testClient");
+			await use(logger);
 		},
-		SentryMock,
-	);
-	t.context.SentryMock = SentryMock;
-	t.context.sentryLogger = new SentryLogger("sentryClient");
+		SentryMock: async ({}, use) => {
+			const SentryMock = {
+				captureException: vi.fn(),
+			};
+			await use(SentryMock);
+		},
+	})
+	.extend<{ sentryLogger: InstanceType<typeof Logger> }>({
+		sentryLogger: async ({ SentryMock }, use) => {
+			const SentryLogger = loggerFactory(
+				{
+					console: {
+						enabled: true,
+					},
+				},
+				SentryMock as any,
+			);
+			await use(new SentryLogger("sentryClient"));
+		},
+	});
+
+test("console - should default to being silent", () => {
+	expect(Logger._silent).toBe(true);
 });
 
-test("console - should default to being silent", (t) => {
-	t.is(Logger._silent, true);
+test('console - should default to level "info"', () => {
+	expect(Logger._level).toBe(LogLevel.Info);
 });
 
-test('console - should default to level "info"', (t) => {
-	t.is(Logger._level, LogLevel.Info);
+test("replicant - should default to false", () => {
+	expect(Logger._shouldLogReplicants).toBe(false);
 });
 
-test("replicant - should default to false", (t) => {
-	t.is(Logger._shouldLogReplicants, false);
+test("replicant - should do nothing when Logger._shouldLogReplicants is false", ({
+	logger,
+}) => {
+	const info = vi.spyOn(console, "info");
+	logger.replicants("replicants");
+	expect(info).not.toBeCalled();
 });
 
-test("replicant - should do nothing when Logger._shouldLogReplicants is false", (t) => {
-	const info = sinon.spy(console, "info");
-	t.context.logger.replicants("replicants");
-	t.is(info.called, false);
-	info.restore();
-});
-
-test("logging methods should all do nothing when _silent is true", (t) => {
+test("logging methods should all do nothing when _silent is true", ({
+	logger,
+}) => {
 	Logger._silent = true;
 	Logger._level = LogLevel.Trace;
 
+	const info = vi.spyOn(console, "info");
+
 	// Trace
-	let info = sinon.spy(console, "info");
-	t.context.logger.trace("trace");
-	t.is(info.called, false);
-	info.restore();
+	logger.trace("trace");
+	expect(info).not.toBeCalled();
+	info.mockClear();
 
 	// Debug
-	info = sinon.spy(console, "info");
-	t.context.logger.debug("debug");
-	t.is(info.called, false);
-	info.restore();
+	logger.debug("debug");
+	expect(info).not.toBeCalled();
+	info.mockClear();
 
 	// Info
-	info = sinon.spy(console, "info");
-	t.context.logger.info("info");
-	t.is(info.called, false);
-	info.restore();
+	logger.info("info");
+	expect(info).not.toBeCalled();
+	info.mockClear();
 
 	// Warn
-	const warn = sinon.spy(console, "warn");
-	t.context.logger.warn("warn");
-	t.is(warn.called, false);
-	warn.restore();
+	const warn = vi.spyOn(console, "warn");
+	logger.warn("warn");
+	expect(warn).not.toBeCalled();
+	warn.mockRestore();
 
 	// Error
-	const error = sinon.spy(console, "error");
-	t.context.logger.error("error");
-	t.is(error.called, false);
-	error.restore();
+	const error = vi.spyOn(console, "error");
+	logger.error("error");
+	expect(error).not.toBeCalled();
+	error.mockRestore();
 
 	// Replicants
-	info = sinon.spy(console, "info");
-	t.context.logger.replicants("replicants");
-	t.is(info.called, false);
-	info.restore();
+	logger.replicants("replicants");
+	expect(info).not.toBeCalled();
+
+	info.mockRestore();
 });
 
-test("logging methods should all do nothing when the log level is above them", (t) => {
+test("logging methods should all do nothing when the log level is above them", ({
+	logger,
+}) => {
 	Logger._silent = false;
 	Logger._level = LogLevel.Silent;
 
+	const info = vi.spyOn(console, "info");
+
 	// Trace
-	let info = sinon.spy(console, "info");
-	t.context.logger.trace("trace");
-	t.is(info.called, false);
-	info.restore();
+	logger.trace("trace");
+	expect(info).not.toBeCalled();
+	info.mockClear();
 
 	// Debug
-	info = sinon.spy(console, "info");
-	t.context.logger.debug("debug");
-	t.is(info.called, false);
-	info.restore();
+	logger.debug("debug");
+	expect(info).not.toBeCalled();
+	info.mockClear();
 
 	// Info
-	info = sinon.spy(console, "info");
-	t.context.logger.info("info");
-	t.is(info.called, false);
-	info.restore();
+	logger.info("info");
+	expect(info).not.toBeCalled();
+	info.mockClear();
 
 	// Warn
-	const warn = sinon.spy(console, "warn");
-	t.context.logger.warn("warn");
-	t.is(warn.called, false);
-	warn.restore();
+	const warn = vi.spyOn(console, "warn");
+	logger.warn("warn");
+	expect(warn).not.toBeCalled();
+	warn.mockRestore();
 
 	// Error
-	const error = sinon.spy(console, "error");
-	t.context.logger.error("error");
-	t.is(error.called, false);
-	error.restore();
+	const error = vi.spyOn(console, "error");
+	logger.error("error");
+	expect(error).not.toBeCalled();
+	error.mockRestore();
+
+	info.mockRestore();
 });
 
-test("logging methods should all prepend the instance name to the output", (t) => {
+test("logging methods should all prepend the instance name to the output", ({
+	logger,
+}) => {
 	Logger._level = LogLevel.Trace;
 	Logger._silent = false;
 
+	const info = vi.spyOn(console, "info");
+
 	// Trace
-	let info = sinon.spy(console, "info");
-	t.context.logger.trace("trace");
-	t.deepEqual(info.getCall(0).args, ["[testClient]", "trace"]);
-	info.restore();
+	logger.trace("trace");
+	expect(info).toBeCalledWith("[testClient]", "trace");
+	info.mockClear();
 
 	// Debug
-	info = sinon.spy(console, "info");
-	t.context.logger.debug("debug");
-	t.deepEqual(info.getCall(0).args, ["[testClient]", "debug"]);
-	info.restore();
+	logger.debug("debug");
+	expect(info).toBeCalledWith("[testClient]", "debug");
+	info.mockClear();
 
 	// Info
-	info = sinon.spy(console, "info");
-	t.context.logger.info("info");
-	t.deepEqual(info.getCall(0).args, ["[testClient]", "info"]);
-	info.restore();
+	logger.info("info");
+	expect(info).toBeCalledWith("[testClient]", "info");
+	info.mockClear();
 
 	// Warn
-	const warn = sinon.spy(console, "warn");
-	t.context.logger.warn("warn");
-	t.deepEqual(warn.getCall(0).args, ["[testClient]", "warn"]);
-	warn.restore();
+	const warn = vi.spyOn(console, "warn");
+	logger.warn("warn");
+	expect(warn).toBeCalledWith("[testClient]", "warn");
+	warn.mockRestore();
 
 	// Error
-	const error = sinon.spy(console, "error");
-	t.context.logger.error("error");
-	t.deepEqual(error.getCall(0).args, ["[testClient]", "error"]);
-	error.restore();
+	const error = vi.spyOn(console, "error");
+	logger.error("error");
+	expect(error).toBeCalledWith("[testClient]", "error");
+	error.mockRestore();
 
 	// Replicants
 	Logger._shouldLogReplicants = true;
-	info = sinon.spy(console, "info");
-	t.context.logger.replicants("replicants");
-	t.deepEqual(info.getCall(0).args, ["[testClient]", "replicants"]);
-	info.restore();
+	logger.replicants("replicants");
+	expect(info).toBeCalledWith("[testClient]", "replicants");
 	Logger._shouldLogReplicants = false;
+
+	info.mockRestore();
 });
 
-test("Sentry - should log errors to Sentry when global.sentryEnabled is true", (t) => {
-	t.context.sentryLogger.error("error message");
-	t.true(t.context.SentryMock.captureException.calledOnce);
-	t.true(
-		t.context.SentryMock.captureException.firstCall.args[0] instanceof Error,
-		"first arg is Error",
-	);
-	t.is(
-		t.context.SentryMock.captureException.firstCall.args[0].message,
-		"[sentryClient] error message",
-	);
+test("Sentry - should log errors to Sentry when global.sentryEnabled is true", ({
+	sentryLogger,
+	SentryMock,
+}) => {
+	sentryLogger.error("error message");
+	expect(SentryMock.captureException).toBeCalledTimes(1);
+	expect(SentryMock.captureException.mock.calls[0][0]).toBeInstanceOf(Error);
+	expect(
+		SentryMock.captureException.mock.calls[0][0].message,
+	).toMatchInlineSnapshot(`"[sentryClient] error message"`);
 });
 
-test("Sentry - should prettyprint objects", (t) => {
-	t.context.sentryLogger.error("error message:", { foo: { bar: "baz" } });
-	t.is(
-		t.context.SentryMock.captureException.firstCall.args[0].message,
-		"[sentryClient] error message: { foo: { bar: 'baz' } }",
+test("Sentry - should prettyprint objects", ({ sentryLogger, SentryMock }) => {
+	sentryLogger.error("error message:", { foo: { bar: "baz" } });
+	expect(
+		SentryMock.captureException.mock.calls[0][0].message,
+	).toMatchInlineSnapshot(
+		`"[sentryClient] error message: { foo: { bar: 'baz' } }"`,
 	);
 });

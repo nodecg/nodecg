@@ -1,5 +1,0 @@
-{
-	"all": true,
-	"include": ["src/server", "src/shared", "src/types"],
-	"exclude": ["src/server/database/default/migration", "**/*.d.ts"]
-}

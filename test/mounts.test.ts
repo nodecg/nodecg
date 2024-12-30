@@ -1,13 +1,14 @@
-import test from "ava";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
-import * as server from "./helpers/server";
+import { expect } from "vitest";
+
+import { setupTest } from "./helpers/setup";
 import * as C from "./helpers/test-constants";
 
-server.setup();
+const test = await setupTest();
 
-test("serves files from custom mountpoints", async (t) => {
+test("serves files from custom mountpoints", async () => {
 	const response = await fetch(
 		`${C.rootUrl()}bundles/test-bundle/custom-mount/hello-world.html`,
 	);
@@ -17,12 +18,12 @@ test("serves files from custom mountpoints", async (t) => {
 		__dirname,
 		"fixtures/nodecg-core/bundles/test-bundle/custom-mount-folder/hello-world.html",
 	);
-	t.is(bodyText, fs.readFileSync(filePath, "utf-8"));
+	expect(bodyText).toBe(fs.readFileSync(filePath, "utf-8"));
 });
 
-test("returns a 404 when the file is not found", async (t) => {
+test("returns a 404 when the file is not found", async () => {
 	const response = await fetch(
 		`${C.rootUrl()}bundles/test-bundle/custom-mount/not-found.html`,
 	);
-	t.is(response.status, 404);
+	expect(response.status).toBe(404);
 });

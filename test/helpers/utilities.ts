@@ -1,12 +1,6 @@
-import type { ExecutionContext } from "ava";
 import type * as Puppeteer from "puppeteer";
 
 import type { NodeCG } from "../../src/types/nodecg";
-
-export const sleep = async (milliseconds: number): Promise<void> =>
-	new Promise((resolve) => {
-		setTimeout(resolve, milliseconds);
-	});
 
 export const waitOneTick = async (): Promise<void> =>
 	new Promise((resolve) => {
@@ -53,19 +47,13 @@ export const shadowSelector = <T extends Element>(
 		return foundDom;
 	}, selectors) as any;
 
-export function invokeAck(
-	t: ExecutionContext,
-	ack?: NodeCG.Acknowledgement,
-	...args: any[]
-): void {
+export function invokeAck(ack?: NodeCG.Acknowledgement, ...args: any[]): void {
 	if (!ack) {
-		t.fail("no callback provided");
-		return;
+		throw new Error("no callback provided");
 	}
 
 	if (ack.handled) {
-		t.fail("cb already handled");
-		return;
+		throw new Error("cb already handled");
 	}
 
 	if (args.length > 0) {

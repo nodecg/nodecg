@@ -1,150 +1,131 @@
-import test from "ava";
+import { expect, test } from "vitest";
 
 import { parseBundle } from "../../src/server/bundle-parser";
 
-test('when there is no "dashboard" folder, assign an empty array to bundle.dashboard.panels', (t) => {
+test('when there is no "dashboard" folder, assign an empty array to bundle.dashboard.panels', () => {
 	const parsedBundle = parseBundle("./test/fixtures/bundle-parser/no-panels");
-	t.true(Array.isArray(parsedBundle.dashboard.panels));
-	t.is(parsedBundle.dashboard.panels.length, 0);
+	expect(parsedBundle.dashboard.panels).toEqual([]);
 });
 
-test('when there is a "dashboard" folder but no "dashboardPanels" property, throw an error', (t) => {
-	const error = t.throws(
+test('when there is a "dashboard" folder but no "dashboardPanels" property, throw an error', () => {
+	expect(
 		parseBundle.bind(
 			parseBundle,
 			"./test/fixtures/bundle-parser/no-panels-prop",
 		),
-	);
-	if (!error) return t.fail();
-	return t.true(
-		error.message.includes('no "nodecg.dashboardPanels" property was found'),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: no-panels-prop has a "dashboard" folder, but no "nodecg.dashboardPanels" property was found in its package.json]`,
 	);
 });
 
-test('when there is a "dashboardPanels" property but no "dashboard" folder, throw an error', (t) => {
-	const error = t.throws(
+test('when there is a "dashboardPanels" property but no "dashboard" folder, throw an error', () => {
+	expect(
 		parseBundle.bind(
 			parseBundle,
 			"./test/fixtures/bundle-parser/no-dashboard-folder",
 		),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: no-dashboard-folder has a "nodecg.dashboardPanels" property in its package.json, but no "dashboard" folder]`,
 	);
-	if (!error) return t.fail();
-	return t.true(error.message.includes('but no "dashboard" folder'));
 });
 
-test('when critical properties are missing from the "dashboardPanels" property, throw an error explaining what is missing', (t) => {
-	const error = t.throws(
+test('when critical properties are missing from the "dashboardPanels" property, throw an error explaining what is missing', () => {
+	expect(
 		parseBundle.bind(
 			parseBundle,
 			"./test/fixtures/bundle-parser/missing-panel-props",
 		),
-	);
-	if (!error) return t.fail();
-	return t.true(
-		error.message.includes("the following properties: name, title, file"),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: Panel #0 could not be parsed as it is missing the following properties: name, title, file]`,
 	);
 });
 
-test("when two panels have the same name, throw an error", (t) => {
-	const error = t.throws(
+test("when two panels have the same name, throw an error", () => {
+	expect(
 		parseBundle.bind(
 			parseBundle,
 			"./test/fixtures/bundle-parser/dupe-panel-name",
 		),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: Panel #1 (test) has the same name as another panel in dupe-panel-name.]`,
 	);
-	if (!error) return t.fail();
-	return t.true(error.message.includes("has the same name as another panel"));
 });
 
-test("when a panel's file has no <!DOCTYPE>, throw an error", (t) => {
-	const error = t.throws(
+test("when a panel's file has no <!DOCTYPE>, throw an error", () => {
+	expect(
 		parseBundle.bind(parseBundle, "./test/fixtures/bundle-parser/no-doctype"),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: Panel "panel.html" in bundle "no-doctype" has no DOCTYPE,panel resizing will not work. Add <!DOCTYPE html> to it.]`,
 	);
-	if (!error) return t.fail();
-	return t.true(error.message.includes("has no DOCTYPE"));
 });
 
-test("when a panel's file has a BOM before it's <!DOCTYPE>, continue to parse it", (t) => {
+test("when a panel's file has a BOM before it's <!DOCTYPE>, continue to parse it", () => {
 	const parsedBundle = parseBundle("./test/fixtures/bundle-parser/bom-doctype");
-	t.true(Array.isArray(parsedBundle.dashboard.panels));
+	expect(Array.isArray(parsedBundle.dashboard.panels)).toBe(true);
 });
 
-test("when a panel's file does not exist, throw an error", (t) => {
-	const error = t.throws(
+test("when a panel's file does not exist, throw an error", () => {
+	expect(
 		parseBundle.bind(
 			parseBundle,
 			"./test/fixtures/bundle-parser/non-existant-panel",
 		),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: Panel file "panel.html" in bundle "non-existant-panel" does not exist.]`,
 	);
-	if (!error) return t.fail();
-	return t.true(error.message.includes(" does not exist"));
 });
 
-test("when a dialog has a workspace, throw an error", (t) => {
-	const error = t.throws(
+test("when a dialog has a workspace, throw an error", () => {
+	expect(
 		parseBundle.bind(
 			parseBundle,
 			"./test/fixtures/bundle-parser/dialog-workspace",
 		),
-	);
-	if (!error) return t.fail();
-	return t.true(
-		error.message.includes("Dialogs don't get put into workspaces"),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: Dialog "panel.html" in bundle "dialog-workspace" has a "workspace" configured. Dialogs don't get put into workspaces. Either remove the "workspace" property from this dialog, or turn it into a normal panel by setting "dialog" to false.]`,
 	);
 });
 
-test("when a dialog is fullbleed, throw an error", (t) => {
-	const error = t.throws(
+test("when a dialog is fullbleed, throw an error", () => {
+	expect(
 		parseBundle.bind(
 			parseBundle,
 			"./test/fixtures/bundle-parser/dialog-fullbleed",
 		),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: Panel "panel.html" in bundle "dialog-fullbleed" is fullbleed, but it also a dialog. Fullbleed panels cannot be dialogs. Either set fullbleed or dialog to false.]`,
 	);
-	if (!error) return t.fail();
-	return t.true(error.message.includes("Fullbleed panels cannot be dialogs"));
 });
 
-test("when a fullbleed panel has a workspace, throw an error", (t) => {
-	const error = t.throws(
+test("when a fullbleed panel has a workspace, throw an error", () => {
+	expect(
 		parseBundle.bind(
 			parseBundle,
 			"./test/fixtures/bundle-parser/fullbleed-workspace",
 		),
-	);
-	if (!error) return t.fail();
-	return t.true(
-		error.message.includes(
-			"Fullbleed panels are not allowed to define a workspace",
-		),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: Panel "panel.html" in bundle "fullbleed-workspace" is fullbleed, but it also has a workspace defined. Fullbleed panels are not allowed to define a workspace, as they are automatically put into their own workspace. Either set fullbleed to false or remove the workspace property from this panel.]`,
 	);
 });
 
-test("when a fullbleed panel has a defined width, throw an error", (t) => {
-	const error = t.throws(
+test("when a fullbleed panel has a defined width, throw an error", () => {
+	expect(
 		parseBundle.bind(
 			parseBundle,
 			"./test/fixtures/bundle-parser/fullbleed-width",
 		),
-	);
-	if (!error) return t.fail();
-	return t.true(
-		error.message.includes(
-			"Fullbleed panels have their width set based on the",
-		),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: Panel "panel.html" in bundle "fullbleed-width" is fullbleed, but it also has a width defined. Fullbleed panels have their width set based on the, width of the browser viewport. Either set fullbleed to false or remove the width property from this panel.]`,
 	);
 });
 
-test("when a panel has a workspace that begins with __nodecg, throw an error", (t) => {
-	const error = t.throws(
+test("when a panel has a workspace that begins with __nodecg, throw an error", () => {
+	expect(
 		parseBundle.bind(
 			parseBundle,
 			"./test/fixtures/bundle-parser/reserved-workspace__nodecg",
 		),
-	);
-	if (!error) return t.fail();
-	return t.true(
-		error.message.includes(
-			"whose name begins with __nodecg, which is a reserved string",
-		),
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: Panel "panel.html" in bundle "reserved-workspace__nodecg" is in a workspace whose name begins with __nodecg, which is a reserved string. Please change the name of this workspace to not begin with this string.]`,
 	);
 });

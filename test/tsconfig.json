@@ -1,19 +1,10 @@
 {
 	"extends": "../tsconfig.json",
 	"compilerOptions": {
-		"preserveSymlinks": true,
-		/**
-		 * When at a lower target than this,
-		 * the compiled functions being passed to Puppeteer
-		 * are messed up, because they expect a bunch of
-		 * injected helpers that the browser won't have,
-		 * such as __awaiter, for polyfilling the "await"
-		 * keyword on older browsers.
-		 */
-		"target": "ES2017",
+		"target": "ESNext",
+		"module": "ESNext",
 		"noEmit": true,
 		"rootDir": ".",
-		"module": "commonjs",
 		"noUncheckedIndexedAccess": false,
 		"noPropertyAccessFromIndexSignature": false
 	},

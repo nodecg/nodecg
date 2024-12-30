@@ -1,80 +1,59 @@
-import test from "ava";
+import { expect, test } from "vitest";
 
 import { parseAssets } from "../../src/server/bundle-parser/assets";
 
-test("should return the validated assetCategories", (t) => {
+test("should return the validated assetCategories", () => {
 	const categories = [
-		{
-			name: "cat1",
-			title: "Cat1",
-		},
-		{
-			name: "cat2",
-			title: "Cat2",
-			allowedTypes: ["mp4"],
-		},
+		{ name: "cat1", title: "Cat1" },
+		{ name: "cat2", title: "Cat2", allowedTypes: ["mp4"] },
 	];
-
-	t.deepEqual(
+	expect(
 		parseAssets({ name: "test-bundle", assetCategories: categories }),
-		categories,
-	);
+	).toEqual(categories);
 });
 
-test("should return an empty array when pkg.nodecg.assetCategories is falsey", (t) => {
-	t.deepEqual(parseAssets({ name: "test-bundle" }), []);
+test("should return an empty array when pkg.nodecg.assetCategories is falsey", () => {
+	expect(parseAssets({ name: "test-bundle" })).toEqual([]);
 });
 
-test("should throw an error when pkg.nodecg.assetCategories is not an Array", (t) => {
-	const error = t.throws(() =>
+test("should throw an error when pkg.nodecg.assetCategories is not an Array", () => {
+	expect(() =>
 		parseAssets({
 			name: "test-bundle",
 			// @ts-expect-error
 			assetCategories: "foo",
 		}),
-	);
-
-	if (!error) return t.fail();
-	return t.is(
-		error.message,
-		"test-bundle's nodecg.assetCategories is not an Array",
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: test-bundle's nodecg.assetCategories is not an Array]`,
 	);
 });
 
-test("should throw an error when an assetCategory lacks a name", (t) => {
-	const error = t.throws(() =>
+test("should throw an error when an assetCategory lacks a name", () => {
+	expect(() =>
 		parseAssets({
 			name: "test-bundle",
 			// @ts-expect-error
 			assetCategories: [{}],
 		}),
-	);
-
-	if (!error) return t.fail();
-	return t.is(
-		error.message,
-		'nodecg.assetCategories[0] in bundle test-bundle lacks a "name" property',
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: nodecg.assetCategories[0] in bundle test-bundle lacks a "name" property]`,
 	);
 });
 
-test("should throw an error when an assetCategory lacks a title", (t) => {
-	const error = t.throws(() =>
+test("should throw an error when an assetCategory lacks a title", () => {
+	expect(() =>
 		parseAssets({
 			name: "test-bundle",
 			// @ts-expect-error
 			assetCategories: [{ name: "category" }],
 		}),
-	);
-
-	if (!error) return t.fail();
-	return t.is(
-		error.message,
-		'nodecg.assetCategories[0] in bundle test-bundle lacks a "title" property',
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: nodecg.assetCategories[0] in bundle test-bundle lacks a "title" property]`,
 	);
 });
 
-test("should throw an error when an assetCategory's allowedTypes isn't an array", (t) => {
-	const error = t.throws(() =>
+test("should throw an error when an assetCategory's allowedTypes isn't an array", () => {
+	expect(() =>
 		parseAssets({
 			name: "test-bundle",
 			assetCategories: [
@@ -86,28 +65,19 @@ test("should throw an error when an assetCategory's allowedTypes isn't an array"
 				},
 			],
 		}),
-	);
-
-	if (!error) return t.fail();
-	return t.is(
-		error.message,
-		"nodecg.assetCategories[0].allowedTypes in bundle test-bundle is not an Array",
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: nodecg.assetCategories[0].allowedTypes in bundle test-bundle is not an Array]`,
 	);
 });
 
-test('should throw an error when an assetCategory is named "sounds"', (t) => {
-	const error = t.throws(() =>
+test('should throw an error when an assetCategory is named "sounds"', () => {
+	expect(() =>
 		parseAssets({
 			name: "test-bundle",
 			// @ts-expect-error
 			assetCategories: [{ name: "Sounds" }],
 		}),
-	);
-
-	if (!error) return t.fail();
-	return t.is(
-		error.message,
-		'"sounds" is a reserved assetCategory name. ' +
-			"Please change nodecg.assetCategories[0].name in bundle test-bundle",
+	).toThrowErrorMatchingInlineSnapshot(
+		`[Error: "sounds" is a reserved assetCategory name. Please change nodecg.assetCategories[0].name in bundle test-bundle]`,
 	);
 });

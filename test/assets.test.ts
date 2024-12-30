@@ -1,23 +1,15 @@
-import type { TestFn } from "ava";
-import anyTest from "ava";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
+import { setTimeout } from "node:timers/promises";
+
 import type * as puppeteer from "puppeteer";
+import { expect } from "vitest";
 
-import * as browser from "./helpers/browser";
-import * as server from "./helpers/server";
-
-const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
-server.setup();
-const { initDashboard } = browser.setup();
-
+import { setupTest } from "./helpers/setup";
 import * as C from "./helpers/test-constants";
 import * as util from "./helpers/utilities";
 
-let dashboard: puppeteer.Page;
-test.before(async () => {
-	dashboard = await initDashboard();
-});
+const test = await setupTest();
 
 const UPLOAD_SOURCE_PATH = path.resolve(
 	__dirname,
@@ -30,12 +22,12 @@ const TWITTER_BANNER_PATH = path.join(
 
 // Doing twice to assert file 'change' event
 for (let i = 0; i < 2; i++) {
-	test.serial(`uploading #${i}`, async (t) => {
-		const assetRep = t.context.apis.extension.Replicant("assets:assets");
+	test(`uploading #${i}`, async ({ apis, dashboard }) => {
+		const assetRep = apis.extension.Replicant("assets:assets");
 
 		// Make sure the file to upload does not exist first
 		if (i === 0) {
-			t.false(fs.existsSync(TWITTER_BANNER_PATH));
+			expect(fs.existsSync(TWITTER_BANNER_PATH)).toBe(false);
 		}
 
 		const assetTab = await util.shadowSelector(
@@ -83,29 +75,35 @@ for (let i = 0; i < 2; i++) {
 			assetCategoryEl,
 		);
 
-		t.true(fs.existsSync(TWITTER_BANNER_PATH));
+		expect(fs.existsSync(TWITTER_BANNER_PATH)).toBe(true);
 	});
 }
 
-test.serial("retrieval - 200", async (t) => {
+test("retrieval - 200", async () => {
 	const response = await fetch(
 		`${C.rootUrl()}assets/test-bundle/assets/%23twitter_banner.png`,
 	);
-	t.is(response.status, 200);
-	t.deepEqual(
-		(await response.arrayBuffer()).byteLength,
+	expect(response.status).toBe(200);
+	expect((await response.arrayBuffer()).byteLength).toBe(
 		fs.readFileSync(TWITTER_BANNER_PATH).length,
 	);
 });
 
-test.serial("retrieval - 404", async (t) => {
+test("retrieval - 404", async () => {
 	const response = await fetch(
 		`${C.rootUrl()}assets/test-bundle/assets/bad.png`,
 	);
-	t.is(response.status, 404);
+	expect(response.status).toBe(404);
 });
 
-test.serial("deletion - 200", async (t) => {
+test("deletion - 200", async ({ dashboard }) => {
+	const assetTab = await util.shadowSelector(
+		dashboard,
+		"ncg-dashboard",
+		'paper-tab[data-route="assets"]',
+	);
+	await assetTab.click();
+
 	const assetFileEl = await util.shadowSelector(
 		dashboard,
 		"ncg-dashboard",
@@ -119,14 +117,14 @@ test.serial("deletion - 200", async (t) => {
 	)) as any;
 
 	await deleteButton.click();
-	await util.sleep(500);
-	t.false(fs.existsSync(TWITTER_BANNER_PATH));
+	await setTimeout(500);
+	expect(fs.existsSync(TWITTER_BANNER_PATH)).toBe(false);
 });
 
-test.serial("deletion - 410", async (t) => {
+test("deletion - 410", async ({}) => {
 	const response = await fetch(
 		`${C.rootUrl()}assets/test-bundle/assets/bad.png`,
 		{ method: "delete" },
 	);
-	t.is(response.status, 410);
+	expect(response.status).toBe(410);
 });

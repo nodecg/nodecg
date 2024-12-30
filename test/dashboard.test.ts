@@ -1,23 +1,11 @@
-import test from "ava";
-import type * as puppeteer from "puppeteer";
+import { expect } from "vitest";
 
-import * as browser from "./helpers/browser";
-import * as server from "./helpers/server";
+import { setupTest } from "./helpers/setup";
 import * as C from "./helpers/test-constants";
 
-server.setup();
+const test = await setupTest();
 
-const { initDashboard, initStandalone } = browser.setup();
-
-let dashboard: puppeteer.Page;
-let standalone: puppeteer.Page;
-test.before(async () => {
-	dashboard = await initDashboard();
-	standalone = await initStandalone();
-});
-
-test.serial("panels - should show up on the dashboard", async (t) => {
-	setTimeout(t.fail, 1000);
+test("panels - should show up on the dashboard", async ({ dashboard }) => {
 	await dashboard.waitForFunction(() => {
 		const found = document
 			.querySelector("ncg-dashboard")!
@@ -27,97 +15,90 @@ test.serial("panels - should show up on the dashboard", async (t) => {
 			);
 		return Boolean(found);
 	});
-	t.pass();
 });
 
-test.serial("panels - should show up standalone", async (t) => {
-	setTimeout(t.fail, 1000);
+test("panels - should show up standalone", async ({ standalone }) => {
 	await standalone.waitForSelector("#test-bundle-paragraph");
-	t.pass();
 });
 
-test("panels - get default styles injected", async (t) => {
+test("panels - get default styles injected", async () => {
 	const response = await fetch(C.testPanelUrl());
-	t.is(response.status, 200);
-	t.true((await response.text()).includes("panel-defaults.css"));
+	expect(response.status).toBe(200);
+	expect(await response.text()).toMatch("panel-defaults.css");
 });
 
-test.serial(
-	"ncg-dialog - should have the buttons defined in dialogButtons",
-	async (t) => {
-		const res = await dashboard.evaluate(() => {
-			const dialog: any = window.dashboardApi.getDialog("test-dialog")!;
-			console.log(dialog);
-			dialog.open();
+test("ncg-dialog - should have the buttons defined in dialogButtons", async ({
+	dashboard,
+}) => {
+	const res = await dashboard.evaluate(() => {
+		const dialog: any = window.dashboardApi.getDialog("test-dialog")!;
+		dialog.open();
 
-			function gatherButtonStats(buttonEl: HTMLButtonElement) {
-				return {
-					confirm: buttonEl.hasAttribute("dialog-confirm"),
-					dismiss: buttonEl.hasAttribute("dialog-dismiss"),
-					text: buttonEl.textContent!.trim(),
-				};
-			}
+		function gatherButtonStats(buttonEl: HTMLButtonElement) {
+			return {
+				confirm: buttonEl.hasAttribute("dialog-confirm"),
+				dismiss: buttonEl.hasAttribute("dialog-dismiss"),
+				text: buttonEl.textContent!.trim(),
+			};
+		}
 
-			return Array.from(
-				dialog.querySelector(".buttons")!.querySelectorAll("paper-button"),
-			).map(gatherButtonStats as any);
-		});
+		return Array.from(
+			dialog.querySelector(".buttons")!.querySelectorAll("paper-button"),
+		).map(gatherButtonStats as any);
+	});
 
-		t.deepEqual(res, [
-			{
-				confirm: false,
-				dismiss: true,
-				text: "close",
-			},
-			{
-				confirm: true,
-				dismiss: false,
-				text: "accept",
-			},
-		]);
-	},
-);
+	expect(res).toEqual([
+		{
+			confirm: false,
+			dismiss: true,
+			text: "close",
+		},
+		{
+			confirm: true,
+			dismiss: false,
+			text: "accept",
+		},
+	]);
+});
 
-test.serial(
-	"ncg-dialog - should open when an element with a valid nodecg-dialog attribute is clicked",
-	async (t) => {
-		await dashboard.bringToFront();
-		await dashboard.evaluate(
-			async () =>
-				new Promise<void>((resolve, reject) => {
-					try {
-						const openDialogButton = document
-							.querySelector("ncg-dashboard")!
-							.shadowRoot!.querySelector("ncg-workspace")!
-							.shadowRoot!.querySelector(
-								'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]',
-							)!
-							.querySelector("iframe")!
-							.contentWindow!.document.querySelector("#openDialog")!;
+test("ncg-dialog - should open when an element with a valid nodecg-dialog attribute is clicked", async ({
+	dashboard,
+}) => {
+	await dashboard.bringToFront();
+	await dashboard.evaluate(
+		async () =>
+			new Promise<void>((resolve, reject) => {
+				try {
+					const openDialogButton = document
+						.querySelector("ncg-dashboard")!
+						.shadowRoot!.querySelector("ncg-workspace")!
+						.shadowRoot!.querySelector(
+							'ncg-dashboard-panel[bundle="test-bundle"][panel="test"]',
+						)!
+						.querySelector("iframe")!
+						.contentWindow!.document.querySelector("#openDialog")!;
 
-						const dialog = window.dashboardApi.getDialog("test-dialog")!;
+					const dialog = window.dashboardApi.getDialog("test-dialog")!;
 
-						const originalOpen = dialog.open;
-						const stubOpen = (): void => {
-							resolve();
-						};
+					const originalOpen = dialog.open;
+					const stubOpen = (): void => {
+						resolve();
+					};
 
-						dialog.open = stubOpen;
-						(openDialogButton as HTMLElement).click();
-						dialog.open = originalOpen;
-					} catch (error) {
-						reject(error);
-					}
-				}),
-		);
+					dialog.open = stubOpen;
+					(openDialogButton as HTMLElement).click();
+					dialog.open = originalOpen;
+				} catch (error) {
+					reject(error);
+				}
+			}),
+	);
+});
 
-		t.pass();
-	},
-);
-
-test.serial.skip(
+test(
 	"ncg-dialog - should emit dialog-confirmed when a confirm button is clicked",
-	async (t) => {
+	{ skip: true },
+	async ({ dashboard }) => {
 		await dashboard.evaluate(
 			async () =>
 				new Promise<void>((resolve) => {
@@ -137,14 +118,13 @@ test.serial.skip(
 					confirmButton.click();
 				}),
 		);
-
-		t.pass();
 	},
 );
 
-test.serial.skip(
+test(
 	"ncg-dialog - should emit dialog-dismissed when a dismiss button is clicked",
-	async (t) => {
+	{ skip: true },
+	async ({ dashboard }) => {
 		await dashboard.evaluate(
 			async () =>
 				new Promise<void>((resolve) => {
@@ -175,21 +155,19 @@ test.serial.skip(
 					dismissButton.click();
 				}),
 		);
-
-		t.pass();
 	},
 );
 
-test.serial("retrieval - 404", async (t) => {
+test("retrieval - 404", async () => {
 	const response = await fetch(
 		`${C.rootUrl()}bundles/test-bundle/dashboard/bad.png`,
 	);
-	t.is(response.status, 404);
+	expect(response.status).toBe(404);
 });
 
-test.serial("retrieval - wrong bundle is 404", async (t) => {
+test("retrieval - wrong bundle is 404", async () => {
 	const response = await fetch(
 		`${C.rootUrl()}bundles/fake-bundle/dashboard/panel.html`,
 	);
-	t.is(response.status, 404);
+	expect(response.status).toBe(404);
 });

@@ -1,37 +1,23 @@
-import type { TestFn } from "ava";
-import anyTest from "ava";
-import type * as puppeteer from "puppeteer";
+import { expect } from "vitest";
 
-import * as browser from "../helpers/browser";
-import * as server from "../helpers/server";
+import { setupTest } from "../helpers/setup";
 
-server.setup();
-const { initDashboard } = browser.setup();
-const test = anyTest as TestFn<browser.BrowserContext & server.ServerContext>;
+const test = await setupTest();
 
-let dashboard: puppeteer.Page;
-test.before(async () => {
-	dashboard = await initDashboard();
-});
-
-test.serial("should produce an error if a callback isn't given", (t) => {
-	const error = t.throws(() => {
-		t.context.apis.extension.listenFor(
+test("should produce an error if a callback isn't given", ({ apis }) => {
+	expect(() => {
+		apis.extension.listenFor(
 			"testMessageName",
 			// @ts-expect-error
 			"test",
 		);
-	});
-
-	if (!error) return t.fail();
-	return t.is(
-		error.message,
-		'argument "handler" must be a function, but you provided a(n) undefined',
+	}).toThrowErrorMatchingInlineSnapshot(
+		`[Error: argument "handler" must be a function, but you provided a(n) undefined]`,
 	);
 });
 
 // Check for basic connectivity. The rest of the tests are run from the dashboard as well.
-test.serial("should receive messages", async (t) => {
+test("should receive messages", async ({ dashboard, apis }) => {
 	await dashboard.evaluate(() => {
 		(window as any).serverToDashboardReceived = false;
 		window.dashboardApi.listenFor("serverToDashboard", () => {
@@ -40,7 +26,7 @@ test.serial("should receive messages", async (t) => {
 	});
 
 	const sendMessageInterval = setInterval(() => {
-		t.context.apis.extension.sendMessage("serverToDashboard");
+		apis.extension.sendMessage("serverToDashboard");
 	}, 500);
 
 	await dashboard.waitForFunction(
@@ -48,18 +34,11 @@ test.serial("should receive messages", async (t) => {
 	);
 
 	clearInterval(sendMessageInterval);
-	t.pass();
 });
 
-test.serial("should send messages", async (t) => {
-	t.plan(1);
-	const timeout = setTimeout(() => {
-		t.fail("Timeout");
-	}, 1000);
+test("should send messages", async ({ dashboard, apis }) => {
 	const promise = new Promise<void>((resolve) => {
-		t.context.apis.extension.listenFor("dashboardToServer", () => {
-			clearTimeout(timeout);
-			t.pass();
+		apis.extension.listenFor("dashboardToServer", () => {
 			resolve();
 		});
 	});
@@ -69,7 +48,10 @@ test.serial("should send messages", async (t) => {
 	return promise;
 });
 
-test.serial("should support multiple listenFor handlers", async (t) => {
+test("should support multiple listenFor handlers", async ({
+	dashboard,
+	apis,
+}) => {
 	await dashboard.evaluate(() => {
 		let callbacksInvoked = 0;
 		window.dashboardApi.listenFor("serverToDashboardMultiple", () => {
@@ -88,27 +70,28 @@ test.serial("should support multiple listenFor handlers", async (t) => {
 	});
 
 	// Send the message from the server to the clients.
-	t.context.apis.extension.sendMessage("serverToDashboardMultiple");
+	apis.extension.sendMessage("serverToDashboardMultiple");
 
 	// Verify that our handlers both ran.
 	await dashboard.waitForFunction(
 		() => (window as any).__serverToDashboardMultipleDone__,
 	);
-	t.pass();
 });
 
-test.serial("#bundleVersion", async (t) => {
+test("#bundleVersion", async ({ dashboard }) => {
 	const res = await dashboard.evaluate(() => window.dashboardApi.bundleVersion);
-	t.is(res, "0.0.1");
+	expect(res).toBe("0.0.1");
 });
 
-test.serial("#bundleGit", async (t) => {
+test("#bundleGit", async ({ dashboard }) => {
 	const res = await dashboard.evaluate(() => window.dashboardApi.bundleGit);
-	t.deepEqual(res, {
-		branch: "master",
-		date: "2018-07-13T17:09:29.000Z",
-		hash: "6262681c7f35eccd7293d57a50bdd25e4cd90684",
-		message: "Initial commit",
-		shortHash: "6262681",
-	});
+	expect(res).toMatchInlineSnapshot(`
+		{
+		  "branch": "master",
+		  "date": "2018-07-13T17:09:29.000Z",
+		  "hash": "6262681c7f35eccd7293d57a50bdd25e4cd90684",
+		  "message": "Initial commit",
+		  "shortHash": "6262681",
+		}
+	`);
 });

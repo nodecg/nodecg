@@ -1,73 +1,67 @@
-import test from "ava";
-import type * as puppeteer from "puppeteer";
+import { expect } from "vitest";
 
-import * as browser from "../helpers/browser";
-import * as server from "../helpers/server";
+import { setupTest } from "../helpers/setup";
 
-server.setup();
-const { initDashboard } = browser.setup();
+const test = await setupTest();
 
-let dashboard: puppeteer.Page;
-test.before(async () => {
-	dashboard = await initDashboard();
-});
-
-test.serial("#config - should exist and have length", async (t) => {
+test("#config - should exist and have length", async ({ dashboard }) => {
 	const res = await dashboard.evaluate(() => window.dashboardApi.config);
-	t.true(Object.keys(res).length > 0);
+	expect(Object.keys(res).length > 0).toBe(true);
 });
 
-test.serial("#config - shouldn't reveal sensitive information", async (t) => {
+test("#config - shouldn't reveal sensitive information", async ({
+	dashboard,
+}) => {
 	const res = await dashboard.evaluate(() => window.dashboardApi.config);
-	t.false(res.login.hasOwnProperty("sessionSecret")); // eslint-disable-line no-prototype-builtins
+	// eslint-disable-next-line no-prototype-builtins
+	expect(res.login.hasOwnProperty("sessionSecret")).toBe(false);
 });
 
-test.serial("#config - shouldn't be writable", async (t) => {
+test("#config - shouldn't be writable", async ({ dashboard }) => {
 	const res = await dashboard.evaluate(() =>
 		Object.isFrozen(window.dashboardApi.config),
 	);
-	t.true(res);
+	expect(res).toBe(true);
 });
 
-test.serial("#bundleConfig - should exist and have length", async (t) => {
+test("#bundleConfig - should exist and have length", async ({ dashboard }) => {
 	const res = await dashboard.evaluate(() => window.dashboardApi.bundleConfig);
-	t.true(Object.keys(res).length > 0);
+	expect(Object.keys(res).length > 0).toBe(true);
 });
 
-test.serial(
-	"#Logger - should exist and be the Logger constructor",
-	async (t) => {
-		const res = await dashboard.evaluate(
-			() =>
-				window.dashboardApi.Logger &&
-				typeof window.dashboardApi.Logger === "function",
-		);
-		t.true(res);
-	},
-);
+test("#Logger - should exist and be the Logger constructor", async ({
+	dashboard,
+}) => {
+	const res = await dashboard.evaluate(
+		() =>
+			window.dashboardApi.Logger &&
+			typeof window.dashboardApi.Logger === "function",
+	);
+	expect(res).toBe(true);
+});
 
-test.serial("#getDialog", async (t) => {
+test("#getDialog", async ({ dashboard }) => {
 	const res = await dashboard.evaluate(() => {
 		const dialog = window.dashboardApi.getDialog("test-dialog");
 		return dialog && dialog.tagName === "NCG-DIALOG";
 	});
-	t.true(res);
+	expect(res).toBe(true);
 });
 
-test.serial("#getDialogDocument", async (t) => {
+test("#getDialogDocument", async ({ dashboard }) => {
 	const res = await dashboard.evaluate(() => {
 		const document = window.dashboardApi.getDialogDocument("test-dialog");
 		return document?.body && document.body.tagName === "BODY";
 	});
-	t.true(res);
+	expect(res).toBe(true);
 });
 
-test.serial("#unlisten", async (t) => {
+test("#unlisten", async ({ dashboard }) => {
 	const res = await dashboard.evaluate(() => {
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		const handlerFunc = function (): void {};
 		window.dashboardApi.listenFor("unlisten", handlerFunc);
 		return window.dashboardApi.unlisten("unlisten", handlerFunc);
 	});
-	t.true(res);
+	expect(res).toBe(true);
 });
