@@ -32,7 +32,7 @@ jobs:
       - run: npm run build
       - run: npm run typetest
 
-  server-test:
+  build-test:
     strategy:
       matrix:
         node-version:
