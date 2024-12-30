@@ -86,7 +86,7 @@ jobs:
       - uses: microsoft/setup-msbuild@v1.1
         if: runner.os == 'Windows'
       - run: |
-          git config --global user.email "ci@nodecg.dev"
+          git config --global user.email "
           git config --global user.name "NodeCG Bot"
       - name: Restore Chromium dependency cache (Linux)
         uses: actions/cache@v3
