@@ -13,38 +13,24 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
+      - run: npm ci
+      - run: npm run lint
 
   test-types:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Test types
-        run: npm run typetest
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typetest
 
   build-test:
     strategy:
@@ -56,26 +42,17 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-
     runs-on: ${{matrix.os}}
-
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{matrix.node-version}}
-
-      - name: Add msbuild to PATH
+      - uses: microsoft/setup-msbuild@v1.1
         if: runner.os == 'Windows'
-        uses: microsoft/setup-msbuild@v1.1
-
-      - name: Ensure that bundle git parsing functionality works
-        run: |
+      - run: |
           git config --global user.email "ci@nodecg.dev"
           git config --global user.name "NodeCG Bot"
-
       - name: Restore Chromium dependency cache (Linux)
         uses: actions/cache@v3
         with:
@@ -83,7 +60,6 @@ jobs:
             /home/runner/.cache/puppeteer
           key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
         if: runner.os == 'Linux'
-
       - name: Restore Chromium dependency cache (Windows)
         uses: actions/cache@v3
         with:
@@ -91,15 +67,44 @@ jobs:
             C:\Users\runneradmin\.cache\puppeteer
           key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
         if: runner.os == 'Windows'
-
       - run: npm ci
-
       - run: npm run build
+      - run: npm run test-server
 
-      - run: npm run test
-
-      - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '22'
-        uses: codecov/codecov-action@v3
+  browser-test:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: microsoft/setup-msbuild@v1.1
+        if: runner.os == 'Windows'
+      - run: |
+          git config --global user.email "
+          git config --global user.name "NodeCG Bot"
+      - name: Restore Chromium dependency cache (Linux)
+        uses: actions/cache@v3
+        with:
+          path: |
+            /home/runner/.cache/puppeteer
+          key: chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+        if: runner.os == 'Linux'
+      - name: Restore Chromium dependency cache (Windows)
+        uses: actions/cache@v3
+        with:
+          path: |
+            C:\Users\runneradmin\.cache\puppeteer
+          key: chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+        if: runner.os == 'Windows'
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test-browser
 
   dry-run-container-build:
     runs-on: ubuntu-latest

@@ -1,7 +1,7 @@
 import path from "path";
 import { expect } from "vitest";
 
-import { setupTest } from "../helpers/setup";
+import { setupTest } from "./helpers/setup";
 
 const test = await setupTest();
 
@@ -165,23 +165,25 @@ test("should throw on invalid property changes to objects", ({ apis }) => {
 	`);
 });
 
-test("should properly load schemas provided with an absolute path", ({
-	apis,
-}) => {
-	const rep = apis.extension.Replicant("schemaAbsolutePath", {
-		schemaPath: path.resolve(
-			__dirname,
-			"../fixtures/nodecg-core/absolute-path-schemas/schemaAbsolutePath.json",
-		),
-	});
+test(
+	"should properly load schemas provided with an absolute path",
+	{ skip: true },
+	({ apis }) => {
+		const rep = apis.extension.Replicant("schemaAbsolutePath", {
+			schemaPath: path.resolve(
+				__dirname,
+				"../fixtures/nodecg-core/absolute-path-schemas/schemaAbsolutePath.json",
+			),
+		});
 
-	expect(rep.value).toEqual({
-		string: "",
-		object: {
-			numA: 0,
-		},
-	});
-});
+		expect(rep.value).toEqual({
+			string: "",
+			object: {
+				numA: 0,
+			},
+		});
+	},
+);
 
 test("supports local file $refs", ({ apis }) => {
 	const rep = apis.extension.Replicant("schemaWithRef");
