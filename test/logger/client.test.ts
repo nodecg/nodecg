@@ -1,11 +1,7 @@
-/**
- * TODO: USE ACTUAL BROWSER
- */
-
 import { expect, Mock, test as baseTest, vi } from "vitest";
 
-import { loggerFactory } from "../src/client/api/logger/logger.client";
-import { LogLevel } from "../src/types/logger-interface";
+import { loggerFactory } from "../../src/client/api/logger/logger.client";
+import { LogLevel } from "../../src/types/logger-interface";
 
 // Start up the logger lib with defaults only
 const Logger = loggerFactory();

@@ -4,7 +4,7 @@ import path from "node:path";
 import tmp from "tmp-promise";
 import { expect, Mock, test as baseTest, vi } from "vitest";
 
-import { loggerFactory } from "../src/server/logger/logger.server";
+import { loggerFactory } from "../../src/server/logger/logger.server";
 
 tmp.setGracefulCleanup();
 const tempFolder = tmp.dirSync().name;

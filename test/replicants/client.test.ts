@@ -1,8 +1,8 @@
 import { expect } from "vitest";
 
-import { Replicant } from "../src/server/database/default/connection";
-import type { NodeCG } from "../src/types/nodecg";
-import { setupTest } from "./helpers/setup";
+import { Replicant } from "../../src/server/database/default/connection";
+import type { NodeCG } from "../../src/types/nodecg";
+import { setupTest } from "../helpers/setup";
 
 const test = await setupTest();
 

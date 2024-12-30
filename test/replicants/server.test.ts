@@ -2,10 +2,10 @@ import timersPromises from "node:timers/promises";
 
 import { expect } from "vitest";
 
-import { Replicant } from "../src/server/database/default/connection";
-import type { AbstractReplicant } from "../src/shared/replicants.shared";
-import { setupTest } from "./helpers/setup";
-import { waitOneTick } from "./helpers/utilities";
+import { Replicant } from "../../src/server/database/default/connection";
+import type { AbstractReplicant } from "../../src/shared/replicants.shared";
+import { setupTest } from "../helpers/setup";
+import { waitOneTick } from "../helpers/utilities";
 
 const test = await setupTest();
 
