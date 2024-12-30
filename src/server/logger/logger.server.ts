@@ -1,8 +1,8 @@
+import fs from "node:fs";
 import * as path from "node:path";
 import { format, inspect } from "node:util";
 
 import type * as Sentry from "@sentry/node";
-import * as fs from "fs-extra";
 import winston from "winston";
 
 import type { LoggerInterface } from "../../types/logger-interface";
@@ -72,7 +72,7 @@ export function loggerFactory(
 
 		// Make logs folder if it does not exist.
 		if (!fs.existsSync(path.dirname(initialOpts.file.path))) {
-			fs.mkdirpSync(path.dirname(initialOpts.file.path));
+			fs.mkdirSync(path.dirname(initialOpts.file.path), { recursive: true });
 		}
 	}
 

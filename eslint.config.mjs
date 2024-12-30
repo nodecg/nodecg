@@ -56,7 +56,7 @@ export default tseslint.config(
 	configPrettier,
 	{
 		ignores: [
-			"**/*.js",
+			"**/*.{js,cjs,mjs}",
 			"node_modules",
 			"dist",
 			"out",

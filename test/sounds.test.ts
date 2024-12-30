@@ -1,6 +1,6 @@
+import fs from "node:fs";
 import path from "node:path";
 
-import fs from "fs-extra";
 import { beforeEach, expect } from "vitest";
 
 import { SetupContext, setupTest } from "./helpers/setup";
@@ -136,21 +136,11 @@ test("mixer - assignable cues - should list new sound Assets as they are uploade
 	 2. Add a sound file directly to nodecg/assets/test-bundle/sounds
 	 3. Check the list of options in the dropdown select for all assignable cues
 	 */
-	await new Promise<void>((resolve, reject) => {
-		const oggPath = path.join(C.assetsRoot(), "test-bundle/sounds/success.ogg");
-		fs.copy(
-			"test/fixtures/nodecg-core/assets/test-bundle/sounds/success.ogg",
-			oggPath,
-			(err) => {
-				if (err) {
-					reject(err);
-					return;
-				}
-
-				resolve();
-			},
-		);
-	});
+	const oggPath = path.join(C.assetsRoot(), "test-bundle/sounds/success.ogg");
+	fs.copyFileSync(
+		"test/fixtures/nodecg-core/assets/test-bundle/sounds/success.ogg",
+		oggPath,
+	);
 
 	const ret = await dashboard.evaluate(
 		async () =>

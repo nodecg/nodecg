@@ -4,7 +4,6 @@ import path from "node:path";
 import { setTimeout as legacySetTimeout } from "node:timers";
 import { setTimeout } from "node:timers/promises";
 
-import fse from "fs-extra";
 import tmp from "tmp-promise";
 import { afterAll, beforeAll, expect, test } from "vitest";
 
@@ -16,7 +15,7 @@ const tempFolder = tmp.dirSync().name;
 let bundleManager: BundleManagerTypeOnly;
 beforeAll(async () => {
 	process.env.NODECG_ROOT = tempFolder;
-	fse.copySync("test/fixtures/bundle-manager", tempFolder);
+	fs.cpSync("test/fixtures/bundle-manager", tempFolder, { recursive: true });
 
 	// The symlink test can't run on Windows unless run with admin privs.
 	// For some reason, creating symlinks on Windows requires admin.

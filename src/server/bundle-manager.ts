@@ -1,8 +1,9 @@
+import fs from 'node:fs'
+import path from "node:path";
+
 import chokidar from "chokidar";
 import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
-import fs from "fs-extra";
 import { debounce } from "lodash";
-import path from "path";
 import semver from "semver";
 
 import { TypedEmitter } from "../shared/typed-emitter";
@@ -107,7 +108,7 @@ export class BundleManager extends TypedEmitter<EventMap> {
 			// Create the "bundles" dir if it does not exist.
 			/* istanbul ignore if: We know this code works and testing it is tedious, so we don't bother to test it. */
 			if (!fs.existsSync(bundlesPath)) {
-				fs.mkdirpSync(bundlesPath);
+				fs.mkdirSync(bundlesPath, { recursive: true });
 			}
 
 			/* istanbul ignore next */

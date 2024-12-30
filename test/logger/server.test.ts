@@ -1,6 +1,6 @@
+import fs from "node:fs";
 import path from "node:path";
 
-import fs from "fs-extra";
 import tmp from "tmp-promise";
 import { expect, Mock, test as baseTest, vi } from "vitest";
 
