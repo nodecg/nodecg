@@ -206,7 +206,7 @@ function installDependencies() {
 	if (fs.existsSync("./bower.json")) {
 		process.stdout.write("Installing production bower dependencies... ");
 		try {
-			execSync("bower install --production", {
+			execSync("npx bower install --production", {
 				stdio: ["pipe", "pipe", "pipe"],
 			});
 			process.stdout.write(chalk.green("done!") + os.EOL);
