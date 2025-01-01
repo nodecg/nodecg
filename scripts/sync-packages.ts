@@ -18,6 +18,15 @@ for (const dependency of dependencies) {
 	generatedTypesPackageJson.dependencies[dependency] = version;
 }
 
+const devDependencies = Object.keys(
+	generatedTypesPackageJson.devDependencies,
+) as (keyof typeof generatedTypesPackageJson.devDependencies)[];
+
+for (const devDependency of devDependencies) {
+	const version = rootPackages[devDependency];
+	generatedTypesPackageJson.devDependencies[devDependency] = version;
+}
+
 fs.writeFileSync(
 	path.join(__dirname, "../generated-types/package.json"),
 	JSON.stringify(generatedTypesPackageJson, null, 2),

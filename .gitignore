@@ -1,6 +1,7 @@
 /dist
 /out
 .eslintcache
+*.tsbuildinfo
 
 # Node / Bower
 bower_components

@@ -20,7 +20,7 @@ const soundMetadata = new WeakMap<
 	createjs.AbstractSoundInstance,
 	{ cueName: string; updateVolume: boolean }
 >();
-const apiContexts = new Set<NodeCGAPIClient>();
+const apiContexts = new Set<NodeCGAPIClient<Record<string, any>>>();
 
 /**
  * This is what enables intra-context messaging.

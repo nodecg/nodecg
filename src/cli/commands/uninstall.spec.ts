@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { Command } from "commander";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -10,8 +9,6 @@ import { setupTmpDir } from "../test/tmp-dir.js";
 import { uninstallCommand } from "./uninstall.js";
 
 vi.mock("@inquirer/prompts", () => ({ confirm: () => Promise.resolve(true) }));
-
-const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let program: MockCommand;
 
