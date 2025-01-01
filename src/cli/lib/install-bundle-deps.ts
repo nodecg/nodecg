@@ -20,8 +20,6 @@ export function installBundleDeps(bundlePath: string, installDev = false) {
 		process.exit(1);
 	}
 
-	let cmdline;
-
 	const cachedCwd = process.cwd();
 	if (fs.existsSync(path.join(bundlePath, "package.json"))) {
 		process.chdir(bundlePath);

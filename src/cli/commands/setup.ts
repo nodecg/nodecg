@@ -1,4 +1,4 @@
-import { execFileSync, execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import stream from "node:stream/promises";
@@ -19,10 +19,7 @@ export function setupCommand(program: Command) {
 	program
 		.command("setup [version]")
 		.option("-u, --update", "Update the local NodeCG installation")
-		.option(
-			"-k, --skip-dependencies",
-			"Skip installing npm dependencies",
-		)
+		.option("-k, --skip-dependencies", "Skip installing npm dependencies")
 		.description("Install a new NodeCG instance")
 		.action(decideActionVersion);
 }
