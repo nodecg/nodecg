@@ -1,4 +1,4 @@
-const timers = new Map<string, NodeJS.Timer>();
+const timers = new Map<string, NodeJS.Timeout>();
 
 /**
  * A standard debounce, but uses a string `name` as the key instead of the callback.

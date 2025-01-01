@@ -20,7 +20,7 @@ export function serverApiFactory(
 	mount: NodeCG.Middleware,
 ) {
 	const apiContexts = new Set<
-		NodeCGAPIBase<"server", NodeCG.Bundle.UnknownConfig, ExtensionEventMap>
+		NodeCGAPIBase<"server", Record<string, any>, ExtensionEventMap>
 	>();
 
 	/**

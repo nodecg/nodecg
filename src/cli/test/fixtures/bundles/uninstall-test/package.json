@@ -1,0 +1,6 @@
+{
+  "name": "uninstall-test",
+  "nodecg": {
+    "compatibleRange": "^1.3.0"
+  }
+}
