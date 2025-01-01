@@ -20,7 +20,9 @@ beforeEach(() => {
 	fs.writeFileSync("package.json", JSON.stringify({ name: "nodecg" }));
 
 	// Copy fixtures.
-	fs.cpSync(path.resolve(dirname, "../test/fixtures/"), "./", { recursive: true });
+	fs.cpSync(path.resolve(dirname, "../test/fixtures/"), "./", {
+		recursive: true,
+	});
 
 	// Build program.
 	program = createMockProgram();

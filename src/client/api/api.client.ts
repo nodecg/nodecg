@@ -105,9 +105,9 @@ export class NodeCGAPIClient<
 				},
 				(err, response?) => {
 					if (response) {
-						cb!(err, response as T);
+						cb(err, response as T);
 					} else {
-						cb!(err);
+						cb(err);
 					}
 				},
 			);

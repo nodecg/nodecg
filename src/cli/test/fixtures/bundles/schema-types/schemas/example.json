@@ -20,10 +20,5 @@
 			"default": "disconnected"
 		}
 	},
-	"required": [
-		"ip",
-		"port",
-		"password",
-		"status"
-	]
+	"required": ["ip", "port", "password", "status"]
 }
