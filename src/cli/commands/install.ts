@@ -20,7 +20,7 @@ export function installCommand(program: Command) {
 			"Install a bundle by cloning a git repo. Can be a GitHub owner/repo pair or a git url." +
 				"\n\t\t    If run in a bundle directory with no arguments, installs that bundle's dependencies.",
 		)
-		.option("-d, --dev", "install development npm & bower dependencies")
+		.option("-d, --dev", "install development npm dependencies")
 		.action(action);
 }
 

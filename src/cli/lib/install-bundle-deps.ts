@@ -8,7 +8,7 @@ import chalk from "chalk";
 import { isBundleFolder } from "./util.js";
 
 /**
- * Installs npm and bower dependencies for the NodeCG bundle present at the given path.
+ * Installs npm dependencies for the NodeCG bundle present at the given path.
  * @param bundlePath - The path of the NodeCG bundle to install dependencies for.
  * @param installDev - Whether to install devDependencies.
  */
@@ -54,26 +54,5 @@ export function installBundleDeps(bundlePath: string, installDev = false) {
 		}
 
 		process.chdir(cachedCwd);
-	}
-
-	if (fs.existsSync(path.join(bundlePath, "bower.json"))) {
-		cmdline = installDev
-			? "npx bower install"
-			: "npx bower install --production";
-		process.stdout.write(
-			`Installing bower dependencies (dev: ${installDev})... `,
-		);
-		try {
-			execSync(cmdline, {
-				cwd: bundlePath,
-				stdio: ["pipe", "pipe", "pipe"],
-			});
-			process.stdout.write(chalk.green("done!") + os.EOL);
-		} catch (e: any) {
-			/* istanbul ignore next */
-			process.stdout.write(chalk.red("failed!") + os.EOL);
-			/* istanbul ignore next */
-			console.error(e.stack);
-		}
 	}
 }

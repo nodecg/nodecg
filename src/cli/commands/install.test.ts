@@ -24,9 +24,6 @@ it("should install a bundle and its dependencies", async () => {
 	expect(
 		fs.readdirSync("./bundles/lfg-streamtip/node_modules").length,
 	).toBeGreaterThan(0);
-	expect(
-		fs.readdirSync("./bundles/lfg-streamtip/bower_components").length,
-	).toBeGreaterThan(0);
 });
 
 it("should install a version that satisfies a provided semver range", async () => {
@@ -41,12 +38,8 @@ it("should install a version that satisfies a provided semver range", async () =
 	expect(semver.satisfies(pjson.version, "^1.1.0")).toBe(true);
 });
 
-it("should install bower & npm dependencies when run with no arguments in a bundle directory", async () => {
+it("should install npm dependencies when run with no arguments in a bundle directory", async () => {
 	fs.rmSync("./bundles/lfg-streamtip/node_modules", {
-		recursive: true,
-		force: true,
-	});
-	fs.rmSync("./bundles/lfg-streamtip/bower_components", {
 		recursive: true,
 		force: true,
 	});
@@ -54,7 +47,6 @@ it("should install bower & npm dependencies when run with no arguments in a bund
 	process.chdir("./bundles/lfg-streamtip");
 	await program.runWith("install");
 	expect(fs.readdirSync("./node_modules").length).toBeGreaterThan(0);
-	expect(fs.readdirSync("./bower_components").length).toBeGreaterThan(0);
 });
 
 it("should print an error when no valid git repo is provided", async () => {

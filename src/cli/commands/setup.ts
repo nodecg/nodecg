@@ -21,7 +21,7 @@ export function setupCommand(program: Command) {
 		.option("-u, --update", "Update the local NodeCG installation")
 		.option(
 			"-k, --skip-dependencies",
-			"Skip installing npm & bower dependencies",
+			"Skip installing npm dependencies",
 		)
 		.description("Install a new NodeCG instance")
 		.action(decideActionVersion);
@@ -201,18 +201,5 @@ function installDependencies() {
 		process.stdout.write(chalk.red("failed!") + os.EOL);
 		console.error(e.stack);
 		return;
-	}
-
-	if (fs.existsSync("./bower.json")) {
-		process.stdout.write("Installing production bower dependencies... ");
-		try {
-			execSync("npx bower install --production", {
-				stdio: ["pipe", "pipe", "pipe"],
-			});
-			process.stdout.write(chalk.green("done!") + os.EOL);
-		} catch (e: any) {
-			process.stdout.write(chalk.red("failed!") + os.EOL);
-			console.error(e.stack);
-		}
 	}
 }
