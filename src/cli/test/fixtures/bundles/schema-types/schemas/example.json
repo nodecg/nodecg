@@ -1,0 +1,29 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"ip": {
+			"type": "string",
+			"default": "localhost"
+		},
+		"port": {
+			"type": "number",
+			"default": 4444
+		},
+		"password": {
+			"type": "string",
+			"default": ""
+		},
+		"status": {
+			"type": "string",
+			"enum": ["connected", "connecting", "disconnected", "error"],
+			"default": "disconnected"
+		}
+	},
+	"required": [
+		"ip",
+		"port",
+		"password",
+		"status"
+	]
+}

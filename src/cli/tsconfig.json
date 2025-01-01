@@ -1,0 +1,29 @@
+{
+	"compilerOptions": {
+		"incremental": true,
+
+		"target": "ESNext",
+		"lib": ["ESNext"],
+
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"types": ["node"],
+
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+		"noPropertyAccessFromIndexSignature": true,
+
+		"skipLibCheck": true,
+		"noEmit": true
+	}
+}
