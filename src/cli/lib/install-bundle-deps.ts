@@ -57,7 +57,9 @@ export function installBundleDeps(bundlePath: string, installDev = false) {
 	}
 
 	if (fs.existsSync(path.join(bundlePath, "bower.json"))) {
-		cmdline = installDev ? "npx bower install" : "npx bower install --production";
+		cmdline = installDev
+			? "npx bower install"
+			: "npx bower install --production";
 		process.stdout.write(
 			`Installing bower dependencies (dev: ${installDev})... `,
 		);
