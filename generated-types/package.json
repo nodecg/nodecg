@@ -2,7 +2,7 @@
   "name": "@nodecg/types",
   "description": "Typings package for NodeCG",
   "types": "index.d.ts",
-  "version": "2.1.12",
+  "version": "0.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/nodecg/nodecg.git"
