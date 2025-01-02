@@ -9,5 +9,5 @@ const typesJson = JSON.parse(
 typesJson.version = version;
 fs.writeFileSync(
 	"./generated-types/package.json",
-	JSON.stringify(typesJson, null, 2),
+	JSON.stringify(typesJson, null, 2) + "\n",
 );
