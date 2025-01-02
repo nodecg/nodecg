@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/nodecg/nodecg/compare/v2.3.2...v2.4.0) (2025-01-02)
+
+
+### Features
+
+* database adapter system ([#763](https://github.com/nodecg/nodecg/issues/763)) ([866aa55](https://github.com/nodecg/nodecg/commit/866aa55f43cc858fac75ed260461c838a8aff0c6))
+* include CLI, deprecating `nodecg-cli` in favour of `nodecg` ([#779](https://github.com/nodecg/nodecg/issues/779)) ([7f50ba5](https://github.com/nodecg/nodecg/commit/7f50ba546cbbe899612d4c43dc7888b992e7981b))
+
 ## [2.3.2](https://github.com/nodecg/nodecg/compare/v2.3.1...v2.3.2) (2024-12-22)
 
 
