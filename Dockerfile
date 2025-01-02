@@ -39,8 +39,7 @@ RUN apt-get update \
 
 WORKDIR /opt/nodecg
 
-RUN  npm i -g nodecg-cli \
-	&& mkdir cfg bundles logs db assets
+RUN mkdir cfg bundles logs db assets
 
 COPY package.json index.js ./
 COPY --from=npm /nodecg/node_modules ./node_modules

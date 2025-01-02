@@ -55,7 +55,7 @@ test("should throw when trying to install v1 NodeCG", async () => {
 	await program.runWith("setup 1.9.0 -u --skip-dependencies");
 	expect(consoleError.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "nodecg-cli does not support NodeCG versions older than v2.0.0.",
+		  "CLI does not support NodeCG versions older than v2.0.0.",
 		]
 	`);
 });

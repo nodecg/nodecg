@@ -10,7 +10,7 @@ try {
 	execFileSync("git", ["--version"]);
 } catch {
 	console.error(
-		`nodecg-cli requires that ${chalk.cyan("git")} be available in your PATH.`,
+		`The CLI requires that ${chalk.cyan("git")} be available in your PATH.`,
 	);
 	process.exit(1);
 }
