@@ -118,9 +118,7 @@ async function decideActionVersion(
 	}
 
 	if (semver.lt(target, "v2.0.0")) {
-		console.error(
-			"CLI does not support NodeCG versions older than v2.0.0.",
-		);
+		console.error("CLI does not support NodeCG versions older than v2.0.0.");
 		return;
 	}
 
