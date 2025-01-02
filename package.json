@@ -45,7 +45,7 @@
     "fix": "npm-run-all -s fix:*",
     "fix:prettier": "prettier --write .",
     "fix:eslint": "npm run lint:eslint -- --fix ",
-    "build": "del-cli \"generated-types/{client,server,shared,types}\" dist out && run-s build:{tsc,client,copy-templates,types}",
+    "build": "del-cli \"generated-types/{client,server,shared,types}\" dist out && run-s build:{tsc,client,copy-templates,cli,types}",
     "build:tsc": "tsc -b src/server src/client src/cli",
     "build:client": "ts-node scripts/build-client.ts",
     "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server",
