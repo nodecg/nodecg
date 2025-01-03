@@ -79,7 +79,7 @@
     "@polymer/paper-tabs": "^3.1.0",
     "@polymer/paper-toast": "^3.0.1",
     "@polymer/paper-toolbar": "^3.0.1",
-    "@polymer/polymer": "^3.5.1",
+    "@polymer/polymer": "^3.5.2",
     "@sentry/browser": "^7.91.0",
     "@sentry/node": "^7.91.0",
     "@vaadin/vaadin-upload": "^4.4.3",
