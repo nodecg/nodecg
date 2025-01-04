@@ -1,9 +1,9 @@
-import { execSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
 import chalk from "chalk";
+import spawn from "nano-spawn";
 
 import { isBundleFolder } from "./util.js";
 
@@ -12,7 +12,10 @@ import { isBundleFolder } from "./util.js";
  * @param bundlePath - The path of the NodeCG bundle to install dependencies for.
  * @param installDev - Whether to install devDependencies.
  */
-export function installBundleDeps(bundlePath: string, installDev = false) {
+export async function installBundleDeps(
+	bundlePath: string,
+	installDev = false,
+) {
 	if (!isBundleFolder(bundlePath)) {
 		console.error(
 			`${chalk.red("Error:")} There doesn't seem to be a valid NodeCG bundle in this folder:\n\t${chalk.magenta(bundlePath)}`,
@@ -22,25 +25,26 @@ export function installBundleDeps(bundlePath: string, installDev = false) {
 
 	const cachedCwd = process.cwd();
 	if (fs.existsSync(path.join(bundlePath, "package.json"))) {
-		process.chdir(bundlePath);
-		let cmdline: string;
-		if (fs.existsSync(path.join(bundlePath, "yarn.lock"))) {
-			cmdline = installDev ? "yarn" : "yarn --production";
-			process.stdout.write(
-				`Installling npm dependencies with yarn (dev: ${installDev})... `,
-			);
-		} else {
-			cmdline = installDev ? "npm install" : "npm install --production";
-			process.stdout.write(
-				`Installing npm dependencies (dev: ${installDev})... `,
-			);
-		}
-
 		try {
-			execSync(cmdline, {
-				cwd: bundlePath,
-				stdio: ["pipe", "pipe", "pipe"],
-			});
+			process.chdir(bundlePath);
+			if (fs.existsSync(path.join(bundlePath, "yarn.lock"))) {
+				process.stdout.write(
+					`Installling npm dependencies with yarn (dev: ${installDev})... `,
+				);
+				await spawn("yarn", installDev ? [] : ["--production"], {
+					cwd: bundlePath,
+				});
+			} else {
+				process.stdout.write(
+					`Installing npm dependencies (dev: ${installDev})... `,
+				);
+				await spawn(
+					"npm",
+					installDev ? ["install"] : ["install", "--production"],
+					{ cwd: bundlePath },
+				);
+			}
+
 			process.stdout.write(chalk.green("done!") + os.EOL);
 		} catch (e: any) {
 			/* istanbul ignore next */

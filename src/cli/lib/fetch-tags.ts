@@ -1,8 +1,13 @@
-import { execFileSync } from "child_process";
+import spawn from "nano-spawn";
 
-export function fetchTags(repoUrl: string) {
-	return execFileSync("git", ["ls-remote", "--refs", "--tags", repoUrl])
-		.toString("utf-8")
+export async function fetchTags(repoUrl: string) {
+	const { stdout } = await spawn("git", [
+		"ls-remote",
+		"--refs",
+		"--tags",
+		repoUrl,
+	]);
+	return stdout
 		.trim()
 		.split("\n")
 		.map((rawTag) => rawTag.split("refs/tags/").at(-1))

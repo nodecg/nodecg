@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import stream from "node:stream/promises";
@@ -6,6 +5,7 @@ import stream from "node:stream/promises";
 import { confirm } from "@inquirer/prompts";
 import chalk from "chalk";
 import { Command } from "commander";
+import spawn from "nano-spawn";
 import semver from "semver";
 import * as tar from "tar";
 
@@ -58,7 +58,7 @@ async function decideActionVersion(
 
 	let tags;
 	try {
-		tags = fetchTags(NODECG_GIT_URL);
+		tags = await fetchTags(NODECG_GIT_URL);
 	} catch (error) {
 		process.stdout.write(chalk.red("failed!") + os.EOL);
 		console.error(error instanceof Error ? error.message : error);
@@ -127,7 +127,7 @@ async function decideActionVersion(
 	// Install NodeCG's dependencies
 	// This operation takes a very long time, so we don't test it.
 	if (!options.skipDependencies) {
-		installDependencies();
+		await installDependencies();
 	}
 
 	if (isUpdate) {
@@ -186,10 +186,10 @@ async function installNodecg(
 	await stream.pipeline(tarballResponse.body, tar.x({ strip: 1 }));
 }
 
-function installDependencies() {
+async function installDependencies() {
 	try {
 		process.stdout.write("Installing production npm dependencies... ");
-		execFileSync("npm", ["install", "--production"]);
+		await spawn("npm", ["install", "--production"]);
 
 		process.stdout.write(chalk.green("done!") + os.EOL);
 	} catch (e: any) {
