@@ -189,7 +189,7 @@ async function installNodecg(
 async function installDependencies() {
 	try {
 		process.stdout.write("Installing production npm dependencies... ");
-		await spawn("npm", ["install", "--production"]);
+		await spawn("npm", ["install", "--production"], { stdio: "inherit" });
 
 		process.stdout.write(chalk.green("done!") + os.EOL);
 	} catch (e: any) {
