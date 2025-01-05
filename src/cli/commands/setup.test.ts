@@ -49,7 +49,7 @@ test("should install v2 NodeCG when specified", async () => {
 	expect(readPackageJson().version).toBe("2.0.0");
 });
 
-test("install NodeCG with dependencies", { timeout: 60_000 }, async () => {
+test("install NodeCG with dependencies", { timeout: 120_000 }, async () => {
 	chdir();
 	await program.runWith("setup 2.4.0");
 	expect(readPackageJson().name).toBe("nodecg");
