@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.1](https://github.com/nodecg/nodecg/compare/v2.4.0...v2.4.1) (2025-01-05)
+
+
+### Bug Fixes
+
+* clean up `nodecg-cli` ([#783](https://github.com/nodecg/nodecg/issues/783)) ([91191e5](https://github.com/nodecg/nodecg/commit/91191e52437afecf747179b7338f23e5d91ead0f))
+* **cli:** npm install on windows ([#786](https://github.com/nodecg/nodecg/issues/786)) ([3ac4490](https://github.com/nodecg/nodecg/commit/3ac44900fc7a23739ca28996c48c67d3a824d56b))
+
 ## [2.4.0](https://github.com/nodecg/nodecg/compare/v2.3.2...v2.4.0) (2025-01-02)
 
 
