@@ -18,13 +18,17 @@ beforeEach(() => {
 	installCommand(program as unknown as Command);
 });
 
-it("should install a bundle and its dependencies", async () => {
-	await program.runWith("install supportclass/lfg-streamtip");
-	expect(fs.existsSync("./bundles/lfg-streamtip/package.json")).toBe(true);
-	expect(
-		fs.readdirSync("./bundles/lfg-streamtip/node_modules").length,
-	).toBeGreaterThan(0);
-});
+it(
+	"should install a bundle and its dependencies",
+	{ timeout: 30_000 },
+	async () => {
+		await program.runWith("install supportclass/lfg-streamtip");
+		expect(fs.existsSync("./bundles/lfg-streamtip/package.json")).toBe(true);
+		expect(
+			fs.readdirSync("./bundles/lfg-streamtip/node_modules").length,
+		).toBeGreaterThan(0);
+	},
+);
 
 it("should install a version that satisfies a provided semver range", async () => {
 	await program.runWith("install supportclass/lfg-nucleus#^1.1.0");
