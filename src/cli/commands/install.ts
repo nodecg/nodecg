@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -6,6 +5,7 @@ import path from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
 import HostedGitInfo from "hosted-git-info";
+import spawn from "nano-spawn";
 import npa from "npm-package-arg";
 import semver, { SemVer } from "semver";
 
@@ -24,12 +24,12 @@ export function installCommand(program: Command) {
 		.action(action);
 }
 
-function action(repo: string, options: { dev: boolean }) {
+async function action(repo: string, options: { dev: boolean }) {
 	const dev = options.dev || false;
 
 	// If no args are supplied, assume the user is intending to operate on the bundle in the current dir
 	if (!repo) {
-		installBundleDeps(process.cwd(), dev);
+		await installBundleDeps(process.cwd(), dev);
 		return;
 	}
 
@@ -75,7 +75,7 @@ function action(repo: string, options: { dev: boolean }) {
 	let tags;
 	let target;
 	try {
-		tags = fetchTags(repoUrl);
+		tags = await fetchTags(repoUrl);
 		target = semver.maxSatisfying(
 			tags
 				.map((tag) => semver.coerce(tag))
@@ -95,9 +95,7 @@ function action(repo: string, options: { dev: boolean }) {
 	// Clone from github
 	process.stdout.write(`Installing ${bundleName}... `);
 	try {
-		execSync(`git clone ${repoUrl} "${bundlePath}"`, {
-			stdio: ["pipe", "pipe", "pipe"],
-		});
+		await spawn("git", ["clone", repoUrl, bundlePath]);
 		process.stdout.write(chalk.green("done!") + os.EOL);
 	} catch (e: any) {
 		/* istanbul ignore next */
@@ -113,17 +111,13 @@ function action(repo: string, options: { dev: boolean }) {
 		process.stdout.write(`Checking out version ${target.version}... `);
 		try {
 			// First try the target as-is.
-			execSync(`git checkout ${target.version}`, {
-				cwd: bundlePath,
-				stdio: ["pipe", "pipe", "pipe"],
-			});
+			await spawn("git", ["checkout", target.version], { cwd: bundlePath });
 			process.stdout.write(chalk.green("done!") + os.EOL);
 		} catch (_) {
 			try {
 				// Next try prepending `v` to the target, which may have been stripped by `semver.coerce`.
-				execSync(`git checkout v${target.version}`, {
+				await spawn("git", ["checkout", `v${target.version}`], {
 					cwd: bundlePath,
-					stdio: ["pipe", "pipe", "pipe"],
 				});
 				process.stdout.write(chalk.green("done!") + os.EOL);
 			} catch (e: any) {
@@ -138,5 +132,5 @@ function action(repo: string, options: { dev: boolean }) {
 	}
 
 	// After installing the bundle, install its npm dependencies
-	installBundleDeps(bundlePath, dev);
+	await installBundleDeps(bundlePath, dev);
 }

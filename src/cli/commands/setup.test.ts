@@ -49,6 +49,14 @@ test("should install v2 NodeCG when specified", async () => {
 	expect(readPackageJson().version).toBe("2.0.0");
 });
 
+test("install NodeCG with dependencies", { timeout: 600_000 }, async () => {
+	chdir();
+	await program.runWith("setup 2.4.0");
+	expect(readPackageJson().name).toBe("nodecg");
+	expect(readPackageJson().version).toBe("2.4.0");
+	expect(fs.readdirSync(".")).toContain("node_modules");
+});
+
 test("should throw when trying to install v1 NodeCG", async () => {
 	chdir();
 	const consoleError = vi.spyOn(console, "error");
