@@ -30,11 +30,10 @@ void (async () => {
 
 		// Roll back the node_modules folder
 		fs.cpSync(tmpNodeModulesPath, rootNodeModulesPath, { recursive: true });
-		fs.rmSync(tmpNodeModulesPath, { recursive: true });
 	} finally {
 		// Clean up tmp_node_modules folder if generate() ended up with an error
 		if (fs.existsSync(tmpNodeModulesPath)) {
-			fs.renameSync(tmpNodeModulesPath, rootNodeModulesPath);
+			fs.rmSync(tmpNodeModulesPath, { recursive: true, force: true });
 		}
 	}
 })();
