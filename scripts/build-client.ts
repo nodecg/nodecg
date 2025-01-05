@@ -2,6 +2,7 @@ import * as fs from "node:fs/promises";
 
 import * as esbuild from "esbuild";
 import { copy } from "esbuild-plugin-copy";
+import { polyfillNode } from "esbuild-plugin-polyfill-node";
 
 const main = async () => {
 	const isWatch = process.argv.includes("--watch");
@@ -16,6 +17,11 @@ const main = async () => {
 		target: "es2016",
 		platform: "browser",
 		plugins: [
+			polyfillNode({
+				polyfills: {
+					events: true,
+				},
+			}),
 			copy({
 				assets: {
 					from: ["src/client/manifest.json", "src/client/favicon.ico"],

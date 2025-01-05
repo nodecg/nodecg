@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+import { EventEmitter } from "node:events";
 
 export interface Builtins {
 	newListener(event: string, listener: EventReceiver<unknown>): void;
