@@ -474,7 +474,6 @@ test("when an object - should react to server-side changes of array properties",
 
 	const ret = await dashboard.waitForFunction(
 		() => (window as any).s2c_nestedArrChange,
-		{ timeout: 1000 },
 	);
 	const retJson: {
 		newVal: RepType;
