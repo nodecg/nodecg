@@ -14,6 +14,7 @@ void (async () => {
 			recursive: true,
 			force: true,
 		});
+
 		// Install dependencies in the types package
 		await spawn("npm", ["i"], {
 			cwd: outputDir,
@@ -28,7 +29,8 @@ void (async () => {
 		await spawn("npx", ["tsc"], { cwd: outputDir, stdio: "inherit" });
 
 		// Roll back the node_modules folder
-		fs.renameSync(tmpNodeModulesPath, rootNodeModulesPath);
+		fs.cpSync(tmpNodeModulesPath, rootNodeModulesPath, { recursive: true });
+		fs.rmSync(tmpNodeModulesPath, { recursive: true });
 	} finally {
 		// Clean up tmp_node_modules folder if generate() ended up with an error
 		if (fs.existsSync(tmpNodeModulesPath)) {
