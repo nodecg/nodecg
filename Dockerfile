@@ -49,7 +49,7 @@ COPY --from=build /nodecg/scripts ./scripts
 COPY --from=build /nodecg/schemas ./schemas
 
 # Define directories that should be persisted in a volume
-VOLUME /opt/nodecg/cfg /opt/nodecg/bundles /opt/nodecg/logs /opt/nodecg/db /opt/nodecg/assets
+VOLUME /opt/nodecg/logs /opt/nodecg/db /opt/nodecg/assets
 # Define ports that should be used to communicate
 EXPOSE 9090/tcp
 
