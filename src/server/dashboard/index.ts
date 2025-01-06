@@ -3,12 +3,12 @@ import * as path from "node:path";
 import express from "express";
 import { klona as clone } from "klona/json";
 
-import { nodecgRootPath } from "../../shared/utils/rootPath";
 import type { NodeCG } from "../../types/nodecg";
 import type { BundleManager } from "../bundle-manager";
 import { config, filteredConfig, sentryEnabled } from "../config";
 import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
+import { nodecgPath } from "../util/nodecg-path";
 import { sendFile } from "../util/sendFile";
 
 type Workspace = NodeCG.Workspace;
@@ -21,7 +21,7 @@ interface DashboardContext {
 	sentryEnabled: boolean;
 }
 
-const BUILD_PATH = path.join(nodecgRootPath, "dist");
+const BUILD_PATH = path.join(nodecgPath, "dist");
 
 export class DashboardLib {
 	app = express();
@@ -35,7 +35,7 @@ export class DashboardLib {
 
 		app.use(
 			"/node_modules",
-			express.static(path.join(nodecgRootPath, "node_modules")),
+			express.static(path.join(nodecgPath, "node_modules")),
 		);
 
 		app.get("/", (_, res) => {

@@ -10,11 +10,11 @@ import { Strategy as LocalStrategy } from "passport-local";
 import SteamStrategy from "passport-steam";
 import { Strategy as TwitchStrategy } from "passport-twitch-helix";
 
-import { nodecgRootPath } from "../../shared/utils/rootPath";
 import { DatabaseAdapter } from "../../types/database-adapter";
 import type { Role, User } from "../../types/models";
 import { config } from "../config";
 import { createLogger } from "../logger";
+import { nodecgPath } from "../util/nodecg-path";
 
 type StrategyDoneCb = (
 	error: NodeJS.ErrnoException | undefined,
@@ -418,7 +418,7 @@ export function createMiddleware(
 	app.use(passport.initialize());
 	app.use(passport.session());
 
-	app.use("/login", express.static(path.join(nodecgRootPath, "dist/login")));
+	app.use("/login", express.static(path.join(nodecgPath, "dist/login")));
 
 	app.get("/login", (req, res) => {
 		// If the user is already logged in, don't show them the login page again.

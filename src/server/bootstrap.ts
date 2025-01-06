@@ -9,25 +9,25 @@
  * over its lifecycle and when the process exits.
  */
 
-import semver from "semver";
+import { isLegacyProject } from "./util/project-type";
+import { rootPath } from "./util/root-path";
 
-import { nodecgRootPath } from "../shared/utils/rootPath";
-
-const cwd = process.cwd();
-
-if (cwd !== nodecgRootPath) {
-	console.warn("[nodecg] process.cwd is %s, expected %s", cwd, nodecgRootPath);
-	process.chdir(nodecgRootPath);
-	console.info("[nodecg] Changed process.cwd to %s", nodecgRootPath);
+if (isLegacyProject) {
+	const cwd = process.cwd();
+	if (cwd !== rootPath) {
+		console.warn(`[nodecg] process.cwd is ${cwd}, expected ${rootPath}`);
+		process.chdir(rootPath);
+		console.info(`[nodecg] Changed process.cwd to ${rootPath}`);
+	}
 }
 
 import { exitOnUncaught, sentryEnabled } from "./config";
 import { NodeCGServer } from "./server";
 import { asyncExitHook } from "./util/exit-hook";
 import { gracefulExit } from "./util/exit-hook";
-import { pjson } from "./util/pjson";
+import { nodecgPackageJson } from "./util/nodecg-package-json";
 
-process.title = `NodeCG - ${pjson.version}`;
+process.title = `NodeCG - ${nodecgPackageJson.version}`;
 
 process.on("uncaughtException", (err) => {
 	if (!sentryEnabled) {
@@ -75,21 +75,3 @@ asyncExitHook(
 		minimumWait: 100,
 	},
 );
-
-// Check for updates
-fetch("https://registry.npmjs.org/nodecg/latest")
-	.then((res: any) => res.json())
-	.then((body: any) => {
-		if (semver.gt(body.version, pjson.version)) {
-			console.warn(
-				"An update is available for NodeCG: %s (current: %s)",
-				JSON.parse(body).version,
-				pjson.version,
-			);
-		}
-	})
-	.catch(
-		/* istanbul ignore next */ () => {
-			// Discard errors.
-		},
-	);

@@ -2,6 +2,9 @@ import * as path from "path";
 import * as semver from "semver";
 
 import type { NodeCG } from "../../types/nodecg";
+import { Logger } from "../logger";
+
+const logger = new Logger("bundle-parser/manifest");
 
 export function parseManifest(
 	pkg: NodeCG.PackageJSON,
@@ -26,8 +29,8 @@ export function parseManifest(
 
 	const bundleFolderName = path.parse(bundlePath).base;
 	if (bundleFolderName !== pkg.name) {
-		throw new Error(
-			`${pkg.name}'s folder is named "${bundleFolderName}". Please rename it to "${pkg.name}".`,
+		logger.warn(
+			`The project "${pkg.name}" is installed in the folder "${bundleFolderName}". Using ${pkg.name} as a bundle name.`,
 		);
 	}
 

@@ -11,6 +11,8 @@ import type { NodeCG } from "../types/nodecg";
 import { parseBundle } from "./bundle-parser";
 import { parseGit as parseBundleGit } from "./bundle-parser/git";
 import { createLogger } from "./logger";
+import { isLegacyProject } from "./util/project-type";
+import { rootPath } from "./util/root-path";
 
 /**
  * Milliseconds
@@ -162,47 +164,45 @@ export class BundleManager extends TypedEmitter<EventMap> {
 				log.error(error.stack);
 			});
 
-			// Do an initial load of each bundle in the "bundles" folder.
-			// During runtime, any changes to a bundle's "dashboard" folder will trigger a re-load of that bundle,
-			// as will changes to its `package.json`.
-			const bundleFolders = fs.readdirSync(bundlesPath);
-			bundleFolders.forEach((bundleFolderName) => {
-				const bundlePath = path.join(bundlesPath, bundleFolderName);
+			const handleBundle = (bundlePath: string) => {
 				if (!fs.statSync(bundlePath).isDirectory()) {
 					return;
 				}
 
+				const bundlePackageJson = fs.readFileSync(
+					path.join(bundlePath, "package.json"),
+					"utf-8",
+				);
+				const bundleName = JSON.parse(bundlePackageJson).name;
+
 				// Prevent attempting to load unwanted directories. Those specified above and all dot-prefixed.
-				if (
-					blacklistedBundleDirectories.includes(bundleFolderName) ||
-					bundleFolderName.startsWith(".")
-				) {
+				if (blacklistedBundleDirectories.includes(bundleName)) {
 					return;
 				}
 
-				if (nodecgConfig?.["bundles"]?.disabled?.includes(bundleFolderName)) {
+				if (nodecgConfig?.["bundles"]?.disabled?.includes(bundleName)) {
 					log.debug(
-						`Not loading bundle ${bundleFolderName} as it is disabled in config`,
+						`Not loading bundle ${bundleName} as it is disabled in config`,
 					);
 					return;
 				}
 
 				if (
 					nodecgConfig?.["bundles"]?.enabled &&
-					!nodecgConfig?.["bundles"].enabled.includes(bundleFolderName)
+					!nodecgConfig?.["bundles"].enabled.includes(bundleName)
 				) {
 					log.debug(
-						`Not loading bundle ${bundleFolderName} as it is not enabled in config`,
+						`Not loading bundle ${bundleName} as it is not enabled in config`,
 					);
 					return;
 				}
 
-				log.debug(`Loading bundle ${bundleFolderName}`);
+				log.debug(`Loading bundle ${bundleName}`);
 
 				// Parse each bundle and push the result onto the bundles array
 				const bundle = parseBundle(
 					bundlePath,
-					loadBundleCfg(cfgPath, bundleFolderName),
+					loadBundleCfg(cfgPath, bundleName),
 				);
 
 				// Check if the bundle is compatible with this version of NodeCG
@@ -228,6 +228,16 @@ export class BundleManager extends TypedEmitter<EventMap> {
 					path.join(bundlePath, "dashboard"), // Watch `dashboard` directories.
 					path.join(bundlePath, "package.json"), // Watch each bundle's `package.json`.
 				]);
+			};
+
+			if (!isLegacyProject) {
+				handleBundle(rootPath);
+			}
+
+			const bundleFolders = fs.readdirSync(bundlesPath);
+			bundleFolders.forEach((bundleFolderName) => {
+				const bundlePath = path.join(bundlesPath, bundleFolderName);
+				handleBundle(bundlePath);
 			});
 		});
 	}

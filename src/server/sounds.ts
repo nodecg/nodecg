@@ -4,10 +4,10 @@ import express from "express";
 import hasha from "hasha";
 import { klona as clone } from "klona/json";
 
-import { nodecgRootPath } from "../shared/utils/rootPath";
 import type { NodeCG } from "../types/nodecg";
 import type { Replicator } from "./replicant/replicator";
 import type { ServerReplicant } from "./replicant/server-replicant";
+import { nodecgPath } from "./util/nodecg-path";
 import { sendFile } from "./util/sendFile";
 
 export class SoundsLib {
@@ -36,7 +36,7 @@ export class SoundsLib {
 					"soundCues",
 					bundle.name,
 					{
-						schemaPath: path.resolve(nodecgRootPath, "schemas/soundCues.json"),
+						schemaPath: path.resolve(nodecgPath, "schemas/soundCues.json"),
 						defaultValue: [],
 					},
 				);
