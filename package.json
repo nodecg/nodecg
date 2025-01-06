@@ -103,7 +103,6 @@
     "events": "^3.3.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
-    "express-transform-bare-module-specifiers": "^1.0.4",
     "extend": "^3.0.2",
     "fast-equals": "^5.0.1",
     "fast-memoize": "^2.5.2",
