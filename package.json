@@ -27,7 +27,7 @@
     "AUTHORS"
   ],
   "bin": {
-    "nodecg": "out/cli.js"
+    "nodecg": "out/cli.mjs"
   },
   "scripts": {
     "start": "node index.js",
@@ -50,7 +50,7 @@
     "build:client": "tsx scripts/build-client.ts",
     "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server",
     "build:types": "tsx scripts/generate-types-package.ts",
-    "build:cli": "esbuild src/cli/bin/nodecg.ts --bundle --format=cjs --sourcemap --platform=node --target=node18 --outfile=out/cli.js --packages=external",
+    "build:cli": "esbuild src/cli/bin/nodecg.ts --bundle --format=esm --sourcemap --platform=node --target=node18 --outfile=out/cli.mjs --packages=external",
     "generate-migrations": "cd src/server && typeorm-ts-node-commonjs migration:generate ./database/migration/rename-me -d ./database/datasource.ts"
   },
   "dependencies": {
