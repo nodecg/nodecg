@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.2](https://github.com/nodecg/nodecg/compare/v2.4.1...v2.4.2) (2025-01-06)
+
+
+### Bug Fixes
+
+* **deps:** use npm-run-all2 and fix chalk reference ([#789](https://github.com/nodecg/nodecg/issues/789)) ([df0f314](https://github.com/nodecg/nodecg/commit/df0f314f1ea1469ce82c57e0355717f2a308ca15))
+* **docker:** remove bundles and cfg from VOLUME ([#791](https://github.com/nodecg/nodecg/issues/791)) ([ae71cc5](https://github.com/nodecg/nodecg/commit/ae71cc531ae73c6ee951a18b9ad3db9a462035fd))
+
 ## [2.4.1](https://github.com/nodecg/nodecg/compare/v2.4.0...v2.4.1) (2025-01-05)
 
 
