@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.3](https://github.com/nodecg/nodecg/compare/v2.4.2...v2.4.3) (2025-01-06)
+
+
+### Bug Fixes
+
+* **cli:** use ESM runtime ([#794](https://github.com/nodecg/nodecg/issues/794)) ([c084c3c](https://github.com/nodecg/nodecg/commit/c084c3c5ce6c6e859dde0b3139d4dccb02b61d4b))
+
 ## [2.4.2](https://github.com/nodecg/nodecg/compare/v2.4.1...v2.4.2) (2025-01-06)
 
 
