@@ -57,7 +57,7 @@ import { GraphicsLib } from "../graphics";
 import { createLogger } from "../logger";
 import { createSocketAuthMiddleware } from "../login/socketAuthMiddleware";
 import { MountsLib } from "../mounts";
-import { NODECG_ROOT } from "../nodecg-root";
+import { getNodecgRoot } from "../nodecg-root";
 import { Replicator } from "../replicant/replicator";
 import { SharedSourcesLib } from "../shared-sources";
 import { SoundsLib } from "../sounds";
@@ -174,10 +174,10 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			});
 		});
 
-		const bundlesPaths = [path.join(NODECG_ROOT, "bundles")].concat(
+		const bundlesPaths = [path.join(getNodecgRoot(), "bundles")].concat(
 			config.bundles?.paths ?? [],
 		);
-		const cfgPath = path.join(NODECG_ROOT, "cfg");
+		const cfgPath = path.join(getNodecgRoot(), "cfg");
 		const bundleManager = new BundleManager(
 			bundlesPaths,
 			cfgPath,
@@ -285,7 +285,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 						"https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap",
 				);
 				const opts = {
-					rootDir: NODECG_ROOT,
+					rootDir: getNodecgRoot(),
 					modulesUrl: `/bundles/${bundle.name}/node_modules`,
 				};
 				app.use(`/bundles/${bundle.name}/*`, transformMiddleware(opts));

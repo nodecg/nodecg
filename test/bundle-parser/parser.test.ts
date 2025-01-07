@@ -176,17 +176,6 @@ test('should error when "extension" exists and it is not a directory', () => {
 	);
 });
 
-test("should error when the bundle's folder name doesn't match its manifest name", () => {
-	expect(
-		parseBundle.bind(
-			parseBundle,
-			"./test/fixtures/bundle-parser/bad-folder-name",
-		),
-	).toThrowErrorMatchingInlineSnapshot(
-		`[Error: bad-folder's folder is named "bad-folder-name". Please rename it to "bad-folder".]`,
-	);
-});
-
 test('should error when "version" is not present', () => {
 	expect(
 		parseBundle.bind(

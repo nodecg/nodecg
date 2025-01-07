@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { DataSource } from "typeorm";
 export * from "./entity";
-import { NODECG_ROOT } from "../../nodecg-root";
+import { getNodecgRoot } from "../../nodecg-root";
 import { nodecgPath } from "../../util/nodecg-path";
 import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
 
@@ -24,7 +24,7 @@ export const dataSource = new DataSource({
 	 * But, bad docs aside, it is still useful
 	 * and we use it for tests.
 	 */
-	database: testing ? ":memory:" : path.join(NODECG_ROOT, "db/nodecg.sqlite3"),
+	database: testing ? ":memory:" : path.join(getNodecgRoot(), "db/nodecg.sqlite3"),
 	logging: false,
 	entities: [ApiKey, Identity, Permission, Replicant, Role, User],
 	migrations: [

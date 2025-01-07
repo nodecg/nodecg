@@ -10,7 +10,7 @@ import { z } from "zod";
 import { stringifyError } from "../shared/utils/errors";
 import type { NodeCG } from "../types/nodecg";
 import { createLogger } from "./logger";
-import { NODECG_ROOT } from "./nodecg-root";
+import { getNodecgRoot } from "./nodecg-root";
 import type { Replicator } from "./replicant/replicator";
 import type { ServerReplicant } from "./replicant/server-replicant";
 import { authCheck } from "./util/authcheck";
@@ -24,7 +24,7 @@ interface Collection {
 
 const logger = createLogger("assets");
 
-const ASSETS_ROOT = path.join(NODECG_ROOT, "assets");
+const ASSETS_ROOT = path.join(getNodecgRoot(), "assets");
 
 const createAssetFile = (filepath: string, sum: string): NodeCG.AssetFile => {
 	const parsedPath = path.parse(filepath);

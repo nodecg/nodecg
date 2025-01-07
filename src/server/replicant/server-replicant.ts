@@ -15,7 +15,7 @@ import {
 import { getSchemaDefault } from "../../shared/utils/compileJsonSchema";
 import type { NodeCG } from "../../types/nodecg";
 import { createLogger } from "../logger";
-import { NODECG_ROOT } from "../nodecg-root";
+import { getNodecgRoot } from "../nodecg-root";
 import { formatSchema } from "./schema-hacks";
 
 /**
@@ -48,7 +48,7 @@ export class ServerReplicant<
 		if (opts.schemaPath) {
 			const absoluteSchemaPath = path.isAbsolute(opts.schemaPath)
 				? opts.schemaPath
-				: path.join(NODECG_ROOT, opts.schemaPath);
+				: path.join(getNodecgRoot(), opts.schemaPath);
 			if (fs.existsSync(absoluteSchemaPath)) {
 				try {
 					const rawSchema = $RefParser.readSync(absoluteSchemaPath);
