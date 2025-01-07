@@ -34,10 +34,7 @@ export class RegistrationCoordinator {
 		const { app } = this;
 
 		this._instancesRep = replicator.declare("graphics:instances", "nodecg", {
-			schemaPath: path.resolve(
-				nodecgPath,
-				"schemas/graphics%3Ainstances.json",
-			),
+			schemaPath: path.resolve(nodecgPath, "schemas/graphics%3Ainstances.json"),
 			persistent: false,
 			defaultValue: [],
 		});
