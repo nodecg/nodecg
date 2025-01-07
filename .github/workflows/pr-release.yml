@@ -20,5 +20,10 @@ jobs:
           npm run build
           npm version 0.0.0-pr${{ github.event.number }}.${{ github.sha }} --no-git-tag-version
           npm publish --tag pr${{ github.event.number }}
+          npx tsx scripts/sync-version.ts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --access public
+        working-directory: ./generated-types
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
