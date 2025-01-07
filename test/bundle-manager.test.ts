@@ -73,10 +73,6 @@ beforeAll(async () => {
 	});
 });
 
-afterAll(() => {
-	bundleManager._stopWatching();
-});
-
 test("loader - should detect and load bundle configuration files", () => {
 	let bundle = bundleManager.find("config-test-json");
 	expect(bundle?.config).toEqual({ bundleConfig: true });

@@ -9,7 +9,8 @@ import { config, filteredConfig, sentryEnabled } from "../config";
 import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
 import { nodecgPath } from "../util/nodecg-path";
-import { sendFile } from "../util/sendFile";
+import { rootPath } from "../util/root-path";
+import { sendFile, sendNodeModulesFile } from "../util/sendFile";
 
 type Workspace = NodeCG.Workspace;
 
@@ -33,10 +34,12 @@ export class DashboardLib {
 
 		app.use(express.static(BUILD_PATH));
 
-		app.use(
-			"/node_modules",
-			express.static(path.join(nodecgPath, "node_modules")),
-		);
+		app.use("/node_modules/:filePath(.*)", (req, res, next) => {
+			const rootNodeModulesPath = path.join(rootPath, "node_modules");
+			const basePath = nodecgPath;
+			const filePath = req.params["filePath"]!;
+			sendNodeModulesFile(rootNodeModulesPath, basePath, filePath, res, next);
+		});
 
 		app.get("/", (_, res) => {
 			res.redirect("/dashboard/");

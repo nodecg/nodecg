@@ -6,7 +6,8 @@ import type { BundleManager } from "../bundle-manager";
 import type { Replicator } from "../replicant/replicator";
 import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
-import { sendFile } from "../util/sendFile";
+import { rootPath } from "../util/root-path";
+import { sendFile, sendNodeModulesFile } from "../util/sendFile";
 import { RegistrationCoordinator } from "./registration";
 
 export class GraphicsLib {
@@ -77,9 +78,8 @@ export class GraphicsLib {
 			}
 		});
 
-		// This isn't really a graphics-specific thing, should probably be in the main server lib.
 		app.get(
-			"/bundles/:bundleName/:target(bower_components|node_modules)/*",
+			"/bundles/:bundleName/bower_components/:filePath(.*)",
 			(req, res, next) => {
 				const { bundleName } = req.params;
 				const bundle = bundleManager.find(bundleName!);
@@ -88,10 +88,28 @@ export class GraphicsLib {
 					return;
 				}
 
-				const resName = req.params[0]!;
-				const parentDir = path.join(bundle.dir, req.params["target"]!);
+				const resName = req.params["filePath"]!;
+				const parentDir = path.join(bundle.dir, "bower_components");
 				const fileLocation = path.join(parentDir, resName);
 				sendFile(parentDir, fileLocation, res, next);
+			},
+		);
+
+		// This isn't really a graphics-specific thing, should probably be in the main server lib.
+		app.get(
+			"/bundles/:bundleName/node_modules/:filePath(.*)",
+			(req, res, next) => {
+				const { bundleName } = req.params;
+				const bundle = bundleManager.find(bundleName!);
+				if (!bundle) {
+					next();
+					return;
+				}
+
+				const rootNodeModulesPath = path.join(rootPath, "node_modules");
+				const basePath = bundle.dir;
+				const filePath = req.params["filePath"]!;
+				sendNodeModulesFile(rootNodeModulesPath, basePath, filePath, res, next);
 			},
 		);
 	}
