@@ -15,7 +15,7 @@ import type { Replicator } from "./replicant/replicator";
 import type { ServerReplicant } from "./replicant/server-replicant";
 import { authCheck } from "./util/authcheck";
 import { debounceName } from "./util/debounce-name";
-import { sendFile } from "./util/sendFile";
+import { sendFile } from "./util/send-file";
 
 interface Collection {
 	name: string;

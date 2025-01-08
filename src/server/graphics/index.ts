@@ -6,8 +6,10 @@ import type { BundleManager } from "../bundle-manager";
 import type { Replicator } from "../replicant/replicator";
 import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
+import { isLegacyProject } from "../util/project-type";
 import { rootPath } from "../util/root-path";
-import { sendFile, sendNodeModulesFile } from "../util/sendFile";
+import { sendFile } from "../util/send-file";
+import { sendNodeModulesFile } from "../util/send-node-modules-file";
 import { RegistrationCoordinator } from "./registration";
 
 export class GraphicsLib {
@@ -106,10 +108,23 @@ export class GraphicsLib {
 					return;
 				}
 
-				const rootNodeModulesPath = path.join(rootPath, "node_modules");
-				const basePath = bundle.dir;
 				const filePath = req.params["filePath"]!;
-				sendNodeModulesFile(rootNodeModulesPath, basePath, filePath, res, next);
+
+				if (isLegacyProject) {
+					const parentDir = path.join(bundle.dir, "node_modules");
+					const fileLocation = path.join(parentDir, filePath);
+					sendFile(parentDir, fileLocation, res, next);
+				} else {
+					const rootNodeModulesPath = path.join(rootPath, "node_modules");
+					const basePath = bundle.dir;
+					sendNodeModulesFile(
+						rootNodeModulesPath,
+						basePath,
+						filePath,
+						res,
+						next,
+					);
+				}
 			},
 		);
 	}

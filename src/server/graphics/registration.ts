@@ -8,7 +8,7 @@ import type { BundleManager } from "../bundle-manager";
 import type { Replicator } from "../replicant/replicator";
 import type { ServerReplicant } from "../replicant/server-replicant";
 import { injectScripts } from "../util/injectscripts";
-import { isChildOf } from "../util/isChildOf";
+import { isChildPath } from "../util/is-child-path";
 import { nodecgPath } from "../util/nodecg-path";
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
@@ -165,7 +165,7 @@ export class RegistrationCoordinator {
 			// If it's a HTML file, inject the graphic setup script and serve that
 			// otherwise, send the file unmodified
 			const fileLocation = path.join(BUILD_PATH, resName);
-			if (resName.endsWith(".html") && isChildOf(BUILD_PATH, fileLocation)) {
+			if (resName.endsWith(".html") && isChildPath(BUILD_PATH, fileLocation)) {
 				if (fs.existsSync(fileLocation)) {
 					injectScripts(fileLocation, "graphic", {}, (html) => res.send(html));
 				} else {

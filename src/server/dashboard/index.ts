@@ -10,7 +10,8 @@ import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
 import { nodecgPath } from "../util/nodecg-path";
 import { rootPath } from "../util/root-path";
-import { sendFile, sendNodeModulesFile } from "../util/sendFile";
+import { sendFile } from "../util/send-file";
+import { sendNodeModulesFile } from "../util/send-node-modules-file";
 
 type Workspace = NodeCG.Workspace;
 

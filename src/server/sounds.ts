@@ -8,7 +8,7 @@ import type { NodeCG } from "../types/nodecg";
 import type { Replicator } from "./replicant/replicator";
 import type { ServerReplicant } from "./replicant/server-replicant";
 import { nodecgPath } from "./util/nodecg-path";
-import { sendFile } from "./util/sendFile";
+import { sendFile } from "./util/send-file";
 
 export class SoundsLib {
 	app = express();
