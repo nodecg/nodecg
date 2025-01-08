@@ -1,14 +1,21 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import tmp from "tmp-promise";
-import { expect, Mock, test as baseTest, vi } from "vitest";
+import { afterAll, expect, Mock, test as baseTest, vi } from "vitest";
 
 import { loggerFactory } from "../../src/server/logger/logger.server";
+import { createTmpDir } from "../helpers/tmp-dir";
 
-tmp.setGracefulCleanup();
-const tempFolder = tmp.dirSync().name;
-const logsDir = path.join(tempFolder, "logs");
+const tmpDir = createTmpDir();
+afterAll(async () => {
+	try {
+		await fs.promises.rm(tmpDir, { recursive: true, force: true });
+	} catch (error) {
+		// Ignore error
+		console.error(error);
+	}
+});
+const logsDir = path.join(tmpDir, "logs");
 
 // Start up the logger lib
 const Logger = loggerFactory({

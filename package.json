@@ -192,7 +192,6 @@
     "replace-in-file": "^6.3.5",
     "simple-git": "^3.22.0",
     "sinon": "^14.0.2",
-    "tmp-promise": "^3.0.3",
     "ts-essentials": "^9.4.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",

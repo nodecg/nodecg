@@ -4,25 +4,33 @@ import path from "node:path";
 import { setTimeout as legacySetTimeout } from "node:timers";
 import { setTimeout } from "node:timers/promises";
 
-import tmp from "tmp-promise";
 import { afterAll, beforeAll, expect, test } from "vitest";
 
 import type { BundleManager as BundleManagerTypeOnly } from "../src/server/bundle-manager";
+import { createTmpDir } from "./helpers/tmp-dir";
 
-tmp.setGracefulCleanup();
-const tempFolder = tmp.dirSync().name;
+const tmpDir = createTmpDir();
+
+afterAll(async () => {
+	try {
+		await fs.promises.rm(tmpDir, { recursive: true, force: true });
+	} catch (error) {
+		// Ignore error
+		console.error(error);
+	}
+});
 
 let bundleManager: BundleManagerTypeOnly;
 beforeAll(async () => {
-	process.env.NODECG_ROOT = tempFolder;
-	fs.cpSync("test/fixtures/bundle-manager", tempFolder, { recursive: true });
+	process.env.NODECG_ROOT = tmpDir;
+	fs.cpSync("test/fixtures/bundle-manager", tmpDir, { recursive: true });
 
 	// The symlink test can't run on Windows unless run with admin privs.
 	// For some reason, creating symlinks on Windows requires admin.
 	if (os.platform() !== "win32") {
 		fs.symlinkSync(
-			path.join(tempFolder, "change-panel-symlink-target"),
-			path.join(tempFolder, "bundles/change-panel-symlink"),
+			path.join(tmpDir, "change-panel-symlink-target"),
+			path.join(tmpDir, "bundles/change-panel-symlink"),
 		);
 	}
 
@@ -37,8 +45,8 @@ beforeAll(async () => {
 	 */
 	const { BundleManager } = await import("../src/server/bundle-manager");
 	bundleManager = new BundleManager(
-		[path.join(tempFolder, "bundles"), path.join(tempFolder, "custom-bundles")],
-		path.join(tempFolder, "cfg"),
+		[path.join(tmpDir, "bundles"), path.join(tmpDir, "custom-bundles")],
+		path.join(tmpDir, "cfg"),
 		"0.7.0",
 		nodecgConfig,
 	);
@@ -105,7 +113,7 @@ test("loader - should detect and load bundle located in custom bundle paths", ()
 test("watcher - should emit a change event when the manifest file changes", async () => {
 	const manifest = JSON.parse(
 		fs.readFileSync(
-			`${tempFolder}/bundles/change-manifest/package.json`,
+			`${tmpDir}/bundles/change-manifest/package.json`,
 			"utf8",
 		),
 	);
@@ -126,7 +134,7 @@ test("watcher - should emit a change event when the manifest file changes", asyn
 	manifest._changed = true;
 	await setTimeout(100);
 	fs.writeFileSync(
-		`${tempFolder}/bundles/change-manifest/package.json`,
+		`${tmpDir}/bundles/change-manifest/package.json`,
 		JSON.stringify(manifest),
 		"utf8",
 	);
@@ -144,8 +152,8 @@ test("watcher - should remove the bundle when the manifest file is renamed", asy
 	});
 
 	fs.renameSync(
-		`${tempFolder}/bundles/rename-manifest/package.json`,
-		`${tempFolder}/bundles/rename-manifest/package.json.renamed`,
+		`${tmpDir}/bundles/rename-manifest/package.json`,
+		`${tmpDir}/bundles/rename-manifest/package.json.renamed`,
 	);
 
 	await promise;
@@ -160,7 +168,7 @@ test("watcher - should emit a removed event when the manifest file is removed", 
 		});
 	});
 
-	fs.unlinkSync(`${tempFolder}/bundles/remove-manifest/package.json`);
+	fs.unlinkSync(`${tmpDir}/bundles/remove-manifest/package.json`);
 
 	await promise;
 });
@@ -173,7 +181,7 @@ test("watcher - should emit a change event when a panel HTML file changes", asyn
 		});
 	});
 
-	const panelPath = `${tempFolder}/bundles/change-panel/dashboard/panel.html`;
+	const panelPath = `${tmpDir}/bundles/change-panel/dashboard/panel.html`;
 	let panel = fs.readFileSync(panelPath, "utf8");
 	panel += "\n";
 	fs.writeFileSync(panelPath, panel);
@@ -192,7 +200,7 @@ if (os.platform() !== "win32") {
 			});
 		});
 
-		const panelPath = `${tempFolder}/bundles/change-panel-symlink/dashboard/panel.html`;
+		const panelPath = `${tmpDir}/bundles/change-panel-symlink/dashboard/panel.html`;
 		let panel = fs.readFileSync(panelPath, "utf8");
 		panel += "\n";
 		fs.writeFileSync(panelPath, panel);
@@ -203,10 +211,10 @@ if (os.platform() !== "win32") {
 
 test("watcher - should reload the bundle's config when the bundle is reloaded due to a change", async () => {
 	const manifest = JSON.parse(
-		fs.readFileSync(`${tempFolder}/bundles/change-config/package.json`, "utf8"),
+		fs.readFileSync(`${tmpDir}/bundles/change-config/package.json`, "utf8"),
 	);
 	const config = JSON.parse(
-		fs.readFileSync(`${tempFolder}/cfg/change-config.json`, "utf8"),
+		fs.readFileSync(`${tmpDir}/cfg/change-config.json`, "utf8"),
 	);
 
 	const promise = new Promise<void>((resolve) => {
@@ -223,11 +231,11 @@ test("watcher - should reload the bundle's config when the bundle is reloaded du
 	config._changed = true;
 	manifest._changed = true;
 	fs.writeFileSync(
-		`${tempFolder}/bundles/change-config/package.json`,
+		`${tmpDir}/bundles/change-config/package.json`,
 		JSON.stringify(manifest),
 	);
 	fs.writeFileSync(
-		`${tempFolder}/cfg/change-config.json`,
+		`${tmpDir}/cfg/change-config.json`,
 		JSON.stringify(config),
 	);
 
@@ -245,7 +253,7 @@ test("watcher - should emit an `invalidBundle` error when a panel HTML file is r
 		});
 	});
 
-	fs.unlinkSync(`${tempFolder}/bundles/remove-panel/dashboard/panel.html`);
+	fs.unlinkSync(`${tmpDir}/bundles/remove-panel/dashboard/panel.html`);
 
 	await promise;
 });
@@ -256,7 +264,7 @@ test("watcher - should emit an `invalidBundle` error when the manifest becomes i
 			expect(bundle.name).toBe("invalid-manifest");
 			expect(error.message).toBe(
 				`${path.join(
-					tempFolder,
+					tmpDir,
 					"bundles/invalid-manifest/package.json",
 				)} is not valid JSON, please check it against a validator such as jsonlint.com`,
 			);
@@ -265,7 +273,7 @@ test("watcher - should emit an `invalidBundle` error when the manifest becomes i
 	});
 
 	fs.writeFileSync(
-		`${tempFolder}/bundles/invalid-manifest/package.json`,
+		`${tmpDir}/bundles/invalid-manifest/package.json`,
 		"invalid-manifest",
 	);
 
