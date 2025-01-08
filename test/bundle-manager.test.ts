@@ -112,10 +112,7 @@ test("loader - should detect and load bundle located in custom bundle paths", ()
 
 test("watcher - should emit a change event when the manifest file changes", async () => {
 	const manifest = JSON.parse(
-		fs.readFileSync(
-			`${tmpDir}/bundles/change-manifest/package.json`,
-			"utf8",
-		),
+		fs.readFileSync(`${tmpDir}/bundles/change-manifest/package.json`, "utf8"),
 	);
 
 	const promise = new Promise<string>((resolve, reject) => {
@@ -234,10 +231,7 @@ test("watcher - should reload the bundle's config when the bundle is reloaded du
 		`${tmpDir}/bundles/change-config/package.json`,
 		JSON.stringify(manifest),
 	);
-	fs.writeFileSync(
-		`${tmpDir}/cfg/change-config.json`,
-		JSON.stringify(config),
-	);
+	fs.writeFileSync(`${tmpDir}/cfg/change-config.json`, JSON.stringify(config));
 
 	await promise;
 });

@@ -169,16 +169,17 @@ export class BundleManager extends TypedEmitter<EventMap> {
 					return;
 				}
 
+				// Prevent attempting to load unwanted directories. Those specified above and all dot-prefixed.
+				const bundleFolderName = path.basename(bundlePath);
+				if (blacklistedBundleDirectories.includes(bundleFolderName)) {
+					return;
+				}
+
 				const bundlePackageJson = fs.readFileSync(
 					path.join(bundlePath, "package.json"),
 					"utf-8",
 				);
 				const bundleName = JSON.parse(bundlePackageJson).name;
-
-				// Prevent attempting to load unwanted directories. Those specified above and all dot-prefixed.
-				if (blacklistedBundleDirectories.includes(bundleName)) {
-					return;
-				}
 
 				if (nodecgConfig?.["bundles"]?.disabled?.includes(bundleName)) {
 					log.debug(
