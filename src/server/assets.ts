@@ -24,12 +24,12 @@ interface Collection {
 
 const logger = createLogger("assets");
 
-const ASSETS_ROOT = path.join(getNodecgRoot(), "assets");
+const getAssetsPath = () => path.join(getNodecgRoot(), "assets");
 
 const createAssetFile = (filepath: string, sum: string): NodeCG.AssetFile => {
 	const parsedPath = path.parse(filepath);
 	const parts = parsedPath.dir
-		.replace(ASSETS_ROOT + path.sep, "")
+		.replace(getAssetsPath() + path.sep, "")
 		.split(path.sep);
 
 	return {
@@ -44,7 +44,7 @@ const createAssetFile = (filepath: string, sum: string): NodeCG.AssetFile => {
 };
 
 const prepareNamespaceAssetsPath = (namespace: string) => {
-	const assetsPath = path.join(ASSETS_ROOT, namespace);
+	const assetsPath = path.join(getAssetsPath(), namespace);
 
 	if (!fs.existsSync(assetsPath)) {
 		fs.mkdirSync(assetsPath);
@@ -97,8 +97,9 @@ export const createAssetsMiddleware = (
 	bundles: NodeCG.Bundle[],
 	replicator: Replicator,
 ) => {
-	if (!fs.existsSync(ASSETS_ROOT)) {
-		fs.mkdirSync(ASSETS_ROOT);
+	const assetsPath = getAssetsPath();
+	if (!fs.existsSync(assetsPath)) {
+		fs.mkdirSync(assetsPath);
 	}
 
 	const collectionsRep = replicator.declare<Collection[]>(
@@ -280,7 +281,7 @@ export const createAssetsMiddleware = (
 
 	const upload = multer({
 		storage: multer.diskStorage({
-			destination: ASSETS_ROOT,
+			destination: getAssetsPath(),
 			filename: (req, file, cb) => {
 				const params = req.params;
 				cb(
@@ -307,7 +308,7 @@ export const createAssetsMiddleware = (
 		// Send the file (or an appropriate error).
 		(req, res, next) => {
 			const params = getParamsSchema.parse(req.params);
-			const parentDir = ASSETS_ROOT;
+			const parentDir = getAssetsPath();
 			const fullPath = path.join(
 				parentDir,
 				params.namespace,
@@ -364,7 +365,7 @@ export const createAssetsMiddleware = (
 		(req, res) => {
 			const params = deleteParamsSchema.parse(req.params);
 			const fullPath = path.join(
-				ASSETS_ROOT,
+				getAssetsPath(),
 				params.namespace,
 				params.category,
 				params.filename,
