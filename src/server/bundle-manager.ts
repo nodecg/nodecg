@@ -171,7 +171,10 @@ export class BundleManager extends TypedEmitter<EventMap> {
 
 				// Prevent attempting to load unwanted directories. Those specified above and all dot-prefixed.
 				const bundleFolderName = path.basename(bundlePath);
-				if (blacklistedBundleDirectories.includes(bundleFolderName)) {
+				if (
+					blacklistedBundleDirectories.includes(bundleFolderName) ||
+					bundleFolderName.startsWith(".")
+				) {
 					return;
 				}
 
