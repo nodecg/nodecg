@@ -8,5 +8,6 @@
 		"composite": true
 	},
 	"include": ["./**/*.ts", "../types/stubs.d.ts"],
+	"exclude": ["./**/*.test.ts"],
 	"references": [{ "path": "../shared" }, { "path": "../types" }]
 }
