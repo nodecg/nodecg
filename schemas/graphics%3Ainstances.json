@@ -41,7 +41,6 @@
 			"ipv4",
 			"timestamp",
 			"bundleName",
-			"bundleVersion",
 			"pathName",
 			"singleInstance",
 			"socketId",

@@ -378,7 +378,7 @@ export namespace NodeCG {
 		ipv4: string;
 		timestamp: number;
 		bundleName: string;
-		bundleVersion: string;
+		bundleVersion?: string;
 		bundleGit: Bundle.GitData;
 		pathName: string;
 		singleInstance: boolean;

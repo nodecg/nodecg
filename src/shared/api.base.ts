@@ -82,7 +82,7 @@ export abstract class NodeCGAPIBase<
 	 * The version (from package.json) of the bundle which this NodeCG API instance is for.
 	 * @name NodeCG#bundleVersion
 	 */
-	readonly bundleVersion: string;
+	readonly bundleVersion?: string;
 
 	/**
 	 * Provides information about the current git status of this bundle, if found.

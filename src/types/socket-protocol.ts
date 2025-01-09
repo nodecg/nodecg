@@ -27,7 +27,7 @@ export interface GraphicRegRequest {
 	timestamp: number;
 	pathName: string;
 	bundleName: string;
-	bundleVersion: string;
+	bundleVersion?: string;
 	bundleGit: NodeCG.Bundle.GitData;
 }
 
