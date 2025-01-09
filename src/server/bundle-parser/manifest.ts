@@ -1,37 +1,30 @@
 import * as path from "path";
-import * as semver from "semver";
 
 import type { NodeCG } from "../../types/nodecg";
-import { Logger } from "../logger";
-
-const logger = new Logger("bundle-parser/manifest");
+import { isLegacyProject } from "../util/project-type";
 
 export function parseManifest(
 	pkg: NodeCG.PackageJSON,
 	bundlePath: string,
 ): NodeCG.Manifest {
-	if (!semver.valid(pkg.version)) {
-		throw new Error(`${pkg.name}'s package.json must specify a valid version.`);
+	if (!pkg.name) {
+		throw new Error(`${bundlePath}'s package.json must specify "name".`);
 	}
 
-	// Check if this manifest has a nodecg property
-	if (!{}.hasOwnProperty.call(pkg, "nodecg")) {
-		throw new Error(
-			`${pkg.name}'s package.json lacks a "nodecg" property, and therefore cannot be parsed.`,
-		);
-	}
+	if (isLegacyProject) {
+		// Check if this manifest has a nodecg property
+		if (!{}.hasOwnProperty.call(pkg, "nodecg")) {
+			throw new Error(
+				`${pkg.name}'s package.json lacks a "nodecg" property, and therefore cannot be parsed.`,
+			);
+		}
 
-	if (!semver.validRange(pkg.nodecg.compatibleRange)) {
-		throw new Error(
-			`${pkg.name}'s package.json does not have a valid "nodecg.compatibleRange" property.`,
-		);
-	}
-
-	const bundleFolderName = path.parse(bundlePath).base;
-	if (bundleFolderName !== pkg.name) {
-		logger.warn(
-			`The project "${pkg.name}" is installed in the folder "${bundleFolderName}". Using ${pkg.name} as a bundle name.`,
-		);
+		const bundleFolderName = path.basename(bundlePath);
+		if (bundleFolderName !== pkg.name) {
+			throw new Error(
+				`${pkg.name}'s folder is named "${bundleFolderName}". Please rename it to "${pkg.name}".`,
+			);
+		}
 	}
 
 	// Grab the standard properties from the package.json that we care about.
@@ -45,7 +38,7 @@ export function parseManifest(
 		author: pkg.author,
 		contributors: pkg.contributors,
 		transformBareModuleSpecifiers: Boolean(
-			pkg.nodecg.transformBareModuleSpecifiers,
+			pkg.nodecg?.transformBareModuleSpecifiers,
 		),
 	};
 

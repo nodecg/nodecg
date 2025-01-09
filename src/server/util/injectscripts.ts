@@ -97,7 +97,7 @@ export function injectScripts(
 				// the bundle specifically lists support for v1.0.0.
 				// If it only supports v1.1.0 and on, we assume it wants the dark theme styles.
 				if (
-					createApiInstance &&
+					createApiInstance?.compatibleRange &&
 					semver.satisfies("1.0.0", createApiInstance.compatibleRange)
 				) {
 					styles.push(

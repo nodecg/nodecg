@@ -203,7 +203,7 @@ export namespace NodeCG {
 		assetCategories: Bundle.AssetCategory[];
 		mount: Bundle.Mount[];
 		soundCues: Bundle.SoundCue[];
-		compatibleRange: string;
+		compatibleRange?: string;
 		bundleDependencies?: Bundle.BundleDependencies;
 		nodecgBundleConfig: NodecgBundleConfig;
 	}

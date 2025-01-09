@@ -209,15 +209,20 @@ export class BundleManager extends TypedEmitter<EventMap> {
 					loadBundleCfg(cfgPath, bundleName),
 				);
 
-				// Check if the bundle is compatible with this version of NodeCG
-				if (!semver.satisfies(nodecgVersion, bundle.compatibleRange)) {
-					log.error(
-						"%s requires NodeCG version %s, current version is %s",
-						bundle.name,
-						bundle.compatibleRange,
-						nodecgVersion,
-					);
-					return;
+				if (isLegacyProject) {
+					if (!bundle.compatibleRange) {
+						log.error(
+							`${bundle.name}'s package.json does not have a "nodecg.compatibleRange" property.`,
+						);
+						return;
+					}
+					// Check if the bundle is compatible with this version of NodeCG
+					if (!semver.satisfies(nodecgVersion, bundle.compatibleRange)) {
+						log.error(
+							`${bundle.name} requires NodeCG version ${bundle.compatibleRange}, current version is ${nodecgVersion}`,
+						);
+						return;
+					}
 				}
 
 				bundles.push(bundle);

@@ -9,27 +9,21 @@ export function parsePanels(
 	manifest: NodeCG.Manifest,
 ): NodeCG.Bundle.Panel[] {
 	const unparsedPanels = manifest.dashboardPanels ?? undefined;
+	const dashboardDirExists = fs.existsSync(dashboardDir);
+
+	// If neither the folder nor the manifest exist, return an empty array.
+	if (!dashboardDirExists && typeof unparsedPanels === "undefined") {
+		return [];
+	}
+
 	const bundleName = manifest.name;
 	const panels: NodeCG.Bundle.Panel[] = [];
 
 	// If the dashboard folder exists but the nodecg.dashboardPanels property doesn't, throw an error.
-	if (fs.existsSync(dashboardDir) && typeof unparsedPanels === "undefined") {
+	if (dashboardDirExists && typeof unparsedPanels === "undefined") {
 		throw new Error(
-			`${bundleName} has a "dashboard" folder, ` +
-				'but no "nodecg.dashboardPanels" property was found in its package.json',
+			`${bundleName} has a "dashboard" folder, but no "nodecg.dashboardPanels" property was found in its package.json`,
 		);
-	}
-
-	// If nodecg.dashboardPanels exists but the dashboard folder doesn't, throw an error.
-	if (!fs.existsSync(dashboardDir) && typeof unparsedPanels !== "undefined") {
-		throw new Error(
-			`${bundleName} has a "nodecg.dashboardPanels" property in its package.json, but no "dashboard" folder`,
-		);
-	}
-
-	// If neither the folder nor the manifest exist, return an empty array.
-	if (!fs.existsSync(dashboardDir) && typeof unparsedPanels === "undefined") {
-		return panels;
 	}
 
 	unparsedPanels?.forEach((panel, index) => {
