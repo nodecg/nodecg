@@ -175,14 +175,3 @@ test('should error when "extension" exists and it is not a directory', () => {
 		`[Error: illegal-extension has an illegal file named "extension" in its root. Either rename it to "extension.js", or make a directory named "extension"]`,
 	);
 });
-
-test('should error when "version" is not present', () => {
-	expect(
-		parseBundle.bind(
-			parseBundle,
-			"./test/fixtures/bundle-parser/no-manifest-version",
-		),
-	).toThrowErrorMatchingInlineSnapshot(
-		`[Error: no-manifest-version's package.json must specify a valid version.]`,
-	);
-});

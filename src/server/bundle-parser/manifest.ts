@@ -1,4 +1,6 @@
-import * as path from "path";
+import * as path from "node:path";
+
+import semver from "semver";
 
 import type { NodeCG } from "../../types/nodecg";
 import { isLegacyProject } from "../util/project-type";
@@ -16,6 +18,12 @@ export function parseManifest(
 		if (!{}.hasOwnProperty.call(pkg, "nodecg")) {
 			throw new Error(
 				`${pkg.name}'s package.json lacks a "nodecg" property, and therefore cannot be parsed.`,
+			);
+		}
+
+		if (!semver.validRange(pkg.nodecg.compatibleRange)) {
+			throw new Error(
+				`${pkg.name}'s package.json does not have a valid "nodecg.compatibleRange" property.`,
 			);
 		}
 

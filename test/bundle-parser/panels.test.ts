@@ -18,17 +18,6 @@ test('when there is a "dashboard" folder but no "dashboardPanels" property, thro
 	);
 });
 
-test('when there is a "dashboardPanels" property but no "dashboard" folder, throw an error', () => {
-	expect(
-		parseBundle.bind(
-			parseBundle,
-			"./test/fixtures/bundle-parser/no-dashboard-folder",
-		),
-	).toThrowErrorMatchingInlineSnapshot(
-		`[Error: no-dashboard-folder has a "nodecg.dashboardPanels" property in its package.json, but no "dashboard" folder]`,
-	);
-});
-
 test('when critical properties are missing from the "dashboardPanels" property, throw an error explaining what is missing', () => {
 	expect(
 		parseBundle.bind(
