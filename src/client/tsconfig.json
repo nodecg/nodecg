@@ -7,7 +7,7 @@
 		"allowSyntheticDefaultImports": true,
 		"composite": true,
 		"outDir": "../../out/client",
-		"declarationDir": "../../generated-types/client",
+		"declaration": true,
 		"baseUrl": ".",
 		"paths": {
 			"@polymer/polymer": ["./types/polymer-element.d.ts"]

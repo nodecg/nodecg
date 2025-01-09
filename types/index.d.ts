@@ -2,15 +2,15 @@
 // This file is for the typings package only.
 
 /// <reference types="passport" />
-/// <reference path="./server/types/augment-express-user.d.ts" />
+/// <reference path="../out/server/types/augment-express-user.d.ts" />
 
 import { DeepReadonly } from "ts-essentials";
 
-import type { NodeCGAPIClient } from "./client/api/api.client";
-import type { serverApiFactory } from "./server/api.server";
-import type { AbstractReplicant } from "./shared/replicants.shared";
-import type * as LoggerStuff from "./types/logger-interface";
-import type { NodeCG } from "./types/nodecg";
+import type { NodeCGAPIClient } from "../out/client/api/api.client";
+import type { serverApiFactory } from "../out/server/api.server";
+import type { AbstractReplicant } from "../out/shared/replicants.shared";
+import type * as LoggerStuff from "../out/types/logger-interface";
+import type { NodeCG } from "../out/types/nodecg";
 
 type NodeCGAPIServer<
 	C extends Record<string, any> = NodeCG.Bundle.UnknownConfig,
@@ -18,7 +18,7 @@ type NodeCGAPIServer<
 	bundleConfig: DeepReadonly<C>;
 };
 
-declare module "./types/nodecg" {
+declare module "../out/types/nodecg" {
 	/**
 	 * A collection of types that describe NodeCG's APIs.
 	 */

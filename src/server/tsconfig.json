@@ -2,7 +2,7 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "../../out/server",
-		"declarationDir": "../../generated-types/server",
+		"declaration": true,
 		"rootDir": ".",
 		"module": "CommonJS",
 		"composite": true

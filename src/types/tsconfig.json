@@ -3,7 +3,7 @@
 	"compilerOptions": {
 		"rootDir": ".",
 		"outDir": "../../out/types",
-		"declarationDir": "../../generated-types/types",
+		"declaration": true,
 		"module": "CommonJS",
 		"composite": true
 	},
