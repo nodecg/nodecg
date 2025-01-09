@@ -1,4 +1,4 @@
-import type NodeCG from "../../../..";
+import type NodeCG from "../../../../types";
 import { assertNever, assertTypeOrUndefined } from "../shared/utils";
 
 type BundleConfig = { foo: { bar: "bar" } };
