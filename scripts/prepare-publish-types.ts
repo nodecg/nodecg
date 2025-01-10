@@ -10,7 +10,9 @@ packageJson.bin = undefined;
 
 const newExports: Record<string, unknown> = {};
 
-for (const exportsKey in packageJson.exports) {
+for (const exportsKey of Object.keys(packageJson.exports).filter((key) =>
+	key.startsWith("./types"),
+)) {
 	newExports[exportsKey.replace(/^\.\/types/, ".")] =
 		packageJson.exports[exportsKey];
 }

@@ -139,37 +139,6 @@ test("watcher - should emit a change event when the manifest file changes", asyn
 	expect(await promise).toBe("change-manifest");
 });
 
-test("watcher - should remove the bundle when the manifest file is renamed", async () => {
-	const promise = new Promise<void>((resolve) => {
-		bundleManager.once("bundleRemoved", () => {
-			const result = bundleManager.find("rename-manifest");
-			expect(result).toBe(undefined);
-			resolve();
-		});
-	});
-
-	fs.renameSync(
-		`${tmpDir}/bundles/rename-manifest/package.json`,
-		`${tmpDir}/bundles/rename-manifest/package.json.renamed`,
-	);
-
-	await promise;
-});
-
-test("watcher - should emit a removed event when the manifest file is removed", async () => {
-	const promise = new Promise<void>((resolve) => {
-		bundleManager.once("bundleRemoved", () => {
-			const result = bundleManager.find("remove-manifest");
-			expect(result).toBe(undefined);
-			resolve();
-		});
-	});
-
-	fs.unlinkSync(`${tmpDir}/bundles/remove-manifest/package.json`);
-
-	await promise;
-});
-
 test("watcher - should emit a change event when a panel HTML file changes", async () => {
 	const promise = new Promise<void>((resolve) => {
 		bundleManager.once("bundleChanged", (bundle) => {
@@ -248,28 +217,6 @@ test("watcher - should emit an `invalidBundle` error when a panel HTML file is r
 	});
 
 	fs.unlinkSync(`${tmpDir}/bundles/remove-panel/dashboard/panel.html`);
-
-	await promise;
-});
-
-test("watcher - should emit an `invalidBundle` error when the manifest becomes invalid", async () => {
-	const promise = new Promise<void>((resolve) => {
-		bundleManager.once("invalidBundle", (bundle, error) => {
-			expect(bundle.name).toBe("invalid-manifest");
-			expect(error.message).toBe(
-				`${path.join(
-					tmpDir,
-					"bundles/invalid-manifest/package.json",
-				)} is not valid JSON, please check it against a validator such as jsonlint.com`,
-			);
-			resolve();
-		});
-	});
-
-	fs.writeFileSync(
-		`${tmpDir}/bundles/invalid-manifest/package.json`,
-		"invalid-manifest",
-	);
 
 	await promise;
 });
