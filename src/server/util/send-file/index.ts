@@ -12,7 +12,6 @@ export function sendFile(
 ): void {
 	if (isChildPath(directoryToPreventTraversalOutOf, fileLocation)) {
 		res.sendFile(fileLocation, (error?: NodeJS.ErrnoException) => {
-			console.log(error);
 			if (!error) {
 				return;
 			}
