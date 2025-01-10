@@ -9,3 +9,9 @@ const rootPackageJson = fs.readFileSync(
 );
 
 export const isLegacyProject = JSON.parse(rootPackageJson).name === "nodecg";
+
+if (!isLegacyProject) {
+	console.warn(
+		"NodeCG is installed as a dependency. This is an experimental feature. Please report any issues you encounter.",
+	);
+}
