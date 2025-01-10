@@ -11,6 +11,7 @@ import type { NodeCG } from "../types/nodecg";
 import { parseBundle } from "./bundle-parser";
 import { parseGit as parseBundleGit } from "./bundle-parser/git";
 import { createLogger } from "./logger";
+import { isChildPath } from "./util/is-child-path";
 import { isLegacyProject } from "./util/project-type";
 import { rootPath } from "./util/root-path";
 
@@ -61,24 +62,6 @@ export class BundleManager extends TypedEmitter<EventMap> {
 
 	private readonly _cfgPath: string;
 
-	// This is on a debouncer to avoid false-positives that can happen when editing a manifest.
-	private readonly _debouncedManifestDeletionCheck = debounce(
-		(bundleName, manifestPath) => {
-			if (fs.existsSync(manifestPath)) {
-				this.handleChange(bundleName);
-			} else {
-				log.debug("Processing removed event for", bundleName);
-				log.info(
-					"%s's package.json can no longer be found on disk, assuming the bundle has been deleted or moved",
-					bundleName,
-				);
-				this.remove(bundleName);
-				this.emit("bundleRemoved", bundleName);
-			}
-		},
-		100,
-	);
-
 	private readonly _debouncedGitChangeHandler = debounce((bundleName) => {
 		const bundle = this.find(bundleName);
 		if (!bundle) {
@@ -107,15 +90,12 @@ export class BundleManager extends TypedEmitter<EventMap> {
 		bundlesPaths.forEach((bundlesPath) => {
 			log.trace(`Loading bundles from ${bundlesPath}`);
 
-			// Create the "bundles" dir if it does not exist.
-			/* istanbul ignore if: We know this code works and testing it is tedious, so we don't bother to test it. */
-			if (!fs.existsSync(bundlesPath)) {
-				fs.mkdirSync(bundlesPath, { recursive: true });
-			}
-
 			/* istanbul ignore next */
 			watcher.on("add", (filePath) => {
-				const bundleName = extractBundleName(bundlesPath, filePath);
+				const bundleName = getParentProjectName(filePath, bundlesPath);
+				if (!bundleName) {
+					return;
+				}
 
 				// In theory, the bundle parser would have thrown an error long before this block would execute,
 				// because in order for us to be adding a panel HTML file, that means that the file would have been missing,
@@ -133,7 +113,10 @@ export class BundleManager extends TypedEmitter<EventMap> {
 			});
 
 			watcher.on("change", (filePath) => {
-				const bundleName = extractBundleName(bundlesPath, filePath);
+				const bundleName = getParentProjectName(filePath, bundlesPath);
+				if (!bundleName) {
+					return;
+				}
 
 				if (
 					isManifest(bundleName, filePath) ||
@@ -146,14 +129,15 @@ export class BundleManager extends TypedEmitter<EventMap> {
 			});
 
 			watcher.on("unlink", (filePath) => {
-				const bundleName = extractBundleName(bundlesPath, filePath);
+				const bundleName = getParentProjectName(filePath, bundlesPath);
+				if (!bundleName) {
+					return;
+				}
 
 				if (this.isPanelHTMLFile(bundleName, filePath)) {
 					// This will cause NodeCG to crash, because the parser will throw an error due to
 					// a panel's HTML file no longer being present.
 					this.handleChange(bundleName);
-				} else if (isManifest(bundleName, filePath)) {
-					this._debouncedManifestDeletionCheck(bundleName, filePath);
 				} else if (isGitData(bundleName, filePath)) {
 					this._debouncedGitChangeHandler(bundleName);
 				}
@@ -243,11 +227,13 @@ export class BundleManager extends TypedEmitter<EventMap> {
 				handleBundle(rootPath);
 			}
 
-			const bundleFolders = fs.readdirSync(bundlesPath);
-			bundleFolders.forEach((bundleFolderName) => {
-				const bundlePath = path.join(bundlesPath, bundleFolderName);
-				handleBundle(bundlePath);
-			});
+			if (fs.existsSync(bundlesPath)) {
+				const bundleFolders = fs.readdirSync(bundlesPath);
+				bundleFolders.forEach((bundleFolderName) => {
+					const bundlePath = path.join(bundlesPath, bundleFolderName);
+					handleBundle(bundlePath);
+				});
+			}
 		});
 	}
 
@@ -390,16 +376,6 @@ export class BundleManager extends TypedEmitter<EventMap> {
 }
 
 /**
- * Returns the name of a bundle that owns a given path.
- * @param filePath {String} - The path of the file to extract a bundle name from.
- * @returns {String} - The name of the bundle that owns this path.
- * @private
- */
-function extractBundleName(bundlesPath: string, filePath: string): string {
-	return filePath.replace(bundlesPath, "").split(path.sep)[1]!;
-}
-
-/**
  * Checks if a given path is the manifest file for a given bundle.
  * @param bundleName {String}
  * @param filePath {String}
@@ -449,5 +425,27 @@ function loadBundleCfg(
 		throw new Error(
 			`Config for bundle "${bundleName}" could not be read. Ensure that it is valid JSON, YAML, or CommonJS.`,
 		);
+	}
+}
+
+function getParentProjectName(changePath: string, rootPath: string) {
+	if (!isChildPath(rootPath, changePath)) {
+		return false;
+	}
+	const filePath = path.join(changePath, "package.json");
+	try {
+		const fileContent = fs.readFileSync(filePath, "utf-8");
+		try {
+			const parsed = JSON.parse(fileContent);
+			return parsed.name as string;
+		} catch (error) {
+			return false;
+		}
+	} catch (error) {
+		const parentDir = path.join(changePath, "..");
+		if (parentDir === changePath) {
+			return false;
+		}
+		return getParentProjectName(parentDir, rootPath);
 	}
 }
