@@ -33,8 +33,7 @@
     "bundles/.empty_directory",
     "db/.empty_directory",
     "schemas",
-    "augment-window.d.ts",
-    "index.d.ts"
+    "types"
   ],
   "scripts": {
     "start": "node index.js",
