@@ -33,7 +33,8 @@
     "bundles/.empty_directory",
     "db/.empty_directory",
     "schemas",
-    "types"
+    "types",
+    "index.js"
   ],
   "scripts": {
     "start": "node index.js",
