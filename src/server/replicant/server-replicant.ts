@@ -57,14 +57,20 @@ export class ServerReplicant<
 			if (JSON.parse(rootPackageJson).name === namespace) {
 				return rootPath;
 			} else {
-				const bundles = fs.readdirSync(path.join(rootPath, "bundles"));
-				for (const bundleDir of bundles) {
-					const bundlePackageJson = fs.readFileSync(
-						path.join(rootPath, "bundles", bundleDir, "package.json"),
-						"utf-8",
-					);
-					if (JSON.parse(bundlePackageJson).name === namespace) {
-						return path.join(rootPath, "bundles", bundleDir);
+				const bundlesDir = path.join(rootPath, "bundles");
+				const bundlesDirStat = fs.existsSync(bundlesDir)
+					? fs.statSync(bundlesDir)
+					: null;
+				if (bundlesDirStat?.isDirectory()) {
+					const bundles = fs.readdirSync(path.join(rootPath, "bundles"));
+					for (const bundleDir of bundles) {
+						const bundlePackageJson = fs.readFileSync(
+							path.join(rootPath, "bundles", bundleDir, "package.json"),
+							"utf-8",
+						);
+						if (JSON.parse(bundlePackageJson).name === namespace) {
+							return path.join(rootPath, "bundles", bundleDir);
+						}
 					}
 				}
 				return false;
