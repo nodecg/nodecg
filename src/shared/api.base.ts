@@ -367,9 +367,6 @@ export abstract class NodeCGAPIBase<
 
 		const defaultOpts: Record<any, unknown> = {};
 		opts = opts ?? defaultOpts;
-		if (typeof opts.schemaPath === "undefined") {
-			opts.schemaPath = `bundles/${encodeURIComponent(namespace)}/schemas/${encodeURIComponent(name)}.json`;
-		}
 
 		return this._replicantFactory(name, namespace, opts);
 	}
