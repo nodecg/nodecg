@@ -9,7 +9,7 @@ import { afterAll, beforeAll, expect, test } from "vitest";
 import type { BundleManager as BundleManagerTypeOnly } from "../src/server/bundle-manager";
 import { createTmpDir } from "./helpers/tmp-dir";
 
-const tmpDir = createTmpDir();
+const tmpDir = await createTmpDir();
 
 afterAll(async () => {
 	try {

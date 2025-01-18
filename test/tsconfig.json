@@ -3,16 +3,11 @@
 	"compilerOptions": {
 		"target": "ESNext",
 		"module": "ESNext",
+		"moduleResolution": "bundler",
 		"noEmit": true,
-		"rootDir": ".",
 		"noUncheckedIndexedAccess": false,
 		"noPropertyAccessFromIndexSignature": false
 	},
-	"references": [
-		{ "path": "../src/types" },
-		{ "path": "../src/client" },
-		{ "path": "../src/server" }
-	],
 	"include": [
 		"./**/*.ts",
 

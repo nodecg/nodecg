@@ -6,7 +6,8 @@ import { afterAll, expect, Mock, test as baseTest, vi } from "vitest";
 import { loggerFactory } from "../../src/server/logger/logger.server";
 import { createTmpDir } from "../helpers/tmp-dir";
 
-const tmpDir = createTmpDir();
+const tmpDir = await createTmpDir();
+
 afterAll(async () => {
 	try {
 		await fs.promises.rm(tmpDir, { recursive: true, force: true });

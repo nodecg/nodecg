@@ -19,6 +19,7 @@ yarn-error.log
 
 # Logs
 /logs/**
+/*.log
 
 # Configs
 /cfg

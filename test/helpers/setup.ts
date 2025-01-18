@@ -26,7 +26,7 @@ export interface SetupContext {
 }
 
 export async function setupTest(nodecgConfigName = "nodecg.json") {
-	const tmpDir = createTmpDir();
+	const tmpDir = await createTmpDir();
 
 	// Tell NodeCG to look in our new temp folder for bundles, cfg, db, and assets, rather than whatever ones the user
 	// may have. We don't want to touch any existing user data!
