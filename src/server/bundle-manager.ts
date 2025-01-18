@@ -22,19 +22,17 @@ const READY_WAIT_THRESHOLD = 1000;
 
 // Start up the watcher, but don't watch any files yet.
 // We'll add the files we want to watch later, in the init() method.
-const watcher = chokidar.watch(
-	[
-		"!**/*___jb_*___", // Ignore temp files created by JetBrains IDEs
-		"!**/node_modules/**", // Ignore node_modules folders
-		"!**/bower_components/**", // Ignore bower_components folders
-		"!**/*.lock", // Ignore lockfiles
+const watcher = chokidar.watch([], {
+	persistent: true,
+	ignoreInitial: true,
+	followSymlinks: true,
+	ignored: [
+		/\/.+___jb_.+___/, // Ignore temp files created by JetBrains IDEs
+		/\/node_modules\//, // Ignore node_modules folders
+		/\/bower_components\//, // Ignore bower_components folders
+		/\/.+\.lock/, // Ignore lockfiles
 	],
-	{
-		persistent: true,
-		ignoreInitial: true,
-		followSymlinks: true,
-	},
-);
+});
 
 const blacklistedBundleDirectories = ["node_modules", "bower_components"];
 
@@ -145,7 +143,7 @@ export class BundleManager extends TypedEmitter<EventMap> {
 
 			/* istanbul ignore next */
 			watcher.on("error", (error) => {
-				log.error(error.stack);
+				log.error((error as Error).stack);
 			});
 
 			const handleBundle = (bundlePath: string) => {

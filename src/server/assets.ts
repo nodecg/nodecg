@@ -1,5 +1,5 @@
-import * as fs from "node:fs";
-import * as path from "node:path";
+import fs from "node:fs";
+import path, { extname } from "node:path";
 
 import chokidar from "chokidar";
 import express from "express";
@@ -136,7 +136,7 @@ export const createAssetsMiddleware = (
 		});
 	}
 
-	const watchPatterns = new Set<string>();
+	const watchDirs: { path: string; types: string[] }[] = [];
 
 	for (const collection of collections) {
 		const namespacedAssetsPath = prepareNamespaceAssetsPath(collection.name);
@@ -172,20 +172,41 @@ export const createAssetsMiddleware = (
 			);
 
 			if (category.allowedTypes && category.allowedTypes.length > 0) {
-				category.allowedTypes.forEach((type) => {
-					watchPatterns.add(`${categoryPath}/**/*.${type}`);
+				watchDirs.push({
+					path: categoryPath,
+					types: category.allowedTypes ?? [],
 				});
 			} else {
-				watchPatterns.add(`${categoryPath}/**/*`);
+				watchDirs.push({
+					path: categoryPath,
+					types: [],
+				});
 			}
 		}
 	}
 
 	// Chokidar does not accept Windows-style path separators when using globs
-	const fixedPaths = Array.from(watchPatterns).map((pattern) =>
-		pattern.replace(/\\/g, "/"),
+	const fixedPaths = Array.from(watchDirs).map((pattern) => ({
+		...pattern,
+		path: pattern.path.replace(/\\/g, "/"),
+	}));
+	const watcher = chokidar.watch(
+		fixedPaths.map((path) => path.path),
+		{
+			ignored: (val, stats) => {
+				if (!stats?.isFile()) {
+					return false;
+				}
+				for (const path of fixedPaths) {
+					if (val.startsWith(path.path)) {
+						const matchesType = path.types.includes(extname(val).slice(1));
+						return !matchesType; // If it matches the type, don't ignore it.
+					}
+				}
+				return false;
+			},
+		},
 	);
-	const watcher = chokidar.watch(fixedPaths, { ignored: "**/.*" });
 
 	/**
 	 * When the Chokidar watcher first starts up, it will fire an 'add' event for each file found.
@@ -274,7 +295,7 @@ export const createAssetsMiddleware = (
 	});
 
 	watcher.on("error", (e) => {
-		logger.error(e.stack);
+		logger.error((e as Error).stack);
 	});
 
 	const assetsRouter = express.Router();
