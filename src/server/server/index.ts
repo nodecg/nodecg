@@ -34,7 +34,6 @@ import path = require("path");
 import bodyParser from "body-parser";
 import compression from "compression";
 import express from "express";
-import transformMiddleware from "express-transform-bare-module-specifiers";
 import memoize from "fast-memoize";
 import type { Server } from "http";
 import { klona as clone } from "klona/json";
@@ -274,23 +273,6 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 				handled = true;
 				clearTimeout(timeout);
 				resolve();
-			}
-		});
-
-		bundleManager.all().forEach((bundle) => {
-			// TODO: remove this feature in v3
-			if (bundle.transformBareModuleSpecifiers) {
-				log.warn(
-					`${bundle.name} uses the deprecated "transformBareModuleSpecifiers" feature. ` +
-						"This feature will be removed in NodeCG v3. " +
-						"Please migrate to using browser-native import maps instead: " +
-						"https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap",
-				);
-				const opts = {
-					rootDir: NODECG_ROOT,
-					modulesUrl: `/bundles/${bundle.name}/node_modules`,
-				};
-				app.use(`/bundles/${bundle.name}/*`, transformMiddleware(opts));
 			}
 		});
 

@@ -41,9 +41,6 @@ export function parseManifest(
 		homepage: pkg.homepage,
 		author: pkg.author,
 		contributors: pkg.contributors,
-		transformBareModuleSpecifiers: Boolean(
-			pkg.nodecg.transformBareModuleSpecifiers,
-		),
 	};
 
 	return manifest;
