@@ -3,7 +3,7 @@ import path from "path";
 
 import type { NodeCG } from "../types/nodecg";
 import { authCheck } from "./util/authcheck";
-import { sendFile } from "./util/sendFile";
+import { sendFile } from "./util/send-file";
 
 export class SharedSourcesLib {
 	app = express();

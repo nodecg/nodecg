@@ -2,18 +2,18 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 
-import { nodecgRootPath } from "../../shared/utils/rootPath";
 import type { NodeCG } from "../../types/nodecg";
 import type { GraphicRegRequest, RootNS } from "../../types/socket-protocol";
 import type { BundleManager } from "../bundle-manager";
 import type { Replicator } from "../replicant/replicator";
 import type { ServerReplicant } from "../replicant/server-replicant";
 import { injectScripts } from "../util/injectscripts";
-import { isChildOf } from "../util/isChildOf";
+import { isChildPath } from "../util/is-child-path";
+import { nodecgPath } from "../util/nodecg-path";
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 
-const BUILD_PATH = path.join(nodecgRootPath, "dist/instance");
+const BUILD_PATH = path.join(nodecgPath, "dist/instance");
 
 export class RegistrationCoordinator {
 	app = express();
@@ -34,10 +34,7 @@ export class RegistrationCoordinator {
 		const { app } = this;
 
 		this._instancesRep = replicator.declare("graphics:instances", "nodecg", {
-			schemaPath: path.resolve(
-				nodecgRootPath,
-				"schemas/graphics%3Ainstances.json",
-			),
+			schemaPath: path.resolve(nodecgPath, "schemas/graphics%3Ainstances.json"),
 			persistent: false,
 			defaultValue: [],
 		});
@@ -168,7 +165,7 @@ export class RegistrationCoordinator {
 			// If it's a HTML file, inject the graphic setup script and serve that
 			// otherwise, send the file unmodified
 			const fileLocation = path.join(BUILD_PATH, resName);
-			if (resName.endsWith(".html") && isChildOf(BUILD_PATH, fileLocation)) {
+			if (resName.endsWith(".html") && isChildPath(BUILD_PATH, fileLocation)) {
 				if (fs.existsSync(fileLocation)) {
 					injectScripts(fileLocation, "graphic", {}, (html) => res.send(html));
 				} else {

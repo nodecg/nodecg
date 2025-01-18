@@ -1,6 +1,4 @@
-import { randomUUID } from "node:crypto";
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 
@@ -13,14 +11,7 @@ import { getConnection } from "../../src/server/database/default/connection";
 import type { NodeCGServer } from "../../src/server/server";
 import { populateTestData } from "./populateTestData";
 import * as C from "./test-constants";
-
-const tmpdir = os.tmpdir();
-
-function createTmpDir() {
-	const dir = path.join(tmpdir, randomUUID());
-	fs.mkdirSync(dir, { recursive: true });
-	return dir;
-}
+import { createTmpDir } from "./tmp-dir";
 
 export interface SetupContext {
 	server: NodeCGServer;
@@ -35,36 +26,32 @@ export interface SetupContext {
 }
 
 export async function setupTest(nodecgConfigName = "nodecg.json") {
-	const tempFolder = createTmpDir();
+	const tmpDir = await createTmpDir();
 
 	// Tell NodeCG to look in our new temp folder for bundles, cfg, db, and assets, rather than whatever ones the user
 	// may have. We don't want to touch any existing user data!
-	process.env.NODECG_ROOT = tempFolder;
+	process.env.NODECG_ROOT = tmpDir;
 
-	fs.cpSync(
-		"test/fixtures/nodecg-core/assets",
-		path.join(tempFolder, "assets"),
-		{ recursive: true },
-	);
-	fs.cpSync(
-		"test/fixtures/nodecg-core/bundles",
-		path.join(tempFolder, "bundles"),
-		{ recursive: true },
-	);
+	fs.cpSync("test/fixtures/nodecg-core/assets", path.join(tmpDir, "assets"), {
+		recursive: true,
+	});
+	fs.cpSync("test/fixtures/nodecg-core/bundles", path.join(tmpDir, "bundles"), {
+		recursive: true,
+	});
 	fs.renameSync(
-		path.join(tempFolder, "bundles/test-bundle/git"),
-		path.join(tempFolder, "bundles/test-bundle/.git"),
+		path.join(tmpDir, "bundles/test-bundle/git"),
+		path.join(tmpDir, "bundles/test-bundle/.git"),
 	);
-	fs.cpSync("test/fixtures/nodecg-core/cfg", path.join(tempFolder, "cfg"), {
+	fs.cpSync("test/fixtures/nodecg-core/cfg", path.join(tmpDir, "cfg"), {
 		recursive: true,
 	});
 	fs.cpSync(
 		`test/fixtures/nodecg-core/cfg/${nodecgConfigName}`,
-		path.join(tempFolder, "cfg/nodecg.json"),
+		path.join(tmpDir, "cfg/nodecg.json"),
 		{ recursive: true },
 	);
 	fs.writeFileSync(
-		path.join(tempFolder, "should-be-forbidden.txt"),
+		path.join(tmpDir, "should-be-forbidden.txt"),
 		"exploit succeeded",
 		"utf-8",
 	);
@@ -86,7 +73,7 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 	afterAll(async () => {
 		await Promise.all([
 			fs.promises
-				.rm(tempFolder, { recursive: true, force: true })
+				.rm(tmpDir, { recursive: true, force: true })
 				.catch((error) => {
 					// Ignore errors when cleaning up the temp folder
 					console.error(error);

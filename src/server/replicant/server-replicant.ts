@@ -15,7 +15,9 @@ import {
 import { getSchemaDefault } from "../../shared/utils/compileJsonSchema";
 import type { NodeCG } from "../../types/nodecg";
 import { createLogger } from "../logger";
-import { NODECG_ROOT } from "../nodecg-root";
+import { getNodecgRoot } from "../nodecg-root";
+import { isLegacyProject } from "../util/project-type";
+import { rootPath } from "../util/root-path";
 import { formatSchema } from "./schema-hacks";
 
 /**
@@ -44,36 +46,83 @@ export class ServerReplicant<
 		this.status = "declared";
 		this.log = createLogger(`Replicant/${namespace}.${name}`);
 
-		// If present, parse the schema and generate the validator function.
-		if (opts.schemaPath) {
-			const absoluteSchemaPath = path.isAbsolute(opts.schemaPath)
-				? opts.schemaPath
-				: path.join(NODECG_ROOT, opts.schemaPath);
-			if (fs.existsSync(absoluteSchemaPath)) {
-				try {
-					const rawSchema = $RefParser.readSync(absoluteSchemaPath);
-					const parsedSchema = formatSchema(
-						rawSchema.root,
-						rawSchema.rootFile,
-						rawSchema.files,
-					);
-					if (!parsedSchema) {
-						throw new Error("parsed schema was unexpectedly undefined");
-					}
-
-					this.schema = parsedSchema;
-					this.schemaSum = hasha(JSON.stringify(parsedSchema), {
-						algorithm: "sha1",
-					});
-					this.validate = this._generateValidator();
-				} catch (e: any) {
-					/* istanbul ignore next */
-					if (!process.env.NODECG_TEST) {
-						this.log.error(
-							"Schema could not be loaded, are you sure that it is valid JSON?\n",
-							e.stack,
+		function getBundlePath() {
+			if (isLegacyProject) {
+				return path.join(getNodecgRoot(), "bundles", namespace);
+			}
+			const rootPackageJson = fs.readFileSync(
+				path.join(rootPath, "package.json"),
+				"utf-8",
+			);
+			if (JSON.parse(rootPackageJson).name === namespace) {
+				return rootPath;
+			} else {
+				const bundlesDir = path.join(rootPath, "bundles");
+				const bundlesDirStat = fs.existsSync(bundlesDir)
+					? fs.statSync(bundlesDir)
+					: null;
+				if (bundlesDirStat?.isDirectory()) {
+					const bundles = fs.readdirSync(path.join(rootPath, "bundles"));
+					for (const bundleDir of bundles) {
+						const bundlePackageJson = fs.readFileSync(
+							path.join(rootPath, "bundles", bundleDir, "package.json"),
+							"utf-8",
 						);
+						if (JSON.parse(bundlePackageJson).name === namespace) {
+							return path.join(rootPath, "bundles", bundleDir);
+						}
 					}
+				}
+				return false;
+			}
+		}
+
+		let absoluteSchemaPath: string | undefined;
+
+		const schemaPath = opts.schemaPath;
+		if (schemaPath) {
+			if (path.isAbsolute(schemaPath)) {
+				absoluteSchemaPath = schemaPath;
+			} else {
+				absoluteSchemaPath = path.join(
+					isLegacyProject ? getNodecgRoot() : rootPath,
+					schemaPath,
+				);
+			}
+		} else {
+			const bundlePath = getBundlePath();
+			if (bundlePath) {
+				absoluteSchemaPath = path.join(
+					bundlePath,
+					"schemas",
+					`${encodeURIComponent(name)}.json`,
+				);
+			}
+		}
+
+		if (absoluteSchemaPath && fs.existsSync(absoluteSchemaPath)) {
+			try {
+				const rawSchema = $RefParser.readSync(absoluteSchemaPath);
+				const parsedSchema = formatSchema(
+					rawSchema.root,
+					rawSchema.rootFile,
+					rawSchema.files,
+				);
+				if (!parsedSchema) {
+					throw new Error("parsed schema was unexpectedly undefined");
+				}
+
+				this.schema = parsedSchema;
+				this.schemaSum = hasha(JSON.stringify(parsedSchema), {
+					algorithm: "sha1",
+				});
+				this.validate = this._generateValidator();
+			} catch (e: any) {
+				if (!process.env.NODECG_TEST) {
+					this.log.error(
+						"Schema could not be loaded, are you sure that it is valid JSON?\n",
+						e.stack,
+					);
 				}
 			}
 		}

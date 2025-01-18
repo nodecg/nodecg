@@ -82,7 +82,7 @@ export abstract class NodeCGAPIBase<
 	 * The version (from package.json) of the bundle which this NodeCG API instance is for.
 	 * @name NodeCG#bundleVersion
 	 */
-	readonly bundleVersion: string;
+	readonly bundleVersion?: string;
 
 	/**
 	 * Provides information about the current git status of this bundle, if found.
@@ -367,9 +367,6 @@ export abstract class NodeCGAPIBase<
 
 		const defaultOpts: Record<any, unknown> = {};
 		opts = opts ?? defaultOpts;
-		if (typeof opts.schemaPath === "undefined") {
-			opts.schemaPath = `bundles/${encodeURIComponent(namespace)}/schemas/${encodeURIComponent(name)}.json`;
-		}
 
 		return this._replicantFactory(name, namespace, opts);
 	}

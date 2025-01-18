@@ -1,4 +1,4 @@
-import { NodeCGAPIClient } from "../../../../generated-types/client/api/api.client";
+import { NodeCGAPIClient } from "../../../../out/client/api/api.client";
 
 type BundleConfig = { foo: { bar: "bar" } };
 

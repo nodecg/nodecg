@@ -8,12 +8,12 @@ import type { NodeCG } from "../../types/nodecg";
 import type { BundleManager } from "../bundle-manager";
 import { config } from "../config";
 import { authCheck } from "../util/authcheck";
-import { pjson } from "./pjson";
+import { nodecgPackageJson } from "./nodecg-package-json";
 
 const baseSentryConfig = {
 	dsn: config.sentry.enabled ? config.sentry.dsn : "",
 	serverName: os.hostname(),
-	release: pjson.version,
+	version: nodecgPackageJson.version,
 };
 
 export class SentryConfig {

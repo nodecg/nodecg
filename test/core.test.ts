@@ -38,7 +38,9 @@ test("should serve bundle-specific bower_components", async () => {
 });
 
 test("should serve bundle-specific node_modules", async () => {
-	const response = await fetch(`${C.bundleNodeModulesUrl()}confirmation.js`);
+	const response = await fetch(
+		`${C.bundleNodeModulesUrl()}dummy-module/confirmation.js`,
+	);
 	expect(response.status).toBe(200);
 	expect(await response.text()).toMatchInlineSnapshot(`
 		"const confirmed = 'node_modules_confirmed';

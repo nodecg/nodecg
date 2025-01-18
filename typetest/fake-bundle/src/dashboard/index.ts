@@ -1,5 +1,5 @@
 /// <reference path="./augment-window-with-bundleconfig.d.ts" />
-import type NodeCGTypes from "../../../../generated-types";
+import type NodeCGTypes from "../../../../types";
 import { assertTypeOrUndefined } from "../shared/utils";
 
 console.log(nodecg);

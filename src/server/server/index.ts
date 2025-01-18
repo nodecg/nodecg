@@ -5,13 +5,13 @@ import * as Sentry from "@sentry/node";
 import * as os from "os";
 
 import { config, filteredConfig, sentryEnabled } from "../config";
-import { pjson } from "../util/pjson";
+import { nodecgPackageJson } from "../util/nodecg-package-json";
 
 if (config.sentry?.enabled) {
 	Sentry.init({
 		dsn: config.sentry.dsn,
 		serverName: os.hostname(),
-		release: pjson.version,
+		release: nodecgPackageJson.version,
 	});
 	Sentry.configureScope((scope) => {
 		scope.setTags({
@@ -43,7 +43,6 @@ import passport from "passport";
 import * as SocketIO from "socket.io";
 
 import { TypedEmitter } from "../../shared/typed-emitter";
-import { nodecgRootPath } from "../../shared/utils/rootPath";
 import type { NodeCG } from "../../types/nodecg";
 import type {
 	ClientToServerEvents,
@@ -58,10 +57,11 @@ import { GraphicsLib } from "../graphics";
 import { createLogger } from "../logger";
 import { createSocketAuthMiddleware } from "../login/socketAuthMiddleware";
 import { MountsLib } from "../mounts";
-import { NODECG_ROOT } from "../nodecg-root";
+import { getNodecgRoot } from "../nodecg-root";
 import { Replicator } from "../replicant/replicator";
 import { SharedSourcesLib } from "../shared-sources";
 import { SoundsLib } from "../sounds";
+import { nodecgPath } from "../util/nodecg-path";
 import { SentryConfig } from "../util/sentry-config";
 import { ExtensionManager } from "./extensions";
 import { socketApiMiddleware } from "./socketApiMiddleware";
@@ -150,9 +150,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		const { _app: app, _server: server, log } = this;
 		const io = this._io.of("/");
 		log.info(
-			"Starting NodeCG %s (Running on Node.js %s)",
-			pjson.version,
-			process.version,
+			`Starting NodeCG ${nodecgPackageJson.version} (Running on Node.js ${process.version})`,
 		);
 
 		if (sentryEnabled) {
@@ -176,14 +174,14 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			});
 		});
 
-		const bundlesPaths = [path.join(NODECG_ROOT, "bundles")].concat(
+		const bundlesPaths = [path.join(getNodecgRoot(), "bundles")].concat(
 			config.bundles?.paths ?? [],
 		);
-		const cfgPath = path.join(NODECG_ROOT, "cfg");
+		const cfgPath = path.join(getNodecgRoot(), "cfg");
 		const bundleManager = new BundleManager(
 			bundlesPaths,
 			cfgPath,
-			pjson.version,
+			nodecgPackageJson.version,
 			config,
 		);
 
@@ -287,7 +285,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 						"https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap",
 				);
 				const opts = {
-					rootDir: NODECG_ROOT,
+					rootDir: getNodecgRoot(),
 					modulesUrl: `/bundles/${bundle.name}/node_modules`,
 				};
 				app.use(`/bundles/${bundle.name}/*`, transformMiddleware(opts));
@@ -378,7 +376,7 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 
 		// Set up "bundles" Replicant.
 		const bundlesReplicant = replicator.declare("bundles", "nodecg", {
-			schemaPath: path.resolve(nodecgRootPath, "schemas/bundles.json"),
+			schemaPath: path.resolve(nodecgPath, "schemas/bundles.json"),
 			persistent: false,
 		});
 		const updateBundlesReplicant = debounce(() => {

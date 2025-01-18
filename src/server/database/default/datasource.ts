@@ -4,7 +4,8 @@ import path from "node:path";
 
 import { DataSource } from "typeorm";
 export * from "./entity";
-import { nodecgRootPath } from "../../../shared/utils/rootPath";
+import { getNodecgRoot } from "../../nodecg-root";
+import { nodecgPath } from "../../util/nodecg-path";
 import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
 
 const testing = process.env.NODECG_TEST?.toLowerCase() === "true";
@@ -25,11 +26,11 @@ export const dataSource = new DataSource({
 	 */
 	database: testing
 		? ":memory:"
-		: path.join(nodecgRootPath, "db/nodecg.sqlite3"),
+		: path.join(getNodecgRoot(), "db/nodecg.sqlite3"),
 	logging: false,
 	entities: [ApiKey, Identity, Permission, Replicant, Role, User],
 	migrations: [
-		path.join(nodecgRootPath, "out/server/database/default/migration/*.js"),
+		path.join(nodecgPath, "out/server/database/default/migration/*.js"),
 	],
 	migrationsRun: true,
 	synchronize: false,

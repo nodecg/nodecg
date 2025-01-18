@@ -2,11 +2,12 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"outDir": "../../out/server",
-		"declarationDir": "../../generated-types/server",
+		"declaration": true,
 		"rootDir": ".",
 		"module": "CommonJS",
 		"composite": true
 	},
 	"include": ["./**/*.ts", "../types/stubs.d.ts"],
+	"exclude": ["./**/*.test.ts"],
 	"references": [{ "path": "../shared" }, { "path": "../types" }]
 }

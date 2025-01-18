@@ -1,3 +1,3 @@
-import NodeCG from "../../../generated-types";
+import NodeCG from "../../../types";
 
 export default {} satisfies NodeCG.NodecgBundleConfig;

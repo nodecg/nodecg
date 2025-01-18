@@ -3,13 +3,15 @@ import * as path from "node:path";
 import express from "express";
 import { klona as clone } from "klona/json";
 
-import { nodecgRootPath } from "../../shared/utils/rootPath";
 import type { NodeCG } from "../../types/nodecg";
 import type { BundleManager } from "../bundle-manager";
 import { config, filteredConfig, sentryEnabled } from "../config";
 import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
-import { sendFile } from "../util/sendFile";
+import { nodecgPath } from "../util/nodecg-path";
+import { rootPath } from "../util/root-path";
+import { sendFile } from "../util/send-file";
+import { sendNodeModulesFile } from "../util/send-node-modules-file";
 
 type Workspace = NodeCG.Workspace;
 
@@ -21,7 +23,7 @@ interface DashboardContext {
 	sentryEnabled: boolean;
 }
 
-const BUILD_PATH = path.join(nodecgRootPath, "dist");
+const BUILD_PATH = path.join(nodecgPath, "dist");
 
 export class DashboardLib {
 	app = express();
@@ -33,10 +35,12 @@ export class DashboardLib {
 
 		app.use(express.static(BUILD_PATH));
 
-		app.use(
-			"/node_modules",
-			express.static(path.join(nodecgRootPath, "node_modules")),
-		);
+		app.use("/node_modules/:filePath(.*)", (req, res, next) => {
+			const rootNodeModulesPath = path.join(rootPath, "node_modules");
+			const basePath = nodecgPath;
+			const filePath = req.params["filePath"]!;
+			sendNodeModulesFile(rootNodeModulesPath, basePath, filePath, res, next);
+		});
 
 		app.get("/", (_, res) => {
 			res.redirect("/dashboard/");

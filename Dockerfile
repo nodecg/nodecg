@@ -15,7 +15,6 @@ RUN npm ci
 COPY tsconfig.json ./
 COPY schemas schemas
 COPY src src
-COPY generated-types generated-types
 
 RUN npm run build
 

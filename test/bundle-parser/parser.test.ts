@@ -175,25 +175,3 @@ test('should error when "extension" exists and it is not a directory', () => {
 		`[Error: illegal-extension has an illegal file named "extension" in its root. Either rename it to "extension.js", or make a directory named "extension"]`,
 	);
 });
-
-test("should error when the bundle's folder name doesn't match its manifest name", () => {
-	expect(
-		parseBundle.bind(
-			parseBundle,
-			"./test/fixtures/bundle-parser/bad-folder-name",
-		),
-	).toThrowErrorMatchingInlineSnapshot(
-		`[Error: bad-folder's folder is named "bad-folder-name". Please rename it to "bad-folder".]`,
-	);
-});
-
-test('should error when "version" is not present', () => {
-	expect(
-		parseBundle.bind(
-			parseBundle,
-			"./test/fixtures/bundle-parser/no-manifest-version",
-		),
-	).toThrowErrorMatchingInlineSnapshot(
-		`[Error: no-manifest-version's package.json must specify a valid version.]`,
-	);
-});
