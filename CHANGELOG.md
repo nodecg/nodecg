@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.0](https://github.com/nodecg/nodecg/compare/v2.4.3...v2.5.0) (2025-01-18)
+
+
+### Features
+
+* allow installing nodecg as dependency ([#796](https://github.com/nodecg/nodecg/issues/796)) ([b8afbf7](https://github.com/nodecg/nodecg/commit/b8afbf778ce32fd44a309039edb779cefe367e9a))
+* **docker:** support linux arm ([#797](https://github.com/nodecg/nodecg/issues/797)) ([fdcc10b](https://github.com/nodecg/nodecg/commit/fdcc10bd6c706e85b6156558236396f6a8f9b79e))
+* update chokidar to v4 ([#799](https://github.com/nodecg/nodecg/issues/799)) ([817d8b1](https://github.com/nodecg/nodecg/commit/817d8b116d7191344b2b629ebba7e1db45ebefe1))
+
 ## [2.4.3](https://github.com/nodecg/nodecg/compare/v2.4.2...v2.4.3) (2025-01-06)
 
 
