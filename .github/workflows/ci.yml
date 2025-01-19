@@ -82,6 +82,8 @@ jobs:
       - run: npm test -- --coverage
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '22'
         uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   dry-run-container-build:
     runs-on: ubuntu-latest
