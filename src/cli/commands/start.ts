@@ -15,7 +15,6 @@ export function startCommand(program: Command) {
 
 			// Check if nodecg is already installed
 			if (pathContainsNodeCG(projectDir)) {
-				console.log(path.join(projectDir, "index.js"));
 				await import(path.join(projectDir, "index.js"));
 				return;
 			}
