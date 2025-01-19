@@ -52,10 +52,6 @@ jobs:
           node-version: ${{matrix.node-version}}
           cache: npm
 
-      # - name: Add msbuild to PATH
-      #   if: runner.os == 'Windows'
-      #   uses: microsoft/setup-msbuild@v1.1
-
       - name: Ensure that bundle git parsing functionality works
         run: |
           git config --global user.email "ci@nodecg.dev"
