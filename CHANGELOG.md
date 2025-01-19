@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.1](https://github.com/nodecg/nodecg/compare/v2.5.0...v2.5.1) (2025-01-19)
+
+
+### Bug Fixes
+
+* publish linux arm image and enable coverage  ([#800](https://github.com/nodecg/nodecg/issues/800)) ([b6a5550](https://github.com/nodecg/nodecg/commit/b6a5550e390bd582e114f1e7966583a7a4033ff2))
+
 ## [2.5.0](https://github.com/nodecg/nodecg/compare/v2.4.3...v2.5.0) (2025-01-18)
 
 
