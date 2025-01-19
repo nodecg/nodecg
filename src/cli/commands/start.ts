@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { Command } from "commander";
 
@@ -15,14 +16,16 @@ export function startCommand(program: Command) {
 
 			// Check if nodecg is already installed
 			if (pathContainsNodeCG(projectDir)) {
-				await import(path.join(projectDir, "index.js"));
+				await import(pathToFileURL(path.join(projectDir, "index.js")).href);
 				return;
 			}
 
 			// Check if NodeCG is installed as a dependency
 			const nodecgDependencyPath = path.join(projectDir, "node_modules/nodecg");
 			if (pathContainsNodeCG(nodecgDependencyPath)) {
-				await import(path.join(nodecgDependencyPath, "index.js"));
+				await import(
+					pathToFileURL(path.join(nodecgDependencyPath, "index.js")).href
+				);
 			}
 		});
 }
