@@ -87,8 +87,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  pr-upload-artifact:
-    if: github.event_name == 'pull_request'
+  upload-artifact:
     runs-on: ubuntu-latest
     needs:
       - lint
