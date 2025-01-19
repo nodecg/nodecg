@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { parseBundle } from "../../src/server/bundle-parser";
+import { parseBundle } from ".";
 
 test('when there is no "graphics" folder, assign an empty array to bundle.graphics', () => {
 	const parsedBundle = parseBundle("./test/fixtures/bundle-parser/no-graphics");

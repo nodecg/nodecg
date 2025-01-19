@@ -25,6 +25,5 @@ export default defineConfig({
 			test: "true",
 			NODECG_TEST: "true",
 		},
-		globalSetup: "./test/global-setup.ts",
 	},
 });

@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { parseMounts } from "../../src/server/bundle-parser/mounts";
+import { parseMounts } from "./mounts";
 
 test("returns an empty array if a bundle has no mounts", () => {
 	expect(parseMounts({ name: "test-bundle" })).toEqual([]);

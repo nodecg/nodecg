@@ -2,7 +2,7 @@ import path from "node:path";
 
 import { expect, test } from "vitest";
 
-import { parseBundle } from "../../src/server/bundle-parser";
+import { parseBundle } from ".";
 
 test("should error when package.json does not exist", () => {
 	expect(
@@ -55,7 +55,7 @@ test('should return the expected data when "nodecg" property does exist', () => 
 			headerColor: "#525F78",
 			path: path.resolve(
 				__dirname,
-				"../fixtures/bundle-parser/good-bundle/dashboard/panel.html",
+				"../../../test/fixtures/bundle-parser/good-bundle/dashboard/panel.html",
 			),
 			file: "panel.html",
 			html:
@@ -73,7 +73,7 @@ test('should return the expected data when "nodecg" property does exist', () => 
 			headerColor: "#ffffff",
 			path: path.resolve(
 				__dirname,
-				"../fixtures/bundle-parser/good-bundle/dashboard/workspace-panel.html",
+				"../../../test/fixtures/bundle-parser/good-bundle/dashboard/workspace-panel.html",
 			),
 			file: "workspace-panel.html",
 			html:
@@ -90,7 +90,7 @@ test('should return the expected data when "nodecg" property does exist', () => 
 			headerColor: "#525F78",
 			path: path.resolve(
 				__dirname,
-				"../fixtures/bundle-parser/good-bundle/dashboard/fullbleed-panel.html",
+				"../../../test/fixtures/bundle-parser/good-bundle/dashboard/fullbleed-panel.html",
 			),
 			file: "fullbleed-panel.html",
 			html: "<!DOCTYPE html><html><head></head>\n<body>\n\t<p>This is a test fullbleed panel!</p>\n</body></html>",
@@ -106,7 +106,7 @@ test('should return the expected data when "nodecg" property does exist', () => 
 			headerColor: "#333222",
 			path: path.resolve(
 				__dirname,
-				"../fixtures/bundle-parser/good-bundle/dashboard/dialog.html",
+				"../../../test/fixtures/bundle-parser/good-bundle/dashboard/dialog.html",
 			),
 			file: "dialog.html",
 			html: "<!DOCTYPE html><html><head></head>\n<body>\n\t<p>This is a test dialog!</p>\n</body></html>",

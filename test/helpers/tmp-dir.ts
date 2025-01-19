@@ -1,7 +1,7 @@
-import { mkdtemp } from "node:fs/promises";
+import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 
-export async function createTmpDir() {
-	const dir = await mkdtemp(tmpdir() + "/");
+export function createTmpDir() {
+	const dir = mkdtempSync(tmpdir() + "/");
 	return dir;
 }

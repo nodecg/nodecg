@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { loadConfig } from "../src/server/config/loader";
+import { loadConfig } from "./loader";
 
 test("should throw an error when the config file is not valid JSON", () => {
 	expect(

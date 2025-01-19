@@ -3,10 +3,10 @@ import path from "node:path";
 
 import { afterAll, expect, Mock, test as baseTest, vi } from "vitest";
 
-import { loggerFactory } from "../../src/server/logger/logger.server";
-import { createTmpDir } from "../helpers/tmp-dir";
+import { createTmpDir } from "../../../test/helpers/tmp-dir";
+import { loggerFactory } from "./logger.server";
 
-const tmpDir = await createTmpDir();
+const tmpDir = createTmpDir();
 
 afterAll(async () => {
 	try {
@@ -50,19 +50,19 @@ const test = baseTest
 	});
 
 test("console - should default to being silent", () => {
-	expect(Logger._consoleLogger.transports[0].silent).toBe(true);
+	expect(Logger._consoleLogger.transports[0]!.silent).toBe(true);
 });
 
 test('console - should default to level "info"', () => {
-	expect(Logger._consoleLogger.transports[0].level).toBe("info");
+	expect(Logger._consoleLogger.transports[0]!.level).toBe("info");
 });
 
 test("file - should default to being silent", () => {
-	expect(Logger._fileLogger.transports[0].silent).toBe(true);
+	expect(Logger._fileLogger.transports[0]!.silent).toBe(true);
 });
 
 test('file - should default to level "info"', () => {
-	expect(Logger._fileLogger.transports[0].level).toBe("info");
+	expect(Logger._fileLogger.transports[0]!.level).toBe("info");
 });
 
 test("file - should make the logs folder", () => {

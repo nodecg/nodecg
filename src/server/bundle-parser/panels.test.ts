@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { parseBundle } from "../../src/server/bundle-parser";
+import { parseBundle } from ".";
 
 test('when there is no "dashboard" folder, assign an empty array to bundle.dashboard.panels', () => {
 	const parsedBundle = parseBundle("./test/fixtures/bundle-parser/no-panels");
