@@ -156,10 +156,6 @@ jobs:
 
   release-please:
     if: github.event_name == 'push' && github.ref_name == 'main'
-    needs:
-      - lint
-      - test-types
-      - build-test
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
@@ -171,7 +167,11 @@ jobs:
           release-type: node
 
   publish:
-    needs: release-please
+    needs:
+      - release-please
+      - lint
+      - test-types
+      - build-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -207,7 +207,11 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   docker-image:
-    needs: release-please
+    needs:
+      - release-please
+      - lint
+      - test-types
+      - build-test
     if: ${{ needs.release-please.outputs.release_created }}
     strategy:
       matrix:
