@@ -59,13 +59,14 @@ test("install NodeCG with dependencies", { timeout: 600_000 }, async () => {
 
 test("should throw when trying to install v1 NodeCG", async () => {
 	chdir();
-	const consoleError = vi.spyOn(console, "error");
+	const spy = vi.spyOn(console, "error");
 	await program.runWith("setup 1.9.0 -u --skip-dependencies");
-	expect(consoleError.mock.calls[0]).toMatchInlineSnapshot(`
+	expect(spy.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "CLI does not support NodeCG versions older than v2.0.0.",
 		]
 	`);
+	spy.mockRestore();
 });
 
 test("should print an error when the target version is the same as current", async () => {

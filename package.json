@@ -181,6 +181,7 @@
     "@types/sinon": "^10.0.20",
     "@types/uuid": "^8.3.4",
     "@types/yargs": "^15.0.19",
+    "@vitest/coverage-v8": "^3.0.2",
     "cpy-cli": "^5.0.0",
     "cross-env": "^7.0.3",
     "del-cli": "^5.1.0",
@@ -205,7 +206,7 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.18.2",
     "vite-plugin-swc-transform": "^1.0.1",
-    "vitest": "^2.1.8",
+    "vitest": "^3.0.2",
     "vitest-mock-express": "^2.2.0"
   },
   "engines": {
