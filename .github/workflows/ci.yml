@@ -13,99 +13,121 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
 
   test-types:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Test types
-        run: npm run typetest
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typetest
 
   build-test:
     strategy:
       matrix:
         node-version:
-          - "18"
-          - "20"
-          - "22"
+          - 18
+          - 20
+          - 22
         os:
           - ubuntu-latest
           - windows-latest
-
     runs-on: ${{matrix.os}}
-
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{matrix.node-version}}
-
-      - name: Add msbuild to PATH
-        if: runner.os == 'Windows'
-        uses: microsoft/setup-msbuild@v1.1
+          cache: npm
 
       - name: Ensure that bundle git parsing functionality works
         run: |
           git config --global user.email "ci@nodecg.dev"
           git config --global user.name "NodeCG Bot"
 
-      - name: Restore Chromium dependency cache (Linux)
-        uses: actions/cache@v3
+      - name: Restore Puppeteer cache (Linux)
+        if: runner.os == 'Linux'
+        uses: actions/cache@v4
         with:
           path: |
             /home/runner/.cache/puppeteer
-          key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
-        if: runner.os == 'Linux'
+          key: puppeteer-${{ runner.os }}
 
-      - name: Restore Chromium dependency cache (Windows)
-        uses: actions/cache@v3
+      - name: Restore Puppeteer cache (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/cache@v4
         with:
           path: |
             C:\Users\runneradmin\.cache\puppeteer
-          key: chromium-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
-        if: runner.os == 'Windows'
+          key: puppeteer-${{ runner.os }}
 
       - run: npm ci
-
       - run: npm run build
-
-      - run: npm run test
+      - run: npm test -- --coverage
 
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '22'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
-  dry-run-container-build:
+  pr-release:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    environment:
+      name: PR Release
+    needs:
+      - lint
+      - test-types
+      - build-test
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/build-push-action@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: |
+          npm version 0.0.0-pr${{ github.event.number }}.${{ github.sha }} --no-git-tag-version
+          npm publish --tag pr${{ github.event.number }}
+          npx tsx scripts/prepare-publish-types.ts
+          npm publish --tag pr${{ github.event.number }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: echo "package-path=$(npm pack)" >> $GITHUB_OUTPUT
+        id: npm-pack
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-package
+          path: ${{ steps.npm-pack.outputs.package-path }}
+
+  dry-run-container-build:
+    if: github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
         with:
           context: .
           push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

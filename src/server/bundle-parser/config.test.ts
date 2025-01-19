@@ -2,7 +2,7 @@ import fs from "node:fs";
 
 import { expect, test } from "vitest";
 
-import { parseBundle } from "../../src/server/bundle-parser";
+import { parseBundle } from ".";
 
 test("parsing - when the config file exists, parse the config and add it as bundle.config", () => {
 	const parsedBundle = parseBundle(

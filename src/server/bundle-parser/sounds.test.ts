@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { parseSounds } from "../../src/server/bundle-parser/sounds";
+import { parseSounds } from "./sounds";
 
 test("should return the parsed soundCues", () => {
 	const input = [
@@ -17,7 +17,7 @@ test("should return the parsed soundCues", () => {
 		},
 		{
 			name: "default-file",
-			defaultFile: "../fixtures/bundle-parser/default-file.ogg",
+			defaultFile: "../../../test/fixtures/bundle-parser/default-file.ogg",
 		},
 	];
 
@@ -37,7 +37,7 @@ test("should return the parsed soundCues", () => {
 		},
 		{
 			name: "default-file",
-			defaultFile: "../fixtures/bundle-parser/default-file.ogg",
+			defaultFile: "../../../test/fixtures/bundle-parser/default-file.ogg",
 			assignable: true,
 		},
 	];
@@ -93,7 +93,7 @@ test("should clamp default volume to a max of 100", () => {
 			},
 		],
 	});
-	expect(result.soundCues[0].defaultVolume).toBe(100);
+	expect(result.soundCues[0]?.defaultVolume).toBe(100);
 });
 
 test("should clamp default volume to a min of 0", () => {
@@ -106,7 +106,7 @@ test("should clamp default volume to a min of 0", () => {
 			},
 		],
 	});
-	expect(result.soundCues[0].defaultVolume).toBe(0);
+	expect(result.soundCues[0]?.defaultVolume).toBe(0);
 });
 
 test("should throw an error when a soundCue's default file doesn't exist", () => {

@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-import { parseAssets } from "../../src/server/bundle-parser/assets";
+import { parseAssets } from "./assets";
 
 test("should return the validated assetCategories", () => {
 	const categories = [

@@ -1,7 +1,7 @@
 import { expect, Mock, test as baseTest, vi } from "vitest";
 
-import { loggerFactory } from "../../src/client/api/logger/logger.client";
-import { LogLevel } from "../../src/types/logger-interface";
+import { LogLevel } from "../../../types/logger-interface";
+import { loggerFactory } from "./logger.client";
 
 // Start up the logger lib with defaults only
 const Logger = loggerFactory();
@@ -186,16 +186,16 @@ test("Sentry - should log errors to Sentry when global.sentryEnabled is true", (
 }) => {
 	sentryLogger.error("error message");
 	expect(SentryMock.captureException).toBeCalledTimes(1);
-	expect(SentryMock.captureException.mock.calls[0][0]).toBeInstanceOf(Error);
+	expect(SentryMock.captureException.mock.calls[0]![0]).toBeInstanceOf(Error);
 	expect(
-		SentryMock.captureException.mock.calls[0][0].message,
+		SentryMock.captureException.mock.calls[0]![0].message,
 	).toMatchInlineSnapshot(`"[sentryClient] error message"`);
 });
 
 test("Sentry - should prettyprint objects", ({ sentryLogger, SentryMock }) => {
 	sentryLogger.error("error message:", { foo: { bar: "baz" } });
 	expect(
-		SentryMock.captureException.mock.calls[0][0].message,
+		SentryMock.captureException.mock.calls[0]![0].message,
 	).toMatchInlineSnapshot(
 		`"[sentryClient] error message: { foo: { bar: 'baz' } }"`,
 	);

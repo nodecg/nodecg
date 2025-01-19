@@ -6,10 +6,10 @@ import { setTimeout } from "node:timers/promises";
 
 import { afterAll, beforeAll, expect, test } from "vitest";
 
-import type { BundleManager as BundleManagerTypeOnly } from "../src/server/bundle-manager";
-import { createTmpDir } from "./helpers/tmp-dir";
+import { createTmpDir } from "../../test/helpers/tmp-dir";
+import type { BundleManager as BundleManagerTypeOnly } from "./bundle-manager";
 
-const tmpDir = await createTmpDir();
+const tmpDir = createTmpDir();
 
 afterAll(async () => {
 	try {
@@ -22,7 +22,7 @@ afterAll(async () => {
 
 let bundleManager: BundleManagerTypeOnly;
 beforeAll(async () => {
-	process.env.NODECG_ROOT = tmpDir;
+	process.env["NODECG_ROOT"] = tmpDir;
 	fs.cpSync("test/fixtures/bundle-manager", tmpDir, { recursive: true });
 
 	// The symlink test can't run on Windows unless run with admin privs.
@@ -43,7 +43,7 @@ beforeAll(async () => {
 	/**
 	 * Delay import so that we have time to set process.env.NODECG_ROOT first.
 	 */
-	const { BundleManager } = await import("../src/server/bundle-manager");
+	const { BundleManager } = await import("./bundle-manager");
 	bundleManager = new BundleManager(
 		[path.join(tmpDir, "bundles"), path.join(tmpDir, "custom-bundles")],
 		path.join(tmpDir, "cfg"),

@@ -9,7 +9,7 @@ COPY package.json package-lock.json ./
 COPY scripts ./scripts
 
 RUN apt-get update && apt-get install -y python3 build-essential
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN npm ci
 
 COPY tsconfig.json ./
