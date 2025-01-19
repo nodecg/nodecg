@@ -111,6 +111,12 @@ jobs:
           npm publish --tag pr${{ github.event.number }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: echo "package-path=$(npm pack)" >> $GITHUB_OUTPUT
+        id: npm-pack
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-package
+          path: ${{ steps.npm-pack.outputs.package-path }}
 
   dry-run-container-build:
     if: github.event_name == 'pull_request'
