@@ -114,7 +114,7 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: npm
       - run: npm ci
-      - run: npm run buld
+      - run: npm run build
       - run: |
           npm version 0.0.0-pr${{ github.event.number }}.${{ github.sha }} --no-git-tag-version
           npm publish --tag pr${{ github.event.number }}
