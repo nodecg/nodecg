@@ -9,6 +9,7 @@ import { Strategy as DiscordStrategy } from "passport-discord";
 import { Strategy as LocalStrategy } from "passport-local";
 import SteamStrategy from "passport-steam";
 import { Strategy as TwitchStrategy } from "passport-twitch-helix";
+import lusca from "lusca";
 
 import { DatabaseAdapter } from "../../types/database-adapter";
 import type { Role, User } from "../../types/models";
@@ -414,6 +415,7 @@ export function createMiddleware(
 	});
 
 	app.use(sessionMiddleware);
+	app.use(lusca.csrf());
 
 	app.use(passport.initialize());
 	app.use(passport.session());
