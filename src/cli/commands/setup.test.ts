@@ -76,7 +76,7 @@ test("should print an error when the target version is the same as current", asy
 	await program.runWith("setup 2.1.0 -u --skip-dependencies");
 	expect(spy.mock.calls[1]).toMatchInlineSnapshot(`
 		[
-		  "The target version (v2.1.0) is equal to the current version (2.1.0). No action will be taken.",
+		  "The target version (2.1.0) is equal to the current version (2.1.0). No action will be taken.",
 		]
 	`);
 	spy.mockRestore();
