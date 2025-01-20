@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.3](https://github.com/nodecg/nodecg/compare/v2.5.2...v2.5.3) (2025-01-20)
+
+
+### Bug Fixes
+
+* **cli:** use npm to list available NodeCG versions ([#810](https://github.com/nodecg/nodecg/issues/810)) ([fcb6e2b](https://github.com/nodecg/nodecg/commit/fcb6e2b46fc584c09e7cf27cd07c7814c44c675d))
+
 ## [2.5.2](https://github.com/nodecg/nodecg/compare/v2.5.1...v2.5.2) (2025-01-20)
 
 
