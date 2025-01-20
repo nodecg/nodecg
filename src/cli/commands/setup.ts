@@ -9,7 +9,7 @@ import spawn from "nano-spawn";
 import semver from "semver";
 import * as tar from "tar";
 
-import { fetchTags } from "../lib/fetch-tags.js";
+import { listNpmVersions } from "../lib/list-npm-versions.js";
 import type { NpmRelease } from "../lib/sample/npm-release.js";
 import { getCurrentNodeCGVersion, pathContainsNodeCG } from "../lib/util.js";
 
@@ -58,7 +58,7 @@ async function decideActionVersion(
 
 	let tags;
 	try {
-		tags = await fetchTags(NODECG_GIT_URL);
+		tags = await listNpmVersions("nodecg");
 	} catch (error) {
 		process.stdout.write(chalk.red("failed!") + os.EOL);
 		console.error(error instanceof Error ? error.message : error);
