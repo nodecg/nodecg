@@ -13,8 +13,6 @@ import { listNpmVersions } from "../lib/list-npm-versions.js";
 import type { NpmRelease } from "../lib/sample/npm-release.js";
 import { getCurrentNodeCGVersion, pathContainsNodeCG } from "../lib/util.js";
 
-const NODECG_GIT_URL = "https://github.com/nodecg/nodecg.git";
-
 export function setupCommand(program: Command) {
 	program
 		.command("setup [version]")
