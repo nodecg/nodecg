@@ -62,14 +62,24 @@ export class ServerReplicant<
 					? fs.statSync(bundlesDir)
 					: null;
 				if (bundlesDirStat?.isDirectory()) {
-					const bundles = fs.readdirSync(path.join(rootPath, "bundles"));
+					const bundles = fs.readdirSync(path.join(rootPath, "bundles"), {
+						withFileTypes: true,
+					});
 					for (const bundleDir of bundles) {
+						if (!bundleDir.isDirectory()) {
+							continue;
+						}
+						const bundlePath = path.join(rootPath, "bundles", bundleDir.name);
+						const bundlePackageJsonPath = path.join(bundlePath, "package.json");
+						if (!fs.existsSync(bundlePackageJsonPath)) {
+							continue;
+						}
 						const bundlePackageJson = fs.readFileSync(
-							path.join(rootPath, "bundles", bundleDir, "package.json"),
+							bundlePackageJsonPath,
 							"utf-8",
 						);
 						if (JSON.parse(bundlePackageJson).name === namespace) {
-							return path.join(rootPath, "bundles", bundleDir);
+							return bundlePath;
 						}
 					}
 				}
