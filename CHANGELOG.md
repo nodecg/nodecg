@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.2](https://github.com/nodecg/nodecg/compare/v2.5.1...v2.5.2) (2025-01-20)
+
+
+### Bug Fixes
+
+* **cli:** start command import path on windows ([#805](https://github.com/nodecg/nodecg/issues/805)) ([bf6aed0](https://github.com/nodecg/nodecg/commit/bf6aed0f8520ca7916466684b34e641b512c526c))
+* **server-replicant:** error handling for unexpected files in bundles ([#808](https://github.com/nodecg/nodecg/issues/808)) ([34a374b](https://github.com/nodecg/nodecg/commit/34a374b384c3639204c775b504d0f27c57f58128))
+
 ## [2.5.1](https://github.com/nodecg/nodecg/compare/v2.5.0...v2.5.1) (2025-01-19)
 
 
