@@ -90,8 +90,7 @@ jobs:
   pr-release:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    environment:
-      name: PR Release
+    environment: PR Release
     needs:
       - lint
       - test-types
@@ -105,11 +104,21 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: |
+
+      - name: PR Release of nodecg
+        run: |
           npm version 0.0.0-pr${{ github.event.number }}.${{ github.sha }} --no-git-tag-version
           npm publish --tag pr${{ github.event.number }}
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag pr${{ github.event.number }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: PR Release of database-adapter-types
+        run: |
+          npm version 0.0.0-canary.${{ github.sha }} --no-git-tag-version
+          npm publish --tag canary
+        working-directory: workspaces/database-adapter-types
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -174,12 +183,22 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - if: ${{ !needs.release-please.outputs.release_created }}
+      - name: Publish canary of nodecg
+        if: ${{ !needs.release-please.outputs.release_created }}
         run: |
           npm version 0.0.0-canary.${{ github.sha }} --no-git-tag-version
           npm publish --tag canary
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag canary
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish canary of database-adapter-types
+        if: ${{ !needs.release-please.outputs.release_created }}
+        run: |
+          npm version 0.0.0-canary.${{ github.sha }} --no-git-tag-version
+          npm publish --tag canary
+        working-directory: workspaces/database-adapter-types
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
