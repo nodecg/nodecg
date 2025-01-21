@@ -1,0 +1,4 @@
+{
+	".": "2.5.3",
+	"workspaces/database-adapter-types": "0.0.0"
+}

@@ -1,0 +1,10 @@
+{
+	"plugins": ["node-workspace"],
+	"packages": {
+		".": {
+			"exclude-paths": ["workspaces"]
+		},
+		"workspaces/database-adapter-types": {}
+	},
+	"prerelease": false
+}
