@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import { DatabaseAdapter } from "@nodecg/database-adapter-types";
 import type express from "express";
 import type * as ExpressCore from "express-serve-static-core";
 
-import { DatabaseAdapter } from "./database-adapter";
 import { NodeCGConfig } from "./nodecg-config-schema";
 import type {
 	ClientToServerEvents,
@@ -17,7 +17,6 @@ type Person =
 	  }
 	| string;
 
-// TODO: remove namespace and combine group of types in each modules (breaking change)
 export namespace NodeCG {
 	/**
 	 * A collection of types that represent the raw data from the `nodecg` stanza in a bundle's `package.json`.

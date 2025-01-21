@@ -90,8 +90,7 @@ jobs:
   pr-release:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    environment:
-      name: PR Release
+    environment: PR Release
     needs:
       - lint
       - test-types
@@ -105,9 +104,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+
       - run: |
-          npm version 0.0.0-pr${{ github.event.number }}.${{ github.sha }} --no-git-tag-version
+          npx tsx scripts/prepare-prerelease.ts --version 0.0.0-pr${{ github.event.number }}.${{ github.sha }}
           npm publish --tag pr${{ github.event.number }}
+          npm --workspaces publish --tag pr${{ github.event.number }}
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag pr${{ github.event.number }}
         env:
@@ -169,6 +170,7 @@ jobs:
       - if: ${{ needs.release-please.outputs.release_created }}
         run: |
           npm publish
+          npm --workspaces publish
           npx tsx scripts/prepare-publish-types.ts
           npm publish
         env:
@@ -176,8 +178,9 @@ jobs:
 
       - if: ${{ !needs.release-please.outputs.release_created }}
         run: |
-          npm version 0.0.0-canary.${{ github.sha }} --no-git-tag-version
+          npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
           npm publish --tag canary
+          npm --workspaces publish --tag canary
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag canary
         env:

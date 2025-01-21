@@ -1,9 +1,11 @@
+import type {
+	DatabaseAdapter,
+	Replicant as ReplicantModel,
+} from "@nodecg/database-adapter-types";
 import { klona as clone } from "klona/json";
 import * as uuid from "uuid";
 
 import { stringifyError } from "../../shared/utils/errors";
-import type { DatabaseAdapter } from "../../types/database-adapter";
-import type { Replicant as ReplicantModel } from "../../types/models";
 import type { NodeCG } from "../../types/nodecg";
 import type {
 	RootNS,

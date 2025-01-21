@@ -1,3 +1,4 @@
+import type { User as UserModel } from "@nodecg/database-adapter-types";
 import {
 	Column,
 	CreateDateColumn,
@@ -8,7 +9,6 @@ import {
 	PrimaryGeneratedColumn,
 } from "typeorm";
 
-import type { User as UserModel } from "../../../../types/models";
 import { ApiKey } from "./ApiKey";
 import { Identity } from "./Identity";
 import { Role } from "./Role";

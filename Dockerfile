@@ -15,6 +15,7 @@ RUN npm ci
 COPY tsconfig.json ./
 COPY schemas schemas
 COPY src src
+COPY workspaces workspaces
 
 RUN npm run build
 
@@ -46,6 +47,7 @@ COPY --from=build /nodecg/dist ./dist
 COPY --from=build /nodecg/out ./out
 COPY --from=build /nodecg/scripts ./scripts
 COPY --from=build /nodecg/schemas ./schemas
+COPY --from=build /nodecg/workspaces ./workspaces
 
 # Define directories that should be persisted in a volume
 VOLUME /opt/nodecg/logs /opt/nodecg/db /opt/nodecg/assets

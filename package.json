@@ -37,13 +37,17 @@
     "types",
     "index.js"
   ],
+  "workspaces": [
+    "workspaces/database-adapter-types"
+  ],
   "scripts": {
     "start": "node index.js",
     "dev": "del-cli dist out && run-p dev:*",
     "dev:client": "npm run build:client -- --watch",
-    "dev:tsc": "tsc -b src/server src/client test --watch --preserveWatchOutput",
+    "dev:tsc": "tsc -b src/server src/client --watch --preserveWatchOutput",
     "dev:copy-templates": "onchange \"src/server/**/*.tmpl\" -i -- cpy \"src/server/**/*.tmpl\" out/server",
     "dev:cli": "npm run build:cli -- --watch",
+    "dev:workspaces": "npm --workspaces run dev",
     "test": "vitest",
     "typetest": "cd typetest/fake-bundle && npm run build",
     "lint": "npm-run-all -s lint:*",
@@ -53,6 +57,7 @@
     "fix:prettier": "prettier --write .",
     "fix:eslint": "npm run lint:eslint -- --fix ",
     "build": "del-cli dist out && run-s build:*",
+    "build:workspaces": "npm --workspaces run build",
     "build:tsc": "tsc -b src/server src/client src/cli",
     "build:client": "tsx scripts/build-client.ts",
     "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server",
@@ -61,6 +66,7 @@
   },
   "dependencies": {
     "@inquirer/prompts": "^7.2.1",
+    "@nodecg/database-adapter-types": "0.0.0",
     "@nodecg/json-schema-defaults": "^1.0.4",
     "@nodecg/json-schema-lib": "0.1.0",
     "@polymer/app-layout": "^3.1.0",
@@ -211,5 +217,8 @@
   },
   "engines": {
     "node": "^18.12.0 || ^20.9.0 || ^22.11.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
