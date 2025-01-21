@@ -15,6 +15,7 @@ RUN npm ci
 COPY tsconfig.json ./
 COPY schemas schemas
 COPY src src
+COPY workspaces workspaces
 
 RUN npm run build
 
