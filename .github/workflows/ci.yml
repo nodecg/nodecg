@@ -133,10 +133,6 @@ jobs:
           cache-to: type=gha,mode=max
 
   release-please:
-    needs:
-      - lint
-      - test-types
-      - build-test
     if: github.event_name == 'push' && github.ref_name == 'main'
     runs-on: ubuntu-latest
     outputs:
