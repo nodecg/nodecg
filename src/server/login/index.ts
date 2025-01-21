@@ -1,7 +1,11 @@
 import * as crypto from "node:crypto";
 import * as path from "node:path";
 
-import type { DatabaseAdapter, Role, User } from '@nodecg/database-adapter-types'
+import type {
+	DatabaseAdapter,
+	Role,
+	User,
+} from "@nodecg/database-adapter-types";
 import cookieParser from "cookie-parser";
 import express from "express";
 import expressSession from "express-session";

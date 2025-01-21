@@ -1,4 +1,4 @@
-import type { Replicant as ReplicantModel } from '@nodecg/database-adapter-types'
+import type { Replicant as ReplicantModel } from "@nodecg/database-adapter-types";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()

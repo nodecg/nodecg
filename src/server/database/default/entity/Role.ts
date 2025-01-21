@@ -1,4 +1,4 @@
-import type { Role as RoleModel } from '@nodecg/database-adapter-types'
+import type { Role as RoleModel } from "@nodecg/database-adapter-types";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 import { Permission } from "./Permission";
