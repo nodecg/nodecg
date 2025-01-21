@@ -216,7 +216,7 @@ async function getAllReplicants() {
 	return connection.getRepository(Replicant).find();
 }
 
-export const defaultAdapter: DatabaseAdapter = {
+export const databaseAdapter: DatabaseAdapter = {
 	findUser,
 	getSuperUserRole,
 	upsertUser,

@@ -4,11 +4,11 @@ import path from "node:path";
 
 import { DataSource } from "typeorm";
 export * from "./entity";
-import { getNodecgRoot } from "../../nodecg-root";
-import { nodecgPath } from "../../util/nodecg-path";
+import { getNodecgRoot } from "../../../src/server/nodecg-root";
+import { nodecgPath } from "../../../src/server/util/nodecg-path";
 import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
 
-const testing = process.env.NODECG_TEST?.toLowerCase() === "true";
+const testing = process.env["NODECG_TEST"]?.toLowerCase() === "true";
 
 export const dataSource = new DataSource({
 	type: "better-sqlite3",
