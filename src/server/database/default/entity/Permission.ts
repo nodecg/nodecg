@@ -1,6 +1,6 @@
+import type { Permission as PermissionModel } from "@nodecg/database-adapter-types";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-import type { Permission as PermissionModel } from "../../../../types/models";
 import { Role } from "./Role";
 
 export const enum Action {

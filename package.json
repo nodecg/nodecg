@@ -37,11 +37,14 @@
     "types",
     "index.js"
   ],
+  "workspaces": [
+    "workspaces/database-adapter-types"
+  ],
   "scripts": {
     "start": "node index.js",
     "dev": "del-cli dist out && run-p dev:*",
     "dev:client": "npm run build:client -- --watch",
-    "dev:tsc": "tsc -b src/server src/client test --watch --preserveWatchOutput",
+    "dev:tsc": "tsc -b src/server src/client --watch --preserveWatchOutput",
     "dev:copy-templates": "onchange \"src/server/**/*.tmpl\" -i -- cpy \"src/server/**/*.tmpl\" out/server",
     "dev:cli": "npm run build:cli -- --watch",
     "test": "vitest",

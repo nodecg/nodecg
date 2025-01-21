@@ -1,6 +1,7 @@
 import * as crypto from "node:crypto";
 import * as path from "node:path";
 
+import type { DatabaseAdapter, Role, User } from '@nodecg/database-adapter-types'
 import cookieParser from "cookie-parser";
 import express from "express";
 import expressSession from "express-session";
@@ -10,8 +11,6 @@ import { Strategy as LocalStrategy } from "passport-local";
 import SteamStrategy from "passport-steam";
 import { Strategy as TwitchStrategy } from "passport-twitch-helix";
 
-import { DatabaseAdapter } from "../../types/database-adapter";
-import type { Role, User } from "../../types/models";
 import { config } from "../config";
 import { createLogger } from "../logger";
 import { nodecgPath } from "../util/nodecg-path";

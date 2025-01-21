@@ -1,4 +1,5 @@
-import type { DatabaseAdapter } from "../../../types/database-adapter";
+import type { DatabaseAdapter } from "@nodecg/database-adapter-types";
+
 import {
 	ApiKey,
 	getConnection,
