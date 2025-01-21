@@ -47,6 +47,7 @@
     "dev:tsc": "tsc -b src/server src/client --watch --preserveWatchOutput",
     "dev:copy-templates": "onchange \"src/server/**/*.tmpl\" -i -- cpy \"src/server/**/*.tmpl\" out/server",
     "dev:cli": "npm run build:cli -- --watch",
+    "dev:workspaces": "npm --workspaces run dev",
     "test": "vitest",
     "typetest": "cd typetest/fake-bundle && npm run build",
     "lint": "npm-run-all -s lint:*",

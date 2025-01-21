@@ -6,7 +6,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "del-cli dist && tsc -b"
+    "build": "del-cli dist && tsc -b",
+    "dev": "tsc -b --watch --preserveWatchOutput"
   },
   "devDependencies": {
     "del-cli": "^6.0.0",
