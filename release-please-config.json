@@ -1,4 +1,5 @@
 {
+	"$schema": "https://raw.githubusercontent.com/googleapis/release-please/refs/tags/v16.15.0/schemas/config.json",
 	"release-type": "node",
 	"plugins": ["node-workspace"],
 	"packages": {
@@ -7,5 +8,6 @@
 		},
 		"workspaces/database-adapter-types": {}
 	},
+	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0",
 	"prerelease": false
 }
