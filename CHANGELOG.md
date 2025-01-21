@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.0](https://github.com/nodecg/nodecg/compare/v2.5.3...v2.6.0) (2025-01-21)
+
+
+### Features
+
+* separate database adapter types into own package ([#814](https://github.com/nodecg/nodecg/issues/814)) ([a8ebaed](https://github.com/nodecg/nodecg/commit/a8ebaed56a7c0ef953d0f079acca38408b36cad4))
+
 ## [2.5.3](https://github.com/nodecg/nodecg/compare/v2.5.2...v2.5.3) (2025-01-20)
 
 
