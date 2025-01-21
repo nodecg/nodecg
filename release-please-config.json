@@ -6,7 +6,11 @@
 		".": {
 			"exclude-paths": ["workspaces"]
 		},
-		"workspaces/database-adapter-types": {}
+		"workspaces/database-adapter-types": {
+			"bump-minor-pre-major": true,
+			"bump-patch-for-minor-pre-major": true,
+			"release-as": "0.0.1"
+		}
 	},
 	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0",
 	"prerelease": false
