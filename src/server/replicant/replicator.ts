@@ -1,9 +1,10 @@
+import { randomUUID } from "node:crypto";
+
 import type {
 	DatabaseAdapter,
 	Replicant as ReplicantModel,
 } from "@nodecg/database-adapter-types";
 import { klona as clone } from "klona/json";
-import * as uuid from "uuid";
 
 import { stringifyError } from "../../shared/utils/errors";
 import type { NodeCG } from "../../types/nodecg";
@@ -22,7 +23,7 @@ const log = createLogger("replicator");
 export class Replicator {
 	readonly declaredReplicants = new Map<string, Map<string, Replicant<any>>>();
 
-	private readonly _uuid = uuid.v4();
+	private readonly _uuid = randomUUID();
 
 	private readonly _repEntities: ReplicantModel[];
 
