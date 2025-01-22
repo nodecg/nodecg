@@ -4,13 +4,15 @@
   "files": [
     "dist"
   ],
+  "main": "dist/database-adapter.js",
   "scripts": {
     "build": "del-cli dist && tsc -b",
-    "dev": "tsc -b --watch --preserveWatchOutput",
+    "dev": "del-cli dist && tsc -b --watch --preserveWatchOutput",
     "generate-migrations": "typeorm-ts-node-commonjs migration:generate ./src/migration/rename-me -d ./src/datasource.ts"
   },
   "dependencies": {
     "@nodecg/database-adapter-types": "0.0.0",
+    "@nodecg/internal-util": "0.0.0",
     "typeorm": "0.3.19"
   },
   "devDependencies": {

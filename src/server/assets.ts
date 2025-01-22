@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path, { extname } from "node:path";
 
+import { getNodecgRoot } from "@nodecg/internal-util";
 import chokidar from "chokidar";
 import express from "express";
 import hasha from "hasha";
@@ -10,7 +11,6 @@ import { z } from "zod";
 import { stringifyError } from "../shared/utils/errors";
 import type { NodeCG } from "../types/nodecg";
 import { createLogger } from "./logger";
-import { getNodecgRoot } from "./nodecg-root";
 import type { Replicator } from "./replicant/replicator";
 import type { ServerReplicant } from "./replicant/server-replicant";
 import { authCheck } from "./util/authcheck";

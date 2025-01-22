@@ -1,9 +1,9 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+import { getNodecgRoot } from "@nodecg/internal-util";
 import { argv } from "yargs";
 
-import { getNodecgRoot } from "../nodecg-root";
 import { loadConfig } from "./loader";
 
 const cfgDirectoryPath =
