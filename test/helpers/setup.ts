@@ -2,12 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 
+import { getConnection } from "@nodecg/database-adapter-sqlite-legacy";
 import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
 import { afterAll, test } from "vitest";
 
 import type { serverApiFactory } from "../../src/server/api.server";
-import { getConnection } from "../../src/server/database/default/connection";
 import type { NodeCGServer } from "../../src/server/server";
 import { populateTestData } from "./populateTestData";
 import * as C from "./test-constants";

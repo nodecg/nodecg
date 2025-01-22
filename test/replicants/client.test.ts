@@ -1,6 +1,6 @@
+import { Replicant } from "@nodecg/database-adapter-sqlite-legacy";
 import { expect } from "vitest";
 
-import { Replicant } from "../../src/server/database/default/connection";
 import type { NodeCG } from "../../src/types/nodecg";
 import { setupTest } from "../helpers/setup";
 
