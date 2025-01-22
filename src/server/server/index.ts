@@ -31,6 +31,8 @@ if (config.sentry?.enabled) {
 import fs = require("fs");
 import path = require("path");
 
+import { databaseAdapter as defaultAdapter } from "@nodecg/database-adapter-sqlite-legacy";
+import { getNodecgRoot } from "@nodecg/internal-util";
 import bodyParser from "body-parser";
 import compression from "compression";
 import express from "express";
@@ -52,12 +54,10 @@ import type {
 import { createAssetsMiddleware } from "../assets";
 import { BundleManager } from "../bundle-manager";
 import { DashboardLib } from "../dashboard";
-import { defaultAdapter } from "../database/default/database-adapter";
 import { GraphicsLib } from "../graphics";
 import { createLogger } from "../logger";
 import { createSocketAuthMiddleware } from "../login/socketAuthMiddleware";
 import { MountsLib } from "../mounts";
-import { getNodecgRoot } from "../nodecg-root";
 import { Replicator } from "../replicant/replicator";
 import { SharedSourcesLib } from "../shared-sources";
 import { SoundsLib } from "../sounds";

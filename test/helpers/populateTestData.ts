@@ -10,7 +10,7 @@ export async function populateTestData(): Promise<void> {
 	// so that we have time to set up the temp
 	// process.env.NODECG_ROOT folder.
 	const { getConnection, Replicant } = await import(
-		"../../src/server/database/default/connection"
+		"@nodecg/database-adapter-sqlite-legacy"
 	);
 
 	const db = await getConnection();

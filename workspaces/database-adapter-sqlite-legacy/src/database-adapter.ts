@@ -9,6 +9,8 @@ import {
 	User,
 } from "./connection";
 
+export { ApiKey, getConnection, Identity, Replicant, Role, User };
+
 async function findUser(id: User["id"]): Promise<User | null> {
 	const database = await getConnection();
 	return database.getRepository(User).findOne({
@@ -216,7 +218,7 @@ async function getAllReplicants() {
 	return connection.getRepository(Replicant).find();
 }
 
-export const defaultAdapter: DatabaseAdapter = {
+export const databaseAdapter: DatabaseAdapter = {
 	findUser,
 	getSuperUserRole,
 	upsertUser,

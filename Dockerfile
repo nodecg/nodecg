@@ -5,17 +5,18 @@ FROM base AS build
 
 WORKDIR /nodecg
 
-COPY package.json package-lock.json ./
-COPY scripts ./scripts
-
 RUN apt-get update && apt-get install -y python3 build-essential
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+COPY package.json package-lock.json ./
+COPY scripts scripts
+COPY workspaces workspaces
+
 RUN npm ci
 
 COPY tsconfig.json ./
 COPY schemas schemas
 COPY src src
-COPY workspaces workspaces
 
 RUN npm run build
 

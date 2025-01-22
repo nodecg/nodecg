@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { rootPath } from "@nodecg/internal-util";
 import chokidar from "chokidar";
 import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
 import { debounce } from "lodash";
@@ -13,7 +14,6 @@ import { parseGit as parseBundleGit } from "./bundle-parser/git";
 import { createLogger } from "./logger";
 import { isChildPath } from "./util/is-child-path";
 import { isLegacyProject } from "./util/project-type";
-import { rootPath } from "./util/root-path";
 
 /**
  * Milliseconds

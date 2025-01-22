@@ -4,11 +4,13 @@ import path from "node:path";
 
 import { DataSource } from "typeorm";
 export * from "./entity";
-import { getNodecgRoot } from "../../nodecg-root";
-import { nodecgPath } from "../../util/nodecg-path";
-import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
+import { getNodecgRoot } from "@nodecg/internal-util";
 
-const testing = process.env.NODECG_TEST?.toLowerCase() === "true";
+import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
+import { initialize1669424617013 } from "./migration/1669424617013-initialize";
+import { defaultRoles1669424781583 } from "./migration/1669424781583-default-roles";
+
+const testing = process.env["NODECG_TEST"]?.toLowerCase() === "true";
 
 export const dataSource = new DataSource({
 	type: "better-sqlite3",
@@ -29,9 +31,7 @@ export const dataSource = new DataSource({
 		: path.join(getNodecgRoot(), "db/nodecg.sqlite3"),
 	logging: false,
 	entities: [ApiKey, Identity, Permission, Replicant, Role, User],
-	migrations: [
-		path.join(nodecgPath, "out/server/database/default/migration/*.js"),
-	],
+	migrations: [initialize1669424617013, defaultRoles1669424781583],
 	migrationsRun: true,
 	synchronize: false,
 });
