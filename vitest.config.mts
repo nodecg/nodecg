@@ -25,5 +25,8 @@ export default defineConfig({
 			test: "true",
 			NODECG_TEST: "true",
 		},
+		coverage: {
+			exclude: ["workspaces"],
+		},
 	},
 });
