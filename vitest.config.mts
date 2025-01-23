@@ -26,7 +26,7 @@ export default defineConfig({
 			NODECG_TEST: "true",
 		},
 		coverage: {
-			exclude: ["workspaces"],
+			include: ["src", "workspaces/*/src"],
 		},
 	},
 });
