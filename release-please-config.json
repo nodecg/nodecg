@@ -8,9 +8,15 @@
 		".": {
 			"exclude-paths": ["workspaces"]
 		},
-		"workspaces/internal-util": {},
-		"workspaces/database-adapter-types": {},
-		"workspaces/database-adapter-sqlite-legacy": {}
+		"workspaces/internal-util": {
+			"release-as": "0.0.1"
+		},
+		"workspaces/database-adapter-types": {
+			"release-as": "0.0.1"
+		},
+		"workspaces/database-adapter-sqlite-legacy": {
+			"release-as": "0.0.1"
+		}
 	},
 	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0",
 	"prerelease": false
