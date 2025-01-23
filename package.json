@@ -164,7 +164,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@eslint/js": "^9.18.0",
+    "@eslint/js": "^9.17.0",
     "@types/app-root-path": "^1.2.8",
     "@types/clone": "^2.1.4",
     "@types/compression": "^1.7.5",
@@ -175,7 +175,7 @@
     "@types/glob": "^8.1.0",
     "@types/hosted-git-info": "^3.0.5",
     "@types/is-ci": "^3.0.4",
-    "@types/lodash": "^4.17.14",
+    "@types/lodash": "^4.17.13",
     "@types/npm-package-arg": "^6.1.4",
     "@types/object-path": "^0.11.4",
     "@types/passport-discord": "^0.1.14",
