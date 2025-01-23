@@ -1,10 +1,10 @@
 {
   "name": "@nodecg/database-adapter-sqlite-legacy",
   "version": "0.0.0",
+  "main": "dist/database-adapter.js",
   "files": [
     "dist"
   ],
-  "main": "dist/database-adapter.js",
   "scripts": {
     "build": "del-cli dist && tsc -b",
     "dev": "del-cli dist && tsc -b --watch --preserveWatchOutput",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@nodecg/database-adapter-types": "0.0.0",
     "@nodecg/internal-util": "0.0.0",
+    "better-sqlite3": "^9.6.0",
     "typeorm": "0.3.19"
   },
   "devDependencies": {

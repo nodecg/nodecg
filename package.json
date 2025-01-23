@@ -109,7 +109,6 @@
     "ajv-draft-04": "^1.0.0",
     "ajv-formats": "^2.1.1",
     "app-root-path": "^3.1.0",
-    "better-sqlite3": "^9.6.0",
     "body-parser": "^1.20.2",
     "chalk": "^5.4.1",
     "cheerio": "1.0.0-rc.12",
