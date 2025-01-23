@@ -3,9 +3,6 @@
   "version": "0.0.0",
   "type": "module",
   "main": "dist/main.js",
-  "bin": {
-    "nodecg": "dist/main.js"
-  },
   "files": [
     "dist"
   ],
