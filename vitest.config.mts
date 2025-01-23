@@ -27,6 +27,7 @@ export default defineConfig({
 		},
 		coverage: {
 			include: ["src", "workspaces/*/src"],
+			exclude: ["src/client"],
 		},
 	},
 });
