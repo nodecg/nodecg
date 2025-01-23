@@ -16,19 +16,9 @@
 		},
 		"status": {
 			"type": "string",
-			"enum": [
-				"connected",
-				"connecting",
-				"disconnected",
-				"error"
-			],
+			"enum": ["connected", "connecting", "disconnected", "error"],
 			"default": "disconnected"
 		}
 	},
-	"required": [
-		"ip",
-		"port",
-		"password",
-		"status"
-	]
+	"required": ["ip", "port", "password", "status"]
 }
