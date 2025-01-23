@@ -4,7 +4,7 @@
   "type": "module",
   "main": "dist/main.js",
   "bin": {
-    "@nodecg/cli": "dist/main.js"
+    "nodecg": "dist/main.js"
   },
   "files": [
     "dist"
