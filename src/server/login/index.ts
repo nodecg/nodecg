@@ -68,7 +68,7 @@ async function makeDiscordAPIRequest(
 		},
 	);
 
-	const data = await res.json();
+	const data = (await res.json()) as { roles: string[] };
 	if (res.status === 200) {
 		return [guild, false, data];
 	}
