@@ -1,22 +1,22 @@
 {
 	"extends": "../tsconfig.json",
 	"compilerOptions": {
+		"rootDir": ".",
 		"target": "ESNext",
 		"module": "ESNext",
 		"moduleResolution": "bundler",
+		"lib": ["ESNext", "DOM"],
+
 		"noEmit": true,
+
 		"noUncheckedIndexedAccess": false,
 		"noPropertyAccessFromIndexSignature": false
 	},
-	"include": [
-		"./**/*.ts",
-
-		/**
-		 * Project references do not resolve ambient types!
-		 * So, we must manually inlcude them here.
-		 * https://github.com/microsoft/TypeScript/issues/29002
-		 */
-		"../src/types/**/*.d.ts",
-		"../src/server/types/**/*.d.ts"
+	"include": ["./**/*.ts"],
+	"references": [
+		{ "path": "../src/types" },
+		{ "path": "../src/shared" },
+		{ "path": "../src/server" },
+		{ "path": "../src/client" }
 	]
 }

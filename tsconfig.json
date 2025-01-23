@@ -1,8 +1,7 @@
 {
 	"compilerOptions": {
-		"target": "ES6",
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
+		"target": "ES2022",
+		"lib": ["ES2022"],
 
 		"module": "commonjs",
 		"moduleResolution": "node10",
@@ -12,12 +11,12 @@
 		"strict": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"exactOptionalPropertyTypes": false,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
 		"noPropertyAccessFromIndexSignature": true,
+
 		"skipLibCheck": true,
 
 		"declaration": true,
