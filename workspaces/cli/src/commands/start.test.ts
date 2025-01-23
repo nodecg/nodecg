@@ -1,7 +1,7 @@
 import type { Command } from "commander";
 import { beforeEach, expect, test, vi } from "vitest";
 
-import { createMockProgram, type MockCommand } from "../test/mocks/program";
+import { createMockProgram, type MockCommand } from "../../test/mocks/program";
 import { startCommand } from "./start";
 
 let program: MockCommand;

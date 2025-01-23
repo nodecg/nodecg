@@ -1,6 +1,6 @@
 import { Command } from "commander";
 
-import packageJson from "../../package.json" with { type: "json" };
+import packageJson from "../package.json" with { type: "json" };
 import { setupCommands } from "./commands/index.js";
 
 export function setupCLI() {

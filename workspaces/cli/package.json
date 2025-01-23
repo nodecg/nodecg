@@ -1,0 +1,47 @@
+{
+  "name": "@nodecg/cli",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/main.js",
+  "bin": {
+    "@nodecg/cli": "dist/main.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "run-s build:*",
+    "build:tsc": "tsc -b",
+    "build:esbuild": "del-cli dist && esbuild src/bin/nodecg.ts --bundle --format=esm --sourcemap --platform=node --target=node18 --outfile=dist/main.js --packages=external",
+    "dev": "run-p dev:*",
+    "dev:tsc": "tsc -b --watch --preserveWatchOutput",
+    "dev:esbuild": "del-cli dist && npm run build -- --watch",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.2.1",
+    "ajv": "^8.17.1",
+    "chalk": "^5.4.1",
+    "commander": "^13.0.0",
+    "hosted-git-info": "^8.0.2",
+    "json-schema-to-typescript": "^15.0.3",
+    "nano-spawn": "^0.2.0",
+    "npm-package-arg": "^12.0.1",
+    "semver": "^7.6.3",
+    "tar": "^7.4.3"
+  },
+  "devDependencies": {
+    "@types/hosted-git-info": "^3.0.5",
+    "@types/node": "18",
+    "@types/npm-package-arg": "^6.1.4",
+    "@types/semver": "^7.5.8",
+    "del-cli": "^6.0.0",
+    "esbuild": "^0.24.2",
+    "typescript": "~5.7.3",
+    "vitest": "^3.0.4",
+    "npm-run-all2": "^7.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

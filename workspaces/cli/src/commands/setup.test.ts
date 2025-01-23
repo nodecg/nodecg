@@ -4,8 +4,8 @@ import { Command } from "commander";
 import type { PackageJson } from "type-fest";
 import { beforeEach, expect, test, vi } from "vitest";
 
-import { createMockProgram, MockCommand } from "../test/mocks/program.js";
-import { setupTmpDir } from "../test/tmp-dir.js";
+import { createMockProgram, MockCommand } from "../../test/mocks/program.js";
+import { setupTmpDir } from "../../test/tmp-dir.js";
 import { setupCommand } from "./setup.js";
 
 vi.mock("@inquirer/prompts", () => ({ confirm: () => Promise.resolve(true) }));

@@ -5,8 +5,8 @@ import { fileURLToPath } from "node:url";
 
 import { beforeEach, expect, it, vi } from "vitest";
 
-import { createMockProgram, MockCommand } from "../test/mocks/program.js";
-import { setupTmpDir } from "../test/tmp-dir.js";
+import { createMockProgram, MockCommand } from "../../test/mocks/program.js";
+import { setupTmpDir } from "../../test/tmp-dir.js";
 import { schemaTypesCommand } from "./schema-types.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,7 +20,7 @@ beforeEach(() => {
 	fs.writeFileSync("package.json", JSON.stringify({ name: "nodecg" }));
 
 	// Copy fixtures.
-	fs.cpSync(path.resolve(dirname, "../test/fixtures/"), "./", {
+	fs.cpSync(path.resolve(dirname, "../../test/fixtures/"), "./", {
 		recursive: true,
 	});
 

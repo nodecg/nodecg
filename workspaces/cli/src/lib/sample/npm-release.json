@@ -1,0 +1,116 @@
+{
+	"name": "nodecg-cli",
+	"version": "8.7.0",
+	"description": "The NodeCG command line interface.",
+	"homepage": "https://github.com/nodecg/nodecg-cli#readme",
+	"bugs": {
+		"url": "http://github.com/nodecg/nodecg-cli/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/nodecg/nodecg-cli.git"
+	},
+	"license": "MIT",
+	"maintainers": [
+		{
+			"name": "mattmcnam",
+			"email": "matt@mattmcn.com"
+		},
+		{
+			"name": "hoishin",
+			"email": "hoishinxii@gmail.com"
+		}
+	],
+	"contributors": [
+		{
+			"name": "Alex Van Camp",
+			"email": "email@alexvan.camp",
+			"url": "https://alexvan.camp/"
+		},
+		{
+			"name": "Matthew McNamara",
+			"email": "matt@mattmcn.com",
+			"url": "http://mattmcn.com/"
+		},
+		{
+			"name": "Keiichiro Amemiya",
+			"email": "kei@hoishin.dev"
+		}
+	],
+	"type": "module",
+	"bin": {
+		"nodecg": "dist/bin/nodecg.js"
+	},
+	"directories": {},
+	"scripts": {
+		"dev": "tsc --build tsconfig.build.json --watch",
+		"fix": "run-s fix:*",
+		"fix:eslint": "eslint --fix",
+		"fix:prettier": "prettier --write \"**/*.ts\"",
+		"test": "vitest",
+		"build": "del-cli dist && tsc --build tsconfig.build.json",
+		"format": "prettier --write \"**/*.ts\"",
+		"static": "run-s static:*",
+		"static:eslint": "eslint --cache",
+		"static:prettier": "prettier --check \"**/*.ts\""
+	},
+	"prettier": {},
+	"dependencies": {
+		"chalk": "^5.4.1",
+		"commander": "^12.1.0",
+		"hosted-git-info": "^8.0.2",
+		"inquirer": "^12.3.0",
+		"json-schema-defaults": "0.4.0",
+		"json-schema-to-typescript": "^15.0.3",
+		"npm-package-arg": "^12.0.1",
+		"semver": "^7.6.3",
+		"tar": "^7.4.3"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.17.0",
+		"@types/hosted-git-info": "^3.0.5",
+		"@types/node": "18",
+		"@types/npm-package-arg": "^6.1.4",
+		"@types/semver": "^7.5.8",
+		"@vitest/coverage-v8": "^2.1.8",
+		"del-cli": "^6.0.0",
+		"eslint": "^9.17.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-simple-import-sort": "^12.1.1",
+		"npm-run-all2": "^7.0.2",
+		"prettier": "^3.4.2",
+		"type-fest": "^4.31.0",
+		"typescript": "~5.7.2",
+		"typescript-eslint": "^8.18.2",
+		"vitest": "^2.1.8"
+	},
+	"engines": {
+		"node": "^18.17.0 || ^20.9.0 || ^22.11.0"
+	},
+	"dist": {
+		"shasum": "bd59db2d98c2077bc03623cb9be59ff45fb511a2",
+		"tarball": "https://registry.npmjs.org/nodecg-cli/-/nodecg-cli-8.7.0.tgz",
+		"fileCount": 28,
+		"integrity": "sha512-RcoE8PhtivBz1dtKDmgBh3MTozckwymcPr9UC1oiagYMlDLoTvLC1Bqssef5h+rNNK/aBeVB33leySFEQWNbjQ==",
+		"signatures": [
+			{
+				"sig": "MEUCIQDuXO/x48us+Bt7A9SskHcLDaAmDFhEDCgbMcTfolZHUQIgNLF0GtmhOF5COKdZue+HwYIRAeO8KbScnZeE/U6PQe4=",
+				"keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+			}
+		],
+		"unpackedSize": 155193
+	},
+	"gitHead": "15d3992ec6d6eeb874d9c20473a63435689acbc9",
+	"_hasShrinkwrap": false,
+	"_id": "nodecg-cli@8.7.0",
+	"_nodeVersion": "22.12.0",
+	"_npmOperationalInternal": {
+		"tmp": "tmp/nodecg-cli_8.7.0_1735252303987_0.756945223884677",
+		"host": "s3://npm-registry-packages-npm-production"
+	},
+	"_npmUser": {
+		"name": "hoishin",
+		"email": "hoishinxii@gmail.com"
+	},
+	"_npmVersion": "10.9.0"
+}

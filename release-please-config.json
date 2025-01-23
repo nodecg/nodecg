@@ -16,8 +16,10 @@
 		},
 		"workspaces/database-adapter-sqlite-legacy": {
 			"release-as": "0.0.1"
+		},
+		"workspaces/cli": {
+			"release-as": "0.0.1"
 		}
 	},
-	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0",
-	"prerelease": false
+	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0"
 }

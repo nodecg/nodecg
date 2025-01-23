@@ -4,8 +4,8 @@ import path from "node:path";
 import { Command } from "commander";
 import { beforeEach, expect, it, vi } from "vitest";
 
-import { createMockProgram, MockCommand } from "../test/mocks/program.js";
-import { setupTmpDir } from "../test/tmp-dir.js";
+import { createMockProgram, MockCommand } from "../../test/mocks/program.js";
+import { setupTmpDir } from "../../test/tmp-dir.js";
 import { uninstallCommand } from "./uninstall.js";
 
 vi.mock("@inquirer/prompts", () => ({ confirm: () => Promise.resolve(true) }));
@@ -19,7 +19,7 @@ beforeEach(() => {
 	fs.writeFileSync("package.json", JSON.stringify({ name: "nodecg" }));
 
 	// Copy fixtures.
-	fs.cpSync(path.resolve(__dirname, "../test/fixtures/"), "./", {
+	fs.cpSync(path.resolve(__dirname, "../../test/fixtures/"), "./", {
 		recursive: true,
 	});
 
