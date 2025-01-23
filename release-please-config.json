@@ -2,15 +2,15 @@
 	"$schema": "https://raw.githubusercontent.com/googleapis/release-please/refs/tags/v16.15.0/schemas/config.json",
 	"release-type": "node",
 	"plugins": ["node-workspace"],
+	"bump-minor-pre-major": true,
+	"bump-patch-for-minor-pre-major": true,
 	"packages": {
 		".": {
 			"exclude-paths": ["workspaces"]
 		},
-		"workspaces/database-adapter-types": {
-			"bump-minor-pre-major": true,
-			"bump-patch-for-minor-pre-major": true,
-			"release-as": "0.0.1"
-		}
+		"workspaces/internal-util": {},
+		"workspaces/database-adapter-types": {},
+		"workspaces/database-adapter-sqlite-legacy": {}
 	},
 	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0",
 	"prerelease": false
