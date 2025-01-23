@@ -26,7 +26,7 @@
     }
   },
   "bin": {
-    "nodecg": "out/cli.mjs"
+    "nodecg": "./cli.mjs"
   },
   "files": [
     "dist",
