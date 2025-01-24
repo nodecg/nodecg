@@ -5,7 +5,7 @@
 		"outDir": "dist",
 		"rootDir": "src",
 		"declaration": true,
-		"sourceMap": true,
-		"tsBuildInfoFile": "tsconfig.tsbuildinfo"
+		"declarationMap": true,
+		"sourceMap": true
 	}
 }
