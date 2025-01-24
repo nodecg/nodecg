@@ -107,8 +107,8 @@ jobs:
 
       - run: |
           npx tsx scripts/prepare-prerelease.ts --version 0.0.0-pr${{ github.event.number }}.${{ github.sha }}
-          npm publish --tag pr${{ github.event.number }}
           npm --workspaces publish --tag pr${{ github.event.number }}
+          npm publish --tag pr${{ github.event.number }}
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag pr${{ github.event.number }}
         env:
@@ -169,8 +169,8 @@ jobs:
 
       - if: ${{ needs.release-please.outputs.release_created }}
         run: |
-          npm publish
           npm --workspaces publish
+          npm publish
           npx tsx scripts/prepare-publish-types.ts
           npm publish
         env:
@@ -179,8 +179,8 @@ jobs:
       - if: ${{ !needs.release-please.outputs.release_created }}
         run: |
           npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
-          npm publish --tag canary
           npm --workspaces publish --tag canary
+          npm publish --tag canary
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag canary
         env:
