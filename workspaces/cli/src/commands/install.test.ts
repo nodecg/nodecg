@@ -4,8 +4,8 @@ import { Command } from "commander";
 import semver from "semver";
 import { beforeEach, expect, it, vi } from "vitest";
 
-import { createMockProgram, MockCommand } from "../test/mocks/program.js";
-import { setupTmpDir } from "../test/tmp-dir.js";
+import { createMockProgram, MockCommand } from "../../test/mocks/program.js";
+import { setupTmpDir } from "../../test/tmp-dir.js";
 import { installCommand } from "./install.js";
 
 let program: MockCommand;

@@ -4,8 +4,8 @@ import { Command } from "commander";
 import type { PackageJson } from "type-fest";
 import { beforeEach, expect, test, vi } from "vitest";
 
-import { createMockProgram, MockCommand } from "../test/mocks/program.js";
-import { setupTmpDir } from "../test/tmp-dir.js";
+import { createMockProgram, MockCommand } from "../../test/mocks/program.js";
+import { setupTmpDir } from "../../test/tmp-dir.js";
 import { setupCommand } from "./setup.js";
 
 vi.mock("@inquirer/prompts", () => ({ confirm: () => Promise.resolve(true) }));
@@ -36,18 +36,22 @@ test("should install the latest NodeCG when no version is specified", async () =
 	expect(readPackageJson().name).toBe("nodecg");
 });
 
-test("should install v2 NodeCG when specified", async () => {
-	chdir();
-	await program.runWith("setup 2.0.0 --skip-dependencies");
-	expect(readPackageJson().name).toBe("nodecg");
-	expect(readPackageJson().version).toBe("2.0.0");
+test(
+	"should install v2 NodeCG when specified",
+	{ timeout: 30_000 },
+	async () => {
+		chdir();
+		await program.runWith("setup 2.0.0 --skip-dependencies");
+		expect(readPackageJson().name).toBe("nodecg");
+		expect(readPackageJson().version).toBe("2.0.0");
 
-	await program.runWith("setup 2.1.0 -u --skip-dependencies");
-	expect(readPackageJson().version).toBe("2.1.0");
+		await program.runWith("setup 2.1.0 -u --skip-dependencies");
+		expect(readPackageJson().version).toBe("2.1.0");
 
-	await program.runWith("setup 2.0.0 -u --skip-dependencies");
-	expect(readPackageJson().version).toBe("2.0.0");
-});
+		await program.runWith("setup 2.0.0 -u --skip-dependencies");
+		expect(readPackageJson().version).toBe("2.0.0");
+	},
+);
 
 test("install NodeCG with dependencies", { timeout: 600_000 }, async () => {
 	chdir();
