@@ -41,6 +41,7 @@
     "workspaces/internal-util",
     "workspaces/database-adapter-types",
     "workspaces/database-adapter-sqlite-legacy",
+    "workspaces/database-adapter-sqlite",
     "workspaces/cli"
   ],
   "scripts": {
@@ -200,7 +201,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "type-fest": "^4.31.0",
-    "typescript": "~5.7.2",
+    "typescript": "~5.7.3",
     "typescript-eslint": "^8.18.2",
     "vite-plugin-swc-transform": "^1.0.1",
     "vitest": "^3.0.2",

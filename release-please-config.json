@@ -17,6 +17,9 @@
 		"workspaces/database-adapter-sqlite-legacy": {
 			"release-as": "0.0.1"
 		},
+		"workspaces/database-adapter-sqlite": {
+			"release-as": "0.0.1"
+		},
 		"workspaces/cli": {
 			"release-as": "0.0.1"
 		}

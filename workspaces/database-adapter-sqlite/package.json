@@ -1,0 +1,14 @@
+{
+  "name": "@nodecg/database-adapter-sqlite",
+  "version": "0.0.0",
+  "main": "dist/main.js",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "prisma": "^6.2.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
