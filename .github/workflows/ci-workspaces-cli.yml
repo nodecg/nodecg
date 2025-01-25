@@ -1,0 +1,42 @@
+name: CI workspaces/cli
+
+on:
+  push:
+    branches:
+      - main
+      - next
+    paths:
+      - workspaces/cli/**
+  pull_request:
+    branches:
+      - main
+      - next
+    paths:
+      - workspaces/cli/**
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        node-version:
+          - 18
+          - 20
+          - 22
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm run test -- --coverage
+        working-directory: workspaces/cli
+      - if: matrix.os == 'ubuntu-latest' && matrix.node-version == 22
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: workspaces/cli
