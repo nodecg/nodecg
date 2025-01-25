@@ -12,7 +12,7 @@ export default defineConfig({
 		},
 		include: ["src/**/*.test.ts", "test/**/*.test.ts"],
 		coverage: {
-			include: ["src", "test"],
+			include: ["src"],
 			exclude: ["src/client"],
 		},
 	},
