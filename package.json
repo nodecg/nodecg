@@ -166,7 +166,7 @@
     "@types/passport-steam": "^1.0.5",
     "@types/semver": "^7.5.8",
     "@types/yargs": "^15.0.19",
-    "@vitest/coverage-v8": "^3.0.2",
+    "@vitest/coverage-v8": "^3.0.4",
     "cpy-cli": "^5.0.0",
     "del-cli": "^5.1.0",
     "esbuild": "^0.19.12",
@@ -183,7 +183,7 @@
     "tsx": "^4.19.2",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.18.2",
-    "vitest": "^3.0.2",
+    "vitest": "^3.0.4",
     "vitest-mock-express": "^2.2.0"
   },
   "engines": {
