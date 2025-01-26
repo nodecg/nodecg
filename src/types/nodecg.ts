@@ -83,7 +83,7 @@ export namespace NodeCG {
 		 * The actual structure of a bundle's `nodecg` stanza from it's `package.json`.
 		 */
 		export interface UnparsedManifest {
-			compatibleRange: string;
+			compatibleRange?: string;
 			transformBareModuleSpecifiers?: boolean;
 			dashboardPanels?: UnparsedPanel[];
 			graphics?: UnparsedGraphic[];
@@ -106,7 +106,7 @@ export namespace NodeCG {
 		homepage?: string;
 		author?: Person;
 		contributors?: Person[];
-		nodecg: Manifest.UnparsedManifest;
+		nodecg?: Manifest.UnparsedManifest;
 	}
 
 	/**
