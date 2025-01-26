@@ -183,7 +183,6 @@
     "tsx": "^4.19.2",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.18.2",
-    "vite-plugin-swc-transform": "^1.0.1",
     "vitest": "^3.0.2",
     "vitest-mock-express": "^2.2.0"
   },
