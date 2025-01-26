@@ -1,54 +1,55 @@
 import * as path from "node:path";
 
+import IOE from "fp-ts/IOEither";
 import semver from "semver";
 
 import type { NodeCG } from "../../types/nodecg";
 import { isLegacyProject } from "../util/project-type";
 
-export function parseManifest(
-	pkg: NodeCG.PackageJSON,
-	bundlePath: string,
-): NodeCG.Manifest {
-	if (!pkg.name) {
-		throw new Error(`${bundlePath}'s package.json must specify "name".`);
-	}
-
-	if (isLegacyProject) {
-		// Check if this manifest has a nodecg property
-		if (!{}.hasOwnProperty.call(pkg, "nodecg")) {
-			throw new Error(
-				`${pkg.name}'s package.json lacks a "nodecg" property, and therefore cannot be parsed.`,
+export const parseManifest =
+	(bundlePath: string) => (packageJson: NodeCG.PackageJSON) => {
+		if (!packageJson.name) {
+			return IOE.left(
+				new Error(`${bundlePath}'s package.json must specify "name".`),
 			);
 		}
 
-		if (!semver.validRange(pkg.nodecg.compatibleRange)) {
-			throw new Error(
-				`${pkg.name}'s package.json does not have a valid "nodecg.compatibleRange" property.`,
-			);
+		if (isLegacyProject) {
+			if (!packageJson.nodecg) {
+				return IOE.left(
+					new Error(
+						`${packageJson.name}'s package.json lacks a "nodecg" property, and therefore cannot be parsed.`,
+					),
+				);
+			}
+			if (!semver.validRange(packageJson.nodecg.compatibleRange)) {
+				return IOE.left(
+					new Error(
+						`${packageJson.name}'s package.json does not have a valid "nodecg.compatibleRange" property.`,
+					),
+				);
+			}
+			const bundleFolderName = path.basename(bundlePath);
+			if (bundleFolderName !== packageJson.name) {
+				return IOE.left(
+					new Error(
+						`${packageJson.name}'s folder is named "${bundleFolderName}". Please rename it to "${packageJson.name}".`,
+					),
+				);
+			}
 		}
 
-		const bundleFolderName = path.basename(bundlePath);
-		if (bundleFolderName !== pkg.name) {
-			throw new Error(
-				`${pkg.name}'s folder is named "${bundleFolderName}". Please rename it to "${pkg.name}".`,
-			);
-		}
-	}
-
-	// Grab the standard properties from the package.json that we care about.
-	const manifest: NodeCG.Manifest = {
-		...pkg.nodecg,
-		name: pkg.name,
-		version: pkg.version,
-		license: pkg.license,
-		description: pkg.description,
-		homepage: pkg.homepage,
-		author: pkg.author,
-		contributors: pkg.contributors,
-		transformBareModuleSpecifiers: Boolean(
-			pkg.nodecg?.transformBareModuleSpecifiers,
-		),
+		return IOE.right({
+			...packageJson.nodecg,
+			name: packageJson.name,
+			version: packageJson.version,
+			license: packageJson.license,
+			description: packageJson.description,
+			homepage: packageJson.homepage,
+			author: packageJson.author,
+			contributors: packageJson.contributors,
+			transformBareModuleSpecifiers: Boolean(
+				packageJson.nodecg?.transformBareModuleSpecifiers,
+			),
+		} satisfies NodeCG.Manifest);
 	};
-
-	return manifest;
-}
