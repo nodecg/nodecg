@@ -17,26 +17,13 @@ import { parseMounts } from "./mounts";
 import { parsePanels } from "./panels";
 import { parseSounds } from "./sounds";
 
-const parsePackageJson = (bundlePath: string) =>
-	flow(
-		parseJson,
-		IOE.map((json) => json as NodeCG.PackageJSON),
-		IOE.mapLeft((error) => {
-			if (error instanceof SyntaxError) {
-				return new Error(
-					`${bundlePath}'s package.json is not valid JSON, please check it against a validator such as jsonlint.com`,
-				);
-			}
-			return error;
-		}),
-	);
-
 const readBundlePackageJson = (bundlePath: string) =>
 	pipe(
 		bundlePath,
 		(bundlePath: string) => path.join(bundlePath, "package.json"),
 		readFileSync,
-		IOE.flatMap(parsePackageJson(bundlePath)),
+		IOE.flatMap(parseJson),
+		IOE.map((json) => json as NodeCG.PackageJSON),
 		IOE.mapLeft((error) => {
 			if (error instanceof NotExistError) {
 				return new Error(
