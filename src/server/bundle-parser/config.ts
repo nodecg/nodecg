@@ -13,7 +13,7 @@ import {
 import { stringifyError } from "../../shared/utils/errors";
 import type { NodeCG } from "../../types/nodecg";
 
-export function parse(
+export function parseBundleConfig(
 	bundleName: string,
 	bundleDir: string,
 	userConfig: NodeCG.Bundle.UnknownConfig,
