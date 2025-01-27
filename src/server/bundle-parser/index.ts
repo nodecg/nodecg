@@ -1,8 +1,8 @@
 import path from "node:path";
 
-import E from "fp-ts/Either";
+import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
-import IOE from "fp-ts/IOEither";
+import * as IOE from "fp-ts/IOEither";
 
 import type { NodeCG } from "../../types/nodecg";
 import { parseJson, ParseJsonError } from "../util-fp/parse-json";

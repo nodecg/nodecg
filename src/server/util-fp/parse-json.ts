@@ -1,4 +1,4 @@
-import IOE from "fp-ts/IOEither";
+import * as IOE from "fp-ts/IOEither";
 
 export class ParseJsonError extends Error {
 	constructor(message: string) {

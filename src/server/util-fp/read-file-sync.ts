@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-import IOE from "fp-ts/IOEither";
+import * as IOE from "fp-ts/IOEither";
 
 export class NotExistError extends Error {
 	public readonly path: string;
