@@ -1,6 +1,6 @@
 import * as path from "node:path";
 
-import IOE from "fp-ts/IOEither";
+import * as IOE from "fp-ts/IOEither";
 import semver from "semver";
 
 import type { NodeCG } from "../../types/nodecg";
