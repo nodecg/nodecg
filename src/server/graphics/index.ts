@@ -1,4 +1,4 @@
-import { isLegacyProject,rootPath } from "@nodecg/internal-util";
+import { isLegacyProject, rootPath } from "@nodecg/internal-util";
 import express from "express";
 import path from "path";
 
