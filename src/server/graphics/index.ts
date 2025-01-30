@@ -1,4 +1,4 @@
-import { rootPath } from "@nodecg/internal-util";
+import { isLegacyProject, rootPath } from "@nodecg/internal-util";
 import express from "express";
 import path from "path";
 
@@ -7,7 +7,6 @@ import type { BundleManager } from "../bundle-manager";
 import type { Replicator } from "../replicant/replicator";
 import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
-import { isLegacyProject } from "../util/project-type";
 import { sendFile } from "../util/send-file";
 import { sendNodeModulesFile } from "../util/send-node-modules-file";
 import { RegistrationCoordinator } from "./registration";

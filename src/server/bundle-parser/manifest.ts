@@ -1,10 +1,10 @@
 import * as path from "node:path";
 
+import { isLegacyProject } from "@nodecg/internal-util";
 import * as IOE from "fp-ts/IOEither";
 import semver from "semver";
 
 import type { NodeCG } from "../../types/nodecg";
-import { isLegacyProject } from "../util/project-type";
 
 export const parseManifest =
 	(bundlePath: string) => (packageJson: NodeCG.PackageJSON) => {

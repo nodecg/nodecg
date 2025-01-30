@@ -1,3 +1,4 @@
+import { nodecgPath } from "@nodecg/internal-util";
 import express from "express";
 import fs from "fs";
 import path from "path";
@@ -9,7 +10,6 @@ import type { Replicator } from "../replicant/replicator";
 import type { ServerReplicant } from "../replicant/server-replicant";
 import { injectScripts } from "../util/injectscripts";
 import { isChildPath } from "../util/is-child-path";
-import { nodecgPath } from "../util/nodecg-path";
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 

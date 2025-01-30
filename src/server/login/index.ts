@@ -6,6 +6,7 @@ import type {
 	Role,
 	User,
 } from "@nodecg/database-adapter-types";
+import { nodecgPath } from "@nodecg/internal-util";
 import cookieParser from "cookie-parser";
 import express from "express";
 import expressSession from "express-session";
@@ -17,7 +18,6 @@ import { Strategy as TwitchStrategy } from "passport-twitch-helix";
 
 import { config } from "../config";
 import { createLogger } from "../logger";
-import { nodecgPath } from "../util/nodecg-path";
 
 type StrategyDoneCb = (
 	error: NodeJS.ErrnoException | undefined,
