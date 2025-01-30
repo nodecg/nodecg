@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@inquirer/prompts": "^7.2.1",
+    "@nodecg/internal-util": "0.0.0",
     "ajv": "^8.17.1",
     "chalk": "^5.4.1",
     "commander": "^13.0.0",
