@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { rootPath } from "@nodecg/internal-util";
+import { rootPath } from "./nodecg-root";
 
 const rootPackageJson = fs.readFileSync(
 	path.join(rootPath, "package.json"),

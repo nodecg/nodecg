@@ -32,7 +32,7 @@ import fs = require("fs");
 import path = require("path");
 
 import { databaseAdapter as defaultAdapter } from "@nodecg/database-adapter-sqlite-legacy";
-import { getNodecgRoot } from "@nodecg/internal-util";
+import { getNodecgRoot, nodecgPath } from "@nodecg/internal-util";
 import bodyParser from "body-parser";
 import compression from "compression";
 import express from "express";
@@ -61,7 +61,6 @@ import { MountsLib } from "../mounts";
 import { Replicator } from "../replicant/replicator";
 import { SharedSourcesLib } from "../shared-sources";
 import { SoundsLib } from "../sounds";
-import { nodecgPath } from "../util/nodecg-path";
 import { SentryConfig } from "../util/sentry-config";
 import { ExtensionManager } from "./extensions";
 import { socketApiMiddleware } from "./socketApiMiddleware";

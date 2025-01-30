@@ -1,7 +1,6 @@
 import path from "node:path";
 
-import { rootPath } from "@nodecg/internal-util";
-
+import { rootPath } from "./nodecg-root";
 import { isLegacyProject } from "./project-type";
 
 export const nodecgPath = isLegacyProject
