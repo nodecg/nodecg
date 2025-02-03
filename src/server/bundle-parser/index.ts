@@ -6,8 +6,7 @@ import * as IOE from "fp-ts/IOEither";
 import * as O from "fp-ts/Option";
 
 import type { NodeCG } from "../../types/nodecg";
-import { readFileSync } from "../util-fp/fs/read-file-sync";
-import { parseJson } from "../util-fp/parse-json";
+import { readJsonFileSync } from "../util-fp/read-json-file-sync";
 import { parseAssets } from "./assets";
 import { parseBundleConfig, parseDefaults } from "./config";
 import { parseExtension } from "./extension";
@@ -22,8 +21,7 @@ const readBundlePackageJson = (bundlePath: string) =>
 	pipe(
 		bundlePath,
 		(bundlePath: string) => path.join(bundlePath, "package.json"),
-		readFileSync,
-		IOE.flatMap(flow(parseJson, IOE.fromEither)),
+		readJsonFileSync,
 		IOE.map((json) => json as NodeCG.PackageJSON),
 		IOE.mapLeft((error) => {
 			if ((error as NodeJS.ErrnoException).code === "ENOENT") {
