@@ -1,17 +1,56 @@
-import * as fs from "node:fs";
 import * as path from "node:path";
 
 import type { ValidateFunction } from "ajv";
 import extend from "extend";
+import * as B from "fp-ts/boolean";
+import { flow, pipe } from "fp-ts/function";
+import * as IO from "fp-ts/IO";
+import * as IOE from "fp-ts/IOEither";
 import { klona as clone } from "klona/json";
 
 import {
 	compileJsonSchema,
 	formatJsonSchemaErrors,
 	getSchemaDefault,
+	getSchemaDefaultFp,
 } from "../../shared/utils/compileJsonSchema";
 import { stringifyError } from "../../shared/utils/errors";
 import type { NodeCG } from "../../types/nodecg";
+import { existsSync } from "../util-fp/fs/exists-sync";
+import { readJsonFileSync } from "../util-fp/read-json-file-sync";
+
+const parseSchema = (bundleName: string) =>
+	flow(
+		readJsonFileSync,
+		IOE.map((json) => json as Record<string, any>),
+		IOE.mapError(() => {
+			return new Error(
+				`configschema.json for bundle "${bundleName}" could not be read. Ensure that it is valid JSON.`,
+			);
+		}),
+	);
+
+const createConfigschemaPath = (bundleDir: string) =>
+	path.join(bundleDir, "configschema.json");
+
+export const parseDefaults = (bundleName: string) =>
+	flow(createConfigschemaPath, (schemaPath) =>
+		pipe(
+			existsSync(schemaPath),
+			IO.flatMap(
+				B.match(
+					() => IOE.of({}),
+					flow(
+						() => parseSchema(bundleName)(schemaPath),
+						IOE.flatMapEither((schema) =>
+							getSchemaDefaultFp(schema, bundleName),
+						),
+						IOE.map((defaults) => defaults as Record<string, any>),
+					),
+				),
+			),
+		),
+	);
 
 export function parseBundleConfig(
 	bundleName: string,
@@ -19,11 +58,17 @@ export function parseBundleConfig(
 	userConfig: NodeCG.Bundle.UnknownConfig,
 ): NodeCG.Bundle.UnknownConfig {
 	const cfgSchemaPath = path.resolve(bundleDir, "configschema.json");
-	if (!fs.existsSync(cfgSchemaPath)) {
+	const configExists = existsSync(cfgSchemaPath);
+	if (!configExists()) {
 		return userConfig;
 	}
 
-	const schema = _parseSchema(bundleName, cfgSchemaPath);
+	const schema = pipe(
+		parseSchema(bundleName)(cfgSchemaPath),
+		IOE.getOrElse((error) => {
+			throw error;
+		}),
+	)();
 	const defaultConfig = getSchemaDefault(
 		schema,
 		bundleName,
@@ -76,30 +121,4 @@ export function parseBundleConfig(
 	throw new Error(
 		`Config for bundle "${bundleName}" is invalid:\n${formatJsonSchemaErrors(schema, validateUserConfig.errors)}`,
 	);
-}
-
-export function parseDefaults(
-	bundleName: string,
-	bundleDir: string,
-): Record<string, any> {
-	const cfgSchemaPath = path.resolve(bundleDir, "configschema.json");
-	if (fs.existsSync(cfgSchemaPath)) {
-		const schema = _parseSchema(bundleName, cfgSchemaPath);
-		return getSchemaDefault(schema, bundleName) as Record<string, any>;
-	}
-
-	return {};
-}
-
-function _parseSchema(
-	bundleName: string,
-	schemaPath: string,
-): Record<string, any> {
-	try {
-		return JSON.parse(fs.readFileSync(schemaPath, { encoding: "utf8" }));
-	} catch (_: unknown) {
-		throw new Error(
-			`configschema.json for bundle "${bundleName}" could not be read. Ensure that it is valid JSON.`,
-		);
-	}
 }

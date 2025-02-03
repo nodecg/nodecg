@@ -10,6 +10,7 @@ export default defineConfig({
 			test: "true",
 			NODECG_TEST: "true",
 		},
+		exclude: ["**/node_modules/**", "**/dist/**", "**/out/**"],
 		coverage: {
 			include: ["src", "workspaces/*/src"],
 			exclude: ["src/client"],
