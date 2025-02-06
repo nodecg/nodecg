@@ -3,10 +3,10 @@ import path from "node:path";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
 import * as IOE from "fp-ts/IOEither";
+import * as O from "fp-ts/Option";
 
 import type { NodeCG } from "../../types/nodecg";
-import { parseJson, ParseJsonError } from "../util-fp/parse-json";
-import { NotExistError, readFileSync } from "../util-fp/read-file-sync";
+import { readJsonFileSync } from "../util-fp/read-json-file-sync";
 import { parseAssets } from "./assets";
 import { parseBundleConfig, parseDefaults } from "./config";
 import { parseExtension } from "./extension";
@@ -21,16 +21,15 @@ const readBundlePackageJson = (bundlePath: string) =>
 	pipe(
 		bundlePath,
 		(bundlePath: string) => path.join(bundlePath, "package.json"),
-		readFileSync,
-		IOE.flatMap(parseJson),
+		readJsonFileSync,
 		IOE.map((json) => json as NodeCG.PackageJSON),
 		IOE.mapLeft((error) => {
-			if (error instanceof NotExistError) {
+			if ((error as NodeJS.ErrnoException).code === "ENOENT") {
 				return new Error(
 					`Bundle at path ${bundlePath} does not contain a package.json!`,
 				);
 			}
-			if (error instanceof ParseJsonError) {
+			if (error instanceof SyntaxError) {
 				return new Error(
 					`${bundlePath}'s package.json is not valid JSON, please check it against a validator such as jsonlint.com`,
 				);
@@ -82,11 +81,20 @@ export const parseBundle = (
 		}),
 	)();
 
-	// If there is a config file for this bundle, parse it.
-	// Else if there is only a configschema for this bundle, parse that and apply any defaults.
-	const config = bundleCfg
-		? parseBundleConfig(manifest.name, bundlePath, bundleCfg)
-		: parseDefaults(manifest.name, bundlePath);
+	const config = pipe(
+		bundleCfg,
+		O.fromNullable,
+		O.match(
+			() => parseDefaults(manifest.name)(bundlePath),
+			IOE.tryCatchK(
+				(bundleCfg) => parseBundleConfig(manifest.name, bundlePath, bundleCfg),
+				E.toError,
+			),
+		),
+		IOE.getOrElse((error) => {
+			throw error;
+		}),
+	)();
 
 	const bundle: NodeCG.Bundle = {
 		...manifest,
