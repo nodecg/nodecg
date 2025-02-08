@@ -6,10 +6,10 @@ import { NodeCGConfig } from './nodecg-config-schema';
 
 type Person =
 	| {
-			name: string;
-			email?: string;
-			url?: string;
-	  }
+		name: string;
+		email?: string;
+		url?: string;
+	}
 	| string;
 
 // TODO: remove namespace and combine group of types in each modules (breaking change)
@@ -118,17 +118,17 @@ export namespace NodeCG {
 		export type GitData =
 			| undefined
 			| {
-					branch: string;
-					hash: string;
-					shortHash: string;
-			  }
+				branch: string;
+				hash: string;
+				shortHash: string;
+			}
 			| {
-					branch: string;
-					hash: string;
-					shortHash: string;
-					date: string;
-					message: string;
-			  };
+				branch: string;
+				hash: string;
+				shortHash: string;
+				date: string;
+				message: string;
+			};
 
 		export type Graphic = {
 			url: string;
@@ -141,21 +141,21 @@ export namespace NodeCG {
 			html: string;
 		} & (
 				| {
-						dialog: false;
-						workspace: string;
-				  }
+					dialog: false;
+					workspace: string;
+				}
 				| {
-						dialog: true;
-				  }
+					dialog: true;
+				}
 			) &
 			(
 				| {
-						fullbleed: false;
-						width: number;
-				  }
+					fullbleed: false;
+					width: number;
+				}
 				| {
-						fullbleed: true;
-				  }
+					fullbleed: true;
+				}
 			);
 
 		export type Mount = Manifest.UnparsedMount;
@@ -328,30 +328,30 @@ export namespace NodeCG {
 		export type Operation<T> = {
 			path: string;
 		} & ( // Objects and arrays
-			| { method: 'overwrite'; args: { newValue: T | undefined } }
-			| { method: 'delete'; args: { prop: string | number | symbol } }
-			| { method: 'add'; args: { prop: string; newValue: any } }
-			| { method: 'update'; args: { prop: string; newValue: any } }
+				| { method: 'overwrite'; args: { newValue: T | undefined } }
+				| { method: 'delete'; args: { prop: string | number | symbol } }
+				| { method: 'add'; args: { prop: string; newValue: any } }
+				| { method: 'update'; args: { prop: string; newValue: any } }
 
-			// Array mutator methods
-			// This whole thing is gross and needs to be removed in v3
-			// It is rife with unsupported cases, very easy to make bugs here
-			| {
+				// Array mutator methods
+				// This whole thing is gross and needs to be removed in v3
+				// It is rife with unsupported cases, very easy to make bugs here
+				| {
 					method: 'copyWithin';
 					args: { mutatorArgs: Parameters<any[]['copyWithin']> };
-			  }
-			| { method: 'fill'; args: { mutatorArgs: Parameters<any[]['fill']> } }
-			| { method: 'pop' }
-			| { method: 'push'; args: { mutatorArgs: Parameters<any[]['push']> } }
-			| { method: 'reverse' }
-			| { method: 'shift' }
-			| { method: 'sort'; args: { mutatorArgs: Parameters<any[]['sort']> } }
-			| { method: 'splice'; args: { mutatorArgs: Parameters<any[]['splice']> } }
-			| {
+				}
+				| { method: 'fill'; args: { mutatorArgs: Parameters<any[]['fill']> } }
+				| { method: 'pop' }
+				| { method: 'push'; args: { mutatorArgs: Parameters<any[]['push']> } }
+				| { method: 'reverse' }
+				| { method: 'shift' }
+				| { method: 'sort'; args: { mutatorArgs: Parameters<any[]['sort']> } }
+				| { method: 'splice'; args: { mutatorArgs: Parameters<any[]['splice']> } }
+				| {
 					method: 'unshift';
 					args: { mutatorArgs: Parameters<any[]['unshift']> };
-			  }
-		);
+				}
+			);
 	}
 
 	/**

@@ -65,7 +65,7 @@ export default function (roleNames: string[], afterLoginRedirect?: string) {
 				return;
 			}
 
-			const allowed = isSuperUser(user) || roleNames.some(rn => isRole(user, rn));
+			const allowed = isSuperUser(user) || roleNames.some(rn => isRole(user!, rn));
 			keyOrSocketTokenAuthenticated = isUsingKeyOrSocketToken && allowed;
 			const provider = user.identities[0]!.provider_type;
 			const providerAllowed = config.login?.[provider]?.enabled;
