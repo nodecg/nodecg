@@ -2,12 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { Ajv, type JSONSchemaType } from "ajv";
+import addFormats from "ajv-formats";
 import chalk from "chalk";
 import { Command } from "commander";
 
 import { getNodeCGPath, isBundleFolder } from "../lib/util.js";
 
 const ajv = new Ajv({ useDefaults: true, strict: true });
+addFormats(ajv);
 
 export function defaultconfigCommand(program: Command) {
 	program
