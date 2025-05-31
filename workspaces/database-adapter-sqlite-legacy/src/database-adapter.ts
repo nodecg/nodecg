@@ -103,8 +103,7 @@ async function createIdentity(
 ): Promise<Identity> {
 	const database = await getConnection();
 	const { manager } = database;
-	// See https://github.com/typeorm/typeorm/issues/9070
-	const ident = manager.create<Identity>(Identity, identInfo);
+	const ident = manager.create(Identity, identInfo);
 	return manager.save(ident);
 }
 
