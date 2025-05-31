@@ -13,8 +13,8 @@
   "dependencies": {
     "@nodecg/database-adapter-types": "0.0.0",
     "@nodecg/internal-util": "0.0.0",
-    "better-sqlite3": "^9.6.0",
-    "typeorm": "0.3.19"
+    "better-sqlite3": "^11.10.0",
+    "typeorm": "0.3.24"
   },
   "devDependencies": {
     "del-cli": "^6.0.0",
