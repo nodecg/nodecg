@@ -7,7 +7,9 @@
 			"merge": false
 		},
 		{
-			"type": "linked-versions"
+			"type": "linked-versions",
+			"groupName": "nodecg",
+			"components": ["nodecg", "internal"]
 		}
 	],
 	"bump-minor-pre-major": true,
@@ -15,12 +17,14 @@
 	"include-component-in-tag": false,
 	"packages": {
 		".": {
-			"exclude-paths": ["workspaces"]
+			"exclude-paths": ["workspaces"],
+			"component": "nodecg",
+			"include-component-in-tag": false
 		},
-		"workspaces/internal-util": {},
-		"workspaces/database-adapter-types": {},
-		"workspaces/database-adapter-sqlite-legacy": {},
-		"workspaces/cli": {}
+		"workspaces/internal-util": { "component": "internal" },
+		"workspaces/database-adapter-types": { "component": "internal" },
+		"workspaces/database-adapter-sqlite-legacy": { "component": "internal" },
+		"workspaces/cli": { "component": "internal" }
 	},
 	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0"
 }
