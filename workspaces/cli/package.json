@@ -17,6 +17,7 @@
   "dependencies": {
     "@inquirer/prompts": "^7.2.1",
     "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "chalk": "^5.4.1",
     "commander": "^13.0.0",
     "hosted-git-info": "^8.0.2",
