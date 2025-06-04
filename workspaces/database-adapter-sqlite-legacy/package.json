@@ -1,6 +1,6 @@
 {
   "name": "@nodecg/database-adapter-sqlite-legacy",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "main": "dist/database-adapter.js",
   "files": [
     "dist"
@@ -11,8 +11,8 @@
     "generate-migrations": "typeorm-ts-node-commonjs migration:generate ./src/migration/rename-me -d ./src/datasource.ts"
   },
   "dependencies": {
-    "@nodecg/database-adapter-types": "0.0.1",
-    "@nodecg/internal-util": "0.0.1",
+    "@nodecg/database-adapter-types": "0.0.0",
+    "@nodecg/internal-util": "0.0.0",
     "better-sqlite3": "^11.10.0",
     "typeorm": "0.3.24"
   },

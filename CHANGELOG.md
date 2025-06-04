@@ -2,30 +2,6 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [2.6.0](https://github.com/nodecg/nodecg/compare/nodecg-v2.5.3...nodecg-v2.6.0) (2025-05-31)
-
-
-### Features
-
-* move CLI to own package ([#827](https://github.com/nodecg/nodecg/issues/827)) ([517e7d0](https://github.com/nodecg/nodecg/commit/517e7d0f4dcea97cd681a07813a254f7c204d37a))
-* move default database adapter to own package ([#821](https://github.com/nodecg/nodecg/issues/821)) ([2527f15](https://github.com/nodecg/nodecg/commit/2527f151737971a9dbde5f686f97edf48c48735b))
-* separate database adapter types into own package ([#814](https://github.com/nodecg/nodecg/issues/814)) ([a8ebaed](https://github.com/nodecg/nodecg/commit/a8ebaed56a7c0ef953d0f079acca38408b36cad4))
-
-
-### Bug Fixes
-
-* **deps:** bump better-sqlite3 and typeorm ([#850](https://github.com/nodecg/nodecg/issues/850)) ([926c2cc](https://github.com/nodecg/nodecg/commit/926c2cc0ca94e6df6437ad0323ad0b226e6f79ca))
-
-
-### Dependencies
-
-* The following workspace dependencies were updated
-  * dependencies
-    * @nodecg/cli bumped from 0.0.0 to 0.0.1
-    * @nodecg/database-adapter-sqlite-legacy bumped from 0.0.0 to 0.0.1
-    * @nodecg/database-adapter-types bumped from 0.0.0 to 0.0.1
-    * @nodecg/internal-util bumped from 0.0.0 to 0.0.1
-
 ## [2.5.3](https://github.com/nodecg/nodecg/compare/v2.5.2...v2.5.3) (2025-01-20)
 
 
