@@ -1,0 +1,31 @@
+[33mcommit 0322b0022251ac9db9be30da920f7dc3e3693dd6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: jazemking <jazem@me.com>
+Date:   Sun Jun 8 20:15:46 2025 +0300
+
+    nodecg
+
+[33mcommit bdffd07b7f115292cafff5a8375f9e4ee773436c[m[33m ([m[1;31mupstream/main[m[33m, [m[1;31mupstream/HEAD[m[33m)[m
+Author: Keiichiro Amemiya <hoishinxii@gmail.com>
+Date:   Wed Jun 4 23:02:29 2025 +0200
+
+    Revert "chore: release main (#819)"
+    
+    This reverts commit 3a416e5c0628908896b6c1a43b85936ac3b73e41.
+
+[33mcommit 157cb032a717569cad42c5f2889f1e7f2b8950d4[m
+Author: Keiichiro Amemiya <hoishinxii@gmail.com>
+Date:   Sun Jun 1 04:11:24 2025 +0200
+
+    chore: remove include-component-in-tag in root
+
+[33mcommit 3f31d2304d1a47b8c7103b6d88887162b56c9cd4[m
+Author: Keiichiro Amemiya <kei@hoishin.dev>
+Date:   Sun Jun 1 04:06:49 2025 +0200
+
+    fix(release): use component names (#855)
+
+[33mcommit fdd6bd816125a64a759d2a34e07f436a928f7f96[m
+Author: Keiichiro Amemiya <kei@hoishin.dev>
+Date:   Sun Jun 1 04:00:51 2025 +0200
+
+    fix(release): use linked-versions (#854)
