@@ -1,0 +1,6 @@
+{
+  "name": "schema-types",
+  "nodecg": {
+    "compatibleRange": "^1.3.0"
+  }
+}

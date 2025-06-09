@@ -1,0 +1,44 @@
+{
+  "description": "Implements a behavior used for material design dialogs",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "dialog",
+    "overlay",
+    "behavior"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/paper-dialog-behavior"
+  },
+  "homepage": "https://github.com/PolymerElements/paper-dialog-behavior",
+  "name": "@polymer/paper-dialog-behavior",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "@polymer/iron-demo-helpers": "^3.0.1",
+    "@polymer/iron-icons": "^3.0.0-pre.26",
+    "@polymer/iron-test-helpers": "^3.0.0-pre.26",
+    "@polymer/paper-button": "^3.0.0-pre.26",
+    "@polymer/paper-dialog-scrollable": "^3.0.0-pre.26",
+    "@polymer/paper-dropdown-menu": "^3.0.0-pre.26",
+    "@polymer/paper-icon-button": "^3.0.0-pre.26",
+    "@polymer/paper-item": "^3.0.0-pre.26",
+    "@polymer/paper-listbox": "^3.0.0-pre.26",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "wct-browser-legacy": "^1.0.1",
+    "webmat": "^0.2.0",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.0.1",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/iron-overlay-behavior": "^3.0.0-pre.27",
+    "@polymer/paper-styles": "^3.0.0-pre.26",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

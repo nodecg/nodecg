@@ -1,0 +1,10 @@
+{
+  "browser": true,
+  "devel": true,
+  "undef": true,
+  "unused": true,
+  "globals": {
+    "Draggabilly": false,
+    "QUnit": false
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "description": "Material design tabs",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "tabs",
+    "control"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/paper-tabs.git"
+  },
+  "name": "@polymer/paper-tabs",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "webmat": "^0.2.0",
+    "@polymer/iron-demo-helpers": "^3.0.1",
+    "@polymer/iron-pages": "^3.0.0-pre.26",
+    "@polymer/iron-test-helpers": "^3.0.0-pre.26",
+    "wct-browser-legacy": "^1.0.1",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.1.0",
+  "main": "paper-tabs.js",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/iron-behaviors": "^3.0.0-pre.26",
+    "@polymer/iron-flex-layout": "^3.0.0-pre.26",
+    "@polymer/iron-icon": "^3.0.0-pre.26",
+    "@polymer/iron-iconset-svg": "^3.0.0-pre.26",
+    "@polymer/iron-menu-behavior": "^3.0.0-pre.26",
+    "@polymer/iron-resizable-behavior": "^3.0.0-pre.26",
+    "@polymer/paper-behaviors": "^3.0.0-pre.27",
+    "@polymer/paper-icon-button": "^3.0.0-pre.26",
+    "@polymer/paper-styles": "^3.0.0-pre.26",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

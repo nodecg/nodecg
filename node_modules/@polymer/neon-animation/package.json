@@ -1,0 +1,43 @@
+{
+  "main": "neon-animation.js",
+  "description": "A system for animating Polymer-based web components",
+  "keywords": [
+    "web-components",
+    "web-component",
+    "polymer",
+    "web-animations"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/neon-animation"
+  },
+  "homepage": "https://github.com/PolymerElements/neon-animation",
+  "name": "@polymer/neon-animation",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "webmat": "^0.2.0",
+    "@polymer/app-layout": "^3.0.0-pre.26",
+    "@polymer/iron-flex-layout": "^3.0.0-pre.26",
+    "@polymer/iron-icon": "^3.0.0-pre.26",
+    "@polymer/iron-icons": "^3.0.0-pre.26",
+    "@polymer/paper-icon-button": "^3.0.0-pre.26",
+    "@polymer/paper-item": "^3.0.0-pre.26",
+    "@polymer/paper-styles": "^3.0.0-pre.26",
+    "web-animations-js": "^2.3.1",
+    "wct-browser-legacy": "^1.0.1",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.0.1",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/iron-resizable-behavior": "^3.0.0-pre.26",
+    "@polymer/iron-selector": "^3.0.0-pre.26",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "files": {
+    "iron-flex-layout.html": {
+      "convertedUrl": "iron-flex-layout.js",
+      "exports": {}
+    },
+    "iron-flex-layout-classes.html": {
+      "convertedUrl": "iron-flex-layout-classes.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-flex-layout-classes.html": {
+      "convertedUrl": "test/iron-flex-layout-classes.html",
+      "exports": {}
+    },
+    "test/iron-flex-layout.html": {
+      "convertedUrl": "test/iron-flex-layout.html",
+      "exports": {}
+    }
+  }
+}

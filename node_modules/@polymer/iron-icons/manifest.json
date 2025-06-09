@@ -1,0 +1,61 @@
+{
+  "files": {
+    "iron-icons.html": {
+      "convertedUrl": "iron-icons.js",
+      "exports": {}
+    },
+    "av-icons.html": {
+      "convertedUrl": "av-icons.js",
+      "exports": {}
+    },
+    "index.html": null,
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "communication-icons.html": {
+      "convertedUrl": "communication-icons.js",
+      "exports": {}
+    },
+    "device-icons.html": {
+      "convertedUrl": "device-icons.js",
+      "exports": {}
+    },
+    "editor-icons.html": {
+      "convertedUrl": "editor-icons.js",
+      "exports": {}
+    },
+    "hardware-icons.html": {
+      "convertedUrl": "hardware-icons.js",
+      "exports": {}
+    },
+    "image-icons.html": {
+      "convertedUrl": "image-icons.js",
+      "exports": {}
+    },
+    "maps-icons.html": {
+      "convertedUrl": "maps-icons.js",
+      "exports": {}
+    },
+    "notification-icons.html": {
+      "convertedUrl": "notification-icons.js",
+      "exports": {}
+    },
+    "social-icons.html": {
+      "convertedUrl": "social-icons.js",
+      "exports": {}
+    },
+    "places-icons.html": {
+      "convertedUrl": "places-icons.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-icons.html": {
+      "convertedUrl": "test/iron-icons.html",
+      "exports": {}
+    }
+  }
+}

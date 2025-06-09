@@ -1,0 +1,43 @@
+{
+  "files": {
+    "paper-dialog-behavior.html": {
+      "convertedUrl": "paper-dialog-behavior.js",
+      "exports": {
+        "Polymer.PaperDialogBehaviorImpl": "PaperDialogBehaviorImpl",
+        "Polymer.PaperDialogBehavior": "PaperDialogBehavior"
+      }
+    },
+    "paper-dialog-shared-styles.html": {
+      "convertedUrl": "paper-dialog-shared-styles.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/simple-dialog.html": {
+      "convertedUrl": "demo/simple-dialog.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/paper-dialog-behavior.html": {
+      "convertedUrl": "test/paper-dialog-behavior.html",
+      "exports": {}
+    },
+    "test/test-dialog.html": {
+      "convertedUrl": "test/test-dialog.js",
+      "exports": {}
+    },
+    "test/test-buttons.html": {
+      "convertedUrl": "test/test-buttons.js",
+      "exports": {}
+    }
+  }
+}

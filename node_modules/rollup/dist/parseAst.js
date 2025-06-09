@@ -1,0 +1,22 @@
+/*
+  @license
+	Rollup.js v4.42.0
+	Fri, 06 Jun 2025 14:47:38 GMT - commit f76339428586620ff3e4c32fce48f923e7be7b05
+
+	https://github.com/rollup/rollup
+
+	Released under the MIT License.
+*/
+'use strict';
+
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+require('./native.js');
+const parseAst_js = require('./shared/parseAst.js');
+require('node:path');
+
+
+
+exports.parseAst = parseAst_js.parseAst;
+exports.parseAstAsync = parseAst_js.parseAstAsync;
+//# sourceMappingURL=parseAst.js.map

@@ -1,0 +1,47 @@
+{
+  "description": "A set of layout elements for your app",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/app-layout"
+  },
+  "homepage": "https://github.com/PolymerElements/app-layout",
+  "name": "@polymer/app-layout",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "@polymer/font-roboto": "^3.0.1",
+    "@polymer/gen-typescript-declarations": "^1.6.2",
+    "@polymer/iron-ajax": "^3.0.0-pre.26",
+    "@polymer/iron-icon": "^3.0.0-pre.26",
+    "@polymer/iron-icons": "^3.0.0-pre.26",
+    "@polymer/iron-list": "^3.0.0-pre.26",
+    "@polymer/iron-pages": "^3.0.0-pre.26",
+    "@polymer/iron-scroll-threshold": "^3.0.0-pre.26",
+    "@polymer/paper-fab": "^3.0.0-pre.26",
+    "@polymer/paper-icon-button": "^3.0.0-pre.26",
+    "@polymer/paper-item": "^3.0.0-pre.26",
+    "@polymer/paper-listbox": "^3.0.0-pre.26",
+    "@polymer/paper-progress": "^3.0.0-pre.26",
+    "@polymer/paper-spinner": "^3.0.0-pre.26",
+    "@polymer/paper-styles": "^3.0.0-pre.26",
+    "@polymer/paper-tabs": "^3.0.0-pre.26",
+    "@polymer/test-fixture": "^4.0.1",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "wct-browser-legacy": "^1.0.2",
+    "webmat": "^0.2.0"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.1.0",
+  "main": "app-layout.js",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/iron-flex-layout": "^3.0.0-pre.26",
+    "@polymer/iron-media-query": "^3.0.0-pre.26",
+    "@polymer/iron-resizable-behavior": "^3.0.0-pre.26",
+    "@polymer/iron-scroll-target-behavior": "^3.0.0-pre.26",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

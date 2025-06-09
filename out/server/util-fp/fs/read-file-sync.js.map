@@ -1,0 +1,1 @@
+{"version":3,"file":"read-file-sync.js","sourceRoot":"","sources":["../../../../src/server/util-fp/fs/read-file-sync.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,sDAAyB;AAEzB,gDAAkC;AAClC,oDAAsC;AAEzB,QAAA,YAAY,GAAG,GAAG,CAAC,SAAS,CACxC,CAAC,IAAY,EAAE,EAAE,CAAC,iBAAE,CAAC,YAAY,CAAC,IAAI,EAAE,OAAO,CAAC,EAChD,CAAC,CAAC,OAAO,CACT,CAAC"}

@@ -1,0 +1,44 @@
+{
+  "description": "A Material Design dialog",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "dialog",
+    "overlay"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/paper-dialog"
+  },
+  "homepage": "https://github.com/PolymerElements/paper-dialog",
+  "name": "@polymer/paper-dialog",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "webmat": "^0.2.0",
+    "@polymer/iron-demo-helpers": "^3.0.1",
+    "@polymer/iron-test-helpers": "^3.0.0-pre.26",
+    "@polymer/paper-button": "^3.0.0-pre.26",
+    "@polymer/paper-dialog-scrollable": "^3.0.0-pre.26",
+    "@polymer/paper-dropdown-menu": "^3.0.0-pre.26",
+    "@polymer/paper-item": "^3.0.0-pre.26",
+    "@polymer/paper-listbox": "^3.0.0-pre.26",
+    "web-animations-js": "^2.3.1",
+    "wct-browser-legacy": "^1.0.1",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.0.1",
+  "main": "paper-dialog.js",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/neon-animation": "^3.0.0-pre.26",
+    "@polymer/paper-dialog-behavior": "^3.0.0-pre.26",
+    "@polymer/iron-overlay-behavior": "^3.0.0-pre.27",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

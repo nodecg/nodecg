@@ -1,0 +1,35 @@
+{
+  "files": {
+    "iron-checked-element-behavior.html": {
+      "convertedUrl": "iron-checked-element-behavior.js",
+      "exports": {
+        "Polymer.IronCheckedElementBehaviorImpl": "IronCheckedElementBehaviorImpl",
+        "Polymer.IronCheckedElementBehavior": "IronCheckedElementBehavior"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/simple-checkbox.html": {
+      "convertedUrl": "demo/simple-checkbox.js",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/simple-checkbox.html": {
+      "convertedUrl": "test/simple-checkbox.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    }
+  }
+}

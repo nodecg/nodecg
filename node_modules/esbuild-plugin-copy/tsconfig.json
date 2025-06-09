@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "dist",
+    "rootDir": "src",
+    "target": "es2018",
+    "module": "CommonJS",
+    "lib": ["esnext", "dom"]
+  },
+  "include": ["src"]
+}

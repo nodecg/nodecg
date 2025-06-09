@@ -1,0 +1,14 @@
+language: node_js
+
+node_js:
+- 5.4.1
+- 4.2.4
+
+deploy:
+  provider: npm
+  email: "toby@nerdping.com"
+  api_key:
+    secure: horC+ViRqUeN3eFbwUdhJ9qAR6xuZIa+Rcs+5/ly6BN2zBz/Tajv68twsWU/QFMH46gvnXoa3ooVD4CqWsPlqpfKcPt8JdiJ05SKNC3WwibTKX0EpA/z/8gS5HlLIiv24gE28hOKxXRmMLSxtVAMAPELkfR1/S6b1LtgAX4G8dzUEqfl3wZ29Gb2lpQp/Yqyj0hG5dCt4z5bRzHC6EaTn7DLvw6ZUB3ZaPspsCtJJdZTMpfPgkyn0GZJsxaANGEgI2uVB8Xr2a54rvfjiSAgvkbzltg0Nt4rm3EMoZ3n0vHcekVRDh52vlMJc1EK86l3gwaO+AAKNCs+zm75EE5Bx+uGyG8DdExzPc4etIGtbGjzJ0LPICdc0c4YiCyDtKaORQsYAVYfHERZNDcinL33u/aZHss48H0yEuazoxDZ3MZp67EKj+FLawf8Ju3LnNGeheVZ3kg0pUV/OUaSl0yN5LrGPNzqLsk5gHYFNdX9AZW7mf3nI1vQRZhxy7tH1llJmN6PBm9QQ6TgQgDoodMHWvKunn6vH+Ef9lsA4HchOHmJF9U9rDFOcG199J6pmntOSTel2ebS+x5MRAONP3A/9Cz6sbFwC2dckLRtRgqBWG5iF/ZHh1WV8Oz5mXjIKqjFVI0ujBrDVdZw3SnSf4vBvR7JryY73/rGKwaXS0gcwOo=
+  on:
+    tags: true
+    branch: production

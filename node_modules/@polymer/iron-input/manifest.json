@@ -1,0 +1,36 @@
+{
+  "files": {
+    "iron-input.html": {
+      "convertedUrl": "iron-input.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/cats-only.html": {
+      "convertedUrl": "demo/cats-only.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-input.html": {
+      "convertedUrl": "test/iron-input.html",
+      "exports": {}
+    },
+    "test/letters-only.html": {
+      "convertedUrl": "test/letters-only.js",
+      "exports": {}
+    },
+    "test/disabled-input.html": {
+      "convertedUrl": "test/disabled-input.js",
+      "exports": {}
+    }
+  }
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lower Third</title>
+  <style>
+    body {
+      margin: 0;
+      background: transparent;
+      font-family: Arial, sans-serif;
+    }
+    .lowerthird {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      padding: 20px 30px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 12px;
+      color: white;
+      max-width: 600px;
+      transition: opacity 0.4s ease;
+    }
+    .line1 {
+      font-weight: bold;
+    }
+    .line2 {
+      margin-top: 4px;
+    }
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="lowerthird" id="lowerthird">
+    <div class="line1" id="line1">Line 1</div>
+    <div class="line2" id="line2">Line 2</div>
+  </div>
+
+  <script src="../../../shared/nodecg.bundle.js"></script>
+  <script>
+    const line1Rep = nodecg.Replicant('lowerthird_line1');
+    const line2Rep = nodecg.Replicant('lowerthird_line2');
+    const posBottomRep = nodecg.Replicant('lowerthird_posBottom');
+    const posLeftRep = nodecg.Replicant('lowerthird_posLeft');
+    const bgOpacityRep = nodecg.Replicant('lowerthird_bgOpacity');
+
+    const line1FontSizeRep = nodecg.Replicant('lowerthird_line1FontSize');
+    const line2FontSizeRep = nodecg.Replicant('lowerthird_line2FontSize');
+    const line1ColorRep = nodecg.Replicant('lowerthird_line1Color');
+    const line2ColorRep = nodecg.Replicant('lowerthird_line2Color');
+
+    const visibleRep = nodecg.Replicant('lowerthird_visible');
+
+    const lowerthirdEl = document.getElementById('lowerthird');
+    const line1El = document.getElementById('line1');
+    const line2El = document.getElementById('line2');
+
+    line1Rep.on('change', val => {
+      line1El.textContent = val || '';
+    });
+    line2Rep.on('change', val => {
+      line2El.textContent = val || '';
+    });
+
+    posBottomRep.on('change', val => {
+      if (val !== undefined) lowerthirdEl.style.bottom = val + 'px';
+    });
+    posLeftRep.on('change', val => {
+      if (val !== undefined) lowerthirdEl.style.left = val + 'px';
+    });
+    bgOpacityRep.on('change', val => {
+      if (val !== undefined) {
+        lowerthirdEl.style.background = `rgba(0, 0, 0, ${val})`;
+      }
+    });
+
+    line1FontSizeRep.on('change', val => {
+      if (val !== undefined) line1El.style.fontSize = val + 'px';
+    });
+    line2FontSizeRep.on('change', val => {
+      if (val !== undefined) line2El.style.fontSize = val + 'px';
+    });
+
+    line1ColorRep.on('change', val => {
+      if (val !== undefined) line1El.style.color = val;
+    });
+    line2ColorRep.on('change', val => {
+      if (val !== undefined) line2El.style.color = val;
+    });
+
+    visibleRep.on('change', val => {
+      if (val === false) {
+        lowerthirdEl.classList.add('hidden');
+      } else {
+        lowerthirdEl.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

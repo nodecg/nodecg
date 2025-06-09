@@ -1,0 +1,47 @@
+{
+  "files": {
+    "paper-icon-item.html": {
+      "convertedUrl": "paper-icon-item.js",
+      "exports": {}
+    },
+    "paper-item-behavior.html": {
+      "convertedUrl": "paper-item-behavior.js",
+      "exports": {
+        "Polymer.PaperItemBehaviorImpl": "PaperItemBehaviorImpl",
+        "Polymer.PaperItemBehavior": "PaperItemBehavior"
+      }
+    },
+    "paper-item-shared-styles.html": {
+      "convertedUrl": "paper-item-shared-styles.js",
+      "exports": {}
+    },
+    "paper-item.html": {
+      "convertedUrl": "paper-item.js",
+      "exports": {}
+    },
+    "paper-item-body.html": {
+      "convertedUrl": "paper-item-body.js",
+      "exports": {}
+    },
+    "all-imports.html": {
+      "convertedUrl": "all-imports.html",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/paper-item.html": {
+      "convertedUrl": "test/paper-item.html",
+      "exports": {}
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "format-util",
+  "description": "Lightweight format utility for the browser, based on util.format().",
+  "version": "1.0.5",
+  "author": "muji <noop@xpm.io>",
+  "browser": "./format.js",
+  "devDependencies": {
+    "browserify": "~11.1.0",
+    "chai": "~3.2.0",
+    "coveralls": "~2.11.6",
+    "istanbul": "~0.3.17",
+    "mocha": "~2.3.2"
+  },
+  "files": [
+    "index.js",
+    "format.js"
+  ],
+  "keywords": [
+    "format",
+    "string",
+    "util"
+  ],
+  "license": "MIT",
+  "mdp": {
+    "title": "Format Util",
+    "pedantic": true,
+    "include": "doc/readme",
+    "require": "lib",
+    "links": "links.md",
+    "toc": "Table of Contents",
+    "base": "https://github.com/tmpfs/format-util",
+    "partial": [
+      {
+        "inc": [
+          "introduction.md",
+          "install.md",
+          "usage.md",
+          "developer.md",
+          "license.md"
+        ]
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tmpfs/format-util.git"
+  },
+  "scripts": {
+    "browserify": "browserify -o format-util.js -e ./format.js && du -bh format-util.js",
+    "clean": "rm -rf coverage ./format-util.js ./test/spec.js",
+    "cover": "NODE_ENV=test istanbul cover _mocha -- ${SPEC:-test/spec}",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "docs": "npm run readme",
+    "lint": "jshint . && jscs .",
+    "readme": "mdp --force -v",
+    "spec": "browserify -o test/spec.js -e test/index.js",
+    "test": "NODE_ENV=test mocha ${SPEC:-test/spec}"
+  }
+}

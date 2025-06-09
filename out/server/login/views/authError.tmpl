@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge; charset=UTF-8">
+		<meta name="viewport" content="width=device-width" initial-scale="1">
+
+		<title>Authorization Error</title>
+		<link rel="stylesheet" href="/login/authError.css">
+	</head>
+	<body>
+		<div class="container">
+			<h1>Authorization Error</h1>
+			<hr>
+			<h3><%- code %></h3>
+			<h4><%- message %></h4>
+
+			<% if (viewUrl) { %>
+				<hr>
+				<p>You're seeing this page because the key you provided for <b><%- viewUrl %></b> was not valid.</p>
+			<% } %>
+		</div>
+	</body>
+</html>

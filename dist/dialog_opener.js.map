@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/client/dashboard/js/dialog_opener.ts"],
+  "sourcesContent": ["import type { PaperDialogElement } from \"@polymer/paper-dialog\";\n\nimport type { NodeCGAPIClient } from \"../../api/api.client\";\n\ndocument.addEventListener(\n\t\"click\",\n\t(e) => {\n\t\tconst nodecg = (window as any).nodecg as NodeCGAPIClient;\n\t\tconst elWithDialogAttr = (e as any)\n\t\t\t.composedPath()[0]\n\t\t\t.closest(\"[nodecg-dialog]\");\n\t\tif (elWithDialogAttr) {\n\t\t\tconst dialogName = elWithDialogAttr.getAttribute(\"nodecg-dialog\");\n\t\t\tconst dialogId = `${nodecg.bundleName}_${dialogName as string}`;\n\t\t\tconst dialogElement = window\n\t\t\t\t.top!.document.querySelector(\"ncg-dashboard\")!\n\t\t\t\t.shadowRoot!.getElementById(dialogId) as PaperDialogElement;\n\t\t\tdialogElement.open();\n\t\t}\n\t},\n\tfalse,\n);\n"],
+  "mappings": "mBAIA,SAAS,iBACR,QACCA,GAAM,CACN,IAAMC,EAAU,OAAe,OACzBC,EAAoBF,EACxB,aAAa,EAAE,CAAC,EAChB,QAAQ,iBAAiB,EAC3B,GAAIE,EAAkB,CACrB,IAAMC,EAAaD,EAAiB,aAAa,eAAe,EAC1DE,EAAW,GAAGH,EAAO,UAAU,IAAIE,CAAoB,GACvC,OACpB,IAAK,SAAS,cAAc,eAAe,EAC3C,WAAY,eAAeC,CAAQ,EACvB,KAAK,CACpB,CACD,EACA,EACD",
+  "names": ["e", "nodecg", "elWithDialogAttr", "dialogName", "dialogId"]
+}

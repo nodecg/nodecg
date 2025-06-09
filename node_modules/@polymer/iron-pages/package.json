@@ -1,0 +1,35 @@
+{
+  "description": "Organizes a set of pages and shows one at a time",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "container"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/iron-pages.git"
+  },
+  "name": "@polymer/iron-pages",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "webmat": "^0.2.0",
+    "@polymer/iron-demo-helpers": "^3.0.1",
+    "@polymer/paper-styles": "^3.0.0-pre.26",
+    "wct-browser-legacy": "^1.0.1",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.0.1",
+  "main": "iron-pages.js",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/iron-resizable-behavior": "^3.0.0-pre.26",
+    "@polymer/iron-selector": "^3.0.0-pre.26",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

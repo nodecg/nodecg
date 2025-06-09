@@ -1,0 +1,42 @@
+{
+  "files": {
+    "iron-scroll-target-behavior.html": {
+      "convertedUrl": "iron-scroll-target-behavior.js",
+      "exports": {
+        "Polymer.IronScrollTargetBehavior": "IronScrollTargetBehavior"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/document.html": {
+      "convertedUrl": "demo/document.html",
+      "exports": {}
+    },
+    "demo/x-scrollable.html": {
+      "convertedUrl": "demo/x-scrollable.js",
+      "exports": {}
+    },
+    "demo/scrolling-region.html": {
+      "convertedUrl": "demo/scrolling-region.html",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/x-scrollable.html": {
+      "convertedUrl": "test/x-scrollable.js",
+      "exports": {}
+    },
+    "test/x-nested-scrollable.html": {
+      "convertedUrl": "test/x-nested-scrollable.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    }
+  }
+}

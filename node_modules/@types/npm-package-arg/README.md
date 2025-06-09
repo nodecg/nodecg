@@ -1,0 +1,15 @@
+# Installation
+> `npm install --save @types/npm-package-arg`
+
+# Summary
+This package contains type definitions for npm-package-arg (https://github.com/npm/npm-package-arg).
+
+# Details
+Files were exported from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/npm-package-arg.
+
+### Additional Details
+ * Last updated: Tue, 07 Nov 2023 09:09:39 GMT
+ * Dependencies: none
+
+# Credits
+These definitions were written by [Melvin Groenhoff](https://github.com/mgroenhoff), and [Jason](https://github.com/OiYouYeahYou).

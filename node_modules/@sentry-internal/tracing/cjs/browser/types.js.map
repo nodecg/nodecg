@@ -1,0 +1,1 @@
+{"version":3,"file":"types.js","sources":["../../../src/browser/types.ts"],"sourcesContent":["import { GLOBAL_OBJ } from '@sentry/utils';\n\nexport const WINDOW = GLOBAL_OBJ as typeof GLOBAL_OBJ & Window;\n"],"names":["GLOBAL_OBJ"],"mappings":";;;;AAEO,MAAM,MAAO,GAAEA,gBAAW;;;;"}

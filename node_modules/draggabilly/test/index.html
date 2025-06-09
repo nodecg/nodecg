@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+
+  <title>Draggabilly tests</title>
+
+  <link rel="stylesheet" href="../node_modules/qunit/qunit/qunit.css" />
+  <link rel="stylesheet" href="test.css" />
+
+  <script src="../node_modules/ev-emitter/ev-emitter.js"></script>
+  <script src="../node_modules/get-size/get-size.js"></script>
+  <script src="../node_modules/unipointer/unipointer.js"></script>
+  <script src="../node_modules/unidragger/unidragger.js"></script>
+  <script src="../draggabilly.js"></script>
+
+<!-- <script src="../dist/draggabilly.pkgd.js"></script> -->
+
+  <script src="../node_modules/qunit/qunit/qunit.js"></script>
+
+  <script src="unit/basics.js"></script>
+  <script src="unit/destroy.js"></script>
+
+</head>
+<body>
+
+  <h1>Draggabilly tests</h1>
+
+  <div class="column column--left">
+    <div class="test test--basics">
+      <h2>basics</h2>
+      <div class="draggie"></div>
+    </div>
+
+    <div class="test test--destroy">
+      <h2>destroy</h2>
+      <div class="draggie"></div>
+    </div>
+  </div>
+
+  <div class="column column--right">
+    <div id="qunit"></div>
+  </div>
+
+</body>
+</html>

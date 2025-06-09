@@ -1,0 +1,87 @@
+{
+  "files": {
+    "iron-multi-selectable.html": {
+      "convertedUrl": "iron-multi-selectable.js",
+      "exports": {
+        "Polymer.IronMultiSelectableBehaviorImpl": "IronMultiSelectableBehaviorImpl",
+        "Polymer.IronMultiSelectableBehavior": "IronMultiSelectableBehavior"
+      }
+    },
+    "iron-selectable.html": {
+      "convertedUrl": "iron-selectable.js",
+      "exports": {
+        "Polymer.IronSelectableBehavior": "IronSelectableBehavior"
+      }
+    },
+    "iron-selection.html": {
+      "convertedUrl": "iron-selection.js",
+      "exports": {
+        "Polymer.IronSelection": "IronSelection"
+      }
+    },
+    "iron-selector.html": {
+      "convertedUrl": "iron-selector.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/activate-event.html": {
+      "convertedUrl": "test/activate-event.html",
+      "exports": {}
+    },
+    "test/attr-for-selected.html": {
+      "convertedUrl": "test/attr-for-selected.html",
+      "exports": {}
+    },
+    "test/attr-for-selected-elements.html": {
+      "convertedUrl": "test/attr-for-selected-elements.js",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/content.html": {
+      "convertedUrl": "test/content.html",
+      "exports": {}
+    },
+    "test/content-element.html": {
+      "convertedUrl": "test/content-element.js",
+      "exports": {}
+    },
+    "test/excluded-local-names.html": {
+      "convertedUrl": "test/excluded-local-names.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/multi.html": {
+      "convertedUrl": "test/multi.html",
+      "exports": {}
+    },
+    "test/next-previous.html": {
+      "convertedUrl": "test/next-previous.html",
+      "exports": {}
+    },
+    "test/numeric-ids.html": {
+      "convertedUrl": "test/numeric-ids.html",
+      "exports": {}
+    },
+    "test/selected-attribute.html": {
+      "convertedUrl": "test/selected-attribute.html",
+      "exports": {}
+    },
+    "test/template-repeat.html": {
+      "convertedUrl": "test/template-repeat.html",
+      "exports": {}
+    }
+  }
+}

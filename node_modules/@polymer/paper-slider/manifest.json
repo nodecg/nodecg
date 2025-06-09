@@ -1,0 +1,32 @@
+{
+  "files": {
+    "paper-slider.html": {
+      "convertedUrl": "paper-slider.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/a11y.html": {
+      "convertedUrl": "test/a11y.html",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/rtl.html": {
+      "convertedUrl": "test/rtl.html",
+      "exports": {}
+    }
+  }
+}

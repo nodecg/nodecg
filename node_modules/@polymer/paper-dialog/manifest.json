@@ -1,0 +1,24 @@
+{
+  "files": {
+    "paper-dialog.html": {
+      "convertedUrl": "paper-dialog.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/paper-dialog.html": {
+      "convertedUrl": "test/paper-dialog.html",
+      "exports": {}
+    }
+  }
+}

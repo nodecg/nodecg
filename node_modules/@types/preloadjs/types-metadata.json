@@ -1,0 +1,24 @@
+{
+    "authors": "Pedro Ferreira <https://bitbucket.org/drk4>, Endel Dreyer <https://github.com/endel>",
+    "libraryDependencies": [
+        "createjs-lib"
+    ],
+    "moduleDependencies": [],
+    "libraryMajorVersion": 0,
+    "libraryMinorVersion": 6,
+    "libraryName": "PreloadJS",
+    "typingsPackageName": "preloadjs",
+    "projectName": "http://www.createjs.com/#!/PreloadJS",
+    "sourceRepoURL": "https://www.github.com/DefinitelyTyped/DefinitelyTyped",
+    "sourceBranch": "types-2.0",
+    "kind": "Global",
+    "globals": [
+        "createjs"
+    ],
+    "declaredModules": [],
+    "files": [
+        "index.d.ts"
+    ],
+    "hasPackageJson": false,
+    "contentHash": "936c6692245c8c8e26d696da9f983c1fcf8b6399a79a50aa34c4a8fd0851412f"
+}

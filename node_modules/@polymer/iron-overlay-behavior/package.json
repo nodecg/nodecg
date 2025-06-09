@@ -1,0 +1,38 @@
+{
+  "description": "Provides a behavior for making an element an overlay",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "behavior",
+    "overlay"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/iron-overlay-behavior.git"
+  },
+  "name": "@polymer/iron-overlay-behavior",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "webmat": "^0.2.0",
+    "@polymer/iron-demo-helpers": "^3.0.1",
+    "@polymer/iron-flex-layout": "^3.0.0-pre.26",
+    "@polymer/iron-test-helpers": "^3.0.0-pre.26",
+    "wct-browser-legacy": "^1.0.1",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.0.3",
+  "main": "iron-overlay-behavior.js",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/iron-a11y-keys-behavior": "^3.0.0-pre.26",
+    "@polymer/iron-fit-behavior": "^3.0.0-pre.26",
+    "@polymer/iron-resizable-behavior": "^3.0.0-pre.26",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

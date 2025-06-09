@@ -1,0 +1,64 @@
+{
+  "files": {
+    "demo-pages.html": {
+      "convertedUrl": "demo-pages.js",
+      "exports": {}
+    },
+    "color.html": {
+      "convertedUrl": "color.js",
+      "exports": {}
+    },
+    "typography.html": {
+      "convertedUrl": "typography.js",
+      "exports": {}
+    },
+    "shadow.html": {
+      "convertedUrl": "shadow.js",
+      "exports": {}
+    },
+    "element-styles/paper-material-styles.html": {
+      "convertedUrl": "element-styles/paper-material-styles.js",
+      "exports": {}
+    },
+    "paper-styles.html": {
+      "convertedUrl": "paper-styles.js",
+      "exports": {}
+    },
+    "default-theme.html": {
+      "convertedUrl": "default-theme.js",
+      "exports": {}
+    },
+    "classes/global.html": {
+      "convertedUrl": "classes/global.js",
+      "exports": {}
+    },
+    "paper-styles-classes.html": {
+      "convertedUrl": "paper-styles-classes.js",
+      "exports": {}
+    },
+    "classes/typography.html": {
+      "convertedUrl": "classes/typography.js",
+      "exports": {}
+    },
+    "classes/shadow.html": {
+      "convertedUrl": "classes/shadow.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "element-styles/paper-item-styles.html": {
+      "convertedUrl": "element-styles/paper-item-styles.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    }
+  }
+}

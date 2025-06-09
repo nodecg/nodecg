@@ -1,0 +1,66 @@
+{
+  "name": "onchange",
+  "version": "7.1.0",
+  "description": "Use glob patterns to watch file sets and run a command when anything is added, changed or deleted.",
+  "author": "Stephen Belanger <admin@stephenbelanger.com>",
+  "keywords": [
+    "glob",
+    "watch",
+    "change"
+  ],
+  "bin": {
+    "onchange": "dist/bin.js"
+  },
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "prettier": "prettier --write",
+    "format": "npm run prettier -- \"{,{src,test}/**/}*.{js,jsx,ts,tsx,json,md,yml,yaml}\"",
+    "build": "rimraf dist/ && tsc",
+    "test": "echo \"npm run test:local\"",
+    "test:local": "node test/queue.js && node test/concurrent.js",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Qard/onchange.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Qard/onchange/issues"
+  },
+  "homepage": "https://github.com/Qard/onchange",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,md,yml,yaml}": "npm run prettier"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "snyk": true,
+  "dependencies": {
+    "@blakeembrey/deque": "^1.0.5",
+    "@blakeembrey/template": "^1.0.0",
+    "arg": "^4.1.3",
+    "chokidar": "^3.3.1",
+    "cross-spawn": "^7.0.1",
+    "ignore": "^5.1.4",
+    "tree-kill": "^1.2.2"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.1",
+    "@types/node": "^14.0.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.1.7",
+    "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
+    "typescript": "^3.7.5"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "passport-discord",
+  "version": "0.1.4",
+  "description": "Passport strategy for authentication with Discord (discordapp.com)",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicholastay/passport-discord.git"
+  },
+  "keywords": [
+    "passport",
+    "discord",
+    "auth",
+    "authentication",
+    "authn",
+    "identity"
+  ],
+  "author": "Nicholas Tay <nexerq@gmail.com> (http://nicholastay.github.io)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nicholastay/passport-discord/issues"
+  },
+  "homepage": "https://github.com/nicholastay/passport-discord#readme",
+  "dependencies": {
+    "passport-oauth2": "^1.5.0"
+  }
+}

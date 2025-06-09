@@ -1,0 +1,24 @@
+{
+  "files": {
+    "paper-ripple.html": {
+      "convertedUrl": "paper-ripple.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/paper-ripple.html": {
+      "convertedUrl": "test/paper-ripple.html",
+      "exports": {}
+    }
+  }
+}

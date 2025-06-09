@@ -1,0 +1,39 @@
+{
+  "description": "Implements an element that has a checked attribute and can be added to a form",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "iron",
+    "behavior"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/iron-checked-element-behavior.git"
+  },
+  "homepage": "https://github.com/PolymerElements/iron-checked-element-behavior",
+  "name": "@polymer/iron-checked-element-behavior",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "@polymer/paper-button": "^3.0.0-pre.26",
+    "@polymer/paper-styles": "^3.0.0-pre.26",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "wct-browser-legacy": "^1.0.1",
+    "webmat": "^0.2.2",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.0.1",
+  "main": "iron-checked-element-behavior.js",
+  "contributors": [
+    "The Polymer Authors"
+  ],
+  "dependencies": {
+    "@polymer/polymer": "^3.0.0",
+    "@polymer/iron-validatable-behavior": "^3.0.0-pre.26",
+    "@polymer/iron-form-element-behavior": "^3.0.0-pre.26"
+  }
+}

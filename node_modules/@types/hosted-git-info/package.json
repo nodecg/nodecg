@@ -1,0 +1,35 @@
+{
+    "name": "@types/hosted-git-info",
+    "version": "3.0.5",
+    "description": "TypeScript definitions for hosted-git-info",
+    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/hosted-git-info",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Jason",
+            "githubUsername": "OiyouYeahYou",
+            "url": "https://github.com/OiyouYeahYou"
+        },
+        {
+            "name": "Michael",
+            "githubUsername": "Ovyerus",
+            "url": "https://github.com/Ovyerus"
+        },
+        {
+            "name": "Daniel Cassidy",
+            "githubUsername": "djcsdy",
+            "url": "https://github.com/djcsdy"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/hosted-git-info"
+    },
+    "scripts": {},
+    "dependencies": {},
+    "typesPublisherContentHash": "d904fb316cac026f24a0b06089071f6a2761f01768cd85e8438b7b97e73c81ab",
+    "typeScriptVersion": "4.5"
+}

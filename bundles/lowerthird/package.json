@@ -1,0 +1,27 @@
+{
+  "name": "lowerthird",
+  "version": "1.0.0",
+  "description": "Lower third overlay with two lines of text",
+  "main": "extension.js",
+  "license": "MIT",
+  "nodecg": {
+    "compatibleRange": "^2.0.0",
+    "dashboardPanels": [
+      {
+        "title": "Lower Third Control",
+        "name": "lowerthird-panel",
+        "file": "panel.html",
+        "width": 6,
+        "height": 7
+      }
+    ],
+    "graphics": [
+      {
+        "file": "index.html",
+        "width": 1920,
+        "height": 1080,
+        "name": "lowerthird-graphic"
+      }
+    ]
+  }
+}

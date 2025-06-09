@@ -1,0 +1,79 @@
+{
+  "files": {
+    "paper-inky-focus-behavior.html": {
+      "convertedUrl": "paper-inky-focus-behavior.js",
+      "exports": {
+        "Polymer.PaperInkyFocusBehaviorImpl": "PaperInkyFocusBehaviorImpl",
+        "Polymer.PaperInkyFocusBehavior": "PaperInkyFocusBehavior"
+      }
+    },
+    "paper-ripple-behavior.html": {
+      "convertedUrl": "paper-ripple-behavior.js",
+      "exports": {
+        "Polymer.PaperRippleBehavior": "PaperRippleBehavior"
+      }
+    },
+    "paper-button-behavior.html": {
+      "convertedUrl": "paper-button-behavior.js",
+      "exports": {
+        "Polymer.PaperButtonBehaviorImpl": "PaperButtonBehaviorImpl",
+        "Polymer.PaperButtonBehavior": "PaperButtonBehavior"
+      }
+    },
+    "paper-checked-element-behavior.html": {
+      "convertedUrl": "paper-checked-element-behavior.js",
+      "exports": {
+        "Polymer.PaperCheckedElementBehaviorImpl": "PaperCheckedElementBehaviorImpl",
+        "Polymer.PaperCheckedElementBehavior": "PaperCheckedElementBehavior"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/paper-button.html": {
+      "convertedUrl": "demo/paper-button.js",
+      "exports": {}
+    },
+    "demo/paper-radio-button.html": {
+      "convertedUrl": "demo/paper-radio-button.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/paper-button-behavior.html": {
+      "convertedUrl": "test/paper-button-behavior.html",
+      "exports": {}
+    },
+    "test/test-button.html": {
+      "convertedUrl": "test/test-button.js",
+      "exports": {}
+    },
+    "test/paper-checked-element-behavior.html": {
+      "convertedUrl": "test/paper-checked-element-behavior.html",
+      "exports": {}
+    },
+    "test/paper-radio-button-behavior.html": {
+      "convertedUrl": "test/paper-radio-button-behavior.html",
+      "exports": {}
+    },
+    "test/test-radio-button.html": {
+      "convertedUrl": "test/test-radio-button.js",
+      "exports": {}
+    },
+    "test/paper-ripple-behavior.html": {
+      "convertedUrl": "test/paper-ripple-behavior.html",
+      "exports": {}
+    },
+    "test/shadowed-ripple.html": {
+      "convertedUrl": "test/shadowed-ripple.js",
+      "exports": {}
+    }
+  }
+}

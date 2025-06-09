@@ -1,0 +1,1 @@
+{"version":3,"file":"database-adapter.d.ts","sourceRoot":"","sources":["../src/database-adapter.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,eAAe,EAAE,MAAM,gCAAgC,CAAC;AAEtE,OAAO,EACN,MAAM,EACN,aAAa,EACb,QAAQ,EACR,SAAS,EACT,IAAI,EACJ,IAAI,EACJ,MAAM,cAAc,CAAC;AAEtB,OAAO,EAAE,MAAM,EAAE,aAAa,EAAE,QAAQ,EAAE,SAAS,EAAE,IAAI,EAAE,IAAI,EAAE,CAAC;AAgNlE,eAAO,MAAM,eAAe,EAAE,eAW7B,CAAC"}

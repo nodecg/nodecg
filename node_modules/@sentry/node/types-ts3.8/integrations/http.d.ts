@@ -1,0 +1,65 @@
+import { Hub } from '@sentry/core';
+import { EventProcessor, Integration, TracePropagationTargets } from '@sentry/types';
+interface TracingOptions {
+    /**
+     * List of strings/regex controlling to which outgoing requests
+     * the SDK will attach tracing headers.
+     *
+     * By default the SDK will attach those headers to all outgoing
+     * requests. If this option is provided, the SDK will match the
+     * request URL of outgoing requests against the items in this
+     * array, and only attach tracing headers if a match was found.
+     *
+     * @deprecated Use top level `tracePropagationTargets` option instead.
+     * This option will be removed in v8.
+     *
+     * ```
+     * Sentry.init({
+     *   tracePropagationTargets: ['api.site.com'],
+     * })
+     */
+    tracePropagationTargets?: TracePropagationTargets;
+    /**
+     * Function determining whether or not to create spans to track outgoing requests to the given URL.
+     * By default, spans will be created for all outgoing requests.
+     */
+    shouldCreateSpanForRequest?: (url: string) => boolean;
+}
+interface HttpOptions {
+    /**
+     * Whether breadcrumbs should be recorded for requests
+     * Defaults to true
+     */
+    breadcrumbs?: boolean;
+    /**
+     * Whether tracing spans should be created for requests
+     * Defaults to false
+     */
+    tracing?: TracingOptions | boolean;
+}
+/**
+ * The http module integration instruments Node's internal http module. It creates breadcrumbs, transactions for outgoing
+ * http requests and attaches trace data when tracing is enabled via its `tracing` option.
+ */
+export declare class Http implements Integration {
+    /**
+     * @inheritDoc
+     */
+    static id: string;
+    /**
+     * @inheritDoc
+     */
+    name: string;
+    private readonly _breadcrumbs;
+    private readonly _tracing;
+    /**
+     * @inheritDoc
+     */
+    constructor(options?: HttpOptions);
+    /**
+     * @inheritDoc
+     */
+    setupOnce(_addGlobalEventProcessor: (callback: EventProcessor) => void, setupOnceGetCurrentHub: () => Hub): void;
+}
+export {};
+//# sourceMappingURL=http.d.ts.map

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lower Third Control</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, button {
+      width: 100%;
+      font-size: 16px;
+      padding: 6px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <h2>Lower Third Control</h2>
+
+  <label>
+    Line 1:
+    <input id="line1" type="text" placeholder="Enter line 1" />
+  </label>
+  <label>
+    Line 1 Font Size (px):
+    <input id="line1FontSize" type="number" min="1" step="1" />
+  </label>
+  <label>
+    Line 1 Color:
+    <input id="line1Color" type="color" />
+  </label>
+
+  <label>
+    Line 2:
+    <input id="line2" type="text" placeholder="Enter line 2" />
+  </label>
+  <label>
+    Line 2 Font Size (px):
+    <input id="line2FontSize" type="number" min="1" step="1" />
+  </label>
+  <label>
+    Line 2 Color:
+    <input id="line2Color" type="color" />
+  </label>
+
+  <label>
+    Position Bottom (px):
+    <input id="posBottom" type="range" min="0" max="500" step="1" />
+  </label>
+  <label>
+    Position Left (px):
+    <input id="posLeft" type="range" min="0" max="1920" step="1" />
+  </label>
+  <label>
+    Background Opacity (0 to 1):
+    <input id="bgOpacity" type="number" min="0" max="1" step="0.01" />
+  </label>
+
+  <button id="toggleVisibility">Hide Lower Third</button>
+
+  <script src="../../../shared/nodecg.bundle.js"></script>
+  <script>
+    const line1Rep = nodecg.Replicant('lowerthird_line1');
+    const line2Rep = nodecg.Replicant('lowerthird_line2');
+    const posBottomRep = nodecg.Replicant('lowerthird_posBottom');
+    const posLeftRep = nodecg.Replicant('lowerthird_posLeft');
+    const bgOpacityRep = nodecg.Replicant('lowerthird_bgOpacity');
+
+    const line1FontSizeRep = nodecg.Replicant('lowerthird_line1FontSize');
+    const line2FontSizeRep = nodecg.Replicant('lowerthird_line2FontSize');
+    const line1ColorRep = nodecg.Replicant('lowerthird_line1Color');
+    const line2ColorRep = nodecg.Replicant('lowerthird_line2Color');
+
+    const visibleRep = nodecg.Replicant('lowerthird_visible');
+
+    const line1Input = document.getElementById('line1');
+    const line2Input = document.getElementById('line2');
+    const posBottomInput = document.getElementById('posBottom');
+    const posLeftInput = document.getElementById('posLeft');
+    const bgOpacityInput = document.getElementById('bgOpacity');
+    const line1FontSizeInput = document.getElementById('line1FontSize');
+    const line2FontSizeInput = document.getElementById('line2FontSize');
+    const line1ColorInput = document.getElementById('line1Color');
+    const line2ColorInput = document.getElementById('line2Color');
+    const toggleButton = document.getElementById('toggleVisibility');
+
+    // Sync replicants -> inputs
+    line1Rep.on('change', val => line1Input.value = val || '');
+    line2Rep.on('change', val => line2Input.value = val || '');
+
+    posBottomRep.on('change', val => posBottomInput.value = val ?? 40);
+    posLeftRep.on('change', val => posLeftInput.value = val ?? 40);
+    bgOpacityRep.on('change', val => bgOpacityInput.value = val ?? 0.7);
+
+    line1FontSizeRep.on('change', val => line1FontSizeInput.value = val ?? 28);
+    line2FontSizeRep.on('change', val => line2FontSizeInput.value = val ?? 20);
+    line1ColorRep.on('change', val => line1ColorInput.value = val || '#FFFFFF');
+    line2ColorRep.on('change', val => line2ColorInput.value = val || '#FFFFFF');
+
+    visibleRep.on('change', val => {
+      toggleButton.textContent = val ? 'Hide Lower Third' : 'Show Lower Third';
+    });
+
+    // Update replicants on input change
+    line1Input.addEventListener('input', e => { line1Rep.value = e.target.value; });
+    line2Input.addEventListener('input', e => { line2Rep.value = e.target.value; });
+
+    posBottomInput.addEventListener('input', e => { posBottomRep.value = Number(e.target.value); });
+    posLeftInput.addEventListener('input', e => { posLeftRep.value = Number(e.target.value); });
+
+    bgOpacityInput.addEventListener('input', e => {
+      let val = parseFloat(e.target.value);
+      if (val < 0) val = 0;
+      if (val > 1) val = 1;
+      bgOpacityRep.value = val;
+    });
+
+    line1FontSizeInput.addEventListener('input', e => {
+      let val = parseInt(e.target.value, 10);
+      if (val > 0) line1FontSizeRep.value = val;
+    });
+    line2FontSizeInput.addEventListener('input', e => {
+      let val = parseInt(e.target.value, 10);
+      if (val > 0) line2FontSizeRep.value = val;
+    });
+
+    line1ColorInput.addEventListener('input', e => {
+      line1ColorRep.value = e.target.value;
+    });
+    line2ColorInput.addEventListener('input', e => {
+      line2ColorRep.value = e.target.value;
+    });
+
+    toggleButton.addEventListener('click', () => {
+      visibleRep.value = !visibleRep.value;
+    });
+  </script>
+</body>
+</html>

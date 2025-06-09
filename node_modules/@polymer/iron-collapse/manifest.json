@@ -1,0 +1,44 @@
+{
+  "files": {
+    "iron-collapse.html": {
+      "convertedUrl": "iron-collapse.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/simple-expand-collapse.html": {
+      "convertedUrl": "demo/simple-expand-collapse.js",
+      "exports": {}
+    },
+    "test/a11y.html": {
+      "convertedUrl": "test/a11y.html",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/flex.html": {
+      "convertedUrl": "test/flex.html",
+      "exports": {}
+    },
+    "test/horizontal.html": {
+      "convertedUrl": "test/horizontal.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/nested.html": {
+      "convertedUrl": "test/nested.html",
+      "exports": {}
+    }
+  }
+}

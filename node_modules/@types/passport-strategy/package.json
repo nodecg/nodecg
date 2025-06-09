@@ -1,0 +1,25 @@
+{
+    "name": "@types/passport-strategy",
+    "version": "0.2.35",
+    "description": "TypeScript definitions for Passport Strategy module",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Lior Mualem",
+            "url": "https://github.com/liorm",
+            "githubUsername": "liorm"
+        }
+    ],
+    "main": "",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git"
+    },
+    "scripts": {},
+    "dependencies": {
+        "@types/passport": "*",
+        "@types/express": "*"
+    },
+    "typesPublisherContentHash": "efc40dd7291981d3992d1eb8d1ece60f02b7218e4ad9cd55f4a44165a97d2f98",
+    "typeScriptVersion": "2.3"
+}

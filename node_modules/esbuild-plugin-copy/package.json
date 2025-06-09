@@ -1,0 +1,44 @@
+{
+  "name": "esbuild-plugin-copy",
+  "version": "2.1.1",
+  "description": "ESBuild plugin for assets copy.",
+  "keywords": [
+    "esbuild",
+    "ESBuild",
+    "copy",
+    "plugin"
+  ],
+  "homepage": "https://github.com/LinbuduLab/esbuild-plugins/tree/master/packages/esbuild-plugin-copy#readme",
+  "changelog": "https://github.com/LinbuduLab/esbuild-plugins/blob/main/packages/esbuild-plugin-copy/CHANGELOG.md",
+  "bugs": {
+    "url": "https://github.com/LinbuduLab/esbuild-plugins/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LinbuduLab/esbuild-plugins.git"
+  },
+  "license": "MIT",
+  "author": "Linbudu <linbudu599@gmail.com> (https://github.com/linbudu599)",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "chokidar": "^3.5.3",
+    "fs-extra": "^10.0.1",
+    "globby": "^11.0.3"
+  },
+  "peerDependencies": {
+    "esbuild": ">= 0.14.0"
+  },
+  "scripts": {
+    "dev": "tsup src/index.ts --watch --dts --format esm",
+    "build": "rm -rf dist && tsup src/index.ts --config ../../tsup.config.ts"
+  }
+}

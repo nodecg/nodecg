@@ -1,0 +1,1 @@
+{"version":3,"file":"worker-script.js","sources":["../../../../src/integrations/anr/worker-script.ts"],"sourcesContent":["// This file is a placeholder that gets overwritten in the build directory.\nexport const base64WorkerScript = '';\n"],"names":[],"mappings":"AAAA;AACO,MAAM,kBAAmB,GAAE;;;;"}

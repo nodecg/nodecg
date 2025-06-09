@@ -1,0 +1,76 @@
+{
+  "name": "ono",
+  "version": "4.0.11",
+  "description": "Throw better errors.",
+  "keywords": [
+    "throw",
+    "error",
+    "errors",
+    "exception",
+    "printf",
+    "format",
+    "wrap",
+    "inner"
+  ],
+  "author": {
+    "name": "James Messinger",
+    "url": "https://jamesmessinger.com"
+  },
+  "homepage": "https://jsdevtools.org/ono",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JS-DevTools/ono.git"
+  },
+  "license": "MIT",
+  "main": "lib/ono.js",
+  "typings": "lib/ono.d.ts",
+  "files": [
+    "dist/ono.js",
+    "dist/ono.js.map",
+    "dist/ono.min.js",
+    "dist/ono.min.js.map",
+    "lib"
+  ],
+  "scripts": {
+    "lint": "eslint lib test/fixtures test/specs",
+    "build": "simplifyify lib/ono.js --outfile dist/ono.js --standalone ono --bundle --debug --minify",
+    "test": "npm run test:node && npm run test:browser && npm run test:typescript && npm run lint",
+    "test:node": "mocha",
+    "test:browser": "karma start --single-run",
+    "test:typescript": "tsc --noEmit test/specs/typescript-definition.ts",
+    "coverage": "npm run coverage:node && npm run coverage:browser",
+    "coverage:node": "nyc --reporter=text --reporter=lcov --report-dir coverage/node mocha",
+    "coverage:browser": "npm run build -- --coverage && npm run test:browser -- --coverage",
+    "upgrade": "npm-check -u",
+    "bump": "bump --prompt --grep dist/* --tag --push --all",
+    "release": "npm run upgrade && npm run build && npm test && npm run bump && npm publish"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.2",
+    "eslint": "^5.10.0",
+    "eslint-config-modular": "^5.0.0",
+    "karma": "^3.1.3",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-cli": "^2.0.0",
+    "karma-coverage": "^1.1.2",
+    "karma-edge-launcher": "^0.4.2",
+    "karma-firefox-launcher": "^1.1.0",
+    "karma-host-environment": "^1.1.6",
+    "karma-ie-launcher": "^1.0.0",
+    "karma-mocha": "^1.3.0",
+    "karma-safari-launcher": "^1.0.0",
+    "karma-sauce-launcher": "^1.2.0",
+    "karma-verbose-reporter": "0.0.6",
+    "mocha": "^5.2.0",
+    "npm-check": "^5.9.0",
+    "nyc": "^13.1.0",
+    "simplifyify": "^7.0.0",
+    "typescript": "^3.2.2",
+    "version-bump-prompt": "^4.2.1"
+  },
+  "dependencies": {
+    "format-util": "^1.0.3"
+  }
+}

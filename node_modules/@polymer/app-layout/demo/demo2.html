@@ -1,0 +1,85 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+  <title>demo2</title>
+
+  <script src="https://unpkg.com/@webcomponents/webcomponentsjs@^2.0.0/webcomponents-loader.js"></script>
+
+  <script type="module">
+    import '@polymer/font-roboto/roboto.js';
+    import '@polymer/iron-icons/iron-icons.js';
+    import '@polymer/paper-icon-button/paper-icon-button.js';
+    import '../app-drawer/app-drawer.js';
+    import '../app-drawer-layout/app-drawer-layout.js';
+    // Import effects before app-header.
+    import '../app-scroll-effects/app-scroll-effects.js';
+    import '../app-header/app-header.js';
+    import '../app-header-layout/app-header-layout.js';
+    import '../app-toolbar/app-toolbar.js';
+    import './sample-content.js';
+  </script>
+
+  <custom-style>
+    <style is="custom-style">
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      background-color: #eee;
+    }
+
+    app-header {
+      background-color: #4285f4;
+      color: #fff;
+    }
+
+    app-header paper-icon-button {
+      --paper-icon-button-ink-color: white;
+    }
+
+    app-drawer-layout:not([narrow]) [drawer-toggle] {
+      display: none;
+    }
+
+    </style>
+  </custom-style>
+
+</head>
+<body unresolved>
+
+  <app-drawer-layout>
+
+    <app-drawer slot="drawer">
+      <app-toolbar>App name</app-toolbar>
+    </app-drawer>
+
+    <app-header-layout>
+
+      <app-header slot="header" fixed effects="waterfall">
+        <app-toolbar>
+          <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+          <div main-title>My Drive</div>
+        </app-toolbar>
+      </app-header>
+
+      <sample-content size="100"></sample-content>
+
+    </app-header-layout>
+
+  </app-drawer-layout>
+
+</body>
+</html>

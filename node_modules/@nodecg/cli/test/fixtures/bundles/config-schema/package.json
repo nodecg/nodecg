@@ -1,0 +1,6 @@
+{
+  "name": "config-schema",
+  "nodecg": {
+    "compatibleRange": "^1.3.0"
+  }
+}

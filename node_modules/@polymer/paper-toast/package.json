@@ -1,0 +1,38 @@
+{
+  "description": "A material design notification toast",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "toast",
+    "notification"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/paper-toast.git"
+  },
+  "name": "@polymer/paper-toast",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "webmat": "^0.2.0",
+    "@polymer/iron-demo-helpers": "^3.0.1",
+    "@polymer/paper-button": "^3.0.0-pre.26",
+    "@polymer/test-fixture": "^4.0.1",
+    "wct-browser-legacy": "^1.0.1",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.0.1",
+  "main": "paper-toast.js",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/iron-a11y-announcer": "^3.0.0-pre.26",
+    "@polymer/iron-overlay-behavior": "^3.0.0-pre.27",
+    "@polymer/iron-fit-behavior": "^3.0.0-pre.26",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

@@ -1,0 +1,177 @@
+import type { DeepReadonly } from "ts-essentials";
+import type { NodeCG } from "../types/nodecg";
+import type { AbstractReplicant } from "./replicants.shared";
+import { type EventMap, TypedEmitter } from "./typed-emitter";
+export interface MessageHandler {
+    messageName: string;
+    bundleName: string;
+    func: NodeCG.ListenHandler;
+}
+export declare abstract class NodeCGAPIBase<P extends NodeCG.Platform, C extends Record<string, any>, E extends EventMap> extends TypedEmitter<E> {
+    static version: any;
+    /**
+     * An object containing references to all Replicants that have been declared in this `window`, sorted by bundle.
+     * E.g., `NodeCG.declaredReplicants.myBundle.myRep`
+     */
+    static declaredReplicants: Map<string, Map<string, AbstractReplicant<"client", any>>>;
+    /**
+     * Lets you easily wait for a group of Replicants to finish declaring.
+     *
+     * Returns a promise which is resolved once all provided Replicants
+     * have emitted a `change` event, which is indicates that they must
+     * have finished declaring.
+     *
+     * This method is only useful in client-side code.
+     * Server-side code never has to wait for Replicants.
+     *
+     * @param replicants {Replicant}
+     * @returns {Promise<any>}
+     *
+     * @example <caption>From a graphic or dashboard panel:</caption>
+     * const rep1 = nodecg.Replicant('rep1');
+     * const rep2 = nodecg.Replicant('rep2');
+     *
+     * // You can provide as many Replicant arguments as you want,
+     * // this example just uses two Replicants.
+     * NodeCG.waitForReplicants(rep1, rep2).then(() => {
+     *     console.log('rep1 and rep2 are fully declared and ready to use!');
+     * });
+     */
+    static waitForReplicants(...replicants: AbstractReplicant<"client", any>[]): Promise<void>;
+    /**
+     * The name of the bundle which this NodeCG API instance is for.
+     */
+    readonly bundleName: string;
+    /**
+     * An object containing the parsed content of `cfg/<bundle-name>.json`, the contents of which
+     * are read once when NodeCG starts up. Used to quickly access per-bundle configuration properties.
+     */
+    readonly bundleConfig: DeepReadonly<C>;
+    /**
+     * The version (from package.json) of the bundle which this NodeCG API instance is for.
+     * @name NodeCG#bundleVersion
+     */
+    readonly bundleVersion?: string;
+    /**
+     * Provides information about the current git status of this bundle, if found.
+     */
+    readonly bundleGit: Readonly<NodeCG.Bundle.GitData>;
+    _messageHandlers: MessageHandler[];
+    /**
+     * Since the process of instantiating a Replicant is quite different on
+     * the client and server, this abstract class relies on its child classes
+     * to define this method that handles this context-specific logic.
+     */
+    protected abstract readonly _replicantFactory: <V, O extends NodeCG.Replicant.Options<any> = NodeCG.Replicant.Options<V>>(name: string, namespace: string, opts: O) => AbstractReplicant<P, V, O>;
+    /**
+     * Provides easy access to the Logger class.
+     * Useful in cases where you want to create your own custom logger.
+     */
+    abstract get Logger(): new (name: string) => NodeCG.Logger;
+    /**
+     * An instance of NodeCG's Logger, with the following methods. The logging level is set in `cfg/nodecg.json`,
+     * NodeCG's global config file.
+     * ```
+     * nodecg.log.trace('trace level logging');
+     * nodecg.log.debug('debug level logging');
+     * nodecg.log.info('info level logging');
+     * nodecg.log.warn('warn level logging');
+     * nodecg.log.error('error level logging');
+     * ```
+     */
+    abstract get log(): NodeCG.Logger;
+    constructor(bundle: NodeCG.Bundle);
+    /**
+     * Listens for a message, and invokes the provided callback each time the message is received.
+     * If any data was sent with the message, it will be passed to the callback.
+     *
+     * Messages are namespaced by bundle.
+     * To listen to a message in another bundle's namespace, provide it as the second argument.
+     *
+     * You may define multiple listenFor handlers for a given message.
+     * They will be called in the order they were registered.
+     *
+     * @example
+     * nodecg.listenFor('printMessage', message => {
+     *     console.log(message);
+     * });
+     *
+     * @example <caption>Listening to a message in another bundle's namespace:</caption>
+     * nodecg.listenFor('printMessage', 'another-bundle', message => {
+     *     console.log(message);
+     * });
+     */
+    listenFor(messageName: string, handlerFunc: NodeCG.ListenHandler): void;
+    listenFor(messageName: string, bundleName: string, handlerFunc: NodeCG.ListenHandler): void;
+    /**
+     * Removes a listener for a message.
+     *
+     * Messages are namespaced by bundle.
+     * To remove a listener to a message in another bundle's namespace, provide it as the second argument.
+     *
+     * @param {string} messageName - The name of the message.
+     * @param {string} [bundleName=CURR_BNDL] - The bundle namespace to in which to listen for this message
+     * @param {function} handlerFunc - A reference to a handler function added as a listener to this message via {@link NodeCG#listenFor}.
+     * @returns {boolean}
+     *
+     * @example
+     * nodecg.unlisten('printMessage', someFunctionName);
+     *
+     * @example <caption>Removing a listener from a message in another bundle's namespace:</caption>
+     * nodecg.unlisten('printMessage', 'another-bundle', someFunctionName);
+     */
+    unlisten(messageName: string, handlerFunc: NodeCG.ListenHandler): boolean;
+    unlisten(messageName: string, bundleName: string, handlerFunc: NodeCG.ListenHandler): boolean;
+    /**
+     * Replicants are objects which monitor changes to a variable's value.
+     * The changes are replicated across all extensions, graphics, and dashboard panels.
+     * When a Replicant changes in one of those places it is quickly updated in the rest,
+     * and a `change` event is emitted allowing bundles to react to the changes in the data.
+     *
+     * If a Replicant with a given name in a given bundle namespace has already been declared,
+     * the Replicant will automatically be assigned the existing value.
+     *
+     * Replicants must be declared in each context that wishes to use them. For instance,
+     * declaring a replicant in an extension does not automatically make it available in a graphic.
+     * The graphic must also declare it.
+     *
+     * By default Replicants will be saved to disk, meaning they will automatically be restored when NodeCG is restarted,
+     * such as after an unexpected crash.
+     * If you need to opt-out of this behaviour simply set `persistent: false` in the `opts` argument.
+     *
+     * As of NodeCG 0.8.4, Replicants can also be automatically validated against a JSON Schema that you provide.
+     * See {@tutorial replicant-schemas} for more information.
+     *
+     * @param {string} name - The name of the replicant.
+     * @param {string} [namespace] - The namespace to in which to look for this replicant. Defaults to the name of the current bundle.
+     * @param {object} [opts] - The options for this replicant.
+     * @param {*} [opts.defaultValue] - The default value to instantiate this Replicant with. The default value is only
+     * applied if this Replicant has not previously been declared and if it has no persisted value.
+     * @param {boolean} [opts.persistent=true] - Whether to persist the Replicant's value to disk on every change.
+     * Persisted values are re-loaded on startup.
+     * @param {number} [opts.persistenceInterval=DEFAULT_PERSISTENCE_INTERVAL] - Interval between each persistence, in milliseconds.
+     * @param {string} [opts.schemaPath] - The filepath at which to look for a JSON Schema for this Replicant.
+     * Defaults to `nodecg/bundles/${bundleName}/schemas/${replicantName}.json`. Please note that this default
+     * path will be URIEncoded to ensure that it results in a valid filename.
+     *
+     * @example
+     * const myRep = nodecg.Replicant('myRep', {defaultValue: 123});
+     *
+     * myRep.on('change', (newValue, oldValue) => {
+     *     console.log(`myRep changed from ${oldValue} to ${newValue}`);
+     * });
+     *
+     * myRep.value = 'Hello!';
+     * myRep.value = {objects: 'work too!'};
+     * myRep.value = {objects: {can: {be: 'nested!'}}};
+     * myRep.value = ['Even', 'arrays', 'work!'];
+     */
+    Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(name: string, namespace: string, opts?: O): AbstractReplicant<P, V, O>;
+    Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(name: string, opts?: O): AbstractReplicant<P, V, O>;
+    Replicant<V, O extends NodeCG.Replicant.OptionsNoDefault = NodeCG.Replicant.OptionsNoDefault>(name: string, namespaceOrOpts?: string | O, opts?: O): AbstractReplicant<P, V, O>;
+    Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(name: string, namespace: string, opts?: O): AbstractReplicant<P, V, O>;
+    Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(name: string, opts?: O): AbstractReplicant<P, V, O>;
+    Replicant<V, O extends NodeCG.Replicant.OptionsWithDefault<V> = NodeCG.Replicant.OptionsWithDefault<V>>(name: string, namespaceOrOpts?: string | O, opts?: O): AbstractReplicant<P, V, O>;
+    Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(name: string, namespace: string, opts?: O): AbstractReplicant<P, V, O>;
+    Replicant<V, O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>>(name: string, opts?: O): AbstractReplicant<P, V, O>;
+}

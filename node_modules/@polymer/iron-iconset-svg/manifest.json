@@ -1,0 +1,28 @@
+{
+  "files": {
+    "iron-iconset-svg.html": {
+      "convertedUrl": "iron-iconset-svg.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/svg-sample-icons.html": {
+      "convertedUrl": "demo/svg-sample-icons.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-iconset-svg.html": {
+      "convertedUrl": "test/iron-iconset-svg.html",
+      "exports": {}
+    }
+  }
+}

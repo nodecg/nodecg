@@ -1,0 +1,8 @@
+import type { Client, DynamicSamplingContext, Scope } from '@sentry/types';
+/**
+ * Creates a dynamic sampling context from a client.
+ *
+ * Dispatchs the `createDsc` lifecycle hook as a side effect.
+ */
+export declare function getDynamicSamplingContextFromClient(trace_id: string, client: Client, scope?: Scope): DynamicSamplingContext;
+//# sourceMappingURL=dynamicSamplingContext.d.ts.map

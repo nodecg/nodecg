@@ -1,0 +1,51 @@
+{
+  "name": "@webcomponents/webcomponentsjs",
+  "version": "2.8.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "Web Components Polyfills",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/webcomponents/polyfills.git",
+    "directory": "packages/webcomponentsjs"
+  },
+  "author": "The Polymer Project Authors (https://polymer.github.io/AUTHORS.txt)",
+  "homepage": "https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs",
+  "bugs": "https://github.com/webcomponents/polyfills/issues?q=is%3Aissue+is%3Aopen+label%3A\"Package%3A+webcomponentsjs\"",
+  "main": "webcomponents-bundle.js",
+  "scripts": {
+    "build": "tsc && gulp",
+    "build:watch": "chokidar --initial --follow-symlinks 'src/entrypoints/**/*.js' 'ts_src/**/*.ts' 'node_modules/@webcomponents/**/*.js' -c 'npm run build'",
+    "clean": "gulp clean",
+    "prepack": "npm run build",
+    "regen-package-lock": "rm -rf node_modules package-lock.json; npm install"
+  },
+  "files": [
+    "bundles/**/*",
+    "CHANGELOG.md",
+    "custom-elements-es5-adapter.js",
+    "src/**/*.js",
+    "webcomponents-bundle.d.ts",
+    "webcomponents-bundle.js*",
+    "webcomponents-loader.js"
+  ],
+  "keywords": [
+    "webcomponents",
+    "web-components",
+    "polyfill",
+    "shim"
+  ],
+  "devDependencies": {
+    "@webcomponents/custom-elements": "^1.6.0",
+    "@webcomponents/shadycss": "^1.11.2",
+    "@webcomponents/shadydom": "^1.11.0",
+    "@webcomponents/template": "^1.5.1",
+    "@webcomponents/url": "^0.7.9",
+    "babel-preset-minify": "^0.4.3",
+    "get-own-property-symbols": "^0.9.2",
+    "gulp-concat": "^2.6.1",
+    "promise-polyfill": "^8.0.0"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "files": {
+    "iron-a11y-announcer.html": {
+      "convertedUrl": "iron-a11y-announcer.js",
+      "exports": {
+        "Polymer.IronA11yAnnouncer": "IronA11yAnnouncer"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/x-announces.html": {
+      "convertedUrl": "demo/x-announces.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-a11y-announcer.html": {
+      "convertedUrl": "test/iron-a11y-announcer.html",
+      "exports": {}
+    }
+  }
+}

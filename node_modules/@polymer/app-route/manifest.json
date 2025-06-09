@@ -1,0 +1,118 @@
+{
+  "files": {
+    "app-location.html": {
+      "convertedUrl": "app-location.js",
+      "exports": {}
+    },
+    "app-route-converter-behavior.html": {
+      "convertedUrl": "app-route-converter-behavior.js",
+      "exports": {
+        "Polymer.AppRouteConverterBehavior": "AppRouteConverterBehavior"
+      }
+    },
+    "app-route.html": {
+      "convertedUrl": "app-route.js",
+      "exports": {}
+    },
+    "app-route-converter.html": {
+      "convertedUrl": "app-route-converter.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/data-loading-demo.html": {
+      "convertedUrl": "demo/data-loading-demo.html",
+      "exports": {}
+    },
+    "demo/data-loading-demo/flickr-search-demo.html": {
+      "convertedUrl": "demo/data-loading-demo/flickr-search-demo.js",
+      "exports": {}
+    },
+    "demo/data-loading-demo/flickr-search-page.html": {
+      "convertedUrl": "demo/data-loading-demo/flickr-search-page.js",
+      "exports": {}
+    },
+    "demo/data-loading-demo/flickr-image-page.html": {
+      "convertedUrl": "demo/data-loading-demo/flickr-image-page.js",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/youtube-demo/youtube-search.html": {
+      "convertedUrl": "demo/youtube-demo/youtube-search.js",
+      "exports": {}
+    },
+    "demo/youtube-demo/route-info.html": {
+      "convertedUrl": "demo/youtube-demo/route-info.js",
+      "exports": {}
+    },
+    "demo/youtube-demo/youtube-toolbar.html": {
+      "convertedUrl": "demo/youtube-demo/youtube-toolbar.js",
+      "exports": {}
+    },
+    "demo/youtube-demo/video-viewer.html": {
+      "convertedUrl": "demo/youtube-demo/video-viewer.js",
+      "exports": {}
+    },
+    "demo/youtube-demo/youtube-lite.html": {
+      "convertedUrl": "demo/youtube-demo/youtube-lite.js",
+      "exports": {}
+    },
+    "demo/youtube-demo/search-results.html": {
+      "convertedUrl": "demo/youtube-demo/search-results.js",
+      "exports": {}
+    },
+    "demo/simple-demo.html": {
+      "convertedUrl": "demo/simple-demo.html",
+      "exports": {}
+    },
+    "test/app-location.html": {
+      "convertedUrl": "test/app-location.html",
+      "exports": {}
+    },
+    "test/app-route-converter.html": {
+      "convertedUrl": "test/app-route-converter.html",
+      "exports": {}
+    },
+    "test/app-route.html": {
+      "convertedUrl": "test/app-route.html",
+      "exports": {}
+    },
+    "test/redirection.html": {
+      "convertedUrl": "test/redirection.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/test-app-example-1.html": {
+      "convertedUrl": "test/test-app-example-1.html",
+      "exports": {}
+    },
+    "test/app-example-1.html": {
+      "convertedUrl": "test/app-example-1.js",
+      "exports": {}
+    },
+    "test/test-app-example-2.html": {
+      "convertedUrl": "test/test-app-example-2.html",
+      "exports": {}
+    },
+    "test/app-example-2.html": {
+      "convertedUrl": "test/app-example-2.js",
+      "exports": {}
+    },
+    "test/test-observer-app.html": {
+      "convertedUrl": "test/test-observer-app.html",
+      "exports": {}
+    },
+    "test/observer-tester.html": {
+      "convertedUrl": "test/observer-tester.js",
+      "exports": {}
+    }
+  }
+}

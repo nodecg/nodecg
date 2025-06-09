@@ -1,0 +1,1 @@
+{"version":3,"file":"isBrowser.js","sourceRoot":"","sources":["../../../src/shared/utils/isBrowser.ts"],"names":[],"mappings":";;AAAA,8BAEC;AAED,4BAKC;AATD,SAAgB,SAAS;IACxB,OAAO,OAAO,UAAU,CAAC,MAAM,KAAK,WAAW,CAAC;AACjD,CAAC;AAED,SAAgB,QAAQ;IACvB,OAAO,CACN,OAAQ,UAAkB,CAAC,iBAAiB,KAAK,WAAW;QAC5D,IAAI,YAAa,UAAkB,CAAC,iBAAiB,CACrD,CAAC;AACH,CAAC"}

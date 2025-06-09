@@ -1,0 +1,36 @@
+{
+  "files": {
+    "paper-icon-button.html": {
+      "convertedUrl": "paper-icon-button.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/paper-icon-button-light.html": {
+      "convertedUrl": "demo/paper-icon-button-light.html",
+      "exports": {}
+    },
+    "paper-icon-button-light.html": {
+      "convertedUrl": "paper-icon-button-light.js",
+      "exports": {}
+    },
+    "test/a11y.html": {
+      "convertedUrl": "test/a11y.html",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    }
+  }
+}

@@ -1,0 +1,1 @@
+{"version":3,"file":"dynamicSamplingContext.d.ts","sourceRoot":"","sources":["../../../src/tracing/dynamicSamplingContext.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,MAAM,EAAE,sBAAsB,EAAE,KAAK,EAAE,MAAM,eAAe,CAAC;AAK3E;;;;GAIG;AACH,wBAAgB,mCAAmC,CACjD,QAAQ,EAAE,MAAM,EAChB,MAAM,EAAE,MAAM,EACd,KAAK,CAAC,EAAE,KAAK,GACZ,sBAAsB,CAiBxB"}

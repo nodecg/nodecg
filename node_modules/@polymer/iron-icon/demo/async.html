@@ -1,0 +1,74 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+<head>
+  <title>iron-icon demo</title>
+  <script src="https://unpkg.com/@webcomponents/webcomponentsjs@^2.0.0/webcomponents-loader.js"></script>
+
+  <script type="module">
+    import '@polymer/iron-demo-helpers/demo-pages-shared-styles.js';
+
+    const template = document.createElement('template');
+    template.innerHTML = `
+      <custom-style>
+        <style is="custom-style" include="demo-pages-shared-styles"></style>
+      </custom-style>
+    `;
+    document.body.appendChild(template.content);
+  </script>
+
+  <custom-style>
+    <style is="custom-style">
+      #loading_message {
+        color: #444;
+        margin-bottom: 16px;
+      }
+      .vertical-section h4 {
+        border-left: 3px solid var(--paper-grey-300);
+        padding-left: 10px;
+      }
+
+      .vertical-section h4:hover {
+        border-left-color: var(--google-blue-700);
+      }
+    </style>
+  </custom-style>
+</head>
+<body>
+  <div class="vertical-section-container centered">
+    <h4>
+      This demo is for an &lt;iron-icon&gt; with an asynchronously loaded
+      iconset.
+    </h4>
+
+    <div id='loading_message'>Waiting to load iconset...</div>
+
+    <div class="vertical-section">
+      <h4>&lt;iron-icon icon="example:location"&gt;</h4>
+      <iron-icon icon="example:location"></iron-icon>
+    </div>
+  </div>
+
+  <!-- iron-icon using a iron-iconset as its icon source -->
+  <template id="exampleIconset">
+    <iron-iconset name="example" icons="location" src="location.png" size="24" width="24"></iron-iconset>
+  </template>
+  <script type="module">
+    import '../iron-icon.js';
+    import '@polymer/iron-iconset/iron-iconset.js';
+
+    setTimeout(function() {
+      document.body.appendChild(exampleIconset.content);
+      document.querySelector('#loading_message').innerText = 'Iconset loaded.';
+    }, 1000);
+  </script>
+</body>
+</html>

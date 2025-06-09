@@ -1,0 +1,19 @@
+{
+  "name": "@nodecg/internal-util",
+  "version": "0.0.0",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "del-cli dist && tsc -b",
+    "dev": "del-cli dist && tsc -b --watch --preserveWatchOutput"
+  },
+  "devDependencies": {
+    "del-cli": "^6.0.0",
+    "typescript": "~5.7.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

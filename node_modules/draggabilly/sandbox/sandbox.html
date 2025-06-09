@@ -1,0 +1,252 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Draggabilly</title>
+
+  <style>
+    .box {
+      width:  100px;
+      height: 100px;
+      background: red;
+    }
+
+    #ex1 {
+      position: relative;
+      left: 200px;
+      top: 50px;
+    }
+
+    #ex2 {
+      background: blue;
+    }
+
+    #has-handles {
+      position: relative;
+      left: 240px;
+      top: 100px;
+      background: orange;
+    }
+
+    .handle {
+      background: #666;
+      position: absolute;
+      width: 40px;
+      height: 40px;
+    }
+
+    #has-handles .handle2 {
+      right: 10px;
+      bottom: 10px;
+    }
+
+    .is-dragging {
+      opacity: 0.5;
+    }
+
+    .container {
+      border: 1px solid;
+      position: relative;
+    }
+
+    .container:after {
+      content: '';
+      display: block;
+      clear: both;
+    }
+
+    #container1 {
+      width: 150px;
+    }
+
+    #container1 .box {
+      float: left;
+      margin: 5px;
+      width: 38px;
+      height: 38px;
+      border: 1px solid;
+      background: orange;
+    }
+
+    #kitties {
+      background: #CCC;
+      width: 140px;
+      padding: 10px;
+    }
+
+    #grid-container {
+      width: 340px;
+      height: 210px;
+      position: absolute;
+      left: 400px;
+      top: 300px;
+      border: 1px solid;
+    }
+
+    #grid-container .draggie {
+      position: relative;
+      left: 30px;
+      top: 30px;
+      width: 80px;
+      height: 80px;
+      background: #CCC;
+    }
+
+    .axised {
+      position: absolute;
+      width: 80px;
+      height: 60px;
+      background: #F09;
+      left: 400px;
+    }
+
+    #axis-x { top: 160px; }
+
+    #axis-y { top: 230px; }
+
+  </style>
+
+</head>
+<body>
+
+  <h1>Draggabilly</h1>
+
+  <p>Press [B] to enable/disable the blue draggabilly</p>
+
+  <div id="ex1" class="box">
+    <div class="handle"></div>
+  </div>
+  <div id="ex2" class="box"></div>
+
+  <div id="has-handles" class="box">
+    <div class="handle handle1"></div>
+    <div class="handle handle2"></div>
+  </div>
+
+  <div id="container1" class="container">
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+  </div>
+
+
+  <img id="kitten" src="https://picsum.photos/100/100" />
+
+  <div id="kitties">
+    <img src="https://picsum.photos/40/60" />
+    <img src="https://picsum.photos/60/40" />
+  </div>
+
+  <div id="grid-container">
+    <div class="draggie"></div>
+  </div>
+
+  <div id="axis-x" class="axised">axis: x</div>
+  <div id="axis-y" class="axised">axis: y</div>
+
+  <div id="got-inputs" class="box">
+    <input />
+    <input type="checkbox" />
+  </div>
+
+<script src="../node_modules/ev-emitter/ev-emitter.js"></script>
+<script src="../node_modules/get-size/get-size.js"></script>
+<script src="../node_modules/unipointer/unipointer.js"></script>
+<script src="../node_modules/unidragger/unidragger.js"></script>
+<script src="../draggabilly.js"></script>
+<script>
+
+
+window.onload = function() {
+
+  var ex1 = document.getElementById('ex1');
+  var drag1 = new Draggabilly( ex1 );
+
+  var ex2 = document.getElementById('ex2');
+  var drag2 = window.drag2 = new Draggabilly( ex2 );
+
+
+  drag2.on( 'dragStart', function( event, pointer ) {
+    console.log('dragStart', this.position.x, this.position.y, event.type, pointer.pageX, pointer.pageY );
+  });
+
+  drag2.on( 'staticClick', function( event, pointer ) {
+    console.log( 'staticClick', event.type );
+  });
+
+  drag2.on( 'dragMove', function( event, pointer ) {
+    console.log('dragMove', this.position.x, this.position.y, event.type, pointer.pageX, pointer.pageY );
+  });
+
+  drag2.on( 'dragEnd', function( event, pointer ) {
+    console.log( 'dragEnd', this.position.x, this.position.y, event && event.type, pointer && pointer.pageX, pointer && pointer.pageY );
+  });
+
+  var handleDraggie = new Draggabilly( document.querySelector('#has-handles'), {
+    handle: '.handle'
+  });
+
+  var container1Draggers = [];
+  var dragger;
+
+  var elems = document.querySelectorAll('#container1 .box');
+
+  function handleDraggerEvent( event, pointer ) {
+    console.log( event.type, this.position.x, this.position.y );
+  }
+  for ( var i=0, len = elems.length; i < len; i++ ) {
+    dragger = new Draggabilly( elems[i], {
+      containment: true
+    });
+    dragger.on( 'dragStart', handleDraggerEvent );
+    dragger.on( 'dragEnd', handleDraggerEvent );
+  }
+
+  // toggle drag2 enable/disable on [B] keypress
+  document.addEventListener( 'keyup', function( event ) {
+    var code = event.keyCode || event.which;
+    // console.log( code );
+    switch ( code ) {
+      case 66 : // B
+        drag2[ drag2.isEnabled ? 'disable' : 'enable' ]();
+        break;
+    }
+  });
+
+  ( function() {
+    var elem = document.querySelector('#kitten');
+    new Draggabilly( elem );
+  })();
+
+  ( function() {
+    var elem = document.querySelector('#kitties');
+    new Draggabilly( elem );
+  })();
+
+  ( function() {
+    new Draggabilly( '#grid-container .draggie', {
+      containment: true,
+      grid: [ 50, 50 ]
+      // axis: 'y'
+    });
+  })();
+
+  new Draggabilly( '#axis-x', { axis: 'x' });
+  new Draggabilly( '#axis-y', { axis: 'y' });
+
+  var inputDraggie = new Draggabilly('#got-inputs');
+  // inputDraggie.disable();
+};
+</script>
+
+</body>
+</html>

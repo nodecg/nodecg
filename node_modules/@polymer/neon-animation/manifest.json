@@ -1,0 +1,245 @@
+{
+  "files": {
+    "neon-animation-runner-behavior.html": {
+      "convertedUrl": "neon-animation-runner-behavior.js",
+      "exports": {
+        "Polymer.NeonAnimationRunnerBehaviorImpl": "NeonAnimationRunnerBehaviorImpl",
+        "Polymer.NeonAnimationRunnerBehavior": "NeonAnimationRunnerBehavior"
+      }
+    },
+    "neon-animatable-behavior.html": {
+      "convertedUrl": "neon-animatable-behavior.js",
+      "exports": {
+        "Polymer.NeonAnimatableBehavior": "NeonAnimatableBehavior"
+      }
+    },
+    "neon-animation-behavior.html": {
+      "convertedUrl": "neon-animation-behavior.js",
+      "exports": {
+        "Polymer.NeonAnimationBehavior": "NeonAnimationBehavior"
+      }
+    },
+    "neon-animated-pages.html": {
+      "convertedUrl": "neon-animated-pages.js",
+      "exports": {}
+    },
+    "neon-animatable.html": {
+      "convertedUrl": "neon-animatable.js",
+      "exports": {}
+    },
+    "neon-animations.html": {
+      "convertedUrl": "neon-animations.js",
+      "exports": {}
+    },
+    "animations/cascaded-animation.html": {
+      "convertedUrl": "animations/cascaded-animation.js",
+      "exports": {}
+    },
+    "animations/fade-in-animation.html": {
+      "convertedUrl": "animations/fade-in-animation.js",
+      "exports": {}
+    },
+    "animations/fade-out-animation.html": {
+      "convertedUrl": "animations/fade-out-animation.js",
+      "exports": {}
+    },
+    "animations/hero-animation.html": {
+      "convertedUrl": "animations/hero-animation.js",
+      "exports": {}
+    },
+    "neon-shared-element-animation-behavior.html": {
+      "convertedUrl": "neon-shared-element-animation-behavior.js",
+      "exports": {
+        "Polymer.NeonSharedElementAnimationBehaviorImpl": "NeonSharedElementAnimationBehaviorImpl",
+        "Polymer.NeonSharedElementAnimationBehavior": "NeonSharedElementAnimationBehavior"
+      }
+    },
+    "animations/opaque-animation.html": {
+      "convertedUrl": "animations/opaque-animation.js",
+      "exports": {}
+    },
+    "animations/ripple-animation.html": {
+      "convertedUrl": "animations/ripple-animation.js",
+      "exports": {}
+    },
+    "animations/reverse-ripple-animation.html": {
+      "convertedUrl": "animations/reverse-ripple-animation.js",
+      "exports": {}
+    },
+    "animations/scale-down-animation.html": {
+      "convertedUrl": "animations/scale-down-animation.js",
+      "exports": {}
+    },
+    "animations/scale-up-animation.html": {
+      "convertedUrl": "animations/scale-up-animation.js",
+      "exports": {}
+    },
+    "animations/slide-from-left-animation.html": {
+      "convertedUrl": "animations/slide-from-left-animation.js",
+      "exports": {}
+    },
+    "animations/slide-from-right-animation.html": {
+      "convertedUrl": "animations/slide-from-right-animation.js",
+      "exports": {}
+    },
+    "animations/slide-from-top-animation.html": {
+      "convertedUrl": "animations/slide-from-top-animation.js",
+      "exports": {}
+    },
+    "animations/slide-from-bottom-animation.html": {
+      "convertedUrl": "animations/slide-from-bottom-animation.js",
+      "exports": {}
+    },
+    "animations/slide-left-animation.html": {
+      "convertedUrl": "animations/slide-left-animation.js",
+      "exports": {}
+    },
+    "animations/slide-right-animation.html": {
+      "convertedUrl": "animations/slide-right-animation.js",
+      "exports": {}
+    },
+    "animations/slide-up-animation.html": {
+      "convertedUrl": "animations/slide-up-animation.js",
+      "exports": {}
+    },
+    "animations/slide-down-animation.html": {
+      "convertedUrl": "animations/slide-down-animation.js",
+      "exports": {}
+    },
+    "animations/transform-animation.html": {
+      "convertedUrl": "animations/transform-animation.js",
+      "exports": {}
+    },
+    "neon-shared-element-animatable-behavior.html": {
+      "convertedUrl": "neon-shared-element-animatable-behavior.js",
+      "exports": {
+        "Polymer.NeonSharedElementAnimatableBehaviorImpl": "NeonSharedElementAnimatableBehaviorImpl",
+        "Polymer.NeonSharedElementAnimatableBehavior": "NeonSharedElementAnimatableBehavior"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "neon-animation.html": {
+      "convertedUrl": "neon-animation.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/card/index.html": {
+      "convertedUrl": "demo/card/index.html",
+      "exports": {}
+    },
+    "demo/card/x-card.html": {
+      "convertedUrl": "demo/card/x-card.js",
+      "exports": {}
+    },
+    "demo/card/x-cards-list.html": {
+      "convertedUrl": "demo/card/x-cards-list.js",
+      "exports": {}
+    },
+    "demo/declarative/index.html": {
+      "convertedUrl": "demo/declarative/index.html",
+      "exports": {}
+    },
+    "demo/doc/index.html": {
+      "convertedUrl": "demo/doc/index.html",
+      "exports": {}
+    },
+    "demo/doc/my-animatable.html": {
+      "convertedUrl": "demo/doc/my-animatable.js",
+      "exports": {}
+    },
+    "demo/doc/my-dialog.html": {
+      "convertedUrl": "demo/doc/my-dialog.js",
+      "exports": {}
+    },
+    "demo/dropdown/index.html": {
+      "convertedUrl": "demo/dropdown/index.html",
+      "exports": {}
+    },
+    "demo/dropdown/animated-dropdown.html": {
+      "convertedUrl": "demo/dropdown/animated-dropdown.js",
+      "exports": {}
+    },
+    "demo/grid/index.html": {
+      "convertedUrl": "demo/grid/index.html",
+      "exports": {}
+    },
+    "demo/grid/animated-grid.html": {
+      "convertedUrl": "demo/grid/animated-grid.js",
+      "exports": {}
+    },
+    "demo/shared-styles.html": {
+      "convertedUrl": "demo/shared-styles.js",
+      "exports": {}
+    },
+    "demo/grid/fullsize-page-with-card.html": {
+      "convertedUrl": "demo/grid/fullsize-page-with-card.js",
+      "exports": {}
+    },
+    "demo/list/index.html": {
+      "convertedUrl": "demo/list/index.html",
+      "exports": {}
+    },
+    "demo/list/list-demo.html": {
+      "convertedUrl": "demo/list/list-demo.js",
+      "exports": {}
+    },
+    "demo/list/list-view.html": {
+      "convertedUrl": "demo/list/list-view.js",
+      "exports": {}
+    },
+    "demo/list/full-view.html": {
+      "convertedUrl": "demo/list/full-view.js",
+      "exports": {}
+    },
+    "demo/load/index.html": {
+      "convertedUrl": "demo/load/index.html",
+      "exports": {}
+    },
+    "demo/load/full-page.html": {
+      "convertedUrl": "demo/load/full-page.js",
+      "exports": {}
+    },
+    "demo/load/animated-grid.html": {
+      "convertedUrl": "demo/load/animated-grid.js",
+      "exports": {}
+    },
+    "demo/tiles/index.html": {
+      "convertedUrl": "demo/tiles/index.html",
+      "exports": {}
+    },
+    "demo/tiles/circles-page.html": {
+      "convertedUrl": "demo/tiles/circles-page.js",
+      "exports": {}
+    },
+    "demo/tiles/squares-page.html": {
+      "convertedUrl": "demo/tiles/squares-page.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/neon-animated-pages-descendant-selection.html": {
+      "convertedUrl": "test/neon-animated-pages-descendant-selection.html",
+      "exports": {}
+    },
+    "test/neon-animated-pages-lazy.html": {
+      "convertedUrl": "test/neon-animated-pages-lazy.html",
+      "exports": {}
+    },
+    "test/test-resizable-pages.html": {
+      "convertedUrl": "test/test-resizable-pages.js",
+      "exports": {}
+    },
+    "test/neon-animated-pages.html": {
+      "convertedUrl": "test/neon-animated-pages.html",
+      "exports": {}
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "description": "An element that supports displaying an icon",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "icon"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/iron-icon.git"
+  },
+  "name": "@polymer/iron-icon",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "@polymer/iron-demo-helpers": "^3.0.1",
+    "@polymer/iron-iconset": "^3.0.0-pre.26",
+    "@polymer/promise-polyfill": "^3.0.0-pre.20",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "wct-browser-legacy": "^1.0.1",
+    "webmat": "^0.2.2",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.0.1",
+  "main": "iron-icon.js",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/iron-flex-layout": "^3.0.0-pre.26",
+    "@polymer/iron-meta": "^3.0.0-pre.26",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

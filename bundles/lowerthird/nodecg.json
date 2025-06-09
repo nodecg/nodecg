@@ -1,0 +1,9 @@
+{
+  "name": "lowerthird",
+  "version": "1.0.0",
+  "description": "Lower third overlay with two lines of text",
+  "license": "MIT",
+  "nodecgDependency": {
+    "nodecg": "^2.0.0"
+  }
+}

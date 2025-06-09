@@ -1,0 +1,1 @@
+{"root":["./src/connection.ts","./src/database-adapter.ts","./src/datasource.ts","./src/entity/apikey.ts","./src/entity/identity.ts","./src/entity/permission.ts","./src/entity/replicant.ts","./src/entity/role.ts","./src/entity/user.ts","./src/entity/index.ts","./src/migration/1669424617013-initialize.ts","./src/migration/1669424781583-default-roles.ts"],"version":"5.7.3"}

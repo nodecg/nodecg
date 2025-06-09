@@ -1,0 +1,29 @@
+{
+  "name": "unipointer",
+  "version": "2.4.0",
+  "description": "Do one thing with one pointer",
+  "main": "unipointer.js",
+  "dependencies": {
+    "ev-emitter": "^1.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/metafizzy/unipointer.git"
+  },
+  "keywords": [
+    "pointer",
+    "touch",
+    "mouse",
+    "browser",
+    "DOM"
+  ],
+  "author": "David DeSandro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/metafizzy/unipointer/issues"
+  },
+  "homepage": "https://github.com/metafizzy/unipointer"
+}

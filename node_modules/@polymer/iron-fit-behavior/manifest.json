@@ -1,0 +1,31 @@
+{
+  "files": {
+    "iron-fit-behavior.html": {
+      "convertedUrl": "iron-fit-behavior.js",
+      "exports": {
+        "Polymer.IronFitBehavior": "IronFitBehavior"
+      }
+    },
+    "index.html": null,
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/simple-fit.html": {
+      "convertedUrl": "demo/simple-fit.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-fit-behavior.html": {
+      "convertedUrl": "test/iron-fit-behavior.html",
+      "exports": {}
+    },
+    "test/test-fit.html": {
+      "convertedUrl": "test/test-fit.js",
+      "exports": {}
+    }
+  }
+}

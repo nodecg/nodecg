@@ -1,0 +1,49 @@
+{
+  "name": "sql-highlight",
+  "version": "6.0.0",
+  "description": "A simple and lightweight library for highlighting SQL queries written in pure JavaScript",
+  "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:scriptcoded/sql-highlight.git"
+  },
+  "files": [
+    "/lib"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "pretest": "npm run lint",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "biome check",
+    "lint-fix": "biome check --write"
+  },
+  "keywords": [
+    "sql",
+    "syntax",
+    "highlight",
+    "highlighter"
+  ],
+  "author": "Malcolm Nihlén <malcolm.nihlen@gmail.com>",
+  "contributors": [
+    "pomahtuk"
+  ],
+  "funding": [
+    "https://github.com/scriptcoded/sql-highlight?sponsor=1",
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/scriptcoded"
+    }
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "jest": "^29.7.0",
+    "semantic-release": "^24.0.0"
+  }
+}

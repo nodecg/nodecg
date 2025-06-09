@@ -1,0 +1,96 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+  <title>demo1</title>
+
+  <script src="https://unpkg.com/@webcomponents/webcomponentsjs@^2.0.0/webcomponents-loader.js"></script>
+
+  <script type="module">
+    import '@polymer/font-roboto/roboto.js';
+    import '@polymer/iron-icons/iron-icons.js';
+    import '@polymer/paper-icon-button/paper-icon-button.js';
+    import '../app-drawer/app-drawer.js';
+    // Import effects before app-header.
+    import '../app-scroll-effects/app-scroll-effects.js';
+    import '../app-header/app-header.js';
+    import '../app-toolbar/app-toolbar.js';
+    import './sample-content.js';
+  </script>
+
+  <custom-style>
+    <style is="custom-style">
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      background-color: #eee;
+    }
+
+    #startDrawer {
+      --app-drawer-content-container: {
+        box-shadow: 1px 0 2px 1px rgba(0,0,0,0.18);
+      }
+    }
+
+    #endDrawer {
+      --app-drawer-content-container: {
+        box-shadow: -1px 0 2px 1px rgba(0,0,0,0.18);
+      }
+    }
+
+    app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #4285f4;
+      color: #fff;
+    }
+
+    app-header paper-icon-button {
+      --paper-icon-button-ink-color: white;
+    }
+
+    sample-content {
+      padding-top: 192px;
+    }
+
+    </style>
+  </custom-style>
+
+</head>
+<body>
+
+  <app-header condenses reveals effects="waterfall">
+    <app-toolbar>
+      <paper-icon-button icon="menu" onclick="startDrawer.toggle()"></paper-icon-button>
+      <div main-title></div>
+      <paper-icon-button icon="shopping-cart" onclick="endDrawer.toggle()"></paper-icon-button>
+    </app-toolbar>
+    <app-toolbar></app-toolbar>
+    <app-toolbar>
+      <div spacer main-title>My App</div>
+    </app-toolbar>
+  </app-header>
+
+  <app-drawer id="startDrawer" align="start"></app-drawer>
+
+  <app-drawer id="endDrawer" align="end"></app-drawer>
+
+  <sample-content size="100"></sample-content>
+
+</body>
+</html>

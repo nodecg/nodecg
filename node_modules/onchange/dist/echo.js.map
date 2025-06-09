@@ -1,0 +1,1 @@
+{"version":3,"file":"echo.js","sourceRoot":"","sources":["../src/echo.ts"],"names":[],"mappings":";;AAEA,OAAO,CAAC,KAAK,CAAC,IAAI,CAAC,OAAO,CAAC,MAAM,CAAC,CAAC","sourcesContent":["#!/usr/bin/env node\n\nprocess.stdin.pipe(process.stdout);\n"]}

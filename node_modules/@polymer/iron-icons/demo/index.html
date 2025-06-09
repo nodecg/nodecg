@@ -1,0 +1,115 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+<head>
+  <title>iron-icons demo</title>
+  <script src="https://unpkg.com/@webcomponents/webcomponentsjs@^2.0.0/webcomponents-loader.js"></script>
+</head>
+<body>
+  <custom-style>
+    <style is="custom-style">
+      h2 {
+        text-transform: capitalize;
+      }
+
+      iron-icon {
+        transition: all 0.2s;
+        -webkit-transition: all 0.2s;
+      }
+
+      iron-icon:hover {
+        fill: var(--google-yellow-700);
+      }
+
+      .set {
+        display: block;
+        text-align: center;
+        margin: auto;
+        padding: 1em 0;
+        border-bottom: 1px solid silver;
+      }
+
+      .set:last-of-type {
+        border-bottom: none;
+      }
+
+      .set:nth-of-type(4n-3) {
+        color: var(--paper-grey-700);
+      }
+
+      .set:nth-of-type(4n-2) {
+        color: var(--paper-pink-500);
+      }
+
+      .set:nth-of-type(4n-1) {
+        color: var(--google-green-500);
+      }
+
+      .set:nth-of-type(4n) {
+        color: var(--google-blue-500);
+      }
+
+      .container {
+        display: inline-block;
+        width: 10em;
+        margin: 1em 0.5em;
+        text-align: center;
+      }
+
+      .container > div {
+        margin-top: 0.5em;
+        color: black;
+        font-size: 10px;
+      }
+    </style>
+  </custom-style>
+
+  <dom-bind id="scope">
+    <template is="dom-bind">
+      <template is="dom-repeat" id="iconsetRepeat">
+        <h2>{{item.name}}</h2>
+        <div class="set">
+          <template is="dom-repeat" items="{{getIconNames(item)}}">
+            <span class="container">
+              <iron-icon icon="{{item}}"></iron-icon>
+              <div>{{item}}</div>
+            </span>
+          </template>
+        </div>
+      </template>
+    </template>
+  </dom-bind>
+
+  <script type="module">
+    import '@polymer/paper-styles/demo-pages.js';
+    import '@polymer/paper-styles/color.js';
+    import '../iron-icons.js';
+    import '../av-icons.js';
+    import '../communication-icons.js';
+    import '../device-icons.js';
+    import '../editor-icons.js';
+    import '../hardware-icons.js';
+    import '../image-icons.js';
+    import '../maps-icons.js';
+    import '../notification-icons.js';
+    import '../social-icons.js';
+    import '../places-icons.js';
+
+    import {IronMeta} from '@polymer/iron-meta/iron-meta.js';
+
+    scope.getIconNames = function(iconset) {
+      return iconset.getIconNames();
+    };
+    scope.parentNode.getIconNames = scope.getIconNames;
+    iconsetRepeat.items = new IronMeta({type: 'iconset'}).list;
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "files": {
+    "paper-spinner.html": {
+      "convertedUrl": "paper-spinner.js",
+      "exports": {}
+    },
+    "paper-spinner-behavior.html": {
+      "convertedUrl": "paper-spinner-behavior.js",
+      "exports": {
+        "Polymer.PaperSpinnerBehavior": "PaperSpinnerBehavior"
+      }
+    },
+    "paper-spinner-styles.html": {
+      "convertedUrl": "paper-spinner-styles.js",
+      "exports": {}
+    },
+    "paper-spinner-lite.html": {
+      "convertedUrl": "paper-spinner-lite.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/paper-spinner.html": {
+      "convertedUrl": "test/paper-spinner.html",
+      "exports": {}
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "files": {
+    "iron-location.html": {
+      "convertedUrl": "iron-location.js",
+      "exports": {}
+    },
+    "iron-query-params.html": {
+      "convertedUrl": "iron-query-params.js",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/iron-query-params.html": {
+      "convertedUrl": "demo/iron-query-params.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/initialization-iframe.html": {
+      "convertedUrl": "test/initialization-iframe.html",
+      "exports": {}
+    },
+    "test/initialization-cases.html": {
+      "convertedUrl": "test/initialization-cases.js",
+      "exports": {}
+    },
+    "test/initialization-tests.html": {
+      "convertedUrl": "test/initialization-tests.html",
+      "exports": {}
+    },
+    "test/replace-state-patch.html": {
+      "convertedUrl": "test/replace-state-patch.js",
+      "exports": {}
+    },
+    "test/integration.html": {
+      "convertedUrl": "test/integration.html",
+      "exports": {}
+    },
+    "test/iron-location.html": {
+      "convertedUrl": "test/iron-location.html",
+      "exports": {}
+    },
+    "test/redirection.html": {
+      "convertedUrl": "test/redirection.js",
+      "exports": {}
+    },
+    "test/iron-query-params.html": {
+      "convertedUrl": "test/iron-query-params.html",
+      "exports": {}
+    }
+  }
+}

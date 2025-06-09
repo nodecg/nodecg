@@ -1,0 +1,43 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.buildSqlTag = buildSqlTag;
+const tslib_1 = require("tslib");
+const dedent_1 = tslib_1.__importDefault(require("dedent"));
+function buildSqlTag({ driver, strings, expressions, }) {
+    let query = "";
+    const parameters = [];
+    let idx = 0;
+    for (const [expressionIdx, expression] of expressions.entries()) {
+        query += strings[expressionIdx];
+        if (expression === null) {
+            query += "NULL";
+            continue;
+        }
+        if (typeof expression === "function") {
+            const value = expression();
+            if (typeof value === "string") {
+                query += value;
+                continue;
+            }
+            if (Array.isArray(value)) {
+                if (value.length === 0) {
+                    throw new Error(`Expression ${expressionIdx} in this sql tagged template is a function which returned an empty array. Empty arrays cannot safely be expanded into parameter lists.`);
+                }
+                const arrayParams = value.map(() => {
+                    return driver.createParameter(`param_${idx + 1}`, idx++);
+                });
+                query += arrayParams.join(", ");
+                parameters.push(...value);
+                continue;
+            }
+            throw new Error(`Expression ${expressionIdx} in this sql tagged template is a function which returned a value of type "${value === null ? "null" : typeof value}". Only array and string types are supported as function return values in sql tagged template expressions.`);
+        }
+        query += driver.createParameter(`param_${idx + 1}`, idx++);
+        parameters.push(expression);
+    }
+    query += strings[strings.length - 1];
+    query = (0, dedent_1.default)(query);
+    return { query, parameters };
+}
+
+//# sourceMappingURL=SqlTagUtils.js.map

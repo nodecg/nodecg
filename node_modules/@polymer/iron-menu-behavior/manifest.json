@@ -1,0 +1,58 @@
+{
+  "files": {
+    "iron-menubar-behavior.html": {
+      "convertedUrl": "iron-menubar-behavior.js",
+      "exports": {
+        "Polymer.IronMenubarBehaviorImpl": "IronMenubarBehaviorImpl",
+        "Polymer.IronMenubarBehavior": "IronMenubarBehavior"
+      }
+    },
+    "iron-menu-behavior.html": {
+      "convertedUrl": "iron-menu-behavior.js",
+      "exports": {
+        "Polymer.IronMenuBehaviorImpl": "IronMenuBehaviorImpl",
+        "Polymer.IronMenuBehavior": "IronMenuBehavior"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/simple-menu.html": {
+      "convertedUrl": "demo/simple-menu.js",
+      "exports": {}
+    },
+    "demo/simple-menubar.html": {
+      "convertedUrl": "demo/simple-menubar.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-menu-behavior.html": {
+      "convertedUrl": "test/iron-menu-behavior.html",
+      "exports": {}
+    },
+    "test/test-menu.html": {
+      "convertedUrl": "test/test-menu.js",
+      "exports": {}
+    },
+    "test/test-nested-menu.html": {
+      "convertedUrl": "test/test-nested-menu.js",
+      "exports": {}
+    },
+    "test/iron-menubar-behavior.html": {
+      "convertedUrl": "test/iron-menubar-behavior.html",
+      "exports": {}
+    },
+    "test/test-menubar.html": {
+      "convertedUrl": "test/test-menubar.js",
+      "exports": {}
+    }
+  }
+}

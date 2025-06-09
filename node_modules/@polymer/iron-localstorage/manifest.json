@@ -1,0 +1,32 @@
+{
+  "files": {
+    "iron-localstorage.html": {
+      "convertedUrl": "iron-localstorage.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/raw.html": {
+      "convertedUrl": "test/raw.html",
+      "exports": {}
+    },
+    "test/value-binding.html": {
+      "convertedUrl": "test/value-binding.html",
+      "exports": {}
+    }
+  }
+}

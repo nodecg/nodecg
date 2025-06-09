@@ -1,0 +1,47 @@
+{
+  "files": {
+    "iron-validatable-behavior.html": {
+      "convertedUrl": "iron-validatable-behavior.js",
+      "exports": {
+        "Polymer.IronValidatableBehaviorMeta": "IronValidatableBehaviorMeta",
+        "Polymer.IronValidatableBehavior": "IronValidatableBehavior"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/cats-only.html": {
+      "convertedUrl": "demo/cats-only.js",
+      "exports": {}
+    },
+    "demo/validatable-input.html": {
+      "convertedUrl": "demo/validatable-input.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-validatable-behavior.html": {
+      "convertedUrl": "test/iron-validatable-behavior.html",
+      "exports": {}
+    },
+    "test/test-validatable.html": {
+      "convertedUrl": "test/test-validatable.js",
+      "exports": {}
+    },
+    "test/cats-only.html": {
+      "convertedUrl": "test/cats-only.js",
+      "exports": {}
+    },
+    "test/dogs-only.html": {
+      "convertedUrl": "test/dogs-only.js",
+      "exports": {}
+    }
+  }
+}

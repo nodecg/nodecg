@@ -1,0 +1,96 @@
+{
+  "name": "json-schema-to-typescript",
+  "version": "15.0.3",
+  "description": "compile json schema to typescript typings",
+  "main": "dist/src/index.js",
+  "bin": {
+    "json2ts": "dist/src/cli.js"
+  },
+  "typings": "dist/src/index.d.ts",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "build": "npm run lint && npm run clean && npm run build:browser && npm run build:server",
+    "build:browser": "browserify src/index.ts -s jstt -p tsify > dist/bundle.js",
+    "build:server": "tsc -d",
+    "clean": "shx rm -rf dist && mkdir dist",
+    "format": "prettier \"{src,test}/*.ts\" --write",
+    "format-check": "prettier \"{src,test}/*.ts\" --check",
+    "lint": "eslint src/*.ts test/*.ts",
+    "tdd": "concurrently -r -p '' -k 'npm run watch' 'npm run watch:test'",
+    "test": "npm run pre-test && ava --timeout=300s --verbose",
+    "stresstest": "seq 1 10 | xargs -I{} npm test",
+    "prepublishOnly": "npm test",
+    "pre-test": "npm run clean && npm run format-check && npm run build:server",
+    "watch": "tsc -w",
+    "watch:test": "ava -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bcherny/json-schema-to-typescript.git"
+  },
+  "keywords": [
+    "json",
+    "schema",
+    "typescript",
+    "compile",
+    "transpile",
+    "api",
+    "interface",
+    "typing",
+    "share"
+  ],
+  "author": "Boris Cherny <boris@borischerny.com> (https://borischerny.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bcherny/json-schema-to-typescript/issues"
+  },
+  "homepage": "https://github.com/bcherny/json-schema-to-typescript#readme",
+  "dependencies": {
+    "@apidevtools/json-schema-ref-parser": "^11.5.5",
+    "@types/json-schema": "^7.0.15",
+    "@types/lodash": "^4.17.7",
+    "is-glob": "^4.0.3",
+    "js-yaml": "^4.1.0",
+    "lodash": "^4.17.21",
+    "minimist": "^1.2.8",
+    "prettier": "^3.2.5",
+    "tinyglobby": "^0.2.9"
+  },
+  "devDependencies": {
+    "@types/cli-color": "^2.0.6",
+    "@types/is-glob": "^4.0.4",
+    "@types/js-yaml": "^4.0.9",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^20.12.7",
+    "@typescript-eslint/eslint-plugin": "^7.7.0",
+    "@typescript-eslint/parser": "^7.7.0",
+    "ava": "^6.1.2",
+    "browserify": "^17.0.0",
+    "browserify-shim": "^3.8.16",
+    "cli-color": "^2.0.4",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "rimraf": "^5.0.5",
+    "shx": "^0.3.4",
+    "tsify": "^5.0.4",
+    "typescript": "^5.4.5"
+  },
+  "ava": {
+    "files": [
+      "./dist/test/test.js"
+    ],
+    "snapshotDir": "./test/__snapshots__"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+  "browserify-shim": {
+    "prettier": "global:prettier"
+  }
+}

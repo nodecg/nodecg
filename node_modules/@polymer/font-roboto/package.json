@@ -1,0 +1,30 @@
+{
+  "description": "An HTML import for Roboto",
+  "keywords": [
+    "font",
+    "roboto"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/font-roboto.git"
+  },
+  "homepage": "https://github.com/PolymerElements/font-roboto/",
+  "name": "@polymer/font-roboto",
+  "version": "3.0.2",
+  "authors": [
+    "The Polymer Authors"
+  ],
+  "main": "roboto.js",
+  "license": "BSD-3-Clause",
+  "author": "The Polymer Authors",
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "webmat": "^0.2.2",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  }
+}

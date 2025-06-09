@@ -1,0 +1,64 @@
+{
+	"name": "cpy-cli",
+	"version": "5.0.0",
+	"description": "Copy files",
+	"license": "MIT",
+	"repository": "sindresorhus/cpy-cli",
+	"funding": "https://github.com/sponsors/sindresorhus",
+	"author": {
+		"name": "Sindre Sorhus",
+		"email": "sindresorhus@gmail.com",
+		"url": "https://sindresorhus.com"
+	},
+	"maintainers": [
+		{
+			"name": "Michael Mayer",
+			"email": "michael@schnittstabil.de",
+			"url": "schnittstabil.de"
+		}
+	],
+	"type": "module",
+	"bin": {
+		"cpy": "cli.js"
+	},
+	"engines": {
+		"node": ">=16"
+	},
+	"scripts": {
+		"test": "xo && ava"
+	},
+	"files": [
+		"cli.js"
+	],
+	"keywords": [
+		"cli-app",
+		"cli",
+		"copy",
+		"cp",
+		"cpy",
+		"file",
+		"files",
+		"clone",
+		"fs",
+		"stream",
+		"glob",
+		"file-system",
+		"ncp",
+		"fast",
+		"quick",
+		"data",
+		"content",
+		"contents"
+	],
+	"dependencies": {
+		"cpy": "^10.1.0",
+		"meow": "^12.0.1"
+	},
+	"devDependencies": {
+		"ava": "^5.3.1",
+		"execa": "^7.1.1",
+		"path-exists": "^5.0.0",
+		"tempfile": "^5.0.0",
+		"xo": "^0.54.2"
+	}
+}

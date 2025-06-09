@@ -1,0 +1,1 @@
+{"version":3,"file":"1669424781583-default-roles.d.ts","sourceRoot":"","sources":["../../src/migration/1669424781583-default-roles.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,kBAAkB,EAAE,KAAK,WAAW,EAAE,MAAM,SAAS,CAAC;AAOpE,qBAAa,yBAA0B,YAAW,kBAAkB;IAC7D,EAAE,CAAC,WAAW,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,CAAC;IAW3C,IAAI,CAAC,WAAW,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,CAAC;CAMnD"}

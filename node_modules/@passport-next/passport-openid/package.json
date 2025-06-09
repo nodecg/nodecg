@@ -1,0 +1,44 @@
+{
+  "name": "@passport-next/passport-openid",
+  "version": "1.0.0",
+  "description": "OpenID authentication strategy for Passport.",
+  "keywords": [
+    "passport",
+    "openid",
+    "auth",
+    "authn",
+    "authentication",
+    "identity"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/passport-next/passport-openid.git"
+  },
+  "bugs": {
+    "url": "http://github.com/passport-next/passport-openid/issues"
+  },
+  "author": {
+    "name": "Rowan Wookey",
+    "email": "admin@rwky.net"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/MIT"
+    }
+  ],
+  "main": "./lib/passport-openid",
+  "dependencies": {
+    "@passport-next/passport-strategy": "1.x.x",
+    "openid": "2.x.x"
+  },
+  "devDependencies": {
+    "vows": "0.8.x"
+  },
+  "scripts": {
+    "test": "NODE_PATH=lib node_modules/.bin/vows test/*-test.js test/**/*-test.js"
+  },
+  "engines": {
+    "node": ">=6"
+  }
+}

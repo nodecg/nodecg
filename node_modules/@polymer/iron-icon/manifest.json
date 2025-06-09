@@ -1,0 +1,25 @@
+{
+  "files": {
+    "iron-icon.html": {
+      "convertedUrl": "iron-icon.js",
+      "exports": {}
+    },
+    "index.html": null,
+    "demo/async.html": {
+      "convertedUrl": "demo/async.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-icon.html": {
+      "convertedUrl": "test/iron-icon.html",
+      "exports": {}
+    }
+  }
+}

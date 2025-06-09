@@ -1,0 +1,97 @@
+{
+  "name": "@blakeembrey/deque",
+  "version": "1.0.5",
+  "description": "Deques are a generalization of stacks and queues",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "prettier": "prettier --single-quote --no-semi --write",
+    "lint": "tslint \"src/**/*.ts\" --project tsconfig.json",
+    "format": "npm run prettier -- \"src/**/*.ts\"",
+    "build": "rimraf dist && tsc",
+    "specs": "jest --coverage",
+    "test": "npm run -s lint && npm run -s build && npm run -s specs",
+    "prepare": "npm run build",
+    "benchmark": "ts-node benchmark/construct.ts && ts-node benchmark/rotate.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/blakeembrey/deque.git"
+  },
+  "keywords": [
+    "deque",
+    "fifo",
+    "lifo",
+    "queue",
+    "stack",
+    "double",
+    "linked",
+    "list",
+    "iterator",
+    "iteration"
+  ],
+  "author": {
+    "name": "Blake Embrey",
+    "email": "hello@blakeembrey.com",
+    "url": "http://blakeembrey.me"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/blakeembrey/deque/issues"
+  },
+  "homepage": "https://github.com/blakeembrey/deque",
+  "jest": {
+    "roots": [
+      "<rootDir>/src/"
+    ],
+    "transform": {
+      "\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(tsx?|jsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,json,css,md}": [
+      "npm run prettier",
+      "git add"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/benchmark": "^1.0.31",
+    "@types/jest": "^24.0.6",
+    "@types/node": "^11.9.4",
+    "benchmark": "^2.1.4",
+    "denque": "^1.3.0",
+    "double-ended-queue": "^2.1.0-0",
+    "husky": "^1.2.0",
+    "jest": "^24.1.0",
+    "lint-staged": "^8.1.0",
+    "prettier": "^1.14.2",
+    "rimraf": "^2.5.4",
+    "ts-jest": "^23.1.4",
+    "ts-node": "^8.0.2",
+    "tslint": "^5.0.0",
+    "tslint-config-prettier": "^1.15.0",
+    "tslint-config-standard": "^8.0.0",
+    "typescript": "^3.0.3"
+  },
+  "dependencies": {}
+}

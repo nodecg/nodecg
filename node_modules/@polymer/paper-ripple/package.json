@@ -1,0 +1,36 @@
+{
+  "description": "Adds a material design ripple to any container",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "ripple"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/paper-ripple.git"
+  },
+  "name": "@polymer/paper-ripple",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "webmat": "^0.2.0",
+    "@polymer/iron-icon": "^3.0.0-pre.26",
+    "@polymer/iron-icons": "^3.0.0-pre.26",
+    "@polymer/iron-test-helpers": "^3.0.0-pre.26",
+    "@polymer/iron-demo-helpers": "^3.0.1",
+    "wct-browser-legacy": "^1.0.1",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.0.2",
+  "main": "paper-ripple.js",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/iron-a11y-keys-behavior": "^3.0.0-pre.26",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "files": {
+    "iron-resizable-behavior.html": {
+      "convertedUrl": "iron-resizable-behavior.js",
+      "exports": {
+        "Polymer.IronResizableBehavior": "IronResizableBehavior"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/src/x-app.html": {
+      "convertedUrl": "demo/src/x-app.js",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/test-elements.html": {
+      "convertedUrl": "test/test-elements.js",
+      "exports": {
+        "Polymer.ObserveIronResizeBehavior": "ObserveIronResizeBehavior"
+      }
+    },
+    "test/x-resizer-parent.html": {
+      "convertedUrl": "test/x-resizer-parent.js",
+      "exports": {}
+    },
+    "test/x-resizable.html": {
+      "convertedUrl": "test/x-resizable.js",
+      "exports": {}
+    },
+    "test/imports.html": {
+      "convertedUrl": "test/imports.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-resizable-behavior.html": {
+      "convertedUrl": "test/iron-resizable-behavior.html",
+      "exports": {}
+    }
+  }
+}

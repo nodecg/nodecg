@@ -1,0 +1,16 @@
+{
+	"type": "object",
+	"properties": {
+		"username": {
+			"type": "string",
+			"default": "user"
+		},
+		"value": {
+			"type": "integer",
+			"default": 5
+		},
+		"nodefault": {
+			"type": "string"
+		}
+	}
+}

@@ -1,0 +1,52 @@
+{
+  "name": "@blakeembrey/template",
+  "version": "1.2.0",
+  "description": "Fast and simple string template library",
+  "keywords": [
+    "string",
+    "template",
+    "curly",
+    "bracket"
+  ],
+  "homepage": "https://github.com/blakeembrey/js-template",
+  "bugs": {
+    "url": "https://github.com/blakeembrey/js-template/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/blakeembrey/js-template.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Blake Embrey",
+    "email": "hello@blakeembrey.com",
+    "url": "http://blakeembrey.me"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "bench": "vitest bench",
+    "build": "ts-scripts build",
+    "format": "ts-scripts format",
+    "lint": "ts-scripts lint",
+    "prepare": "ts-scripts install && npm run build",
+    "specs": "ts-scripts specs",
+    "test": "ts-scripts test"
+  },
+  "devDependencies": {
+    "@borderless/ts-scripts": "^0.15.0",
+    "@types/node": "^22.5.2",
+    "@vitest/coverage-v8": "^2.0.5",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "ts-scripts": {
+    "project": "tsconfig.build.json"
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "files": {
+    "iron-overlay-behavior.html": {
+      "convertedUrl": "iron-overlay-behavior.js",
+      "exports": {
+        "Polymer.IronOverlayBehaviorImpl": "IronOverlayBehaviorImpl",
+        "Polymer.IronOverlayBehavior": "IronOverlayBehavior"
+      }
+    },
+    "iron-overlay-manager.html": {
+      "convertedUrl": "iron-overlay-manager.js",
+      "exports": {
+        "Polymer.IronOverlayManagerClass": "IronOverlayManagerClass",
+        "Polymer.IronOverlayManager": "IronOverlayManager"
+      }
+    },
+    "iron-overlay-backdrop.html": {
+      "convertedUrl": "iron-overlay-backdrop.js",
+      "exports": {}
+    },
+    "iron-scroll-manager.html": {
+      "convertedUrl": "iron-scroll-manager.js",
+      "exports": {
+        "Polymer.IronScrollManager.currentLockingElement": "currentLockingElement",
+        "Polymer.IronScrollManager.elementIsScrollLocked": "elementIsScrollLocked",
+        "Polymer.IronScrollManager.pushScrollLock": "pushScrollLock",
+        "Polymer.IronScrollManager.removeScrollLock": "removeScrollLock",
+        "Polymer.IronScrollManager._lockingElements": "_lockingElements",
+        "Polymer.IronScrollManager._lockedElementCache": "_lockedElementCache",
+        "Polymer.IronScrollManager._unlockedElementCache": "_unlockedElementCache",
+        "Polymer.IronScrollManager._hasCachedLockedElement": "_hasCachedLockedElement",
+        "Polymer.IronScrollManager._hasCachedUnlockedElement": "_hasCachedUnlockedElement",
+        "Polymer.IronScrollManager._composedTreeContains": "_composedTreeContains",
+        "Polymer.IronScrollManager._scrollInteractionHandler": "_scrollInteractionHandler",
+        "Polymer.IronScrollManager._boundScrollHandler": "_boundScrollHandler",
+        "Polymer.IronScrollManager._lockScrollInteractions": "_lockScrollInteractions",
+        "Polymer.IronScrollManager._unlockScrollInteractions": "_unlockScrollInteractions",
+        "Polymer.IronScrollManager._shouldPreventScrolling": "_shouldPreventScrolling",
+        "Polymer.IronScrollManager._getScrollableNodes": "_getScrollableNodes",
+        "Polymer.IronScrollManager._getScrollingNode": "_getScrollingNode",
+        "Polymer.IronScrollManager._getScrollInfo": "_getScrollInfo",
+        "Polymer.IronScrollManager": "*"
+      }
+    },
+    "iron-focusables-helper.html": {
+      "convertedUrl": "iron-focusables-helper.js",
+      "exports": {
+        "Polymer.IronFocusablesHelper": "IronFocusablesHelper"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/simple-overlay.html": {
+      "convertedUrl": "demo/simple-overlay.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-focusables-helper.html": {
+      "convertedUrl": "test/iron-focusables-helper.html",
+      "exports": {}
+    },
+    "test/test-buttons.html": {
+      "convertedUrl": "test/test-buttons.js",
+      "exports": {}
+    },
+    "test/test-buttons-wrapper.html": {
+      "convertedUrl": "test/test-buttons-wrapper.js",
+      "exports": {}
+    },
+    "test/iron-overlay-backdrop.html": {
+      "convertedUrl": "test/iron-overlay-backdrop.html",
+      "exports": {}
+    },
+    "test/test-overlay.html": {
+      "convertedUrl": "test/test-overlay.js",
+      "exports": {}
+    },
+    "test/iron-overlay-behavior-scroll-actions.html": {
+      "convertedUrl": "test/iron-overlay-behavior-scroll-actions.html",
+      "exports": {}
+    },
+    "test/test-scrollable.html": {
+      "convertedUrl": "test/test-scrollable.js",
+      "exports": {}
+    },
+    "test/iron-overlay-behavior.html": {
+      "convertedUrl": "test/iron-overlay-behavior.html",
+      "exports": {}
+    },
+    "test/test-overlay2.html": {
+      "convertedUrl": "test/test-overlay2.js",
+      "exports": {}
+    },
+    "test/test-menu-button.html": {
+      "convertedUrl": "test/test-menu-button.js",
+      "exports": {}
+    },
+    "test/iron-scroll-manager.html": {
+      "convertedUrl": "test/iron-scroll-manager.html",
+      "exports": {}
+    },
+    "test/x-scrollable-element.html": {
+      "convertedUrl": "test/x-scrollable-element.js",
+      "exports": {}
+    }
+  }
+}

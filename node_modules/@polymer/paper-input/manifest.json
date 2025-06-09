@@ -1,0 +1,86 @@
+{
+  "files": {
+    "paper-input.html": {
+      "convertedUrl": "paper-input.js",
+      "exports": {}
+    },
+    "paper-input-behavior.html": {
+      "convertedUrl": "paper-input-behavior.js",
+      "exports": {
+        "Polymer.PaperInputHelper": "PaperInputHelper",
+        "Polymer.PaperInputBehaviorImpl": "PaperInputBehaviorImpl",
+        "Polymer.PaperInputBehavior": "PaperInputBehavior"
+      }
+    },
+    "paper-input-char-counter.html": {
+      "convertedUrl": "paper-input-char-counter.js",
+      "exports": {}
+    },
+    "paper-input-addon-behavior.html": {
+      "convertedUrl": "paper-input-addon-behavior.js",
+      "exports": {
+        "Polymer.PaperInputAddonBehavior": "PaperInputAddonBehavior"
+      }
+    },
+    "paper-input-container.html": {
+      "convertedUrl": "paper-input-container.js",
+      "exports": {}
+    },
+    "paper-input-error.html": {
+      "convertedUrl": "paper-input-error.js",
+      "exports": {}
+    },
+    "paper-textarea.html": {
+      "convertedUrl": "paper-textarea.js",
+      "exports": {}
+    },
+    "all-imports.html": {
+      "convertedUrl": "all-imports.html",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/ssn-input.html": {
+      "convertedUrl": "demo/ssn-input.js",
+      "exports": {}
+    },
+    "demo/ssn-validator.html": {
+      "convertedUrl": "demo/ssn-validator.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/paper-input-char-counter.html": {
+      "convertedUrl": "test/paper-input-char-counter.html",
+      "exports": {}
+    },
+    "test/paper-input-container.html": {
+      "convertedUrl": "test/paper-input-container.html",
+      "exports": {}
+    },
+    "test/letters-only.html": {
+      "convertedUrl": "test/letters-only.js",
+      "exports": {}
+    },
+    "test/paper-input-error.html": {
+      "convertedUrl": "test/paper-input-error.html",
+      "exports": {}
+    },
+    "test/paper-input.html": {
+      "convertedUrl": "test/paper-input.html",
+      "exports": {}
+    },
+    "test/paper-textarea.html": {
+      "convertedUrl": "test/paper-textarea.html",
+      "exports": {}
+    }
+  }
+}

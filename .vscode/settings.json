@@ -1,0 +1,6 @@
+{
+    "svn.ignoreMissingSvnWarning": true,
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
+    ]
+}

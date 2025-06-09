@@ -1,0 +1,24 @@
+{
+  "files": {
+    "paper-toolbar.html": {
+      "convertedUrl": "paper-toolbar.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/paper-toolbar.html": {
+      "convertedUrl": "test/paper-toolbar.html",
+      "exports": {}
+    }
+  }
+}

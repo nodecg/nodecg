@@ -1,0 +1,1 @@
+{"version":3,"sources":["../browser/src/common/PrimitiveCriteria.ts"],"names":[],"mappings":"","file":"PrimitiveCriteria.js","sourcesContent":["export type SinglePrimitiveCriteria = string | number | Date\n\nexport type PrimitiveCriteria =\n    | SinglePrimitiveCriteria\n    | SinglePrimitiveCriteria[]\n"],"sourceRoot":".."}

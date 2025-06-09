@@ -1,0 +1,40 @@
+{
+  "files": {
+    "paper-tabs.html": {
+      "convertedUrl": "paper-tabs.js",
+      "exports": {}
+    },
+    "paper-tabs-icons.html": {
+      "convertedUrl": "paper-tabs-icons.js",
+      "exports": {}
+    },
+    "paper-tab.html": {
+      "convertedUrl": "paper-tab.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/attr-for-selected.html": {
+      "convertedUrl": "test/attr-for-selected.html",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/links.html": {
+      "convertedUrl": "test/links.html",
+      "exports": {}
+    }
+  }
+}

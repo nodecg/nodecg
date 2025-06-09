@@ -1,0 +1,28 @@
+{
+  "files": {
+    "paper-dialog-scrollable.html": {
+      "convertedUrl": "paper-dialog-scrollable.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/paper-dialog-scrollable.html": {
+      "convertedUrl": "test/paper-dialog-scrollable.html",
+      "exports": {}
+    },
+    "test/test-dialog.html": {
+      "convertedUrl": "test/test-dialog.js",
+      "exports": {}
+    }
+  }
+}

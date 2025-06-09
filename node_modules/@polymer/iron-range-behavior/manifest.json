@@ -1,0 +1,30 @@
+{
+  "files": {
+    "iron-range-behavior.html": {
+      "convertedUrl": "iron-range-behavior.js",
+      "exports": {
+        "Polymer.IronRangeBehavior": "IronRangeBehavior"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/x-progressbar.html": {
+      "convertedUrl": "test/x-progressbar.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    }
+  }
+}

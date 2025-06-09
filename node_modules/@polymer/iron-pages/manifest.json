@@ -1,0 +1,36 @@
+{
+  "files": {
+    "iron-pages.html": {
+      "convertedUrl": "iron-pages.js",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/attr-for-selected.html": {
+      "convertedUrl": "test/attr-for-selected.html",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/nested.html": {
+      "convertedUrl": "test/nested.html",
+      "exports": {}
+    },
+    "test/nested-pages.html": {
+      "convertedUrl": "test/nested-pages.js",
+      "exports": {}
+    }
+  }
+}

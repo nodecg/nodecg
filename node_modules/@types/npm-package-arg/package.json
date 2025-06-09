@@ -1,0 +1,30 @@
+{
+    "name": "@types/npm-package-arg",
+    "version": "6.1.4",
+    "description": "TypeScript definitions for npm-package-arg",
+    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/npm-package-arg",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Melvin Groenhoff",
+            "githubUsername": "mgroenhoff",
+            "url": "https://github.com/mgroenhoff"
+        },
+        {
+            "name": "Jason",
+            "githubUsername": "OiYouYeahYou",
+            "url": "https://github.com/OiYouYeahYou"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/npm-package-arg"
+    },
+    "scripts": {},
+    "dependencies": {},
+    "typesPublisherContentHash": "07e0b1e18dbd3b59c5d2807e05f17302c96078a681dab45e456aa2fe14e5465e",
+    "typeScriptVersion": "4.5"
+}

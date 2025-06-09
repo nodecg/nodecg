@@ -1,0 +1,38 @@
+{
+  "description": "An input element with data binding",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "input"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PolymerElements/iron-input.git"
+  },
+  "homepage": "https://github.com/PolymerElements/iron-input",
+  "name": "@polymer/iron-input",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "webmat": "^0.2.0",
+    "@polymer/iron-demo-helpers": "^3.0.1",
+    "@polymer/iron-validator-behavior": "^3.0.0-pre.26",
+    "@polymer/paper-styles": "^3.0.0-pre.26",
+    "@polymer/test-fixture": "^4.0.1",
+    "wct-browser-legacy": "^1.0.1",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@polymer/gen-typescript-declarations": "^1.5.1"
+  },
+  "scripts": {
+    "format": "webmat",
+    "generate-types": "gen-typescript-declarations --deleteExisting --outDir . --verify",
+    "prepare": "npm run generate-types"
+  },
+  "version": "3.0.1",
+  "main": "iron-input.js",
+  "author": "The Polymer Authors",
+  "dependencies": {
+    "@polymer/iron-a11y-announcer": "^3.0.0-pre.26",
+    "@polymer/iron-validatable-behavior": "^3.0.0-pre.26",
+    "@polymer/polymer": "^3.0.0"
+  }
+}

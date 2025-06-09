@@ -1,0 +1,475 @@
+{
+  "files": {
+    "app-layout.html": {
+      "convertedUrl": "app-layout.js",
+      "exports": {}
+    },
+    "helpers/helpers.html": {
+      "convertedUrl": "helpers/helpers.js",
+      "exports": {
+        "Polymer.AppLayout._scrollEffects": "_scrollEffects",
+        "Polymer.AppLayout._scrollTimer": "_scrollTimer",
+        "Polymer.AppLayout.scrollTimingFunction": "scrollTimingFunction",
+        "Polymer.AppLayout.registerEffect": "registerEffect",
+        "Polymer.AppLayout.queryAllRoot": "queryAllRoot",
+        "Polymer.AppLayout.scroll": "scroll"
+      }
+    },
+    "app-drawer/app-drawer.html": {
+      "convertedUrl": "app-drawer/app-drawer.js",
+      "exports": {}
+    },
+    "app-drawer-layout/app-drawer-layout.html": {
+      "convertedUrl": "app-drawer-layout/app-drawer-layout.js",
+      "exports": {}
+    },
+    "app-layout-behavior/app-layout-behavior.html": {
+      "convertedUrl": "app-layout-behavior/app-layout-behavior.js",
+      "exports": {
+        "Polymer.AppLayoutBehavior": "AppLayoutBehavior"
+      }
+    },
+    "app-grid/app-grid-style.html": {
+      "convertedUrl": "app-grid/app-grid-style.js",
+      "exports": {}
+    },
+    "app-header/app-header.html": {
+      "convertedUrl": "app-header/app-header.js",
+      "exports": {}
+    },
+    "app-scroll-effects/app-scroll-effects-behavior.html": {
+      "convertedUrl": "app-scroll-effects/app-scroll-effects-behavior.js",
+      "exports": {
+        "Polymer.AppScrollEffectsBehavior": "AppScrollEffectsBehavior"
+      }
+    },
+    "app-header-layout/app-header-layout.html": {
+      "convertedUrl": "app-header-layout/app-header-layout.js",
+      "exports": {}
+    },
+    "app-toolbar/app-toolbar.html": {
+      "convertedUrl": "app-toolbar/app-toolbar.js",
+      "exports": {}
+    },
+    "app-box/app-box.html": {
+      "convertedUrl": "app-box/app-box.js",
+      "exports": {}
+    },
+    "app-scroll-effects/effects/waterfall.html": {
+      "convertedUrl": "app-scroll-effects/effects/waterfall.js",
+      "exports": {}
+    },
+    "docs.html": {
+      "convertedUrl": "docs.html",
+      "exports": {}
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "app-box/demo/document-scroll.html": {
+      "convertedUrl": "app-box/demo/document-scroll.html",
+      "exports": {}
+    },
+    "demo/sample-content.html": {
+      "convertedUrl": "demo/sample-content.js",
+      "exports": {}
+    },
+    "app-scroll-effects/effects/parallax-background.html": {
+      "convertedUrl": "app-scroll-effects/effects/parallax-background.js",
+      "exports": {}
+    },
+    "app-box/demo/index.html": {
+      "convertedUrl": "app-box/demo/index.html",
+      "exports": {}
+    },
+    "app-box/demo/scrolling-region.html": {
+      "convertedUrl": "app-box/demo/scrolling-region.html",
+      "exports": {}
+    },
+    "app-drawer/demo/index.html": {
+      "convertedUrl": "app-drawer/demo/index.html",
+      "exports": {}
+    },
+    "app-drawer/demo/left-drawer.html": {
+      "convertedUrl": "app-drawer/demo/left-drawer.html",
+      "exports": {}
+    },
+    "app-drawer/demo/right-drawer.html": {
+      "convertedUrl": "app-drawer/demo/right-drawer.html",
+      "exports": {}
+    },
+    "app-drawer/test/app-drawer.html": {
+      "convertedUrl": "app-drawer/test/app-drawer.html",
+      "exports": {}
+    },
+    "app-drawer/test/index.html": {
+      "convertedUrl": "app-drawer/test/index.html",
+      "exports": {}
+    },
+    "app-drawer-layout/demo/index.html": {
+      "convertedUrl": "app-drawer-layout/demo/index.html",
+      "exports": {}
+    },
+    "app-drawer-layout/test/app-drawer-layout.html": {
+      "convertedUrl": "app-drawer-layout/test/app-drawer-layout.html",
+      "exports": {}
+    },
+    "app-drawer-layout/test/index.html": {
+      "convertedUrl": "app-drawer-layout/test/index.html",
+      "exports": {}
+    },
+    "app-grid/demo/aspect-ratio.html": {
+      "convertedUrl": "app-grid/demo/aspect-ratio.html",
+      "exports": {}
+    },
+    "app-grid/demo/flickr-grid-layout.html": {
+      "convertedUrl": "app-grid/demo/flickr-grid-layout.html",
+      "exports": {}
+    },
+    "app-grid/demo/index.html": {
+      "convertedUrl": "app-grid/demo/index.html",
+      "exports": {}
+    },
+    "app-grid/demo/md-grid-layout.html": {
+      "convertedUrl": "app-grid/demo/md-grid-layout.html",
+      "exports": {}
+    },
+    "app-grid/demo/simple-responsive-grid.html": {
+      "convertedUrl": "app-grid/demo/simple-responsive-grid.html",
+      "exports": {}
+    },
+    "app-grid/test/app-grid-1.html": {
+      "convertedUrl": "app-grid/test/app-grid-1.html",
+      "exports": {}
+    },
+    "app-grid/test/app-grid-2.html": {
+      "convertedUrl": "app-grid/test/app-grid-2.html",
+      "exports": {}
+    },
+    "app-grid/test/app-grid-3.html": {
+      "convertedUrl": "app-grid/test/app-grid-3.html",
+      "exports": {}
+    },
+    "app-grid/test/index.html": {
+      "convertedUrl": "app-grid/test/index.html",
+      "exports": {}
+    },
+    "app-header/demo/blend-background-1.html": {
+      "convertedUrl": "app-header/demo/blend-background-1.html",
+      "exports": {}
+    },
+    "app-scroll-effects/app-scroll-effects.html": {
+      "convertedUrl": "app-scroll-effects/app-scroll-effects.js",
+      "exports": {}
+    },
+    "app-scroll-effects/effects/blend-background.html": {
+      "convertedUrl": "app-scroll-effects/effects/blend-background.js",
+      "exports": {}
+    },
+    "app-scroll-effects/effects/fade-background.html": {
+      "convertedUrl": "app-scroll-effects/effects/fade-background.js",
+      "exports": {}
+    },
+    "app-scroll-effects/effects/material.html": {
+      "convertedUrl": "app-scroll-effects/effects/material.js",
+      "exports": {}
+    },
+    "app-scroll-effects/effects/resize-title.html": {
+      "convertedUrl": "app-scroll-effects/effects/resize-title.js",
+      "exports": {}
+    },
+    "app-scroll-effects/effects/resize-snapped-title.html": {
+      "convertedUrl": "app-scroll-effects/effects/resize-snapped-title.js",
+      "exports": {}
+    },
+    "app-header/demo/blend-background-2.html": {
+      "convertedUrl": "app-header/demo/blend-background-2.html",
+      "exports": {}
+    },
+    "app-header/demo/blend-background-3.html": {
+      "convertedUrl": "app-header/demo/blend-background-3.html",
+      "exports": {}
+    },
+    "app-header/demo/contacts.html": {
+      "convertedUrl": "app-header/demo/contacts.html",
+      "exports": {}
+    },
+    "app-header/demo/custom-sticky-element-1.html": {
+      "convertedUrl": "app-header/demo/custom-sticky-element-1.html",
+      "exports": {}
+    },
+    "app-header/demo/custom-sticky-element-2.html": {
+      "convertedUrl": "app-header/demo/custom-sticky-element-2.html",
+      "exports": {}
+    },
+    "app-header/demo/give.html": {
+      "convertedUrl": "app-header/demo/give.html",
+      "exports": {}
+    },
+    "app-header/demo/index.html": {
+      "convertedUrl": "app-header/demo/index.html",
+      "exports": {}
+    },
+    "app-header/demo/music.html": {
+      "convertedUrl": "app-header/demo/music.html",
+      "exports": {}
+    },
+    "app-header/demo/no-effects.html": {
+      "convertedUrl": "app-header/demo/no-effects.html",
+      "exports": {}
+    },
+    "app-header/demo/notes.html": {
+      "convertedUrl": "app-header/demo/notes.html",
+      "exports": {}
+    },
+    "app-header/test/app-header.html": {
+      "convertedUrl": "app-header/test/app-header.html",
+      "exports": {}
+    },
+    "app-header/test/index.html": {
+      "convertedUrl": "app-header/test/index.html",
+      "exports": {}
+    },
+    "app-header-layout/demo/footer.html": {
+      "convertedUrl": "app-header-layout/demo/footer.html",
+      "exports": {}
+    },
+    "app-header-layout/demo/index.html": {
+      "convertedUrl": "app-header-layout/demo/index.html",
+      "exports": {}
+    },
+    "app-header-layout/demo/music.html": {
+      "convertedUrl": "app-header-layout/demo/music.html",
+      "exports": {}
+    },
+    "app-header-layout/demo/scrolling-region.html": {
+      "convertedUrl": "app-header-layout/demo/scrolling-region.html",
+      "exports": {}
+    },
+    "app-header-layout/demo/simple.html": {
+      "convertedUrl": "app-header-layout/demo/simple.html",
+      "exports": {}
+    },
+    "app-header-layout/test/app-header-layout.html": {
+      "convertedUrl": "app-header-layout/test/app-header-layout.html",
+      "exports": {}
+    },
+    "app-header-layout/test/index.html": {
+      "convertedUrl": "app-header-layout/test/index.html",
+      "exports": {}
+    },
+    "app-scroll-effects/test/app-scroll-effects-behavior.html": {
+      "convertedUrl": "app-scroll-effects/test/app-scroll-effects-behavior.html",
+      "exports": {}
+    },
+    "app-scroll-effects/test/x-container.html": {
+      "convertedUrl": "app-scroll-effects/test/x-container.js",
+      "exports": {}
+    },
+    "app-scroll-effects/test/blend-background.html": {
+      "convertedUrl": "app-scroll-effects/test/blend-background.html",
+      "exports": {}
+    },
+    "app-scroll-effects/test/utils.html": {
+      "convertedUrl": "app-scroll-effects/test/utils.js",
+      "exports": {}
+    },
+    "app-scroll-effects/test/fade-background.html": {
+      "convertedUrl": "app-scroll-effects/test/fade-background.html",
+      "exports": {}
+    },
+    "app-scroll-effects/test/index.html": {
+      "convertedUrl": "app-scroll-effects/test/index.html",
+      "exports": {}
+    },
+    "app-scroll-effects/test/parallax-background.html": {
+      "convertedUrl": "app-scroll-effects/test/parallax-background.html",
+      "exports": {}
+    },
+    "app-scroll-effects/test/resize-snapped-title.html": {
+      "convertedUrl": "app-scroll-effects/test/resize-snapped-title.html",
+      "exports": {}
+    },
+    "app-scroll-effects/test/resize-title.html": {
+      "convertedUrl": "app-scroll-effects/test/resize-title.html",
+      "exports": {}
+    },
+    "app-scroll-effects/test/waterfall.html": {
+      "convertedUrl": "app-scroll-effects/test/waterfall.html",
+      "exports": {}
+    },
+    "app-toolbar/demo/index.html": {
+      "convertedUrl": "app-toolbar/demo/index.html",
+      "exports": {}
+    },
+    "app-toolbar/test/app-toolbar.html": {
+      "convertedUrl": "app-toolbar/test/app-toolbar.html",
+      "exports": {}
+    },
+    "app-toolbar/test/index.html": {
+      "convertedUrl": "app-toolbar/test/index.html",
+      "exports": {}
+    },
+    "demo/demo1.html": {
+      "convertedUrl": "demo/demo1.html",
+      "exports": {}
+    },
+    "demo/demo2.html": {
+      "convertedUrl": "demo/demo2.html",
+      "exports": {}
+    },
+    "demo/demo3.html": {
+      "convertedUrl": "demo/demo3.html",
+      "exports": {}
+    },
+    "demo/demo4.html": {
+      "convertedUrl": "demo/demo4.html",
+      "exports": {}
+    },
+    "demo/demo5.html": {
+      "convertedUrl": "demo/demo5.html",
+      "exports": {}
+    },
+    "demo/demo6.html": {
+      "convertedUrl": "demo/demo6.html",
+      "exports": {}
+    },
+    "demo/demo7.html": {
+      "convertedUrl": "demo/demo7.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "helpers/test/index.html": {
+      "convertedUrl": "helpers/test/index.html",
+      "exports": {}
+    },
+    "helpers/test/register-effect.html": {
+      "convertedUrl": "helpers/test/register-effect.html",
+      "exports": {}
+    },
+    "helpers/test/scroll.html": {
+      "convertedUrl": "helpers/test/scroll.html",
+      "exports": {}
+    },
+    "patterns/expand-card/index.html": {
+      "convertedUrl": "patterns/expand-card/index.html",
+      "exports": {}
+    },
+    "patterns/md-responsive-toolbar/index.html": {
+      "convertedUrl": "patterns/md-responsive-toolbar/index.html",
+      "exports": {}
+    },
+    "patterns/transform-navigation/index.html": {
+      "convertedUrl": "patterns/transform-navigation/index.html",
+      "exports": {}
+    },
+    "patterns/transform-navigation/x-app.html": {
+      "convertedUrl": "patterns/transform-navigation/x-app.js",
+      "exports": {}
+    },
+    "templates/getting-started/index.html": {
+      "convertedUrl": "templates/getting-started/index.html",
+      "exports": {}
+    },
+    "templates/getting-started/x-app.html": {
+      "convertedUrl": "templates/getting-started/x-app.js",
+      "exports": {}
+    },
+    "templates/landing-page/index.html": {
+      "convertedUrl": "templates/landing-page/index.html",
+      "exports": {}
+    },
+    "templates/landing-page/x-app.html": {
+      "convertedUrl": "templates/landing-page/x-app.js",
+      "exports": {}
+    },
+    "templates/pesto/index.html": {
+      "convertedUrl": "templates/pesto/index.html",
+      "exports": {}
+    },
+    "templates/pesto/src/recipe-app.html": {
+      "convertedUrl": "templates/pesto/src/recipe-app.js",
+      "exports": {}
+    },
+    "templates/pesto/src/recipe-detail.html": {
+      "convertedUrl": "templates/pesto/src/recipe-detail.js",
+      "exports": {}
+    },
+    "templates/pesto/src/recipe-list.html": {
+      "convertedUrl": "templates/pesto/src/recipe-list.js",
+      "exports": {}
+    },
+    "templates/pesto/src/app-icons.html": {
+      "convertedUrl": "templates/pesto/src/app-icons.js",
+      "exports": {}
+    },
+    "templates/publishing/index.html": {
+      "convertedUrl": "templates/publishing/index.html",
+      "exports": {}
+    },
+    "templates/publishing/src/blog-app.html": {
+      "convertedUrl": "templates/publishing/src/blog-app.js",
+      "exports": {}
+    },
+    "templates/publishing/src/app-icons.html": {
+      "convertedUrl": "templates/publishing/src/app-icons.js",
+      "exports": {}
+    },
+    "templates/publishing/src/article-headline.html": {
+      "convertedUrl": "templates/publishing/src/article-headline.js",
+      "exports": {}
+    },
+    "templates/publishing/src/article-detail.html": {
+      "convertedUrl": "templates/publishing/src/article-detail.js",
+      "exports": {}
+    },
+    "templates/publishing/src/two-columns-grid.html": {
+      "convertedUrl": "templates/publishing/src/two-columns-grid.js",
+      "exports": {}
+    },
+    "templates/shrine/index.html": {
+      "convertedUrl": "templates/shrine/index.html",
+      "exports": {}
+    },
+    "templates/shrine/src/shrine-app.html": {
+      "convertedUrl": "templates/shrine/src/shrine-app.js",
+      "exports": {}
+    },
+    "templates/shrine/src/shrine-list.html": {
+      "convertedUrl": "templates/shrine/src/shrine-list.js",
+      "exports": {}
+    },
+    "templates/shrine/src/shrine-item.html": {
+      "convertedUrl": "templates/shrine/src/shrine-item.js",
+      "exports": {}
+    },
+    "templates/shrine/src/shrine-featured-item.html": {
+      "convertedUrl": "templates/shrine/src/shrine-featured-item.js",
+      "exports": {}
+    },
+    "templates/shrine/src/shrine-detail.html": {
+      "convertedUrl": "templates/shrine/src/shrine-detail.js",
+      "exports": {}
+    },
+    "templates/shrine/src/shrine-simple-item.html": {
+      "convertedUrl": "templates/shrine/src/shrine-simple-item.js",
+      "exports": {}
+    },
+    "templates/test-drive/index.html": {
+      "convertedUrl": "templates/test-drive/index.html",
+      "exports": {}
+    },
+    "templates/test-drive/test-app.html": {
+      "convertedUrl": "templates/test-drive/test-app.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    }
+  }
+}

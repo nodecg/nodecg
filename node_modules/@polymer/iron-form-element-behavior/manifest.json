@@ -1,0 +1,42 @@
+{
+  "files": {
+    "iron-form-element-behavior.html": {
+      "convertedUrl": "iron-form-element-behavior.js",
+      "exports": {
+        "Polymer.IronFormElementBehavior": "IronFormElementBehavior"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/simple-form.html": {
+      "convertedUrl": "demo/simple-form.js",
+      "exports": {}
+    },
+    "demo/simple-element.html": {
+      "convertedUrl": "demo/simple-element.js",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/simple-element.html": {
+      "convertedUrl": "test/simple-element.js",
+      "exports": {}
+    },
+    "test/simple-form.html": {
+      "convertedUrl": "test/simple-form.js",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    }
+  }
+}

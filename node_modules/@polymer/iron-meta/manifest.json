@@ -1,0 +1,30 @@
+{
+  "files": {
+    "iron-meta.html": {
+      "convertedUrl": "iron-meta.js",
+      "exports": {
+        "Polymer.IronMeta": "IronMeta"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "test/basic.html": {
+      "convertedUrl": "test/basic.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    },
+    "test/iron-meta.html": {
+      "convertedUrl": "test/iron-meta.html",
+      "exports": {}
+    }
+  }
+}

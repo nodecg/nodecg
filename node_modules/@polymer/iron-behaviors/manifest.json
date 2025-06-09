@@ -1,0 +1,49 @@
+{
+  "files": {
+    "iron-button-state.html": {
+      "convertedUrl": "iron-button-state.js",
+      "exports": {
+        "Polymer.IronButtonStateImpl": "IronButtonStateImpl",
+        "Polymer.IronButtonState": "IronButtonState"
+      }
+    },
+    "iron-control-state.html": {
+      "convertedUrl": "iron-control-state.js",
+      "exports": {
+        "Polymer.IronControlState": "IronControlState"
+      }
+    },
+    "index.html": {
+      "convertedUrl": "index.html",
+      "exports": {}
+    },
+    "demo/index.html": {
+      "convertedUrl": "demo/index.html",
+      "exports": {}
+    },
+    "demo/simple-button.html": {
+      "convertedUrl": "demo/simple-button.js",
+      "exports": {}
+    },
+    "test/active-state.html": {
+      "convertedUrl": "test/active-state.html",
+      "exports": {}
+    },
+    "test/test-elements.html": {
+      "convertedUrl": "test/test-elements.js",
+      "exports": {}
+    },
+    "test/disabled-state.html": {
+      "convertedUrl": "test/disabled-state.html",
+      "exports": {}
+    },
+    "test/focused-state.html": {
+      "convertedUrl": "test/focused-state.html",
+      "exports": {}
+    },
+    "test/index.html": {
+      "convertedUrl": "test/index.html",
+      "exports": {}
+    }
+  }
+}
