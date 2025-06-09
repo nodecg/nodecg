@@ -18,7 +18,7 @@ NodeCG is a broadcast graphics framework and application. It enables you to writ
 
 Have questions about NodeCG, or just want to say 'hi'? [Join our Discord server](https://discord.gg/nsXXDFGBEt)!
 
-## Documentation & API Reference
+## Documentation & API Reference and so on
 
 Full docs and API reference are available at https://nodecg.dev
 
