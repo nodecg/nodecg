@@ -3,7 +3,7 @@
 [![NodeCG](https://raw.githubusercontent.com/nodecg/nodecg/main/media/splash.png)](https://nodecg.dev/)
 
 [![Discord](https://img.shields.io/discord/754749209722486814)](https://discord.gg/nsXXDFGBEt)
-[![Build Status](https://github.com/nodecg/nodecg/workflows/CI/badge.svg)](https://github.com/nodecg/nodecg/actions?query=workflow%3ACI)
+[![Build Status](https://github.com/hoishin/nodecg/workflows/CI/badge.svg)](https://github.com/hoishin/nodecg/actions?query=workflow%3ACI)
 [![Coverage Status](https://codecov.io/gh/nodecg/nodecg/branch/main/graph/badge.svg)](https://codecov.io/gh/nodecg/nodecg)
 [![Docker Build Status](https://ghcr-badge.egpl.dev/nodecg/nodecg/latest_tag)](https://ghcr.io/nodecg/nodecg)
 

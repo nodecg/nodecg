@@ -9,21 +9,32 @@
 		{
 			"type": "linked-versions",
 			"groupName": "nodecg",
-			"components": ["nodecg", "internal"]
+			"components": [
+				"nodecg",
+				"internal-util",
+				"database-adapter-types",
+				"database-adapter-sqlite-legacy",
+				"nodecg-cli"
+			]
 		}
 	],
-	"bump-minor-pre-major": true,
-	"bump-patch-for-minor-pre-major": true,
 	"packages": {
 		".": {
 			"exclude-paths": ["workspaces"],
-			"component": "nodecg",
-			"include-component-in-tag": false
+			"component": "nodecg"
 		},
-		"workspaces/internal-util": { "component": "nodecg" },
-		"workspaces/database-adapter-types": { "component": "nodecg" },
-		"workspaces/database-adapter-sqlite-legacy": { "component": "nodecg" },
-		"workspaces/cli": { "component": "nodecg" }
+		"workspaces/internal-util": {
+			"component": "internal-util"
+		},
+		"workspaces/database-adapter-types": {
+			"component": "database-adapter-types"
+		},
+		"workspaces/database-adapter-sqlite-legacy": {
+			"component": "database-adapter-sqlite-legacy"
+		},
+		"workspaces/cli": {
+			"component": "nodecg-cli"
+		}
 	},
 	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0"
 }

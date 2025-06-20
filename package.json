@@ -10,10 +10,10 @@
     "broadcast"
   ],
   "homepage": "https://nodecg.dev/",
-  "bugs": "https://github.com/nodecg/nodecg/issues",
+  "bugs": "https://github.com/hoishin/nodecg/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nodecg/nodecg.git"
+    "url": "https://github.com/hoishin/nodecg.git"
   },
   "license": "MIT",
   "exports": {
