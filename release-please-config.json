@@ -20,10 +20,10 @@
 			"component": "nodecg",
 			"include-component-in-tag": false
 		},
-		"workspaces/internal-util": { "component": "internal" },
-		"workspaces/database-adapter-types": { "component": "internal" },
-		"workspaces/database-adapter-sqlite-legacy": { "component": "internal" },
-		"workspaces/cli": { "component": "internal" }
+		"workspaces/internal-util": { "component": "nodecg" },
+		"workspaces/database-adapter-types": { "component": "nodecg" },
+		"workspaces/database-adapter-sqlite-legacy": { "component": "nodecg" },
+		"workspaces/cli": { "component": "nodecg" }
 	},
 	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0"
 }
