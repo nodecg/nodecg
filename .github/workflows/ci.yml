@@ -143,7 +143,37 @@ jobs:
         with:
           config-file: release-please-config.json
 
+  canary-publish:
+    if: ${{ !needs.release-please.outputs.release_created }}
+    needs:
+      - release-please
+      - lint
+      - test-types
+      - build-test
+    environment: Canary Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - run: |
+          npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
+          npm --workspaces publish --tag canary
+          npm publish --tag canary
+          npx tsx scripts/prepare-publish-types.ts
+          npm publish --tag canary
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   publish:
+    if: ${{ needs.release-please.outputs.release_created }}
     needs:
       - release-please
       - lint
@@ -161,27 +191,11 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - if: ${{ needs.release-please.outputs.release_created }}
-        run: gh release upload ${{ needs.release-please.outputs.release_name }} $(npm pack)
-        env:
-          GH_TOKEN: ${{ github.token }}
-
-      - if: ${{ needs.release-please.outputs.release_created }}
-        run: |
+      - run: |
           npm --workspaces publish
           npm publish
           npx tsx scripts/prepare-publish-types.ts
           npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - if: ${{ !needs.release-please.outputs.release_created }}
-        run: |
-          npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
-          npm --workspaces publish --tag canary
-          npm publish --tag canary
-          npx tsx scripts/prepare-publish-types.ts
-          npm publish --tag canary
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
