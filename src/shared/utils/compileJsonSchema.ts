@@ -8,7 +8,7 @@ import Ajv2019 from "ajv/dist/2019";
 import Ajv2020 from "ajv/dist/2020";
 import AjvDraft04 from "ajv-draft-04";
 import addFormats from "ajv-formats";
-import * as E from "fp-ts/Either";
+import { Effect } from "effect";
 
 import { stringifyError } from "./errors";
 
@@ -88,14 +88,14 @@ export function getSchemaDefault(
 export const getSchemaDefaultFp = (
 	schema: Record<any, unknown>,
 	labelForDebugging: string,
-) =>
-	E.tryCatch(
-		() => defaults(schema),
-		(error) =>
+): Effect.Effect<unknown, Error> =>
+	Effect.try({
+		try: () => defaults(schema),
+		catch: (error) =>
 			new Error(
 				`Error generating default value(s) for schema "${labelForDebugging}":\n\t${stringifyError(error)}`,
 			),
-	);
+	});
 
 function extractSchemaVersion(schema: Record<any, unknown>): string {
 	// For backwards compat, we default to draft-04.

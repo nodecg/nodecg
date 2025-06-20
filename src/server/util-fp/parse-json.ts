@@ -1,6 +1,8 @@
-import * as E from "fp-ts/Either";
+import { Effect } from "effect";
 
-export const parseJson = E.tryCatchK(
-	(json: string) => JSON.parse(json) as unknown,
-	E.toError,
-);
+export const parseJson = (json: string): Effect.Effect<unknown, Error> =>
+	Effect.try({
+		try: () => JSON.parse(json) as unknown,
+		catch: (error) =>
+			error instanceof Error ? error : new Error(String(error)),
+	});

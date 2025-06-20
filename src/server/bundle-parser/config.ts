@@ -1,11 +1,8 @@
 import * as path from "node:path";
 
 import type { ValidateFunction } from "ajv";
+import { Effect, pipe } from "effect";
 import extend from "extend";
-import * as B from "fp-ts/boolean";
-import { flow, pipe } from "fp-ts/function";
-import * as IO from "fp-ts/IO";
-import * as IOE from "fp-ts/IOEither";
 import { klona as clone } from "klona/json";
 
 import {
@@ -19,38 +16,41 @@ import type { NodeCG } from "../../types/nodecg";
 import { existsSync } from "../util-fp/fs/exists-sync";
 import { readJsonFileSync } from "../util-fp/read-json-file-sync";
 
-const parseSchema = (bundleName: string) =>
-	flow(
-		readJsonFileSync,
-		IOE.map((json) => json as Record<string, any>),
-		IOE.mapError(() => {
-			return new Error(
-				`configschema.json for bundle "${bundleName}" could not be read. Ensure that it is valid JSON.`,
-			);
-		}),
-	);
+const parseSchema =
+	(bundleName: string) =>
+	(schemaPath: string): Effect.Effect<Record<string, any>, Error> =>
+		pipe(
+			readJsonFileSync(schemaPath),
+			Effect.map((json) => json as Record<string, any>),
+			Effect.mapError(() => {
+				return new Error(
+					`configschema.json for bundle "${bundleName}" could not be read. Ensure that it is valid JSON.`,
+				);
+			}),
+		);
 
 const createConfigschemaPath = (bundleDir: string) =>
 	path.join(bundleDir, "configschema.json");
 
-export const parseDefaults = (bundleName: string) =>
-	flow(createConfigschemaPath, (schemaPath) =>
-		pipe(
+export const parseDefaults =
+	(bundleName: string) =>
+	(bundleDir: string): Effect.Effect<Record<string, any>, Error> => {
+		const schemaPath = createConfigschemaPath(bundleDir);
+		return pipe(
 			existsSync(schemaPath),
-			IO.flatMap(
-				B.match(
-					() => IOE.of({}),
-					flow(
-						() => parseSchema(bundleName)(schemaPath),
-						IOE.flatMapEither((schema) =>
-							getSchemaDefaultFp(schema, bundleName),
-						),
-						IOE.map((defaults) => defaults as Record<string, any>),
-					),
-				),
+			Effect.flatMap((exists) =>
+				exists
+					? pipe(
+							parseSchema(bundleName)(schemaPath),
+							Effect.flatMap((schema) =>
+								getSchemaDefaultFp(schema, bundleName),
+							),
+							Effect.map((defaults) => defaults as Record<string, any>),
+						)
+					: Effect.succeed({}),
 			),
-		),
-	);
+		);
+	};
 
 export function parseBundleConfig(
 	bundleName: string,
@@ -58,17 +58,12 @@ export function parseBundleConfig(
 	userConfig: NodeCG.Bundle.UnknownConfig,
 ): NodeCG.Bundle.UnknownConfig {
 	const cfgSchemaPath = path.resolve(bundleDir, "configschema.json");
-	const configExists = existsSync(cfgSchemaPath);
-	if (!configExists()) {
+	const configExists = Effect.runSync(existsSync(cfgSchemaPath));
+	if (!configExists) {
 		return userConfig;
 	}
 
-	const schema = pipe(
-		parseSchema(bundleName)(cfgSchemaPath),
-		IOE.getOrElse((error) => {
-			throw error;
-		}),
-	)();
+	const schema = Effect.runSync(parseSchema(bundleName)(cfgSchemaPath));
 	const defaultConfig = getSchemaDefault(
 		schema,
 		bundleName,

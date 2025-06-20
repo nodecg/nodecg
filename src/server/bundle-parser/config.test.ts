@@ -63,7 +63,7 @@ test("validation - when the schema file exists, should throw when the config fai
 		),
 	);
 	expect(fn).toThrowErrorMatchingInlineSnapshot(`
-		[Error: Config for bundle "config-validation" is invalid:
+		[(FiberFailure) Error: Config for bundle "config-validation" is invalid:
 		foo must be string]
 	`);
 });
@@ -129,7 +129,7 @@ test("validation - when the schema file isn't valid JSON, throw an error", () =>
 		),
 	);
 	expect(fn).toThrowErrorMatchingInlineSnapshot(
-		`[Error: configschema.json for bundle "bad-schema" could not be read. Ensure that it is valid JSON.]`,
+		`[(FiberFailure) (FiberFailure) Error: configschema.json for bundle "bad-schema" could not be read. Ensure that it is valid JSON.]`,
 	);
 });
 

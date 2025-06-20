@@ -1,9 +1,10 @@
 import fs from "node:fs";
 
-import * as E from "fp-ts/Either";
-import * as IOE from "fp-ts/IOEither";
+import { Effect } from "effect";
 
-export const readFileSync = IOE.tryCatchK(
-	(path: string) => fs.readFileSync(path, "utf-8"),
-	E.toError,
-);
+export const readFileSync = (path: string): Effect.Effect<string, Error> =>
+	Effect.try({
+		try: () => fs.readFileSync(path, "utf-8"),
+		catch: (error) =>
+			error instanceof Error ? error : new Error(String(error)),
+	});

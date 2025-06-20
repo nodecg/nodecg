@@ -1,8 +1,6 @@
 import fs from "node:fs";
 
-import * as IO from "fp-ts/IO";
+import { Effect } from "effect";
 
-export const existsSync =
-	(path: string): IO.IO<boolean> =>
-	() =>
-		fs.existsSync(path);
+export const existsSync = (path: string): Effect.Effect<boolean> =>
+	Effect.sync(() => fs.existsSync(path));
