@@ -1,6 +1,6 @@
 {
   "name": "@nodecg/database-adapter-types",
-  "version": "0.0.0",
+  "version": "2.6.0",
   "types": "dist/main.d.ts",
   "files": [
     "dist"
