@@ -122,6 +122,7 @@ Bundles are defined in `package.json` with a `nodecg` field containing:
 - ESLint with TypeScript rules
 - Prettier for formatting
 - Simple import sorting plugin
+- **File naming**: Use kebab-case for all new files (e.g., `timer-service.ts`, not `TimerService.ts`)
 
 ### Testing Considerations
 
