@@ -129,6 +129,7 @@ Bundles are defined in `package.json` with a `nodecg` field containing:
 - Tests run in single worker mode (`maxWorkers: 1`)
 - Special test environment variables (`NODECG_TEST=true`)
 - Server tests require careful cleanup due to shared state
+- **IMPORTANT**: Always check TypeScript diagnostics using `mcp__typescript-language-server__diagnostics` tool before running test files to catch TypeScript errors early
 
 ## Commit Message Guidelines
 
