@@ -457,13 +457,52 @@ export class UnauthorizedError extends Data.TaggedError("UnauthorizedError")<{
 - Use `@effect/platform` test utilities for mocking FileSystem
 - Test both success and failure paths with typed errors
 - Compose test layers for integration scenarios
+- Use `@effect/vitest` for Effect-based test utilities
 
 **Test Organization:**
 
 - Co-locate test files with implementation
 - Create test-specific service implementations
-- Use Effect's built-in test utilities
-- Ensure deterministic test execution
+- Use Effect's built-in test utilities and `@effect/vitest` package
+- Ensure deterministic test execution with TestClock manipulation
+
+**@effect/vitest Integration:**
+
+- Install `@effect/vitest` for enhanced Effect testing capabilities
+- Use `it.effect()` for running Effect-based tests with TestContext
+- Leverage `it.scoped` for resource management in tests
+- Use `it.flakyTest` for handling non-deterministic test scenarios
+- Access TestClock service for time-based testing
+- Handle both success and failure cases with `Effect.exit`
+
+```typescript
+// Example Effect test pattern
+import { it, expect } from "@effect/vitest"
+import { Effect, TestClock } from "effect"
+import { MyService, ServiceError } from "../MyService"
+
+it.effect("should handle service operation successfully", () =>
+  Effect.gen(function* () {
+    const result = yield* MyService.performOperation("test-input")
+    expect(result).toBe("expected-output")
+  })
+)
+
+it.effect("should handle time-based operations", () =>
+  Effect.gen(function* () {
+    const testClock = yield* TestClock.TestClock
+    const promise = Effect.runPromise(
+      Effect.gen(function* () {
+        yield* Effect.sleep("1 second")
+        return "completed"
+      })
+    )
+    yield* testClock.adjust("1 second")
+    const result = yield* Effect.promise(() => promise)
+    expect(result).toBe("completed")
+  })
+)
+```
 
 ## Backward Compatibility Strategy
 
