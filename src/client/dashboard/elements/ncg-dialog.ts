@@ -17,7 +17,7 @@ import { PaperDialogBehavior } from "@polymer/paper-dialog-behavior/paper-dialog
 import * as Polymer from "@polymer/polymer";
 import { mixinBehaviors } from "@polymer/polymer/lib/legacy/class.js";
 import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
-import { initialize } from '@open-iframe-resizer/core';
+import { initialize } from "@open-iframe-resizer/core";
 
 class NcgDialog extends mixinBehaviors(
 	[NeonAnimationRunnerBehavior, PaperDialogBehavior],
