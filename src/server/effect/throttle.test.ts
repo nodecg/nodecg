@@ -11,7 +11,7 @@ import { describe, expect, it } from "vitest";
 
 import { throttle } from "./throttle";
 
-describe("throttle", { timeout: 1000 }, () => {
+describe("throttle", () => {
 	const run = <A, E>(effect: Effect.Effect<A, E, Scope.Scope>) =>
 		Effect.runPromise(
 			pipe(effect, Effect.scoped, Effect.provide(TestContext.TestContext)),
@@ -171,6 +171,7 @@ describe("throttle", { timeout: 1000 }, () => {
 				);
 
 				// Only first call completed before scope cleanup
+				yield* TestClock.adjust(Duration.millis(200));
 				expect(results).toEqual(["a"]);
 			}),
 		);

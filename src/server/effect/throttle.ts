@@ -4,12 +4,7 @@ import { Chunk, Deferred, Duration, Effect, pipe, Queue, Stream } from "effect";
  * Wraps a function in a throttling mechanism that limits the number of calls
  * to the function within a specified duration.
  */
-export const throttle = <
-	T,
-	A extends unknown[],
-	E,
-	R,
->(
+export const throttle = <T, A extends unknown[], E, R>(
 	callback: (...args: A) => Effect.Effect<T, E, R>,
 	duration: Duration.Duration,
 ) =>
@@ -29,25 +24,12 @@ export const throttle = <
 					callback(...args),
 					Effect.flatMap((result) => Deferred.succeed(deferred, result)),
 					Effect.catchAll((result) => Deferred.fail(deferred, result)),
+					Effect.asVoid,
 				),
 			),
 		);
 
-		yield* Effect.forkScoped(
-			Effect.gen(function* () {
-				yield* Effect.addFinalizer(() =>
-					pipe(
-						queue,
-						Queue.takeAll,
-						Effect.flatMap(
-							Effect.forEach(({ deferred }) => Deferred.interrupt(deferred)),
-						),
-						Effect.orDie,
-					),
-				);
-				yield* Stream.runDrain(stream);
-			}),
-		);
+		yield* Effect.forkScoped(Stream.runDrain(stream));
 
 		return (...args: A) =>
 			Effect.gen(function* () {
