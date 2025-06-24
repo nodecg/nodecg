@@ -477,31 +477,31 @@ export class UnauthorizedError extends Data.TaggedError("UnauthorizedError")<{
 
 ```typescript
 // Example Effect test pattern
-import { it, expect } from "@effect/vitest"
-import { Effect, TestClock } from "effect"
-import { MyService, ServiceError } from "../MyService"
+import { it, expect } from "@effect/vitest";
+import { Effect, TestClock } from "effect";
+import { MyService, ServiceError } from "../MyService";
 
 it.effect("should handle service operation successfully", () =>
   Effect.gen(function* () {
-    const result = yield* MyService.performOperation("test-input")
-    expect(result).toBe("expected-output")
-  })
-)
+    const result = yield* MyService.performOperation("test-input");
+    expect(result).toBe("expected-output");
+  }),
+);
 
 it.effect("should handle time-based operations", () =>
   Effect.gen(function* () {
-    const testClock = yield* TestClock.TestClock
+    const testClock = yield* TestClock.TestClock;
     const promise = Effect.runPromise(
       Effect.gen(function* () {
-        yield* Effect.sleep("1 second")
-        return "completed"
-      })
-    )
-    yield* testClock.adjust("1 second")
-    const result = yield* Effect.promise(() => promise)
-    expect(result).toBe("completed")
-  })
-)
+        yield* Effect.sleep("1 second");
+        return "completed";
+      }),
+    );
+    yield* testClock.adjust("1 second");
+    const result = yield* Effect.promise(() => promise);
+    expect(result).toBe("completed");
+  }),
+);
 ```
 
 ## Backward Compatibility Strategy
