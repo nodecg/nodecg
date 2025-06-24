@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.1](https://github.com/nodecg/nodecg/compare/nodecg-v2.6.0...nodecg-v2.6.1) (2025-06-24)
+
+
+### Bug Fixes
+
+* **deps:** remove GPLv3 packages ([#858](https://github.com/nodecg/nodecg/issues/858)) ([7c26304](https://github.com/nodecg/nodecg/commit/7c26304bc9e63474ce867755a0d2073a21483d17))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg/cli bumped from 2.6.0 to 2.6.1
+    * @nodecg/database-adapter-sqlite-legacy bumped from 2.6.0 to 2.6.1
+    * @nodecg/database-adapter-types bumped from 2.6.0 to 2.6.1
+    * @nodecg/internal-util bumped from 2.6.0 to 2.6.1
+
 ## [2.6.0](https://github.com/nodecg/nodecg/compare/nodecg-v2.5.3...nodecg-v2.6.0) (2025-06-20)
 
 

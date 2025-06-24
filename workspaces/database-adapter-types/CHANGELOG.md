@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.1](https://github.com/nodecg/nodecg/compare/database-adapter-types-v2.6.0...database-adapter-types-v2.6.1) (2025-06-24)
+
+
+### Miscellaneous Chores
+
+* **database-adapter-types:** Synchronize nodecg versions
+
 ## 2.6.0 (2025-06-20)
 
 

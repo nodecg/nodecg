@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.1](https://github.com/nodecg/nodecg/compare/nodecg-cli-v2.6.0...nodecg-cli-v2.6.1) (2025-06-24)
+
+
+### Miscellaneous Chores
+
+* **nodecg-cli:** Synchronize nodecg versions
+
 ## 2.6.0 (2025-06-20)
 
 

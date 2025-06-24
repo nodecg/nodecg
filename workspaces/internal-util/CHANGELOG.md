@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.1](https://github.com/nodecg/nodecg/compare/internal-util-v2.6.0...internal-util-v2.6.1) (2025-06-24)
+
+
+### Miscellaneous Chores
+
+* **internal-util:** Synchronize nodecg versions
+
 ## 2.6.0 (2025-06-20)
 
 
