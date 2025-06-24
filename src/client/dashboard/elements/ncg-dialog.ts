@@ -17,7 +17,7 @@ import { PaperDialogBehavior } from "@polymer/paper-dialog-behavior/paper-dialog
 import * as Polymer from "@polymer/polymer";
 import { mixinBehaviors } from "@polymer/polymer/lib/legacy/class.js";
 import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
-import { iframeResizer } from "iframe-resizer";
+import { initialize } from "@open-iframe-resizer/core";
 
 class NcgDialog extends mixinBehaviors(
 	[NeonAnimationRunnerBehavior, PaperDialogBehavior],
@@ -150,13 +150,10 @@ class NcgDialog extends mixinBehaviors(
 	}
 
 	_attachIframeResize(iframe: HTMLIFrameElement) {
-		iframeResizer(
+		initialize(
 			{
-				log: false,
-				resizeFrom: "child",
-				heightCalculationMethod: "documentElementOffset",
-				onResized(data: any) {
-					data.iframe.dispatchEvent(new CustomEvent("iframe-resized"));
+				onIframeResize(context) {
+					context.iframe.dispatchEvent(new CustomEvent("iframe-resized"));
 				},
 			},
 			iframe,

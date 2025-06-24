@@ -6,7 +6,7 @@ import "@polymer/paper-styles/typography.js";
 
 import * as Polymer from "@polymer/polymer";
 import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
-import { iframeResizer } from "iframe-resizer";
+import { initialize } from "@open-iframe-resizer/core";
 
 const HEX_PARSE_SHORTHAND_REGEX = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 const HEX_PARSE_REGEX = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
@@ -263,14 +263,11 @@ export class NcgDashboardPanel extends Polymer.PolymerElement {
 	}
 
 	_attachIframeResize(iframe: HTMLIFrameElement) {
-		iframeResizer(
+		initialize(
 			{
-				log: false,
-				resizeFrom: "child",
-				heightCalculationMethod: "documentElementOffset",
-				onResized: (data: any) => {
+				onIframeResize: (context) => {
 					this.$["collapse"].updateSize("auto", false);
-					data.iframe.dispatchEvent(new CustomEvent("iframe-resized"));
+					context.iframe.dispatchEvent(new CustomEvent("iframe-resized"));
 				},
 			},
 			iframe,

@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.6.1](https://github.com/nodecg/nodecg/compare/database-adapter-sqlite-legacy-v2.6.0...database-adapter-sqlite-legacy-v2.6.1) (2025-06-24)
+
+
+### Miscellaneous Chores
+
+* **database-adapter-sqlite-legacy:** Synchronize nodecg versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg/database-adapter-types bumped from 2.6.0 to 2.6.1
+    * @nodecg/internal-util bumped from 2.6.0 to 2.6.1
+
 ## 2.6.0 (2025-06-20)
 
 

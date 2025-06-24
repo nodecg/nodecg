@@ -23,7 +23,6 @@ export function injectScripts(
 		standalone = false,
 		createApiInstance,
 		sound = false,
-		fullbleed = false,
 	}: Options = {} as Options,
 	cb: (html: string) => void = noop,
 ): void {
@@ -78,14 +77,6 @@ export function injectScripts(
 			} else {
 				// They both also need to reference the dashboard window's socket, rather than make their own
 				scripts.push("<script>window.socket = window.top.socket;</script>");
-			}
-
-			// Likewise, they both need the contentWindow portion of the iframeResizer.
-			// We put this at the start and make it async so it loads ASAP.
-			if (!fullbleed) {
-				scripts.unshift(
-					'<script async src="/node_modules/iframe-resizer/js/iframeResizer.contentWindow.js"></script>',
-				);
 			}
 
 			// Panels need the default panel styles and the dialog_opener.
