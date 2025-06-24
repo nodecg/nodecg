@@ -1,9 +1,10 @@
 import path from "node:path";
 
+import { NodeFileSystem } from "@effect/platform-node";
 import { Effect, Option, pipe } from "effect";
 
 import type { NodeCG } from "../../types/nodecg";
-import { readJsonFileSync } from "../util-fp/read-json-file-sync";
+import { readJsonFileSync } from "../effect/read-json-file";
 import { parseAssets } from "./assets";
 import { parseBundleConfig, parseDefaults } from "./config";
 import { parseExtension } from "./extension";
@@ -14,9 +15,7 @@ import { parseMounts } from "./mounts";
 import { parsePanels } from "./panels";
 import { parseSounds } from "./sounds";
 
-const readBundlePackageJson = (
-	bundlePath: string,
-): Effect.Effect<NodeCG.PackageJSON, Error> =>
+const readBundlePackageJson = (bundlePath: string) =>
 	pipe(
 		path.join(bundlePath, "package.json"),
 		readJsonFileSync,
@@ -68,6 +67,7 @@ export const parseBundle = (
 	const manifest = pipe(
 		readBundlePackageJson(bundlePath),
 		Effect.flatMap(parseManifest(bundlePath)),
+		Effect.provide(NodeFileSystem.layer),
 		Effect.runSync,
 	);
 
@@ -89,6 +89,7 @@ export const parseBundle = (
 						error instanceof Error ? error : new Error(String(error)),
 				}),
 		}),
+		Effect.provide(NodeFileSystem.layer),
 		Effect.runSync,
 	);
 

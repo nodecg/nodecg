@@ -65,6 +65,8 @@
     "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server"
   },
   "dependencies": {
+    "@effect/platform": "^0.87.0",
+    "@effect/platform-node": "^0.88.1",
     "@nodecg/cli": "2.6.0",
     "@nodecg/database-adapter-sqlite-legacy": "2.6.0",
     "@nodecg/database-adapter-types": "2.6.0",
