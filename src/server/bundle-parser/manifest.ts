@@ -1,30 +1,29 @@
 import * as path from "node:path";
 
 import { isLegacyProject } from "@nodecg/internal-util";
-import { Effect } from "effect";
+import * as IOE from "fp-ts/IOEither";
 import semver from "semver";
 
 import type { NodeCG } from "../../types/nodecg";
 
 export const parseManifest =
-	(bundlePath: string) =>
-	(packageJson: NodeCG.PackageJSON): Effect.Effect<NodeCG.Manifest, Error> => {
+	(bundlePath: string) => (packageJson: NodeCG.PackageJSON) => {
 		if (!packageJson.name) {
-			return Effect.fail(
+			return IOE.left(
 				new Error(`${bundlePath}'s package.json must specify "name".`),
 			);
 		}
 
 		if (isLegacyProject) {
 			if (!packageJson.nodecg) {
-				return Effect.fail(
+				return IOE.left(
 					new Error(
 						`${packageJson.name}'s package.json lacks a "nodecg" property, and therefore cannot be parsed.`,
 					),
 				);
 			}
 			if (!semver.validRange(packageJson.nodecg.compatibleRange)) {
-				return Effect.fail(
+				return IOE.left(
 					new Error(
 						`${packageJson.name}'s package.json does not have a valid "nodecg.compatibleRange" property.`,
 					),
@@ -32,7 +31,7 @@ export const parseManifest =
 			}
 			const bundleFolderName = path.basename(bundlePath);
 			if (bundleFolderName !== packageJson.name) {
-				return Effect.fail(
+				return IOE.left(
 					new Error(
 						`${packageJson.name}'s folder is named "${bundleFolderName}". Please rename it to "${packageJson.name}".`,
 					),
@@ -40,7 +39,7 @@ export const parseManifest =
 			}
 		}
 
-		return Effect.succeed({
+		return IOE.right({
 			...packageJson.nodecg,
 			name: packageJson.name,
 			version: packageJson.version,

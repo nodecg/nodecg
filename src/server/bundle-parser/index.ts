@@ -1,10 +1,12 @@
 import path from "node:path";
 
-import { NodeFileSystem } from "@effect/platform-node";
-import { Effect, Option, pipe } from "effect";
+import * as E from "fp-ts/Either";
+import { flow, pipe } from "fp-ts/function";
+import * as IOE from "fp-ts/IOEither";
+import * as O from "fp-ts/Option";
 
 import type { NodeCG } from "../../types/nodecg";
-import { readJsonFileSync } from "../effect/read-json-file";
+import { readJsonFileSync } from "../util-fp/read-json-file-sync";
 import { parseAssets } from "./assets";
 import { parseBundleConfig, parseDefaults } from "./config";
 import { parseExtension } from "./extension";
@@ -17,10 +19,11 @@ import { parseSounds } from "./sounds";
 
 const readBundlePackageJson = (bundlePath: string) =>
 	pipe(
-		path.join(bundlePath, "package.json"),
+		bundlePath,
+		(bundlePath: string) => path.join(bundlePath, "package.json"),
 		readJsonFileSync,
-		Effect.map((json) => json as NodeCG.PackageJSON),
-		Effect.mapError((error) => {
+		IOE.map((json) => json as NodeCG.PackageJSON),
+		IOE.mapLeft((error) => {
 			if ((error as NodeJS.ErrnoException).code === "ENOENT") {
 				return new Error(
 					`Bundle at path ${bundlePath} does not contain a package.json!`,
@@ -35,63 +38,63 @@ const readBundlePackageJson = (bundlePath: string) =>
 		}),
 	);
 
-const parseBundleNodecgConfig = (
-	bundlePath: string,
-): Effect.Effect<NodeCG.NodecgBundleConfig, Error> =>
-	pipe(
-		path.join(bundlePath, "nodecg.config.js"),
-		(configPath) =>
-			Effect.try({
-				try: () => require(configPath),
-				catch: (error) =>
-					error instanceof Error ? error : new Error(String(error)),
-			}),
-		Effect.catchAll(() => Effect.succeed({})),
-		Effect.map((config) => config.default || config),
-		Effect.flatMap((config) => {
-			if (
-				typeof config !== "object" ||
-				config === null ||
-				Array.isArray(config)
-			) {
-				return Effect.fail(new Error("nodecg.config.js must export an object"));
-			}
-			return Effect.succeed(config as NodeCG.NodecgBundleConfig);
-		}),
-	);
+const parseBundleNodecgConfig = flow(
+	(bundlePath: string) => path.join(bundlePath, "nodecg.config.js"),
+	IOE.tryCatchK(require, E.toError),
+	IOE.match(
+		() => ({}),
+		(config) => config.default || config,
+	),
+	IOE.fromIO,
+	IOE.flatMap((config) => {
+		if (
+			typeof config !== "object" ||
+			config === null ||
+			Array.isArray(config)
+		) {
+			return IOE.left(new Error("nodecg.config.js must export an object"));
+		}
+		return IOE.right(config as NodeCG.NodecgBundleConfig);
+	}),
+);
 
 export const parseBundle = (
 	bundlePath: string,
 	bundleCfg?: NodeCG.Bundle.UnknownConfig,
 ): NodeCG.Bundle => {
 	const manifest = pipe(
-		readBundlePackageJson(bundlePath),
-		Effect.flatMap(parseManifest(bundlePath)),
-		Effect.provide(NodeFileSystem.layer),
-		Effect.runSync,
-	);
+		bundlePath,
+		readBundlePackageJson,
+		IOE.flatMap(parseManifest(bundlePath)),
+		IOE.getOrElse((error) => {
+			throw error;
+		}),
+	)();
 
 	const dashboardDir = path.resolve(bundlePath, "dashboard");
 	const graphicsDir = path.resolve(bundlePath, "graphics");
 
-	const nodecgBundleConfig = Effect.runSync(
+	const nodecgBundleConfig = pipe(
 		parseBundleNodecgConfig(bundlePath),
-	);
+		IOE.getOrElse((error) => {
+			throw error;
+		}),
+	)();
 
 	const config = pipe(
-		Option.fromNullable(bundleCfg),
-		Option.match({
-			onNone: () => parseDefaults(manifest.name)(bundlePath),
-			onSome: (bundleCfg) =>
-				Effect.try({
-					try: () => parseBundleConfig(manifest.name, bundlePath, bundleCfg),
-					catch: (error) =>
-						error instanceof Error ? error : new Error(String(error)),
-				}),
+		bundleCfg,
+		O.fromNullable,
+		O.match(
+			() => parseDefaults(manifest.name)(bundlePath),
+			IOE.tryCatchK(
+				(bundleCfg) => parseBundleConfig(manifest.name, bundlePath, bundleCfg),
+				E.toError,
+			),
+		),
+		IOE.getOrElse((error) => {
+			throw error;
 		}),
-		Effect.provide(NodeFileSystem.layer),
-		Effect.runSync,
-	);
+	)();
 
 	const bundle: NodeCG.Bundle = {
 		...manifest,

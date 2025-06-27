@@ -8,7 +8,7 @@ test("should error when package.json does not exist", () => {
 	expect(
 		parseBundle.bind(parseBundle, "./test"),
 	).toThrowErrorMatchingInlineSnapshot(
-		`[(FiberFailure) Error: Bundle at path ./test does not contain a package.json!]`,
+		`[Error: Bundle at path ./test does not contain a package.json!]`,
 	);
 });
 
@@ -19,7 +19,7 @@ test('should error when package.json has no "nodecg" property', () => {
 			"./test/fixtures/bundle-parser/no-nodecg-prop",
 		),
 	).toThrowErrorMatchingInlineSnapshot(
-		`[(FiberFailure) Error: no-nodecg-prop's package.json lacks a "nodecg" property, and therefore cannot be parsed.]`,
+		`[Error: no-nodecg-prop's package.json lacks a "nodecg" property, and therefore cannot be parsed.]`,
 	);
 });
 
@@ -150,7 +150,7 @@ test('should error when "nodecg.compatibleRange" is not a valid semver range', (
 			"./test/fixtures/bundle-parser/no-compatible-range",
 		),
 	).toThrowErrorMatchingInlineSnapshot(
-		`[(FiberFailure) Error: no-compatible-range's package.json does not have a valid "nodecg.compatibleRange" property.]`,
+		`[Error: no-compatible-range's package.json does not have a valid "nodecg.compatibleRange" property.]`,
 	);
 });
 

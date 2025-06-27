@@ -127,6 +127,7 @@
     "extend": "^3.0.2",
     "fast-equals": "^5.0.1",
     "fast-memoize": "^2.5.2",
+    "fp-ts": "^2.16.10",
     "git-rev-sync": "^3.0.2",
     "hasha": "^5.2.2",
     "httpolyglot": "^0.1.2",
