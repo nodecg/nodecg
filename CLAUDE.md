@@ -218,6 +218,7 @@ The Effect type `Effect<A, E, R>` represents a computation that:
 - Keep pure functions pure (don't wrap in Effect unnecessarily)
 - Define specific error types instead of using generic errors
 - Make dependencies explicit in function signatures
+- **Don't explicitly type Effect return types** - rely on TypeScript inference for better maintainability
 
 ### Error Modeling
 
