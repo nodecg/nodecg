@@ -1,9 +1,6 @@
 import path from "node:path";
 
-import * as E from "fp-ts/Either";
-import { flow, pipe } from "fp-ts/function";
-import * as IOE from "fp-ts/IOEither";
-import * as O from "fp-ts/Option";
+import { Either, Option, pipe } from "effect";
 
 import type { NodeCG } from "../../types/nodecg";
 import { readJsonFileSync } from "../util-fp/read-json-file-sync";
@@ -19,11 +16,10 @@ import { parseSounds } from "./sounds";
 
 const readBundlePackageJson = (bundlePath: string) =>
 	pipe(
-		bundlePath,
-		(bundlePath: string) => path.join(bundlePath, "package.json"),
+		path.join(bundlePath, "package.json"),
 		readJsonFileSync,
-		IOE.map((json) => json as NodeCG.PackageJSON),
-		IOE.mapLeft((error) => {
+		Either.map((json) => json as NodeCG.PackageJSON),
+		Either.mapLeft((error) => {
 			if ((error as NodeJS.ErrnoException).code === "ENOENT") {
 				return new Error(
 					`Bundle at path ${bundlePath} does not contain a package.json!`,
@@ -38,63 +34,72 @@ const readBundlePackageJson = (bundlePath: string) =>
 		}),
 	);
 
-const parseBundleNodecgConfig = flow(
-	(bundlePath: string) => path.join(bundlePath, "nodecg.config.js"),
-	IOE.tryCatchK(require, E.toError),
-	IOE.match(
-		() => ({}),
-		(config) => config.default || config,
-	),
-	IOE.fromIO,
-	IOE.flatMap((config) => {
-		if (
-			typeof config !== "object" ||
-			config === null ||
-			Array.isArray(config)
-		) {
-			return IOE.left(new Error("nodecg.config.js must export an object"));
-		}
-		return IOE.right(config as NodeCG.NodecgBundleConfig);
-	}),
-);
+const parseBundleNodecgConfig = (bundlePath: string) =>
+	pipe(
+		Either.try({
+			try: () => require(path.join(bundlePath, "nodecg.config.js")),
+			catch: (error) => {
+				if (error instanceof Error) {
+					return error;
+				}
+				return new Error(
+					`Failed to load nodecg.config.js for bundle at ${bundlePath}: ${String(error)}`,
+				);
+			},
+		}),
+		Either.match({
+			onLeft: () => ({}),
+			onRight: (config) => config.default || config,
+		}),
+		Either.flatMap((config) => {
+			if (
+				typeof config !== "object" ||
+				config === null ||
+				Array.isArray(config)
+			) {
+				return Either.left(new Error("nodecg.config.js must export an object"));
+			}
+			return Either.right(config as NodeCG.NodecgBundleConfig);
+		}),
+	);
 
 export const parseBundle = (
 	bundlePath: string,
 	bundleCfg?: NodeCG.Bundle.UnknownConfig,
 ): NodeCG.Bundle => {
 	const manifest = pipe(
-		bundlePath,
-		readBundlePackageJson,
-		IOE.flatMap(parseManifest(bundlePath)),
-		IOE.getOrElse((error) => {
-			throw error;
-		}),
-	)();
+		readBundlePackageJson(bundlePath),
+		Either.flatMap(parseManifest(bundlePath)),
+		Either.getOrThrow,
+	);
 
 	const dashboardDir = path.resolve(bundlePath, "dashboard");
 	const graphicsDir = path.resolve(bundlePath, "graphics");
 
 	const nodecgBundleConfig = pipe(
 		parseBundleNodecgConfig(bundlePath),
-		IOE.getOrElse((error) => {
-			throw error;
-		}),
-	)();
+		Either.getOrThrow,
+	);
 
 	const config = pipe(
-		bundleCfg,
-		O.fromNullable,
-		O.match(
-			() => parseDefaults(manifest.name)(bundlePath),
-			IOE.tryCatchK(
-				(bundleCfg) => parseBundleConfig(manifest.name, bundlePath, bundleCfg),
-				E.toError,
-			),
-		),
-		IOE.getOrElse((error) => {
-			throw error;
+		Option.fromNullable(bundleCfg),
+		Option.match({
+			onNone: () => parseDefaults(manifest.name)(bundlePath),
+			onSome: (bundleCfg) =>
+				Either.try({
+					try: () => parseBundleConfig(manifest.name, bundlePath, bundleCfg),
+					catch: (error) => {
+						if (error instanceof Error) {
+							return error;
+						}
+						return new Error(
+							`Failed to parse bundle config for ${manifest.name}: ${String(error)}`,
+						);
+					},
+				}),
 		}),
-	)();
+		Either.getOrThrow,
+	);
 
 	const bundle: NodeCG.Bundle = {
 		...manifest,

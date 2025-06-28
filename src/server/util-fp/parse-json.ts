@@ -1,6 +1,12 @@
-import * as E from "fp-ts/Either";
+import { Either } from "effect";
 
-export const parseJson = E.tryCatchK(
-	(json: string) => JSON.parse(json) as unknown,
-	E.toError,
-);
+export const parseJson = (json: string) =>
+	Either.try({
+		try: () => JSON.parse(json) as unknown,
+		catch: (error) => {
+			if (error instanceof Error) {
+				return error;
+			}
+			return new Error(`Failed to parse JSON: ${String(error)}`);
+		},
+	});
