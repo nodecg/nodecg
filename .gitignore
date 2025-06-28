@@ -2,6 +2,7 @@ dist/
 /out
 .eslintcache
 *.tsbuildinfo
+*.local.*
 
 # Node / Bower
 bower_components

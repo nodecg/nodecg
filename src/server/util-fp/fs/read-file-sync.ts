@@ -1,9 +1,14 @@
 import fs from "node:fs";
 
-import * as E from "fp-ts/Either";
-import * as IOE from "fp-ts/IOEither";
+import { Either } from "effect";
 
-export const readFileSync = IOE.tryCatchK(
-	(path: string) => fs.readFileSync(path, "utf-8"),
-	E.toError,
-);
+export const readFileSync = (path: string) =>
+	Either.try({
+		try: () => fs.readFileSync(path, "utf-8"),
+		catch: (error) => {
+			if (error instanceof Error) {
+				return error;
+			}
+			return new Error(`Failed to read file at ${path}: ${String(error)}`);
+		},
+	});

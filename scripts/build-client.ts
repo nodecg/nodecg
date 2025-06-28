@@ -13,7 +13,7 @@ const main = async () => {
 		bundle: true,
 		minify: true,
 		sourcemap: true,
-		target: "es2016",
+		target: "es2020",
 		platform: "browser",
 		plugins: [
 			copy({

@@ -65,6 +65,8 @@
     "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server"
   },
   "dependencies": {
+    "@effect/platform": "^0.87.0",
+    "@effect/platform-node": "^0.88.1",
     "@nodecg/cli": "2.6.1",
     "@nodecg/database-adapter-sqlite-legacy": "2.6.1",
     "@nodecg/database-adapter-types": "2.6.1",
@@ -117,6 +119,7 @@
     "cookies-js": "^1.2.3",
     "cosmiconfig": "^8.3.6",
     "draggabilly": "^2.4.1",
+    "effect": "^3.16.8",
     "events": "^3.3.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
@@ -124,7 +127,6 @@
     "extend": "^3.0.2",
     "fast-equals": "^5.0.1",
     "fast-memoize": "^2.5.2",
-    "fp-ts": "^2.16.9",
     "git-rev-sync": "^3.0.2",
     "hasha": "^5.2.2",
     "httpolyglot": "^0.1.2",
@@ -154,6 +156,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@effect/vitest": "^0.23.8",
     "@eslint/js": "^9.17.0",
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
