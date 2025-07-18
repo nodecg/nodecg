@@ -132,7 +132,7 @@
     "json-ptr": "^3.1.1",
     "klona": "^2.0.6",
     "lodash": "^4.17.21",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^2.0.2",
     "nano-spawn": "^0.2.0",
     "object-path": "^0.11.8",
     "packery": "^3.0.0",
