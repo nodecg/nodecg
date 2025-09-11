@@ -56,6 +56,8 @@ export namespace NodeCG {
 			height: number;
 			name?: string;
 			description?: string;
+			group?: string;
+			order?: number;
 			singleInstance?: boolean;
 		}
 
@@ -139,8 +141,8 @@ export namespace NodeCG {
 
 		export type Graphic = {
 			url: string;
-		} & Required<Omit<Manifest.UnparsedGraphic, 'name' | 'description'>> &
-			Pick<Manifest.UnparsedGraphic, 'name' | 'description'>;
+		} & Required<Omit<Manifest.UnparsedGraphic, 'name' | 'description' | 'group' | 'order'>> &
+			Pick<Manifest.UnparsedGraphic, 'name' | 'description' | 'group' | 'order'>;
 
 		export type Panel = Manifest.UnparsedPanel & {
 			path: string;
