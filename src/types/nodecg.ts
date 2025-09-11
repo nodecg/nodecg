@@ -41,6 +41,7 @@ export namespace NodeCG {
 			headerColor?: string;
 			fullbleed?: boolean;
 			workspace?: string;
+			workspaceOrder?: number;
 			dialog?: boolean;
 			dialogButtons?: { name: string; type: "dismiss" | "confirm" }[];
 			width?: number;
@@ -136,7 +137,8 @@ export namespace NodeCG {
 
 		export type Graphic = {
 			url: string;
-		} & Required<Manifest.UnparsedGraphic>;
+		} & Required<Omit<Manifest.UnparsedGraphic, 'name' | 'description'>> &
+			Pick<Manifest.UnparsedGraphic, 'name' | 'description'>;
 
 		export type Panel = Manifest.UnparsedPanel & {
 			path: string;
