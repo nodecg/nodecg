@@ -117,7 +117,7 @@ function getDashboardContext(bundles: NodeCG.Bundle[]): DashboardContext {
 	};
 }
 
-function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
+export function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 	let defaultWorkspaceHasPanels = false;
 	let otherWorkspacesHavePanels = false;
 	const workspaces: Workspace[] = [];
