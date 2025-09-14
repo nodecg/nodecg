@@ -117,6 +117,12 @@ function getDashboardContext(bundles: NodeCG.Bundle[]): DashboardContext {
 	};
 }
 
+/**
+ * Parses bundles and generates workspace configuration for the dashboard.
+ * Workspaces are sorted by workspaceOrder (ascending), with items without an order
+ * placed after ordered items. When two workspaces have the same order value,
+ * they are sorted alphabetically by label as a secondary criterion.
+ */
 export function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 	let defaultWorkspaceHasPanels = false;
 	let otherWorkspacesHavePanels = false;
@@ -173,20 +179,24 @@ export function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 	workspaces.sort((a, b) => {
 		const orderA = workspaceOrders.get(a.name);
 		const orderB = workspaceOrders.get(b.name);
-		
-		// Both have orders: sort by order
+
+		// Both have orders: sort by order, then alphabetically if same order
 		if (orderA !== undefined && orderB !== undefined) {
-			return orderA - orderB;
+			if (orderA !== orderB) {
+				return orderA - orderB;
+			}
+			// Same order: fall through to alphabetical sorting
 		}
 		// Only A has order: A comes first
-		if (orderA !== undefined) {
+		else if (orderA !== undefined) {
 			return -1;
 		}
 		// Only B has order: B comes first
-		if (orderB !== undefined) {
+		else if (orderB !== undefined) {
 			return 1;
 		}
-		// Neither has order: sort alphabetically
+
+		// Both have same order or neither has order: sort alphabetically
 		return a.label.localeCompare(b.label);
 	});
 

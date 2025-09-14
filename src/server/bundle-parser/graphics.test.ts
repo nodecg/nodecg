@@ -86,10 +86,26 @@ test("should handle graphics with only name field", () => {
 test("should handle graphics with only description field", () => {
 	const parsedBundle = parseBundle("./test/fixtures/bundle-parser/graphics-description-only");
 	expect(parsedBundle.graphics).toHaveLength(1);
-	
+
 	const graphic = parsedBundle.graphics[0]!;
 	expect(graphic.name).toBeUndefined();
 	expect(graphic.description).toBe("A graphic with only description");
 	expect(graphic.width).toBe(1024);
 	expect(graphic.height).toBe(768);
+});
+
+test("should parse graphics with order values for sorting stability", () => {
+	const parsedBundle = parseBundle("./test/fixtures/bundle-parser/graphics-with-metadata");
+	expect(parsedBundle.graphics).toHaveLength(2);
+
+	// Both graphics should have order values for testing sorting stability
+	const overlayGraphic = parsedBundle.graphics.find(g => g.file === "overlay.html");
+	const simpleGraphic = parsedBundle.graphics.find(g => g.file === "simple.html");
+
+	expect(overlayGraphic).toBeDefined();
+	expect(simpleGraphic).toBeDefined();
+
+	// The fixture should have order values set to test identical order sorting
+	expect(overlayGraphic!.order).toBe(1);
+	expect(simpleGraphic!.order).toBe(1);
 });

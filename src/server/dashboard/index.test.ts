@@ -98,6 +98,24 @@ test("parseWorkspaces - should use minimum order when multiple panels share work
 	expect(nonDefaultWorkspaces[1]!.name).toBe("other"); // order 3
 });
 
+test("parseWorkspaces - should sort alphabetically when workspaces have identical order values", () => {
+	const bundles = [
+		mockBundle("bundle1", [
+			mockPanel({ workspace: "zebra", workspaceOrder: 1 }),
+			mockPanel({ workspace: "alpha", workspaceOrder: 1 }), // same order
+			mockPanel({ workspace: "beta", workspaceOrder: 1 })   // same order
+		])
+	];
+
+	const workspaces = parseWorkspaces(bundles);
+	const nonDefaultWorkspaces = workspaces.filter(w => w.name !== "default");
+
+	expect(nonDefaultWorkspaces).toHaveLength(3);
+	expect(nonDefaultWorkspaces[0]!.name).toBe("alpha"); // alphabetical order despite same workspaceOrder
+	expect(nonDefaultWorkspaces[1]!.name).toBe("beta");
+	expect(nonDefaultWorkspaces[2]!.name).toBe("zebra");
+});
+
 test("parseWorkspaces - should respect workspaceOrder for fullbleed panels", () => {
 	const bundles = [
 		mockBundle("bundle1", [
