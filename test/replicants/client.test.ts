@@ -392,8 +392,7 @@ test("when an object - should react to changes in nested properties", async ({
 						if (
 							newVal &&
 							oldVal &&
-							operations &&
-							operations[0].method === "update"
+							operations?.[0].method === "update"
 						) {
 							resolve({
 								newVal: JSON.parse(JSON.stringify(newVal)),

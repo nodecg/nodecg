@@ -34,7 +34,7 @@ export function stringifyErrorInner(error: unknown): {
 		} else if ((error as any).reason) {
 			if ((error as any).reason.message) {
 				message = (error as any).reason.message;
-				stack = (error as any).reason.stack || (error as any).reason.reason;
+				stack = (error as any).reason.stack ?? (error as any).reason.reason;
 			} else {
 				// Is a Meteor.Error
 				message = (error as any).reason;

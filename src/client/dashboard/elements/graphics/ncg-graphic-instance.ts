@@ -278,8 +278,8 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 				clearTimeout(this["_offTimeout"]);
 				this["_offTimeout"] = null;
 				this["statusHover"] = false;
-			} else if (!this["_offTimeout"]) {
-				this["_offTimeout"] = setTimeout(() => {
+			} else {
+				this["_offTimeout"] ??= setTimeout(() => {
 					clearTimeout(this["_offTimeout"]);
 					this["_offTimeout"] = null;
 					this["statusHover"] = false;

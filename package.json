@@ -154,7 +154,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
+    "@eslint/js": "^9.38.0",
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
     "@types/extend": "^3.0.4",
@@ -172,10 +172,11 @@
     "del-cli": "^5.1.0",
     "esbuild": "^0.19.12",
     "esbuild-plugin-copy": "^2.1.1",
-    "eslint": "^9.17.0",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "is-ci": "^3.0.1",
+    "jiti": "^2.6.1",
     "npm-run-all2": "^7.0.2",
     "onchange": "^7.1.0",
     "prettier": "^3.4.2",
@@ -183,7 +184,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "typescript": "~5.7.2",
-    "typescript-eslint": "^8.18.2",
+    "typescript-eslint": "^8.46.1",
     "vitest": "^3.0.2",
     "vitest-mock-express": "^2.2.0"
   },

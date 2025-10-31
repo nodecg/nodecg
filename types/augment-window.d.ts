@@ -1,4 +1,4 @@
-/* eslint-disable no-var */
+ 
 
 import { NodeCGAPIClient } from "../out/client/api/api.client";
 

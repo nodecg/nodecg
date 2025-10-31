@@ -1,16 +1,25 @@
-// @ts-check
-
 import eslint from "@eslint/js";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import tseslint from "typescript-eslint";
-import configPrettier from "eslint-config-prettier";
+import { defineConfig } from "eslint/config";
+import eslintConfigPrettier from "eslint-config-prettier/flat";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
+import tseslint from "typescript-eslint";
 
-export default tseslint.config(
+export default defineConfig(
 	eslint.configs.recommended,
-	tseslint.configs.recommendedTypeChecked,
-	tseslint.configs.stylisticTypeChecked,
+	{
+		files: ["**/*.{ts,mts,cts,tsx}"],
+		extends: [
+			tseslint.configs.recommendedTypeChecked,
+			tseslint.configs.stylisticTypeChecked,
+			{
+				languageOptions: {
+					parserOptions: {
+						projectService: true,
+					},
+				},
+			},
+		],
+	},
 	{
 		rules: {
 			"no-empty-pattern": "off",
@@ -37,14 +46,6 @@ export default tseslint.config(
 		},
 	},
 	{
-		languageOptions: {
-			parserOptions: {
-				projectService: true,
-				tsconfigRootDir: path.dirname(fileURLToPath(import.meta.url)),
-			},
-		},
-	},
-	{
 		plugins: {
 			"simple-import-sort": simpleImportSort,
 		},
@@ -53,7 +54,7 @@ export default tseslint.config(
 			"simple-import-sort/exports": "warn",
 		},
 	},
-	configPrettier,
+	eslintConfigPrettier,
 	{
 		ignores: [
 			"**/*.{js,cjs,mjs}",
@@ -64,7 +65,7 @@ export default tseslint.config(
 			"test/fixtures",
 			"coverage",
 			"typetest/fake-bundle",
-			"eslint.config.mjs",
+			"eslint.config.ts",
 			"generated-types/client",
 			"generated-types/server",
 		],

@@ -43,7 +43,7 @@ const parseBundleNodecgConfig = flow(
 	IOE.tryCatchK(require, E.toError),
 	IOE.match(
 		() => ({}),
-		(config) => config.default || config,
+		(config) => config.default ?? config,
 	),
 	IOE.fromIO,
 	IOE.flatMap((config) => {
