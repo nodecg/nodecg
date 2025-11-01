@@ -62,12 +62,6 @@ jobs:
           git config --global user.email "ci@nodecg.dev"
           git config --global user.name "NodeCG Bot"
 
-      - name: Install build tools for native modules (Linux, Node 24)
-        if: runner.os == 'Linux' && matrix.node-version == '24'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3 make g++
-
       - name: Restore Puppeteer cache (Linux)
         if: runner.os == 'Linux'
         uses: actions/cache@v4
@@ -83,10 +77,6 @@ jobs:
           path: |
             C:\Users\runneradmin\.cache\puppeteer
           key: puppeteer-${{ runner.os }}
-
-      - name: Setup MSBuild for native modules (Windows, Node 24)
-        if: runner.os == 'Windows' && matrix.node-version == '24'
-        uses: microsoft/setup-msbuild@v2
 
       - run: npm ci
       - run: npm run build
