@@ -24,7 +24,6 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: corepack enable npm
       - run: npm ci
       - run: npm run lint
 
@@ -36,7 +35,6 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: corepack enable npm
       - run: npm ci
       - run: npm run build
       - run: npm run typetest
@@ -80,8 +78,6 @@ jobs:
             C:\Users\runneradmin\.cache\puppeteer
           key: puppeteer-${{ runner.os }}
 
-      - run: corepack enable npm
-      - run: npm -v
       - run: npm ci
       - run: npm run build
       - run: npm test -- --coverage
@@ -106,7 +102,6 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
           cache: npm
-      - run: corepack enable npm
       - run: npm ci
       - run: npm run build
 
@@ -166,7 +161,6 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: npm
 
-      - run: corepack enable npm
       - run: npm ci
       - run: npm run build
 
@@ -195,7 +189,6 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: npm
 
-      - run: corepack enable npm
       - run: npm ci
       - run: npm run build
 

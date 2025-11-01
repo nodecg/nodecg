@@ -2,6 +2,7 @@ import "reflect-metadata";
 
 import path from "node:path";
 
+import sqlite3 from 'better-sqlite3'
 import { DataSource } from "typeorm";
 export * from "./entity";
 import { getNodecgRoot } from "@nodecg/internal-util";
@@ -14,6 +15,7 @@ const testing = process.env["NODECG_TEST"]?.toLowerCase() === "true";
 
 export const dataSource = new DataSource({
 	type: "better-sqlite3",
+	driver: sqlite3,
 
 	/**
 	 * TypeORM has this special :memory: key which indicates

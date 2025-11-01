@@ -13,6 +13,7 @@
   "dependencies": {
     "@nodecg/database-adapter-types": "2.6.1",
     "@nodecg/internal-util": "2.6.1",
+    "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.4.1",
     "typeorm": "0.3.27"
   },
