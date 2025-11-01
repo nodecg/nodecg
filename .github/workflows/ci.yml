@@ -20,11 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: corepack enable npm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
+      - run: corepack enable npm
       - run: npm ci
       - run: npm run lint
 
@@ -32,11 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: corepack enable npm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
+      - run: corepack enable npm
       - run: npm ci
       - run: npm run build
       - run: npm run typetest
@@ -54,7 +54,6 @@ jobs:
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v5
-      - run: corepack enable npm
       - uses: actions/setup-node@v6
         with:
           node-version: ${{matrix.node-version}}
@@ -81,6 +80,7 @@ jobs:
             C:\Users\runneradmin\.cache\puppeteer
           key: puppeteer-${{ runner.os }}
 
+      - run: corepack enable npm
       - run: npm -v
       - run: npm ci
       - run: npm run build
@@ -101,12 +101,12 @@ jobs:
       - build-test
     steps:
       - uses: actions/checkout@v5
-      - run: corepack enable npm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
           cache: npm
+      - run: corepack enable npm
       - run: npm ci
       - run: npm run build
 
@@ -166,6 +166,7 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: npm
 
+      - run: corepack enable npm
       - run: npm ci
       - run: npm run build
 
@@ -194,6 +195,7 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: npm
 
+      - run: corepack enable npm
       - run: npm ci
       - run: npm run build
 
