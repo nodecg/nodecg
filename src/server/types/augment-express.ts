@@ -40,6 +40,8 @@ declare global {
 			 * router.post('/stripe-webhook', (req, res) => {
 			 *   const signature = req.headers['stripe-signature'];
 			 *   const [timestamp, providedSig] = parseStripeSignature(signature);
+			 *   // Note: Convert to string only if required by the webhook service.
+			 *   // Many services require the raw bytes (Buffer) for signature verification.
 			 *   const signedPayload = `${timestamp}.${req.rawBody.toString()}`;
 			 *   const expectedSig = crypto
 			 *     .createHmac('sha256', stripeWebhookSecret)

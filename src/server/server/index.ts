@@ -160,6 +160,9 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		app.use(compression());
 		app.use(
 			bodyParser.json({
+				// The verify callback receives the raw request object (IncomingMessage)
+				// before body-parser processes it. We use 'any' here because we're
+				// augmenting it with a property that will be available on Express.Request.
 				verify: (req: any, _res, buf) => {
 					req.rawBody = buf;
 				},
