@@ -1,5 +1,3 @@
- 
-
 import { NodeCGAPIClient } from "../out/client/api/api.client";
 
 declare global {

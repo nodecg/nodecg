@@ -1,4 +1,3 @@
- 
 import type { NodeCG } from "../../types/nodecg";
 import type { TypedClientSocket } from "../../types/socket-protocol";
 import type { NodeCGAPIClient } from "../api/api.client";

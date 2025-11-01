@@ -98,10 +98,7 @@ class NcgGraphicInstanceDiff extends MutableData(Polymer.PolymerElement) {
 	}
 
 	_updateBundleInfo() {
-		if (
-			bundlesRep?.status !== "declared" ||
-			!Array.isArray(bundlesRep.value)
-		) {
+		if (bundlesRep?.status !== "declared" || !Array.isArray(bundlesRep.value)) {
 			return;
 		}
 
