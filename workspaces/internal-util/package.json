@@ -2,9 +2,16 @@
   "name": "@nodecg/internal-util",
   "version": "2.6.1",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "main": "dist/main.js",
+  "exports": {
+    ".": {
+      "source": "./src/main.ts",
+      "default": "./dist/main.js"
+    }
+  },
   "scripts": {
     "build": "del-cli dist && tsc -b",
     "dev": "del-cli dist && tsc -b --watch --preserveWatchOutput"

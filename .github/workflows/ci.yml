@@ -84,8 +84,12 @@ jobs:
 
       - run: npm ci
       - run: npm run build
-      - run: npm test -- --coverage
 
+      - if: matrix.os != 'ubuntu-latest' || matrix.node-version != '24'
+        run: npm test
+
+      - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
+        run: npm test -- --coverage
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         uses: codecov/codecov-action@v5
         with:

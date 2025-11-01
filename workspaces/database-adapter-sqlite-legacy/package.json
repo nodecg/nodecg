@@ -2,8 +2,15 @@
   "name": "@nodecg/database-adapter-sqlite-legacy",
   "version": "2.6.1",
   "main": "dist/database-adapter.js",
+  "exports": {
+    ".": {
+      "source": "./src/database-adapter.ts",
+      "default": "./dist/database-adapter.js"
+    }
+  },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "del-cli dist && tsc -b",
