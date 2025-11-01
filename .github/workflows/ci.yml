@@ -81,6 +81,7 @@ jobs:
             C:\Users\runneradmin\.cache\puppeteer
           key: puppeteer-${{ runner.os }}
 
+      - run: npm -v
       - run: npm ci
       - run: npm run build
       - run: npm test -- --coverage
