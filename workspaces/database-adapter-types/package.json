@@ -4,7 +4,7 @@
   "types": "dist/main.d.ts",
   "exports": {
     ".": {
-      "source": "./src/index.ts",
+      "source": "./src/main.ts",
       "types": "./dist/main.d.ts"
     }
   },
