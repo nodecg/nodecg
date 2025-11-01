@@ -188,9 +188,6 @@
     "vitest": "^3.0.2",
     "vitest-mock-express": "^2.2.0"
   },
-  "engines": {
-    "node": "^20.9.0 || ^22.11.0"
-  },
   "publishConfig": {
     "access": "public"
   },
