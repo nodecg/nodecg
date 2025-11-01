@@ -28,6 +28,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - run: npm install -g npm@11
       - run: npm ci
       - run: npm run lint
 
@@ -39,6 +40,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - run: npm install -g npm@11
       - run: npm ci
       - run: npm run build
       - run: npm run typetest
@@ -61,6 +63,7 @@ jobs:
         with:
           node-version: ${{matrix.node-version}}
           cache: npm
+      - run: npm install -g npm@11
 
       - name: Ensure that bundle git parsing functionality works
         run: |
@@ -111,6 +114,7 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
           cache: npm
+      - run: npm install -g npm@11
       - run: npm ci
       - run: npm run build
 
@@ -169,6 +173,7 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
           cache: npm
+      - run: npm install -g npm@11
 
       - run: npm ci
       - run: npm run build
@@ -197,6 +202,7 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
           cache: npm
+      - run: npm install -g npm@11
 
       - run: npm ci
       - run: npm run build
