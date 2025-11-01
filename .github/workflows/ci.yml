@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    - main
+    - next
   pull_request:
 
 permissions:
