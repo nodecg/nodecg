@@ -51,7 +51,9 @@ export class DashboardLib {
 				return;
 			}
 
-			this.dashboardContext ??= getDashboardContext(bundleManager.all());
+			if (!this.dashboardContext) {
+				this.dashboardContext = getDashboardContext(bundleManager.all());
+			}
 
 			res.render(path.join(__dirname, "dashboard.tmpl"), this.dashboardContext);
 		});

@@ -37,6 +37,7 @@ export default defineConfig(
 			"@typescript-eslint/no-require-imports": "off",
 			"@typescript-eslint/prefer-promise-reject-errors": "off",
 			"@typescript-eslint/unbound-method": "off",
+			"@typescript-eslint/prefer-nullish-coalescing": "off",
 		},
 	},
 	{

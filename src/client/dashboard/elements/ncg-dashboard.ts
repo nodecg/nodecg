@@ -530,7 +530,9 @@ class NcgDashboard extends Polymer.PolymerElement {
 			window.location.hash = window.__renderData__.workspaces[0]!.route;
 		}
 
-		this["routeData"] ??= {};
+		if (!this["routeData"]) {
+			this["routeData"] = {};
+		}
 
 		if (!this["routeData"].page) {
 			this.set("routeData.page", "");
