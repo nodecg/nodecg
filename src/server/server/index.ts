@@ -158,8 +158,21 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 
 		// Set up Express
 		app.use(compression());
-		app.use(bodyParser.json());
-		app.use(bodyParser.urlencoded({ extended: true }));
+		app.use(
+			bodyParser.json({
+				verify: (req: any, _res, buf) => {
+					req.rawBody = buf;
+				},
+			}),
+		);
+		app.use(
+			bodyParser.urlencoded({
+				extended: true,
+				verify: (req: any, _res, buf) => {
+					req.rawBody = buf;
+				},
+			}),
+		);
 
 		app.set("trust proxy", true);
 
