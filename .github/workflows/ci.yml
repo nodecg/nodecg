@@ -2,8 +2,9 @@ name: CI
 
 on:
   push:
-    - main
-    - next
+    branches:
+      - main
+      - next
   pull_request:
 
 permissions:
