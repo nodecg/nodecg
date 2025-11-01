@@ -51,7 +51,7 @@ test("#getDialog", async ({ dashboard }) => {
 test("#getDialogDocument", async ({ dashboard }) => {
 	const res = await dashboard.evaluate(() => {
 		const document = window.dashboardApi.getDialogDocument("test-dialog");
-		return document?.body && document.body.tagName === "BODY";
+		return document?.body?.tagName === "BODY";
 	});
 	expect(res).toBe(true);
 });
