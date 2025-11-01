@@ -1,17 +1,17 @@
-// @ts-check
-
 import eslint from "@eslint/js";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import tseslint from "typescript-eslint";
+import { defineConfig } from "eslint/config";
 import configPrettier from "eslint-config-prettier";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
+import tseslint from "typescript-eslint";
 
-export default tseslint.config(
+export default defineConfig(
 	eslint.configs.recommended,
-	tseslint.configs.recommendedTypeChecked,
-	tseslint.configs.stylisticTypeChecked,
 	{
+		files: ["**/*.{ts,mts,cts,tsx}"],
+		extends: [
+			tseslint.configs.recommendedTypeChecked,
+			tseslint.configs.stylisticTypeChecked,
+		],
 		rules: {
 			"no-empty-pattern": "off",
 			"@typescript-eslint/no-explicit-any": "off",
@@ -28,20 +28,18 @@ export default tseslint.config(
 			"@typescript-eslint/no-require-imports": "off",
 			"@typescript-eslint/prefer-promise-reject-errors": "off",
 			"@typescript-eslint/unbound-method": "off",
+			"@typescript-eslint/prefer-nullish-coalescing": "off",
+		},
+		languageOptions: {
+			parserOptions: {
+				projectService: true,
+			},
 		},
 	},
 	{
 		files: ["src/client/dashboard/**/*"],
 		rules: {
 			"@typescript-eslint/no-unused-expressions": "off",
-		},
-	},
-	{
-		languageOptions: {
-			parserOptions: {
-				projectService: true,
-				tsconfigRootDir: path.dirname(fileURLToPath(import.meta.url)),
-			},
 		},
 	},
 	{
@@ -64,7 +62,6 @@ export default tseslint.config(
 			"test/fixtures",
 			"coverage",
 			"typetest/fake-bundle",
-			"eslint.config.mjs",
 			"generated-types/client",
 			"generated-types/server",
 		],

@@ -2,8 +2,15 @@
   "name": "@nodecg/database-adapter-sqlite-legacy",
   "version": "2.6.1",
   "main": "dist/database-adapter.js",
+  "exports": {
+    ".": {
+      "source": "./src/database-adapter.ts",
+      "default": "./dist/database-adapter.js"
+    }
+  },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "del-cli dist && tsc -b",
@@ -13,8 +20,9 @@
   "dependencies": {
     "@nodecg/database-adapter-types": "2.6.1",
     "@nodecg/internal-util": "2.6.1",
-    "better-sqlite3": "^11.10.0",
-    "typeorm": "0.3.24"
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.4.1",
+    "typeorm": "0.3.27"
   },
   "devDependencies": {
     "del-cli": "^6.0.0",

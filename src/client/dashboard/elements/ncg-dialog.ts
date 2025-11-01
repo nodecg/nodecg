@@ -12,12 +12,12 @@ Lange - 1/28/2016
 
 import "@polymer/paper-dialog-behavior/paper-dialog-shared-styles.js";
 
+import { initialize } from "@open-iframe-resizer/core";
 import { NeonAnimationRunnerBehavior } from "@polymer/neon-animation/neon-animation-runner-behavior.js";
 import { PaperDialogBehavior } from "@polymer/paper-dialog-behavior/paper-dialog-behavior.js";
 import * as Polymer from "@polymer/polymer";
 import { mixinBehaviors } from "@polymer/polymer/lib/legacy/class.js";
 import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
-import { initialize } from "@open-iframe-resizer/core";
 
 class NcgDialog extends mixinBehaviors(
 	[NeonAnimationRunnerBehavior, PaperDialogBehavior],

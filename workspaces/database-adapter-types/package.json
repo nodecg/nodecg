@@ -2,8 +2,15 @@
   "name": "@nodecg/database-adapter-types",
   "version": "2.6.1",
   "types": "dist/main.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/main.ts",
+      "types": "./dist/main.d.ts"
+    }
+  },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "del-cli dist && tsc -b",

@@ -4,9 +4,9 @@ import "@polymer/iron-localstorage/iron-localstorage.js";
 import "@polymer/paper-styles/element-styles/paper-material-styles.js";
 import "@polymer/paper-styles/typography.js";
 
+import { initialize } from "@open-iframe-resizer/core";
 import * as Polymer from "@polymer/polymer";
 import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
-import { initialize } from "@open-iframe-resizer/core";
 
 const HEX_PARSE_SHORTHAND_REGEX = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 const HEX_PARSE_REGEX = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
