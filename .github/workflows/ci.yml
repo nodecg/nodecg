@@ -79,6 +79,14 @@ jobs:
           key: puppeteer-${{ runner.os }}
 
       - run: npm ci
+
+      - name: Force reinstall better-sqlite3 for Node.js 24
+        if: matrix.node-version == '24'
+        run: |
+          rm -rf node_modules/better-sqlite3 workspaces/database-adapter-sqlite-legacy/node_modules/better-sqlite3
+          npm install --no-save
+        shell: bash
+
       - run: npm run build
       - run: npm test -- --coverage
 
