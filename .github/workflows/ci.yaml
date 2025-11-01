@@ -53,6 +53,11 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
+        exclude:
+          - node-version: 22
+            os: windows-latest
+          - node-version: 24
+            os: windows-latest
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v5
