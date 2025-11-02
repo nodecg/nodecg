@@ -1,5 +1,14 @@
 # Changelog
 
+## [5.4.5](https://github.com/Hoishin/nodecg-release-test/compare/database-adapter-sqlite-legacy-v5.4.4...database-adapter-sqlite-legacy-v5.4.5) (2025-11-02)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg-release-test/internal-util bumped from 3.4.6 to 4.0.0
+
 ## [5.4.4](https://github.com/Hoishin/nodecg-release-test/compare/database-adapter-sqlite-legacy-v5.4.3...database-adapter-sqlite-legacy-v5.4.4) (2025-11-02)
 
 

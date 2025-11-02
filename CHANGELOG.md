@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.11.14](https://github.com/Hoishin/nodecg-release-test/compare/v10.11.13...v10.11.14) (2025-11-02)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg-release-test/database-adapter-sqlite-legacy bumped from 5.4.4 to 5.4.5
+    * @nodecg-release-test/internal-util bumped from 3.4.6 to 4.0.0
+
 ## [10.11.13](https://github.com/Hoishin/nodecg-release-test/compare/v10.11.12...v10.11.13) (2025-11-02)
 
 
