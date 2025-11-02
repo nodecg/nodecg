@@ -1,5 +1,14 @@
 # Changelog
 
+## [7.0.2](https://github.com/Hoishin/nodecg-release-test/compare/database-adapter-sqlite-legacy-v7.0.1...database-adapter-sqlite-legacy-v7.0.2) (2025-11-02)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg-release-test/internal-util bumped from 6.0.0 to 6.0.1
+
 ## [7.0.1](https://github.com/Hoishin/nodecg-release-test/compare/database-adapter-sqlite-legacy-v7.0.0...database-adapter-sqlite-legacy-v7.0.1) (2025-11-02)
 
 

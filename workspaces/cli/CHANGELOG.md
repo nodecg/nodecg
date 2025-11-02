@@ -1,5 +1,12 @@
 # Changelog
 
+## [15.4.0](https://github.com/Hoishin/nodecg-release-test/compare/cli-v15.3.0...cli-v15.4.0) (2025-11-02)
+
+
+### Features
+
+* include src in cli ([9b19c24](https://github.com/Hoishin/nodecg-release-test/commit/9b19c243389a7d0799a3277ab7a01a330b7d68e1))
+
 ## [15.3.0](https://github.com/Hoishin/nodecg-release-test/compare/cli-v15.2.0...cli-v15.3.0) (2025-11-02)
 
 
