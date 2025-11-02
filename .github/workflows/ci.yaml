@@ -138,7 +138,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       prs_created: ${{ steps.release.outputs.prs_created }}
-      pr_number: ${{ fromJson(steps.release.outputs.pr).number }}
+      pr: ${{ steps.release.outputs.pr }}
       releases_created: ${{ steps.release.outputs.releases_created }}
       root_release_created: ${{ steps.release.outputs.release_created }}
       root_release_version: ${{ steps.release.outputs.version }}
@@ -161,7 +161,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - run: gh pr checkout ${{ needs.release-please.outputs.pr_number }}
+      - run: gh pr checkout ${{ fromJson(needs.release-please.outputs.pr).number }}
         env:
           GH_TOKEN: ${{ github.token }}
       - uses: actions/setup-node@v6
