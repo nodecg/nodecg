@@ -13,7 +13,7 @@
 	"packages": {
 		".": {
 			"include-component-in-tag": false,
-			"exclude-paths": ["workspaces", "package-lock.json"],
+			"exclude-paths": ["workspaces"],
 			"component": "nodecg"
 		},
 		"workspaces/internal-util": {
