@@ -1,6 +1,6 @@
 {
   "name": "@nodecg-release-test/database-adapter-sqlite-legacy",
-  "version": "5.4.4",
+  "version": "5.4.5",
   "main": "dist/database-adapter.js",
   "exports": {
     ".": {
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@nodecg-release-test/database-adapter-types": "4.0.1",
-    "@nodecg-release-test/internal-util": "3.4.6",
+    "@nodecg-release-test/internal-util": "4.0.0",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.4.1",
     "typeorm": "0.3.27"
