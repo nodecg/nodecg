@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.0](https://github.com/Hoishin/nodecg-release-test/compare/cli-v2.6.1...cli-v2.7.0) (2025-11-02)
+
+
+### Features
+
+* aaaaa ([561b4ae](https://github.com/Hoishin/nodecg-release-test/commit/561b4ae7793261ff8f73a0c661c0b77c22361ddd))
+
 ## [2.6.1](https://github.com/nodecg/nodecg/compare/nodecg-cli-v2.6.0...nodecg-cli-v2.6.1) (2025-06-24)
 
 
