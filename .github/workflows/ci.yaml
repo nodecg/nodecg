@@ -139,9 +139,9 @@ jobs:
     outputs:
       prs_created: ${{ steps.release.outputs.prs_created }}
       pr: ${{ steps.release.outputs.pr }}
-      root_release_created: ${{ steps.release.outputs.root_release_created }}
       releases_created: ${{ steps.release.outputs.releases_created }}
-      release_name: ${{ steps.release.outputs.name }}
+      root_release_created: ${{ steps.release.outputs.release_created }}
+      root_release_version: ${{ steps.release.outputs.version }}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
@@ -253,9 +253,9 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=branch
-            type=semver,pattern={{major}}.{{minor}}.{{patch}},value=${{ needs.release-please.outputs.release_name }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.release_name }}
-            type=semver,pattern={{major}},value=${{ needs.release-please.outputs.release_name }}
+            type=semver,pattern={{major}}.{{minor}}.{{patch}},value=${{ needs.release-please.outputs.root_release_version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.root_release_version }}
+            type=semver,pattern={{major}},value=${{ needs.release-please.outputs.root_release_version }}
       - uses: docker/build-push-action@v5
         with:
           context: .
