@@ -140,6 +140,7 @@ jobs:
       prs_created: ${{ steps.release.outputs.prs_created }}
       pr: ${{ steps.release.outputs.pr }}
       releases_created: ${{ steps.release.outputs.releases_created }}
+      release_paths: ${{ steps.release.outputs.paths_released }}
       root_release_created: ${{ steps.release.outputs.release_created }}
       root_release_version: ${{ steps.release.outputs.version }}
     steps:
@@ -207,10 +208,14 @@ jobs:
       - if: ${{ needs.release-please.outputs.releases_created == 'true' }}
         name: Publish to NPM
         run: |
-          npm --workspaces publish
-          npm publish
-          npx tsx scripts/prepare-publish-types.ts
-          npm publish
+          echo ${{ needs.release-please.outputs.release_paths }} | jq -r '.[]' | while read -r path; do
+            if [[ "$path" == "." ]]; then
+              npx tsx scripts/prepare-publish-types.ts
+              npm publish
+            else
+              (cd "$path" && npm publish)
+            fi
+          done
 
       - if: ${{ needs.release-please.outputs.releases_created != 'true' }}
         name: Publish Canary to NPM
