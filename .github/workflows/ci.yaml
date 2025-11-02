@@ -146,7 +146,9 @@ jobs:
     if: github.event_name == 'push' && github.ref_name == 'main'
     runs-on: ubuntu-latest
     outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
+      prs_created: ${{ steps.release.outputs.prs_created }}
+      pr: ${{ steps.release.outputs.pr }}
+      releases_created: ${{ steps.release.outputs.releases_created }}
       release_name: ${{ steps.release.outputs.name }}
     steps:
       - uses: googleapis/release-please-action@v4
@@ -154,47 +156,48 @@ jobs:
         with:
           config-file: release-please-config.json
 
-  canary-publish:
+  update-lock-file:
     permissions:
-      contents: read
-      id-token: write
-    if: ${{ !needs.release-please.outputs.release_created }}
+      contents: write
     needs:
       - release-please
-      - lint
-      - test-types
-      - build-test
-    environment: Canary Release
+    if: ${{ needs.release-please.outputs.prs_created }}
     runs-on: ubuntu-latest
+    env:
+      PR_NUMBER: ${{ fromJson(needs.release-please.outputs.pr).number }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - run: gh pr checkout ${{ env.PR_NUMBER }}
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: npm
-          registry-url: https://registry.npmjs.org
       - run: corepack enable npm
-
-      - run: npm ci
-      - run: npm run build
-
       - run: |
-          npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
-          npm --workspaces publish --tag canary
-          npm publish --tag canary
-          npx tsx scripts/prepare-publish-types.ts
-          npm publish --tag canary
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          npm install
+          if git diff --quiet package-lock.json; then
+            echo "lock file is up to date"
+          else
+            git add package-lock.json
+            git commit -m "chore: update package-lock.json"
+            git push origin HEAD:main
+          fi
 
   publish:
     permissions:
       contents: read
       id-token: write
-    if: ${{ needs.release-please.outputs.release_created }}
+    if: ${{ !needs.release-please.outputs.releases_created }}
     needs:
       - release-please
       - lint
       - test-types
       - build-test
+    environment: ${{ needs.release-please.outputs.releases_created && '' || 'Canary Release' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -208,11 +211,22 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - run: |
+      - if: ${{ needs.release-please.outputs.releases_created }}
+        name: Publish to NPM
+        run: |
           npm --workspaces publish
           npm publish
           npx tsx scripts/prepare-publish-types.ts
           npm publish
+
+      - if: ${{ !needs.release-please.outputs.releases_created }}
+        name: Publish Canary to NPM
+        run: |
+          npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
+          npm --workspaces publish --tag canary
+          npm publish --tag canary
+          npx tsx scripts/prepare-publish-types.ts
+          npm publish --tag canary
 
   docker-image:
     permissions:
@@ -223,7 +237,7 @@ jobs:
       - lint
       - test-types
       - build-test
-    if: ${{ needs.release-please.outputs.release_created }}
+    if: ${{ needs.release-please.outputs.releases_created }}
     strategy:
       matrix:
         os:
@@ -253,5 +267,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
