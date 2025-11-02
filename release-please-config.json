@@ -10,7 +10,8 @@
 	"packages": {
 		".": {
 			"include-component-in-tag": false,
-			"exclude-paths": ["workspaces"]
+			"exclude-paths": ["workspaces"],
+			"component": "nodecg"
 		},
 		"workspaces/internal-util": {
 			"skip-changelog": true
