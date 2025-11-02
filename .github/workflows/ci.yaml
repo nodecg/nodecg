@@ -164,6 +164,8 @@ jobs:
         with:
           fetch-depth: 0
       - run: gh pr checkout ${{ needs.release-please.outputs.pr_number }}
+        env:
+          GH_TOKEN: ${{ github.token }}
       - uses: actions/setup-node@v6
         with:
           node-version: 24
