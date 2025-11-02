@@ -1,6 +1,6 @@
 {
   "name": "@nodecg-release-test/database-adapter-sqlite-legacy",
-  "version": "2.6.1",
+  "version": "5.4.3",
   "main": "dist/database-adapter.js",
   "exports": {
     ".": {

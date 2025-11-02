@@ -1,6 +1,6 @@
 {
   "name": "@nodecg-release-test/internal-util",
-  "version": "2.6.1",
+  "version": "3.4.5",
   "files": [
     "dist",
     "src"
