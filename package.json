@@ -1,6 +1,6 @@
 {
   "name": "@nodecg-release-test/nodecg",
-  "version": "11.4.0",
+  "version": "11.4.1",
   "description": "Dynamic broadcast graphics rendered in a browser",
   "keywords": [
     "graphics",
@@ -66,9 +66,9 @@
   },
   "dependencies": {
     "@nodecg-release-test/cli": "15.4.0",
-    "@nodecg-release-test/database-adapter-sqlite-legacy": "7.0.2",
+    "@nodecg-release-test/database-adapter-sqlite-legacy": "7.0.3",
     "@nodecg-release-test/database-adapter-types": "6.0.1",
-    "@nodecg-release-test/internal-util": "6.0.1",
+    "@nodecg-release-test/internal-util": "6.0.2",
     "@nodecg/json-schema-defaults": "^1.0.4",
     "@nodecg/json-schema-lib": "0.1.0",
     "@open-iframe-resizer/core": "^1.6.0",

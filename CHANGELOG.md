@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.4.1](https://github.com/Hoishin/nodecg-release-test/compare/nodecg-v11.4.0...nodecg-v11.4.1) (2025-11-02)
+
+
+### Bug Fixes
+
+* why not ([fe72baf](https://github.com/Hoishin/nodecg-release-test/commit/fe72baf4cc27da1e442ba4719ba5d8d3643b75d5))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg-release-test/database-adapter-sqlite-legacy bumped from 7.0.2 to 7.0.3
+    * @nodecg-release-test/internal-util bumped from 6.0.1 to 6.0.2
+
 ## [11.4.0](https://github.com/Hoishin/nodecg-release-test/compare/nodecg-v11.3.1...nodecg-v11.4.0) (2025-11-02)
 
 

@@ -1,7 +1,7 @@
 {
-	".": "11.4.0",
-	"workspaces/internal-util": "6.0.1",
+	".": "11.4.1",
+	"workspaces/internal-util": "6.0.2",
 	"workspaces/database-adapter-types": "6.0.1",
-	"workspaces/database-adapter-sqlite-legacy": "7.0.2",
+	"workspaces/database-adapter-sqlite-legacy": "7.0.3",
 	"workspaces/cli": "15.4.0"
 }
