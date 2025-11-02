@@ -180,7 +180,7 @@ jobs:
           else
             git add package-lock.json
             git commit -m "chore: update package-lock.json"
-            git push origin HEAD:main
+            git push
           fi
 
   publish:
