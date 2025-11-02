@@ -19,5 +19,5 @@
 		"workspaces/database-adapter-sqlite-legacy": {},
 		"workspaces/cli": {}
 	},
-	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0"
+	"bootstrap-sha": "5d3b47910f6dc04bb7a53d0cabfa0792b0dd4328"
 }
