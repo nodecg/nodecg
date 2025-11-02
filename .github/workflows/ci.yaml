@@ -149,8 +149,6 @@ jobs:
           config-file: release-please-config.json
       - run: |
           echo '${{ toJson(steps.release.outputs) }}'
-          echo '${{ steps.release.outputs.prs_created }}'
-          echo '${{ steps.release.outputs.releases_created }}'
 
   update-lock-file:
     permissions:
