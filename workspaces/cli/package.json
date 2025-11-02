@@ -1,6 +1,6 @@
 {
   "name": "@nodecg-release-test/cli",
-  "version": "12.11.10",
+  "version": "12.12.0",
   "type": "module",
   "main": "dist/main.js",
   "files": [
