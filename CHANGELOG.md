@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.2.0](https://github.com/Hoishin/nodecg-release-test/compare/v11.1.1...v11.2.0) (2025-11-02)
+
+
+### Features
+
+* foaaa ([1a947e8](https://github.com/Hoishin/nodecg-release-test/commit/1a947e8dbc4c4879ef3d771a26c3ecbf62cee377))
+
+
+### Bug Fixes
+
+* actually this ([1693362](https://github.com/Hoishin/nodecg-release-test/commit/16933626fc256388b594dfcc5ef13c3395a0e2ed))
+* add repository field to all workspace packages ([#7](https://github.com/Hoishin/nodecg-release-test/issues/7)) ([594d2c3](https://github.com/Hoishin/nodecg-release-test/commit/594d2c37d5667b8cb9adb0168599e706eab3fab0))
+* ci ([c9b234d](https://github.com/Hoishin/nodecg-release-test/commit/c9b234de269ad888fec1bc3e44bd708c57a8f540))
+* does it escape? ([d6fb048](https://github.com/Hoishin/nodecg-release-test/commit/d6fb0487134b37eacb48fbdb5bd78243d1ed2f19))
+* don't name component ([1634d16](https://github.com/Hoishin/nodecg-release-test/commit/1634d164b8a723e46609d0ce2b1fd7fe99e9948c))
+* fooooo ([6490f31](https://github.com/Hoishin/nodecg-release-test/commit/6490f31ac3ff4bb7db2b6c955d89ddf583be4bc9))
+* how about this ([f7b8eb5](https://github.com/Hoishin/nodecg-release-test/commit/f7b8eb5cb8f1c736d196bfdbde6a63c77df900ce))
+* maybe ([da51ddb](https://github.com/Hoishin/nodecg-release-test/commit/da51ddbabd64b2412fd403c81c8f7b66bdb8ea64))
+* publish ([0f895cf](https://github.com/Hoishin/nodecg-release-test/commit/0f895cfb615e56aaf91e2efd5fc466bbb7a353bc))
+* release ([a4106cd](https://github.com/Hoishin/nodecg-release-test/commit/a4106cd9021987813a92d77b9b03807e28147530))
+* release CI getting serious ([c003e09](https://github.com/Hoishin/nodecg-release-test/commit/c003e0979cbdcedfa968cc6b7bad38b77523b66a))
+* remove echo ([81c5553](https://github.com/Hoishin/nodecg-release-test/commit/81c5553f0491c50f0e8fd23866f11368667c2484))
+* super version ([508e24f](https://github.com/Hoishin/nodecg-release-test/commit/508e24f58c1a1db53aee1c634adade16bd4101a0))
+* test ([400c699](https://github.com/Hoishin/nodecg-release-test/commit/400c699954a105bb248cf7346e48a10b2d0ca2b1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg-release-test/cli bumped from 15.2.0 to 15.3.0
+
 ## [11.1.1](https://github.com/Hoishin/nodecg-release-test/compare/v11.1.0...v11.1.1) (2025-11-02)
 
 
