@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path, { extname } from "node:path";
 
-import { getNodecgRoot } from "@nodecg/internal-util";
+import { getNodecgRoot } from "@nodecg-release-test/internal-util";
 import chokidar from "chokidar";
 import express from "express";
 import hasha from "hasha";

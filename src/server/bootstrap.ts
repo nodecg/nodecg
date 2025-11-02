@@ -9,7 +9,7 @@
  * over its lifecycle and when the process exits.
  */
 
-import { isLegacyProject, rootPath } from "@nodecg/internal-util";
+import { isLegacyProject, rootPath } from "@nodecg-release-test/internal-util";
 
 if (isLegacyProject) {
 	const cwd = process.cwd();

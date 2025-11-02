@@ -1,4 +1,4 @@
-import type { DatabaseAdapter } from "@nodecg/database-adapter-types";
+import type { DatabaseAdapter } from "@nodecg-release-test/database-adapter-types";
 import { serializeError } from "serialize-error";
 import type { ExtendedError } from "socket.io/dist/namespace";
 

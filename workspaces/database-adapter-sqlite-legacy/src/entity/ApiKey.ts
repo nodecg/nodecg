@@ -1,4 +1,4 @@
-import type { ApiKey as ApiKeyModel } from "@nodecg/database-adapter-types";
+import type { ApiKey as ApiKeyModel } from "@nodecg-release-test/database-adapter-types";
 import { Entity, Generated, ManyToOne, PrimaryColumn } from "typeorm";
 
 import { User } from "./User";

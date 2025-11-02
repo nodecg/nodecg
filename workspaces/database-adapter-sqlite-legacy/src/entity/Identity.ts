@@ -1,4 +1,4 @@
-import type { Identity as IdentityModel } from "@nodecg/database-adapter-types";
+import type { Identity as IdentityModel } from "@nodecg-release-test/database-adapter-types";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { User } from "./User";

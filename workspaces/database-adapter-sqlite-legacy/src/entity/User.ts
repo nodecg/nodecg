@@ -1,4 +1,4 @@
-import type { User as UserModel } from "@nodecg/database-adapter-types";
+import type { User as UserModel } from "@nodecg-release-test/database-adapter-types";
 import {
 	Column,
 	CreateDateColumn,

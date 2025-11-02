@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { isLegacyProject, rootPath } from "@nodecg/internal-util";
+import { isLegacyProject, rootPath } from "@nodecg-release-test/internal-util";
 import chokidar from "chokidar";
 import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
 import { debounce } from "lodash";

@@ -1,6 +1,6 @@
 import * as path from "node:path";
 
-import { isLegacyProject } from "@nodecg/internal-util";
+import { isLegacyProject } from "@nodecg-release-test/internal-util";
 import * as IOE from "fp-ts/IOEither";
 import semver from "semver";
 

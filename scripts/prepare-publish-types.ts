@@ -5,7 +5,7 @@ const packageJson = JSON.parse(
 	fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf-8"),
 );
 
-packageJson.name = "@nodecg/types";
+packageJson.name = "@nodecg-release-test/types";
 packageJson.bin = undefined;
 
 const newExports: Record<string, unknown> = {};

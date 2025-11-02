@@ -1,5 +1,5 @@
 {
-  "name": "@nodecg/cli",
+  "name": "@nodecg-release-test/cli",
   "version": "2.6.1",
   "type": "module",
   "main": "dist/main.js",

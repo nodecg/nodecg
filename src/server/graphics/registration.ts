@@ -1,4 +1,4 @@
-import { nodecgPath } from "@nodecg/internal-util";
+import { nodecgPath } from "@nodecg-release-test/internal-util";
 import express from "express";
 import fs from "fs";
 import path from "path";

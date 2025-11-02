@@ -5,7 +5,7 @@ import path from "node:path";
 import sqlite3 from "better-sqlite3";
 import { DataSource } from "typeorm";
 export * from "./entity";
-import { getNodecgRoot } from "@nodecg/internal-util";
+import { getNodecgRoot } from "@nodecg-release-test/internal-util";
 
 import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
 import { initialize1669424617013 } from "./migration/1669424617013-initialize";
