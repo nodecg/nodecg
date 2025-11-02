@@ -208,7 +208,7 @@ jobs:
       - if: ${{ needs.release-please.outputs.releases_created == 'true' }}
         name: Publish to NPM
         run: |
-          echo "${{ needs.release-please.outputs.release_paths }}" | jq -r '.[]' | while read -r path; do
+          echo '${{ needs.release-please.outputs.release_paths }}' | jq -r '.[]' | while read -r path; do
             if [[ "$path" == "." ]]; then
               npx tsx scripts/prepare-publish-types.ts
               npm publish
