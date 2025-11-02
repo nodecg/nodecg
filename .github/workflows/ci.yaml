@@ -82,16 +82,6 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      # - if: matrix.os != 'ubuntu-latest' || matrix.node-version != '24'
-      #   run: npm test
-
-      # - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
-      #   run: npm test -- --coverage
-      # - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
-      #   uses: codecov/codecov-action@v5
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-
   pr-release:
     permissions:
       contents: read
@@ -111,6 +101,7 @@ jobs:
           cache: npm
           registry-url: https://registry.npmjs.org
       - run: corepack enable npm
+
       - run: npm ci
       - run: npm run build
 
@@ -148,6 +139,7 @@ jobs:
     outputs:
       prs_created: ${{ steps.release.outputs.prs_created }}
       pr: ${{ steps.release.outputs.pr }}
+      root_release_created: ${{ steps.release.outputs.root_release_created }}
       releases_created: ${{ steps.release.outputs.releases_created }}
       release_name: ${{ steps.release.outputs.name }}
     steps:
@@ -191,7 +183,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    if: ${{ !needs.release-please.outputs.releases_created }}
     needs:
       - release-please
       - lint
@@ -237,7 +228,7 @@ jobs:
       - lint
       - test-types
       - build-test
-    if: ${{ needs.release-please.outputs.releases_created }}
+    if: ${{ needs.release-please.outputs.root_release_created }}
     strategy:
       matrix:
         os:
