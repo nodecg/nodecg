@@ -210,6 +210,7 @@ jobs:
         run: |
           echo '${{ needs.release-please.outputs.release_paths }}' | jq -r '.[]' | while read -r path; do
             if [[ "$path" == "." ]]; then
+              npm publish
               npx tsx scripts/prepare-publish-types.ts
               npm publish
             else
