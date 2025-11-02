@@ -1,6 +1,6 @@
 {
   "name": "@nodecg-release-test/nodecg",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "Dynamic broadcast graphics rendered in a browser",
   "keywords": [
     "graphics",
@@ -65,7 +65,7 @@
     "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server"
   },
   "dependencies": {
-    "@nodecg-release-test/cli": "2.6.1",
+    "@nodecg-release-test/cli": "2.7.0",
     "@nodecg-release-test/database-adapter-sqlite-legacy": "2.6.1",
     "@nodecg-release-test/database-adapter-types": "2.6.1",
     "@nodecg-release-test/internal-util": "2.6.1",
