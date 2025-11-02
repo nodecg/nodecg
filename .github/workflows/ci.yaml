@@ -148,8 +148,6 @@ jobs:
         id: release
         with:
           config-file: release-please-config.json
-      - run: |
-          echo '${{ toJson(steps.release.outputs) }}'
 
   update-lock-file:
     permissions:
