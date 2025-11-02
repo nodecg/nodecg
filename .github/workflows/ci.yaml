@@ -137,7 +137,6 @@ jobs:
     if: github.event_name == 'push' && github.ref_name == 'main'
     runs-on: ubuntu-latest
     outputs:
-      prs_created: ${{ steps.release.outputs.prs_created }}
       pr: ${{ steps.release.outputs.pr }}
       releases_created: ${{ steps.release.outputs.releases_created }}
       release_paths: ${{ steps.release.outputs.paths_released }}
@@ -154,7 +153,7 @@ jobs:
       contents: write
     needs:
       - release-please
-    if: ${{ needs.release-please.outputs.prs_created == 'true' }}
+    if: ${{ needs.release-please.outputs.pr }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
