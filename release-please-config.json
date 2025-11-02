@@ -3,7 +3,7 @@
 	"release-type": "node",
 	"bump-minor-pre-major": true,
 	"bump-patch-for-minor-pre-major": true,
-	"changelog-type": "github",
+	"sequential-calls": true,
 	"plugins": [
 		{
 			"type": "node-workspace",
