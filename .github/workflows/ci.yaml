@@ -14,11 +14,6 @@ concurrency:
   group: ${{github.workflow}}-${{github.event_name}}-${{github.event.pull_request.number || github.event.ref}}
   cancel-in-progress: true
 
-permissions:
-  contents: write
-  pull-requests: write
-  packages: write
-
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -144,6 +139,9 @@ jobs:
           cache-to: type=gha,mode=max
 
   release-please:
+    permissions:
+      contents: write
+      pull-requests: write
     if: github.event_name == 'push' && github.ref_name == 'main'
     runs-on: ubuntu-latest
     outputs:
@@ -214,6 +212,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   docker-image:
+    permissions:
+      contents: write
+      packages: write
     needs:
       - release-please
       - lint
