@@ -1,6 +1,6 @@
 {
-  "name": "@nodecg-release-test/database-adapter-types",
-  "version": "6.0.1",
+  "name": "@nodecg/database-adapter-types",
+  "version": "2.6.1",
   "types": "dist/main.d.ts",
   "exports": {
     ".": {
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Hoishin/nodecg-release-test.git",
+    "url": "https://github.com/nodecg/nodecg.git",
     "directory": "workspaces/database-adapter-types"
   },
   "publishConfig": {

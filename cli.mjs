@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-import "@nodecg-release-test/cli";
+import "@nodecg/cli";
