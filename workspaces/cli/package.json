@@ -4,7 +4,8 @@
   "type": "module",
   "main": "dist/main.js",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "run-s build:*",
