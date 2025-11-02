@@ -1,5 +1,12 @@
 # Changelog
 
+## [15.2.0](https://github.com/Hoishin/nodecg-release-test/compare/cli-v15.1.0...cli-v15.2.0) (2025-11-02)
+
+
+### Features
+
+* cool ([f1ff15f](https://github.com/Hoishin/nodecg-release-test/commit/f1ff15f947ff0ec770fd5fa235357a97df64fe03))
+
 ## [15.1.0](https://github.com/Hoishin/nodecg-release-test/compare/cli-v15.0.0...cli-v15.1.0) (2025-11-02)
 
 
