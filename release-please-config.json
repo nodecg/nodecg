@@ -9,6 +9,7 @@
 	],
 	"packages": {
 		".": {
+			"include-component-in-tag": false,
 			"exclude-paths": ["workspaces", "package-lock.json"],
 			"component": "nodecg"
 		},
