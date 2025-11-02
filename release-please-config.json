@@ -12,7 +12,6 @@
 	],
 	"packages": {
 		".": {
-			"include-component-in-tag": false,
 			"exclude-paths": ["workspaces"]
 		},
 		"workspaces/internal-util": {
