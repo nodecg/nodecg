@@ -105,7 +105,6 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
           cache: npm
       - run: corepack enable npm
       - run: npm ci
@@ -167,7 +166,6 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
           cache: npm
       - run: corepack enable npm
 
@@ -196,7 +194,6 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
           cache: npm
       - run: corepack enable npm
 

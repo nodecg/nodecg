@@ -38,6 +38,8 @@
     "npm-run-all2": "^7.0.2"
   },
   "publishConfig": {
-    "access": "public"
+    "registry": "https://registry.npmjs.org",
+    "access": "public",
+    "provenance": true
   }
 }
