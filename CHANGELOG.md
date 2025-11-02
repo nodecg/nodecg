@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.2](https://github.com/Hoishin/nodecg-release-test/compare/v2.6.1...v2.6.2) (2025-11-02)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg-release-test/cli bumped from 2.6.1 to 2.7.0
+
 ## [2.6.1](https://github.com/nodecg/nodecg/compare/nodecg-v2.6.0...nodecg-v2.6.1) (2025-06-24)
 
 
