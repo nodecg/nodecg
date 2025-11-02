@@ -5,8 +5,8 @@ import type {
 	DatabaseAdapter,
 	Role,
 	User,
-} from "@nodecg-release-test/database-adapter-types";
-import { nodecgPath } from "@nodecg-release-test/internal-util";
+} from "@nodecg/database-adapter-types";
+import { nodecgPath } from "@nodecg/internal-util";
 import cookieParser from "cookie-parser";
 import express from "express";
 import expressSession from "express-session";

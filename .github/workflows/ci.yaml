@@ -44,10 +44,12 @@ jobs:
     strategy:
       matrix:
         node-version:
+          - 20
           - 22
           - 24
         os:
           - ubuntu-latest
+          - windows-latest
       fail-fast: false
     runs-on: ${{matrix.os}}
     steps:
@@ -82,13 +84,23 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - if: matrix.os != 'ubuntu-latest' || matrix.node-version != '24'
+        run: npm test
+
+      - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
+        run: npm test -- --coverage
+      - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   pr-release:
     permissions:
       contents: read
       id-token: write
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    environment: PR Release
+    environment: pr-release
     needs:
       - lint
       - test-types
@@ -188,7 +200,7 @@ jobs:
       - lint
       - test-types
       - build-test
-    environment: ${{ needs.release-please.outputs.releases_created == 'true' && 'Latest Release' || 'Canary Release' }}
+    environment: ${{ needs.release-please.outputs.releases_created == 'true' && 'latest-release' || 'canary-release' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

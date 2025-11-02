@@ -6,7 +6,7 @@ import {
 	getNodecgRoot,
 	isLegacyProject,
 	rootPath,
-} from "@nodecg-release-test/internal-util";
+} from "@nodecg/internal-util";
 import hasha from "hasha";
 import { klona as clone } from "klona/json";
 

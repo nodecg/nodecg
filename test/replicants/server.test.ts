@@ -1,6 +1,6 @@
 import timersPromises from "node:timers/promises";
 
-import { Replicant } from "@nodecg-release-test/database-adapter-sqlite-legacy";
+import { Replicant } from "@nodecg/database-adapter-sqlite-legacy";
 import { expect } from "vitest";
 
 import type { AbstractReplicant } from "../../src/shared/replicants.shared";

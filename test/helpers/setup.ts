@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 
-import { getConnection } from "@nodecg-release-test/database-adapter-sqlite-legacy";
+import { getConnection } from "@nodecg/database-adapter-sqlite-legacy";
 import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
 import { afterAll, test } from "vitest";

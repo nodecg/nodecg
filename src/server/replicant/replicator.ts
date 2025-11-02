@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import type {
 	DatabaseAdapter,
 	Replicant as ReplicantModel,
-} from "@nodecg-release-test/database-adapter-types";
+} from "@nodecg/database-adapter-types";
 import { klona as clone } from "klona/json";
 
 import { stringifyError } from "../../shared/utils/errors";

@@ -1,4 +1,4 @@
-import type { Permission as PermissionModel } from "@nodecg-release-test/database-adapter-types";
+import type { Permission as PermissionModel } from "@nodecg/database-adapter-types";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { Role } from "./Role";

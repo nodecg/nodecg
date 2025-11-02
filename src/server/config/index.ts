@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { getNodecgRoot } from "@nodecg-release-test/internal-util";
+import { getNodecgRoot } from "@nodecg/internal-util";
 import { argv } from "yargs";
 
 import { loadConfig } from "./loader";
