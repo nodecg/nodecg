@@ -3,5 +3,5 @@
 	"workspaces/internal-util": "5.0.0",
 	"workspaces/database-adapter-types": "6.0.0",
 	"workspaces/database-adapter-sqlite-legacy": "7.0.0",
-	"workspaces/cli": "8.0.0"
+	"workspaces/cli": "15.0.0"
 }
