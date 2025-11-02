@@ -28,5 +28,3 @@ export function setupCLI() {
 	// Process commands
 	program.parse(process.argv);
 }
-
-console.log("aaaaa");
