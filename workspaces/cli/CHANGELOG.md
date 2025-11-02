@@ -1,5 +1,17 @@
 # Changelog
 
+## [12.12.0](https://github.com/Hoishin/nodecg-release-test/compare/cli-v12.11.10...cli-v12.12.0) (2025-11-02)
+
+
+### Features
+
+* aaaaa ([561b4ae](https://github.com/Hoishin/nodecg-release-test/commit/561b4ae7793261ff8f73a0c661c0b77c22361ddd))
+
+
+### Bug Fixes
+
+* add repository field to all workspace packages ([#7](https://github.com/Hoishin/nodecg-release-test/issues/7)) ([594d2c3](https://github.com/Hoishin/nodecg-release-test/commit/594d2c37d5667b8cb9adb0168599e706eab3fab0))
+
 ## [2.6.1](https://github.com/nodecg/nodecg/compare/nodecg-cli-v2.6.0...nodecg-cli-v2.6.1) (2025-06-24)
 
 

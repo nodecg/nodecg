@@ -1,6 +1,6 @@
 {
   "name": "@nodecg-release-test/database-adapter-types",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "types": "dist/main.d.ts",
   "exports": {
     ".": {

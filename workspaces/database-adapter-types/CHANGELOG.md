@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.1](https://github.com/Hoishin/nodecg-release-test/compare/database-adapter-types-v4.0.0...database-adapter-types-v4.0.1) (2025-11-02)
+
+
+### Bug Fixes
+
+* add repository field to all workspace packages ([#7](https://github.com/Hoishin/nodecg-release-test/issues/7)) ([594d2c3](https://github.com/Hoishin/nodecg-release-test/commit/594d2c37d5667b8cb9adb0168599e706eab3fab0))
+
 ## [2.6.1](https://github.com/nodecg/nodecg/compare/database-adapter-types-v2.6.0...database-adapter-types-v2.6.1) (2025-06-24)
 
 
