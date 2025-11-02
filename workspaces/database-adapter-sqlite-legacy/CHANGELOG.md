@@ -1,5 +1,20 @@
 # Changelog
 
+## [7.0.1](https://github.com/Hoishin/nodecg-release-test/compare/database-adapter-sqlite-legacy-v7.0.0...database-adapter-sqlite-legacy-v7.0.1) (2025-11-02)
+
+
+### Bug Fixes
+
+* add repository field to all workspace packages ([#7](https://github.com/Hoishin/nodecg-release-test/issues/7)) ([594d2c3](https://github.com/Hoishin/nodecg-release-test/commit/594d2c37d5667b8cb9adb0168599e706eab3fab0))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg-release-test/database-adapter-types bumped from 4.0.1 to 6.0.1
+    * @nodecg-release-test/internal-util bumped from 4.0.0 to 6.0.0
+
 ## [5.4.5](https://github.com/Hoishin/nodecg-release-test/compare/database-adapter-sqlite-legacy-v5.4.4...database-adapter-sqlite-legacy-v5.4.5) (2025-11-02)
 
 

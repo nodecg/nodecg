@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.1.0](https://github.com/Hoishin/nodecg-release-test/compare/v11.0.0...v11.1.0) (2025-11-02)
+
+
+### Features
+
+* foaaa ([1a947e8](https://github.com/Hoishin/nodecg-release-test/commit/1a947e8dbc4c4879ef3d771a26c3ecbf62cee377))
+
+
+### Bug Fixes
+
+* actually this ([1693362](https://github.com/Hoishin/nodecg-release-test/commit/16933626fc256388b594dfcc5ef13c3395a0e2ed))
+* add repository field to all workspace packages ([#7](https://github.com/Hoishin/nodecg-release-test/issues/7)) ([594d2c3](https://github.com/Hoishin/nodecg-release-test/commit/594d2c37d5667b8cb9adb0168599e706eab3fab0))
+* ci ([c9b234d](https://github.com/Hoishin/nodecg-release-test/commit/c9b234de269ad888fec1bc3e44bd708c57a8f540))
+* does it escape? ([d6fb048](https://github.com/Hoishin/nodecg-release-test/commit/d6fb0487134b37eacb48fbdb5bd78243d1ed2f19))
+* fooooo ([6490f31](https://github.com/Hoishin/nodecg-release-test/commit/6490f31ac3ff4bb7db2b6c955d89ddf583be4bc9))
+* how about this ([f7b8eb5](https://github.com/Hoishin/nodecg-release-test/commit/f7b8eb5cb8f1c736d196bfdbde6a63c77df900ce))
+* maybe ([da51ddb](https://github.com/Hoishin/nodecg-release-test/commit/da51ddbabd64b2412fd403c81c8f7b66bdb8ea64))
+* release ([a4106cd](https://github.com/Hoishin/nodecg-release-test/commit/a4106cd9021987813a92d77b9b03807e28147530))
+* release CI getting serious ([c003e09](https://github.com/Hoishin/nodecg-release-test/commit/c003e0979cbdcedfa968cc6b7bad38b77523b66a))
+* super version ([508e24f](https://github.com/Hoishin/nodecg-release-test/commit/508e24f58c1a1db53aee1c634adade16bd4101a0))
+* test ([400c699](https://github.com/Hoishin/nodecg-release-test/commit/400c699954a105bb248cf7346e48a10b2d0ca2b1))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg-release-test/cli bumped from 12.12.1 to 15.1.0
+    * @nodecg-release-test/database-adapter-sqlite-legacy bumped from 5.4.5 to 7.0.1
+    * @nodecg-release-test/database-adapter-types bumped from 4.0.1 to 6.0.1
+    * @nodecg-release-test/internal-util bumped from 4.0.0 to 6.0.0
+
 ## [10.12.0](https://github.com/Hoishin/nodecg-release-test/compare/v10.11.13...v10.12.0) (2025-11-02)
 
 
