@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.12.1](https://github.com/Hoishin/nodecg-release-test/compare/v10.12.0...v10.12.1) (2025-11-02)
+
+
+### Bug Fixes
+
+* ci ([c9b234d](https://github.com/Hoishin/nodecg-release-test/commit/c9b234de269ad888fec1bc3e44bd708c57a8f540))
+* release CI getting serious ([c003e09](https://github.com/Hoishin/nodecg-release-test/commit/c003e0979cbdcedfa968cc6b7bad38b77523b66a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg-release-test/cli bumped from 12.12.0 to 12.12.1
+
 ## [10.12.0](https://github.com/Hoishin/nodecg-release-test/compare/v10.11.13...v10.12.0) (2025-11-02)
 
 

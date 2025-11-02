@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.12.1](https://github.com/Hoishin/nodecg-release-test/compare/cli-v12.12.0...cli-v12.12.1) (2025-11-02)
+
+
+### Bug Fixes
+
+* hahaha ([a8236e9](https://github.com/Hoishin/nodecg-release-test/commit/a8236e908c85456e0959075b701e0b6a2c3ee5b2))
+
 ## [12.12.0](https://github.com/Hoishin/nodecg-release-test/compare/cli-v12.11.10...cli-v12.12.0) (2025-11-02)
 
 
