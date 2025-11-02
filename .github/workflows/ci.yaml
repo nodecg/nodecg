@@ -153,6 +153,9 @@ jobs:
           config-file: release-please-config.json
 
   canary-publish:
+    permissions:
+      contents: read
+      id-token: write
     if: ${{ !needs.release-please.outputs.release_created }}
     needs:
       - release-please
@@ -182,6 +185,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish:
+    permissions:
+      contents: read
+      id-token: write
     if: ${{ needs.release-please.outputs.release_created }}
     needs:
       - release-please
