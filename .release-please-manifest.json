@@ -1,5 +1,5 @@
 {
-	".": "10.12.1",
+	".": "10.12.2",
 	"workspaces/internal-util": "4.0.0",
 	"workspaces/database-adapter-types": "4.0.1",
 	"workspaces/database-adapter-sqlite-legacy": "5.4.5",

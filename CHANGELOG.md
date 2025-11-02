@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.12.2](https://github.com/Hoishin/nodecg-release-test/compare/v10.12.1...v10.12.2) (2025-11-02)
+
+
+### Bug Fixes
+
+* does it escape? ([d6fb048](https://github.com/Hoishin/nodecg-release-test/commit/d6fb0487134b37eacb48fbdb5bd78243d1ed2f19))
+
 ## [10.12.1](https://github.com/Hoishin/nodecg-release-test/compare/v10.12.0...v10.12.1) (2025-11-02)
 
 
