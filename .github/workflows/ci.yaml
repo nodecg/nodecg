@@ -93,6 +93,9 @@ jobs:
       #     token: ${{ secrets.CODECOV_TOKEN }}
 
   pr-release:
+    permissions:
+      contents: read
+      id-token: write
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: PR Release
@@ -116,8 +119,6 @@ jobs:
           npm publish --tag pr${{ github.event.number }}
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag pr${{ github.event.number }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   pr-dry-run-container-build:
     if: github.event_name == 'pull_request'
@@ -181,8 +182,6 @@ jobs:
           npm publish --tag canary
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag canary
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish:
     permissions:
@@ -211,8 +210,6 @@ jobs:
           npm publish
           npx tsx scripts/prepare-publish-types.ts
           npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   docker-image:
     permissions:
