@@ -190,7 +190,7 @@ jobs:
       - lint
       - test-types
       - build-test
-    environment: ${{ needs.release-please.outputs.releases_created && '' || 'Canary Release' }}
+    environment: ${{ needs.release-please.outputs.releases_created == 'true' && 'Latest Release' || 'Canary Release' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
