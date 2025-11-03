@@ -30,11 +30,15 @@ beforeEach(() => {
 	setupCommand(program as unknown as Command);
 });
 
-test("should install the latest NodeCG when no version is specified", async () => {
-	chdir();
-	await program.runWith("setup --skip-dependencies");
-	expect(readPackageJson().name).toBe("nodecg");
-});
+test(
+	"should install the latest NodeCG when no version is specified",
+	{ timeout: 30_000 },
+	async () => {
+		chdir();
+		await program.runWith("setup --skip-dependencies");
+		expect(readPackageJson().name).toBe("nodecg");
+	},
+);
 
 test(
 	"should install v2 NodeCG when specified",

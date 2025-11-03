@@ -11,13 +11,8 @@ on:
       - next
 
 concurrency:
-  group: ${{github.workflow}}-${{github.event_name}}-${{github.event.pull_request.number || github.event.ref}}
-  cancel-in-progress: true
-
-permissions:
-  contents: write
-  pull-requests: write
-  packages: write
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lint:
@@ -93,16 +88,24 @@ jobs:
         run: npm test
 
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
-        run: npm test -- --coverage
+        run: npm test -- --coverage --reporter=junit --outputFile=test-report.junit.xml
+      - if: (success() || failure()) && matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: test-report.junit.xml
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   pr-release:
+    permissions:
+      contents: read
+      id-token: write
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    environment: PR Release
+    environment: pr-release
     needs:
       - lint
       - test-types
@@ -112,9 +115,10 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
           cache: npm
+          registry-url: https://registry.npmjs.org
       - run: corepack enable npm
+
       - run: npm ci
       - run: npm run build
 
@@ -124,8 +128,6 @@ jobs:
           npm publish --tag pr${{ github.event.number }}
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag pr${{ github.event.number }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   pr-dry-run-container-build:
     if: github.event_name == 'pull_request'
@@ -146,82 +148,109 @@ jobs:
           cache-to: type=gha,mode=max
 
   release-please:
+    permissions:
+      contents: write
+      pull-requests: write
     if: github.event_name == 'push' && github.ref_name == 'main'
     runs-on: ubuntu-latest
     outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      release_name: ${{ steps.release.outputs.name }}
+      pr: ${{ steps.release.outputs.pr }}
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      release_paths: ${{ steps.release.outputs.paths_released }}
+      root_release_created: ${{ steps.release.outputs.release_created }}
+      root_release_version: ${{ steps.release.outputs.version }}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
           config-file: release-please-config.json
 
-  canary-publish:
-    if: ${{ !needs.release-please.outputs.release_created }}
+  update-lock-file:
+    permissions:
+      contents: write
+    needs:
+      - release-please
+    if: ${{ needs.release-please.outputs.pr }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - run: gh pr checkout ${{ fromJson(needs.release-please.outputs.pr).number }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: corepack enable npm
+      - run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          npm install
+          if git diff --quiet package-lock.json; then
+            echo "lock file is up to date"
+          else
+            git add package-lock.json
+            git commit -m "chore: update package-lock.json"
+            git push
+          fi
+
+  publish:
+    permissions:
+      contents: read
+      id-token: write
     needs:
       - release-please
       - lint
       - test-types
       - build-test
-    environment: Canary Release
+    environment: ${{ needs.release-please.outputs.releases_created == 'true' && 'latest-release' || 'canary-release' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
           cache: npm
+          registry-url: https://registry.npmjs.org
       - run: corepack enable npm
 
       - run: npm ci
       - run: npm run build
 
-      - run: |
+      - if: ${{ needs.release-please.outputs.releases_created == 'true' }}
+        name: Publish to NPM
+        run: |
+          echo '${{ needs.release-please.outputs.release_paths }}' | jq -r '.[]' | while read -r path; do
+            if [[ "$path" == "." ]]; then
+              npm publish
+              npx tsx scripts/prepare-publish-types.ts
+              npm publish
+            else
+              (cd "$path" && npm publish)
+            fi
+          done
+
+      - if: ${{ needs.release-please.outputs.releases_created != 'true' }}
+        name: Publish Canary to NPM
+        run: |
           npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
           npm --workspaces publish --tag canary
           npm publish --tag canary
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag canary
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  publish:
-    if: ${{ needs.release-please.outputs.release_created }}
-    needs:
-      - release-please
-      - lint
-      - test-types
-      - build-test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org
-          cache: npm
-      - run: corepack enable npm
-
-      - run: npm ci
-      - run: npm run build
-
-      - run: |
-          npm --workspaces publish
-          npm publish
-          npx tsx scripts/prepare-publish-types.ts
-          npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   docker-image:
+    permissions:
+      contents: write
+      packages: write
     needs:
       - release-please
       - lint
       - test-types
       - build-test
-    if: ${{ needs.release-please.outputs.release_created }}
+    if: ${{ needs.release-please.outputs.root_release_created == 'true' }}
     strategy:
       matrix:
         os:
@@ -242,14 +271,15 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=branch
-            type=semver,pattern={{major}}.{{minor}}.{{patch}},value=${{ needs.release-please.outputs.release_name }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.release_name }}
-            type=semver,pattern={{major}},value=${{ needs.release-please.outputs.release_name }}
+            type=semver,pattern={{major}}.{{minor}}.{{patch}},value=${{ needs.release-please.outputs.root_release_version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.root_release_version }}
+            type=semver,pattern={{major}},value=${{ needs.release-please.outputs.root_release_version }}
       - uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
