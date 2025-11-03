@@ -93,9 +93,11 @@ jobs:
 
   build-test:
     needs: build-test-matrix
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - run: echo "ok"
+      - run: exit 1
+        if: needs.build-test-matrix.result != 'success'
 
   container-build-matrix:
     strategy:
@@ -116,6 +118,8 @@ jobs:
 
   container-build:
     needs: container-build-matrix
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - run: echo "ok"
+      - run: exit 1
+        if: needs.container-build-matrix.result != 'success'
