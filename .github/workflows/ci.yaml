@@ -127,27 +127,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          MARKER="<!-- pr-release-install-instructions -->"
-          COMMENT_BODY="${MARKER}
-          ## 🚀 PR Release Published
-
-          A preview version of this PR has been published to npm!
-
-          ### Install Instructions
-
-          \`\`\`bash
-          npm install nodecg@pr${{ github.event.number }}
-          \`\`\`
-
-          **Version:** \`0.0.0-pr${{ github.event.number }}.${{ github.sha }}\`
-
-          This preview version will be updated automatically with each push to this PR."
-
-          # Find and delete existing comment with the marker
-          gh pr view ${{ github.event.number }} --json comments --jq ".comments[] | select(.body | contains(\"${MARKER}\")) | .id" | \
-            xargs -I {} gh api -X DELETE /repos/{owner}/{repo}/issues/comments/{} 2>/dev/null || true
-
-          # Post new comment
+          COMMENT_BODY="
+          PR Release Published: <https://www.npmjs.com/package/nodecg/v/0.0.0-pr${{ github.event.number }}.${{ github.sha }}>
+          Install with \`npm install nodecg@pr${{ github.event.number }}\`
+          "
           gh pr comment ${{ github.event.number }} --body "$COMMENT_BODY"
 
   release-please:
