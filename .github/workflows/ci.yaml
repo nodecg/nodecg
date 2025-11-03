@@ -127,11 +127,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          COMMENT_BODY="
-          PR Release Published: <https://www.npmjs.com/package/nodecg/v/0.0.0-pr${{ github.event.number }}.${{ github.sha }}>
-          Install with \`npm install nodecg@pr${{ github.event.number }}\`
-          "
-          gh pr comment ${{ github.event.number }} --body "$COMMENT_BODY"
+          gh pr comment ${{ github.event.number }} --body "PR Release Published: \`npm install nodecg@pr${{ github.event.number }}\`"
 
   release-please:
     permissions:
