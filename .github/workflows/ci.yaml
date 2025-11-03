@@ -77,7 +77,7 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - run: npm test -- --coverage --reporter=junit --outputFile=test-report.junit.xml
+      - run: npm test -- --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
