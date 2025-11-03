@@ -88,7 +88,12 @@ jobs:
         run: npm test
 
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
-        run: npm test -- --coverage
+        run: npm test -- --coverage --reporter=junit --outputFile=test-report.junit.xml
+      - if: (success() || failure()) && matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: test-report.junit.xml
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         uses: codecov/codecov-action@v5
         with:
