@@ -98,7 +98,6 @@ jobs:
     steps:
       - run: exit 1
         if: ${{ needs.build-test-matrix.result != 'success' }}
-      - run: echo "ok"
 
   container-build-matrix:
     strategy:
@@ -124,4 +123,3 @@ jobs:
     steps:
       - run: exit 1
         if: ${{ needs.container-build-matrix.result != 'success' }}
-      - run: echo "ok"
