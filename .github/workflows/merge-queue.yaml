@@ -97,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: exit 1
-        if: ${{ needs.build-test-matrix.result != 'success' }}
+        if: needs.build-test-matrix.result != 'success'
 
   container-build-matrix:
     strategy:
@@ -122,4 +122,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: exit 1
-        if: ${{ needs.container-build-matrix.result != 'success' }}
+        if: needs.container-build-matrix.result != 'success'
