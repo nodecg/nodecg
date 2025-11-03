@@ -77,9 +77,9 @@ jobs:
       - run: npm run build
 
       - if: matrix.os != 'ubuntu-latest' || matrix.node-version != '24'
-        run: npm test -- --reporter=default --reporter=junit --outputFile=test-report.junit.xml
+        run: npx vitest --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
-        run: npm test -- --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
+        run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
