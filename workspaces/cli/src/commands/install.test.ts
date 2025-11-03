@@ -30,17 +30,21 @@ it(
 	},
 );
 
-it("should install a version that satisfies a provided semver range", async () => {
-	await program.runWith("install supportclass/lfg-nucleus#^1.1.0");
-	expect(fs.existsSync("./bundles/lfg-nucleus/package.json")).toBe(true);
+it(
+	"should install a version that satisfies a provided semver range",
+	{ timeout: 30_000 },
+	async () => {
+		await program.runWith("install supportclass/lfg-nucleus#^1.1.0");
+		expect(fs.existsSync("./bundles/lfg-nucleus/package.json")).toBe(true);
 
-	const pjson = JSON.parse(
-		fs.readFileSync("./bundles/lfg-nucleus/package.json", {
-			encoding: "utf8",
-		}),
-	);
-	expect(semver.satisfies(pjson.version, "^1.1.0")).toBe(true);
-});
+		const pjson = JSON.parse(
+			fs.readFileSync("./bundles/lfg-nucleus/package.json", {
+				encoding: "utf8",
+			}),
+		);
+		expect(semver.satisfies(pjson.version, "^1.1.0")).toBe(true);
+	},
+);
 
 it(
 	"should install npm dependencies when run with no arguments in a bundle directory",

@@ -77,14 +77,15 @@ jobs:
       - run: npm run build
 
       - if: matrix.os != 'ubuntu-latest' || matrix.node-version != '24'
-        run: npm test -- --reporter=junit --outputFile=test-report.junit.xml
+        run: npx vitest --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
-        run: npm test -- --coverage --reporter=junit --outputFile=test-report.junit.xml
+        run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: test-report.junit.xml
+          flags: merge-queue-${{ matrix.os }}-node${{ matrix['node-version'] }}
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         uses: codecov/codecov-action@v5
         with:
@@ -92,9 +93,11 @@ jobs:
 
   build-test:
     needs: build-test-matrix
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - run: echo "ok"
+      - run: exit 1
+        if: needs.build-test-matrix.result != 'success'
 
   container-build-matrix:
     strategy:
@@ -115,6 +118,8 @@ jobs:
 
   container-build:
     needs: container-build-matrix
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - run: echo "ok"
+      - run: exit 1
+        if: needs.container-build-matrix.result != 'success'
