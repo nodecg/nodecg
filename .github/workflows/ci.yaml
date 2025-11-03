@@ -96,6 +96,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: pr-release
@@ -121,6 +122,12 @@ jobs:
           npm publish --tag pr${{ github.event.number }}
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag pr${{ github.event.number }}
+
+      - name: Post PR comment with install instructions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          npx tsx scripts/post-pr-release-comment.ts --version 0.0.0-pr${{ github.event.number }}.${{ github.sha }} --prNumber ${{ github.event.number }}
 
   release-please:
     permissions:
