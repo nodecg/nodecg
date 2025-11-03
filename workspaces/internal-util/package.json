@@ -1,17 +1,22 @@
 {
   "name": "@nodecg/internal-util",
   "version": "2.6.1",
-  "files": [
-    "dist",
-    "src"
-  ],
-  "main": "dist/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodecg/nodecg.git",
+    "directory": "workspaces/internal-util"
+  },
   "exports": {
     ".": {
       "source": "./src/main.ts",
       "default": "./dist/main.js"
     }
   },
+  "main": "dist/main.js",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "build": "del-cli dist && tsc -b",
     "dev": "del-cli dist && tsc -b --watch --preserveWatchOutput"
@@ -20,14 +25,9 @@
     "del-cli": "^6.0.0",
     "typescript": "~5.7.3"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nodecg/nodecg.git",
-    "directory": "workspaces/internal-util"
-  },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org",
     "access": "public",
-    "provenance": true
+    "provenance": true,
+    "registry": "https://registry.npmjs.org"
   }
 }
