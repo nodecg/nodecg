@@ -85,6 +85,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: test-report.junit.xml
+          flags: merge-queue-${{ matrix.os }}-node${{ matrix['node-version'] }}
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         uses: codecov/codecov-action@v5
         with:

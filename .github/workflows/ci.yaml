@@ -83,6 +83,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: test-report.junit.xml
+          flags: ${{ github.event_name == 'pull_request' && 'pr' || 'branch' }}
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
