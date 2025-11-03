@@ -10,10 +10,10 @@
     "broadcast"
   ],
   "homepage": "https://nodecg.dev/",
-  "bugs": "https://github.com/hoishin/nodecg/issues",
+  "bugs": "https://github.com/nodecg/nodecg/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hoishin/nodecg.git"
+    "url": "https://github.com/nodecg/nodecg.git"
   },
   "license": "MIT",
   "exports": {
@@ -64,6 +64,7 @@
     "build:client": "tsx scripts/build-client.ts",
     "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server"
   },
+  "prettier": {},
   "dependencies": {
     "@nodecg/cli": "2.6.1",
     "@nodecg/database-adapter-sqlite-legacy": "2.6.1",
@@ -154,7 +155,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
+    "@eslint/js": "^9.39.0",
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
     "@types/extend": "^3.0.4",
@@ -170,12 +171,13 @@
     "@vitest/coverage-v8": "^3.0.2",
     "cpy-cli": "^5.0.0",
     "del-cli": "^5.1.0",
-    "esbuild": "^0.19.12",
+    "esbuild": "^0.25.11",
     "esbuild-plugin-copy": "^2.1.1",
-    "eslint": "^9.17.0",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "is-ci": "^3.0.1",
+    "jiti": "^2.6.1",
     "npm-run-all2": "^7.0.2",
     "onchange": "^7.1.0",
     "prettier": "^3.4.2",
@@ -183,14 +185,14 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "typescript": "~5.7.2",
-    "typescript-eslint": "^8.18.2",
+    "typescript-eslint": "^8.46.2",
     "vitest": "^3.0.2",
     "vitest-mock-express": "^2.2.0"
   },
-  "engines": {
-    "node": "^20.9.0 || ^22.11.0"
-  },
+  "packageManager": "npm@11.6.2+sha512.ee22b335fcbc95662cdf3ab8a053daf045d9cf9c6df6040d28965abb707512b2c16fa6c5eec049d34c74f78f390cebd14f697919eadb97756564d4f9eccc4954",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org"
   }
 }

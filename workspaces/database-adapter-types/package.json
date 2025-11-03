@@ -1,9 +1,21 @@
 {
   "name": "@nodecg/database-adapter-types",
   "version": "2.6.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodecg/nodecg.git",
+    "directory": "workspaces/database-adapter-types"
+  },
+  "exports": {
+    ".": {
+      "source": "./src/main.ts",
+      "types": "./dist/main.d.ts"
+    }
+  },
   "types": "dist/main.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "del-cli dist && tsc -b",
@@ -14,6 +26,8 @@
     "typescript": "~5.7.3"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org"
   }
 }

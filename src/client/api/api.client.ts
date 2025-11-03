@@ -452,7 +452,7 @@ export class NodeCGAPIClient<
 		for (let i = instancesArr.length - 1; i >= 0; i--) {
 			const instance = instancesArr[i]!;
 			const meta = soundMetadata.get(instance);
-			if (meta && meta.cueName === cueName) {
+			if (meta?.cueName === cueName) {
 				instance.stop();
 			}
 		}

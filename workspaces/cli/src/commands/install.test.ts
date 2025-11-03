@@ -42,16 +42,20 @@ it("should install a version that satisfies a provided semver range", async () =
 	expect(semver.satisfies(pjson.version, "^1.1.0")).toBe(true);
 });
 
-it("should install npm dependencies when run with no arguments in a bundle directory", async () => {
-	fs.rmSync("./bundles/lfg-streamtip/node_modules", {
-		recursive: true,
-		force: true,
-	});
+it(
+	"should install npm dependencies when run with no arguments in a bundle directory",
+	{ timeout: 30_000 },
+	async () => {
+		fs.rmSync("./bundles/lfg-streamtip/node_modules", {
+			recursive: true,
+			force: true,
+		});
 
-	process.chdir("./bundles/lfg-streamtip");
-	await program.runWith("install");
-	expect(fs.readdirSync("./node_modules").length).toBeGreaterThan(0);
-});
+		process.chdir("./bundles/lfg-streamtip");
+		await program.runWith("install");
+		expect(fs.readdirSync("./node_modules").length).toBeGreaterThan(0);
+	},
+);
 
 it("should print an error when no valid git repo is provided", async () => {
 	const spy = vi.spyOn(console, "error");
