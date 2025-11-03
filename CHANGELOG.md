@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.5.0](https://github.com/Hoishin/nodecg-release-test/compare/nodecg-v11.4.1...nodecg-v11.5.0) (2025-11-03)
+
+
+### Features
+
+* rm yes ([0937355](https://github.com/Hoishin/nodecg-release-test/commit/093735525181f60e715bd1f4f096f49970a12059))
+
 ## [11.4.1](https://github.com/Hoishin/nodecg-release-test/compare/nodecg-v11.4.0...nodecg-v11.4.1) (2025-11-02)
 
 
