@@ -97,6 +97,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: pr-release
@@ -122,6 +123,12 @@ jobs:
           npm publish --tag pr${{ github.event.number }}
           npx tsx scripts/prepare-publish-types.ts
           npm publish --tag pr${{ github.event.number }}
+
+      - name: Comment PR with install instructions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ github.event.number }} --body "PR Release Published: \`npm install nodecg@pr${{ github.event.number }}\`"
 
   release-please:
     permissions:
