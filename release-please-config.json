@@ -7,7 +7,7 @@
 	"plugins": [
 		{
 			"type": "node-workspace",
-			"merge": false
+			"updatePeerDependencies": true
 		}
 	],
 	"packages": {
