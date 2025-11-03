@@ -181,7 +181,7 @@
     "npm-run-all2": "^7.0.2",
     "onchange": "^7.1.0",
     "prettier": "^3.4.2",
-    "puppeteer": "^23.11.1",
+    "puppeteer": "^24.28.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "typescript": "~5.7.2",
