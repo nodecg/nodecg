@@ -1,3 +1,18 @@
-import { defineWorkspace } from "vitest/config";
+import { defineConfig, defineWorkspace } from "vitest/config";
 
-export default defineWorkspace([".", "./workspaces/*"]);
+export default defineWorkspace([
+	defineConfig({
+		test: {
+			name: "unit",
+			include: ["src/**/*.test.{ts,tsx}"],
+		},
+	}),
+	defineConfig({
+		test: {
+			name: "e2e",
+			include: ["test/**/*.test.{ts,tsx}"],
+			fileParallelism: false,
+		},
+	}),
+	"./workspaces/*",
+]);
