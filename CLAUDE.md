@@ -102,6 +102,16 @@ vi.mock("module-name", async (importOriginal) => { ... });
 import "../../test/mocks/foo-mock.js"; // Side-effect import
 ```
 
+### Mocking fetch()
+
+- Mock `globalThis.fetch` to intercept HTTP requests in tests
+- Avoid real network calls - they cause flaky/slow tests
+- **Response mock pattern**: Return plain object with Node.js stream as `body`, typed as `unknown as Response`
+  - Using `new Response()` converts Node streams to Web ReadableStream
+  - Web ReadableStream may not work properly with Node.js `stream.pipeline()`
+  - Keeping Node.js Readable stream in mock body works with pipeline
+- **Tar archives in mocks**: Use `tar.create()` with gzip, convert to stream with `Readable.from(buffer)`
+
 ### Mocking Child Processes
 
 - Mock `child_process.spawn`/`fork` to avoid spawning real processes in tests
@@ -121,6 +131,8 @@ import "../../test/mocks/foo-mock.js"; // Side-effect import
 - **Run single test**: `npx vitest run path/to/test.ts`
 - **Watch mode**: `npx vitest` (re-runs on file changes)
 - **Filter by name**: `npx vitest run -t "test name pattern"`
+- **Read entire error output carefully** - includes stdout, stderr, and multiple test failures that reveal patterns
+- **Compare passing vs failing tests** - look for differences in test output/behavior to identify root cause
 - **Puppeteer debugging**: Set `headless: false`, `slowMo: 100` in browser launch options
 - **Check diagnostics**: Use `mcp__ide__getDiagnostics` to see type errors before running tests
 
