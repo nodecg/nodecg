@@ -81,11 +81,17 @@ jobs:
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: success() || failure()
+        uses: trunk-io/analytics-uploader@v1
+        with:
+          junit-paths: test-report.junit.xml
+          org-slug: nodecg
+          token: ${{ secrets.TRUNK_API_TOKEN }}
+      - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: test-report.junit.xml
-          flags: merge-queue-${{ matrix.os }}-node${{ matrix['node-version'] }}
+          override_branch: ${{ github.event.merge_group.base_ref }}
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         uses: codecov/codecov-action@v5
         with:
