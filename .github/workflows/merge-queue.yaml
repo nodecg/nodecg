@@ -2,6 +2,8 @@ name: Merge Queue
 
 on:
   merge_group:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -85,24 +87,25 @@ jobs:
         with:
           junit-paths: test-report.junit.xml
           org-slug: nodecg
-          repo-head-branch: ${{ github.event.merge_group.base_ref }}
+          repo-head-branch: main
           variant: ${{ matrix.os }}
           token: ${{ secrets.TRUNK_API_TOKEN }}
       - if: (success() || failure()) && matrix.os == 'windows-latest'
         run: |
           Invoke-RestMethod -Uri https://trunk.io/releases/trunk.ps1 -OutFile trunk.ps1
           Set-ExecutionPolicy Bypass -Scope CurrentUser
-          .\trunk.ps1 flakytests upload --junit-paths test-report.junit.xml --org-url-slug nodecg --repo-head-branch ${{ github.event.merge_group.base_ref }} --variant ${{ matrix.os }} --token ${{ secrets.TRUNK_API_TOKEN }}
+          .\trunk.ps1 flakytests upload --junit-paths test-report.junit.xml --org-url-slug nodecg --repo-head-branch main --variant ${{ matrix.os }} --token ${{ secrets.TRUNK_API_TOKEN }}
       - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: test-report.junit.xml
-          override_branch: ${{ github.event.merge_group.base_ref }}
+          override_branch: main
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          override_branch: main
 
   build-test:
     needs: build-test-matrix
