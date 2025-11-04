@@ -83,7 +83,7 @@ jobs:
         with:
           junit-paths: test-report.junit.xml
           org-slug: nodecg
-          variant: ${{ matrix.os }}
+          variant: ${{ runner.os }}
           token: ${{ secrets.TRUNK_API_TOKEN }}
       - if: success() || failure()
         uses: codecov/test-results-action@v1
