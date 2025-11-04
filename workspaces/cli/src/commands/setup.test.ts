@@ -1,3 +1,5 @@
+import "../../test/mocks/nano-spawn-mock.js";
+
 import fs from "node:fs";
 
 import { Command } from "commander";
