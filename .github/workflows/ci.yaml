@@ -79,18 +79,11 @@ jobs:
 
       - run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: success() || failure()
-        uses: trunk-io/analytics-uploader@v1
-        with:
-          junit-paths: test-report.junit.xml
-          org-slug: nodecg
-          variant: ${{ runner.os }}
-          token: ${{ secrets.TRUNK_API_TOKEN }}
-      - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: test-report.junit.xml
-          flags: ${{ github.event_name == 'pull_request' && 'pr' || 'branch' }}
+          flags: ${{ github.event_name == 'pull_request' && 'pr' || github.ref_name }}
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
