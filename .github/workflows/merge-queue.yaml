@@ -2,6 +2,8 @@ name: Merge Queue
 
 on:
   merge_group:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -85,11 +87,12 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: test-report.junit.xml
-          flags: merge-queue-${{ matrix.os }}-node${{ matrix['node-version'] }}
+          override_branch: main
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          override_branch: main
 
   build-test:
     needs: build-test-matrix
