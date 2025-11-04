@@ -88,6 +88,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: test-report.junit.xml
           override_branch: main
+          flags: ${{ runner.os }}
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
         uses: codecov/codecov-action@v5
         with:
