@@ -85,6 +85,8 @@ jobs:
         with:
           junit-paths: test-report.junit.xml
           org-slug: nodecg
+          repo-head-branch: ${{ github.event.merge_group.base_ref }}
+          variant: ${{ matrix.os }}
           token: ${{ secrets.TRUNK_API_TOKEN }}
       - if: success() || failure()
         uses: codecov/test-results-action@v1
