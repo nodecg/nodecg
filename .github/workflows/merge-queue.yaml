@@ -94,7 +94,7 @@ jobs:
         run: |
           Invoke-RestMethod -Uri https://trunk.io/releases/trunk.ps1 -OutFile trunk.ps1
           Set-ExecutionPolicy Bypass -Scope CurrentUser
-          .\trunk.ps1 -- flakytests upload --junit-paths test-report.junit.xml --org-url-slug nodecg --repo-head-branch main --variant ${{ runner.os }} --token ${{ secrets.TRUNK_API_TOKEN }}
+          .\trunk.ps1 --% flakytests upload --junit-paths test-report.junit.xml --org-url-slug nodecg --repo-head-branch main --variant ${{ runner.os }} --token ${{ secrets.TRUNK_API_TOKEN }}
       - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
