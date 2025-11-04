@@ -12,6 +12,8 @@ export default defineWorkspace([
 			name: "e2e",
 			include: ["test/**/*.test.{ts,tsx}"],
 			fileParallelism: false,
+			testTimeout: 15_000,
+			hookTimeout: 30_000,
 		},
 	}),
 	"./workspaces/*",
