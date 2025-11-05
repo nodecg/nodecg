@@ -25,9 +25,8 @@ test("singleInstance - scripts get injected into /instance/*.html routes", async
 	expect(body).toMatch('<script src="/socket.io/socket.io.js"></script>');
 });
 
-test(
+test.skip(
 	"singleInstance - should redirect to busy.html when the instance is already taken",
-	{ skip: true },
 	async ({ singleInstance, browser }) => {
 		expect(singleInstance.url()).toMatch(
 			"/bundles/test-bundle/graphics/single_instance.html",
@@ -46,9 +45,8 @@ test(
 	},
 );
 
-test(
+test.skip(
 	"singleInstance - should redirect to killed.html when the instance is killed",
-	{ skip: true },
 	async ({ dashboard, singleInstance }) => {
 		const graphicBoard = await util.shadowSelector(
 			dashboard,
