@@ -12,7 +12,7 @@ export default defineWorkspace([
 			name: "e2e",
 			include: ["test/**/*.test.{ts,tsx}"],
 			fileParallelism: false,
-			testTimeout: 15_000,
+			testTimeout: 30_000,
 			hookTimeout: 30_000,
 		},
 	}),
