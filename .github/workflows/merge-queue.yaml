@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       - run: pnpm lint
 
   test-types:
@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       - run: pnpm build
       - run: pnpm typetest
 
@@ -75,7 +75,7 @@ jobs:
             C:\Users\runneradmin\.cache\puppeteer
           key: puppeteer-${{ runner.os }}
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       - run: pnpm build
 
       - if: matrix.os != 'ubuntu-latest' || matrix.node-version != '24'
