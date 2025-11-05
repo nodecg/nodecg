@@ -18,7 +18,7 @@
     "build:esbuild": "del-cli dist && esbuild src/bin/nodecg.ts --bundle --format=esm --sourcemap --platform=node --target=node18 --outfile=dist/main.js --packages=external",
     "dev": "run-p dev:*",
     "dev:tsc": "tsc -b --watch --preserveWatchOutput",
-    "dev:esbuild": "del-cli dist && npm run build:esbuild -- --watch"
+    "dev:esbuild": "del-cli dist && pnpm build:esbuild -- --watch"
   },
   "dependencies": {
     "@inquirer/prompts": "^7.2.1",

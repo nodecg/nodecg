@@ -18,7 +18,7 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 
 ## Build System
 
-- `npm run build` compiles TypeScript (`tsc`) and bundles client assets
+- `pnpm build` compiles TypeScript (`tsc`) and bundles client assets
 - **Output**: `out/` (compiled TS as CommonJS), `dist/` (client bundles)
 - **Required before tests**: Tests import from compiled `out/` directory
 - Build errors block test execution
@@ -49,9 +49,9 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 
 ### Build/Test Workflow
 
-1. `npm install` - Install dependencies
-2. `npm run build` - Build before testing
-3. `npx vitest run` - Run tests in CI mode (not `npm test`)
+1. `pnpm install` - Install dependencies
+2. `pnpm build` - Build before testing
+3. `npx vitest run` - Run tests in CI mode (not `pnpm test`)
 
 ## Codebase Patterns
 
@@ -64,7 +64,7 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 ### Module Resolution
 
 - **Always use `.js` extensions** in imports, even for `.ts` source files
-- Workspace packages (`@nodecg/*`) resolve via npm workspaces
+- Workspace packages (`@nodecg/*`) resolve via pnpm workspaces
 - Source uses ESM-style imports, compiled output is CommonJS
 - Tests import from compiled `out/` directory (CommonJS modules)
 
@@ -139,7 +139,15 @@ import "../../test/mocks/foo-mock.js"; // Side-effect import
 ## Common Pitfalls
 
 - Missing `.js` extension in imports (causes module resolution errors)
-- Not running `npm run build` before tests (tests import stale/missing code)
-- Using `npm test` instead of `npx vitest run` (wrong test runner)
+- Not running `pnpm build` before tests (tests import stale/missing code)
+- Using `pnpm test` instead of `npx vitest run` (wrong test runner)
 - Sharing state between test files (each file must be isolated)
 - Forgetting that array/object access returns `T | undefined` (`noUncheckedIndexedAccess`)
+
+## pnpm Workspace Commands
+
+- `pnpm -r run <script>` - Run script recursively in all workspaces
+- `pnpm -r --parallel run <script>` - Run script in all workspaces simultaneously
+- `pnpm --filter <package> <command>` - Run command in specific workspace
+- `workspace:^` protocol in dependencies links to local workspace packages
+- `pnpm-lock.yaml` should be committed to version control

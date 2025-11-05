@@ -1,0 +1,6 @@
+packages:
+  - 'workspaces/*'
+
+# Wait 7 days before allowing new package versions (supply chain security)
+minimumReleaseAge: 10080
+

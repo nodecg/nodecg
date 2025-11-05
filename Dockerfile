@@ -1,4 +1,5 @@
 FROM node:22-slim AS base
+RUN corepack enable pnpm
 
 
 FROM base AS build
@@ -8,29 +9,29 @@ WORKDIR /nodecg
 RUN apt-get update && apt-get install -y python3 build-essential
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY workspaces workspaces
 
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 COPY tsconfig.json ./
 COPY schemas schemas
 COPY src src
 COPY scripts scripts
 
-RUN npm run build
+RUN pnpm run build
 
 
-FROM base AS npm
+FROM base AS pnpm-prod
 
 WORKDIR /nodecg
 
 RUN apt-get update && apt-get install -y python3 build-essential
 
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --from=build /nodecg/workspaces workspaces
 
-RUN npm ci --omit=dev
+RUN pnpm install --frozen-lockfile --prod
 
 
 FROM base AS runtime
@@ -44,8 +45,8 @@ WORKDIR /opt/nodecg
 RUN mkdir cfg bundles logs db assets
 
 COPY package.json index.js cli.mjs ./
-COPY --from=npm /nodecg/node_modules node_modules
-COPY --from=npm /nodecg/workspaces workspaces
+COPY --from=pnpm-prod /nodecg/node_modules node_modules
+COPY --from=pnpm-prod /nodecg/workspaces workspaces
 COPY --from=build /nodecg/dist dist
 COPY --from=build /nodecg/out out
 COPY --from=build /nodecg/schemas schemas

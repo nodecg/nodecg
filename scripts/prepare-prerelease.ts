@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 
@@ -14,18 +14,27 @@ if (!version) {
 	throw new Error("Missing required argument: --version");
 }
 
+// Read workspaces by scanning the workspaces directory
+// This works with the 'workspaces/*' glob pattern in pnpm-workspace.yaml
+const workspacesDir = join(__dirname, "..", "workspaces");
+const workspaces = readdirSync(workspacesDir)
+	.filter((name) => {
+		const path = join(workspacesDir, name);
+		return statSync(path).isDirectory();
+	})
+	.map((name) => `workspaces/${name}`);
+
 const rootPackageJsonPath = join(__dirname, "../package.json");
 const rootPackageJson = JSON.parse(
 	readFileSync(rootPackageJsonPath, "utf-8"),
 ) as {
 	version: string;
 	dependencies: Record<string, string>;
-	workspaces: string[];
 };
 
 rootPackageJson.version = version;
 
-for (const workspace of rootPackageJson.workspaces) {
+for (const workspace of workspaces) {
 	const { name } = JSON.parse(
 		readFileSync(join(__dirname, "..", workspace, "package.json"), "utf-8"),
 	) as { name: string };
@@ -39,7 +48,7 @@ writeFileSync(
 	JSON.stringify(rootPackageJson, null, 2) + "\n",
 );
 
-for (const workspace of rootPackageJson.workspaces) {
+for (const workspace of workspaces) {
 	const packageJsonPath = join(__dirname, "..", workspace, "package.json");
 	const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8")) as {
 		version: string;
@@ -49,7 +58,7 @@ for (const workspace of rootPackageJson.workspaces) {
 	packageJson.version = version;
 
 	if (packageJson.dependencies) {
-		for (const dependencyWorkspace of rootPackageJson.workspaces) {
+		for (const dependencyWorkspace of workspaces) {
 			const { name } = JSON.parse(
 				readFileSync(
 					join(__dirname, "..", dependencyWorkspace, "package.json"),

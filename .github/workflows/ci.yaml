@@ -22,36 +22,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-      - run: corepack enable npm
-      - run: npm ci
-      - run: npm run lint
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
 
   test-types:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-      - run: corepack enable npm
-      - run: npm ci
-      - run: npm run build
-      - run: npm run typetest
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm typetest
 
   build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-      - run: corepack enable npm
+          cache: pnpm
 
       - name: Ensure that bundle git parsing functionality works
         run: |
@@ -74,8 +74,8 @@ jobs:
             C:\Users\runneradmin\.cache\puppeteer
           key: puppeteer-${{ runner.os }}
 
-      - run: npm ci
-      - run: npm run build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
 
       - run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: success() || failure()
@@ -107,28 +107,28 @@ jobs:
       - build-test
     steps:
       - uses: actions/checkout@v5
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
+          cache: pnpm
           registry-url: https://registry.npmjs.org
-      - run: corepack enable npm
 
-      - run: npm ci
-      - run: npm run build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
 
       - run: |
           npx tsx scripts/prepare-prerelease.ts --version 0.0.0-pr${{ github.event.number }}.${{ github.sha }}
-          npm --workspaces publish --tag pr${{ github.event.number }}
-          npm publish --tag pr${{ github.event.number }}
+          pnpm -r publish --tag pr${{ github.event.number }}
+          pnpm publish --tag pr${{ github.event.number }}
           npx tsx scripts/prepare-publish-types.ts
-          npm publish --tag pr${{ github.event.number }}
+          pnpm publish --tag pr${{ github.event.number }}
 
       - name: Comment PR with install instructions
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh pr comment ${{ github.event.number }} --body "PR Release Published: \`npm install nodecg@pr${{ github.event.number }}\`"
+          gh pr comment ${{ github.event.number }} --body "PR release is published and can be installed as \`nodecg@pr${{ github.event.number }}\`"
 
   release-please:
     permissions:
@@ -161,22 +161,22 @@ jobs:
       - run: gh pr checkout ${{ fromJson(needs.release-please.outputs.pr).number }}
         env:
           GH_TOKEN: ${{ secrets.NODECG_MONOREPO_GH_TOKEN }}
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-      - run: corepack enable npm
+          cache: pnpm
       - run: |
           git config --global user.email "ci@nodecg.dev"
           git config --global user.name "NodeCG"
       - run: |
-          npm ci
-          if git diff --quiet package-lock.json; then
+          pnpm install
+          if git diff --quiet pnpm-lock.yaml; then
             git commit -m "chore: run CI" --allow-empty
             git push
           else
-            git add package-lock.json
-            git commit -m "chore: update package-lock.json"
+            git add pnpm-lock.yaml
+            git commit -m "chore: update pnpm-lock.yaml"
             git push
           fi
 
@@ -193,26 +193,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
+          cache: pnpm
           registry-url: https://registry.npmjs.org
-      - run: corepack enable npm
 
-      - run: npm ci
-      - run: npm run build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
 
       - if: ${{ needs.release-please.outputs.releases_created == 'true' }}
         name: Publish to NPM
         run: |
           echo '${{ needs.release-please.outputs.release_paths }}' | jq -r '.[]' | while read -r path; do
             if [[ "$path" == "." ]]; then
-              npm publish
+              pnpm publish
               npx tsx scripts/prepare-publish-types.ts
-              npm publish
+              pnpm publish
             else
-              (cd "$path" && npm publish)
+              (cd "$path" && pnpm publish)
             fi
           done
 
@@ -220,10 +220,10 @@ jobs:
         name: Publish Canary to NPM
         run: |
           npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
-          npm --workspaces publish --tag canary
-          npm publish --tag canary
+          pnpm -r publish --tag canary
+          pnpm publish --tag canary
           npx tsx scripts/prepare-publish-types.ts
-          npm publish --tag canary
+          pnpm publish --tag canary
 
   docker-image:
     permissions:
