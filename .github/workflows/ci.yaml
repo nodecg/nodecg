@@ -52,7 +52,6 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
 
       - name: Ensure that bundle git parsing functionality works
         run: |
@@ -75,7 +74,7 @@ jobs:
             C:\Users\runneradmin\.cache\puppeteer
           key: puppeteer-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --force
       - run: pnpm build
 
       - run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
