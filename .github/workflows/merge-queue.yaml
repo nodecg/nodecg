@@ -76,6 +76,7 @@ jobs:
           key: puppeteer-${{ runner.os }}
 
       - run: pnpm install
+      - run: pnpm exec puppeteer browsers install chrome
       - run: pnpm build
 
       - if: matrix.os != 'ubuntu-latest' || matrix.node-version != '24'

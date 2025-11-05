@@ -75,6 +75,7 @@ jobs:
           key: puppeteer-${{ runner.os }}
 
       - run: pnpm install
+      - run: pnpm exec puppeteer browsers install chrome
       - run: pnpm build
 
       - run: pnpm exec vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
@@ -204,7 +205,6 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - run: pnpm install
-      - run: pnpm exec puppeteer browsers install chrome
       - run: pnpm build
 
       - if: ${{ needs.release-please.outputs.releases_created == 'true' }}
