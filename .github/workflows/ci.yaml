@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       - run: pnpm lint
 
   test-types:
@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       - run: pnpm build
       - run: pnpm typetest
 
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          # cache: pnpm
+          cache: pnpm
 
       - name: Ensure that bundle git parsing functionality works
         run: |
@@ -74,14 +74,7 @@ jobs:
             C:\Users\runneradmin\.cache\puppeteer
           key: puppeteer-${{ runner.os }}
 
-      - run: pnpm config set store-dir ${{ runner.temp }}/.pnpm-store
-
-      - run: pnpm install --frozen-lockfile
-      - name: Save
-        uses: actions/cache/save@v4
-        with:
-          path: ${{ runner.temp }}/.pnpm-store
-          key: ${{ runner.os }}-node-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm install
       - run: pnpm build
 
       - run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
@@ -121,7 +114,7 @@ jobs:
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       - run: pnpm build
 
       - run: |
@@ -207,7 +200,7 @@ jobs:
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       - run: pnpm build
 
       - if: ${{ needs.release-please.outputs.releases_created == 'true' }}
