@@ -77,7 +77,7 @@ jobs:
       - run: pnpm install
       - run: pnpm build
 
-      - run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
+      - run: pnpm exec vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
@@ -124,7 +124,7 @@ jobs:
 
           pnpm -r publish --tag pr${{ github.event.number }}
           pnpm publish --tag pr${{ github.event.number }}
-          npx tsx scripts/prepare-publish-types.ts
+          pnpm exec tsx scripts/prepare-publish-types.ts
           pnpm publish --tag pr${{ github.event.number }}
 
       - name: Comment PR with install instructions
@@ -204,6 +204,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - run: pnpm install
+      - run: pnpm exec puppeteer browsers install chrome
       - run: pnpm build
 
       - if: ${{ needs.release-please.outputs.releases_created == 'true' }}
@@ -212,7 +213,7 @@ jobs:
           echo '${{ needs.release-please.outputs.release_paths }}' | jq -r '.[]' | while read -r path; do
             if [[ "$path" == "." ]]; then
               pnpm publish --tag latest
-              npx tsx scripts/prepare-publish-types.ts
+              pnpm exec tsx scripts/prepare-publish-types.ts
               pnpm publish --tag latest
             else
               (cd "$path" && pnpm publish --tag latest)
@@ -228,7 +229,7 @@ jobs:
 
           pnpm -r publish --tag canary
           pnpm publish --tag canary
-          npx tsx scripts/prepare-publish-types.ts
+          pnpm exec tsx scripts/prepare-publish-types.ts
           pnpm publish --tag canary
 
   docker-image:
