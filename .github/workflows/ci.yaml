@@ -118,7 +118,10 @@ jobs:
       - run: pnpm build
 
       - run: |
-          npx tsx scripts/prepare-prerelease.ts --version 0.0.0-pr${{ github.event.number }}.${{ github.sha }}
+          NEW_VERSION="0.0.0-pr${{ github.event.number }}.${{ github.sha }}"
+          pnpm -r exec pnpm version "$NEW_VERSION" --no-git-tag-version
+          pnpm version "$NEW_VERSION" --no-git-tag-version
+
           pnpm -r publish --tag pr${{ github.event.number }}
           pnpm publish --tag pr${{ github.event.number }}
           npx tsx scripts/prepare-publish-types.ts
@@ -208,18 +211,21 @@ jobs:
         run: |
           echo '${{ needs.release-please.outputs.release_paths }}' | jq -r '.[]' | while read -r path; do
             if [[ "$path" == "." ]]; then
-              pnpm publish
+              pnpm publish --tag latest
               npx tsx scripts/prepare-publish-types.ts
-              pnpm publish
+              pnpm publish --tag latest
             else
-              (cd "$path" && pnpm publish)
+              (cd "$path" && pnpm publish --tag latest)
             fi
           done
 
       - if: ${{ needs.release-please.outputs.releases_created != 'true' }}
         name: Publish Canary to NPM
         run: |
-          npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
+          NEW_VERSION="0.0.0-canary.${{ github.sha }}"
+          pnpm -r exec pnpm version "$NEW_VERSION" --no-git-tag-version
+          pnpm version "$NEW_VERSION" --no-git-tag-version
+
           pnpm -r publish --tag canary
           pnpm publish --tag canary
           npx tsx scripts/prepare-publish-types.ts
