@@ -40,7 +40,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "del-cli dist out && run-p dev:*",
-    "dev:client": "pnpm build:client -- --watch",
+    "dev:client": "pnpm build:client --watch",
     "dev:tsc": "tsc -b src/server src/client --watch --preserveWatchOutput",
     "dev:copy-templates": "onchange \"src/server/**/*.tmpl\" -i -- cpy \"src/server/**/*.tmpl\" out/server",
     "dev:workspaces": "pnpm -r --parallel run dev",
@@ -51,7 +51,7 @@
     "lint:eslint": "eslint --cache",
     "fix": "npm-run-all -s fix:*",
     "fix:prettier": "prettier --write .",
-    "fix:eslint": "pnpm lint:eslint -- --fix ",
+    "fix:eslint": "pnpm lint:eslint --fix ",
     "build": "del-cli dist out && run-s build:*",
     "build:workspaces": "pnpm -r run build",
     "build:tsc": "tsc -b src/server src/client",

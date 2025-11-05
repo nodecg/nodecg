@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 import fs from "node:fs";
 import * as path from "node:path";
 import { format, inspect } from "node:util";
