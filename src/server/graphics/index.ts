@@ -61,20 +61,21 @@ export class GraphicsLib {
 				return false;
 			});
 
-			const parentDir = path.join(bundle.dir, "graphics");
-			const fileLocation = path.join(parentDir, resName);
-			// If this file is a main HTML file for a graphic, inject the graphic setup scripts.
-			if (isGraphic) {
-				injectScripts(
-					fileLocation,
-					"graphic",
-					{
-						createApiInstance: bundle,
-						sound: bundle.soundCues && bundle.soundCues.length > 0,
-					},
-					(html) => res.send(html),
-				);
-			} else {
+		const parentDir = path.join(bundle.dir, "graphics");
+		const fileLocation = path.join(parentDir, resName);
+		// If this file is a main HTML file for a graphic, inject the graphic setup scripts.
+		if (isGraphic) {
+			injectScripts(
+				fileLocation,
+				"graphic",
+				parentDir,
+				{
+					createApiInstance: bundle,
+					sound: bundle.soundCues && bundle.soundCues.length > 0,
+				},
+				(html) => res.send(html),
+			);
+		} else {
 				sendFile(parentDir, fileLocation, res, next);
 			}
 		});

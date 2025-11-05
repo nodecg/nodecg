@@ -167,7 +167,9 @@ export class RegistrationCoordinator {
 			const fileLocation = path.join(BUILD_PATH, resName);
 			if (resName.endsWith(".html") && isChildPath(BUILD_PATH, fileLocation)) {
 				if (fs.existsSync(fileLocation)) {
-					injectScripts(fileLocation, "graphic", {}, (html) => res.send(html));
+					injectScripts(fileLocation, "graphic", BUILD_PATH, {}, (html) =>
+						res.send(html),
+					);
 				} else {
 					next();
 				}

@@ -4,6 +4,7 @@ import semver from "semver";
 
 import type { NodeCG } from "../../types/nodecg";
 import { filteredConfig, sentryEnabled } from "../config";
+import { isChildPath } from "./is-child-path";
 import { noop } from "./noop";
 
 interface Options {
@@ -19,6 +20,7 @@ interface Options {
 export function injectScripts(
 	pathOrHtml: string,
 	resourceType: "panel" | "dialog" | "graphic",
+	parentDir: string,
 	{
 		standalone = false,
 		createApiInstance,
@@ -26,6 +28,12 @@ export function injectScripts(
 	}: Options = {} as Options,
 	cb: (html: string) => void = noop,
 ): void {
+	// Validate that the file path is within the allowed directory to prevent path traversal attacks
+	if (!isChildPath(parentDir, pathOrHtml)) {
+		// Path validation failed - don't read the file
+		return;
+	}
+
 	fs.readFile(pathOrHtml, { encoding: "utf8" }, (error, data) => {
 		inject(error ?? undefined, data);
 	});

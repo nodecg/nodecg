@@ -69,21 +69,22 @@ export class DashboardLib {
 			const resName = req.params[0]!;
 			// If the target file is a panel or dialog, inject the appropriate scripts.
 			// Else, serve the file as-is.
-			const panel = bundle.dashboard.panels.find((p) => p.file === resName);
-			if (panel) {
-				const resourceType = panel.dialog ? "dialog" : "panel";
-				injectScripts(
-					panel.path,
-					resourceType,
-					{
-						createApiInstance: bundle,
-						standalone: Boolean(req.query["standalone"]),
-						fullbleed: panel.fullbleed,
-						sound: bundle.soundCues && bundle.soundCues.length > 0,
-					},
-					(html) => res.send(html),
-				);
-			} else {
+		const panel = bundle.dashboard.panels.find((p) => p.file === resName);
+		if (panel) {
+			const resourceType = panel.dialog ? "dialog" : "panel";
+			injectScripts(
+				panel.path,
+				resourceType,
+				bundle.dashboard.dir,
+				{
+					createApiInstance: bundle,
+					standalone: Boolean(req.query["standalone"]),
+					fullbleed: panel.fullbleed,
+					sound: bundle.soundCues && bundle.soundCues.length > 0,
+				},
+				(html) => res.send(html),
+			);
+		} else {
 				const parentDir = bundle.dashboard.dir;
 				const fileLocation = path.join(parentDir, resName);
 				sendFile(parentDir, fileLocation, res, next);
