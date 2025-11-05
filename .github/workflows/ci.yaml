@@ -51,30 +51,30 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: pnpm
+          # cache: pnpm
 
       - name: Ensure that bundle git parsing functionality works
         run: |
           git config --global user.email "ci@nodecg.dev"
           git config --global user.name "NodeCG Bot"
 
-      - name: Restore Puppeteer cache (Linux)
-        if: runner.os == 'Linux'
-        uses: actions/cache@v4
-        with:
-          path: |
-            /home/runner/.cache/puppeteer
-          key: puppeteer-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      # - name: Restore Puppeteer cache (Linux)
+      #   if: runner.os == 'Linux'
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       /home/runner/.cache/puppeteer
+      #     key: puppeteer-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
-      - name: Restore Puppeteer cache (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/cache@v4
-        with:
-          path: |
-            C:\Users\runneradmin\.cache\puppeteer
-          key: puppeteer-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      # - name: Restore Puppeteer cache (Windows)
+      #   if: runner.os == 'Windows'
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       C:\Users\runneradmin\.cache\puppeteer
+      #     key: puppeteer-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
-      - run: pnpm install --frozen-lockfile --force
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
       - run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
