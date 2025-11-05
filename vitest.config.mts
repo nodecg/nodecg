@@ -11,5 +11,22 @@ export default defineConfig({
 			include: ["src", "workspaces/*/src"],
 			exclude: ["src/client"],
 		},
+		projects: [
+			{
+				test: {
+					name: "unit",
+					include: ["src/**/*.test.{ts,tsx}"],
+				},
+			},
+			{
+				test: {
+					name: "e2e",
+					include: ["test/**/*.test.{ts,tsx}"],
+					testTimeout: 30_000,
+					hookTimeout: 30_000,
+				},
+			},
+			"./workspaces/*",
+		],
 	},
 });
