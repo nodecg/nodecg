@@ -18,15 +18,15 @@ export default defineConfig({
 					include: ["src/**/*.test.{ts,tsx}"],
 				},
 			},
-		{
-			test: {
-				name: "e2e",
-				include: ["test/**/*.test.{ts,tsx}"],
-				fileParallelism: false,
-				testTimeout: 60_000,
-				hookTimeout: 30_000,
+			{
+				test: {
+					name: "e2e",
+					include: ["test/**/*.test.{ts,tsx}"],
+					fileParallelism: false,
+					testTimeout: 60_000,
+					hookTimeout: 30_000,
+				},
 			},
-		},
 			"./workspaces/*",
 		],
 	},
