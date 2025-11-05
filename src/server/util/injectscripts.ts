@@ -26,15 +26,9 @@ export function injectScripts(
 	}: Options = {} as Options,
 	cb: (html: string) => void = noop,
 ): void {
-	// Graphics only pass the path to the html file.
-	// Panels and dialogs pass a cached HTML string.
-	if (resourceType === "graphic") {
-		fs.readFile(pathOrHtml, { encoding: "utf8" }, (error, data) => {
-			inject(error ?? undefined, data);
-		});
-	} else {
-		inject(undefined, pathOrHtml);
-	}
+	fs.readFile(pathOrHtml, { encoding: "utf8" }, (error, data) => {
+		inject(error ?? undefined, data);
+	});
 
 	function inject(err: NodeJS.ErrnoException | undefined, html: string): void {
 		if (err) {

@@ -73,7 +73,7 @@ export class DashboardLib {
 			if (panel) {
 				const resourceType = panel.dialog ? "dialog" : "panel";
 				injectScripts(
-					panel.html,
+					panel.path,
 					resourceType,
 					{
 						createApiInstance: bundle,
