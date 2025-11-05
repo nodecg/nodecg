@@ -64,7 +64,7 @@ jobs:
         with:
           path: |
             /home/runner/.cache/puppeteer
-          key: puppeteer-${{ runner.os }}
+          key: puppeteer-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Restore Puppeteer cache (Windows)
         if: runner.os == 'Windows'
@@ -72,7 +72,7 @@ jobs:
         with:
           path: |
             C:\Users\runneradmin\.cache\puppeteer
-          key: puppeteer-${{ runner.os }}
+          key: puppeteer-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
