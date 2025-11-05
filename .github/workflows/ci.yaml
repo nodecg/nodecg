@@ -74,11 +74,15 @@ jobs:
             C:\Users\runneradmin\.cache\puppeteer
           key: puppeteer-${{ runner.os }}
 
-      - run: pnpm install --frozen-lockfile
-      - uses: actions/setup-node@v6
+      - run: pnpm config set store-dir ${{ runner.temp }}/.pnpm-store
+      - name: Temp
+        uses: actions/cache@v4
         with:
-          node-version: 24
-          cache: pnpm
+          path: ${{ runner.temp }}/.pnpm-store
+          key: ${{ runner.os }}-node-${{ hashFiles('pnpm-lock.yaml') }}
+          lookup-only: true
+
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
       - run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
