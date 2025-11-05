@@ -52,6 +52,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Ensure that bundle git parsing functionality works
         run: |
