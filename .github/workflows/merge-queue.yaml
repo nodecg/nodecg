@@ -13,26 +13,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-      - run: corepack enable npm
-      - run: npm ci
-      - run: npm run lint
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm lint
 
   test-types:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-      - run: corepack enable npm
-      - run: npm ci
-      - run: npm run build
-      - run: npm run typetest
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm build
+      - run: pnpm typetest
 
   build-test-matrix:
     strategy:
@@ -48,11 +48,11 @@ jobs:
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v5
+      - run: corepack enable pnpm
       - uses: actions/setup-node@v6
         with:
           node-version: ${{matrix.node-version}}
-          cache: npm
-      - run: corepack enable npm
+          cache: pnpm
 
       - name: Ensure that bundle git parsing functionality works
         run: |
@@ -75,13 +75,14 @@ jobs:
             C:\Users\runneradmin\.cache\puppeteer
           key: puppeteer-${{ runner.os }}
 
-      - run: npm ci
-      - run: npm run build
+      - run: pnpm install
+      - run: pnpm exec puppeteer browsers install chrome
+      - run: pnpm build
 
       - if: matrix.os != 'ubuntu-latest' || matrix.node-version != '24'
-        run: npx vitest --reporter=default --reporter=junit --outputFile=test-report.junit.xml
+        run: pnpm exec vitest --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: matrix.os == 'ubuntu-latest' && matrix.node-version == '24'
-        run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
+        run: pnpm exec vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
       - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:

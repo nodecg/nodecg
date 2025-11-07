@@ -20,6 +20,7 @@
 .env
 package-lock.json
 CHANGELOG.md
+pnpm-lock.yaml
 
 # Intentionally broken as part of tests
 /test/fixtures/bundle-parser/bad-json/bundleConfig.json
