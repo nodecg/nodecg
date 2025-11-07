@@ -123,10 +123,10 @@ jobs:
           pnpm -r exec pnpm version "$NEW_VERSION" --no-git-tag-version
           pnpm version "$NEW_VERSION" --no-git-tag-version
 
-          pnpm -r publish --tag pr${{ github.event.number }}
-          pnpm publish --tag pr${{ github.event.number }}
+          pnpm -r publish --tag pr${{ github.event.number }} --no-git-checks
+          pnpm publish --tag pr${{ github.event.number }} --no-git-checks
           pnpm exec tsx scripts/prepare-publish-types.ts
-          pnpm publish --tag pr${{ github.event.number }}
+          pnpm publish --tag pr${{ github.event.number }} --no-git-checks
 
       - name: Comment PR with install instructions
         env:
@@ -227,10 +227,10 @@ jobs:
           pnpm -r exec pnpm version "$NEW_VERSION" --no-git-tag-version
           pnpm version "$NEW_VERSION" --no-git-tag-version
 
-          pnpm -r publish --tag canary
-          pnpm publish --tag canary
+          pnpm -r publish --tag canary --no-git-checks
+          pnpm publish --tag canary --no-git-checks
           pnpm exec tsx scripts/prepare-publish-types.ts
-          pnpm publish --tag canary
+          pnpm publish --tag canary --no-git-checks
 
   docker-image:
     permissions:
