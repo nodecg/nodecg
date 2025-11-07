@@ -119,6 +119,7 @@ jobs:
       - run: pnpm build
 
       - run: |
+          set -ex
           NEW_VERSION="0.0.0-pr${{ github.event.number }}.${{ github.sha }}"
           pnpm -r exec pnpm version "$NEW_VERSION" --no-git-tag-version
           pnpm version "$NEW_VERSION" --no-git-tag-version
