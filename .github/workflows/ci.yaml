@@ -258,7 +258,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}.{{patch}},value=${{ needs.release-please.outputs.root_release_version }}
             type=semver,pattern={{major}}.{{minor}},value=${{ needs.release-please.outputs.root_release_version }}
             type=semver,pattern={{major}},value=${{ needs.release-please.outputs.root_release_version }}
-      - uses: docker/build-push-action@v5
+      - uses: docker/build-push-action@v6
         with:
           context: .
           push: true
