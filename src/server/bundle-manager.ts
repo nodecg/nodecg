@@ -84,7 +84,11 @@ export class BundleManager extends TypedEmitter<EventMap> {
 			this.emit("ready");
 		}, READY_WAIT_THRESHOLD);
 
-		bundlesPaths.forEach((bundlesPath) => {
+		const bundleRootPaths = isLegacyProject
+			? bundlesPaths
+			: [rootPath, ...bundlesPaths];
+
+		bundleRootPaths.forEach((bundlesPath) => {
 			log.trace(`Loading bundles from ${bundlesPath}`);
 
 			/* istanbul ignore next */
@@ -220,11 +224,9 @@ export class BundleManager extends TypedEmitter<EventMap> {
 				]);
 			};
 
-			if (!isLegacyProject) {
+			if (bundlesPath === rootPath) {
 				handleBundle(rootPath);
-			}
-
-			if (fs.existsSync(bundlesPath)) {
+			} else if (fs.existsSync(bundlesPath)) {
 				const bundleFolders = fs.readdirSync(bundlesPath);
 				bundleFolders.forEach((bundleFolderName) => {
 					const bundlePath = path.join(bundlesPath, bundleFolderName);
@@ -426,7 +428,7 @@ function loadBundleCfg(
 }
 
 function getParentProjectName(changePath: string, rootPath: string) {
-	if (!isChildPath(rootPath, changePath)) {
+	if (rootPath !== changePath && !isChildPath(rootPath, changePath)) {
 		return false;
 	}
 	const filePath = path.join(changePath, "package.json");

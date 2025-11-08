@@ -1,8 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 
+/**
+ * The root path of the NodeCG runtime. It is either bundle project root (modern) or the NodeCG root (legacy).
+ */
 export const rootPath = recursivelyFindNodeJSProject(process.cwd());
 
+/**
+ * Mainly for tests to override the NodeCG root path.
+ */
 export function getNodecgRoot() {
 	return process.env["NODECG_ROOT"] ?? rootPath;
 }

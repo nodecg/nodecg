@@ -1,8 +1,8 @@
 import { Replicant } from "@nodecg/database-adapter-sqlite-legacy";
 import { expect } from "vitest";
 
-import type { NodeCG } from "../../src/types/nodecg";
-import { setupTest } from "../helpers/setup";
+import type { NodeCG } from "../../../src/types/nodecg";
+import { setupTest } from "../../helpers/setup";
 
 const test = await setupTest();
 

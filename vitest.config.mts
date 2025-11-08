@@ -20,10 +20,19 @@ export default defineConfig({
 			},
 			{
 				test: {
-					name: "e2e",
-					include: ["test/**/*.test.{ts,tsx}"],
+					name: "e2e-legacy-mode",
+					include: ["test/legacy-mode/**/*.test.{ts,tsx}"],
 					testTimeout: 30_000,
 					hookTimeout: 30_000,
+				},
+			},
+			{
+				test: {
+					name: "e2e-installed-mode",
+					include: ["test/installed-mode/**/*.test.{ts,tsx}"],
+					testTimeout: 30_000,
+					hookTimeout: 30_000,
+					fileParallelism: false,
 				},
 			},
 			"./workspaces/*",

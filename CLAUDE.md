@@ -136,6 +136,17 @@ import "../../test/mocks/foo-mock.js"; // Side-effect import
 - **Puppeteer debugging**: Set `headless: false`, `slowMo: 100` in browser launch options
 - **Check diagnostics**: Use `mcp__ide__getDiagnostics` to see type errors before running tests
 
+## NodeCG Architecture
+
+### Legacy vs Installed Mode
+
+- **Legacy mode**: NodeCG is the root project, bundles in `bundles/` directory
+- **Installed mode**: NodeCG installed as dependency in `node_modules`, project root IS the bundle
+- Mode determined by `isLegacyProject` check (package.json name === "nodecg")
+- **Critical**: `@nodecg/internal-util` caches `rootPath` and `isLegacyProject` at module load time
+- Tests must set `process.env.NODECG_ROOT` BEFORE importing any NodeCG modules
+- Use `getNodecgRoot()` function (respects NODECG_ROOT) instead of `rootPath` constant where appropriate
+
 ## Common Pitfalls
 
 - Missing `.js` extension in imports (causes module resolution errors)
@@ -143,3 +154,4 @@ import "../../test/mocks/foo-mock.js"; // Side-effect import
 - Using `npm test` instead of `npx vitest run` (wrong test runner)
 - Sharing state between test files (each file must be isolated)
 - Forgetting that array/object access returns `T | undefined` (`noUncheckedIndexedAccess`)
+- Importing NodeCG modules before setting `NODECG_ROOT` env var (causes wrong root path to be cached)

@@ -1,7 +1,7 @@
 import path from "path";
 import { expect } from "vitest";
 
-import { setupTest } from "../helpers/setup";
+import { setupTest } from "../../helpers/setup";
 
 const test = await setupTest();
 
@@ -171,7 +171,7 @@ test("should properly load schemas provided with an absolute path", ({
 	const rep = apis.extension.Replicant("schemaAbsolutePath", {
 		schemaPath: path.resolve(
 			__dirname,
-			"../fixtures/nodecg-core/absolute-path-schemas/schemaAbsolutePath.json",
+			"../../fixtures/nodecg-core/absolute-path-schemas/schemaAbsolutePath.json",
 		),
 	});
 
