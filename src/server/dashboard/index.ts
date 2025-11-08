@@ -117,11 +117,19 @@ function getDashboardContext(bundles: NodeCG.Bundle[]): DashboardContext {
 	};
 }
 
-function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
+/**
+ * Parses bundles and generates workspace configuration for the dashboard.
+ * Workspaces are sorted by workspaceOrder (ascending), with items without an order
+ * placed after ordered items. When two workspaces have the same order value,
+ * they are sorted alphabetically by label as a secondary criterion.
+ */
+export function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 	let defaultWorkspaceHasPanels = false;
 	let otherWorkspacesHavePanels = false;
 	const workspaces: Workspace[] = [];
 	const workspaceNames = new Set<string>();
+	const workspaceOrders = new Map<string, number>();
+	
 	bundles.forEach((bundle) => {
 		bundle.dashboard.panels.forEach((panel) => {
 			if (panel.dialog) {
@@ -137,11 +145,24 @@ function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 					route: `fullbleed/${panel.name}`,
 					fullbleed: true,
 				});
+				
+				// Track order for fullbleed panels too
+				if (panel.workspaceOrder !== undefined) {
+					workspaceOrders.set(workspaceName, panel.workspaceOrder);
+				}
 			} else if (panel.workspace === "default") {
 				defaultWorkspaceHasPanels = true;
 			} else {
 				workspaceNames.add(panel.workspace);
 				otherWorkspacesHavePanels = true;
+				
+				// Track the minimum order value for each workspace
+				if (panel.workspaceOrder !== undefined) {
+					const currentOrder = workspaceOrders.get(panel.workspace);
+					if (currentOrder === undefined || panel.workspaceOrder < currentOrder) {
+						workspaceOrders.set(panel.workspace, panel.workspaceOrder);
+					}
+				}
 			}
 		});
 	});
@@ -154,7 +175,30 @@ function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 		});
 	});
 
-	workspaces.sort((a, b) => a.label.localeCompare(b.label));
+	// Sort workspaces by order first, then alphabetically
+	workspaces.sort((a, b) => {
+		const orderA = workspaceOrders.get(a.name);
+		const orderB = workspaceOrders.get(b.name);
+
+		// Both have orders: sort by order, then alphabetically if same order
+		if (orderA !== undefined && orderB !== undefined) {
+			if (orderA !== orderB) {
+				return orderA - orderB;
+			}
+			// Same order: fall through to alphabetical sorting
+		}
+		// Only A has order: A comes first
+		else if (orderA !== undefined) {
+			return -1;
+		}
+		// Only B has order: B comes first
+		else if (orderB !== undefined) {
+			return 1;
+		}
+
+		// Both have same order or neither has order: sort alphabetically
+		return a.label.localeCompare(b.label);
+	});
 
 	if (defaultWorkspaceHasPanels || !otherWorkspacesHavePanels) {
 		workspaces.unshift({

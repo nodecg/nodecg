@@ -1,0 +1,15 @@
+{
+  "name": "graphics-description-only",
+  "version": "0.0.1",
+  "nodecg": {
+    "compatibleRange": "~0.7.0",
+    "graphics": [
+      {
+        "file": "described.html",
+        "width": 1024,
+        "height": 768,
+        "description": "A graphic with only description"
+      }
+    ]
+  }
+}

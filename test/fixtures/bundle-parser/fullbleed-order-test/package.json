@@ -1,0 +1,16 @@
+{
+  "name": "fullbleed-order-test",
+  "version": "0.0.1",
+  "nodecg": {
+    "compatibleRange": "~0.7.0",
+    "dashboardPanels": [
+      {
+        "name": "fullbleed-panel",
+        "title": "Fullbleed Panel",
+        "file": "panel.html",
+        "fullbleed": true,
+        "workspaceOrder": 3
+      }
+    ]
+  }
+}

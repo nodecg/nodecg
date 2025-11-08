@@ -3,7 +3,9 @@ import "@polymer/paper-dialog/paper-dialog.js";
 
 // These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
 import * as keep1 from "./ncg-graphic";
+import * as keep2 from "./ncg-graphics-group";
 keep1;
+keep2;
 
 import * as Polymer from "@polymer/polymer";
 import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
@@ -96,9 +98,20 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 			</paper-button>
 		</div>
 
-		<template is="dom-repeat" items="[[bundle.graphics]]" as="graphic" mutable-data="">
+		<!-- Ungrouped graphics -->
+		<template is="dom-repeat" items="[[_ungroupedGraphics]]" as="graphic" mutable-data="">
 			<ncg-graphic graphic="[[graphic]]" instances="[[_calcGraphicInstances(bundle, graphic, instances)]]">
 			</ncg-graphic>
+		</template>
+
+		<!-- Grouped graphics -->
+		<template is="dom-repeat" items="[[_graphicsGroups]]" as="group" mutable-data="">
+			<ncg-graphics-group 
+				bundle-name="[[bundle.name]]" 
+				group-name="[[group.name]]" 
+				graphics="[[group.graphics]]" 
+				instances="[[instances]]">
+			</ncg-graphics-group>
 		</template>
 
 		<paper-dialog id="reloadAllConfirmDialog" on-iron-overlay-closed="_handleReloadAllConfirmDialogClose">
@@ -122,6 +135,14 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 		return {
 			bundle: Object,
 			instances: Array,
+			_ungroupedGraphics: {
+				type: Array,
+				computed: "_computeUngroupedGraphics(bundle.graphics)",
+			},
+			_graphicsGroups: {
+				type: Array,
+				computed: "_computeGraphicsGroups(bundle.graphics)",
+			},
 		};
 	}
 
@@ -143,6 +164,64 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 				instance.bundleName === bundle.name &&
 				instance.pathName === graphic.url,
 		);
+	}
+
+	_computeUngroupedGraphics(graphics?: NodeCG.Bundle.Graphic[]) {
+		if (!graphics) {
+			return [];
+		}
+		const ungrouped = graphics.filter((graphic) => !graphic.group);
+		return this._sortGraphics(ungrouped);
+	}
+
+	_computeGraphicsGroups(graphics?: NodeCG.Bundle.Graphic[]) {
+		if (!graphics) {
+			return [];
+		}
+
+		const groupedGraphics = graphics.filter((graphic) => graphic.group);
+		const groupsMap = new Map<string, NodeCG.Bundle.Graphic[]>();
+
+		groupedGraphics.forEach((graphic) => {
+			const groupName = graphic.group!;
+			if (!groupsMap.has(groupName)) {
+				groupsMap.set(groupName, []);
+			}
+			groupsMap.get(groupName)!.push(graphic);
+		});
+
+		const groups = Array.from(groupsMap.entries()).map(([name, graphics]) => ({
+			name,
+			graphics: this._sortGraphics(graphics),
+		}));
+
+		groups.sort((a, b) => a.name.localeCompare(b.name));
+		return groups;
+	}
+
+	_sortGraphics(graphics: NodeCG.Bundle.Graphic[]) {
+		return graphics.slice().sort((a, b) => {
+			// Items with order should come before items without order
+			if (a.order !== undefined && b.order === undefined) {
+				return -1;
+			}
+			if (a.order === undefined && b.order !== undefined) {
+				return 1;
+			}
+			
+			// Both have order - sort by order value
+			if (a.order !== undefined && b.order !== undefined) {
+				if (a.order !== b.order) {
+					return a.order - b.order;
+				}
+				// If orders are equal, fall through to name sorting
+			}
+			
+			// Sort by name (using display name if available, otherwise file name)
+			const nameA = a.name ?? a.file;
+			const nameB = b.name ?? b.file;
+			return nameA.localeCompare(nameB);
+		});
 	}
 
 	_handleReloadAllConfirmDialogClose(e: any) {
