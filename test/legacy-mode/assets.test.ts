@@ -5,15 +5,15 @@ import { setTimeout } from "node:timers/promises";
 import type * as puppeteer from "puppeteer";
 import { expect } from "vitest";
 
-import { setupTest } from "./helpers/setup";
-import * as C from "./helpers/test-constants";
-import * as util from "./helpers/utilities";
+import { setupTest } from "../helpers/setup";
+import * as C from "../helpers/test-constants";
+import * as util from "../helpers/utilities";
 
 const test = await setupTest();
 
 const UPLOAD_SOURCE_PATH = path.resolve(
 	__dirname,
-	"fixtures/assets-to-upload/#twitter_banner.png",
+	"../fixtures/assets-to-upload/#twitter_banner.png",
 );
 const TWITTER_BANNER_PATH = path.join(
 	C.assetsRoot(),

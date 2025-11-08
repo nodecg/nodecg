@@ -1,0 +1,226 @@
+import fs from "node:fs";
+import path from "node:path";
+import { setTimeout } from "node:timers/promises";
+import { pathToFileURL } from "node:url";
+
+import type { getConnection } from "@nodecg/database-adapter-sqlite-legacy";
+import isCi from "is-ci";
+import * as puppeteer from "puppeteer";
+import { afterAll, test } from "vitest";
+
+import type { serverApiFactory } from "../../src/server/api.server";
+import type { NodeCGServer } from "../../src/server/server";
+import { populateTestData } from "../helpers/populateTestData";
+import * as C from "../helpers/test-constants";
+import { createTmpDir } from "../helpers/tmp-dir";
+
+export interface SetupContext {
+	server: NodeCGServer;
+	apis: { extension: InstanceType<ReturnType<typeof serverApiFactory>> };
+	browser: puppeteer.Browser;
+	dashboard: puppeteer.Page;
+	standalone: puppeteer.Page;
+	graphic: puppeteer.Page;
+	singleInstance: puppeteer.Page;
+	loginPage: puppeteer.Page;
+	database: Awaited<ReturnType<typeof getConnection>>;
+}
+
+export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
+	const tmpDir = createTmpDir();
+	const originalCwd = process.cwd();
+
+	// Copy test-bundle contents directly to tmpDir root (tmpDir IS the bundle)
+	const testBundlePath = "test/fixtures/nodecg-core/bundles/test-bundle";
+	fs.cpSync(testBundlePath, tmpDir, {
+		recursive: true,
+		filter: (src) => {
+			// Skip git directory during initial copy, we'll rename it after
+			return !src.endsWith("/git");
+		},
+	});
+
+	// Rename git → .git
+	const gitPath = path.join(testBundlePath, "git");
+	if (fs.existsSync(gitPath)) {
+		fs.cpSync(gitPath, path.join(tmpDir, ".git"), { recursive: true });
+	}
+
+	// Copy NodeCG configuration
+	fs.cpSync("test/fixtures/nodecg-core/cfg", path.join(tmpDir, "cfg"), {
+		recursive: true,
+	});
+	fs.cpSync(
+		`test/fixtures/nodecg-core/cfg/${nodecgConfigName}`,
+		path.join(tmpDir, "cfg/nodecg.json"),
+		{ recursive: true },
+	);
+
+	// Copy test assets (bundle's assets)
+	fs.cpSync("test/fixtures/nodecg-core/assets", path.join(tmpDir, "assets"), {
+		recursive: true,
+	});
+
+	// Create test security file
+	fs.writeFileSync(
+		path.join(tmpDir, "should-be-forbidden.txt"),
+		"exploit succeeded",
+		"utf-8",
+	);
+
+	// Copy entire node_modules directory (includes all dependencies and @nodecg/* workspaces)
+	fs.cpSync("node_modules", path.join(tmpDir, "node_modules"), {
+		recursive: true,
+	});
+
+	// Create node_modules/nodecg and copy the current NodeCG project into it
+	const nodecgModulePath = path.join(tmpDir, "node_modules/nodecg");
+	fs.mkdirSync(nodecgModulePath, { recursive: true });
+
+	fs.cpSync("package.json", path.join(nodecgModulePath, "package.json"));
+	fs.cpSync("index.js", path.join(nodecgModulePath, "index.js"));
+	fs.cpSync("out", path.join(nodecgModulePath, "out"), { recursive: true });
+	fs.cpSync("dist", path.join(nodecgModulePath, "dist"), { recursive: true });
+
+	// Change cwd and set NODECG_ROOT before importing NodeCGServer
+	// This ensures isLegacyProject check works correctly
+	process.chdir(tmpDir);
+	process.env.NODECG_ROOT = tmpDir;
+
+	// Dynamically import NodeCGServer from the installed location
+	const serverModulePath = pathToFileURL(
+		path.join(nodecgModulePath, "out/server/server/index.js"),
+	).href;
+	const { NodeCGServer } = (await import(serverModulePath)) as {
+		NodeCGServer: typeof import("../../src/server/server").NodeCGServer;
+	};
+
+	const server = new NodeCGServer();
+
+	await populateTestData();
+	await server.start();
+
+	let browser: puppeteer.Browser | null = null;
+
+	let dashboard: puppeteer.Page | null = null;
+	let standalone: puppeteer.Page | null = null;
+	let graphic: puppeteer.Page | null = null;
+	let singleInstance: puppeteer.Page | null = null;
+	let loginPage: puppeteer.Page | null = null;
+
+	afterAll(async () => {
+		// Restore original cwd
+		process.chdir(originalCwd);
+
+		await Promise.all([
+			fs.promises
+				.rm(tmpDir, { recursive: true, force: true })
+				.catch((error) => {
+					// Ignore errors when cleaning up the temp folder
+					console.error(error);
+				}),
+			browser?.close(),
+		]);
+	});
+
+	return test
+		.extend<Pick<SetupContext, "server" | "apis">>({
+			server,
+			apis: {
+				extension: server.getExtensions()[C.bundleName()] as InstanceType<
+					ReturnType<typeof serverApiFactory>
+				>,
+			},
+		})
+		.extend<Pick<SetupContext, "browser">>({
+			browser: async ({}, use) => {
+				if (browser) {
+					await use(browser);
+				} else {
+					const args = isCi ? ["--no-sandbox"] : undefined;
+					browser = await puppeteer.launch({
+						headless: true,
+						args,
+					});
+
+					await use(browser);
+				}
+			},
+		})
+		.extend<
+			Pick<
+				SetupContext,
+				"dashboard" | "standalone" | "graphic" | "singleInstance" | "loginPage"
+			>
+		>({
+			dashboard: async ({ browser }, use) => {
+				if (!dashboard) {
+					const page = await browser.newPage();
+					await page.goto(C.dashboardUrl());
+					await page.waitForFunction(
+						() => typeof window.dashboardApi !== "undefined",
+					);
+					await page.waitForFunction(() => window.WebComponentsReady);
+					dashboard = page;
+				}
+				await use(dashboard);
+			},
+			standalone: async ({ browser }, use) => {
+				if (!standalone) {
+					const page = await browser.newPage();
+					await page.goto(`${C.testPanelUrl()}?standalone=true`);
+					await page.waitForFunction(
+						() => typeof window.dashboardApi !== "undefined",
+					);
+					standalone = page;
+				}
+				await use(standalone);
+			},
+			graphic: async ({ browser }, use) => {
+				if (!graphic) {
+					const page = await browser.newPage();
+					await page.goto(C.graphicUrl());
+					await page.waitForFunction(
+						() => typeof window.graphicApi !== "undefined",
+					);
+					graphic = page;
+				}
+				await use(graphic);
+			},
+			singleInstance: async ({ browser }, use) => {
+				if (!singleInstance) {
+					const page = await browser.newPage();
+					await page.goto(C.singleInstanceUrl());
+					await page.waitForFunction(() => {
+						if (window.location.pathname.endsWith("busy.html")) {
+							return true;
+						}
+						if (window.location.pathname.endsWith("killed.html")) {
+							return true;
+						}
+						return typeof window.singleInstanceApi !== "undefined";
+					});
+					await setTimeout(500);
+					singleInstance = page;
+				}
+				await use(singleInstance);
+			},
+			loginPage: async ({ browser }, use) => {
+				if (!loginPage) {
+					const page = await browser.newPage();
+					await page.goto(C.loginUrl());
+					loginPage = page;
+				}
+				await use(loginPage);
+			},
+		})
+		.extend<Pick<SetupContext, "database">>({
+			database: async ({}, use) => {
+				const { getConnection } = await import(
+					"@nodecg/database-adapter-sqlite-legacy"
+				);
+				const database = await getConnection();
+				await use(database);
+			},
+		});
+}

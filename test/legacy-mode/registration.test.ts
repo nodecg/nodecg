@@ -2,9 +2,9 @@ import { setTimeout } from "node:timers/promises";
 
 import { expect } from "vitest";
 
-import { setupTest } from "./helpers/setup";
-import * as C from "./helpers/test-constants";
-import * as util from "./helpers/utilities";
+import { setupTest } from "../helpers/setup";
+import * as C from "../helpers/test-constants";
+import * as util from "../helpers/utilities";
 
 const test = await setupTest();
 

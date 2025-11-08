@@ -1,10 +1,10 @@
 import express from "express";
 import { expect } from "vitest";
 
-import { NodeCG } from "../../src/types/nodecg";
-import { setupTest } from "../helpers/setup";
-import * as C from "../helpers/test-constants";
-import { invokeAck } from "../helpers/utilities";
+import { NodeCG } from "../../../src/types/nodecg";
+import { setupTest } from "../../helpers/setup";
+import * as C from "../../helpers/test-constants";
+import { invokeAck } from "../../helpers/utilities";
 
 const test = await setupTest();
 

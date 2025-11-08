@@ -1,8 +1,8 @@
 import { Replicant } from "@nodecg/database-adapter-sqlite-legacy";
 import { expect } from "vitest";
 
-import type { NodeCG } from "../../src/types/nodecg";
-import { setupTest } from "../helpers/setup";
+import type { NodeCG } from "../../../src/types/nodecg";
+import { setupTest } from "../../helpers/setup";
 
 const test = await setupTest();
 
@@ -251,7 +251,7 @@ test('when an array - should support the "delete" operator', async ({
 					}
 
 					if (newVal[0] === "foo" && !deleted) {
-						// eslint-disable-next-line @typescript-eslint/no-array-delete
+						 
 						delete rep.value![0];
 						deleted = true;
 					} else if (newVal[0] === undefined) {

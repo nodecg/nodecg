@@ -2,8 +2,8 @@ import { Page } from "puppeteer";
 import socketIoClient from "socket.io-client";
 import { expect } from "vitest";
 
-import { setupTest } from "./helpers/setup";
-import * as C from "./helpers/test-constants";
+import { setupTest } from "../helpers/setup";
+import * as C from "../helpers/test-constants";
 
 const test = await setupTest("nodecg-login.json");
 

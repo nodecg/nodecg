@@ -1,8 +1,8 @@
 import { expect } from "vitest";
 
-import type { NodeCG } from "../src/types/nodecg";
-import { setupTest } from "./helpers/setup";
-import * as C from "./helpers/test-constants";
+import type { NodeCG } from "../../src/types/nodecg";
+import { setupTest } from "../helpers/setup";
+import * as C from "../helpers/test-constants";
 
 const test = await setupTest();
 

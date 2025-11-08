@@ -1,6 +1,6 @@
 import { expect } from "vitest";
 
-import { setupTest } from "../helpers/setup";
+import { setupTest } from "../../helpers/setup";
 
 const test = await setupTest();
 
