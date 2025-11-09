@@ -37,6 +37,7 @@
     "cli.mjs"
   ],
   "scripts": {
+    "reset": "del-cli dist out tsconfig.tsbuildinfo",
     "start": "node index.js",
     "watch": "del-cli dist out && run-p watch:*",
     "watch:client": "tsx scripts/build-client.mts --watch",
@@ -150,7 +151,7 @@
     "@types/semver": "^7.5.8",
     "@types/yargs": "^15.0.19",
     "cpy-cli": "^5.0.0",
-    "del-cli": "^5.1.0",
+    "del-cli": "^7.0.0",
     "esbuild": "^0.25.11",
     "esbuild-plugin-copy": "^2.1.1",
     "is-ci": "^3.0.1",

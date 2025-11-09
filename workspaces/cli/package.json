@@ -12,7 +12,9 @@
     "dist",
     "src"
   ],
-  "scripts": {},
+  "scripts": {
+    "reset": "del-cli dist tsconfig.tsbuildinfo"
+  },
   "dependencies": {
     "@inquirer/prompts": "^7.2.1",
     "ajv": "^8.17.1",
@@ -30,8 +32,7 @@
     "@types/node": "20",
     "@types/npm-package-arg": "^6.1.4",
     "@types/semver": "^7.5.8",
-    "del-cli": "^6.0.0",
-    "npm-run-all2": "^7.0.2",
+    "del-cli": "^7.0.0",
     "type-fest": "^4.33.0",
     "typescript": "~5.9.3"
   },

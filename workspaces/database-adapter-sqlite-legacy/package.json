@@ -29,7 +29,7 @@
     "typeorm": "0.3.27"
   },
   "devDependencies": {
-    "del-cli": "^6.0.0",
+    "del-cli": "^7.0.0",
     "typescript": "~5.9.3"
   },
   "publishConfig": {

@@ -15,6 +15,7 @@
     "workspaces/nodecg"
   ],
   "scripts": {
+    "reset": "npm --workspaces --if-present run reset",
     "start": "node index.js",
     "dev": "run-p dev:*",
     "dev:watch": "tsx scripts/workspaces-parallel.ts watch",
