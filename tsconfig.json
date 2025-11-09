@@ -3,7 +3,6 @@
 		"target": "ES2022",
 		"lib": ["ES2022"],
 		"module": "commonjs",
-		"moduleResolution": "node10",
 		"esModuleInterop": true,
 
 		"strict": true,
@@ -14,6 +13,9 @@
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
 		"noPropertyAccessFromIndexSignature": true,
+
+		"verbatimModuleSyntax": false,
+		"forceConsistentCasingInFileNames": true,
 
 		"skipLibCheck": true
 	}

@@ -1,15 +1,15 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"target": "ESNext",
-		"lib": ["ESNext"],
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"types": ["node"],
-		"esModuleInterop": null,
-		"isolatedModules": true,
-		"verbatimModuleSyntax": true,
-		"forceConsistentCasingInFileNames": true,
-		"noEmit": true
-	}
+		"module": "node20",
+
+		"composite": true,
+		"outDir": "dist",
+		"rootDir": "src",
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true
+	},
+	"include": ["src/**/*.ts", "src/**/*.json"],
+	"exclude": ["**/*.test.ts"]
 }

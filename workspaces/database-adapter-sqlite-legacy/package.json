@@ -18,8 +18,7 @@
     "src"
   ],
   "scripts": {
-    "build": "del-cli dist && tsc -b",
-    "dev": "del-cli dist && tsc -b --watch --preserveWatchOutput",
+    "reset": "del-cli dist tsconfig.tsbuildinfo",
     "generate-migrations": "typeorm-ts-node-commonjs migration:generate ./src/migration/rename-me -d ./src/datasource.ts"
   },
   "dependencies": {
@@ -31,7 +30,7 @@
   },
   "devDependencies": {
     "del-cli": "^6.0.0",
-    "typescript": "~5.7.3"
+    "typescript": "~5.9.3"
   },
   "publishConfig": {
     "access": "public",

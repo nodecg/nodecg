@@ -5,11 +5,14 @@
 		"experimentalDecorators": true,
 
 		"composite": true,
-		"noEmit": false,
 		"outDir": "dist",
 		"rootDir": "src",
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true
-	}
+	},
+	"references": [
+		{"path": "../internal-util"},
+		{"path": "../database-adapter-types"}
+	]
 }

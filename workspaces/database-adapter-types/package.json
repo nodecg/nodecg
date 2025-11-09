@@ -17,13 +17,10 @@
     "dist",
     "src"
   ],
-  "scripts": {
-    "build": "del-cli dist && tsc -b",
-    "dev": "tsc -b --watch --preserveWatchOutput"
-  },
+  "scripts": {},
   "devDependencies": {
     "del-cli": "^6.0.0",
-    "typescript": "~5.7.3"
+    "typescript": "~5.9.3"
   },
   "publishConfig": {
     "access": "public",

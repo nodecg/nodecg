@@ -16,7 +16,9 @@
   ],
   "scripts": {
     "start": "node index.js",
-    "dev": "tsx scripts/workspaces-parallel.ts dev",
+    "dev": "run-p dev:*",
+    "dev:watch": "tsx scripts/workspaces-parallel.ts watch",
+    "dev:tsc": "npm run build:tsc -- --watch --preserveWatchOutput",
     "test": "vitest",
     "typetest": "npm -w nodecg run typetest",
     "lint": "npm-run-all -s lint:*",
@@ -24,15 +26,21 @@
     "lint:eslint": "eslint --cache",
     "fix": "npm-run-all -s fix:*",
     "fix:prettier": "prettier --write .",
-    "fix:eslint": "npm run lint:eslint -- --fix ",
-    "build": "npm --workspaces run build"
+    "fix:eslint": "npm run lint:eslint -- --fix",
+    "build": "run-s build:*",
+    "build:tsc": "tsc -b workspaces/cli workspaces/nodecg/src/client workspaces/nodecg/src/server",
+    "build:workspaces": "npm --workspaces --if-present run build"
   },
   "prettier": {},
   "devDependencies": {
+    "@effect/cli": "^0.72.1",
+    "@effect/platform": "^0.93.0",
+    "@effect/platform-node": "^0.100.0",
     "@eslint/js": "^9.39.0",
     "@vitest/coverage-v8": "^4.0.7",
     "cpy-cli": "^5.0.0",
     "del-cli": "^5.1.0",
+    "effect": "^3.19.3",
     "eslint": "^9.39.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-simple-import-sort": "^12.1.1",
@@ -42,7 +50,7 @@
     "puppeteer": "^24.28.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
-    "typescript": "~5.7.2",
+    "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.2",
     "vitest": "^4.0.7"
   },
