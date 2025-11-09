@@ -32,12 +32,14 @@
     "dist",
     "out",
     "schemas",
+    "src",
     "types",
+    "cli.mjs",
     "index.js",
-    "cli.mjs"
+    "!**/tsconfig.tsbuildinfo"
   ],
   "scripts": {
-    "reset": "del-cli dist out tsconfig.tsbuildinfo",
+    "reset": "del-cli dist out",
     "start": "node index.js",
     "watch": "run-p watch:*",
     "watch:client": "tsx scripts/build-client.mts --watch",
