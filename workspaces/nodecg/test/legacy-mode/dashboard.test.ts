@@ -38,7 +38,7 @@ test("ncg-dialog - should have the buttons defined in dialogButtons", async ({
 			return {
 				confirm: buttonEl.hasAttribute("dialog-confirm"),
 				dismiss: buttonEl.hasAttribute("dialog-dismiss"),
-				text: buttonEl.textContent!.trim(),
+				text: buttonEl.textContent.trim(),
 			};
 		}
 
