@@ -4,9 +4,12 @@
 		"noEmit": false,
 		"composite": true,
 		"rootDir": ".",
+		"module": "commonjs",
+
 		"outDir": "../../out/types",
 		"declaration": true,
-		"module": "CommonJS"
+		"declarationMap": true,
+		"sourceMap": true
 	},
 	"include": ["./**/*.ts"],
 	"references": [{ "path": "../../../database-adapter-types" }]
