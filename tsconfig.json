@@ -2,11 +2,9 @@
 	"compilerOptions": {
 		"target": "ES2022",
 		"lib": ["ES2022"],
-
 		"module": "commonjs",
 		"moduleResolution": "node10",
 		"esModuleInterop": true,
-		"resolveJsonModule": true,
 
 		"strict": true,
 		"noUnusedLocals": true,
@@ -18,8 +16,5 @@
 		"noPropertyAccessFromIndexSignature": true,
 
 		"skipLibCheck": true,
-
-		"declaration": true,
-		"sourceMap": true
 	}
 }

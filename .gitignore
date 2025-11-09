@@ -1,5 +1,5 @@
 dist/
-/out
+out/
 .eslintcache
 *.tsbuildinfo
 
