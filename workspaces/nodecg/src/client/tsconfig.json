@@ -1,10 +1,11 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
+		"noEmit": false,
 		"target": "es2019",
-		"composite": true,
 		"outDir": "../../out/client",
 		"declaration": true,
+		"declarationMap": true,
 		"baseUrl": ".",
 		"paths": {
 			"@polymer/polymer": ["./types/polymer-element.d.ts"]

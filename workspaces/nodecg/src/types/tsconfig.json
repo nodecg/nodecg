@@ -1,11 +1,12 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
+		"noEmit": false,
+		"composite": true,
 		"rootDir": ".",
 		"outDir": "../../out/types",
 		"declaration": true,
-		"module": "CommonJS",
-		"composite": true
+		"module": "CommonJS"
 	},
 	"include": ["./**/*.ts"],
 	"references": [{ "path": "../../../database-adapter-types" }]

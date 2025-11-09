@@ -39,12 +39,12 @@
   "scripts": {
     "reset": "del-cli dist out tsconfig.tsbuildinfo",
     "start": "node index.js",
-    "watch": "del-cli dist out && run-p watch:*",
+    "watch": "run-p watch:*",
     "watch:client": "tsx scripts/build-client.mts --watch",
     "watch:copy-templates": "onchange \"src/server/**/*.tmpl\" -i -- cpy \"src/server/**/*.tmpl\" out/server",
     "test": "vitest",
     "typetest": "cd typetest/fake-bundle && npm run build",
-    "build": "del-cli dist out && run-s build:*",
+    "build": "run-s build:*",
     "build:client": "tsx scripts/build-client.mts",
     "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server"
   },

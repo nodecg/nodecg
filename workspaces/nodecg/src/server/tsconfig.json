@@ -1,11 +1,11 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
+		"noEmit": false,
 		"outDir": "../../out/server",
 		"declaration": true,
-		"rootDir": ".",
-		"module": "CommonJS",
-		"composite": true
+		"declarationMap": true,
+		"module": "CommonJS"
 	},
 	"include": ["./**/*.ts", "../types/stubs.d.ts"],
 	"exclude": ["./**/*.test.ts"],

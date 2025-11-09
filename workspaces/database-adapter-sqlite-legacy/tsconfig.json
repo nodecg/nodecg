@@ -4,6 +4,7 @@
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 
+		"noEmit": false,
 		"composite": true,
 		"outDir": "dist",
 		"rootDir": "src",
@@ -12,7 +13,7 @@
 		"sourceMap": true
 	},
 	"references": [
-		{"path": "../internal-util"},
-		{"path": "../database-adapter-types"}
+		{ "path": "../internal-util" },
+		{ "path": "../database-adapter-types" }
 	]
 }
