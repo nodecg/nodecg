@@ -7,5 +7,6 @@
 		"module": "CommonJS",
 		"composite": true
 	},
-	"include": ["./**/*.ts"]
+	"include": ["./**/*.ts"],
+	"references": [{ "path": "../../../database-adapter-types" }]
 }
