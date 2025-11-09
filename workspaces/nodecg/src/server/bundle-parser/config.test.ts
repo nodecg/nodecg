@@ -30,7 +30,9 @@ test("parsing - when the config file exists, should not reject a config if it do
 		testDirPath("fixtures/bundle-parser/required-defaults"),
 		JSON.parse(
 			fs.readFileSync(
-				testDirPath("fixtures/bundle-parser/required-defaults/bundleConfig.json"),
+				testDirPath(
+					"fixtures/bundle-parser/required-defaults/bundleConfig.json",
+				),
 				"utf8",
 			),
 		),
@@ -44,7 +46,9 @@ test("validation - when the schema file exists, should not throw when the config
 		testDirPath("fixtures/bundle-parser/config-validation"),
 		JSON.parse(
 			fs.readFileSync(
-				testDirPath("fixtures/bundle-parser/config-validation/validConfig.json"),
+				testDirPath(
+					"fixtures/bundle-parser/config-validation/validConfig.json",
+				),
 				"utf8",
 			),
 		),
@@ -58,7 +62,9 @@ test("validation - when the schema file exists, should throw when the config fai
 		testDirPath("fixtures/bundle-parser/config-validation"),
 		JSON.parse(
 			fs.readFileSync(
-				testDirPath("fixtures/bundle-parser/config-validation/invalidConfig.json"),
+				testDirPath(
+					"fixtures/bundle-parser/config-validation/invalidConfig.json",
+				),
 				"utf8",
 			),
 		),
@@ -75,7 +81,9 @@ test("validation - when the schema file exists, properly merge configs that have
 		testDirPath("fixtures/bundle-parser/config-schema-array-of-objects"),
 		JSON.parse(
 			fs.readFileSync(
-				testDirPath("fixtures/bundle-parser/config-schema-array-of-objects/bundleConfig.json"),
+				testDirPath(
+					"fixtures/bundle-parser/config-schema-array-of-objects/bundleConfig.json",
+				),
 				"utf8",
 			),
 		),
@@ -136,10 +144,14 @@ test("validation - when the schema file isn't valid JSON, throw an error", () =>
 
 test("validation - should not reject a config if it doesn't an optional object that has some properties with defaults and other required properties that do not have defaults", () => {
 	const parsedBundle = parseBundle(
-		testDirPath("fixtures/bundle-parser/optional-object-with-required-props-and-defaults"),
+		testDirPath(
+			"fixtures/bundle-parser/optional-object-with-required-props-and-defaults",
+		),
 		JSON.parse(
 			fs.readFileSync(
-				testDirPath("fixtures/bundle-parser/optional-object-with-required-props-and-defaults/bundleConfig.json"),
+				testDirPath(
+					"fixtures/bundle-parser/optional-object-with-required-props-and-defaults/bundleConfig.json",
+				),
 				"utf8",
 			),
 		),

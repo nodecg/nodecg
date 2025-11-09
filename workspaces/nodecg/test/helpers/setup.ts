@@ -33,12 +33,20 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 	// may have. We don't want to touch any existing user data!
 	process.env.NODECG_ROOT = tmpDir;
 
-	fs.cpSync(testDirPath("fixtures/nodecg-core/assets"), path.join(tmpDir, "assets"), {
-		recursive: true,
-	});
-	fs.cpSync(testDirPath("fixtures/nodecg-core/bundles"), path.join(tmpDir, "bundles"), {
-		recursive: true,
-	});
+	fs.cpSync(
+		testDirPath("fixtures/nodecg-core/assets"),
+		path.join(tmpDir, "assets"),
+		{
+			recursive: true,
+		},
+	);
+	fs.cpSync(
+		testDirPath("fixtures/nodecg-core/bundles"),
+		path.join(tmpDir, "bundles"),
+		{
+			recursive: true,
+		},
+	);
 	fs.renameSync(
 		path.join(tmpDir, "bundles/test-bundle/git"),
 		path.join(tmpDir, "bundles/test-bundle/.git"),

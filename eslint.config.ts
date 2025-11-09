@@ -55,9 +55,9 @@ export default defineConfig(
 	{
 		ignores: [
 			"**/*.{js,cjs,mjs}",
-			"node_modules",
-			"dist",
-			"out",
+			"**/node_modules",
+			"**/dist",
+			"**/out",
 			"bundles",
 			"workspaces/nodecg/test/fixtures",
 			"coverage",
