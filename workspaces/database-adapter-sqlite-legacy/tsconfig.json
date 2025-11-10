@@ -1,19 +1,13 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
-
 		"noEmit": false,
-		"composite": true,
 		"outDir": "dist",
 		"rootDir": "src",
-		"declaration": true,
-		"declarationMap": true,
-		"sourceMap": true
+
+		"module": "node20",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true
 	},
-	"references": [
-		{ "path": "../internal-util" },
-		{ "path": "../database-adapter-types" }
-	]
+	"include": ["src/**/*.ts"]
 }

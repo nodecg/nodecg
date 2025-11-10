@@ -13,11 +13,13 @@
   "bugs": "https://github.com/nodecg/nodecg/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nodecg/nodecg.git"
+    "url": "git+https://github.com/nodecg/nodecg.git",
+    "directory": "workspaces/nodecg"
   },
   "license": "MIT",
+  "type": "commonjs",
   "exports": {
-    ".": "./index.js",
+    ".": "./dist/server/bootstrap.js",
     "./types": {
       "types": "./types/index.d.ts"
     },
@@ -25,6 +27,7 @@
       "types": "./types/augment-window.d.ts"
     }
   },
+  "main": "./dist/server/bootstrap.js",
   "bin": {
     "nodecg": "./cli.mjs"
   },
@@ -34,21 +37,16 @@
     "schemas",
     "src",
     "types",
-    "cli.mjs",
-    "index.js",
-    "!**/tsconfig.tsbuildinfo"
+    "cli.mjs"
   ],
   "scripts": {
-    "reset": "del-cli dist out",
+    "build": "tsdown",
     "start": "node index.js",
-    "watch": "run-p watch:*",
-    "watch:client": "tsx scripts/build-client.mts --watch",
-    "watch:copy-templates": "onchange \"src/server/**/*.tmpl\" -i -- cpy \"src/server/**/*.tmpl\" out/server",
     "test": "vitest",
+    "typecheck": "tsc -b src/client src/server test",
+    "typecheck-watch": "tsc -b src/client src/server test --watch --preserveWatchOutput",
     "typetest": "cd typetest/fake-bundle && npm run build",
-    "build": "run-s build:*",
-    "build:client": "tsx scripts/build-client.mts",
-    "build:copy-templates": "cpy \"src/server/**/*.tmpl\" out/server"
+    "watch": "tsdown --watch"
   },
   "dependencies": {
     "@nodecg/cli": "2.6.1",
@@ -152,13 +150,10 @@
     "@types/passport-steam": "^1.0.5",
     "@types/semver": "^7.5.8",
     "@types/yargs": "^15.0.19",
-    "cpy-cli": "^5.0.0",
-    "del-cli": "^7.0.0",
-    "esbuild": "^0.25.11",
-    "esbuild-plugin-copy": "^2.1.1",
     "is-ci": "^3.0.1",
     "npm-run-all2": "^7.0.2",
     "onchange": "^7.1.0",
+    "tsdown": "^0.16.1",
     "tsx": "^4.19.2",
     "typescript": "~5.9.3",
     "vitest": "^4.0.7",

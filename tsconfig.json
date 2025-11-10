@@ -2,8 +2,8 @@
 	"compilerOptions": {
 		"target": "ES2022",
 		"lib": ["ES2022"],
-		"module": "commonjs",
-		"esModuleInterop": true,
+		"module": "preserve",
+		"resolveJsonModule": true,
 
 		"strict": true,
 		"noUnusedLocals": true,
@@ -19,6 +19,10 @@
 
 		"skipLibCheck": true,
 
-		"noEmit": true
+		"noEmit": true,
+		"declaration": true,
+		"declarationMap": true,
+
+		"customConditions": ["source"]
 	}
 }

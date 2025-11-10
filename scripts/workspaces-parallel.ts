@@ -25,14 +25,14 @@ const command = cli.Command.make(
 	Effect.fn("workspaces-parallel")(function* ({ arg }) {
 		const path = yield* Path.Path;
 		const fs = yield* FileSystem.FileSystem;
-		const packageJsonPath = path.join(__dirname, "../package.json");
+		const packageJsonPath = path.join(import.meta.dirname, "../package.json");
 		const packageJson = yield* decodePackageJson(
 			yield* fs.readFileString(packageJsonPath),
 		);
 		const fibers = yield* Effect.all(
 			packageJson.workspaces.map(
 				Effect.fn(function* (workspace) {
-					const workspacePath = path.join(__dirname, "..", workspace);
+					const workspacePath = path.join(import.meta.dirname, "..", workspace);
 					const workspacePackageJsonPath = path.join(
 						workspacePath,
 						"package.json",
@@ -49,7 +49,7 @@ const command = cli.Command.make(
 						Command.stderr("inherit"),
 						Command.exitCode,
 						Effect.map((exitCode) =>
-							exitCode === 0 ? null : { workspace, exitCode },
+							exitCode === 0 ? null : { exitCode, workspace },
 						),
 					);
 					return yield* Effect.fork(commandEffect);
@@ -69,7 +69,7 @@ const command = cli.Command.make(
 				new CommandFailedError({ workspaces: nonZeroExits }),
 			);
 		}
-	}),
+	}, Effect.scoped),
 );
 
 NodeRuntime.runMain(

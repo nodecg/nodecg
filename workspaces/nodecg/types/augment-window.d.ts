@@ -1,4 +1,4 @@
-import { NodeCGAPIClient } from "../out/client/api/api.client";
+import { NodeCGAPIClient } from "../out/client/api.client";
 
 declare global {
 	var NodeCG: typeof NodeCGAPIClient;

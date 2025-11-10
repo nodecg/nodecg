@@ -1,13 +1,14 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"target": "ES2022",
-		"lib": ["ES2022"],
-		"module": "preserve",
-		"esModuleInterop": true,
-		"resolveJsonModule": true,
+		"lib": ["ESNext", "DOM"],
+		"noPropertyAccessFromIndexSignature": false,
+		"noUncheckedIndexedAccess": false,
 
-		"declaration": true,
-		"sourceMap": true
-	}
+		"baseUrl": ".",
+		"paths": {
+			"@polymer/polymer": ["./src/client/types/polymer-element.d.ts"]
+		}
+	},
+	"exclude": ["./typetest"]
 }

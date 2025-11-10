@@ -7,6 +7,7 @@
     "url": "https://github.com/nodecg/nodecg.git"
   },
   "license": "MIT",
+  "type": "module",
   "workspaces": [
     "workspaces/internal-util",
     "workspaces/database-adapter-types",
@@ -15,11 +16,12 @@
     "workspaces/nodecg"
   ],
   "scripts": {
-    "reset": "npm --workspaces --if-present run reset",
     "start": "node index.js",
-    "dev": "run-p dev:*",
-    "dev:watch": "tsx scripts/workspaces-parallel.ts watch",
-    "dev:tsc": "npm run build:tsc -- --watch --preserveWatchOutput",
+    "dev": "run-p watch typecheck-watch",
+    "watch": "tsx scripts/workspaces-parallel.ts watch",
+    "typecheck-watch": "tsx scripts/workspaces-parallel.ts typecheck-watch",
+    "build": "npm --workspaces run build",
+    "typecheck": "npm --workspaces run typecheck",
     "test": "vitest",
     "typetest": "npm -w nodecg run typetest",
     "lint": "npm-run-all -s lint:*",
@@ -27,10 +29,7 @@
     "lint:eslint": "eslint --cache",
     "fix": "npm-run-all -s fix:*",
     "fix:prettier": "prettier --write .",
-    "fix:eslint": "npm run lint:eslint -- --fix",
-    "build": "run-s build:*",
-    "build:tsc": "tsc -b workspaces/cli workspaces/nodecg/src/client workspaces/nodecg/src/server",
-    "build:workspaces": "npm --workspaces --if-present run build"
+    "fix:eslint": "npm run lint:eslint -- --fix"
   },
   "prettier": {},
   "devDependencies": {
@@ -39,7 +38,6 @@
     "@effect/platform-node": "^0.100.0",
     "@eslint/js": "^9.39.0",
     "@vitest/coverage-v8": "^4.0.7",
-    "cpy-cli": "^5.0.0",
     "effect": "^3.19.3",
     "eslint": "^9.39.0",
     "eslint-config-prettier": "^10.1.8",
@@ -49,6 +47,7 @@
     "prettier": "^3.4.2",
     "puppeteer": "^24.28.0",
     "ts-node": "^10.9.2",
+    "tsdown": "^0.16.1",
     "tsx": "^4.19.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.2",

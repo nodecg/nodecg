@@ -9,9 +9,9 @@ import {
 	PrimaryGeneratedColumn,
 } from "typeorm";
 
-import { ApiKey } from "./ApiKey";
-import { Identity } from "./Identity";
-import { Role } from "./Role";
+import { ApiKey } from "./ApiKey.js";
+import { Identity } from "./Identity.js";
+import { Role } from "./Role.js";
 
 @Entity()
 export class User implements UserModel {

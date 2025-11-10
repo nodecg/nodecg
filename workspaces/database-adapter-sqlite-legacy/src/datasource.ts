@@ -4,13 +4,13 @@ import path from "node:path";
 
 import sqlite3 from "better-sqlite3";
 import { DataSource } from "typeorm";
-export * from "./entity";
+export * from "./entity/index.js";
 
 import { rootPaths } from "@nodecg/internal-util";
 
-import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
-import { initialize1669424617013 } from "./migration/1669424617013-initialize";
-import { defaultRoles1669424781583 } from "./migration/1669424781583-default-roles";
+import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity/index.js";
+import { initialize1669424617013 } from "./migration/1669424617013-initialize.js";
+import { defaultRoles1669424781583 } from "./migration/1669424781583-default-roles.js";
 
 const testing = process.env["NODECG_TEST"]?.toLowerCase() === "true";
 

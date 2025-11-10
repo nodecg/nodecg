@@ -1,7 +1,7 @@
 import type { Identity as IdentityModel } from "@nodecg/database-adapter-types";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-import { User } from "./User";
+import { User } from "./User.js";
 
 @Entity()
 export class Identity implements IdentityModel {

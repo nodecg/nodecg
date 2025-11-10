@@ -1,6 +1,6 @@
 import type { DatabaseAdapter } from "@nodecg/database-adapter-types";
 import { serializeError } from "serialize-error";
-import type { ExtendedError } from "socket.io/dist/namespace";
+import type { ExtendedError } from "socket.io";
 
 import type { TypedServerSocket } from "../../types/socket-protocol";
 import { UnAuthErrCode } from "../../types/socket-protocol";

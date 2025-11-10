@@ -7,7 +7,7 @@ import {
 	Replicant,
 	Role,
 	User,
-} from "./connection";
+} from "./connection.js";
 
 export { ApiKey, getConnection, Identity, Replicant, Role, User };
 

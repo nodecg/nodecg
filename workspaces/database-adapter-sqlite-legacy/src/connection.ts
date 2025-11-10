@@ -1,6 +1,6 @@
-import { dataSource } from "./datasource";
+import { dataSource } from "./datasource.js";
 
-export * from "./entity";
+export * from "./entity/index.js";
 
 let initialized = false;
 

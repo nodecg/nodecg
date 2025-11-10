@@ -6,7 +6,7 @@
 
 import { DeepReadonly } from "ts-essentials";
 
-import type { NodeCGAPIClient } from "../out/client/api/api.client";
+import type { NodeCGAPIClient } from "../out/client/api.client";
 import type { serverApiFactory } from "../out/server/api.server";
 import type { AbstractReplicant } from "../out/shared/replicants.shared";
 import type * as LoggerStuff from "../out/types/logger-interface";

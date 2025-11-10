@@ -3,17 +3,26 @@
   "version": "2.6.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nodecg/nodecg.git",
+    "url": "git+https://github.com/nodecg/nodecg.git",
     "directory": "workspaces/cli"
   },
   "type": "module",
-  "main": "dist/main.js",
+  "exports": {
+    ".": "./dist/nodecg.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/nodecg.js",
+  "module": "./dist/nodecg.js",
+  "types": "./dist/nodecg.d.ts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
-    "reset": "del-cli dist tsconfig.tsbuildinfo"
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "typecheck-watch": "tsc --noEmit --watch --preserveWatchOutput",
+    "watch": "tsdown --watch"
   },
   "dependencies": {
     "@inquirer/prompts": "^7.2.1",
@@ -32,7 +41,8 @@
     "@types/node": "20",
     "@types/npm-package-arg": "^6.1.4",
     "@types/semver": "^7.5.8",
-    "del-cli": "^7.0.0",
+    "publint": "^0.3.15",
+    "tsdown": "^0.16.1",
     "type-fest": "^4.33.0",
     "typescript": "~5.9.3"
   },

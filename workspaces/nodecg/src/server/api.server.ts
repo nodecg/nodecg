@@ -93,25 +93,14 @@ export function serverApiFactory(
 			return replicator.declare(name, namespace, opts);
 		}
 
-		get Logger(): new (name: string) => NodeCG.Logger {
-			return Logger;
-		}
+		readonly Logger = Logger;
 
-		get log(): NodeCG.Logger {
-			if (this._memoizedLogger) {
-				return this._memoizedLogger;
-			}
-
-			this._memoizedLogger = new Logger(this.bundleName);
-			return this._memoizedLogger;
-		}
+		readonly log = new Logger(this.bundleName);
 
 		/**
 		 * The full NodeCG server config, including potentially sensitive keys.
 		 */
-		get config(): DeepReadonly<typeof config> {
-			return JSON.parse(JSON.stringify(config));
-		}
+		readonly config = JSON.parse(JSON.stringify(config));
 
 		/**
 		 * _Extension only_<br/>
@@ -154,9 +143,7 @@ export function serverApiFactory(
 		 *     // Now I can use `otherBundle`!
 		 * }
 		 */
-		get extensions(): Record<string, unknown> {
-			return extensions;
-		}
+		readonly extension = extensions;
 
 		/**
 		 * _Extension only_<br/>
@@ -167,8 +154,6 @@ export function serverApiFactory(
 		 * @function
 		 */
 		mount = mount;
-
-		_memoizedLogger?: NodeCG.Logger;
 
 		constructor(bundle: NodeCG.Bundle) {
 			super(bundle);

@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import type { ExtendedError } from "socket.io/dist/namespace";
+import type { ExtendedError } from "socket.io";
 
 import type { TypedServerSocket } from "../../types/socket-protocol";
 import { sentryEnabled } from "../config";
