@@ -60,7 +60,7 @@ export class DashboardLib {
 				this.dashboardContext = getDashboardContext(bundleManager.all());
 			}
 
-			res.render(path.join(__dirname, "dashboard.tmpl"), this.dashboardContext);
+			res.render(path.join(rootPaths.nodecgInstalledPath, "dist/server/templates/dashboard.tmpl"), this.dashboardContext);
 		});
 
 		app.get("/bundles/:bundleName/dashboard/*", authCheck, (req, res, next) => {

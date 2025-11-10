@@ -18,9 +18,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "run-p watch typecheck-watch",
-    "watch": "tsx scripts/workspaces-parallel.ts watch",
+    "watch": "tsdown --watch",
     "typecheck-watch": "tsx scripts/workspaces-parallel.ts typecheck-watch",
-    "build": "npm --workspaces run build",
+    "build": "tsdown",
     "typecheck": "npm --workspaces run typecheck",
     "test": "vitest",
     "typetest": "npm -w nodecg run typetest",

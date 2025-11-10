@@ -6,23 +6,24 @@
     "url": "git+https://github.com/nodecg/nodecg.git",
     "directory": "workspaces/database-adapter-sqlite-legacy"
   },
-  "type": "commonjs",
+  "type": "module",
   "exports": {
     ".": "./dist/database-adapter.js",
     "./package.json": "./package.json"
   },
   "main": "./dist/database-adapter.js",
+  "module": "./dist/database-adapter.js",
   "types": "./dist/database-adapter.d.ts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
+    "build": "tsdown",
     "generate-migrations": "typeorm-ts-node-commonjs migration:generate ./src/migration/rename-me -d ./src/datasource.ts",
     "typecheck": "tsc --noEmit",
     "typecheck-watch": "tsc --noEmit --watch --preserveWatchOutput",
-    "build": "del-cli dist && tsc",
-    "watch": "tsc --watch --preserveWatchOutput"
+    "watch": "tsdown --watch"
   },
   "dependencies": {
     "@nodecg/database-adapter-types": "2.6.1",

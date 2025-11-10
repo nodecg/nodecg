@@ -1,9 +1,15 @@
 import type { Identity as IdentityModel } from "@nodecg/database-adapter-types";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+	Column,
+	Entity,
+	ManyToOne,
+	PrimaryGeneratedColumn,
+	type Relation,
+} from "typeorm";
 
 import { User } from "./User.js";
 
-@Entity()
+@Entity({ name: "identity" })
 export class Identity implements IdentityModel {
 	@PrimaryGeneratedColumn("uuid")
 	id!: string;
@@ -30,5 +36,5 @@ export class Identity implements IdentityModel {
 	provider_refresh_token: string | null = null;
 
 	@ManyToOne(() => User, (user) => user.identities)
-	user!: User;
+	user!: Relation<User>;
 }

@@ -13,7 +13,7 @@ import { ApiKey } from "./ApiKey.js";
 import { Identity } from "./Identity.js";
 import { Role } from "./Role.js";
 
-@Entity()
+@Entity({ name: "user" })
 export class User implements UserModel {
 	@PrimaryGeneratedColumn("uuid")
 	id!: string;

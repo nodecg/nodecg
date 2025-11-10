@@ -3,7 +3,7 @@ import { Entity, Generated, ManyToOne, PrimaryColumn } from "typeorm";
 
 import { User } from "./User.js";
 
-@Entity()
+@Entity({ name: "api_key" })
 export class ApiKey implements ApiKeyModel {
 	@PrimaryColumn()
 	@Generated("uuid")

@@ -1,7 +1,5 @@
 import { dataSource } from "./datasource.js";
 
-export * from "./entity/index.js";
-
 let initialized = false;
 
 export async function getConnection() {

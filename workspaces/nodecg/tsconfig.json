@@ -2,8 +2,8 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"lib": ["ESNext", "DOM"],
-		"noPropertyAccessFromIndexSignature": false,
-		"noUncheckedIndexedAccess": false,
+		"noPropertyAccessFromIndexSignature": true,
+		"noUncheckedIndexedAccess": true,
 
 		"baseUrl": ".",
 		"paths": {

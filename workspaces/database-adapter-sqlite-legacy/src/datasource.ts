@@ -1,14 +1,15 @@
-import "reflect-metadata";
-
 import path from "node:path";
 
+import { rootPaths } from "@nodecg/internal-util";
 import sqlite3 from "better-sqlite3";
 import { DataSource } from "typeorm";
-export * from "./entity/index.js";
 
-import { rootPaths } from "@nodecg/internal-util";
-
-import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity/index.js";
+import { ApiKey } from "./entity/ApiKey.js";
+import { Identity } from "./entity/Identity.js";
+import { Permission } from "./entity/Permission.js";
+import { Replicant } from "./entity/Replicant.js";
+import { Role } from "./entity/Role.js";
+import { User } from "./entity/User.js";
 import { initialize1669424617013 } from "./migration/1669424617013-initialize.js";
 import { defaultRoles1669424781583 } from "./migration/1669424781583-default-roles.js";
 

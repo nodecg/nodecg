@@ -1,15 +1,13 @@
+import "reflect-metadata";
+
 import type { DatabaseAdapter } from "@nodecg/database-adapter-types";
 
-import {
-	ApiKey,
-	getConnection,
-	Identity,
-	Replicant,
-	Role,
-	User,
-} from "./connection.js";
-
-export { ApiKey, getConnection, Identity, Replicant, Role, User };
+import { getConnection } from "./connection.js";
+import { ApiKey } from "./entity/ApiKey.js";
+import { Identity } from "./entity/Identity.js";
+import { Replicant } from "./entity/Replicant.js";
+import { Role } from "./entity/Role.js";
+import { User } from "./entity/User.js";
 
 async function findUser(id: User["id"]): Promise<User | null> {
 	const database = await getConnection();
