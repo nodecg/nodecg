@@ -45,8 +45,6 @@
     "jiti": "^2.6.1",
     "npm-run-all2": "^7.0.2",
     "prettier": "^3.4.2",
-    "puppeteer": "^24.28.0",
-    "ts-node": "^10.9.2",
     "tsdown": "^0.16.1",
     "tsx": "^4.19.2",
     "typescript": "~5.9.3",

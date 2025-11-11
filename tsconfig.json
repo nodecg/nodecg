@@ -3,7 +3,6 @@
 		"target": "ES2022",
 		"lib": ["ES2022"],
 		"module": "node20",
-		"resolveJsonModule": true,
 		"allowImportingTsExtensions": true,
 		"rewriteRelativeImportExtensions": true,
 

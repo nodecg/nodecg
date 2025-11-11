@@ -10,15 +10,6 @@ const base = {
 	ignoreWatch: ["./dist"],
 } satisfies UserConfig;
 
-const lint = {
-	attw: {
-		profile: "esmOnly",
-	},
-	publint: {
-		strict: true,
-	},
-} satisfies UserConfig;
-
 const clientEntries = globSync("src/client/bundles/*.ts", {
 	cwd: import.meta.dirname,
 });
@@ -76,12 +67,17 @@ const clientConfigs = clientEntries.map(
 export default defineConfig([
 	{
 		...base,
-		...lint,
 		entry: ["src/server/bootstrap.ts"],
 		outDir: "dist/server",
 		platform: "node",
 		target: "node20",
 		copy: ["src/server/templates"],
+		attw: {
+			profile: "esmOnly",
+		},
+		publint: {
+			strict: true,
+		},
 	},
 	...clientConfigs,
 	{
