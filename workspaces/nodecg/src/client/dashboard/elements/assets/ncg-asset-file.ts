@@ -62,14 +62,14 @@ class NcgAssetFile extends Polymer.PolymerElement {
 	}
 
 	_deletingChanged(newVal: string) {
-		this.$["spinner"].style.display = newVal ? "block" : "none";
-		this.$["delete"].style.visibility = newVal ? "hidden" : "visible";
+		this.$.spinner.style.display = newVal ? "block" : "none";
+		this.$.delete.style.visibility = newVal ? "hidden" : "visible";
 	}
 
 	_handleDeleteClick() {
-		this["deleting"] = true;
+		this.deleting = true;
 
-		void fetch(this["file"].url, {
+		void fetch(this.file.url, {
 			method: "DELETE",
 			credentials: "include",
 		}).then((response) => {
@@ -83,7 +83,7 @@ class NcgAssetFile extends Polymer.PolymerElement {
 				);
 			}
 
-			this["deleting"] = false;
+			this.deleting = false;
 		});
 	}
 }

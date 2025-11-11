@@ -102,19 +102,19 @@ class NcgGraphicInstanceDiff extends MutableData(Polymer.PolymerElement) {
 			return;
 		}
 
-		if (!this["instance"]?.bundleName) {
+		if (!this.instance?.bundleName) {
 			return;
 		}
 
 		const bundle = bundlesRep.value.find(
-			(bundle) => bundle.name === this["instance"].bundleName,
+			(bundle) => bundle.name === this.instance.bundleName,
 		);
 		if (!bundle) {
 			return;
 		}
 
-		this["_bundleVersion"] = bundle.version;
-		this["_bundleGit"] = bundle.git;
+		this._bundleVersion = bundle.version;
+		this._bundleGit = bundle.git;
 	}
 
 	_formatCommitMessage(message: string) {

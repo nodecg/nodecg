@@ -105,17 +105,13 @@ export class SoundsLib {
 		res: express.Response,
 		next: express.NextFunction,
 	): void {
-		const bundle = this._bundles.find(
-			(b) => b.name === req.params.bundleName,
-		);
+		const bundle = this._bundles.find((b) => b.name === req.params.bundleName);
 		if (!bundle) {
 			res.status(404).send(`File not found: ${req.path}`);
 			return;
 		}
 
-		const cue = bundle.soundCues.find(
-			(cue) => cue.name === req.params.cueName,
-		);
+		const cue = bundle.soundCues.find((cue) => cue.name === req.params.cueName);
 		if (!cue) {
 			res.status(404).send(`File not found: ${req.path}`);
 			return;

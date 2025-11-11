@@ -145,7 +145,7 @@ class NcgDialog extends mixinBehaviors(
 
 		const iframe = this.querySelector("iframe")!;
 		iframe.addEventListener("iframe-resized", () => {
-			this["refit"]();
+			this.refit();
 		});
 	}
 
@@ -161,26 +161,26 @@ class NcgDialog extends mixinBehaviors(
 	}
 
 	_renderOpened() {
-		if (this["withBackdrop"]) {
-			this["backdropElement"].open();
+		if (this.withBackdrop) {
+			this.backdropElement.open();
 		}
 
-		this["playAnimation"]("entry");
+		this.playAnimation("entry");
 	}
 
 	_renderClosed() {
-		if (this["withBackdrop"]) {
-			this["backdropElement"].close();
+		if (this.withBackdrop) {
+			this.backdropElement.close();
 		}
 
-		this["playAnimation"]("exit");
+		this.playAnimation("exit");
 	}
 
 	_onNeonAnimationFinish() {
-		if (this["opened"]) {
-			this["_finishRenderOpened"]();
+		if (this.opened) {
+			this._finishRenderOpened();
 		} else {
-			this["_finishRenderClosed"]();
+			this._finishRenderClosed();
 		}
 	}
 

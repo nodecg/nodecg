@@ -15,10 +15,10 @@ export const authCheck: express.RequestHandler = async (req, res, next) => {
 		let { user } = req;
 		let isUsingKeyOrSocketToken = false;
 		let keyOrSocketTokenAuthenticated = false;
-		if (req.query["key"] ?? req.cookies.socketToken) {
+		if (req.query.key ?? req.cookies.socketToken) {
 			isUsingKeyOrSocketToken = true;
 			const apiKey = await res.locals.databaseAdapter.findApiKey(
-				req.query["key"] ?? req.cookies.socketToken,
+				req.query.key ?? req.cookies.socketToken,
 			);
 
 			// No record of this API Key found, reject the request.

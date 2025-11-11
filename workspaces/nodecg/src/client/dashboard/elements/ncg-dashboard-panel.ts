@@ -232,7 +232,7 @@ export class NcgDashboardPanel extends Polymer.PolymerElement {
 		super.ready();
 
 		afterNextRender(this, async () => {
-			const distributedNodes: HTMLElement[] = this.$["slot"].assignedNodes({
+			const distributedNodes: HTMLElement[] = this.$.slot.assignedNodes({
 				flatten: true,
 			});
 			const iframe = distributedNodes.find(
@@ -250,7 +250,7 @@ export class NcgDashboardPanel extends Polymer.PolymerElement {
 				});
 			}
 
-			if (!this["fullbleed"]) {
+			if (!this.fullbleed) {
 				if (iframe.contentWindow!.document.readyState === "complete") {
 					this._attachIframeResize(iframe);
 				} else {
@@ -266,7 +266,7 @@ export class NcgDashboardPanel extends Polymer.PolymerElement {
 		initialize(
 			{
 				onIframeResize: (context) => {
-					this.$["collapse"].updateSize("auto", false);
+					this.$.collapse.updateSize("auto", false);
 					context.iframe.dispatchEvent(new CustomEvent("iframe-resized"));
 				},
 			},
@@ -278,24 +278,24 @@ export class NcgDashboardPanel extends Polymer.PolymerElement {
 		super.connectedCallback();
 
 		const { src } = this.querySelector("iframe")!;
-		this["standaloneUrl"] = `${src}?standalone=true`;
+		this.standaloneUrl = `${src}?standalone=true`;
 	}
 
 	toggleCollapse() {
-		this.$["collapse"].toggle();
+		this.$.collapse.toggle();
 	}
 
 	initializeDefaultOpened() {
-		this["opened"] = true;
+		this.opened = true;
 	}
 
 	_openedChanged(newVal: boolean) {
-		this.$["expandBtn"].icon = newVal ? "unfold-less" : "unfold-more";
+		this.$.expandBtn.icon = newVal ? "unfold-less" : "unfold-more";
 	}
 
 	_headerColorChanged(newVal: string) {
-		this.$["header"].style.backgroundColor = newVal;
-		this.$["buttons"].style.background = this._calcLinearGradient(
+		this.$.header.style.backgroundColor = newVal;
+		this.$.buttons.style.background = this._calcLinearGradient(
 			this._hexToRGB(newVal)!,
 		);
 	}

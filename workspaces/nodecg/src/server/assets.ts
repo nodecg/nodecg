@@ -307,7 +307,7 @@ export const createAssetsMiddleware = (
 				const params = req.params;
 				cb(
 					null,
-					`${params["namespace"]}/${params["category"]}/${Buffer.from(file.originalname, "latin1").toString("utf8")}`,
+					`${params.namespace}/${params.category}/${Buffer.from(file.originalname, "latin1").toString("utf8")}`,
 				);
 			},
 		}),

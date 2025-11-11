@@ -48,7 +48,7 @@ export function loggerFactory(
 			winston.format.colorize(),
 			winston.format.printf(
 				(info) =>
-					`${initialOpts?.console?.timestamps ? `${info["timestamp"]} - ` : ""}${info.level}: ${info.message}`,
+					`${initialOpts?.console?.timestamps ? `${info.timestamp} - ` : ""}${info.level}: ${info.message}`,
 			),
 		),
 	});
@@ -62,7 +62,7 @@ export function loggerFactory(
 			winston.format.errors({ stack: true }),
 			winston.format.printf(
 				(info) =>
-					`${initialOpts?.file?.timestamps ? `${info["timestamp"]} - ` : ""}${info.level}: ${info.message}`,
+					`${initialOpts?.file?.timestamps ? `${info.timestamp} - ` : ""}${info.level}: ${info.message}`,
 			),
 		),
 	});
