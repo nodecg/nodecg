@@ -1,81 +1,77 @@
-import fs from "node:fs";
+import { Effect } from "effect";
+import { Command, Args } from "@effect/cli";
+import { FileSystemService } from "../services/file-system.js";
+import { TerminalService } from "../services/terminal.js";
+import { PathService } from "../services/path.js";
+import { JsonSchemaService } from "../services/json-schema.js";
 import path from "node:path";
 
-import { Ajv, type JSONSchemaType } from "ajv";
-import chalk from "chalk";
-import { Command } from "commander";
+export const defaultconfigCommand = Command.make(
+	"defaultconfig",
+	{
+		bundle: Args.text({ name: "bundle" }).pipe(Args.optional),
+	},
+	({ bundle: bundleName }) =>
+		Effect.fn("defaultconfigCommand")(function* () {
+			const fs = yield* FileSystemService;
+			const terminal = yield* TerminalService;
+			const pathService = yield* PathService;
+			const jsonSchema = yield* JsonSchemaService;
 
-import { getNodeCGPath, isBundleFolder } from "../lib/util.js";
+			const cwd = process.cwd();
+			const nodecgPath = yield* pathService.getNodeCGPath();
 
-const ajv = new Ajv({ useDefaults: true, strict: true });
+			let finalBundleName = bundleName;
+			if (!finalBundleName) {
+				const isBundle = yield* pathService.isBundleFolder(cwd);
+				if (isBundle) {
+					finalBundleName = path.basename(cwd);
+				} else {
+					yield* terminal.writeError(
+						"Error: No bundle found in the current directory!",
+					);
+					return;
+				}
+			}
 
-export function defaultconfigCommand(program: Command) {
-	program
-		.command("defaultconfig [bundle]")
-		.description("Generate default config from configschema.json")
-		.action(action);
-}
+			const bundlePath = path.join(nodecgPath, "bundles", finalBundleName);
+			const schemaPath = path.join(bundlePath, "configschema.json");
+			const cfgPath = path.join(nodecgPath, "cfg");
 
-function action(bundleName?: string) {
-	const cwd = process.cwd();
-	const nodecgPath = getNodeCGPath();
+			const bundleExists = yield* fs.exists(bundlePath);
+			if (!bundleExists) {
+				yield* terminal.writeError(
+					`Error: Bundle ${finalBundleName} does not exist`,
+				);
+				return;
+			}
 
-	if (!bundleName) {
-		if (isBundleFolder(cwd)) {
-			bundleName = bundleName ?? path.basename(cwd);
-		} else {
-			console.error(
-				`${chalk.red("Error:")} No bundle found in the current directory!`,
-			);
-			return;
-		}
-	}
+			const schemaExists = yield* fs.exists(schemaPath);
+			if (!schemaExists) {
+				yield* terminal.writeError(
+					`Error: Bundle ${finalBundleName} does not have a configschema.json`,
+				);
+				return;
+			}
 
-	const bundlePath = path.join(nodecgPath, "bundles/", bundleName);
-	const schemaPath = path.join(
-		nodecgPath,
-		"bundles/",
-		bundleName,
-		"/configschema.json",
-	);
-	const cfgPath = path.join(nodecgPath, "cfg/");
+			const cfgExists = yield* fs.exists(cfgPath);
+			if (!cfgExists) {
+				yield* fs.mkdir(cfgPath);
+			}
 
-	if (!fs.existsSync(bundlePath)) {
-		console.error(`${chalk.red("Error:")} Bundle ${bundleName} does not exist`);
-		return;
-	}
+			const configPath = path.join(cfgPath, `${finalBundleName}.json`);
+			const configExists = yield* fs.exists(configPath);
 
-	if (!fs.existsSync(schemaPath)) {
-		console.error(
-			`${chalk.red("Error:")} Bundle ${bundleName} does not have a configschema.json`,
-		);
-		return;
-	}
-
-	if (!fs.existsSync(cfgPath)) {
-		fs.mkdirSync(cfgPath);
-	}
-
-	const schema: JSONSchemaType<unknown> = JSON.parse(
-		fs.readFileSync(schemaPath, "utf8"),
-	);
-	const configPath = path.join(nodecgPath, "cfg/", `${bundleName}.json`);
-	if (fs.existsSync(configPath)) {
-		console.error(
-			`${chalk.red("Error:")} Bundle ${bundleName} already has a config file`,
-		);
-	} else {
-		try {
-			const validate = ajv.compile(schema);
-			const data = {};
-			validate(data);
-
-			fs.writeFileSync(configPath, JSON.stringify(data, null, 2));
-			console.log(
-				`${chalk.green("Success:")} Created ${chalk.bold(bundleName)}'s default config from schema\n`,
-			);
-		} catch (error) {
-			console.error(chalk.red("Error:"), error);
-		}
-	}
-}
+			if (configExists) {
+				yield* terminal.writeError(
+					`Error: Bundle ${finalBundleName} already has a config file`,
+				);
+			} else {
+				const data = yield* jsonSchema.applyDefaults(schemaPath);
+				yield* fs.writeJson(configPath, data);
+				yield* terminal.writeSuccess(
+					`Success: Created ${finalBundleName}'s default config from schema\n`,
+				);
+			}
+		}),
+);

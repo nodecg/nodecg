@@ -1,17 +1,66 @@
 #!/usr/bin/env node
+import { Effect, Layer } from "effect";
+import {
+	NodeFileSystem,
+	NodeHttpClient,
+	NodeTerminal,
+	NodeContext,
+	NodeRuntime,
+} from "@effect/platform-node";
+import { cli } from "../index.js";
+import { FileSystemService } from "../services/file-system.js";
+import { TerminalService } from "../services/terminal.js";
+import { HttpService } from "../services/http.js";
+import { CommandService } from "../services/command.js";
+import { GitService } from "../services/git.js";
+import { NpmService } from "../services/npm.js";
+import { JsonSchemaService } from "../services/json-schema.js";
+import { PackageResolverService } from "../services/package-resolver.js";
+import { PathService } from "../services/path.js";
 
-import chalk from "chalk";
-import spawn from "nano-spawn";
+const program = Effect.fn("main")(function* () {
+	const git = yield* GitService;
+	const terminal = yield* TerminalService;
 
-import { setupCLI } from "../index.js";
-
-try {
-	await spawn("git", ["--version"]);
-} catch (error) {
-	console.error(
-		`The CLI requires that ${chalk.cyan("git")} be available in your PATH.`,
+	// Check git availability
+	yield* git.checkAvailable().pipe(
+		Effect.catchAll(() =>
+			Effect.fn("gitError")(function* () {
+				yield* terminal.writeError(
+					"The CLI requires that git be available in your PATH.",
+				);
+				return yield* Effect.fail(new Error("git not available"));
+			}),
+		),
 	);
-	process.exit(1);
-}
 
-setupCLI();
+	// Set process title
+	yield* Effect.sync(() => {
+		process.title = "nodecg";
+	});
+
+	// Run CLI
+	yield* cli(process.argv);
+});
+
+const MainLayer = Layer.mergeAll(
+	NodeFileSystem.layer,
+	NodeHttpClient.layerWithoutAgent,
+	NodeTerminal.layer,
+).pipe(
+	Layer.provideMerge(FileSystemService.Default),
+	Layer.provideMerge(TerminalService.Default),
+	Layer.provideMerge(HttpService.Default),
+	Layer.provideMerge(CommandService.Default),
+	Layer.provideMerge(GitService.Default),
+	Layer.provideMerge(NpmService.Default),
+	Layer.provideMerge(JsonSchemaService.Default),
+	Layer.provideMerge(PackageResolverService.Default),
+	Layer.provideMerge(PathService.Default),
+);
+
+program.pipe(
+	Effect.provide(MainLayer),
+	Effect.provide(NodeContext.layer),
+	NodeRuntime.runMain,
+);

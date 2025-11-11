@@ -1,63 +1,50 @@
-import fs from "node:fs";
-import os from "node:os";
+import { Effect } from "effect";
+import { Command, Args, Options } from "@effect/cli";
+import { FileSystemService } from "../services/file-system.js";
+import { TerminalService } from "../services/terminal.js";
+import { PathService } from "../services/path.js";
 import path from "node:path";
 
-import { confirm } from "@inquirer/prompts";
-import chalk from "chalk";
-import { Command } from "commander";
+export const uninstallCommand = Command.make(
+	"uninstall",
+	{
+		bundle: Args.text({ name: "bundle" }),
+		force: Options.boolean("force").pipe(
+			Options.withAlias("f"),
+			Options.optional,
+		),
+	},
+	({ bundle: bundleName, force }) =>
+		Effect.fn("uninstallCommand")(function* () {
+			const fs = yield* FileSystemService;
+			const terminal = yield* TerminalService;
+			const pathService = yield* PathService;
 
-import { getNodeCGPath } from "../lib/util.js";
+			const nodecgPath = yield* pathService.getNodeCGPath();
+			const bundlePath = path.join(nodecgPath, "bundles", bundleName);
 
-export function uninstallCommand(program: Command) {
-	program
-		.command("uninstall <bundle>")
-		.description("Uninstalls a bundle.")
-		.option("-f, --force", "ignore warnings")
-		.action(action);
-}
-
-function action(bundleName: string, options: { force: boolean }) {
-	const nodecgPath = getNodeCGPath();
-	const bundlePath = path.join(nodecgPath, "bundles/", bundleName);
-
-	if (!fs.existsSync(bundlePath)) {
-		console.error(
-			`Cannot uninstall ${chalk.magenta(bundleName)}: bundle is not installed.`,
-		);
-		return;
-	}
-
-	/* istanbul ignore if: deleteBundle() is tested in the else path */
-	if (options.force) {
-		deleteBundle(bundleName, bundlePath);
-	} else {
-		void confirm({
-			message: `Are you sure you wish to uninstall ${chalk.magenta(bundleName)}?`,
-		}).then((answer) => {
-			if (answer) {
-				deleteBundle(bundleName, bundlePath);
+			const exists = yield* fs.exists(bundlePath);
+			if (!exists) {
+				yield* terminal.write("Cannot uninstall ");
+				yield* terminal.writeColored(bundleName, "magenta");
+				yield* terminal.writeLine(": bundle is not installed.");
+				return;
 			}
-		});
-	}
-}
 
-function deleteBundle(name: string, path: string) {
-	if (!fs.existsSync(path)) {
-		console.log("Nothing to uninstall.");
-		return;
-	}
+			let shouldDelete = force ?? false;
+			if (!shouldDelete) {
+				shouldDelete = yield* terminal.confirm(
+					`Are you sure you wish to uninstall ${bundleName}?`,
+				);
+			}
 
-	process.stdout.write(`Uninstalling ${chalk.magenta(name)}... `);
-	try {
-		fs.rmSync(path, { recursive: true, force: true });
-	} catch (e: any) {
-		/* istanbul ignore next */
-		process.stdout.write(chalk.red("failed!") + os.EOL);
-		/* istanbul ignore next */
-		console.error(e.stack);
-		/* istanbul ignore next */
-		return;
-	}
-
-	process.stdout.write(chalk.green("done!") + os.EOL);
-}
+			if (shouldDelete) {
+				yield* terminal.write(`Uninstalling `);
+				yield* terminal.writeColored(bundleName, "magenta");
+				yield* terminal.write("... ");
+				yield* fs.rm(bundlePath, { recursive: true, force: true });
+				yield* terminal.writeColored("done!", "green");
+				yield* terminal.writeLine("");
+			}
+		}),
+);

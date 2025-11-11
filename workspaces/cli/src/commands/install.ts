@@ -1,136 +1,87 @@
-import fs from "node:fs";
-import os from "node:os";
+import { Effect } from "effect";
+import { Command, Args, Options } from "@effect/cli";
+import { FileSystemService } from "../services/file-system.js";
+import { TerminalService } from "../services/terminal.js";
+import { PathService } from "../services/path.js";
+import { GitService } from "../services/git.js";
+import { PackageResolverService } from "../services/package-resolver.js";
+import { installBundleDeps } from "../lib/bundle-utils.js";
+import * as semverLib from "../lib/semver.js";
 import path from "node:path";
 
-import chalk from "chalk";
-import { Command } from "commander";
-import HostedGitInfo from "hosted-git-info";
-import spawn from "nano-spawn";
-import npa from "npm-package-arg";
-import semver, { SemVer } from "semver";
+export const installCommand = Command.make(
+	"install",
+	{
+		repo: Args.text({ name: "repo" }).pipe(Args.optional),
+		dev: Options.boolean("dev").pipe(Options.withAlias("d"), Options.optional),
+	},
+	({ repo, dev }) =>
+		Effect.fn("installCommand")(function* () {
+			const fs = yield* FileSystemService;
+			const terminal = yield* TerminalService;
+			const pathService = yield* PathService;
+			const git = yield* GitService;
+			const packageResolver = yield* PackageResolverService;
 
-import { fetchTags } from "../lib/fetch-tags.js";
-import { installBundleDeps } from "../lib/install-bundle-deps.js";
-import { getNodeCGPath } from "../lib/util.js";
+			const isDev = dev ?? false;
 
-export function installCommand(program: Command) {
-	program
-		.command("install [repo]")
-		.description(
-			"Install a bundle by cloning a git repo. Can be a GitHub owner/repo pair or a git url." +
-				"\n\t\t    If run in a bundle directory with no arguments, installs that bundle's dependencies.",
-		)
-		.option("-d, --dev", "install development npm dependencies")
-		.action(action);
-}
-
-async function action(repo: string, options: { dev: boolean }) {
-	const dev = options.dev || false;
-
-	// If no args are supplied, assume the user is intending to operate on the bundle in the current dir
-	if (!repo) {
-		await installBundleDeps(process.cwd(), dev);
-		return;
-	}
-
-	let range = "";
-	if (repo.indexOf("#") > 0) {
-		const repoParts = repo.split("#");
-		range = repoParts[1] ?? "";
-		repo = repoParts[0] ?? "";
-	}
-
-	const nodecgPath = getNodeCGPath();
-	const parsed = npa(repo);
-	if (!parsed.hosted) {
-		console.error(
-			"Please enter a valid git repository URL or GitHub username/repo pair.",
-		);
-		return;
-	}
-
-	const hostedInfo = parsed.hosted as unknown as HostedGitInfo;
-	const repoUrl = hostedInfo.https();
-	if (!repoUrl) {
-		console.error(
-			"Please enter a valid git repository URL or GitHub username/repo pair.",
-		);
-		return;
-	}
-
-	// Check that `bundles` exists
-	const bundlesPath = path.join(nodecgPath, "bundles");
-	/* istanbul ignore next: Simple directory creation, not necessary to test */
-	if (!fs.existsSync(bundlesPath)) {
-		fs.mkdirSync(bundlesPath);
-	}
-
-	// Extract repo name from git url
-	const temp = repoUrl.split("/").pop() ?? "";
-	const bundleName = temp.slice(0, temp.length - 4);
-	const bundlePath = path.join(nodecgPath, "bundles/", bundleName);
-
-	// Figure out what version to checkout
-	process.stdout.write(`Fetching ${bundleName} release list... `);
-	let tags;
-	let target;
-	try {
-		tags = await fetchTags(repoUrl);
-		target = semver.maxSatisfying(
-			tags
-				.map((tag) => semver.coerce(tag))
-				.filter((coercedTag): coercedTag is SemVer => Boolean(coercedTag)),
-			range,
-		);
-		process.stdout.write(chalk.green("done!") + os.EOL);
-	} catch (e: any) {
-		/* istanbul ignore next */
-		process.stdout.write(chalk.red("failed!") + os.EOL);
-		/* istanbul ignore next */
-		console.error(e.stack);
-		/* istanbul ignore next */
-		return;
-	}
-
-	// Clone from github
-	process.stdout.write(`Installing ${bundleName}... `);
-	try {
-		await spawn("git", ["clone", repoUrl, bundlePath]);
-		process.stdout.write(chalk.green("done!") + os.EOL);
-	} catch (e: any) {
-		/* istanbul ignore next */
-		process.stdout.write(chalk.red("failed!") + os.EOL);
-		/* istanbul ignore next */
-		console.error(e.stack);
-		/* istanbul ignore next */
-		return;
-	}
-
-	// If a bundle has no git tags, target will be null.
-	if (target) {
-		process.stdout.write(`Checking out version ${target.version}... `);
-		try {
-			// First try the target as-is.
-			await spawn("git", ["checkout", target.version], { cwd: bundlePath });
-			process.stdout.write(chalk.green("done!") + os.EOL);
-		} catch (_) {
-			try {
-				// Next try prepending `v` to the target, which may have been stripped by `semver.coerce`.
-				await spawn("git", ["checkout", `v${target.version}`], {
-					cwd: bundlePath,
-				});
-				process.stdout.write(chalk.green("done!") + os.EOL);
-			} catch (e: any) {
-				/* istanbul ignore next */
-				process.stdout.write(chalk.red("failed!") + os.EOL);
-				/* istanbul ignore next */
-				console.error(e.stack);
-				/* istanbul ignore next */
+			if (!repo) {
+				yield* installBundleDeps(process.cwd(), isDev);
 				return;
 			}
-		}
-	}
 
-	// After installing the bundle, install its npm dependencies
-	await installBundleDeps(bundlePath, dev);
-}
+			const { repo: repoName, range } =
+				yield* packageResolver.parseVersionSpec(repo);
+			const nodecgPath = yield* pathService.getNodeCGPath();
+
+			const { url: repoUrl, name: bundleName } =
+				yield* packageResolver.resolveGitUrl(repoName);
+
+			const bundlesPath = path.join(nodecgPath, "bundles");
+			const bundlesExists = yield* fs.exists(bundlesPath);
+			if (!bundlesExists) {
+				yield* fs.mkdir(bundlesPath);
+			}
+
+			const bundlePath = path.join(nodecgPath, "bundles", bundleName);
+
+			yield* terminal.write(`Fetching `);
+			yield* terminal.writeColored(bundleName, "magenta");
+			yield* terminal.write(` release list... `);
+
+			const tags = yield* git.listRemoteTags(repoUrl);
+			const target = semverLib.maxSatisfying(
+				tags
+					.map((tag) => semverLib.coerce(tag))
+					.filter((coercedTag): coercedTag is semver.SemVer =>
+						Boolean(coercedTag),
+					)
+					.map((v) => v.version),
+				range,
+			);
+
+			yield* terminal.writeColored("done!", "green");
+			yield* terminal.writeLine("");
+
+			yield* terminal.write(`Installing `);
+			yield* terminal.writeColored(bundleName, "magenta");
+			yield* terminal.write("... ");
+			yield* git.clone(repoUrl, bundlePath);
+			yield* terminal.writeColored("done!", "green");
+			yield* terminal.writeLine("");
+
+			if (target) {
+				yield* terminal.write(`Checking out version ${target}... `);
+
+				const checkoutEffect = git.checkout(target, bundlePath).pipe(
+					Effect.catchAll(() => git.checkout(`v${target}`, bundlePath)),
+				);
+
+				yield* checkoutEffect;
+				yield* terminal.writeColored("done!", "green");
+				yield* terminal.writeLine("");
+			}
+
+			yield* installBundleDeps(bundlePath, isDev);
+		}),
+);

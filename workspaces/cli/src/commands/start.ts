@@ -1,46 +1,70 @@
-import fs from "node:fs";
+import { Effect } from "effect";
+import { Command, Options } from "@effect/cli";
+import { FileSystemService } from "../services/file-system.js";
+import { PathService } from "../services/path.js";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { Command } from "commander";
+const recursivelyFindProject = (startDir: string) =>
+	Effect.fn("recursivelyFindProject")(function* () {
+		const fs = yield* FileSystemService;
 
-import { pathContainsNodeCG } from "../lib/util.js";
+		if (!path.isAbsolute(startDir)) {
+			return yield* Effect.fail(
+				new Error("startDir must be an absolute path"),
+			);
+		}
 
-export function startCommand(program: Command) {
-	program
-		.command("start")
-		.option("-d, --disable-source-maps", "Disable source map support")
-		.description("Start NodeCG")
-		.action(async () => {
-			const projectDir = recursivelyFindProject(process.cwd());
+		const packageJsonPath = path.join(startDir, "package.json");
+		const exists = yield* fs.exists(packageJsonPath);
 
-			// Check if nodecg is already installed
-			if (pathContainsNodeCG(projectDir)) {
-				await import(pathToFileURL(path.join(projectDir, "index.js")).href);
+		if (exists) {
+			return startDir;
+		}
+
+		const parentDir = path.dirname(startDir);
+		if (parentDir === startDir) {
+			return yield* Effect.fail(new Error("Could not find a project directory"));
+		}
+
+		return yield* recursivelyFindProject(parentDir);
+	});
+
+export const startCommand = Command.make(
+	"start",
+	{
+		disableSourceMaps: Options.boolean("disable-source-maps").pipe(
+			Options.withAlias("d"),
+			Options.optional,
+		),
+	},
+	() =>
+		Effect.fn("startCommand")(function* () {
+			const pathService = yield* PathService;
+
+			const projectDir = yield* recursivelyFindProject(process.cwd());
+
+			const containsNodeCG = yield* pathService.pathContainsNodeCG(projectDir);
+			if (containsNodeCG) {
+				yield* Effect.promise(() =>
+					import(pathToFileURL(path.join(projectDir, "index.js")).href),
+				);
 				return;
 			}
 
-			// Check if NodeCG is installed as a dependency
-			const nodecgDependencyPath = path.join(projectDir, "node_modules/nodecg");
-			if (pathContainsNodeCG(nodecgDependencyPath)) {
-				await import(
-					pathToFileURL(path.join(nodecgDependencyPath, "index.js")).href
+			const nodecgDependencyPath = path.join(
+				projectDir,
+				"node_modules/nodecg",
+			);
+			const hasNodeCGDep =
+				yield* pathService.pathContainsNodeCG(nodecgDependencyPath);
+
+			if (hasNodeCGDep) {
+				yield* Effect.promise(() =>
+					import(
+						pathToFileURL(path.join(nodecgDependencyPath, "index.js")).href
+					),
 				);
 			}
-		});
-}
-
-function recursivelyFindProject(startDir: string) {
-	if (!path.isAbsolute(startDir)) {
-		throw new Error("startDir must be an absolute path");
-	}
-	const packageJsonDir = path.join(startDir, "package.json");
-	if (fs.existsSync(packageJsonDir)) {
-		return startDir;
-	}
-	const parentDir = path.dirname(startDir);
-	if (parentDir === startDir) {
-		throw new Error("Could not find a project directory");
-	}
-	return recursivelyFindProject(parentDir);
-}
+		}),
+);
