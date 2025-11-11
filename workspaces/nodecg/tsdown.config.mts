@@ -13,7 +13,6 @@ const base = {
 const clientEntries = globSync("src/client/bundles/*.ts", {
 	cwd: import.meta.dirname,
 });
-console.log(clientEntries);
 const clientConfigs = clientEntries.map(
 	(entry, index) =>
 		({
