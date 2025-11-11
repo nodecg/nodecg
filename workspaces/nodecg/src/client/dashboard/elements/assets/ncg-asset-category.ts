@@ -211,8 +211,7 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 
 	_onFileReject(event: any): void {
 		this.refitUploadDialog();
-		this.$.toast.text =
-			`${event.detail.file.name} error: ${event.detail.error}`;
+		this.$.toast.text = `${event.detail.file.name} error: ${event.detail.error}`;
 		this.$.toast.open();
 	}
 
