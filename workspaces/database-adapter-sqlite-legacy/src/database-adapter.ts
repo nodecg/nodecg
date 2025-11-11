@@ -9,6 +9,8 @@ import { Replicant } from "./entity/Replicant.js";
 import { Role } from "./entity/Role.js";
 import { User } from "./entity/User.js";
 
+export { ApiKey, getConnection, Identity, Replicant, Role, User };
+
 async function findUser(id: User["id"]): Promise<User | null> {
 	const database = await getConnection();
 	return database.getRepository(User).findOne({

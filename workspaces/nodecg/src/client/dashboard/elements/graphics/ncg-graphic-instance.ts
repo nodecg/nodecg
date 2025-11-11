@@ -1,10 +1,7 @@
 import "@polymer/iron-icons/device-icons.js";
 import "@polymer/iron-icons/iron-icons.js";
 import "@polymer/paper-button/paper-button.js";
-
-// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from "./ncg-graphic-instance-diff";
-keep1;
+import "./ncg-graphic-instance-diff";
 
 import * as Polymer from "@polymer/polymer";
 import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";

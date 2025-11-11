@@ -1,1 +1,1 @@
-export * from "../socket";
+import "../socket";

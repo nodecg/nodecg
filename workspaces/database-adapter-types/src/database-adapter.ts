@@ -1,4 +1,4 @@
-import { ApiKey, Identity, Replicant, Role, User } from "./models";
+import type { ApiKey, Identity, Replicant, Role, User } from "./models.ts";
 
 type MaybePromise<T> = T | Promise<T>;
 

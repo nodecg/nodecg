@@ -1,2 +1,2 @@
-export { isLegacyProject } from "./project-type";
-export { rootPaths } from "./root-paths";
+export { isLegacyProject } from "./project-type.ts";
+export { rootPaths } from "./root-paths.ts";

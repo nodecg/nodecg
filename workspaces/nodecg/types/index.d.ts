@@ -6,11 +6,11 @@
 
 import { DeepReadonly } from "ts-essentials";
 
-import type { NodeCGAPIClient } from "../out/client/api.client";
-import type { serverApiFactory } from "../out/server/api.server";
-import type { AbstractReplicant } from "../out/shared/replicants.shared";
-import type * as LoggerStuff from "../out/types/logger-interface";
-import type { NodeCG } from "../out/types/nodecg";
+import type { NodeCGAPIClient } from "../dist/dts/client/api/api.client.js";
+import type { serverApiFactory } from "../dist/dts/server/api.server.js";
+import type { AbstractReplicant } from "../dist/dts/shared/replicants.shared.js";
+import type * as LoggerStuff from "../dist/dts/types/logger-interface.js";
+import type { NodeCG } from "../dist/dts/types/nodecg.js";
 
 type NodeCGAPIServer<
 	C extends Record<string, any> = NodeCG.Bundle.UnknownConfig,

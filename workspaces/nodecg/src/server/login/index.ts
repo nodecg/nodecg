@@ -423,7 +423,7 @@ export function createMiddleware(
 
 	app.use(
 		"/login",
-		express.static(path.join(rootPaths.nodecgInstalledPath, "dist/login")),
+		express.static(path.join(rootPaths.nodecgInstalledPath, "dist/client/login")),
 	);
 
 	app.get("/login", (req, res) => {
@@ -431,19 +431,31 @@ export function createMiddleware(
 		if (req.user && db.isSuperUser(req.user)) {
 			res.redirect("/dashboard");
 		} else {
-			res.render(path.join(__dirname, "views/login.tmpl"), {
-				user: req.user,
-				config,
-			});
+			res.render(
+				path.join(
+					rootPaths.nodecgInstalledPath,
+					"dist/server/templates/login.tmpl",
+				),
+				{
+					user: req.user,
+					config,
+				},
+			);
 		}
 	});
 
 	app.get("/authError", (req, res) => {
-		res.render(path.join(__dirname, "views/authError.tmpl"), {
-			message: req.query["message"],
-			code: req.query["code"],
-			viewUrl: req.query["viewUrl"],
-		});
+		res.render(
+			path.join(
+				rootPaths.nodecgInstalledPath,
+				"dist/server/templates/authError.tmpl",
+			),
+			{
+				message: req.query["message"],
+				code: req.query["code"],
+				viewUrl: req.query["viewUrl"],
+			},
+		);
 	});
 
 	app.get("/login/steam", passport.authenticate("steam"));

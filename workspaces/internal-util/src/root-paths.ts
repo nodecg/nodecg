@@ -1,7 +1,7 @@
 import path from "node:path";
 
-import { nearestProjectDirFromCwd } from "./find-nodejs-project";
-import { isLegacyProject } from "./project-type";
+import { nearestProjectDirFromCwd } from "./find-nodejs-project.ts";
+import { isLegacyProject } from "./project-type.ts";
 
 const runtimeRootPath = nearestProjectDirFromCwd;
 

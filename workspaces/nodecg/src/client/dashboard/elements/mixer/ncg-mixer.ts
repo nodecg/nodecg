@@ -1,8 +1,7 @@
-// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from "./ncg-sounds";
-keep1;
+import "./ncg-sounds";
 
 import * as Polymer from "@polymer/polymer";
+
 class NcgMixer extends Polymer.PolymerElement {
 	static get template() {
 		return Polymer.html`

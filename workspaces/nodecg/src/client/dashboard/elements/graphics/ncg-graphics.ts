@@ -1,8 +1,5 @@
 import "@polymer/paper-toast/paper-toast.js";
-
-// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from "./ncg-graphics-bundle";
-keep1;
+import "./ncg-graphics-bundle";
 
 import * as Polymer from "@polymer/polymer";
 import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";

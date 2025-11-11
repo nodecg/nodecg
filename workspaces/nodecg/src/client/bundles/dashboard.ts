@@ -1,1 +1,1 @@
-export * from "../dashboard/elements/ncg-dashboard";
+import "../dashboard/elements/ncg-dashboard";

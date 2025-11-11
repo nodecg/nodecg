@@ -1,7 +1,6 @@
 import express from "express";
 import isError from "is-error";
 import { serializeError } from "serialize-error";
-import type { DeepReadonly } from "ts-essentials";
 
 import { NodeCGAPIBase } from "../shared/api.base";
 import type { NodeCG } from "../types/nodecg";

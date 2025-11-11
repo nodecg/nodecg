@@ -1,10 +1,7 @@
 import "@polymer/iron-flex-layout/iron-flex-layout.js";
 import "@polymer/paper-slider/paper-slider.js";
 import "@polymer/paper-styles/typography.js";
-
-// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from "../ui/ui-select";
-keep1;
+import   "../ui/ui-select";
 
 import * as Polymer from "@polymer/polymer";
 

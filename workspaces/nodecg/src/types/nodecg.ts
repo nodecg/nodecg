@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { DatabaseAdapter } from "@nodecg/database-adapter-types";
+import type { DatabaseAdapter } from "@nodecg/database-adapter-types";
 import type express from "express";
 import type * as ExpressCore from "express-serve-static-core";
 
-import { NodeCGConfig } from "./nodecg-config-schema";
+import type { NodeCGConfig } from "./nodecg-config-schema";
 import type {
 	ClientToServerEvents,
 	ServerToClientEvents,

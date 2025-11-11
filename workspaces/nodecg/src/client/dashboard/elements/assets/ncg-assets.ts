@@ -1,8 +1,5 @@
 import "@polymer/paper-card/paper-card.js";
-
-// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from "./ncg-asset-category";
-keep1;
+import "./ncg-asset-category";
 
 import * as Polymer from "@polymer/polymer";
 import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";

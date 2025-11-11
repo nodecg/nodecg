@@ -1,6 +1,7 @@
 import * as os from "node:os";
 import * as path from "node:path";
 
+import { rootPaths } from "@nodecg/internal-util";
 import * as Sentry from "@sentry/node";
 import express from "express";
 
@@ -55,10 +56,16 @@ export class SentryConfig {
 		// Render a pre-configured Sentry instance for client pages that request it.
 		app.get("/sentry.js", authCheck, (_req, res) => {
 			res.type(".js");
-			res.render(path.join(__dirname, "sentry.js.tmpl"), {
-				baseSentryConfig,
-				bundleMetadata,
-			});
+			res.render(
+				path.join(
+					rootPaths.nodecgInstalledPath,
+					"dist/server/templates/sentry.js.tmpl",
+				),
+				{
+					baseSentryConfig,
+					bundleMetadata,
+				},
+			);
 		});
 	}
 }

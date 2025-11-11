@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { beforeEach, expect } from "vitest";
 
-import { SetupContext, setupTest } from "../helpers/setup";
+import { type SetupContext, setupTest } from "../helpers/setup";
 import * as C from "../helpers/test-constants";
 import { testDirPath } from "../helpers/test-dir-path";
 

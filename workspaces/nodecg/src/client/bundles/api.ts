@@ -1,1 +1,1 @@
-export * from "../api/api.client";
+import "../api/api.client";

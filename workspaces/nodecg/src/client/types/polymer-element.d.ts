@@ -1,4 +1,4 @@
-import { ElementMixin } from "./element-mixin";
+import type { ElementMixin } from "./element-mixin";
 
 export { html } from "@polymer/polymer/lib/utils/html-tag.js";
 

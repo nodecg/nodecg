@@ -2,8 +2,10 @@
 	"compilerOptions": {
 		"target": "ES2022",
 		"lib": ["ES2022"],
-		"module": "preserve",
+		"module": "node20",
 		"resolveJsonModule": true,
+		"allowImportingTsExtensions": true,
+		"rewriteRelativeImportExtensions": true,
 
 		"strict": true,
 		"noUnusedLocals": true,
@@ -14,15 +16,15 @@
 		"noImplicitOverride": true,
 		"noPropertyAccessFromIndexSignature": true,
 
-		"verbatimModuleSyntax": false,
 		"forceConsistentCasingInFileNames": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"noUncheckedSideEffectImports": true,
 
 		"skipLibCheck": true,
 
 		"noEmit": true,
 		"declaration": true,
-		"declarationMap": true,
-
-		"customConditions": ["source"]
+		"declarationMap": true
 	}
 }

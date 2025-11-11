@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { nearestProjectDirFromCwd } from "./find-nodejs-project";
+import { nearestProjectDirFromCwd } from "./find-nodejs-project.ts";
 
 const rootPackageJson = JSON.parse(
 	fs.readFileSync(path.join(nearestProjectDirFromCwd, "package.json"), "utf-8"),

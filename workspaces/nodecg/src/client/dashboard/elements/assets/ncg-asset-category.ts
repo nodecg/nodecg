@@ -5,12 +5,8 @@ import "@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js";
 import "@polymer/paper-dialog/paper-dialog.js";
 import "@polymer/paper-toast/paper-toast.js";
 import "@vaadin/vaadin-upload/vaadin-upload.js";
-
-// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from "../util-scrollable";
-keep1;
-import * as keep2 from "./ncg-asset-file";
-keep2;
+import "../util-scrollable";
+import "./ncg-asset-file";
 
 import * as Polymer from "@polymer/polymer";
 import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";

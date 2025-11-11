@@ -19,27 +19,17 @@ import "@polymer/paper-item/paper-icon-item.js";
 import "@polymer/paper-tabs/paper-tabs.js";
 import "@polymer/paper-toast/paper-toast.js";
 import "@polymer/polymer/lib/elements/custom-style.js";
+import "../css/nodecg-theme";
+import "./assets/ncg-assets";
+import "./graphics/ncg-graphics";
+import "./mixer/ncg-mixer";
+import "./ncg-dialog";
+import "./ncg-workspace";
+import "./settings/ncg-settings";
 
 import * as Polymer from "@polymer/polymer";
-import { Debouncer } from "@polymer/polymer/lib/utils/debounce.js";
-
-// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from "../css/nodecg-theme";
-keep1;
-import * as keep2 from "./assets/ncg-assets";
-keep2;
-import * as keep3 from "./graphics/ncg-graphics";
-keep3;
-import * as keep4 from "./mixer/ncg-mixer";
-keep4;
-import * as keep5 from "./ncg-dialog";
-keep5;
-import * as keep6 from "./ncg-workspace";
-keep6;
-import * as keep7 from "./settings/ncg-settings";
-keep7;
-
 import { timeOut } from "@polymer/polymer/lib/utils/async.js";
+import { Debouncer } from "@polymer/polymer/lib/utils/debounce.js";
 
 import type { NodeCG } from "../../../types/nodecg";
 

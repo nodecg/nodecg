@@ -1,9 +1,6 @@
 import "@polymer/paper-button/paper-button.js";
 import "@polymer/paper-dialog/paper-dialog.js";
-
-// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from "./ncg-graphic";
-keep1;
+import "./ncg-graphic";
 
 import * as Polymer from "@polymer/polymer";
 import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";

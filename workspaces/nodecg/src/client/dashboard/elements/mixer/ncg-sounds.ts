@@ -3,14 +3,12 @@ import "@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js";
 import "@polymer/paper-dialog/paper-dialog.js";
 import "@polymer/paper-toast/paper-toast.js";
 import "@polymer/paper-slider/paper-slider.js";
+import "./ncg-sound-cue";
 
 import * as Polymer from "@polymer/polymer";
 
 import type { NodeCG as NCGTypes } from "../../../../types/nodecg";
 import type { NcgSoundCue } from "./ncg-sound-cue";
-import * as keep1 from "./ncg-sound-cue";
-
-keep1;
 
 class NcgSounds extends Polymer.PolymerElement {
 	static get template() {

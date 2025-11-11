@@ -1,0 +1,12 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"module": "preserve",
+		"noUncheckedIndexedAccess": false
+	},
+	"include": [
+		"**/*.ts",
+		"../src/server/types/**/*.ts",
+		"../src/types/stubs.d.ts"
+	]
+}

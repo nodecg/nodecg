@@ -18,7 +18,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "run-p watch typecheck-watch",
-    "watch": "tsdown --watch",
+    "watch": "tsdown --watch --no-clean",
     "typecheck-watch": "tsx scripts/workspaces-parallel.ts typecheck-watch",
     "build": "tsdown",
     "typecheck": "npm --workspaces run typecheck",

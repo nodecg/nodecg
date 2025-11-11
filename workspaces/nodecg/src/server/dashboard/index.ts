@@ -22,7 +22,7 @@ interface DashboardContext {
 	sentryEnabled: boolean;
 }
 
-const BUILD_PATH = path.join(rootPaths.nodecgInstalledPath, "dist");
+const BUILD_PATH = path.join(rootPaths.nodecgInstalledPath, "dist/client");
 
 export class DashboardLib {
 	app = express();

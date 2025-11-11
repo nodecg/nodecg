@@ -1,8 +1,5 @@
 import "@polymer/paper-spinner/paper-spinner.js";
-
-// These get elided unless we do this hacky stuff to force typescript and webpack to keep them.
-import * as keep1 from "./ncg-dashboard-panel";
-keep1;
+import  "./ncg-dashboard-panel";
 
 import * as Polymer from "@polymer/polymer";
 import { timeOut } from "@polymer/polymer/lib/utils/async.js";

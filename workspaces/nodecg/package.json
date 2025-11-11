@@ -43,8 +43,8 @@
     "build": "tsdown",
     "start": "node index.js",
     "test": "vitest",
-    "typecheck": "tsc -b src/client src/server test",
-    "typecheck-watch": "tsc -b src/client src/server test --watch --preserveWatchOutput",
+    "typecheck": "tsc -p src -p test --noEmit",
+    "typecheck-watch": "tsc -p src -p test --noEmit --watch --preserveWatchOutput",
     "typetest": "cd typetest/fake-bundle && npm run build",
     "watch": "tsdown --watch"
   },
@@ -153,6 +153,7 @@
     "is-ci": "^3.0.1",
     "npm-run-all2": "^7.0.2",
     "onchange": "^7.1.0",
+    "tinyglobby": "^0.2.15",
     "tsdown": "^0.16.1",
     "tsx": "^4.19.2",
     "typescript": "~5.9.3",
