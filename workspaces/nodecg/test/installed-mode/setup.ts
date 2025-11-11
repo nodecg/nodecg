@@ -106,7 +106,7 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 
 	// Dynamically import NodeCGServer from the installed location
 	const serverModulePath = pathToFileURL(
-		path.join(nodecgModulePath, "out/server/server/index.js"),
+		path.join(nodecgModulePath, "src/server/server/index.ts"),
 	).href;
 	const { NodeCGServer } = (await import(serverModulePath)) as {
 		NodeCGServer: typeof import("../../src/server/server").NodeCGServer;
