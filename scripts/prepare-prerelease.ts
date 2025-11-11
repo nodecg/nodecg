@@ -14,7 +14,7 @@ if (!version) {
 	throw new Error("Missing required argument: --version");
 }
 
-const rootPackageJsonPath = join(__dirname, "../package.json");
+const rootPackageJsonPath = join(import.meta.dirname, "../package.json");
 const rootPackageJson = JSON.parse(
 	readFileSync(rootPackageJsonPath, "utf-8"),
 ) as {
@@ -27,7 +27,10 @@ rootPackageJson.version = version;
 
 for (const workspace of rootPackageJson.workspaces) {
 	const { name } = JSON.parse(
-		readFileSync(join(__dirname, "..", workspace, "package.json"), "utf-8"),
+		readFileSync(
+			join(import.meta.dirname, "..", workspace, "package.json"),
+			"utf-8",
+		),
 	) as { name: string };
 	if (rootPackageJson.dependencies[name]) {
 		rootPackageJson.dependencies[name] = version;
@@ -40,7 +43,12 @@ writeFileSync(
 );
 
 for (const workspace of rootPackageJson.workspaces) {
-	const packageJsonPath = join(__dirname, "..", workspace, "package.json");
+	const packageJsonPath = join(
+		import.meta.dirname,
+		"..",
+		workspace,
+		"package.json",
+	);
 	const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8")) as {
 		version: string;
 		dependencies?: Record<string, string>;
@@ -52,7 +60,7 @@ for (const workspace of rootPackageJson.workspaces) {
 		for (const dependencyWorkspace of rootPackageJson.workspaces) {
 			const { name } = JSON.parse(
 				readFileSync(
-					join(__dirname, "..", dependencyWorkspace, "package.json"),
+					join(import.meta.dirname, "..", dependencyWorkspace, "package.json"),
 					"utf-8",
 				),
 			) as {
