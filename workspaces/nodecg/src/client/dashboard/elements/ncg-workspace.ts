@@ -1,5 +1,5 @@
 import "@polymer/paper-spinner/paper-spinner.js";
-import  "./ncg-dashboard-panel";
+import "./ncg-dashboard-panel";
 
 import * as Polymer from "@polymer/polymer";
 import { timeOut } from "@polymer/polymer/lib/utils/async.js";
@@ -126,19 +126,19 @@ class NcgWorkspace extends Polymer.PolymerElement {
 	}
 
 	_init() {
-		if (this["_initialized"]) {
+		if (this._initialized) {
 			throw new Error("attempted multiple init");
 		}
 
-		this["_initialized"] = true;
+		this._initialized = true;
 
-		this.$["loadingSpinner"].active = false;
+		this.$.loadingSpinner.active = false;
 		this.applyPackery();
 		setTimeout(() => {
 			this.addEventListener("tap", this.shiftPackery);
-			this.$["panels"].style.opacity = 1;
-			this.$["panels"].style.transform = "translateY(0)";
-			this.$["panels"].style.pointerEvents = "auto";
+			this.$.panels.style.opacity = 1;
+			this.$.panels.style.transform = "translateY(0)";
+			this.$.panels.style.pointerEvents = "auto";
 		}, 750);
 	}
 
@@ -146,7 +146,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 		super.connectedCallback();
 
 		afterNextRender(this, () => {
-			if (this["usePackery"]) {
+			if (this.usePackery) {
 				// Init Packery
 				this.initPackery();
 				this.startObservingPanelMutations();
@@ -158,14 +158,14 @@ class NcgWorkspace extends Polymer.PolymerElement {
 		// Packery causes attributes changes, so before applying it
 		// we disconnect then reconnect our observer to avoid infinite loops
 		try {
-			if (this["_panelMutationObserver"]) {
+			if (this._panelMutationObserver) {
 				return;
 			}
 
 			// Create a MutationObserver which will watch for changes to the DOM and re-apply masonry
-			this["_panelMutationObserver"] = new MutationObserver(() => {
-				this["_handleMutationDebounce"] = Debouncer.debounce(
-					this["_handleMutationDebounce"],
+			this._panelMutationObserver = new MutationObserver(() => {
+				this._handleMutationDebounce = Debouncer.debounce(
+					this._handleMutationDebounce,
 					timeOut.after(150),
 					this._debouncedMutationHandler.bind(this),
 				);
@@ -173,7 +173,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 
 			// Define what element should be observed by the observer
 			// and what types of mutations trigger the callback
-			this["_panelMutationObserver"].observe(this.$["panels"], {
+			this._panelMutationObserver.observe(this.$.panels, {
 				subtree: true,
 				attributes: true,
 				childList: true,
@@ -189,7 +189,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 	}
 
 	initPackery() {
-		const packery = new Packery(this.$["panels"], {
+		const packery = new Packery(this.$.panels, {
 			itemSelector: "ncg-dashboard-panel",
 			columnWidth: 128,
 			gutter: 16,
@@ -197,12 +197,12 @@ class NcgWorkspace extends Polymer.PolymerElement {
 			containerStyle: { position: "relative" },
 		});
 
-		this["_packery"] = packery;
+		this._packery = packery;
 
 		// Initial sort
 		const sortOrder: string[] = []; // global variable for saving order, used later
 		const rawStoredSortOrder = localStorage.getItem(
-			this["PANEL_SORT_ORDER_STORAGE_KEY"],
+			this.PANEL_SORT_ORDER_STORAGE_KEY,
 		);
 		if (rawStoredSortOrder) {
 			const storedSortOrder: string[] = JSON.parse(rawStoredSortOrder);
@@ -241,9 +241,9 @@ class NcgWorkspace extends Polymer.PolymerElement {
 
 		// Manually trigger initial layout
 		packery.layout();
-		this["_packeryInitialized"] = true;
+		this._packeryInitialized = true;
 
-		const panelsList: NcgDashboardPanel[] = this.$["panels"].querySelectorAll(
+		const panelsList: NcgDashboardPanel[] = this.$.panels.querySelectorAll(
 			"ncg-dashboard-panel",
 		);
 		panelsList.forEach((itemElem) => {
@@ -251,7 +251,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 			const draggie = new Draggabilly(itemElem);
 
 			// Manually set the handle because we can't just use a CSS selector due to ShadowDOM
-			draggie.handles = [itemElem.$["dragHandle"]];
+			draggie.handles = [itemElem.$.dragHandle];
 
 			// Bind Draggabilly events to Packery
 			packery.bindDraggabillyEvents(draggie);
@@ -279,7 +279,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 
 			// Save ordering
 			localStorage.setItem(
-				this["PANEL_SORT_ORDER_STORAGE_KEY"],
+				this.PANEL_SORT_ORDER_STORAGE_KEY,
 				JSON.stringify(sortOrder),
 			);
 		};
@@ -289,19 +289,19 @@ class NcgWorkspace extends Polymer.PolymerElement {
 	}
 
 	applyPackery() {
-		this["_applyPackeryDebounce"] = Debouncer.debounce(
-			this["_applyPackeryDebounce"],
+		this._applyPackeryDebounce = Debouncer.debounce(
+			this._applyPackeryDebounce,
 			timeOut.after(10),
 			() => {
-				if (this["_packeryInitialized"]) {
-					this["_packery"].layout();
+				if (this._packeryInitialized) {
+					this._packery.layout();
 				}
 			},
 		);
 	}
 
 	shiftPackery() {
-		if (!this["usePackery"]) {
+		if (!this.usePackery) {
 			return;
 		}
 
@@ -312,13 +312,13 @@ class NcgWorkspace extends Polymer.PolymerElement {
 		// caused by clicks are caught, because those mutations might
 		// have changed the vertical size of the panel.
 
-		this["_shiftPackeryDebounce"] = Debouncer.debounce(
-			this["_shiftPackeryDebounce"],
+		this._shiftPackeryDebounce = Debouncer.debounce(
+			this._shiftPackeryDebounce,
 			timeOut.after(100),
 			() => {
-				if (this["_packeryInitialized"]) {
+				if (this._packeryInitialized) {
 					// See http://packery.metafizzy.co/methods.html#shiftlayout for more details
-					this["_packery"].shiftLayout();
+					this._packery.shiftLayout();
 				}
 			},
 		);
@@ -367,12 +367,12 @@ class NcgWorkspace extends Polymer.PolymerElement {
 	}
 
 	_routeChanged(route: { path: string }) {
-		if (this["usePackery"]) {
+		if (this.usePackery) {
 			// This is a hack to fix packery when the viewport size is changed
 			// when the workspace is not visible.
 			if (route.path === (this as any).parentNode.route) {
-				this["_fixPackeryDebounce"] = Debouncer.debounce(
-					this["_fixPackeryDebounce"],
+				this._fixPackeryDebounce = Debouncer.debounce(
+					this._fixPackeryDebounce,
 					timeOut.after(10),
 					this._fixPackery.bind(this),
 				);
@@ -395,7 +395,7 @@ class NcgWorkspace extends Polymer.PolymerElement {
 	}
 
 	_debouncedMutationHandler() {
-		this["_panelMutationObserver"].disconnect();
+		this._panelMutationObserver.disconnect();
 		this.shiftPackery();
 		this.startObservingPanelMutations();
 	}

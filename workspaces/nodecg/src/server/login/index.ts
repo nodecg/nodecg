@@ -423,7 +423,9 @@ export function createMiddleware(
 
 	app.use(
 		"/login",
-		express.static(path.join(rootPaths.nodecgInstalledPath, "dist/client/login")),
+		express.static(
+			path.join(rootPaths.nodecgInstalledPath, "dist/client/login"),
+		),
 	);
 
 	app.get("/login", (req, res) => {
@@ -451,9 +453,9 @@ export function createMiddleware(
 				"dist/server/templates/authError.tmpl",
 			),
 			{
-				message: req.query["message"],
-				code: req.query["code"],
-				viewUrl: req.query["viewUrl"],
+				message: req.query.message,
+				code: req.query.code,
+				viewUrl: req.query.viewUrl,
 			},
 		);
 	});

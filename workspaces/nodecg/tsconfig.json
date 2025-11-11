@@ -1,6 +1,7 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
+		"module": "preserve",
 		"lib": ["ESNext", "DOM"],
 		"noPropertyAccessFromIndexSignature": false,
 

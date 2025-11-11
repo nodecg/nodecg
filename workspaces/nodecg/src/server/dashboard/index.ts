@@ -42,7 +42,7 @@ export class DashboardLib {
 					]
 				: [path.join(rootPaths.runtimeRootPath, "node_modules")];
 			const basePath = rootPaths.runtimeRootPath;
-			const filePath = req.params["filePath"]!;
+			const filePath = req.params.filePath!;
 			sendNodeModulesFile(rootNodeModulesPaths, basePath, filePath, res, next);
 		});
 
@@ -60,7 +60,13 @@ export class DashboardLib {
 				this.dashboardContext = getDashboardContext(bundleManager.all());
 			}
 
-			res.render(path.join(rootPaths.nodecgInstalledPath, "dist/server/templates/dashboard.tmpl"), this.dashboardContext);
+			res.render(
+				path.join(
+					rootPaths.nodecgInstalledPath,
+					"dist/server/templates/dashboard.tmpl",
+				),
+				this.dashboardContext,
+			);
 		});
 
 		app.get("/bundles/:bundleName/dashboard/*", authCheck, (req, res, next) => {
@@ -82,7 +88,7 @@ export class DashboardLib {
 					resourceType,
 					{
 						createApiInstance: bundle,
-						standalone: Boolean(req.query["standalone"]),
+						standalone: Boolean(req.query.standalone),
 						fullbleed: panel.fullbleed,
 						sound: bundle.soundCues && bundle.soundCues.length > 0,
 					},

@@ -458,19 +458,19 @@ class NcgDashboard extends Polymer.PolymerElement {
 				window.location.href = `/authError?code=${err.code}&message=${err.message}`;
 			} else {
 				console.error("Unhandled socket error:", err);
-				this.$["mainToast"].show("Unhandled socket error!");
+				this.$.mainToast.show("Unhandled socket error!");
 			}
 		});
 
 		window.socket.on("disconnect", () => {
-			this.$["mainToast"].show("Lost connection to NodeCG server!");
+			this.$.mainToast.show("Lost connection to NodeCG server!");
 			notified = false;
-			this["disconnected"] = true;
+			this.disconnected = true;
 		});
 
 		window.socket.io.on("reconnect_attempt", (attempts) => {
-			if (!this.$["reconnectToast"].opened) {
-				this.$["reconnectToast"].open();
+			if (!this.$.reconnectToast.opened) {
+				this.$.reconnectToast.open();
 			}
 
 			if (attempts >= 3 && !notified) {
@@ -484,9 +484,9 @@ class NcgDashboard extends Polymer.PolymerElement {
 		});
 
 		window.socket.io.on("reconnect", (attempts) => {
-			this.$["mainToast"].show("Reconnected to NodeCG server!");
-			this.$["reconnectToast"].hide();
-			this["disconnected"] = false;
+			this.$.mainToast.show("Reconnected to NodeCG server!");
+			this.$.reconnectToast.hide();
+			this.disconnected = false;
 
 			if (attempts >= 3) {
 				notify("Reconnected", {
@@ -498,7 +498,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 		});
 
 		window.socket.io.on("reconnect_failed", () => {
-			this.$["mainToast"].show("Failed to reconnect to NodeCG server!");
+			this.$.mainToast.show("Failed to reconnect to NodeCG server!");
 
 			notify("Reconnection Failed", {
 				body: "Could not reconnect to NodeCG after the maximum number of attempts.",
@@ -514,17 +514,17 @@ class NcgDashboard extends Polymer.PolymerElement {
 		// If the default workspace is hidden (due to it having no panels),
 		// show the next workspace by default.
 		if (
-			this["route"].path === "" &&
+			this.route.path === "" &&
 			window.__renderData__.workspaces[0]!.route !== ""
 		) {
 			window.location.hash = window.__renderData__.workspaces[0]!.route;
 		}
 
-		if (!this["routeData"]) {
-			this["routeData"] = {};
+		if (!this.routeData) {
+			this.routeData = {};
 		}
 
-		if (!this["routeData"].page) {
+		if (!this.routeData.page) {
 			this.set("routeData.page", "");
 		}
 
@@ -537,7 +537,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 	}
 
 	closeDrawer() {
-		this.$["drawer"].close();
+		this.$.drawer.close();
 	}
 
 	_smallScreenChanged(newVal: boolean) {
@@ -556,8 +556,8 @@ class NcgDashboard extends Polymer.PolymerElement {
 
 	_routeChanged() {
 		this._fixTabs();
-		this["_fixPathDebounce"] = Debouncer.debounce(
-			this["_fixPathDebounce"],
+		this._fixPathDebounce = Debouncer.debounce(
+			this._fixPathDebounce,
 			timeOut.after(100),
 			this._fixPath.bind(this),
 		);
@@ -569,8 +569,8 @@ class NcgDashboard extends Polymer.PolymerElement {
 		const tabs = this.shadowRoot!.querySelectorAll("paper-tabs");
 		if (tabs) {
 			tabs.forEach((tabSet) => {
-				if (tabSet.selected !== this["route"].path) {
-					tabSet.selected = this["route"].path;
+				if (tabSet.selected !== this.route.path) {
+					tabSet.selected = this.route.path;
 				}
 			});
 		}
@@ -579,7 +579,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 	_fixPath() {
 		// If the current hash points to a route that doesn't exist, (such as
 		// after a refresh which removed a workspace), default to the first workspace.
-		if (!this.$["pages"].selectedItem) {
+		if (!this.$.pages.selectedItem) {
 			window.location.hash = window.__renderData__.workspaces[0]!.route;
 		}
 	}

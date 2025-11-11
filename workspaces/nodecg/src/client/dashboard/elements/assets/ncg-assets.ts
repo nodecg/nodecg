@@ -53,7 +53,7 @@ class NcgAssets extends MutableData(Polymer.PolymerElement) {
 		super.ready();
 
 		collectionsRep.on("change", (newVal) => {
-			this["collections"] = newVal;
+			this.collections = newVal;
 		});
 	}
 }

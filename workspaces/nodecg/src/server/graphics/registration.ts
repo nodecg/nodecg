@@ -13,7 +13,10 @@ import { isChildPath } from "../util/is-child-path";
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 
-const BUILD_PATH = path.join(rootPaths.nodecgInstalledPath, "dist/client/instance");
+const BUILD_PATH = path.join(
+	rootPaths.nodecgInstalledPath,
+	"dist/client/instance",
+);
 
 export class RegistrationCoordinator {
 	app = express();

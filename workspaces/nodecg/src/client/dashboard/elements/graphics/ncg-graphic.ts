@@ -274,20 +274,20 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 	override ready(): void {
 		super.ready();
 
-		const clipboard = new Clipboard(this.$["copyButton"]);
+		const clipboard = new Clipboard(this.$.copyButton);
 		this._initClipboard(clipboard);
-		this.$["url"].addEventListener("dragstart", this._onDrag.bind(this));
+		this.$.url.addEventListener("dragstart", this._onDrag.bind(this));
 	}
 
 	reloadAll() {
-		this.$["reloadButton"].disabled = true;
-		window.socket.emit("graphic:requestRefreshAll", this["graphic"], () => {
-			this.$["reloadButton"].disabled = false;
+		this.$.reloadButton.disabled = true;
+		window.socket.emit("graphic:requestRefreshAll", this.graphic, () => {
+			this.$.reloadButton.disabled = false;
 		});
 	}
 
 	toggleCollapse() {
-		this.$["instancesCollapse"].toggle();
+		this.$.instancesCollapse.toggle();
 	}
 
 	/* istanbul ignore next: we dont currently test responsiveness */
@@ -384,9 +384,9 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 			obsURL = `${dragged.href}?`;
 		}
 
-		obsURL += `layer-name=${this["graphic"].file.replace(".html", "")}&layer-height=${
-			this["graphic"].height
-		}&layer-width=${this["graphic"].width}`;
+		obsURL += `layer-name=${this.graphic.file.replace(".html", "")}&layer-height=${
+			this.graphic.height
+		}&layer-width=${this.graphic.width}`;
 
 		event.dataTransfer.setData("text/uri-list", obsURL);
 	}
