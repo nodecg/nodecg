@@ -19,7 +19,7 @@ const rootPackageJson = JSON.parse(
 	readFileSync(rootPackageJsonPath, "utf-8"),
 ) as {
 	version: string;
-	dependencies: Record<string, string>;
+	dependencies?: Record<string, string>;
 	workspaces: string[];
 };
 
@@ -32,7 +32,7 @@ for (const workspace of rootPackageJson.workspaces) {
 			"utf-8",
 		),
 	) as { name: string };
-	if (rootPackageJson.dependencies[name]) {
+	if (rootPackageJson.dependencies?.[name]) {
 		rootPackageJson.dependencies[name] = version;
 	}
 }
