@@ -91,7 +91,7 @@ export class GraphicsLib {
 					return;
 				}
 
-				const resName = req.params["filePath"]!;
+				const resName = req.params.filePath!;
 				const parentDir = path.join(bundle.dir, "bower_components");
 				const fileLocation = path.join(parentDir, resName);
 				sendFile(parentDir, fileLocation, res, next);
@@ -113,7 +113,7 @@ export class GraphicsLib {
 					return;
 				}
 
-				const filePath = req.params["filePath"]!;
+				const filePath = req.params.filePath!;
 
 				if (isLegacyProject) {
 					const parentDir = path.join(bundle.dir, "node_modules");

@@ -94,7 +94,7 @@ function replaceRefs(
 		}
 
 		if (dereferencedData && referenceFile) {
-			delete obj["$ref"];
+			delete obj.$ref;
 			for (const key in dereferencedData) {
 				if (key === "$schema") {
 					continue;
@@ -134,7 +134,7 @@ function replaceRefs(
  * @returns {boolean}
  */
 function isFileReference(value: UnknownObject): value is FileReference {
-	return typeof value["$ref"] === "string" && !value["$ref"].startsWith("#");
+	return typeof value.$ref === "string" && !value.$ref.startsWith("#");
 }
 
 /**
@@ -144,7 +144,7 @@ function isFileReference(value: UnknownObject): value is FileReference {
  * @returns {boolean}
  */
 function isPointerReference(value: UnknownObject): value is PointerReference {
-	return typeof value["$ref"] === "string" && value["$ref"].startsWith("#");
+	return typeof value.$ref === "string" && value.$ref.startsWith("#");
 }
 
 /**
@@ -184,8 +184,8 @@ export function formatSchema(
 		This ensures that the schema will be compliant by removing these custom properties and allowing the schema converter to customize the generated type if needed.
 	 */
 	if (schema) {
-		delete schema["tsType"];
-		delete schema["tsEnumNames"];
+		delete schema.tsType;
+		delete schema.tsEnumNames;
 	}
 
 	return schema;

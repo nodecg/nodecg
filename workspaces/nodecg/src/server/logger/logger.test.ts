@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { afterAll, expect, Mock, test as baseTest, vi } from "vitest";
+import { afterAll, expect, type Mock, test as baseTest, vi } from "vitest";
 
 import { createTmpDir } from "../../../test/helpers/tmp-dir";
 import { loggerFactory } from "./logger.server";

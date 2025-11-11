@@ -23,7 +23,7 @@ afterAll(async () => {
 
 let bundleManager: BundleManagerTypeOnly;
 beforeAll(async () => {
-	process.env["NODECG_ROOT"] = tmpDir;
+	process.env.NODECG_ROOT = tmpDir;
 	fs.cpSync(testDirPath("fixtures/bundle-manager"), tmpDir, {
 		recursive: true,
 	});

@@ -90,9 +90,7 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 		fs.cpSync(
 			testDirPath("../node_modules"),
 			path.join(tmpDir, "node_modules"),
-			{
-				recursive: true,
-			},
+			{ recursive: true },
 		);
 	}
 

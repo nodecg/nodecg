@@ -34,7 +34,6 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.2",
-    "del-cli": "^7.0.0",
     "publint": "^0.3.15",
     "ts-node": "^10.9.2",
     "tsdown": "^0.16.1",

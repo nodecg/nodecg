@@ -106,7 +106,7 @@ export class SoundsLib {
 		next: express.NextFunction,
 	): void {
 		const bundle = this._bundles.find(
-			(b) => b.name === req.params["bundleName"],
+			(b) => b.name === req.params.bundleName,
 		);
 		if (!bundle) {
 			res.status(404).send(`File not found: ${req.path}`);
@@ -114,7 +114,7 @@ export class SoundsLib {
 		}
 
 		const cue = bundle.soundCues.find(
-			(cue) => cue.name === req.params["cueName"],
+			(cue) => cue.name === req.params.cueName,
 		);
 		if (!cue) {
 			res.status(404).send(`File not found: ${req.path}`);

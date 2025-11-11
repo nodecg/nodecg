@@ -100,7 +100,7 @@ export const getSchemaDefaultFp = (
 function extractSchemaVersion(schema: Record<any, unknown>): string {
 	// For backwards compat, we default to draft-04.
 	const defaultVersion = "https://json-schema.org/draft-04/schema";
-	const extractedVersion = schema["$schema"];
+	const extractedVersion = schema.$schema;
 	return typeof extractedVersion === "string"
 		? extractedVersion
 		: defaultVersion;

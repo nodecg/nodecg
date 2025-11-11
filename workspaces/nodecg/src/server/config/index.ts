@@ -7,7 +7,7 @@ import { argv } from "yargs";
 import { loadConfig } from "./loader";
 
 const cfgDirectoryPath =
-	(argv["cfgPath"] as string) ?? path.join(rootPaths.getRuntimeRoot(), "cfg");
+	(argv.cfgPath as string) ?? path.join(rootPaths.getRuntimeRoot(), "cfg");
 
 // Make 'cfg' folder if it doesn't exist
 if (!fs.existsSync(cfgDirectoryPath)) {

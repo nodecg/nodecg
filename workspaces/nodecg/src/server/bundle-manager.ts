@@ -169,7 +169,7 @@ export class BundleManager extends TypedEmitter<EventMap> {
 				);
 				const bundleName = JSON.parse(bundlePackageJson).name;
 
-				if (nodecgConfig?.["bundles"]?.disabled?.includes(bundleName)) {
+				if (nodecgConfig?.bundles?.disabled?.includes(bundleName)) {
 					log.debug(
 						`Not loading bundle ${bundleName} as it is disabled in config`,
 					);
@@ -177,8 +177,8 @@ export class BundleManager extends TypedEmitter<EventMap> {
 				}
 
 				if (
-					nodecgConfig?.["bundles"]?.enabled &&
-					!nodecgConfig?.["bundles"].enabled.includes(bundleName)
+					nodecgConfig?.bundles?.enabled &&
+					!nodecgConfig?.bundles.enabled.includes(bundleName)
 				) {
 					log.debug(
 						`Not loading bundle ${bundleName} as it is not enabled in config`,

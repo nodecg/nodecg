@@ -1,6 +1,7 @@
 import express from "express";
 import isError from "is-error";
 import { serializeError } from "serialize-error";
+import type { DeepReadonly } from "ts-essentials";
 
 import { NodeCGAPIBase } from "../shared/api.base";
 import type { NodeCG } from "../types/nodecg";
@@ -99,7 +100,9 @@ export function serverApiFactory(
 		/**
 		 * The full NodeCG server config, including potentially sensitive keys.
 		 */
-		readonly config = JSON.parse(JSON.stringify(config));
+		readonly config: DeepReadonly<typeof config> = JSON.parse(
+			JSON.stringify(config),
+		);
 
 		/**
 		 * _Extension only_<br/>
