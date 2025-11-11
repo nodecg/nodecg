@@ -24,12 +24,12 @@
     "typecheck": "npm --workspaces run typecheck",
     "test": "vitest",
     "typetest": "npm -w nodecg run typetest",
-    "lint": "npm-run-all -s lint:*",
-    "lint:prettier": "prettier --check .",
+    "lint": "run-s lint:*",
     "lint:eslint": "eslint --cache",
-    "fix": "npm-run-all -s fix:*",
-    "fix:prettier": "prettier --write .",
-    "fix:eslint": "npm run lint:eslint -- --fix"
+    "lint:prettier": "prettier --check .",
+    "fix": "run-s fix:*",
+    "fix:eslint": "npm run lint:eslint -- --fix",
+    "fix:prettier": "prettier --write ."
   },
   "prettier": {},
   "devDependencies": {
