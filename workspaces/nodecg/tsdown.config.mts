@@ -83,6 +83,7 @@ export default defineConfig([
 		...base,
 		entry: [
 			"src/server/api.server.ts",
+			"src/server/types/augment-express-user.ts",
 			"src/client/api/api.client.ts",
 			"src/shared/replicants.shared.ts",
 			"src/types/logger-interface.ts",
