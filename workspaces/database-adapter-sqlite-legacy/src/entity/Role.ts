@@ -1,7 +1,7 @@
 import type { Role as RoleModel } from "@nodecg/database-adapter-types";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-import { Permission } from "./Permission.js";
+import { Permission } from "./Permission.ts";
 
 @Entity({ name: "role" })
 export class Role implements RoleModel {

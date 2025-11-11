@@ -51,6 +51,7 @@ const clientConfigs = clientEntries.map(
 					? [
 							"src/client/manifest.json",
 							"src/client/favicon.ico",
+							"src/client/service-worker.js",
 							{
 								from: "src/client/dashboard/img",
 								to: "dist/client/dashboard/img",

@@ -7,7 +7,7 @@ import {
 	type Relation,
 } from "typeorm";
 
-import { User } from "./User.js";
+import { User } from "./User.ts";
 
 @Entity({ name: "identity" })
 export class Identity implements IdentityModel {

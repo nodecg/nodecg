@@ -1,6 +1,6 @@
 import { type MigrationInterface, type QueryRunner } from "typeorm";
 
-import { Action } from "../entity/Permission.js";
+import { Action } from "../entity/Permission.ts";
 
 const ROLE_ID = "07e18d80-fa74-4d98-ac18-838c745a480f";
 const PERMISSION_ID = "923561ef-4186-4370-b7df-f12e64fc7bd2";

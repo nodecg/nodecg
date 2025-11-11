@@ -1,4 +1,4 @@
-import { expect, Mock, test as baseTest, vi } from "vitest";
+import { expect, type Mock, test as baseTest, vi } from "vitest";
 
 import { LogLevel } from "../../../types/logger-interface";
 import { loggerFactory } from "./logger.client";

@@ -9,6 +9,6 @@ export default defineConfig({
 	fixedExtension: false,
 	exports: true,
 	publint: {
-		level: "error",
+		strict: true,
 	},
 });

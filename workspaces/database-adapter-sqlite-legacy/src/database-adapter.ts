@@ -2,12 +2,12 @@ import "reflect-metadata";
 
 import type { DatabaseAdapter } from "@nodecg/database-adapter-types";
 
-import { getConnection } from "./connection.js";
-import { ApiKey } from "./entity/ApiKey.js";
-import { Identity } from "./entity/Identity.js";
-import { Replicant } from "./entity/Replicant.js";
-import { Role } from "./entity/Role.js";
-import { User } from "./entity/User.js";
+import { getConnection } from "./connection.ts";
+import { ApiKey } from "./entity/ApiKey.ts";
+import { Identity } from "./entity/Identity.ts";
+import { Replicant } from "./entity/Replicant.ts";
+import { Role } from "./entity/Role.ts";
+import { User } from "./entity/User.ts";
 
 export { ApiKey, getConnection, Identity, Replicant, Role, User };
 

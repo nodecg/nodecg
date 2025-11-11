@@ -1,12 +1,7 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"outDir": "dist",
-		"rootDir": "src",
-
-		"module": "node20",
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true
-	},
-	"include": ["src/**/*.ts"]
+	}
 }

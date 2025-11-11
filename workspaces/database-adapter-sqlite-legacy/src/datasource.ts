@@ -4,14 +4,14 @@ import { rootPaths } from "@nodecg/internal-util";
 import sqlite3 from "better-sqlite3";
 import { DataSource } from "typeorm";
 
-import { ApiKey } from "./entity/ApiKey.js";
-import { Identity } from "./entity/Identity.js";
-import { Permission } from "./entity/Permission.js";
-import { Replicant } from "./entity/Replicant.js";
-import { Role } from "./entity/Role.js";
-import { User } from "./entity/User.js";
-import { initialize1669424617013 } from "./migration/1669424617013-initialize.js";
-import { defaultRoles1669424781583 } from "./migration/1669424781583-default-roles.js";
+import { ApiKey } from "./entity/ApiKey.ts";
+import { Identity } from "./entity/Identity.ts";
+import { Permission } from "./entity/Permission.ts";
+import { Replicant } from "./entity/Replicant.ts";
+import { Role } from "./entity/Role.ts";
+import { User } from "./entity/User.ts";
+import { initialize1669424617013 } from "./migration/1669424617013-initialize.ts";
+import { defaultRoles1669424781583 } from "./migration/1669424781583-default-roles.ts";
 
 const testing = process.env["NODECG_TEST"]?.toLowerCase() === "true";
 

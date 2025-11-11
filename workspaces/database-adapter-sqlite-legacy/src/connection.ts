@@ -1,4 +1,4 @@
-import { dataSource } from "./datasource.js";
+import { dataSource } from "./datasource.ts";
 
 let initialized = false;
 

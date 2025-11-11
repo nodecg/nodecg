@@ -9,10 +9,9 @@ export default defineConfig({
 	fixedExtension: false,
 	exports: true,
 	attw: {
-		level: "error",
 		profile: "esmOnly",
 	},
 	publint: {
-		level: "error",
+		strict: true,
 	},
 });

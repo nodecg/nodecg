@@ -7,7 +7,7 @@ import {
 	type Relation,
 } from "typeorm";
 
-import { Role } from "./Role.js";
+import { Role } from "./Role.ts";
 
 export const enum Action {
 	NONE = 0,
