@@ -15,16 +15,15 @@ NodeCG is a broadcast graphics framework. This codebase includes:
   - Main package is in `workspaces/nodecg/`
 - **Source**: `workspaces/nodecg/src/{server,client,shared}`
 - **Tests**: `workspaces/nodecg/test/**/*.test.ts` (E2E), `workspaces/nodecg/src/**/*.test.ts` (unit)
-- **Build output**: `workspaces/nodecg/out/` (server/client), `workspaces/nodecg/dist/` (client bundles)
-- **Root**: Minimal wrapper with `nodecgDevelopment: true` field, `index.js` wrapper pointing to workspace
+- **Build output**: `workspaces/nodecg/dist/` (bundled server/client code)
+- **Root**: Minimal wrapper with `nodecgRoot: true` field, `index.js` wrapper pointing to workspace
 
 ## Build System
 
-- `npm run build` compiles TypeScript (`tsc`) and bundles client assets for all workspaces
-- **Output**: `workspaces/nodecg/out/` (compiled TS as CommonJS), `workspaces/nodecg/dist/` (client bundles)
-- **Required before tests**: Tests import from compiled `out/` directory
+- `npm run build` uses `tsdown` bundler to compile and bundle all workspaces
+- **Output**: `workspaces/nodecg/dist/` (bundled server and client code as CommonJS)
+- **Required before tests**: Workspace packages must be built as tests import from their `dist/` directories
 - Build errors block test execution
-- **First build may need two runs** - workspace dependencies may not be ready on first pass
 
 ## Test Infrastructure
 
@@ -54,7 +53,7 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 ### Build/Test Workflow
 
 1. `npm install` - Install dependencies
-2. `npm run build` - Build before testing
+2. `npm run build` - Build workspace packages before testing
 3. `npx vitest run` - Run tests in CI mode (not `npm test`)
 
 ## Codebase Patterns
@@ -144,9 +143,9 @@ import "../../test/mocks/foo-mock.js"; // Side-effect import
 
 ### Legacy vs Installed Mode
 
-- **Legacy mode (development)**: Root package has `nodecgDevelopment: true`, bundles in `bundles/` directory
+- **Legacy mode**: Root package has `nodecgRoot: true`, bundles in `bundles/` directory
 - **Installed mode**: NodeCG installed as dependency in `node_modules`, project root IS the bundle
-- Mode determined by `isLegacyProject` check (`package.json` has `nodecgDevelopment: true`)
+- Mode determined by `isLegacyProject` check (`package.json` has `nodecgRoot: true`)
 - **Critical**: `@nodecg/internal-util` caches `rootPath` and `isLegacyProject` at module load time
 - Tests must set `process.env.NODECG_ROOT` BEFORE importing any NodeCG modules
 - Use `getNodecgRoot()` function (respects NODECG_ROOT) instead of `rootPath` constant where appropriate
@@ -154,7 +153,7 @@ import "../../test/mocks/foo-mock.js"; // Side-effect import
 ## Common Pitfalls
 
 - Missing `.js` extension in imports (causes module resolution errors)
-- Not running `npm run build` before tests (tests import stale/missing code)
+- Not running `npm run build` before tests (workspace packages export from `dist/`)
 - Using `npm test` instead of `npx vitest run` (wrong test runner)
 - Sharing state between test files (each file must be isolated)
 - Forgetting that array/object access returns `T | undefined` (`noUncheckedIndexedAccess`)

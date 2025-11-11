@@ -10,7 +10,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 COPY package.json package-lock.json ./
 COPY workspaces workspaces
-COPY tsconfig.json ./
+COPY tsconfig.json tsdown.config.ts ./
 COPY scripts scripts
 
 RUN npm ci
@@ -44,7 +44,6 @@ COPY package.json index.js ./
 COPY --from=npm /nodecg/node_modules node_modules
 COPY --from=npm /nodecg/workspaces workspaces
 COPY --from=build /nodecg/workspaces/nodecg/dist workspaces/nodecg/dist
-COPY --from=build /nodecg/workspaces/nodecg/out workspaces/nodecg/out
 
 # Define directories that should be persisted in a volume
 VOLUME /opt/nodecg/logs /opt/nodecg/db /opt/nodecg/assets
