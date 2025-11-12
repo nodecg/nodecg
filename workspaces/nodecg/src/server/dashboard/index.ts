@@ -35,7 +35,7 @@ export class DashboardLib {
 		app.use(express.static(BUILD_PATH));
 
 		app.use("/node_modules/:filePath(*)", (req, res, next) => {
-			const startDir = path.join(rootPaths.nodecgInstalledPath);
+			const startDir = rootPaths.nodecgInstalledPath;
 			const limitDir = rootPaths.runtimeRootPath;
 			const filePath = req.params.filePath!;
 			sendNodeModulesFile(startDir, limitDir, filePath, res, next);
