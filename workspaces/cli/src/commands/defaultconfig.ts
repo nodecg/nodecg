@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { Command, Args } from "@effect/cli";
 import { FileSystemService } from "../services/file-system.js";
 import { TerminalService } from "../services/terminal.js";
@@ -12,7 +12,7 @@ export const defaultconfigCommand = Command.make(
 		bundle: Args.text({ name: "bundle" }).pipe(Args.optional),
 	},
 	({ bundle: bundleName }) =>
-		Effect.fn("defaultconfigCommand")(function* () {
+		Effect.gen(function* () {
 			const fs = yield* FileSystemService;
 			const terminal = yield* TerminalService;
 			const pathService = yield* PathService;
@@ -21,18 +21,23 @@ export const defaultconfigCommand = Command.make(
 			const cwd = process.cwd();
 			const nodecgPath = yield* pathService.getNodeCGPath();
 
-			let finalBundleName = bundleName;
-			if (!finalBundleName) {
-				const isBundle = yield* pathService.isBundleFolder(cwd);
-				if (isBundle) {
-					finalBundleName = path.basename(cwd);
-				} else {
-					yield* terminal.writeError(
-						"Error: No bundle found in the current directory!",
-					);
-					return;
-				}
-			}
+			const finalBundleName = yield* Option.match(bundleName, {
+				onNone: () =>
+					Effect.gen(function* () {
+						const isBundle = yield* pathService.isBundleFolder(cwd);
+						if (isBundle) {
+							return path.basename(cwd);
+						} else {
+							yield* terminal.writeError(
+								"Error: No bundle found in the current directory!",
+							);
+							return yield* Effect.fail(
+								new Error("No bundle found in current directory"),
+							);
+						}
+					}),
+				onSome: (name) => Effect.succeed(name),
+			});
 
 			const bundlePath = path.join(nodecgPath, "bundles", finalBundleName);
 			const schemaPath = path.join(bundlePath, "configschema.json");

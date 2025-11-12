@@ -1,7 +1,7 @@
 import { Effect, Data } from "effect";
 import { FileSystem } from "@effect/platform";
 import { Schema } from "@effect/schema";
-import tar from "tar";
+import * as tar from "tar";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 
@@ -13,12 +13,12 @@ export class FileSystemError extends Data.TaggedError("FileSystemError")<{
 export class FileSystemService extends Effect.Service<FileSystemService>()(
 	"FileSystemService",
 	{
-		effect: Effect.fn("FileSystemService.make")(function* () {
+		effect: Effect.gen(function* () {
 			const fs = yield* FileSystem.FileSystem;
 
 			return {
-				readJson: <A>(path: string, schema: Schema.Schema<A, unknown>) =>
-					Effect.fn("readJson")(function* () {
+				readJson: <A, I, R>(path: string, schema: Schema.Schema<A, I, R>) =>
+					Effect.gen(function* () {
 						const content = yield* fs.readFileString(path).pipe(
 							Effect.mapError(
 								() =>
@@ -41,7 +41,7 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					}),
 
 				writeJson: <A>(path: string, data: A) =>
-					Effect.fn("writeJson")(function* () {
+					Effect.gen(function* () {
 						yield* fs
 							.writeFileString(path, JSON.stringify(data, null, 2))
 							.pipe(
@@ -56,12 +56,12 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					}),
 
 				exists: (path: string) =>
-					Effect.fn("exists")(function* () {
+					Effect.gen(function* () {
 						return yield* fs.exists(path).pipe(Effect.orElseSucceed(() => false));
 					}),
 
 				mkdir: (path: string, options?: { recursive?: boolean }) =>
-					Effect.fn("mkdir")(function* () {
+					Effect.gen(function* () {
 						yield* fs.makeDirectory(path, options).pipe(
 							Effect.mapError(
 								() =>
@@ -74,7 +74,7 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					}),
 
 				rm: (path: string, options?: { recursive?: boolean; force?: boolean }) =>
-					Effect.fn("rm")(function* () {
+					Effect.gen(function* () {
 						yield* fs.remove(path, options).pipe(
 							Effect.mapError(
 								() =>
@@ -87,7 +87,7 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					}),
 
 				readdir: (path: string) =>
-					Effect.fn("readdir")(function* () {
+					Effect.gen(function* () {
 						return yield* fs.readDirectory(path).pipe(
 							Effect.mapError(
 								() =>
@@ -100,7 +100,7 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					}),
 
 				readFileString: (path: string) =>
-					Effect.fn("readFileString")(function* () {
+					Effect.gen(function* () {
 						return yield* fs.readFileString(path).pipe(
 							Effect.mapError(
 								() =>
@@ -113,7 +113,7 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					}),
 
 				writeFileString: (path: string, content: string) =>
-					Effect.fn("writeFileString")(function* () {
+					Effect.gen(function* () {
 						yield* fs.writeFileString(path, content).pipe(
 							Effect.mapError(
 								() =>
@@ -129,7 +129,7 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					stream: AsyncIterable<Uint8Array>,
 					options?: { cwd?: string; strip?: number },
 				) =>
-					Effect.fn("extractTarball")(function* () {
+					Effect.gen(function* () {
 						yield* Effect.promise(() =>
 							pipeline(
 								Readable.from(stream),
@@ -146,6 +146,5 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					}),
 			};
 		}),
-		dependencies: [FileSystem.FileSystem.Default],
 	},
 ) {}

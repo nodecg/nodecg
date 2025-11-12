@@ -8,7 +8,7 @@ export class TerminalError extends Data.TaggedError("TerminalError")<{
 export class TerminalService extends Effect.Service<TerminalService>()(
 	"TerminalService",
 	{
-		effect: Effect.fn("TerminalService.make")(function* () {
+		effect: Effect.gen(function* () {
 			const terminal = yield* Terminal.Terminal;
 
 			// ANSI color codes
@@ -22,27 +22,27 @@ export class TerminalService extends Effect.Service<TerminalService>()(
 
 			return {
 				write: (message: string) =>
-					Effect.fn("write")(function* () {
+					Effect.gen(function* () {
 						yield* terminal.display(message);
 					}),
 
 				writeLine: (message: string) =>
-					Effect.fn("writeLine")(function* () {
+					Effect.gen(function* () {
 						yield* terminal.display(message + "\n");
 					}),
 
 				writeSuccess: (message: string) =>
-					Effect.fn("writeSuccess")(function* () {
+					Effect.gen(function* () {
 						yield* terminal.display(colors.green(message) + "\n");
 					}),
 
 				writeError: (message: string) =>
-					Effect.fn("writeError")(function* () {
+					Effect.gen(function* () {
 						yield* terminal.display(colors.red(message) + "\n");
 					}),
 
 				writeInfo: (message: string) =>
-					Effect.fn("writeInfo")(function* () {
+					Effect.gen(function* () {
 						yield* terminal.display(colors.cyan(message) + "\n");
 					}),
 
@@ -50,12 +50,12 @@ export class TerminalService extends Effect.Service<TerminalService>()(
 					message: string,
 					color: "green" | "red" | "cyan" | "magenta",
 				) =>
-					Effect.fn("writeColored")(function* () {
+					Effect.gen(function* () {
 						yield* terminal.display(colors[color](message));
 					}),
 
 				confirm: (message: string) =>
-					Effect.fn("confirm")(function* () {
+					Effect.gen(function* () {
 						yield* terminal.display(`${message} (y/n): `);
 						const input = yield* terminal.readLine.pipe(
 							Effect.mapError(
@@ -68,7 +68,7 @@ export class TerminalService extends Effect.Service<TerminalService>()(
 					}),
 
 				readLine: () =>
-					Effect.fn("readLine")(function* () {
+					Effect.gen(function* () {
 						return yield* terminal.readLine.pipe(
 							Effect.mapError(
 								() => new TerminalError({ message: "Failed to read input" }),
@@ -77,6 +77,5 @@ export class TerminalService extends Effect.Service<TerminalService>()(
 					}),
 			};
 		}),
-		dependencies: [Terminal.Terminal.Default],
 	},
 ) {}

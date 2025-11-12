@@ -8,17 +8,20 @@ export class JsonSchemaError extends Data.TaggedError("JsonSchemaError")<{
 	readonly schemaPath?: string;
 }> {}
 
-const ajv = new Ajv({ useDefaults: true, strict: true });
+const AjvConstructor = Ajv as unknown as {
+	new (options: { useDefaults: boolean; strict: boolean }): typeof Ajv.prototype;
+};
+const ajv = new AjvConstructor({ useDefaults: true, strict: true });
 
 export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 	"JsonSchemaService",
 	{
-		effect: Effect.fn("JsonSchemaService.make")(function* () {
+		effect: Effect.gen(function* () {
 			const fs = yield* FileSystemService;
 
 			return {
 				applyDefaults: (schemaPath: string) =>
-					Effect.fn("applyDefaults")(function* () {
+					Effect.gen(function* () {
 						const schemaContent = yield* fs.readFileString(schemaPath).pipe(
 							Effect.mapError(
 								() =>
@@ -47,7 +50,7 @@ export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 					}),
 
 				validate: (data: unknown, schemaPath: string) =>
-					Effect.fn("validate")(function* () {
+					Effect.gen(function* () {
 						const schemaContent = yield* fs.readFileString(schemaPath).pipe(
 							Effect.mapError(
 								() =>
@@ -80,7 +83,7 @@ export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 						style?: { singleQuote?: boolean; useTabs?: boolean };
 					},
 				) =>
-					Effect.fn("compileToTypeScript")(function* () {
+					Effect.gen(function* () {
 						const ts = yield* Effect.promise(() =>
 							compileFromFile(schemaPath, {
 								cwd: options?.cwd,
@@ -112,6 +115,5 @@ export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 					}),
 			};
 		}),
-		dependencies: [FileSystemService.Default],
 	},
 ) {}

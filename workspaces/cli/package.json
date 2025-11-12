@@ -25,12 +25,12 @@
     "watch": "tsdown --watch"
   },
   "dependencies": {
-    "@effect/cli": "^0.51.0",
-    "@effect/platform": "^0.72.0",
-    "@effect/platform-node": "^0.66.0",
-    "@effect/schema": "^0.75.0",
+    "@effect/cli": "^0.72.1",
+    "@effect/platform": "^0.93.0",
+    "@effect/platform-node": "^0.100.0",
+    "@effect/schema": "^0.75.5",
     "ajv": "^8.17.1",
-    "effect": "^3.10.0",
+    "effect": "^3.19.3",
     "hosted-git-info": "^8.0.2",
     "json-schema-to-typescript": "^15.0.3",
     "npm-package-arg": "^12.0.1",

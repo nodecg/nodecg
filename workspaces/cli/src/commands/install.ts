@@ -16,7 +16,7 @@ export const installCommand = Command.make(
 		dev: Options.boolean("dev").pipe(Options.withAlias("d"), Options.optional),
 	},
 	({ repo, dev }) =>
-		Effect.fn("installCommand")(function* () {
+		Effect.gen(function* () {
 			const fs = yield* FileSystemService;
 			const terminal = yield* TerminalService;
 			const pathService = yield* PathService;

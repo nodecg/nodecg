@@ -18,14 +18,14 @@ import { JsonSchemaService } from "../services/json-schema.js";
 import { PackageResolverService } from "../services/package-resolver.js";
 import { PathService } from "../services/path.js";
 
-const program = Effect.fn("main")(function* () {
+const program = Effect.gen(function* () {
 	const git = yield* GitService;
 	const terminal = yield* TerminalService;
 
 	// Check git availability
 	yield* git.checkAvailable().pipe(
 		Effect.catchAll(() =>
-			Effect.fn("gitError")(function* () {
+			Effect.gen(function* () {
 				yield* terminal.writeError(
 					"The CLI requires that git be available in your PATH.",
 				);

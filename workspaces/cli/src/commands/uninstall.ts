@@ -15,7 +15,7 @@ export const uninstallCommand = Command.make(
 		),
 	},
 	({ bundle: bundleName, force }) =>
-		Effect.fn("uninstallCommand")(function* () {
+		Effect.gen(function* () {
 			const fs = yield* FileSystemService;
 			const terminal = yield* TerminalService;
 			const pathService = yield* PathService;

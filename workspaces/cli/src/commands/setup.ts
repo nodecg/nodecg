@@ -21,7 +21,7 @@ export const setupCommand = Command.make(
 		),
 	},
 	({ version, update, skipDependencies }) =>
-		Effect.fn("setupCommand")(function* () {
+		Effect.gen(function* () {
 			const fs = yield* FileSystemService;
 			const terminal = yield* TerminalService;
 			const pathService = yield* PathService;

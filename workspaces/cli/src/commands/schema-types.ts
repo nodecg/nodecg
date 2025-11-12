@@ -18,7 +18,7 @@ export const schemaTypesCommand = Command.make(
 		),
 	},
 	({ dir: inDir, outDir: outDirOption, configSchema }) =>
-		Effect.fn("schemaTypesCommand")(function* () {
+		Effect.gen(function* () {
 			const fs = yield* FileSystemService;
 			const terminal = yield* TerminalService;
 			const jsonSchema = yield* JsonSchemaService;
@@ -48,7 +48,7 @@ export const schemaTypesCommand = Command.make(
 			};
 
 			const compile = (input: string, output: string, cwd = processCwd) =>
-				Effect.fn("compile")(function* () {
+				Effect.gen(function* () {
 					yield* jsonSchema.compileToTypeScript(input, output, { cwd, style });
 					yield* terminal.writeLine(output);
 				});

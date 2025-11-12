@@ -9,7 +9,10 @@ export class NpmError extends Data.TaggedError("NpmError")<{
 }> {}
 
 const NpmRegistrySchema = Schema.Struct({
-	versions: Schema.Record(Schema.String, Schema.Unknown),
+	versions: Schema.Record({
+		key: Schema.String,
+		value: Schema.Unknown,
+	}),
 });
 
 const NpmReleaseSchema = Schema.Struct({
@@ -18,16 +21,17 @@ const NpmReleaseSchema = Schema.Struct({
 	}),
 });
 
-export type NpmRelease = Schema.Schema.Type<typeof NpmReleaseSchema>;
+type NpmReleaseEncoded = typeof NpmReleaseSchema.Type;
+export type NpmRelease = NpmReleaseEncoded;
 
 export class NpmService extends Effect.Service<NpmService>()("NpmService", {
-	effect: Effect.fn("NpmService.make")(function* () {
+	effect: Effect.gen(function* () {
 		const http = yield* HttpService;
 		const cmd = yield* CommandService;
 
 		return {
 			listVersions: (packageName: string) =>
-				Effect.fn("listVersions")(function* () {
+				Effect.gen(function* () {
 					const url = `https://registry.npmjs.org/${packageName}`;
 					const data = yield* http.fetchJson(url, NpmRegistrySchema).pipe(
 						Effect.mapError(
@@ -42,7 +46,7 @@ export class NpmService extends Effect.Service<NpmService>()("NpmService", {
 				}),
 
 			getRelease: (packageName: string, version: string) =>
-				Effect.fn("getRelease")(function* () {
+				Effect.gen(function* () {
 					const url = `http://registry.npmjs.org/${packageName}/${version}`;
 					return yield* http.fetchJson(url, NpmReleaseSchema).pipe(
 						Effect.mapError(
@@ -56,7 +60,7 @@ export class NpmService extends Effect.Service<NpmService>()("NpmService", {
 				}),
 
 			install: (cwd: string, production: boolean) =>
-				Effect.fn("install")(function* () {
+				Effect.gen(function* () {
 					const args = production ? ["install", "--production"] : ["install"];
 					yield* cmd.exec("npm", args, { cwd }).pipe(
 						Effect.mapError(
@@ -70,7 +74,7 @@ export class NpmService extends Effect.Service<NpmService>()("NpmService", {
 				}),
 
 			yarnInstall: (cwd: string, production: boolean) =>
-				Effect.fn("yarnInstall")(function* () {
+				Effect.gen(function* () {
 					const args = production ? ["--production"] : [];
 					yield* cmd.exec("yarn", args, { cwd }).pipe(
 						Effect.mapError(
@@ -84,5 +88,5 @@ export class NpmService extends Effect.Service<NpmService>()("NpmService", {
 				}),
 		};
 	}),
-	dependencies: [HttpService.Default, CommandService.Default],
-}) {}
+	},
+) {}

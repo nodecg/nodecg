@@ -22,70 +22,68 @@ export type PackageSpec = {
 export class PackageResolverService extends Effect.Service<PackageResolverService>()(
 	"PackageResolverService",
 	{
-		effect: Effect.fn("PackageResolverService.make")(function* () {
-			return {
-				resolveGitUrl: (spec: string) =>
-					Effect.fn("resolveGitUrl")(function* () {
-						const parsed = npa(spec);
+		sync: () => ({
+			resolveGitUrl: (spec: string) =>
+				Effect.gen(function* () {
+					const parsed = npa(spec);
 
-						if (!parsed.hosted) {
-							return yield* Effect.fail(
-								new PackageResolverError({
-									message: "Not a valid git repository spec",
-									spec,
-								}),
-							);
-						}
+					if (!parsed.hosted) {
+						return yield* Effect.fail(
+							new PackageResolverError({
+								message: "Not a valid git repository spec",
+								spec,
+							}),
+						);
+					}
 
-						const hostedInfo = parsed.hosted as unknown as HostedGitInfo;
-						const url = hostedInfo.https();
+					const hostedInfo = parsed.hosted as unknown as HostedGitInfo;
+					const url = hostedInfo.https();
 
-						if (!url) {
-							return yield* Effect.fail(
-								new PackageResolverError({
-									message: "Could not resolve git URL",
-									spec,
-								}),
-							);
-						}
+					if (!url) {
+						return yield* Effect.fail(
+							new PackageResolverError({
+								message: "Could not resolve git URL",
+								spec,
+							}),
+						);
+					}
 
-						const temp = url.split("/").pop();
-						if (!temp) {
-							return yield* Effect.fail(
-								new PackageResolverError({
-									message: "Could not extract repository name",
-									spec,
-								}),
-							);
-						}
+					const temp = url.split("/").pop();
+					if (!temp) {
+						return yield* Effect.fail(
+							new PackageResolverError({
+								message: "Could not extract repository name",
+								spec,
+							}),
+						);
+					}
 
-						const name = temp.slice(0, temp.length - 4);
+					const name = temp.slice(0, temp.length - 4);
 
-						return { url, name } as GitRepoInfo;
-					}),
+					return { url, name } as GitRepoInfo;
+				}),
 
-				parseVersionSpec: (spec: string) =>
-					Effect.fn("parseVersionSpec")(function* () {
-						if (spec.indexOf("#") <= 0) {
-							return { repo: spec, range: "" } as PackageSpec;
-						}
+			parseVersionSpec: (spec: string) =>
+				Effect.gen(function* () {
+					if (spec.indexOf("#") <= 0) {
+						return { repo: spec, range: "" } as PackageSpec;
+					}
 
-						const repoParts = spec.split("#");
-						const repo = repoParts[0];
-						const range = repoParts[1];
+					const repoParts = spec.split("#");
+					const repo = repoParts[0];
+					const range = repoParts[1];
 
-						if (!repo) {
-							return yield* Effect.fail(
-								new PackageResolverError({
-									message: "Invalid package spec format",
-									spec,
-								}),
-							);
-						}
+					if (!repo) {
+						return yield* Effect.fail(
+							new PackageResolverError({
+								message: "Invalid package spec format",
+								spec,
+							}),
+						);
+					}
 
-						return { repo, range: range ?? "" } as PackageSpec;
-					}),
-			};
+					return { repo, range: range ?? "" } as PackageSpec;
+				}),
 		}),
 	},
 ) {}

@@ -1,4 +1,4 @@
-import { Command, CliApp } from "@effect/cli";
+import { Command } from "@effect/cli";
 import { setupCommand } from "./commands/setup.js";
 import { installCommand } from "./commands/install.js";
 import { startCommand } from "./commands/start.js";
@@ -18,9 +18,7 @@ const command = Command.make("nodecg").pipe(
 	]),
 );
 
-export const cli = CliApp.make({
+export const cli = Command.run(command, {
 	name: "nodecg",
 	version: packageJson.version,
-	summary: "NodeCG broadcast graphics framework CLI",
-	command,
 });

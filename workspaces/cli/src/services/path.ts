@@ -14,18 +14,18 @@ const PackageJsonSchema = Schema.Struct({
 });
 
 export class PathService extends Effect.Service<PathService>()("PathService", {
-	effect: Effect.fn("PathService.make")(function* () {
+	effect: Effect.gen(function* () {
 		const fs = yield* FileSystemService;
 
 		const pathContainsNodeCG = (checkPath: string) =>
-			Effect.fn("pathContainsNodeCG")(function* () {
+			Effect.gen(function* () {
 				const pjsonPath = path.join(checkPath, "package.json");
 				const pjson = yield* fs.readJson(pjsonPath, PackageJsonSchema);
 				return pjson.name.toLowerCase() === "nodecg";
 			}).pipe(Effect.orElseSucceed(() => false));
 
 		const isBundleFolder = (checkPath: string) =>
-			Effect.fn("isBundleFolder")(function* () {
+			Effect.gen(function* () {
 				const pjsonPath = path.join(checkPath, "package.json");
 				const pjson = yield* fs.readJson(pjsonPath, PackageJsonSchema);
 				return pjson.nodecg !== undefined;
@@ -35,7 +35,7 @@ export class PathService extends Effect.Service<PathService>()("PathService", {
 			pathContainsNodeCG,
 
 			getNodeCGPath: () =>
-				Effect.fn("getNodeCGPath")(function* () {
+				Effect.gen(function* () {
 					let curr = process.cwd();
 
 					while (true) {
@@ -60,7 +60,7 @@ export class PathService extends Effect.Service<PathService>()("PathService", {
 			isBundleFolder,
 
 			getCurrentNodeCGVersion: () =>
-				Effect.fn("getCurrentNodeCGVersion")(function* () {
+				Effect.gen(function* () {
 					const self = yield* PathService;
 					const nodecgPath = yield* self.getNodeCGPath();
 					const pjsonPath = path.join(nodecgPath, "package.json");
@@ -69,5 +69,5 @@ export class PathService extends Effect.Service<PathService>()("PathService", {
 				}),
 		};
 	}),
-	dependencies: [FileSystemService.Default],
-}) {}
+	},
+) {}

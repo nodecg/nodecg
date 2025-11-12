@@ -6,7 +6,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 const recursivelyFindProject = (startDir: string) =>
-	Effect.fn("recursivelyFindProject")(function* () {
+	Effect.gen(function* () {
 		const fs = yield* FileSystemService;
 
 		if (!path.isAbsolute(startDir)) {
@@ -39,7 +39,7 @@ export const startCommand = Command.make(
 		),
 	},
 	() =>
-		Effect.fn("startCommand")(function* () {
+		Effect.gen(function* () {
 			const pathService = yield* PathService;
 
 			const projectDir = yield* recursivelyFindProject(process.cwd());

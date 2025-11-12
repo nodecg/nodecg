@@ -6,7 +6,7 @@ import { PathService } from "../services/path.js";
 import path from "node:path";
 
 export const installBundleDeps = (bundlePath: string, installDev: boolean) =>
-	Effect.fn("installBundleDeps")(function* () {
+	Effect.gen(function* () {
 		const fs = yield* FileSystemService;
 		const npm = yield* NpmService;
 		const terminal = yield* TerminalService;

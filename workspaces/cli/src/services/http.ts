@@ -9,12 +9,12 @@ export class HttpError extends Data.TaggedError("HttpError")<{
 }> {}
 
 export class HttpService extends Effect.Service<HttpService>()("HttpService", {
-	effect: Effect.fn("HttpService.make")(function* () {
+	effect: Effect.gen(function* () {
 		const client = yield* HttpClient.HttpClient;
 
 		return {
-			fetchJson: <A>(url: string, schema: Schema.Schema<A, unknown>) =>
-				Effect.fn("fetchJson")(function* () {
+			fetchJson: <A, I, R>(url: string, schema: Schema.Schema<A, I, R>) =>
+				Effect.gen(function* () {
 					const response = yield* HttpClientRequest.get(url).pipe(
 						client.execute,
 						Effect.mapError(
@@ -45,7 +45,7 @@ export class HttpService extends Effect.Service<HttpService>()("HttpService", {
 				}),
 
 			fetchStream: (url: string) =>
-				Effect.fn("fetchStream")(function* () {
+				Effect.gen(function* () {
 					const response = yield* HttpClientRequest.get(url).pipe(
 						client.execute,
 						Effect.mapError(
@@ -64,7 +64,7 @@ export class HttpService extends Effect.Service<HttpService>()("HttpService", {
 				}),
 
 			fetch: (url: string) =>
-				Effect.fn("fetch")(function* () {
+				Effect.gen(function* () {
 					return yield* HttpClientRequest.get(url).pipe(
 						client.execute,
 						Effect.mapError(
@@ -82,5 +82,5 @@ export class HttpService extends Effect.Service<HttpService>()("HttpService", {
 				}),
 		};
 	}),
-	dependencies: [HttpClient.HttpClient.Default],
-}) {}
+	},
+) {}

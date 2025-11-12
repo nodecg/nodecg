@@ -7,12 +7,12 @@ export class GitError extends Data.TaggedError("GitError")<{
 }> {}
 
 export class GitService extends Effect.Service<GitService>()("GitService", {
-	effect: Effect.fn("GitService.make")(function* () {
+	effect: Effect.gen(function* () {
 		const cmd = yield* CommandService;
 
 		return {
 			checkAvailable: () =>
-				Effect.fn("checkAvailable")(function* () {
+				Effect.gen(function* () {
 					yield* cmd.exec("git", ["--version"]).pipe(
 						Effect.mapError(
 							() =>
@@ -25,7 +25,7 @@ export class GitService extends Effect.Service<GitService>()("GitService", {
 				}),
 
 			clone: (url: string, destination: string) =>
-				Effect.fn("clone")(function* () {
+				Effect.gen(function* () {
 					yield* cmd.exec("git", ["clone", url, destination]).pipe(
 						Effect.mapError(
 							() =>
@@ -38,7 +38,7 @@ export class GitService extends Effect.Service<GitService>()("GitService", {
 				}),
 
 			checkout: (version: string, cwd: string) =>
-				Effect.fn("checkout")(function* () {
+				Effect.gen(function* () {
 					yield* cmd.exec("git", ["checkout", version], { cwd }).pipe(
 						Effect.mapError(
 							() =>
@@ -51,7 +51,7 @@ export class GitService extends Effect.Service<GitService>()("GitService", {
 				}),
 
 			listRemoteTags: (repoUrl: string) =>
-				Effect.fn("listRemoteTags")(function* () {
+				Effect.gen(function* () {
 					const stdout = yield* cmd
 						.string("git", ["ls-remote", "--refs", "--tags", repoUrl])
 						.pipe(
@@ -72,5 +72,4 @@ export class GitService extends Effect.Service<GitService>()("GitService", {
 				}),
 		};
 	}),
-	dependencies: [CommandService.Default],
 }) {}
