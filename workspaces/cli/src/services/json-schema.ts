@@ -13,7 +13,6 @@ const ajv = new (Ajv as any)({ useDefaults: true, strict: true });
 export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 	"JsonSchemaService",
 	{
-		accessors: true,
 		effect: Effect.gen(function* () {
 			const fs = yield* FileSystemService;
 

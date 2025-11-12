@@ -9,7 +9,6 @@ export class HttpError extends Data.TaggedError("HttpError")<{
 }> {}
 
 export class HttpService extends Effect.Service<HttpService>()("HttpService", {
-		accessors: true,
 	effect: Effect.gen(function* () {
 		const client = yield* HttpClient.HttpClient;
 

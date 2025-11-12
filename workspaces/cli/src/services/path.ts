@@ -14,7 +14,6 @@ const PackageJsonSchema = Schema.Struct({
 });
 
 export class PathService extends Effect.Service<PathService>()("PathService", {
-		accessors: true,
 	effect: Effect.gen(function* () {
 		const fs = yield* FileSystemService;
 

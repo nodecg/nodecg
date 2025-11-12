@@ -25,7 +25,6 @@ type NpmReleaseEncoded = typeof NpmReleaseSchema.Type;
 export type NpmRelease = NpmReleaseEncoded;
 
 export class NpmService extends Effect.Service<NpmService>()("NpmService", {
-		accessors: true,
 	effect: Effect.gen(function* () {
 		const http = yield* HttpService;
 		const cmd = yield* CommandService;

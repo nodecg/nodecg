@@ -13,7 +13,6 @@ export class FileSystemError extends Data.TaggedError("FileSystemError")<{
 export class FileSystemService extends Effect.Service<FileSystemService>()(
 	"FileSystemService",
 	{
-		accessors: true,
 		effect: Effect.gen(function* () {
 			const fs = yield* FileSystem.FileSystem;
 
