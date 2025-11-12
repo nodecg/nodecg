@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { Command, Args, Options } from "@effect/cli";
 import { FileSystemService } from "../services/file-system.js";
 import { TerminalService } from "../services/terminal.js";
@@ -28,12 +28,16 @@ export const setupCommand = Command.make(
 			const npm = yield* NpmService;
 			const http = yield* HttpService;
 
+			const isUpdateFlag = Option.getOrElse(update, () => false);
+			const skipDeps = Option.getOrElse(skipDependencies, () => false);
+			const versionSpec = Option.getOrNull(version);
+
 			let isUpdate = false;
 
 			const containsNodeCG =
 				yield* pathService.pathContainsNodeCG(process.cwd());
 			if (containsNodeCG) {
-				if (!update) {
+				if (!isUpdateFlag) {
 					yield* terminal.writeError(
 						"NodeCG is already installed in this directory.",
 					);
@@ -47,11 +51,11 @@ export const setupCommand = Command.make(
 				isUpdate = true;
 			}
 
-			if (version) {
+			if (versionSpec) {
 				yield* terminal.write(
 					`Finding latest release that satisfies semver range `,
 				);
-				yield* terminal.writeColored(version, "magenta");
+				yield* terminal.writeColored(versionSpec, "magenta");
 				yield* terminal.write("... ");
 			} else if (isUpdate) {
 				yield* terminal.write("Checking against local install for updates... ");
@@ -61,17 +65,17 @@ export const setupCommand = Command.make(
 
 			const tags = yield* npm.listVersions("nodecg");
 
-			const target = version
-				? semverLib.maxSatisfying(tags, version)
+			const target = versionSpec
+				? semverLib.maxSatisfying(tags, versionSpec)
 				: semverLib.maxSatisfying(tags, "");
 
 			if (!target) {
 				yield* terminal.writeColored("failed!", "red");
 				yield* terminal.writeLine("");
 				yield* terminal.writeError(
-					version
-						? `No releases match the supplied semver range (${version})`
-						: "No releases found",
+					versionSpec
+						? `No releases match the supplied semver range (${versionSpec})`
+						: "Failed to find a suitable release",
 				);
 				return;
 			}
@@ -81,71 +85,34 @@ export const setupCommand = Command.make(
 
 			let current: string | undefined;
 			let downgrade = false;
-
 			if (isUpdate) {
-				current = yield* pathService.getCurrentNodeCGVersion();
-
-				if (semverLib.eq(target, current)) {
-					yield* terminal.write(`The target version (`);
-					yield* terminal.writeColored(target, "magenta");
-					yield* terminal.write(`) is equal to the current version (`);
-					yield* terminal.writeColored(current, "magenta");
-					yield* terminal.writeLine(`). No action will be taken.`);
+				current = yield* pathService
+					.getCurrentNodeCGVersion()
+					.pipe(Effect.option, Effect.map(Option.getOrUndefined));
+				if (current && semverLib.eq(current, target)) {
+					yield* terminal.writeLine(
+						`The target version (${target}) is equal to the current version (${current}). No action will be taken.`,
+					);
 					return;
 				}
-
-				if (semverLib.lt(target, current)) {
-					yield* terminal.writeColored("WARNING:", "red");
-					yield* terminal.write(` The target version (`);
-					yield* terminal.writeColored(target, "magenta");
-					yield* terminal.write(`) is older than the current version (`);
-					yield* terminal.writeColored(current, "magenta");
-					yield* terminal.writeLine(`)`);
-
-					const answer = yield* terminal.confirm(
-						"Are you sure you wish to continue?",
-					);
-					if (!answer) {
-						yield* terminal.writeLine("Setup cancelled.");
+				if (current && semverLib.gte(current, target)) {
+					downgrade = true;
+					const msg = `You are about to downgrade from ${current} to ${target}. Are you sure?`;
+					const confirmed = yield* terminal.confirm(msg);
+					if (!confirmed) {
+						yield* terminal.writeLine(
+							"Aborting setup due to user response.",
+						);
 						return;
 					}
-
-					downgrade = true;
 				}
+			} else {
+				yield* terminal.write(`Installing NodeCG version `);
+				yield* terminal.writeColored(target, "magenta");
+				yield* terminal.write("... ");
 			}
 
-			if (semverLib.lt(target, "v2.0.0")) {
-				yield* terminal.writeError(
-					"CLI does not support NodeCG versions older than v2.0.0.",
-				);
-				return;
-			}
-
-			// Install NodeCG
-			if (isUpdate) {
-				const deletingDirectories = [".git", "build", "scripts", "schemas"];
-				yield* Effect.all(
-					deletingDirectories.map((dir) =>
-						fs.rm(dir, { recursive: true, force: true }),
-					),
-					{ concurrency: "unbounded" },
-				);
-			}
-
-			yield* terminal.write(`Downloading `);
-			yield* terminal.writeColored(target, "magenta");
-			yield* terminal.write(` from npm... `);
-
-			const targetVersion = semverLib.coerce(target)?.version;
-			if (!targetVersion) {
-				yield* terminal.writeError("Failed to determine target NodeCG version");
-				return;
-			}
-
-			const release = yield* npm.getRelease("nodecg", targetVersion);
-
-			yield* terminal.writeColored("done!", "green");
-			yield* terminal.writeLine("");
+			const release = yield* npm.getRelease("nodecg", target);
 
 			if (current) {
 				const verb = semverLib.lt(target, current)
@@ -162,7 +129,7 @@ export const setupCommand = Command.make(
 			yield* fs.extractTarball(tarballStream, { strip: 1 });
 
 			// Install dependencies
-			if (!skipDependencies) {
+			if (!skipDeps) {
 				yield* terminal.write("Installing production npm dependencies... ");
 				yield* npm.install(process.cwd(), true);
 				yield* terminal.writeColored("done!", "green");

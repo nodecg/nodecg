@@ -7,6 +7,7 @@ export class GitError extends Data.TaggedError("GitError")<{
 }> {}
 
 export class GitService extends Effect.Service<GitService>()("GitService", {
+		accessors: true,
 	effect: Effect.gen(function* () {
 		const cmd = yield* CommandService;
 
@@ -72,4 +73,5 @@ export class GitService extends Effect.Service<GitService>()("GitService", {
 				}),
 		};
 	}),
+	dependencies: [CommandService.Default],
 }) {}

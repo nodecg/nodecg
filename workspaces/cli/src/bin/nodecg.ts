@@ -44,6 +44,7 @@ const program = Effect.gen(function* () {
 });
 
 const MainLayer = Layer.mergeAll(
+	NodeContext.layer,
 	NodeFileSystem.layer,
 	NodeHttpClient.layerWithoutAgent,
 	NodeTerminal.layer,
@@ -59,8 +60,4 @@ const MainLayer = Layer.mergeAll(
 	Layer.provideMerge(PathService.Default),
 );
 
-program.pipe(
-	Effect.provide(MainLayer),
-	Effect.provide(NodeContext.layer),
-	NodeRuntime.runMain,
-);
+NodeRuntime.runMain(Effect.provide(program, MainLayer));

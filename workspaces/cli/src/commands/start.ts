@@ -5,7 +5,9 @@ import { PathService } from "../services/path.js";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const recursivelyFindProject = (startDir: string) =>
+const recursivelyFindProject: (
+	startDir: string,
+) => Effect.Effect<string, Error, FileSystemService> = (startDir) =>
 	Effect.gen(function* () {
 		const fs = yield* FileSystemService;
 

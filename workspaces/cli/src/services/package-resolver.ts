@@ -22,6 +22,7 @@ export type PackageSpec = {
 export class PackageResolverService extends Effect.Service<PackageResolverService>()(
 	"PackageResolverService",
 	{
+		accessors: true,
 		sync: () => ({
 			resolveGitUrl: (spec: string) =>
 				Effect.gen(function* () {

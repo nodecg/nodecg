@@ -10,6 +10,7 @@ export class CommandError extends Data.TaggedError("CommandError")<{
 export class CommandService extends Effect.Service<CommandService>()(
 	"CommandService",
 	{
+		accessors: true,
 		sync: () => ({
 			exec: (
 				cmd: string,

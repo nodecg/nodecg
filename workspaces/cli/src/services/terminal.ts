@@ -8,6 +8,7 @@ export class TerminalError extends Data.TaggedError("TerminalError")<{
 export class TerminalService extends Effect.Service<TerminalService>()(
 	"TerminalService",
 	{
+		accessors: true,
 		effect: Effect.gen(function* () {
 			const terminal = yield* Terminal.Terminal;
 
@@ -77,5 +78,6 @@ export class TerminalService extends Effect.Service<TerminalService>()(
 					}),
 			};
 		}),
+		dependencies: [Terminal.Terminal.Default],
 	},
 ) {}

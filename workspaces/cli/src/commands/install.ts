@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { Command, Args, Options } from "@effect/cli";
 import { FileSystemService } from "../services/file-system.js";
 import { TerminalService } from "../services/terminal.js";
@@ -7,6 +7,7 @@ import { GitService } from "../services/git.js";
 import { PackageResolverService } from "../services/package-resolver.js";
 import { installBundleDeps } from "../lib/bundle-utils.js";
 import * as semverLib from "../lib/semver.js";
+import type * as semver from "semver";
 import path from "node:path";
 
 export const installCommand = Command.make(
@@ -23,15 +24,16 @@ export const installCommand = Command.make(
 			const git = yield* GitService;
 			const packageResolver = yield* PackageResolverService;
 
-			const isDev = dev ?? false;
+			const isDev = Option.getOrElse(dev, () => false);
 
-			if (!repo) {
+			const repoSpec = Option.getOrNull(repo);
+			if (!repoSpec) {
 				yield* installBundleDeps(process.cwd(), isDev);
 				return;
 			}
 
 			const { repo: repoName, range } =
-				yield* packageResolver.parseVersionSpec(repo);
+				yield* packageResolver.parseVersionSpec(repoSpec);
 			const nodecgPath = yield* pathService.getNodeCGPath();
 
 			const { url: repoUrl, name: bundleName } =

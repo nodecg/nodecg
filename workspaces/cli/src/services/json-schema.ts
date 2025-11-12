@@ -8,14 +8,12 @@ export class JsonSchemaError extends Data.TaggedError("JsonSchemaError")<{
 	readonly schemaPath?: string;
 }> {}
 
-const AjvConstructor = Ajv as unknown as {
-	new (options: { useDefaults: boolean; strict: boolean }): typeof Ajv.prototype;
-};
-const ajv = new AjvConstructor({ useDefaults: true, strict: true });
+const ajv = new (Ajv as any)({ useDefaults: true, strict: true });
 
 export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 	"JsonSchemaService",
 	{
+		accessors: true,
 		effect: Effect.gen(function* () {
 			const fs = yield* FileSystemService;
 
@@ -82,6 +80,7 @@ export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 						cwd?: string;
 						style?: { singleQuote?: boolean; useTabs?: boolean };
 					},
+		dependencies: [FileSystemService.Default],
 				) =>
 					Effect.gen(function* () {
 						const ts = yield* Effect.promise(() =>
@@ -115,5 +114,6 @@ export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 					}),
 			};
 		}),
+	dependencies: [FileSystemService.Default],
 	},
 ) {}

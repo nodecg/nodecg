@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { Command, Args, Options } from "@effect/cli";
 import { FileSystemService } from "../services/file-system.js";
 import { TerminalService } from "../services/terminal.js";
@@ -24,7 +24,10 @@ export const schemaTypesCommand = Command.make(
 			const jsonSchema = yield* JsonSchemaService;
 
 			const processCwd = process.cwd();
-			const schemasDir = path.resolve(processCwd, inDir ?? "schemas");
+			const schemasDir = path.resolve(
+				processCwd,
+				Option.getOrElse(inDir, () => "schemas"),
+			);
 
 			const schemasDirExists = yield* fs.exists(schemasDir);
 			if (!schemasDirExists) {

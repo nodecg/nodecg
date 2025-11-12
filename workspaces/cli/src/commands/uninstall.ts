@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { Command, Args, Options } from "@effect/cli";
 import { FileSystemService } from "../services/file-system.js";
 import { TerminalService } from "../services/terminal.js";
@@ -31,7 +31,7 @@ export const uninstallCommand = Command.make(
 				return;
 			}
 
-			let shouldDelete = force ?? false;
+			let shouldDelete = Option.getOrElse(force, () => false);
 			if (!shouldDelete) {
 				shouldDelete = yield* terminal.confirm(
 					`Are you sure you wish to uninstall ${bundleName}?`,

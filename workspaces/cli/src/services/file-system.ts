@@ -1,4 +1,4 @@
-import { Effect, Data } from "effect";
+import { Effect, Data, Stream } from "effect";
 import { FileSystem } from "@effect/platform";
 import { Schema } from "@effect/schema";
 import * as tar from "tar";
@@ -13,6 +13,7 @@ export class FileSystemError extends Data.TaggedError("FileSystemError")<{
 export class FileSystemService extends Effect.Service<FileSystemService>()(
 	"FileSystemService",
 	{
+		accessors: true,
 		effect: Effect.gen(function* () {
 			const fs = yield* FileSystem.FileSystem;
 
@@ -125,16 +126,21 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 						);
 					}),
 
-				extractTarball: (
-					stream: AsyncIterable<Uint8Array>,
+				extractTarball: <E>(
+					stream: Stream.Stream<Uint8Array, E, never>,
 					options?: { cwd?: string; strip?: number },
 				) =>
 					Effect.gen(function* () {
+						// Convert Stream to ReadableStream
+						const readableStream = Stream.toReadableStream(stream);
+
+						// Convert Web ReadableStream to Node Readable
+						const nodeReadable = Readable.fromWeb(
+							readableStream as import("stream/web").ReadableStream,
+						);
+
 						yield* Effect.promise(() =>
-							pipeline(
-								Readable.from(stream),
-								tar.x({ cwd: options?.cwd, strip: options?.strip }),
-							),
+							pipeline(nodeReadable, tar.x({ cwd: options?.cwd, strip: options?.strip })),
 						).pipe(
 							Effect.mapError(
 								() =>
@@ -146,5 +152,6 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					}),
 			};
 		}),
+		dependencies: [FileSystem.FileSystem.Default],
 	},
 ) {}
