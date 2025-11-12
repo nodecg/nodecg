@@ -34,16 +34,11 @@ export class DashboardLib {
 
 		app.use(express.static(BUILD_PATH));
 
-		app.use("/node_modules/:filePath(.*)", (req, res, next) => {
-			const rootNodeModulesPaths = isLegacyProject
-				? [
-						path.join(rootPaths.nodecgInstalledPath, "node_modules"),
-						path.join(rootPaths.runtimeRootPath, "node_modules"),
-					]
-				: [path.join(rootPaths.runtimeRootPath, "node_modules")];
-			const basePath = rootPaths.runtimeRootPath;
+		app.use("/node_modules/:filePath(*)", (req, res, next) => {
+			const startDir = path.join(rootPaths.nodecgInstalledPath);
+			const limitDir = rootPaths.runtimeRootPath;
 			const filePath = req.params.filePath!;
-			sendNodeModulesFile(rootNodeModulesPaths, basePath, filePath, res, next);
+			sendNodeModulesFile(startDir, limitDir, filePath, res, next);
 		});
 
 		app.get("/", (_, res) => {

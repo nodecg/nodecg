@@ -48,6 +48,39 @@ test("should serve bundle-specific node_modules", async () => {
 	`);
 });
 
+test("should serve bundle-specific scoped packages", async () => {
+	const response = await fetch(
+		`${C.bundleNodeModulesUrl()}@test-scope/simple-package/index.js`,
+	);
+	expect(response.status).toBe(200);
+	expect(await response.text()).toMatchInlineSnapshot(`
+		"const confirmed = 'scoped_package_confirmed';
+		"
+	`);
+});
+
+test("should serve bundle-specific deeply nested scoped packages", async () => {
+	const response = await fetch(
+		`${C.bundleNodeModulesUrl()}@test-scope/nested-package/lib/index.js`,
+	);
+	expect(response.status).toBe(200);
+	expect(await response.text()).toMatchInlineSnapshot(`
+		"const confirmed = 'scoped_nested_confirmed';
+		"
+	`);
+});
+
+test("should serve bundle-specific deeply nested files", async () => {
+	const response = await fetch(
+		`${C.bundleNodeModulesUrl()}deep-package/dist/cjs/lib/index.js`,
+	);
+	expect(response.status).toBe(200);
+	expect(await response.text()).toMatchInlineSnapshot(`
+		"const confirmed = 'deep_nested_confirmed';
+		"
+	`);
+});
+
 test("should 404 on non-existent bower_component", async () => {
 	const response = await fetch(
 		`${C.bundleBowerComponentsUrl()}confirmation_404.js`,

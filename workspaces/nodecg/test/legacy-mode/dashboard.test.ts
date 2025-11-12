@@ -171,3 +171,26 @@ test("retrieval - wrong bundle is 404", async () => {
 	);
 	expect(response.status).toBe(404);
 });
+
+test("node_modules - should serve scoped package files", async () => {
+	const response = await fetch(
+		`${C.rootUrl()}node_modules/@babel/core/lib/index.js`,
+	);
+	expect(response.status).toBe(200);
+	expect(response.headers.get("content-type")).toMatch(/javascript/);
+});
+
+test("node_modules - should serve deeply nested files", async () => {
+	const response = await fetch(
+		`${C.rootUrl()}node_modules/@babel/core/lib/config/index.js`,
+	);
+	expect(response.status).toBe(200);
+	expect(response.headers.get("content-type")).toMatch(/javascript/);
+});
+
+test("node_modules - should return 404 for non-existent files", async () => {
+	const response = await fetch(
+		`${C.rootUrl()}node_modules/@babel/core/does-not-exist.js`,
+	);
+	expect(response.status).toBe(404);
+});

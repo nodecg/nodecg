@@ -8,7 +8,7 @@ describe("recursivelyFindFileInNodeModules", () => {
 	test("should find existing file in current node_modules", () => {
 		const result = recursivelyFindFileInNodeModules(
 			path.join(__dirname, "fixtures/node_modules/bar/node_modules/bar"),
-			path.join(__dirname, "fixtures/node_modules"),
+			path.join(__dirname, "fixtures"),
 			"bar/bar",
 		);
 		expect(result).toBe(
@@ -18,8 +18,8 @@ describe("recursivelyFindFileInNodeModules", () => {
 
 	test("should find existing file in parent node_modules", () => {
 		const result = recursivelyFindFileInNodeModules(
-			path.join(__dirname, "fixtures/node_modules/bar/node_modules/foo"),
-			path.join(__dirname, "fixtures/node_modules"),
+			path.join(__dirname, "fixtures/node_modules/bar/node_modules/bar"),
+			path.join(__dirname, "fixtures"),
 			"foo/foo",
 		);
 		expect(result).toBe(path.join(__dirname, "fixtures/node_modules/foo/foo"));
@@ -28,7 +28,7 @@ describe("recursivelyFindFileInNodeModules", () => {
 	test("should return undefined for non-existing file", () => {
 		const result = recursivelyFindFileInNodeModules(
 			path.join(__dirname, "fixtures/node_modules/bar/node_modules/foo"),
-			path.join(__dirname, "fixtures/node_modules"),
+			path.join(__dirname, "fixtures"),
 			"foo/bar",
 		);
 		expect(result).toBe(undefined);
@@ -37,7 +37,7 @@ describe("recursivelyFindFileInNodeModules", () => {
 	test("should return undefined for node_modules outside of root", () => {
 		const result = recursivelyFindFileInNodeModules(
 			path.join(__dirname, "fixtures/node_modules/bar/node_modules/foo"),
-			path.join(__dirname, "fixtures/node_modules/bar/node_modules"),
+			path.join(__dirname, "fixtures/node_modules/bar"),
 			"../foo/foo",
 		);
 		expect(result).toBe(undefined);

@@ -57,6 +57,30 @@ test("should serve bundle assets", async () => {
 	expect(await response.text()).toContain("node_modules_confirmed");
 });
 
+test("should serve scoped packages from bundle node_modules", async () => {
+	const response = await fetch(
+		`${C.bundleNodeModulesUrl()}@test-scope/simple-package/index.js`,
+	);
+	expect(response.status).toBe(200);
+	expect(await response.text()).toContain("scoped_package_confirmed");
+});
+
+test("should serve deeply nested scoped packages from bundle node_modules", async () => {
+	const response = await fetch(
+		`${C.bundleNodeModulesUrl()}@test-scope/nested-package/lib/index.js`,
+	);
+	expect(response.status).toBe(200);
+	expect(await response.text()).toContain("scoped_nested_confirmed");
+});
+
+test("should serve deeply nested files from bundle node_modules", async () => {
+	const response = await fetch(
+		`${C.bundleNodeModulesUrl()}deep-package/dist/cjs/lib/index.js`,
+	);
+	expect(response.status).toBe(200);
+	expect(await response.text()).toContain("deep_nested_confirmed");
+});
+
 test("should handle client-server messaging", async ({ apis, dashboard }) => {
 	apis.extension.listenFor("installedModeTest", (_, cb) => {
 		invokeAck(cb, null, "response from server");
