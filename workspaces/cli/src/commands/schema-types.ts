@@ -50,11 +50,14 @@ export const schemaTypesCommand = Command.make(
 				useTabs: true,
 			};
 
-			const compile = (input: string, output: string, cwd = processCwd) =>
-				Effect.gen(function* () {
-					yield* jsonSchema.compileToTypeScript(input, output, { cwd, style });
-					yield* terminal.writeLine(output);
-				});
+			const compile = Effect.fn("compile")(function* (
+				input: string,
+				output: string,
+				cwd = processCwd,
+			) {
+				yield* jsonSchema.compileToTypeScript(input, output, { cwd, style });
+				yield* terminal.writeLine(output);
+			});
 
 			const compilePromises: Array<Effect.Effect<void, unknown, unknown>> = [];
 

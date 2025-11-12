@@ -21,60 +21,50 @@ export class TerminalService extends Effect.Service<TerminalService>()(
 			};
 
 			return {
-				write: (message: string) =>
-					Effect.gen(function* () {
-						yield* terminal.display(message);
-					}),
+				write: Effect.fn("write")(function* (message: string) {
+					yield* terminal.display(message);
+				}),
 
-				writeLine: (message: string) =>
-					Effect.gen(function* () {
-						yield* terminal.display(message + "\n");
-					}),
+				writeLine: Effect.fn("writeLine")(function* (message: string) {
+					yield* terminal.display(message + "\n");
+				}),
 
-				writeSuccess: (message: string) =>
-					Effect.gen(function* () {
-						yield* terminal.display(colors.green(message) + "\n");
-					}),
+				writeSuccess: Effect.fn("writeSuccess")(function* (message: string) {
+					yield* terminal.display(colors.green(message) + "\n");
+				}),
 
-				writeError: (message: string) =>
-					Effect.gen(function* () {
-						yield* terminal.display(colors.red(message) + "\n");
-					}),
+				writeError: Effect.fn("writeError")(function* (message: string) {
+					yield* terminal.display(colors.red(message) + "\n");
+				}),
 
-				writeInfo: (message: string) =>
-					Effect.gen(function* () {
-						yield* terminal.display(colors.cyan(message) + "\n");
-					}),
+				writeInfo: Effect.fn("writeInfo")(function* (message: string) {
+					yield* terminal.display(colors.cyan(message) + "\n");
+				}),
 
-				writeColored: (
+				writeColored: Effect.fn("writeColored")(function* (
 					message: string,
 					color: "green" | "red" | "cyan" | "magenta",
-				) =>
-					Effect.gen(function* () {
-						yield* terminal.display(colors[color](message));
-					}),
+				) {
+					yield* terminal.display(colors[color](message));
+				}),
 
-				confirm: (message: string) =>
-					Effect.gen(function* () {
-						yield* terminal.display(`${message} (y/n): `);
-						const input = yield* terminal.readLine.pipe(
-							Effect.mapError(
-								() => new TerminalError({ message: "Failed to read input" }),
-							),
-						);
-						return (
-							input.toLowerCase() === "y" || input.toLowerCase() === "yes"
-						);
-					}),
+				confirm: Effect.fn("confirm")(function* (message: string) {
+					yield* terminal.display(`${message} (y/n): `);
+					const input = yield* terminal.readLine.pipe(
+						Effect.mapError(
+							() => new TerminalError({ message: "Failed to read input" }),
+						),
+					);
+					return input.toLowerCase() === "y" || input.toLowerCase() === "yes";
+				}),
 
-				readLine: () =>
-					Effect.gen(function* () {
-						return yield* terminal.readLine.pipe(
-							Effect.mapError(
-								() => new TerminalError({ message: "Failed to read input" }),
-							),
-						);
-					}),
+				readLine: Effect.fn("readLine")(function* () {
+					return yield* terminal.readLine.pipe(
+						Effect.mapError(
+							() => new TerminalError({ message: "Failed to read input" }),
+						),
+					);
+				}),
 			};
 		}),
 	},

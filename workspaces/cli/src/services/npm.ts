@@ -30,62 +30,64 @@ export class NpmService extends Effect.Service<NpmService>()("NpmService", {
 		const cmd = yield* CommandService;
 
 		return {
-			listVersions: (packageName: string) =>
-				Effect.gen(function* () {
-					const url = `https://registry.npmjs.org/${packageName}`;
-					const data = yield* http.fetchJson(url, NpmRegistrySchema).pipe(
-						Effect.mapError(
-							() =>
-								new NpmError({
-									message: `Failed to fetch versions for ${packageName}`,
-									operation: "list",
-								}),
-						),
-					);
-					return Object.keys(data.versions);
-				}),
+			listVersions: Effect.fn("listVersions")(function* (packageName: string) {
+				const url = `https://registry.npmjs.org/${packageName}`;
+				const data = yield* http.fetchJson(url, NpmRegistrySchema).pipe(
+					Effect.mapError(
+						() =>
+							new NpmError({
+								message: `Failed to fetch versions for ${packageName}`,
+								operation: "list",
+							}),
+					),
+				);
+				return Object.keys(data.versions);
+			}),
 
-			getRelease: (packageName: string, version: string) =>
-				Effect.gen(function* () {
-					const url = `http://registry.npmjs.org/${packageName}/${version}`;
-					return yield* http.fetchJson(url, NpmReleaseSchema).pipe(
-						Effect.mapError(
-							() =>
-								new NpmError({
-									message: `Failed to fetch release ${packageName}@${version}`,
-									operation: "release",
-								}),
-						),
-					);
-				}),
+			getRelease: Effect.fn("getRelease")(function* (
+				packageName: string,
+				version: string,
+			) {
+				const url = `http://registry.npmjs.org/${packageName}/${version}`;
+				return yield* http.fetchJson(url, NpmReleaseSchema).pipe(
+					Effect.mapError(
+						() =>
+							new NpmError({
+								message: `Failed to fetch release ${packageName}@${version}`,
+								operation: "release",
+							}),
+					),
+				);
+			}),
 
-			install: (cwd: string, production: boolean) =>
-				Effect.gen(function* () {
-					const args = production ? ["install", "--production"] : ["install"];
-					yield* cmd.exec("npm", args, { cwd }).pipe(
-						Effect.mapError(
-							() =>
-								new NpmError({
-									message: "Failed to install npm dependencies",
-									operation: "install",
-								}),
-						),
-					);
-				}),
+			install: Effect.fn("install")(function* (cwd: string, production: boolean) {
+				const args = production ? ["install", "--production"] : ["install"];
+				yield* cmd.exec("npm", args, { cwd }).pipe(
+					Effect.mapError(
+						() =>
+							new NpmError({
+								message: "Failed to install npm dependencies",
+								operation: "install",
+							}),
+					),
+				);
+			}),
 
-			yarnInstall: (cwd: string, production: boolean) =>
-				Effect.gen(function* () {
-					const args = production ? ["--production"] : [];
-					yield* cmd.exec("yarn", args, { cwd }).pipe(
-						Effect.mapError(
-							() =>
-								new NpmError({
-									message: "Failed to install yarn dependencies",
-									operation: "install",
-								}),
-						),
-					);
-				}),
+			yarnInstall: Effect.fn("yarnInstall")(function* (
+				cwd: string,
+				production: boolean,
+			) {
+				const args = production ? ["--production"] : [];
+				yield* cmd.exec("yarn", args, { cwd }).pipe(
+					Effect.mapError(
+						() =>
+							new NpmError({
+								message: "Failed to install yarn dependencies",
+								operation: "install",
+							}),
+					),
+				);
+			}),
 		};
 	}),
 	dependencies: [HttpService.Default, CommandService.Default],

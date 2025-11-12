@@ -17,99 +17,99 @@ export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 			const fs = yield* FileSystemService;
 
 			return {
-				applyDefaults: (schemaPath: string) =>
-					Effect.gen(function* () {
-						const schemaContent = yield* fs.readFileString(schemaPath).pipe(
-							Effect.mapError(
-								() =>
-									new JsonSchemaError({
-										message: `Failed to read schema`,
-										schemaPath,
-									}),
-							),
-						);
-
-						const schema = JSON.parse(schemaContent);
-						const validate = ajv.compile(schema);
-						const data = {};
-						const valid = validate(data);
-
-						if (!valid) {
-							return yield* Effect.fail(
+				applyDefaults: Effect.fn("applyDefaults")(function* (schemaPath: string) {
+					const schemaContent = yield* fs.readFileString(schemaPath).pipe(
+						Effect.mapError(
+							() =>
 								new JsonSchemaError({
-									message: `Schema validation failed`,
+									message: `Failed to read schema`,
 									schemaPath,
 								}),
-							);
-						}
+						),
+					);
 
-						return data;
-					}),
+					const schema = JSON.parse(schemaContent);
+					const validate = ajv.compile(schema);
+					const data = {};
+					const valid = validate(data);
 
-				validate: (data: unknown, schemaPath: string) =>
-					Effect.gen(function* () {
-						const schemaContent = yield* fs.readFileString(schemaPath).pipe(
-							Effect.mapError(
-								() =>
-									new JsonSchemaError({
-										message: `Failed to read schema`,
-										schemaPath,
-									}),
-							),
+					if (!valid) {
+						return yield* Effect.fail(
+							new JsonSchemaError({
+								message: `Schema validation failed`,
+								schemaPath,
+							}),
 						);
+					}
 
-						const schema = JSON.parse(schemaContent);
-						const validate = ajv.compile(schema);
-						const valid = validate(data);
+					return data;
+				}),
 
-						if (!valid) {
-							return yield* Effect.fail(
+				validate: Effect.fn("validate")(function* (
+					data: unknown,
+					schemaPath: string,
+				) {
+					const schemaContent = yield* fs.readFileString(schemaPath).pipe(
+						Effect.mapError(
+							() =>
 								new JsonSchemaError({
-									message: `Validation failed`,
+									message: `Failed to read schema`,
 									schemaPath,
 								}),
-							);
-						}
-					}),
+						),
+					);
 
-				compileToTypeScript: (
+					const schema = JSON.parse(schemaContent);
+					const validate = ajv.compile(schema);
+					const valid = validate(data);
+
+					if (!valid) {
+						return yield* Effect.fail(
+							new JsonSchemaError({
+								message: `Validation failed`,
+								schemaPath,
+							}),
+						);
+					}
+				}),
+
+				compileToTypeScript: Effect.fn("compileToTypeScript")(function* (
 					schemaPath: string,
 					outputPath: string,
 					options?: {
 						cwd?: string;
 						style?: { singleQuote?: boolean; useTabs?: boolean };
 					},
-				) =>
-					Effect.gen(function* () {
-						const ts = yield* Effect.promise(() =>
-							compileFromFile(schemaPath, {
-								cwd: options?.cwd,
-								declareExternallyReferenced: true,
-								enableConstEnums: true,
-								style: options?.style,
-							}),
-						).pipe(
+				) {
+					const ts = yield* Effect.promise(() =>
+						compileFromFile(schemaPath, {
+							cwd: options?.cwd,
+							declareExternallyReferenced: true,
+							enableConstEnums: true,
+							style: options?.style,
+						}),
+					).pipe(
+						Effect.mapError(
+							() =>
+								new JsonSchemaError({
+									message: `Failed to compile schema`,
+									schemaPath,
+								}),
+						),
+					);
+
+					yield* fs
+						.writeFileString(outputPath, "/* prettier-ignore */\n" + ts)
+						.pipe(
 							Effect.mapError(
 								() =>
 									new JsonSchemaError({
-										message: `Failed to compile schema`,
+										message: `Failed to write output`,
 										schemaPath,
 									}),
 							),
 						);
-
-						yield* fs
-							.writeFileString(outputPath, "/* prettier-ignore */\n" + ts)
-							.pipe(
-								Effect.mapError(
-									() =>
-										new JsonSchemaError({
-											message: `Failed to write output`,
-											schemaPath,
-										}),
-								),
-							);
-					}),
+				}),
 			};
 		}),
 	dependencies: [FileSystemService.Default],

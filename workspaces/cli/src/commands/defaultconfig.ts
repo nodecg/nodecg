@@ -22,20 +22,19 @@ export const defaultconfigCommand = Command.make(
 			const nodecgPath = yield* pathService.getNodeCGPath();
 
 			const finalBundleName = yield* Option.match(bundleName, {
-				onNone: () =>
-					Effect.gen(function* () {
-						const isBundle = yield* pathService.isBundleFolder(cwd);
-						if (isBundle) {
-							return path.basename(cwd);
-						} else {
-							yield* terminal.writeError(
-								"Error: No bundle found in the current directory!",
-							);
-							return yield* Effect.fail(
-								new Error("No bundle found in current directory"),
-							);
-						}
-					}),
+				onNone: Effect.fn("onNone")(function* () {
+					const isBundle = yield* pathService.isBundleFolder(cwd);
+					if (isBundle) {
+						return path.basename(cwd);
+					} else {
+						yield* terminal.writeError(
+							"Error: No bundle found in the current directory!",
+						);
+						return yield* Effect.fail(
+							new Error("No bundle found in current directory"),
+						);
+					}
+				}),
 				onSome: (name) => Effect.succeed(name),
 			});
 

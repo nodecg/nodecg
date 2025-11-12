@@ -13,73 +13,72 @@ export class HttpService extends Effect.Service<HttpService>()("HttpService", {
 		const client = yield* HttpClient.HttpClient;
 
 		return {
-			fetchJson: <A, I, R>(url: string, schema: Schema.Schema<A, I, R>) =>
-				Effect.gen(function* () {
-					const response = yield* HttpClientRequest.get(url).pipe(
-						client.execute,
-						Effect.mapError(
-							(e) =>
-								new HttpError({
-									message: `HTTP request failed`,
-									url,
-									statusCode:
-										"status" in e && typeof e.status === "number"
-											? e.status
-											: undefined,
-								}),
-						),
-					);
+			fetchJson: Effect.fn("fetchJson")<A, I, R>(function* (
+				url: string,
+				schema: Schema.Schema<A, I, R>,
+			) {
+				const response = yield* HttpClientRequest.get(url).pipe(
+					client.execute,
+					Effect.mapError(
+						(e) =>
+							new HttpError({
+								message: `HTTP request failed`,
+								url,
+								statusCode:
+									"status" in e && typeof e.status === "number"
+										? e.status
+										: undefined,
+							}),
+					),
+				);
 
-					const json = yield* response.json.pipe(
-						Effect.mapError(
-							() => new HttpError({ message: `Failed to parse JSON`, url }),
-						),
-					);
+				const json = yield* response.json.pipe(
+					Effect.mapError(
+						() => new HttpError({ message: `Failed to parse JSON`, url }),
+					),
+				);
 
-					return yield* Schema.decodeUnknown(schema)(json).pipe(
-						Effect.mapError(
-							() =>
-								new HttpError({ message: `Invalid response schema`, url }),
-						),
-					);
-				}),
+				return yield* Schema.decodeUnknown(schema)(json).pipe(
+					Effect.mapError(
+						() => new HttpError({ message: `Invalid response schema`, url }),
+					),
+				);
+			}),
 
-			fetchStream: (url: string) =>
-				Effect.gen(function* () {
-					const response = yield* HttpClientRequest.get(url).pipe(
-						client.execute,
-						Effect.mapError(
-							(e) =>
-								new HttpError({
-									message: `Failed to fetch stream`,
-									url,
-									statusCode:
-										"status" in e && typeof e.status === "number"
-											? e.status
-											: undefined,
-								}),
-						),
-					);
-					return response.stream;
-				}),
+			fetchStream: Effect.fn("fetchStream")(function* (url: string) {
+				const response = yield* HttpClientRequest.get(url).pipe(
+					client.execute,
+					Effect.mapError(
+						(e) =>
+							new HttpError({
+								message: `Failed to fetch stream`,
+								url,
+								statusCode:
+									"status" in e && typeof e.status === "number"
+										? e.status
+										: undefined,
+							}),
+					),
+				);
+				return response.stream;
+			}),
 
-			fetch: (url: string) =>
-				Effect.gen(function* () {
-					return yield* HttpClientRequest.get(url).pipe(
-						client.execute,
-						Effect.mapError(
-							(e) =>
-								new HttpError({
-									message: `HTTP request failed`,
-									url,
-									statusCode:
-										"status" in e && typeof e.status === "number"
-											? e.status
-											: undefined,
-								}),
-						),
-					);
-				}),
+			fetch: Effect.fn("fetch")(function* (url: string) {
+				return yield* HttpClientRequest.get(url).pipe(
+					client.execute,
+					Effect.mapError(
+						(e) =>
+							new HttpError({
+								message: `HTTP request failed`,
+								url,
+								statusCode:
+									"status" in e && typeof e.status === "number"
+										? e.status
+										: undefined,
+							}),
+					),
+				);
+			}),
 		};
 	}),
 	},

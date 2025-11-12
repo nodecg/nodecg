@@ -34,39 +34,37 @@ export class PathService extends Effect.Service<PathService>()("PathService", {
 		return {
 			pathContainsNodeCG,
 
-			getNodeCGPath: () =>
-				Effect.gen(function* () {
-					let curr = process.cwd();
+			getNodeCGPath: Effect.fn("getNodeCGPath")(function* () {
+				let curr = process.cwd();
 
-					while (true) {
-						const contains = yield* pathContainsNodeCG(curr);
-						if (contains) {
-							return curr;
-						}
-
-						const nextCurr = path.resolve(curr, "..");
-						if (nextCurr === curr) {
-							return yield* Effect.fail(
-								new PathError({
-									message:
-										"NodeCG installation could not be found in this directory or any parent directory.",
-								}),
-							);
-						}
-						curr = nextCurr;
+				while (true) {
+					const contains = yield* pathContainsNodeCG(curr);
+					if (contains) {
+						return curr;
 					}
-				}),
+
+					const nextCurr = path.resolve(curr, "..");
+					if (nextCurr === curr) {
+						return yield* Effect.fail(
+							new PathError({
+								message:
+									"NodeCG installation could not be found in this directory or any parent directory.",
+							}),
+						);
+					}
+					curr = nextCurr;
+				}
+			}),
 
 			isBundleFolder,
 
-			getCurrentNodeCGVersion: () =>
-				Effect.gen(function* () {
-					const self = yield* PathService;
-					const nodecgPath = yield* self.getNodeCGPath();
-					const pjsonPath = path.join(nodecgPath, "package.json");
-					const pjson = yield* fs.readJson(pjsonPath, PackageJsonSchema);
-					return pjson.version;
-				}),
+			getCurrentNodeCGVersion: Effect.fn("getCurrentNodeCGVersion")(function* () {
+				const self = yield* PathService;
+				const nodecgPath = yield* self.getNodeCGPath();
+				const pjsonPath = path.join(nodecgPath, "package.json");
+				const pjson = yield* fs.readJson(pjsonPath, PackageJsonSchema);
+				return pjson.version;
+			}),
 		};
 	}),
 	dependencies: [FileSystemService.Default],

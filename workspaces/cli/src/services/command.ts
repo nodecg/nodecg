@@ -11,59 +11,57 @@ export class CommandService extends Effect.Service<CommandService>()(
 	"CommandService",
 	{
 		sync: () => ({
-			exec: (
+			exec: Effect.fn("exec")(function* (
 				cmd: string,
 				args: ReadonlyArray<string>,
 				options?: { cwd?: string },
-			) =>
-				Effect.gen(function* () {
-					let command = PlatformCommand.make(cmd, ...args);
-					if (options?.cwd) {
-						command = PlatformCommand.workingDirectory(command, options.cwd);
-					}
+			) {
+				let command = PlatformCommand.make(cmd, ...args);
+				if (options?.cwd) {
+					command = PlatformCommand.workingDirectory(command, options.cwd);
+				}
 
-					const exitCode = yield* PlatformCommand.exitCode(command).pipe(
-						Effect.mapError(
-							() =>
-								new CommandError({
-									message: `Command execution failed`,
-									command: `${cmd} ${args.join(" ")}`,
-								}),
-						),
-					);
-
-					if (exitCode !== 0) {
-						return yield* Effect.fail(
+				const exitCode = yield* PlatformCommand.exitCode(command).pipe(
+					Effect.mapError(
+						() =>
 							new CommandError({
-								message: `Command failed with exit code ${exitCode}`,
+								message: `Command execution failed`,
 								command: `${cmd} ${args.join(" ")}`,
-								exitCode,
 							}),
-						);
-					}
-				}),
+					),
+				);
 
-			string: (
+				if (exitCode !== 0) {
+					return yield* Effect.fail(
+						new CommandError({
+							message: `Command failed with exit code ${exitCode}`,
+							command: `${cmd} ${args.join(" ")}`,
+							exitCode,
+						}),
+					);
+				}
+			}),
+
+			string: Effect.fn("string")(function* (
 				cmd: string,
 				args: ReadonlyArray<string>,
 				options?: { cwd?: string },
-			) =>
-				Effect.gen(function* () {
-					let command = PlatformCommand.make(cmd, ...args);
-					if (options?.cwd) {
-						command = PlatformCommand.workingDirectory(command, options.cwd);
-					}
+			) {
+				let command = PlatformCommand.make(cmd, ...args);
+				if (options?.cwd) {
+					command = PlatformCommand.workingDirectory(command, options.cwd);
+				}
 
-					return yield* PlatformCommand.string(command).pipe(
-						Effect.mapError(
-							() =>
-								new CommandError({
-									message: `Command execution failed`,
-									command: `${cmd} ${args.join(" ")}`,
-								}),
-						),
-					);
-				}),
+				return yield* PlatformCommand.string(command).pipe(
+					Effect.mapError(
+						() =>
+							new CommandError({
+								message: `Command execution failed`,
+								command: `${cmd} ${args.join(" ")}`,
+							}),
+					),
+				);
+			}),
 		}),
 	},
 ) {}
