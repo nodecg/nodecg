@@ -1,11 +1,11 @@
 import { Effect, Option } from "effect";
 import { Command, Args, Options } from "@effect/cli";
+import semver from "semver";
 import { FileSystemService } from "../services/file-system.js";
 import { TerminalService } from "../services/terminal.js";
 import { PathService } from "../services/path.js";
 import { HttpService } from "../services/http.js";
 import { NpmService } from "../services/npm.js";
-import * as semverLib from "../lib/semver.js";
 
 export const setupCommand = Command.make(
 	"setup",
@@ -65,9 +65,7 @@ export const setupCommand = Command.make(
 
 			const tags = yield* npm.listVersions("nodecg");
 
-			const target = versionSpec
-				? semverLib.maxSatisfying(tags, versionSpec)
-				: semverLib.maxSatisfying(tags, "");
+			const target = semver.maxSatisfying(tags, versionSpec || "*");
 
 			if (!target) {
 				yield* terminal.writeColored("failed!", "red");
@@ -89,13 +87,13 @@ export const setupCommand = Command.make(
 				current = yield* pathService
 					.getCurrentNodeCGVersion()
 					.pipe(Effect.option, Effect.map((opt) => Option.getOrElse(opt, () => undefined)));
-				if (current && semverLib.eq(current, target)) {
+				if (current && semver.eq(current, target)) {
 					yield* terminal.writeLine(
 						`The target version (${target}) is equal to the current version (${current}). No action will be taken.`,
 					);
 					return;
 				}
-				if (current && semverLib.gte(current, target)) {
+				if (current && semver.gte(current, target)) {
 					downgrade = true;
 					const msg = `You are about to downgrade from ${current} to ${target}. Are you sure?`;
 					const confirmed = yield* terminal.confirm(msg);
@@ -115,7 +113,7 @@ export const setupCommand = Command.make(
 			const release = yield* npm.getRelease("nodecg", target);
 
 			if (current) {
-				const verb = semverLib.lt(target, current)
+				const verb = semver.lt(target, current)
 					? "Downgrading"
 					: "Upgrading";
 				yield* terminal.write(`${verb} from `);

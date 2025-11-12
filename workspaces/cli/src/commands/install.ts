@@ -6,8 +6,7 @@ import { PathService } from "../services/path.js";
 import { GitService } from "../services/git.js";
 import { PackageResolverService } from "../services/package-resolver.js";
 import { installBundleDeps } from "../lib/bundle-utils.js";
-import * as semverLib from "../lib/semver.js";
-import type * as semver from "semver";
+import semver from "semver";
 import path from "node:path";
 
 export const installCommand = Command.make(
@@ -52,9 +51,9 @@ export const installCommand = Command.make(
 			yield* terminal.write(` release list... `);
 
 			const tags = yield* git.listRemoteTags(repoUrl);
-			const target = semverLib.maxSatisfying(
+			const target = semver.maxSatisfying(
 				tags
-					.map((tag) => semverLib.coerce(tag))
+					.map((tag) => semver.coerce(tag))
 					.filter((coercedTag): coercedTag is semver.SemVer =>
 						Boolean(coercedTag),
 					)
