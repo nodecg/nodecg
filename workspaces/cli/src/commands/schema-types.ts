@@ -43,7 +43,7 @@ export const schemaTypesCommand = Command.make(
 
 			const configSchemaPath = path.join(processCwd, "configschema.json");
 			const files = yield* fs.readdir(schemasDir);
-			const schemas = files.filter((f) => f.endsWith(".json"));
+			const schemas = files.filter((f: string) => f.endsWith(".json"));
 
 			const style = {
 				singleQuote: true,
@@ -56,7 +56,7 @@ export const schemaTypesCommand = Command.make(
 					yield* terminal.writeLine(output);
 				});
 
-			const compilePromises: Array<Effect.Effect<void, unknown>> = [];
+			const compilePromises: Array<Effect.Effect<void, unknown, unknown>> = [];
 
 			if (configSchema) {
 				const configSchemaExists = yield* fs.exists(configSchemaPath);

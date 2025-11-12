@@ -77,6 +77,5 @@ export class TerminalService extends Effect.Service<TerminalService>()(
 					}),
 			};
 		}),
-		dependencies: [Terminal.Terminal.Default],
 	},
 ) {}

@@ -151,6 +151,5 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					}),
 			};
 		}),
-		dependencies: [FileSystem.FileSystem.Default],
 	},
 ) {}

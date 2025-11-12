@@ -88,7 +88,7 @@ export const setupCommand = Command.make(
 			if (isUpdate) {
 				current = yield* pathService
 					.getCurrentNodeCGVersion()
-					.pipe(Effect.option, Effect.map(Option.getOrUndefined));
+					.pipe(Effect.option, Effect.map((opt) => Option.getOrElse(opt, () => undefined)));
 				if (current && semverLib.eq(current, target)) {
 					yield* terminal.writeLine(
 						`The target version (${target}) is equal to the current version (${current}). No action will be taken.`,

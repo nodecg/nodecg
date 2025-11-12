@@ -5,6 +5,7 @@ import {
 	NodeHttpClient,
 	NodeTerminal,
 	NodeContext,
+	NodePath,
 	NodeRuntime,
 } from "@effect/platform-node";
 import { cli } from "../index.js";
@@ -48,6 +49,7 @@ const MainLayer = Layer.mergeAll(
 	NodeFileSystem.layer,
 	NodeHttpClient.layerWithoutAgent,
 	NodeTerminal.layer,
+	NodePath.layer,
 ).pipe(
 	Layer.provideMerge(FileSystemService.Default),
 	Layer.provideMerge(TerminalService.Default),
@@ -60,4 +62,16 @@ const MainLayer = Layer.mergeAll(
 	Layer.provideMerge(PathService.Default),
 );
 
-NodeRuntime.runMain(Effect.provide(program, MainLayer));
+const runnable = program.pipe(
+	Effect.provide(MainLayer),
+	Effect.catchAllDefect((defect) => {
+		console.error("Fatal error:", defect);
+		return Effect.sync(() => process.exit(1));
+	}),
+	Effect.catchAll((error) => {
+		console.error("Error:", error);
+		return Effect.sync(() => process.exit(1));
+	}),
+);
+
+NodeRuntime.runMain(runnable as Effect.Effect<void, never, never>);

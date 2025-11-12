@@ -79,7 +79,6 @@ export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 						cwd?: string;
 						style?: { singleQuote?: boolean; useTabs?: boolean };
 					},
-		dependencies: [FileSystemService.Default],
 				) =>
 					Effect.gen(function* () {
 						const ts = yield* Effect.promise(() =>

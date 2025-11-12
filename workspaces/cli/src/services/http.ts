@@ -82,6 +82,5 @@ export class HttpService extends Effect.Service<HttpService>()("HttpService", {
 				}),
 		};
 	}),
-		dependencies: [HttpClient.HttpClient.Default],
 	},
 ) {}
