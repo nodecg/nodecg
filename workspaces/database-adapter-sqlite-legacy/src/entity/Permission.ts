@@ -1,7 +1,13 @@
 import type { Permission as PermissionModel } from "@nodecg/database-adapter-types";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+	Column,
+	Entity,
+	ManyToOne,
+	PrimaryGeneratedColumn,
+	type Relation,
+} from "typeorm";
 
-import { Role } from "./Role";
+import { Role } from "./Role.ts";
 
 export const enum Action {
 	NONE = 0,
@@ -9,7 +15,7 @@ export const enum Action {
 	WRITE = 1 << 1,
 }
 
-@Entity()
+@Entity({ name: "permission" })
 export class Permission implements PermissionModel {
 	@PrimaryGeneratedColumn("uuid")
 	id!: string;
@@ -18,7 +24,7 @@ export class Permission implements PermissionModel {
 	name!: string;
 
 	@ManyToOne(() => Role, (role) => role.permissions)
-	role!: Role;
+	role!: Relation<Role>;
 
 	@Column("text")
 	entityId!: string;

@@ -11,9 +11,7 @@
 		}
 	],
 	"packages": {
-		".": {
-			"exclude-paths": ["workspaces"]
-		},
+		"workspaces/nodecg": {},
 		"workspaces/internal-util": {
 			"skip-changelog": true
 		},

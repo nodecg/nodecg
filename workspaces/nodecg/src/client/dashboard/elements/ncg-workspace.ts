@@ -1,0 +1,421 @@
+import "@polymer/paper-spinner/paper-spinner.js";
+import "./ncg-dashboard-panel";
+
+import * as Polymer from "@polymer/polymer";
+import { timeOut } from "@polymer/polymer/lib/utils/async.js";
+import { Debouncer } from "@polymer/polymer/lib/utils/debounce.js";
+import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
+import Draggabilly from "draggabilly";
+import Packery from "packery";
+
+import type { NodeCG } from "../../../types/nodecg";
+import type { NcgDashboardPanel } from "./ncg-dashboard-panel";
+
+class NcgWorkspace extends Polymer.PolymerElement {
+	static get template() {
+		return Polymer.html`
+		<style include="nodecg-theme">
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+				box-sizing: border-box;
+			}
+
+			#panels {
+				transform: translateY(40px);
+				opacity: 0;
+				transition: opacity 500ms ease, transform 600ms ease-out;
+			}
+
+			:host(:not([fullbleed])) {
+				padding: 32px;
+			}
+
+			:host(:not([fullbleed])) #panels {
+				padding-bottom: 32px;
+			}
+
+			#panels {
+				width: 100%;
+				height: 100%;
+			}
+
+			#loadingSpinner {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%);
+				width: 68px;
+				height: 68px;
+				--paper-spinner-stroke-width: 5px;
+				--paper-spinner-layer-1-color: #645BA6;
+				--paper-spinner-layer-2-color: #A50074;
+				--paper-spinner-layer-3-color: #5BA664;
+				--paper-spinner-layer-4-color: #C9513E;
+			}
+
+			iframe {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+
+		<div id="panels">
+			<template is="dom-repeat" items="[[panels]]" as="panel">
+				<ncg-dashboard-panel id="[[panel.bundleName]]_[[panel.name]]" display-title="[[panel.title]]" bundle="[[panel.bundleName]]" panel="[[panel.name]]" header-color="[[panel.headerColor]]" width="[[panel.width]]" on-transitioning-changed="_handlePanelCollapseTransition" fullbleed="[[panel.fullbleed]]">
+					<iframe src="/bundles/[[panel.bundleName]]/dashboard/[[panel.file]]" frameborder="0" scrolling\$="[[_calcIframeScrolling(panel.fullbleed)]]" id="[[panel.bundleName]]_[[panel.name]]_iframe" on-iframe-resized="shiftPackery" fullbleed\$="[[panel.fullbleed]]" loading="lazy">
+					</iframe>
+				</ncg-dashboard-panel>
+			</template>
+		</div>
+
+		<paper-spinner id="loadingSpinner" active=""></paper-spinner>
+`;
+	}
+
+	static get is() {
+		return "ncg-workspace";
+	}
+
+	static get properties() {
+		return {
+			workspace: Object,
+			panels: {
+				type: Array,
+				computed: "_computePanels(workspace)",
+			},
+			fullbleed: {
+				type: Boolean,
+				computed: "_computeFullbleed(workspace)",
+				reflectToAttribute: true,
+				value: false,
+			},
+			usePackery: {
+				type: Boolean,
+				computed: "_computeUsePackery(fullbleed)",
+			},
+			route: {
+				type: Object,
+				observer: "_routeChanged",
+			},
+			PANEL_SORT_ORDER_STORAGE_KEY: {
+				type: String,
+				computed: "_computePanelSortOrderStorageKey(workspace)",
+			},
+		};
+	}
+
+	override ready(): void {
+		super.ready();
+
+		// 2018-08-26: This is a quick fix for workspaces never initializing on Firefox.
+		// For some reason FF never fires the `load` event, or it's firing it before we start listening.
+		// This is less than ideal for us, because this quick fix doesn't _actually_ hide the loads,
+		// so it looks quite ugly.
+		// This might need to move to listening for the load events of each individual iframe instead?
+		if (document.readyState === "complete") {
+			this._init();
+		} else {
+			window.addEventListener("load", () => {
+				this._init();
+			});
+		}
+	}
+
+	_init() {
+		if (this._initialized) {
+			throw new Error("attempted multiple init");
+		}
+
+		this._initialized = true;
+
+		this.$.loadingSpinner.active = false;
+		this.applyPackery();
+		setTimeout(() => {
+			this.addEventListener("tap", this.shiftPackery);
+			this.$.panels.style.opacity = 1;
+			this.$.panels.style.transform = "translateY(0)";
+			this.$.panels.style.pointerEvents = "auto";
+		}, 750);
+	}
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+
+		afterNextRender(this, () => {
+			if (this.usePackery) {
+				// Init Packery
+				this.initPackery();
+				this.startObservingPanelMutations();
+			}
+		});
+	}
+
+	startObservingPanelMutations() {
+		// Packery causes attributes changes, so before applying it
+		// we disconnect then reconnect our observer to avoid infinite loops
+		try {
+			if (this._panelMutationObserver) {
+				return;
+			}
+
+			// Create a MutationObserver which will watch for changes to the DOM and re-apply masonry
+			this._panelMutationObserver = new MutationObserver(() => {
+				this._handleMutationDebounce = Debouncer.debounce(
+					this._handleMutationDebounce,
+					timeOut.after(150),
+					this._debouncedMutationHandler.bind(this),
+				);
+			});
+
+			// Define what element should be observed by the observer
+			// and what types of mutations trigger the callback
+			this._panelMutationObserver.observe(this.$.panels, {
+				subtree: true,
+				attributes: true,
+				childList: true,
+				characterData: true,
+				attributeOldValue: false,
+				characterDataOldValue: false,
+			});
+		} catch (_: unknown) {
+			console.warn(
+				"MutationObserver not supported, dashboard panels may be less responsive to DOM changes",
+			);
+		}
+	}
+
+	initPackery() {
+		const packery = new Packery(this.$.panels, {
+			itemSelector: "ncg-dashboard-panel",
+			columnWidth: 128,
+			gutter: 16,
+			isInitLayout: false,
+			containerStyle: { position: "relative" },
+		});
+
+		this._packery = packery;
+
+		// Initial sort
+		const sortOrder: string[] = []; // global variable for saving order, used later
+		const rawStoredSortOrder = localStorage.getItem(
+			this.PANEL_SORT_ORDER_STORAGE_KEY,
+		);
+		if (rawStoredSortOrder) {
+			const storedSortOrder: string[] = JSON.parse(rawStoredSortOrder);
+
+			// Create a hash of items
+			const itemsByFullName: Record<string, HTMLElement> = {};
+			const allPanels: string[] = [];
+			let panelName;
+			let bundleName;
+			let i;
+			let len;
+			for (i = 0, len = packery.items.length; i < len; i++) {
+				const item = packery.items[i];
+				panelName = item.element.getAttribute("panel");
+				bundleName = item.element.getAttribute("bundle");
+				const fullName = `${bundleName}.${panelName}`;
+				allPanels[i] = fullName;
+				itemsByFullName[fullName] = item;
+			}
+
+			// Merge the saved panel array with our currently loaded panels, remove dupes
+			const allPanelsOrdered = arrayUnique(storedSortOrder.concat(allPanels));
+
+			// Remove panels that no longer exist
+			const removededOld = allPanelsOrdered.filter((val) =>
+				allPanels.includes(val),
+			);
+
+			// Overwrite packery item order
+			len = removededOld.length;
+			for (i = 0; i < len; i++) {
+				panelName = removededOld[i]!;
+				packery.items[i] = itemsByFullName[panelName];
+			}
+		}
+
+		// Manually trigger initial layout
+		packery.layout();
+		this._packeryInitialized = true;
+
+		const panelsList: NcgDashboardPanel[] = this.$.panels.querySelectorAll(
+			"ncg-dashboard-panel",
+		);
+		panelsList.forEach((itemElem) => {
+			// Make element draggable with Draggabilly
+			const draggie = new Draggabilly(itemElem);
+
+			// Manually set the handle because we can't just use a CSS selector due to ShadowDOM
+			draggie.handles = [itemElem.$.dragHandle];
+
+			// Bind Draggabilly events to Packery
+			packery.bindDraggabillyEvents(draggie);
+		});
+
+		// Currently, there is no built-in option to force dragged elements to gravitate to their
+		// nearest neighbour in a specific direction. This will reset their locations 100ms after a drag
+		// causing them to gravitate.
+		packery.on("dragItemPositioned", () => {
+			setTimeout(() => {
+				packery.layout();
+			}, 100);
+		});
+
+		const orderItems = () => {
+			const itemElems = packery.getItemElements();
+
+			// Reset / empty order array
+			sortOrder.length = 0;
+
+			for (let i = 0; i < itemElems.length; i++) {
+				sortOrder[i] =
+					`${itemElems[i].getAttribute("bundle")}.${itemElems[i].getAttribute("panel")}`;
+			}
+
+			// Save ordering
+			localStorage.setItem(
+				this.PANEL_SORT_ORDER_STORAGE_KEY,
+				JSON.stringify(sortOrder),
+			);
+		};
+
+		packery.on("layoutComplete", orderItems);
+		packery.on("dragItemPositioned", orderItems);
+	}
+
+	applyPackery() {
+		this._applyPackeryDebounce = Debouncer.debounce(
+			this._applyPackeryDebounce,
+			timeOut.after(10),
+			() => {
+				if (this._packeryInitialized) {
+					this._packery.layout();
+				}
+			},
+		);
+	}
+
+	shiftPackery() {
+		if (!this.usePackery) {
+			return;
+		}
+
+		// Called when anything in #panels receives a click or tap event.
+		// There's probably a lot of room to optimize this and not call
+		// this routine for every single click,
+		// but this was just the easiest way to ensure that mutations
+		// caused by clicks are caught, because those mutations might
+		// have changed the vertical size of the panel.
+
+		this._shiftPackeryDebounce = Debouncer.debounce(
+			this._shiftPackeryDebounce,
+			timeOut.after(100),
+			() => {
+				if (this._packeryInitialized) {
+					// See http://packery.metafizzy.co/methods.html#shiftlayout for more details
+					this._packery.shiftLayout();
+				}
+			},
+		);
+	}
+
+	_fixPackery() {
+		this.applyPackery();
+	}
+
+	_computePanels(workspace: NodeCG.Workspace) {
+		const workspaceName = workspace.route === "" ? "default" : workspace.name;
+		const { bundles } = window.__renderData__;
+		const panels: NodeCG.Bundle.Panel[] = [];
+		bundles.forEach((bundle) => {
+			bundle.dashboard.panels.forEach((panel) => {
+				if (panel.dialog) {
+					return;
+				}
+
+				if (panel.fullbleed) {
+					if (
+						workspaceName === `__nodecg_fullbleed__${bundle.name}_${panel.name}`
+					) {
+						return panels.push(panel);
+					}
+
+					return;
+				}
+
+				if (panel.workspace === workspaceName) {
+					panels.push(panel);
+				}
+
+				return undefined;
+			});
+		});
+		return panels;
+	}
+
+	_computeFullbleed(workspace: NodeCG.Workspace) {
+		return workspace.fullbleed;
+	}
+
+	_computeUsePackery(fullbleed: boolean) {
+		return !fullbleed;
+	}
+
+	_routeChanged(route: { path: string }) {
+		if (this.usePackery) {
+			// This is a hack to fix packery when the viewport size is changed
+			// when the workspace is not visible.
+			if (route.path === (this as any).parentNode.route) {
+				this._fixPackeryDebounce = Debouncer.debounce(
+					this._fixPackeryDebounce,
+					timeOut.after(10),
+					this._fixPackery.bind(this),
+				);
+			}
+		}
+	}
+
+	_computePanelSortOrderStorageKey(workspace: NodeCG.Workspace) {
+		return (
+			(workspace.route === "" ? "default" : workspace.name) +
+			"_workspace_panel_sort_order"
+		);
+	}
+
+	_handlePanelCollapseTransition(e: any) {
+		// Whenever a panel finishes transitioning, shiftPackery.
+		if (e.detail.value === false) {
+			this.shiftPackery();
+		}
+	}
+
+	_debouncedMutationHandler() {
+		this._panelMutationObserver.disconnect();
+		this.shiftPackery();
+		this.startObservingPanelMutations();
+	}
+
+	_calcIframeScrolling(fullbleed: boolean) {
+		return fullbleed ? "yes" : "no";
+	}
+}
+
+customElements.define("ncg-workspace", NcgWorkspace);
+
+function arrayUnique<T>(array: T[]): T[] {
+	const a = array.concat();
+	for (let i = 0; i < a.length; ++i) {
+		for (let j = i + 1; j < a.length; ++j) {
+			if (a[i] === a[j]) {
+				a.splice(j--, 1);
+			}
+		}
+	}
+
+	return a;
+}

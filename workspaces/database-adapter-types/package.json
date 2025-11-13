@@ -3,27 +3,32 @@
   "version": "2.6.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nodecg/nodecg.git",
+    "url": "git+https://github.com/nodecg/nodecg.git",
     "directory": "workspaces/database-adapter-types"
   },
+  "type": "module",
   "exports": {
-    ".": {
-      "source": "./src/main.ts",
-      "types": "./dist/main.d.ts"
-    }
+    ".": "./dist/main.js",
+    "./package.json": "./package.json"
   },
-  "types": "dist/main.d.ts",
+  "main": "./dist/main.js",
+  "module": "./dist/main.js",
+  "types": "./dist/main.d.ts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
-    "build": "del-cli dist && tsc -b",
-    "dev": "tsc -b --watch --preserveWatchOutput"
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "typecheck-watch": "tsc --noEmit --watch --preserveWatchOutput",
+    "watch": "tsdown --watch"
   },
   "devDependencies": {
-    "del-cli": "^6.0.0",
-    "typescript": "~5.7.3"
+    "@arethetypeswrong/core": "^0.18.2",
+    "publint": "^0.3.15",
+    "tsdown": "^0.16.1",
+    "typescript": "~5.9.3"
   },
   "publishConfig": {
     "access": "public",

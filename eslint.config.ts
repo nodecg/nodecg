@@ -37,7 +37,7 @@ export default defineConfig(
 		},
 	},
 	{
-		files: ["src/client/dashboard/**/*"],
+		files: ["workspaces/nodecg/src/client/dashboard/**/*"],
 		rules: {
 			"@typescript-eslint/no-unused-expressions": "off",
 		},
@@ -55,13 +55,13 @@ export default defineConfig(
 	{
 		ignores: [
 			"**/*.{js,cjs,mjs}",
-			"node_modules",
-			"dist",
-			"out",
+			"**/node_modules",
+			"**/dist",
+			"**/out",
 			"bundles",
-			"test/fixtures",
+			"workspaces/nodecg/test/fixtures",
 			"coverage",
-			"typetest/fake-bundle",
+			"workspaces/nodecg/typetest/fake-bundle",
 			"generated-types/client",
 			"generated-types/server",
 		],
