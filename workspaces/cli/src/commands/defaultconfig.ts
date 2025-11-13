@@ -1,11 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { rootPaths } from "@nodecg/internal-util";
 import { Ajv, type JSONSchemaType } from "ajv";
 import chalk from "chalk";
 import { Command } from "commander";
 
-import { getNodeCGPath, isBundleFolder } from "../lib/util.js";
+import { isBundleFolder } from "../lib/util.js";
 
 const ajv = new Ajv({ useDefaults: true, strict: true });
 
@@ -16,42 +17,77 @@ export function defaultconfigCommand(program: Command) {
 		.action(action);
 }
 
+function getBundlePath(bundleName: string): string | null {
+	const rootPath = rootPaths.getRuntimeRoot();
+
+	// Check if root project itself is the bundle
+	if (isBundleFolder(rootPath)) {
+		try {
+			const rootPjsonPath = path.join(rootPath, "package.json");
+			const rootPjson = JSON.parse(fs.readFileSync(rootPjsonPath, "utf8"));
+			if (rootPjson.name === bundleName) {
+				return rootPath;
+			}
+		} catch {
+			// Ignore JSON parse errors
+		}
+	}
+
+	// Otherwise check bundles directory
+	const bundlesPath = path.join(rootPath, "bundles", bundleName);
+	if (isBundleFolder(bundlesPath)) {
+		return bundlesPath;
+	}
+
+	return null;
+}
+
 function action(bundleName?: string) {
 	const cwd = process.cwd();
-	const nodecgPath = getNodeCGPath();
+	const rootPath = rootPaths.getRuntimeRoot();
+
+	let resolvedBundleName: string;
 
 	if (!bundleName) {
+		// Check if cwd is a bundle
 		if (isBundleFolder(cwd)) {
-			bundleName = bundleName ?? path.basename(cwd);
+			const pjson = JSON.parse(
+				fs.readFileSync(path.join(cwd, "package.json"), "utf8"),
+			);
+			resolvedBundleName = pjson.name;
+		} else if (isBundleFolder(rootPath)) {
+			// Check if root project is a bundle (installed mode)
+			const pjson = JSON.parse(
+				fs.readFileSync(path.join(rootPath, "package.json"), "utf8"),
+			);
+			resolvedBundleName = pjson.name;
 		} else {
 			console.error(
 				`${chalk.red("Error:")} No bundle found in the current directory!`,
 			);
 			return;
 		}
+	} else {
+		resolvedBundleName = bundleName;
 	}
 
-	const bundlePath = path.join(nodecgPath, "bundles/", bundleName);
-	const schemaPath = path.join(
-		nodecgPath,
-		"bundles/",
-		bundleName,
-		"/configschema.json",
-	);
-	const cfgPath = path.join(nodecgPath, "cfg/");
-
-	if (!fs.existsSync(bundlePath)) {
-		console.error(`${chalk.red("Error:")} Bundle ${bundleName} does not exist`);
-		return;
-	}
-
-	if (!fs.existsSync(schemaPath)) {
+	const bundlePath = getBundlePath(resolvedBundleName);
+	if (!bundlePath) {
 		console.error(
-			`${chalk.red("Error:")} Bundle ${bundleName} does not have a configschema.json`,
+			`${chalk.red("Error:")} Bundle ${resolvedBundleName} does not exist`,
 		);
 		return;
 	}
 
+	const schemaPath = path.join(bundlePath, "configschema.json");
+	if (!fs.existsSync(schemaPath)) {
+		console.error(
+			`${chalk.red("Error:")} Bundle ${resolvedBundleName} does not have a configschema.json`,
+		);
+		return;
+	}
+
+	const cfgPath = path.join(rootPath, "cfg");
 	if (!fs.existsSync(cfgPath)) {
 		fs.mkdirSync(cfgPath);
 	}
@@ -59,10 +95,10 @@ function action(bundleName?: string) {
 	const schema: JSONSchemaType<unknown> = JSON.parse(
 		fs.readFileSync(schemaPath, "utf8"),
 	);
-	const configPath = path.join(nodecgPath, "cfg/", `${bundleName}.json`);
+	const configPath = path.join(cfgPath, `${resolvedBundleName}.json`);
 	if (fs.existsSync(configPath)) {
 		console.error(
-			`${chalk.red("Error:")} Bundle ${bundleName} already has a config file`,
+			`${chalk.red("Error:")} Bundle ${resolvedBundleName} already has a config file`,
 		);
 	} else {
 		try {
@@ -72,7 +108,7 @@ function action(bundleName?: string) {
 
 			fs.writeFileSync(configPath, JSON.stringify(data, null, 2));
 			console.log(
-				`${chalk.green("Success:")} Created ${chalk.bold(bundleName)}'s default config from schema\n`,
+				`${chalk.green("Success:")} Created ${chalk.bold(resolvedBundleName)}'s default config from schema\n`,
 			);
 		} catch (error) {
 			console.error(chalk.red("Error:"), error);

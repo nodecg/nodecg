@@ -16,6 +16,7 @@ let program: MockCommand;
 beforeEach(() => {
 	// Set up environment.
 	const tempFolder = setupTmpDir();
+	process.env["NODECG_ROOT"] = tempFolder;
 	process.chdir(tempFolder);
 	fs.writeFileSync("package.json", JSON.stringify({ name: "nodecg" }));
 
@@ -45,6 +46,13 @@ describe("when run with a bundle argument", () => {
 		fs.mkdirSync(
 			path.resolve(process.cwd(), "./bundles/missing-schema-bundle"),
 			{ recursive: true },
+		);
+		fs.writeFileSync(
+			"./bundles/missing-schema-bundle/package.json",
+			JSON.stringify({
+				name: "missing-schema-bundle",
+				nodecg: { compatibleRange: "^2.0.0" },
+			}),
 		);
 		await program.runWith("defaultconfig missing-schema-bundle");
 		expect(spy.mock.calls[0]).toMatchInlineSnapshot(
@@ -112,5 +120,84 @@ describe("when run with no arguments", () => {
 		`,
 		);
 		spy.mockRestore();
+	});
+});
+
+describe("installed mode (NodeCG as dependency)", () => {
+	beforeEach(() => {
+		// Set up installed mode environment.
+		const tempFolder = setupTmpDir();
+		process.env["NODECG_ROOT"] = tempFolder;
+		process.chdir(tempFolder);
+
+		// Root is a bundle project with nodecg field
+		fs.writeFileSync(
+			"package.json",
+			JSON.stringify({
+				name: "my-awesome-bundle",
+				nodecg: { compatibleRange: "^2.0.0" },
+			}),
+		);
+
+		// Create configschema.json in root
+		fs.writeFileSync(
+			"configschema.json",
+			JSON.stringify({
+				type: "object",
+				properties: {
+					installedMode: { type: "boolean", default: true },
+					value: { type: "number", default: 42 },
+				},
+			}),
+		);
+
+		// Build program.
+		program = createMockProgram();
+		defaultconfigCommand(program as unknown as Command);
+	});
+
+	it("should create config for root bundle when bundle name matches root package", async () => {
+		await program.runWith("defaultconfig my-awesome-bundle");
+		const config = JSON.parse(
+			fs.readFileSync("./cfg/my-awesome-bundle.json", { encoding: "utf8" }),
+		);
+		expect(config.installedMode).toBe(true);
+		expect(config.value).toBe(42);
+	});
+
+	it("should create config for root bundle when run with no arguments", async () => {
+		await program.runWith("defaultconfig");
+		expect(fs.existsSync("./cfg/my-awesome-bundle.json")).toBe(true);
+		const config = JSON.parse(
+			fs.readFileSync("./cfg/my-awesome-bundle.json", { encoding: "utf8" }),
+		);
+		expect(config.installedMode).toBe(true);
+	});
+
+	it("should still check bundles directory when bundle name doesn't match root", async () => {
+		// Create a bundle in bundles directory
+		fs.mkdirSync("./bundles/another-bundle", { recursive: true });
+		fs.writeFileSync(
+			"./bundles/another-bundle/package.json",
+			JSON.stringify({
+				name: "another-bundle",
+				nodecg: { compatibleRange: "^2.0.0" },
+			}),
+		);
+		fs.writeFileSync(
+			"./bundles/another-bundle/configschema.json",
+			JSON.stringify({
+				type: "object",
+				properties: {
+					fromBundlesDir: { type: "boolean", default: true },
+				},
+			}),
+		);
+
+		await program.runWith("defaultconfig another-bundle");
+		const config = JSON.parse(
+			fs.readFileSync("./cfg/another-bundle.json", { encoding: "utf8" }),
+		);
+		expect(config.fromBundlesDir).toBe(true);
 	});
 });
