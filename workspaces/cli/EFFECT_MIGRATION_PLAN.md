@@ -20,17 +20,17 @@ This document outlines the complete migration plan for `@nodecg/cli` from impera
 
 ### Services: 9 Total
 
-| # | Service | Purpose | Dependencies |
-|---|---------|---------|--------------|
-| 1 | FileSystemService | File I/O, JSON read/write, tar extraction | `FileSystem.FileSystem` |
-| 2 | TerminalService | Terminal I/O, colors, prompts | `Terminal.Terminal` |
-| 3 | HttpService | HTTP requests, JSON fetching, streams | `HttpClient.HttpClient` |
-| 4 | CommandService | Process spawning and execution | `Command` (platform) |
-| 5 | GitService | Git operations (clone, checkout, tags) | CommandService |
-| 6 | NpmService | NPM operations (versions, install) | HttpService, CommandService |
-| 7 | JsonSchemaService | JSON Schema validation, defaults, TS gen | FileSystemService |
-| 8 | PackageResolverService | Parse package specs to git URLs | (pure libraries) |
-| 9 | PathService | NodeCG-specific path utilities | FileSystemService |
+| #   | Service                | Purpose                                   | Dependencies                |
+| --- | ---------------------- | ----------------------------------------- | --------------------------- |
+| 1   | FileSystemService      | File I/O, JSON read/write, tar extraction | `FileSystem.FileSystem`     |
+| 2   | TerminalService        | Terminal I/O, colors, prompts             | `Terminal.Terminal`         |
+| 3   | HttpService            | HTTP requests, JSON fetching, streams     | `HttpClient.HttpClient`     |
+| 4   | CommandService         | Process spawning and execution            | `Command` (platform)        |
+| 5   | GitService             | Git operations (clone, checkout, tags)    | CommandService              |
+| 6   | NpmService             | NPM operations (versions, install)        | HttpService, CommandService |
+| 7   | JsonSchemaService      | JSON Schema validation, defaults, TS gen  | FileSystemService           |
+| 8   | PackageResolverService | Parse package specs to git URLs           | (pure libraries)            |
+| 9   | PathService            | NodeCG-specific path utilities            | FileSystemService           |
 
 ### Pure Utilities
 
@@ -45,6 +45,7 @@ This document outlines the complete migration plan for `@nodecg/cli` from impera
 Wraps `FileSystem.FileSystem` with domain-specific error handling.
 
 **Methods:**
+
 ```typescript
 readJson<A>(path: string, schema: Schema.Schema<A, unknown>): Effect<A, FileSystemError>
 writeJson<A>(path: string, data: A): Effect<void, FileSystemError>
@@ -58,6 +59,7 @@ extractTarball(stream: Stream<Uint8Array>, options?: { cwd?: string; strip?: num
 ```
 
 **Error Type:**
+
 ```typescript
 class FileSystemError extends Data.TaggedError("FileSystemError")<{
   readonly message: string
@@ -72,6 +74,7 @@ class FileSystemError extends Data.TaggedError("FileSystemError")<{
 Wraps `Terminal.Terminal` with ANSI color helpers and prompts.
 
 **Methods:**
+
 ```typescript
 write(message: string): Effect<void, never>
 writeLine(message: string): Effect<void, never>
@@ -84,6 +87,7 @@ readLine(): Effect<string, TerminalError>
 ```
 
 **Error Type:**
+
 ```typescript
 class TerminalError extends Data.TaggedError("TerminalError")<{
   readonly message: string
@@ -97,6 +101,7 @@ class TerminalError extends Data.TaggedError("TerminalError")<{
 Wraps `HttpClient.HttpClient` with typed JSON fetching and schema validation.
 
 **Methods:**
+
 ```typescript
 fetchJson<A>(url: string, schema: Schema.Schema<A, unknown>): Effect<A, HttpError>
 fetchStream(url: string): Effect<Stream<Uint8Array>, HttpError>
@@ -104,6 +109,7 @@ fetch(url: string): Effect<HttpClientResponse, HttpError>
 ```
 
 **Error Type:**
+
 ```typescript
 class HttpError extends Data.TaggedError("HttpError")<{
   readonly message: string
@@ -119,12 +125,14 @@ class HttpError extends Data.TaggedError("HttpError")<{
 Wraps platform `Command` for unified process spawning.
 
 **Methods:**
+
 ```typescript
 exec(cmd: string, args: ReadonlyArray<string>, options?: { cwd?: string }): Effect<void, CommandError>
 string(cmd: string, args: ReadonlyArray<string>, options?: { cwd?: string }): Effect<string, CommandError>
 ```
 
 **Error Type:**
+
 ```typescript
 class CommandError extends Data.TaggedError("CommandError")<{
   readonly message: string
@@ -140,6 +148,7 @@ class CommandError extends Data.TaggedError("CommandError")<{
 Domain-specific git operations.
 
 **Methods:**
+
 ```typescript
 checkAvailable(): Effect<void, GitError>
 clone(url: string, destination: string): Effect<void, GitError>
@@ -150,6 +159,7 @@ listRemoteTags(repoUrl: string): Effect<ReadonlyArray<string>, GitError>
 **Dependencies:** CommandService
 
 **Error Type:**
+
 ```typescript
 class GitError extends Data.TaggedError("GitError")<{
   readonly message: string
@@ -164,6 +174,7 @@ class GitError extends Data.TaggedError("GitError")<{
 Domain-specific npm operations.
 
 **Methods:**
+
 ```typescript
 listVersions(packageName: string): Effect<ReadonlyArray<string>, NpmError>
 getRelease(packageName: string, version: string): Effect<NpmRelease, NpmError>
@@ -172,17 +183,19 @@ yarnInstall(cwd: string, production: boolean): Effect<void, NpmError>
 ```
 
 **Types:**
+
 ```typescript
 type NpmRelease = {
   dist: {
-    tarball: string
-  }
-}
+    tarball: string;
+  };
+};
 ```
 
 **Dependencies:** HttpService, CommandService
 
 **Error Type:**
+
 ```typescript
 class NpmError extends Data.TaggedError("NpmError")<{
   readonly message: string
@@ -197,6 +210,7 @@ class NpmError extends Data.TaggedError("NpmError")<{
 JSON Schema validation, default application, and TypeScript generation.
 
 **Methods:**
+
 ```typescript
 applyDefaults(schemaPath: string): Effect<unknown, JsonSchemaError>
 validate(data: unknown, schemaPath: string): Effect<void, JsonSchemaError>
@@ -206,10 +220,12 @@ compileToTypeScript(schemaPath: string, outputPath: string, options?: CompileOpt
 **Dependencies:** FileSystemService
 
 **Libraries Used:**
+
 - `ajv` - JSON Schema validation and default application
 - `json-schema-to-typescript` - TypeScript definition generation
 
 **Error Type:**
+
 ```typescript
 class JsonSchemaError extends Data.TaggedError("JsonSchemaError")<{
   readonly message: string
@@ -224,29 +240,33 @@ class JsonSchemaError extends Data.TaggedError("JsonSchemaError")<{
 Parse npm package specs and resolve to git URLs.
 
 **Methods:**
+
 ```typescript
 resolveGitUrl(spec: string): Effect<GitRepoInfo, PackageResolverError>
 parseVersionSpec(spec: string): Effect<PackageSpec, PackageResolverError>
 ```
 
 **Types:**
+
 ```typescript
 type GitRepoInfo = {
-  url: string
-  name: string
-}
+  url: string;
+  name: string;
+};
 
 type PackageSpec = {
-  repo: string
-  range: string
-}
+  repo: string;
+  range: string;
+};
 ```
 
 **Libraries Used:**
+
 - `npm-package-arg` - Parse package specifications
 - `hosted-git-info` - Resolve to git URLs
 
 **Error Type:**
+
 ```typescript
 class PackageResolverError extends Data.TaggedError("PackageResolverError")<{
   readonly message: string
@@ -261,6 +281,7 @@ class PackageResolverError extends Data.TaggedError("PackageResolverError")<{
 NodeCG-specific path detection and utilities.
 
 **Methods:**
+
 ```typescript
 pathContainsNodeCG(path: string): Effect<boolean, never>
 getNodeCGPath(): Effect<string, PathError>
@@ -271,6 +292,7 @@ getCurrentNodeCGVersion(): Effect<string, PathError>
 **Dependencies:** FileSystemService
 
 **Error Type:**
+
 ```typescript
 class PathError extends Data.TaggedError("PathError")<{
   readonly message: string
@@ -284,6 +306,7 @@ class PathError extends Data.TaggedError("PathError")<{
 Pure utility functions wrapping semver library.
 
 **Functions:**
+
 ```typescript
 maxSatisfying(versions: ReadonlyArray<string>, range: string): string | undefined
 coerce(version: string): SemVer | undefined
@@ -389,6 +412,7 @@ Main Program
 ```
 
 **Layer Dependencies:**
+
 - Layer 1 (Platform): FileSystemService, TerminalService, HttpService, CommandService
 - Layer 2 (Domain): GitService → CommandService
 - Layer 2 (Domain): NpmService → HttpService, CommandService
@@ -407,11 +431,13 @@ All commands use `@effect/cli` Command builder with typed options and arguments.
 **Command:** `nodecg setup [version] [-u] [-k]`
 
 **Options:**
+
 - `version` (optional) - Semver range to install
 - `-u, --update` - Update existing installation
 - `-k, --skip-dependencies` - Skip npm install
 
 **Flow:**
+
 1. Check if NodeCG already installed (update mode)
 2. List npm versions
 3. Find target version with semver
@@ -429,10 +455,12 @@ All commands use `@effect/cli` Command builder with typed options and arguments.
 **Command:** `nodecg install [repo] [-d]`
 
 **Options:**
+
 - `repo` (optional) - Git repo (user/repo or URL with optional #version)
 - `-d, --dev` - Install dev dependencies
 
 **Flow:**
+
 1. If no repo: install bundle deps in current directory
 2. Parse repo spec (handle #version)
 3. Resolve to git URL
@@ -451,9 +479,11 @@ All commands use `@effect/cli` Command builder with typed options and arguments.
 **Command:** `nodecg start [-d]`
 
 **Options:**
+
 - `-d, --disable-source-maps` - Disable source map support
 
 **Flow:**
+
 1. Recursively find project directory
 2. Check if NodeCG exists (legacy mode)
 3. Check if NodeCG in node_modules (installed mode)
@@ -468,9 +498,11 @@ All commands use `@effect/cli` Command builder with typed options and arguments.
 **Command:** `nodecg defaultconfig [bundle]`
 
 **Options:**
+
 - `bundle` (optional) - Bundle name (uses cwd if omitted)
 
 **Flow:**
+
 1. Determine bundle name
 2. Verify bundle and schema exist
 3. Read configschema.json
@@ -486,10 +518,12 @@ All commands use `@effect/cli` Command builder with typed options and arguments.
 **Command:** `nodecg uninstall <bundle> [-f]`
 
 **Options:**
+
 - `bundle` (required) - Bundle name to uninstall
 - `-f, --force` - Skip confirmation
 
 **Flow:**
+
 1. Verify bundle exists
 2. Confirm deletion (unless force)
 3. Delete bundle directory
@@ -503,11 +537,13 @@ All commands use `@effect/cli` Command builder with typed options and arguments.
 **Command:** `nodecg schema-types [dir] [-o <path>] [--no-config-schema]`
 
 **Options:**
+
 - `dir` (optional) - Schema directory (default: "schemas")
 - `-o, --out-dir` - Output directory (default: "src/types/schemas")
 - `--config-schema` - Include configschema.json (default: true)
 
 **Flow:**
+
 1. Verify input directory exists
 2. Create output directory if needed
 3. List all .json schema files
@@ -535,13 +571,13 @@ Commands handle errors at the boundary:
 ```typescript
 program.pipe(
   Effect.catchTag("FileSystemError", (e) =>
-    terminal.writeError(`File error: ${e.message}`)
+    terminal.writeError(`File error: ${e.message}`),
   ),
   Effect.catchTag("GitError", (e) =>
-    terminal.writeError(`Git error: ${e.message}`)
+    terminal.writeError(`Git error: ${e.message}`),
   ),
   // ... other error handlers
-)
+);
 ```
 
 ---
@@ -568,14 +604,14 @@ program.pipe(
 
 - ✅ **Only import from library roots**
   ```typescript
-  import { Effect, Layer, Data } from "effect"
-  import { FileSystem, Command, Terminal, HttpClient } from "@effect/platform"
-  import { NodeFileSystem, NodeHttpClient } from "@effect/platform-node"
+  import { Effect, Layer, Data } from "effect";
+  import { FileSystem, Command, Terminal, HttpClient } from "@effect/platform";
+  import { NodeFileSystem, NodeHttpClient } from "@effect/platform-node";
   ```
 - ❌ **Never import from subpaths**
   ```typescript
   // WRONG:
-  import { FileSystem } from "@effect/platform/FileSystem"
+  import { FileSystem } from "@effect/platform/FileSystem";
   ```
 
 ### Service Definition Pattern
@@ -583,16 +619,16 @@ program.pipe(
 ```typescript
 export class MyService extends Effect.Service<MyService>()("MyService", {
   effect: Effect.fn("MyService.make")(function* () {
-    const dep = yield* SomeDependency
+    const dep = yield* SomeDependency;
 
     return {
       myMethod: (arg: string) =>
         Effect.fn("myMethod")(function* () {
           // implementation
-        })
-    }
+        }),
+    };
   }),
-  dependencies: [SomeDependency.Default]
+  dependencies: [SomeDependency.Default],
 }) {}
 ```
 
@@ -661,37 +697,34 @@ Create mock layers for testing:
 
 ```typescript
 // test/layers/mock-file-system.ts
-export const MockFileSystemLayer = Layer.succeed(
-  FileSystemService,
-  {
-    readJson: () => Effect.succeed({}),
-    writeJson: () => Effect.void,
-    exists: () => Effect.succeed(false),
-    // ... other methods
-  }
-)
+export const MockFileSystemLayer = Layer.succeed(FileSystemService, {
+  readJson: () => Effect.succeed({}),
+  writeJson: () => Effect.void,
+  exists: () => Effect.succeed(false),
+  // ... other methods
+});
 ```
 
 ### Test Pattern
 
 ```typescript
-import { Effect } from "effect"
-import { describe, it, expect } from "vitest"
-import { startCommand } from "../src/commands/start.js"
+import { Effect } from "effect";
+import { describe, it, expect } from "vitest";
+import { startCommand } from "../src/commands/start.js";
 
 describe("start command", () => {
   it("should start NodeCG", async () => {
     const result = await Effect.fn("test")(function* () {
-      return yield* startCommand({ disableSourceMaps: false })
+      return yield* startCommand({ disableSourceMaps: false });
     }).pipe(
       Effect.provide(MockFileSystemLayer),
       Effect.provide(MockPathServiceLayer),
-      Effect.runPromise
-    )
+      Effect.runPromise,
+    );
 
-    expect(result).toBeDefined()
-  })
-})
+    expect(result).toBeDefined();
+  });
+});
 ```
 
 ### Test Layers Needed
@@ -742,12 +775,15 @@ describe("start command", () => {
 ### Known Challenges
 
 1. **Stream handling** - Tarball extraction with Effect streams
+
    - **Mitigation**: Use `Readable.from()` to convert Effect Stream → Node stream for tar
 
 2. **Dynamic imports** - Start command imports NodeCG dynamically
+
    - **Mitigation**: Wrap in `Effect.promise()`
 
 3. **JSON Schema runtime** - Cannot convert JSON Schema → Effect Schema
+
    - **Mitigation**: Keep `ajv` and wrap in JsonSchemaService
 
 4. **Process spawning** - Some commands need stdout streaming
@@ -756,6 +792,7 @@ describe("start command", () => {
 ### Rollback Plan
 
 If migration blocked:
+
 1. Keep current implementation in separate branch
 2. Can revert to pre-migration state
 3. Migration is isolated to `workspaces/cli` only
@@ -783,7 +820,7 @@ If migration blocked:
 
 ```typescript
 // Effect core
-import { Effect, Layer, Data, Context, pipe, Option } from "effect"
+import { Effect, Layer, Data, Context, pipe, Option } from "effect";
 
 // Platform
 import {
@@ -793,8 +830,8 @@ import {
   HttpClient,
   HttpClientRequest,
   HttpClientError,
-  HttpClientResponse
-} from "@effect/platform"
+  HttpClientResponse,
+} from "@effect/platform";
 
 // Platform Node
 import {
@@ -802,19 +839,19 @@ import {
   NodeHttpClient,
   NodeTerminal,
   NodeContext,
-  NodeRuntime
-} from "@effect/platform-node"
+  NodeRuntime,
+} from "@effect/platform-node";
 
 // CLI
-import { Command, Args, Options, CliApp } from "@effect/cli"
+import { Command, Args, Options, CliApp } from "@effect/cli";
 
 // Schema
-import { Schema } from "@effect/schema"
+import { Schema } from "@effect/schema";
 
 // Node built-ins (use node: prefix)
-import path from "node:path"
-import { Readable } from "node:stream"
-import { pipeline } from "node:stream/promises"
+import path from "node:path";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 ```
 
 ---
@@ -822,33 +859,33 @@ import { pipeline } from "node:stream/promises"
 ## Appendix B: Service Template
 
 ```typescript
-import { Effect, Data } from "effect"
+import { Effect, Data } from "effect";
 
 export class MyServiceError extends Data.TaggedError("MyServiceError")<{
-  readonly message: string
+  readonly message: string;
   // ... other fields
 }> {}
 
 export class MyService extends Effect.Service<MyService>()("MyService", {
   effect: Effect.fn("MyService.make")(function* () {
-    const dep1 = yield* Dependency1
-    const dep2 = yield* Dependency2
+    const dep1 = yield* Dependency1;
+    const dep2 = yield* Dependency2;
 
     return {
       method1: (arg: string) =>
         Effect.fn("method1")(function* () {
           // Implementation
-          return yield* someEffect
+          return yield* someEffect;
         }),
 
       method2: (arg: number) =>
         Effect.fn("method2")(function* () {
           // Implementation
-          return yield* anotherEffect
-        })
-    }
+          return yield* anotherEffect;
+        }),
+    };
   }),
-  dependencies: [Dependency1.Default, Dependency2.Default]
+  dependencies: [Dependency1.Default, Dependency2.Default],
 }) {}
 ```
 
@@ -857,8 +894,8 @@ export class MyService extends Effect.Service<MyService>()("MyService", {
 ## Appendix C: Command Template
 
 ```typescript
-import { Effect } from "effect"
-import { Command, Args, Options } from "@effect/cli"
+import { Effect } from "effect";
+import { Command, Args, Options } from "@effect/cli";
 
 export const myCommand = Command.make(
   "my-command",
@@ -867,25 +904,25 @@ export const myCommand = Command.make(
     optionalArg: Args.text({ name: "opt" }).pipe(Args.optional),
     flag: Options.boolean("flag").pipe(
       Options.withAlias("f"),
-      Options.optional
+      Options.optional,
     ),
     textOption: Options.text("option").pipe(
-      Options.withDefault("default-value")
-    )
+      Options.withDefault("default-value"),
+    ),
   },
   ({ requiredArg, optionalArg, flag, textOption }) =>
     Effect.fn("myCommand")(function* () {
-      const service1 = yield* Service1
-      const service2 = yield* Service2
+      const service1 = yield* Service1;
+      const service2 = yield* Service2;
 
       // Command implementation
-      yield* service1.doSomething(requiredArg)
+      yield* service1.doSomething(requiredArg);
 
       if (flag) {
-        yield* service2.doSomethingElse()
+        yield* service2.doSomethingElse();
       }
-    })
-)
+    }),
+);
 ```
 
 ---

@@ -1,9 +1,11 @@
-import { Effect, Option } from "effect";
-import { Command, Args, Options } from "@effect/cli";
-import { FileSystemService } from "../services/file-system.js";
-import { TerminalService } from "../services/terminal.js";
-import { JsonSchemaService } from "../services/json-schema.js";
 import path from "node:path";
+
+import { Args, Command, Options } from "@effect/cli";
+import { Effect, Option } from "effect";
+
+import { FileSystemService } from "../services/file-system.js";
+import { JsonSchemaService } from "../services/json-schema.js";
+import { TerminalService } from "../services/terminal.js";
 
 export const schemaTypesCommand = Command.make(
 	"schema-types",
@@ -59,13 +61,16 @@ export const schemaTypesCommand = Command.make(
 				yield* terminal.writeLine(output);
 			});
 
-			const compilePromises: Array<Effect.Effect<void, unknown, unknown>> = [];
+			const compilePromises: Effect.Effect<void, unknown, unknown>[] = [];
 
 			if (configSchema) {
 				const configSchemaExists = yield* fs.exists(configSchemaPath);
 				if (configSchemaExists) {
 					compilePromises.push(
-						compile(configSchemaPath, path.resolve(outDir, "configschema.d.ts")),
+						compile(
+							configSchemaPath,
+							path.resolve(outDir, "configschema.d.ts"),
+						),
 					);
 				}
 			}
@@ -83,7 +88,9 @@ export const schemaTypesCommand = Command.make(
 			yield* Effect.all(compilePromises, { concurrency: "unbounded" });
 
 			yield* Effect.sync(() => {
-				(process.emit as unknown as (event: string) => void)("schema-types-done");
+				(process.emit as unknown as (event: string) => void)(
+					"schema-types-done",
+				);
 			});
 		}),
 );

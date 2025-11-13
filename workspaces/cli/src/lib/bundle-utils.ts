@@ -1,9 +1,11 @@
+import path from "node:path";
+
 import { Effect } from "effect";
+
 import { FileSystemService } from "../services/file-system.js";
 import { NpmService } from "../services/npm.js";
-import { TerminalService } from "../services/terminal.js";
 import { PathService } from "../services/path.js";
-import path from "node:path";
+import { TerminalService } from "../services/terminal.js";
 
 export const installBundleDeps = Effect.fn("installBundleDeps")(function* (
 	bundlePath: string,
@@ -26,9 +28,7 @@ export const installBundleDeps = Effect.fn("installBundleDeps")(function* (
 
 	const hasYarnLock = yield* fs.exists(path.join(bundlePath, "yarn.lock"));
 
-	yield* terminal.write(
-		`Installing npm dependencies (dev: ${installDev})... `,
-	);
+	yield* terminal.write(`Installing npm dependencies (dev: ${installDev})... `);
 
 	if (hasYarnLock) {
 		yield* npm.yarnInstall(bundlePath, !installDev);

@@ -1,9 +1,11 @@
-import { Effect, Option } from "effect";
-import { Command, Args, Options } from "@effect/cli";
-import { FileSystemService } from "../services/file-system.js";
-import { TerminalService } from "../services/terminal.js";
-import { PathService } from "../services/path.js";
 import path from "node:path";
+
+import { Args, Command, Options } from "@effect/cli";
+import { Effect, Option } from "effect";
+
+import { FileSystemService } from "../services/file-system.js";
+import { PathService } from "../services/path.js";
+import { TerminalService } from "../services/terminal.js";
 
 export const uninstallCommand = Command.make(
 	"uninstall",

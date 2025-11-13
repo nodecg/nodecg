@@ -1,11 +1,12 @@
+import { Args, Command, Options } from "@effect/cli";
 import { Effect, Option } from "effect";
-import { Command, Args, Options } from "@effect/cli";
 import semver from "semver";
+
 import { FileSystemService } from "../services/file-system.js";
-import { TerminalService } from "../services/terminal.js";
-import { PathService } from "../services/path.js";
 import { HttpService } from "../services/http.js";
 import { NpmService } from "../services/npm.js";
+import { PathService } from "../services/path.js";
+import { TerminalService } from "../services/terminal.js";
 
 export const setupCommand = Command.make(
 	"setup",
@@ -34,8 +35,9 @@ export const setupCommand = Command.make(
 
 			let isUpdate = false;
 
-			const containsNodeCG =
-				yield* pathService.pathContainsNodeCG(process.cwd());
+			const containsNodeCG = yield* pathService.pathContainsNodeCG(
+				process.cwd(),
+			);
 			if (containsNodeCG) {
 				if (!isUpdateFlag) {
 					yield* terminal.writeError(
@@ -84,9 +86,10 @@ export const setupCommand = Command.make(
 			let current: string | undefined;
 			let downgrade = false;
 			if (isUpdate) {
-				current = yield* pathService
-					.getCurrentNodeCGVersion()
-					.pipe(Effect.option, Effect.map((opt) => Option.getOrElse(opt, () => undefined)));
+				current = yield* pathService.getCurrentNodeCGVersion().pipe(
+					Effect.option,
+					Effect.map((opt) => Option.getOrElse(opt, () => undefined)),
+				);
 				if (current && semver.eq(current, target)) {
 					yield* terminal.writeLine(
 						`The target version (${target}) is equal to the current version (${current}). No action will be taken.`,
@@ -98,9 +101,7 @@ export const setupCommand = Command.make(
 					const msg = `You are about to downgrade from ${current} to ${target}. Are you sure?`;
 					const confirmed = yield* terminal.confirm(msg);
 					if (!confirmed) {
-						yield* terminal.writeLine(
-							"Aborting setup due to user response.",
-						);
+						yield* terminal.writeLine("Aborting setup due to user response.");
 						return;
 					}
 				}
@@ -113,9 +114,7 @@ export const setupCommand = Command.make(
 			const release = yield* npm.getRelease("nodecg", target);
 
 			if (current) {
-				const verb = semver.lt(target, current)
-					? "Downgrading"
-					: "Upgrading";
+				const verb = semver.lt(target, current) ? "Downgrading" : "Upgrading";
 				yield* terminal.write(`${verb} from `);
 				yield* terminal.writeColored(current, "magenta");
 				yield* terminal.write(` to `);

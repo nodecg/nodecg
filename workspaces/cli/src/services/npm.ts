@@ -1,6 +1,7 @@
-import { Effect, Data, Schema } from "effect";
-import { HttpService } from "./http.js";
+import { Data, Effect, Schema } from "effect";
+
 import { CommandService } from "./command.js";
+import { HttpService } from "./http.js";
 
 export class NpmError extends Data.TaggedError("NpmError")<{
 	readonly message: string;
@@ -59,7 +60,10 @@ export class NpmService extends Effect.Service<NpmService>()("NpmService", {
 				);
 			}),
 
-			install: Effect.fn("install")(function* (cwd: string, production: boolean) {
+			install: Effect.fn("install")(function* (
+				cwd: string,
+				production: boolean,
+			) {
 				const args = production ? ["install", "--production"] : ["install"];
 				yield* cmd.exec("npm", args, { cwd }).pipe(
 					Effect.mapError(
@@ -90,5 +94,4 @@ export class NpmService extends Effect.Service<NpmService>()("NpmService", {
 		};
 	}),
 	dependencies: [HttpService.Default, CommandService.Default],
-	},
-) {}
+}) {}

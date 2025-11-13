@@ -1,4 +1,5 @@
-import { Effect, Data } from "effect";
+import { Data, Effect } from "effect";
+
 import { CommandService } from "./command.js";
 
 export class GitError extends Data.TaggedError("GitError")<{

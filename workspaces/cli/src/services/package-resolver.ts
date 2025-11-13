@@ -1,4 +1,4 @@
-import { Effect, Data } from "effect";
+import { Data, Effect } from "effect";
 import HostedGitInfo from "hosted-git-info";
 import npa from "npm-package-arg";
 
@@ -9,15 +9,15 @@ export class PackageResolverError extends Data.TaggedError(
 	readonly spec: string;
 }> {}
 
-export type GitRepoInfo = {
+export interface GitRepoInfo {
 	url: string;
 	name: string;
-};
+}
 
-export type PackageSpec = {
+export interface PackageSpec {
 	repo: string;
 	range: string;
-};
+}
 
 export class PackageResolverService extends Effect.Service<PackageResolverService>()(
 	"PackageResolverService",

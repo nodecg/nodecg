@@ -1,19 +1,21 @@
-import { Effect } from "effect";
-import { Command, Options } from "@effect/cli";
-import { FileSystemService } from "../services/file-system.js";
-import { PathService } from "../services/path.js";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const recursivelyFindProject = Effect.fn("recursivelyFindProject")(function* (
+import { Command, Options } from "@effect/cli";
+import { Effect } from "effect";
+
+import { FileSystemService } from "../services/file-system.js";
+import { PathService } from "../services/path.js";
+
+const recursivelyFindProject: (
 	startDir: string,
-): Effect.Effect<string, Error, FileSystemService> {
+) => Effect.Effect<string, Error, FileSystemService> = Effect.fn(
+	"recursivelyFindProject",
+)(function* (startDir: string) {
 	const fs = yield* FileSystemService;
 
 	if (!path.isAbsolute(startDir)) {
-		return yield* Effect.fail(
-			new Error("startDir must be an absolute path"),
-		);
+		return yield* Effect.fail(new Error("startDir must be an absolute path"));
 	}
 
 	const packageJsonPath = path.join(startDir, "package.json");
@@ -47,24 +49,22 @@ export const startCommand = Command.make(
 
 			const containsNodeCG = yield* pathService.pathContainsNodeCG(projectDir);
 			if (containsNodeCG) {
-				yield* Effect.promise(() =>
-					import(pathToFileURL(path.join(projectDir, "index.js")).href),
+				yield* Effect.promise(
+					() => import(pathToFileURL(path.join(projectDir, "index.js")).href),
 				);
 				return;
 			}
 
-			const nodecgDependencyPath = path.join(
-				projectDir,
-				"node_modules/nodecg",
-			);
+			const nodecgDependencyPath = path.join(projectDir, "node_modules/nodecg");
 			const hasNodeCGDep =
 				yield* pathService.pathContainsNodeCG(nodecgDependencyPath);
 
 			if (hasNodeCGDep) {
-				yield* Effect.promise(() =>
-					import(
-						pathToFileURL(path.join(nodecgDependencyPath, "index.js")).href
-					),
+				yield* Effect.promise(
+					() =>
+						import(
+							pathToFileURL(path.join(nodecgDependencyPath, "index.js")).href
+						),
 				);
 			}
 		}),

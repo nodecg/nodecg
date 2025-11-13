@@ -7,10 +7,12 @@ All type errors resolved. Build passes. Ready for testing.
 ## Completed
 
 ### Phase 1: Dependencies
+
 - ✅ Added all Effect dependencies (effect 3.19.3, @effect/cli 0.72.1, @effect/platform 0.93.0, @effect/platform-node 0.100.0, @effect/schema 0.75.5)
 - ✅ Removed old dependencies (commander, chalk, nano-spawn, @inquirer/prompts)
 
 ### Phase 2-3: Services Created (9 services)
+
 - ✅ FileSystemService - File I/O, JSON, tar extraction
 - ✅ TerminalService - Terminal I/O, colors, prompts
 - ✅ HttpService - HTTP requests, JSON, streams
@@ -22,10 +24,12 @@ All type errors resolved. Build passes. Ready for testing.
 - ✅ PathService - NodeCG path utilities
 
 ### Phase 4: Utilities Created
+
 - ✅ semver.ts - Pure semver functions
 - ✅ bundle-utils.ts - Bundle dependency installation
 
 ### Phase 5: Commands Migrated (6 commands)
+
 - ✅ start.ts - Start NodeCG
 - ✅ uninstall.ts - Uninstall bundle
 - ✅ defaultconfig.ts - Generate default config
@@ -34,10 +38,12 @@ All type errors resolved. Build passes. Ready for testing.
 - ✅ install.ts - Install bundle from git
 
 ### Phase 6: Main CLI
+
 - ✅ index.ts - CLI app with @effect/cli Command.run pattern
 - ✅ bin/nodecg.ts - Entry point with layer composition
 
 ### Phase 7: Type Checking
+
 - ✅ Fixed Effect.Service pattern usage
 - ✅ Fixed command handler signatures (Effect.gen instead of Effect.fn)
 - ✅ Fixed Option type handling in all commands
@@ -49,37 +55,45 @@ All type errors resolved. Build passes. Ready for testing.
 ## Key Issues Fixed
 
 ### 1. Platform Service Dependencies
+
 **Problem:** Services were trying to depend on platform services using `.Default`:
+
 ```typescript
 // ❌ Wrong - platform services don't have .Default
-dependencies: [FileSystem.FileSystem.Default]
+dependencies: [FileSystem.FileSystem.Default];
 ```
 
 **Solution:** Removed dependencies array - platform service requirements flow through context naturally:
+
 ```typescript
 // ✅ Correct - no dependencies needed for platform services
 export class FileSystemService extends Effect.Service<FileSystemService>()(
   "FileSystemService",
   {
     effect: Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;  // Just yield directly
-      return { /* methods */ };
+      const fs = yield* FileSystem.FileSystem; // Just yield directly
+      return {
+        /* methods */
+      };
     }),
   },
 ) {}
 ```
 
 ### 2. Missing NodePath Layer
+
 **Problem:** CLI requires `FileSystem | Path | Terminal` but NodePath.layer wasn't provided.
 
 **Solution:** Added `NodePath.layer` to MainLayer composition.
 
 ### 3. Option Type Handling
+
 **Problem:** Commands passing `Option<T>` to functions expecting `T`.
 
 **Solution:** Used `Option.getOrElse()`, `Option.getOrNull()`, and `Option.match()` to unwrap.
 
 ### 4. Effect.gen Pattern
+
 **Problem:** Using `Effect.fn("name")(fn*(){})` throughout.
 
 **Solution:** Replaced with `Effect.gen(function* () {})` pattern.
@@ -87,6 +101,7 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 ## Architecture Summary
 
 The migration follows Effect best practices:
+
 - ✅ No `any` types (except inherited from libraries)
 - ✅ No type assertions (except final runMain call for residual context)
 - ✅ Effect.gen pattern throughout
@@ -101,18 +116,19 @@ The migration follows Effect best practices:
 Services use the Effect.Service pattern with automatic `.Default` layer generation:
 
 ```typescript
-export class MyService extends Effect.Service<MyService>()(
-  "MyService",
-  {
-    sync: () => ({ /* methods */ }),
-    // or
-    effect: Effect.gen(function* () {
-      const dep = yield* OtherService;  // Access dependencies
-      return { /* methods */ };
-    }),
-    dependencies: [OtherService.Default],  // Only for custom Effect.Services
-  },
-) {}
+export class MyService extends Effect.Service<MyService>()("MyService", {
+  sync: () => ({
+    /* methods */
+  }),
+  // or
+  effect: Effect.gen(function* () {
+    const dep = yield* OtherService; // Access dependencies
+    return {
+      /* methods */
+    };
+  }),
+  dependencies: [OtherService.Default], // Only for custom Effect.Services
+}) {}
 ```
 
 **Key insight:** Platform services (FileSystem, Terminal, HttpClient, etc.) are Context.Tags and should NOT be in the dependencies array. They're accessed via `yield*` and their requirements flow through the context naturally.
@@ -144,17 +160,20 @@ const MainLayer = Layer.mergeAll(
 ## Files Modified
 
 **New Files:**
+
 - `src/services/*.ts` (9 files)
 - `src/lib/semver.ts`
 - `src/lib/bundle-utils.ts`
 
 **Modified Files:**
+
 - `src/commands/*.ts` (6 files)
 - `src/index.ts`
 - `src/bin/nodecg.ts`
 - `package.json`
 
 **Deleted Files:**
+
 - `src/commands/index.ts`
 - `src/lib/util.ts`
 - `src/lib/fetch-tags.ts`
@@ -174,6 +193,7 @@ const MainLayer = Layer.mergeAll(
 ## Testing Checklist
 
 Commands to test manually:
+
 - [ ] `nodecg setup` - Install NodeCG
 - [ ] `nodecg setup <version>` - Install specific version
 - [ ] `nodecg setup <version> -u` - Update NodeCG

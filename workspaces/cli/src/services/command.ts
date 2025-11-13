@@ -1,5 +1,5 @@
-import { Effect, Data } from "effect";
 import { Command as PlatformCommand } from "@effect/platform";
+import { Data, Effect } from "effect";
 
 export class CommandError extends Data.TaggedError("CommandError")<{
 	readonly message: string;
@@ -13,7 +13,7 @@ export class CommandService extends Effect.Service<CommandService>()(
 		sync: () => ({
 			exec: Effect.fn("exec")(function* (
 				cmd: string,
-				args: ReadonlyArray<string>,
+				args: readonly string[],
 				options?: { cwd?: string },
 			) {
 				let command = PlatformCommand.make(cmd, ...args);
@@ -44,7 +44,7 @@ export class CommandService extends Effect.Service<CommandService>()(
 
 			string: Effect.fn("string")(function* (
 				cmd: string,
-				args: ReadonlyArray<string>,
+				args: readonly string[],
 				options?: { cwd?: string },
 			) {
 				let command = PlatformCommand.make(cmd, ...args);

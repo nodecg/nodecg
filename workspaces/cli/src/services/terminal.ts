@@ -1,5 +1,5 @@
-import { Effect, Data } from "effect";
 import { Terminal } from "@effect/platform";
+import { Data, Effect } from "effect";
 
 export class TerminalError extends Data.TaggedError("TerminalError")<{
 	readonly message: string;

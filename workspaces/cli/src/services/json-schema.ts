@@ -1,7 +1,8 @@
-import { Effect, Data } from "effect";
-import { FileSystemService } from "./file-system.js";
 import Ajv from "ajv";
+import { Data, Effect } from "effect";
 import { compileFromFile } from "json-schema-to-typescript";
+
+import { FileSystemService } from "./file-system.js";
 
 export class JsonSchemaError extends Data.TaggedError("JsonSchemaError")<{
 	readonly message: string;
@@ -17,7 +18,9 @@ export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 			const fs = yield* FileSystemService;
 
 			return {
-				applyDefaults: Effect.fn("applyDefaults")(function* (schemaPath: string) {
+				applyDefaults: Effect.fn("applyDefaults")(function* (
+					schemaPath: string,
+				) {
 					const schemaContent = yield* fs.readFileString(schemaPath).pipe(
 						Effect.mapError(
 							() =>
@@ -112,6 +115,6 @@ export class JsonSchemaService extends Effect.Service<JsonSchemaService>()(
 				}),
 			};
 		}),
-	dependencies: [FileSystemService.Default],
+		dependencies: [FileSystemService.Default],
 	},
 ) {}

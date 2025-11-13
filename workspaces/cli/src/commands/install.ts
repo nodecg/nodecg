@@ -1,13 +1,15 @@
+import path from "node:path";
+
+import { Args, Command, Options } from "@effect/cli";
 import { Effect, Option } from "effect";
-import { Command, Args, Options } from "@effect/cli";
+import semver from "semver";
+
+import { installBundleDeps } from "../lib/bundle-utils.js";
 import { FileSystemService } from "../services/file-system.js";
-import { TerminalService } from "../services/terminal.js";
-import { PathService } from "../services/path.js";
 import { GitService } from "../services/git.js";
 import { PackageResolverService } from "../services/package-resolver.js";
-import { installBundleDeps } from "../lib/bundle-utils.js";
-import semver from "semver";
-import path from "node:path";
+import { PathService } from "../services/path.js";
+import { TerminalService } from "../services/terminal.js";
 
 export const installCommand = Command.make(
 	"install",
@@ -74,9 +76,9 @@ export const installCommand = Command.make(
 			if (target) {
 				yield* terminal.write(`Checking out version ${target}... `);
 
-				const checkoutEffect = git.checkout(target, bundlePath).pipe(
-					Effect.catchAll(() => git.checkout(`v${target}`, bundlePath)),
-				);
+				const checkoutEffect = git
+					.checkout(target, bundlePath)
+					.pipe(Effect.catchAll(() => git.checkout(`v${target}`, bundlePath)));
 
 				yield* checkoutEffect;
 				yield* terminal.writeColored("done!", "green");
