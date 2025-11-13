@@ -1,10 +1,12 @@
-import { Effect, Option } from "effect";
-import { Command, Args } from "@effect/cli";
-import { FileSystemService } from "../services/file-system.js";
-import { TerminalService } from "../services/terminal.js";
-import { PathService } from "../services/path.js";
-import { JsonSchemaService } from "../services/json-schema.js";
 import path from "node:path";
+
+import { Args,Command } from "@effect/cli";
+import { Effect, Option } from "effect";
+
+import { FileSystemService } from "../services/file-system.js";
+import { JsonSchemaService } from "../services/json-schema.js";
+import { PathService } from "../services/path.js";
+import { TerminalService } from "../services/terminal.js";
 
 export const defaultconfigCommand = Command.make(
 	"defaultconfig",
