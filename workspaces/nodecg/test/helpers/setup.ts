@@ -80,6 +80,8 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 	let loginPage: puppeteer.Page | null = null;
 
 	afterAll(async () => {
+		await server.stop();
+
 		await Promise.all([
 			fs.promises
 				.rm(tmpDir, { recursive: true, force: true })

@@ -124,6 +124,8 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 	let loginPage: puppeteer.Page | null = null;
 
 	afterAll(async () => {
+		await server.stop();
+
 		// Restore original cwd
 		process.chdir(originalCwd);
 
