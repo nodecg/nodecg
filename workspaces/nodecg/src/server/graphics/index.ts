@@ -82,7 +82,7 @@ export class GraphicsLib {
 		});
 
 		app.get(
-			"/bundles/:bundleName/bower_components/:filePath(.*)",
+			"/bundles/:bundleName/bower_components/:filePath(*)",
 			(req, res, next) => {
 				const { bundleName } = req.params;
 				const bundle = bundleManager.find(bundleName!);
@@ -100,7 +100,7 @@ export class GraphicsLib {
 
 		// This isn't really a graphics-specific thing, should probably be in the main server lib.
 		app.get(
-			"/bundles/:bundleName/node_modules/:filePath(.*)",
+			"/bundles/:bundleName/node_modules/:filePath(*)",
 			async (req, res, next) => {
 				const { bundleName } = req.params;
 				if (!bundleName) {
@@ -129,25 +129,14 @@ export class GraphicsLib {
 						);
 						if (rootPackageJson.name === bundleName) {
 							sendNodeModulesFile(
-								[path.join(rootPaths.runtimeRootPath, "node_modules")],
 								bundle.dir,
+								rootPaths.runtimeRootPath,
 								filePath,
 								res,
 								next,
 							);
 						} else {
-							const bundleDir = path.join(
-								rootPaths.getRuntimeRoot(),
-								"bundles",
-								bundleName,
-							);
-							sendNodeModulesFile(
-								[path.join(bundleDir, "node_modules")],
-								bundle.dir,
-								filePath,
-								res,
-								next,
-							);
+							sendNodeModulesFile(bundle.dir, bundle.dir, filePath, res, next);
 						}
 					} catch (error) {
 						next(error);

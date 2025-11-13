@@ -4,10 +4,8 @@ import { testDirPath } from "../../../test/helpers/test-dir-path";
 import { parseBundle } from ".";
 
 test("should error when package.json does not exist", () => {
-	expect(
-		parseBundle.bind(parseBundle, testDirPath("")),
-	).toThrowErrorMatchingInlineSnapshot(
-		`[Error: Bundle at path ./workspaces/nodecg/test does not contain a package.json!]`,
+	expect(parseBundle.bind(parseBundle, testDirPath(""))).toThrowError(
+		/^Bundle at path \.\/workspaces(\/|\\)nodecg(\/|\\)test does not contain a package\.json!$/,
 	);
 });
 

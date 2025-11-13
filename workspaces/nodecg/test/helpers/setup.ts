@@ -81,13 +81,14 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 
 	afterAll(async () => {
 		await Promise.all([
+			browser?.close(),
+			server.stop(),
 			fs.promises
 				.rm(tmpDir, { recursive: true, force: true })
 				.catch((error) => {
 					// Ignore errors when cleaning up the temp folder
 					console.error(error);
 				}),
-			browser?.close(),
 		]);
 	});
 

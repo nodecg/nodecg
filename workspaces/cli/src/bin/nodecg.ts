@@ -1,23 +1,24 @@
 #!/usr/bin/env node
-import { Effect, Layer } from "effect";
 import {
+	NodeContext,
 	NodeFileSystem,
 	NodeHttpClient,
-	NodeTerminal,
-	NodeContext,
 	NodePath,
 	NodeRuntime,
+	NodeTerminal,
 } from "@effect/platform-node";
+import { Effect, Layer } from "effect";
+
 import { cli } from "../index.js";
-import { FileSystemService } from "../services/file-system.js";
-import { TerminalService } from "../services/terminal.js";
-import { HttpService } from "../services/http.js";
 import { CommandService } from "../services/command.js";
+import { FileSystemService } from "../services/file-system.js";
 import { GitService } from "../services/git.js";
-import { NpmService } from "../services/npm.js";
+import { HttpService } from "../services/http.js";
 import { JsonSchemaService } from "../services/json-schema.js";
+import { NpmService } from "../services/npm.js";
 import { PackageResolverService } from "../services/package-resolver.js";
 import { PathService } from "../services/path.js";
+import { TerminalService } from "../services/terminal.js";
 
 const program = Effect.gen(function* () {
 	const git = yield* GitService;

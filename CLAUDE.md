@@ -36,6 +36,15 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - **E2E fixtures**: Browser pages are lazy-loaded and reused within test file
 - **Working directory**: Vitest runs from repo root, so all test paths must be `workspaces/nodecg/test/...`
 
+### Test Fixtures
+
+- **Location**: `workspaces/nodecg/test/fixtures/nodecg-core/`
+- **Test fixtures are version controlled**: node_modules in test fixtures are tracked by git
+- **Gitignore patterns**: `.gitignore` has negation patterns for test fixtures:
+  - `!**/test/**/node_modules/` - un-ignores node_modules in test directories
+  - `!**/test/**/node_modules/**/dist/` - un-ignores dist directories inside test node_modules
+- **Creating test packages**: When adding fixture packages, verify they're not gitignored with `git check-ignore -v <path>`
+
 ### Key Test Helpers
 
 - `workspaces/nodecg/test/helpers/setup.ts`: Creates NodeCG server + Puppeteer browser per test file
@@ -49,6 +58,14 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - **Server URL**: `server.getUrl()` or `server.getUrl('/path')`
 - **Waiting for changes**: Use Puppeteer's `page.waitForSelector()`, `page.waitForFunction()`
 - **Client-side evaluation**: `await page.evaluate(() => { ... })`
+
+### Test Coverage Guidelines
+
+- **Test nested paths thoroughly**: Express route parameters need tests for deeply nested paths (3+ levels)
+- **Test scoped packages**: Always include `@scope/package/file.js` patterns in route tests
+- **Dashboard routes**: `/node_modules/` route serves from nodecg installation to bundles
+- **Graphics routes**: `/bundles/:bundle/node_modules/` serves from bundle's own node_modules
+- **Legacy vs installed mode**: Test both modes separately as they have different node_modules resolution
 
 ### Build/Test Workflow
 

@@ -1,1 +1,1 @@
-require("./dist//server/bootstrap.js");
+require("./dist/server/bootstrap.js");

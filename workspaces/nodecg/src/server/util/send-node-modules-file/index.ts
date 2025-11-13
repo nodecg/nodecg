@@ -7,49 +7,39 @@ import { isChildPath } from "../is-child-path";
 import { sendFile } from "../send-file";
 
 export function recursivelyFindFileInNodeModules(
-	currentPath: string,
-	rootNodeModulesPath: string,
-	filePath: string,
+	startDir: string,
+	limitDir: string,
+	targetFilePath: string,
 ) {
-	const nodeModulesPath = path.join(currentPath, "node_modules");
-	const fileFullPath = path.join(nodeModulesPath, filePath);
-	if (!isChildPath(rootNodeModulesPath, fileFullPath)) {
-		return undefined;
-	}
-	if (fs.existsSync(fileFullPath)) {
+	const fileFullPath = path.join(startDir, "node_modules", targetFilePath);
+	if (isChildPath(limitDir, fileFullPath) && fs.existsSync(fileFullPath)) {
 		return fileFullPath;
 	}
-	return recursivelyFindFileInNodeModules(
-		path.join(currentPath, "../.."),
-		rootNodeModulesPath,
-		filePath,
-	);
+	const parentDir = path.dirname(startDir);
+	if (
+		parentDir === startDir ||
+		(limitDir !== parentDir && !isChildPath(limitDir, parentDir))
+	) {
+		return undefined;
+	}
+	return recursivelyFindFileInNodeModules(parentDir, limitDir, targetFilePath);
 }
 
 export function sendNodeModulesFile(
-	rootNodeModulesPaths: string[],
-	basePath: string,
+	startDir: string,
+	limitDir: string,
 	filePath: string,
 	res: express.Response,
 	next: express.NextFunction,
 ) {
-	let rootNodeModulesPath;
-	let fileFullPath;
-	for (const nodeModulesPath of rootNodeModulesPaths) {
-		const foundPath = recursivelyFindFileInNodeModules(
-			basePath,
-			nodeModulesPath,
-			filePath,
-		);
-		if (foundPath) {
-			fileFullPath = foundPath;
-			rootNodeModulesPath = nodeModulesPath;
-			break;
-		}
-	}
-	if (!fileFullPath || !rootNodeModulesPath) {
+	const foundPath = recursivelyFindFileInNodeModules(
+		startDir,
+		limitDir,
+		filePath,
+	);
+	if (!foundPath) {
 		res.sendStatus(404);
 		return;
 	}
-	sendFile(rootNodeModulesPath, fileFullPath, res, next);
+	sendFile(limitDir, foundPath, res, next);
 }

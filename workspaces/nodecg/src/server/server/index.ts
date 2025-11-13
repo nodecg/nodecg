@@ -5,6 +5,7 @@ import * as Sentry from "@sentry/node";
 import * as os from "os";
 
 import { config, filteredConfig, sentryEnabled } from "../config";
+import * as login from "../login";
 import { nodecgPackageJson } from "../util/nodecg-package-json";
 
 if (config.sentry?.enabled) {
@@ -224,7 +225,6 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 
 		if (config.login?.enabled) {
 			log.info("Login security enabled");
-			const login = await import("../login");
 			const { app: loginMiddleware, sessionMiddleware } =
 				login.createMiddleware(databaseAdapter, {
 					onLogin: (user) => {
