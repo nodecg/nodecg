@@ -1,6 +1,5 @@
-import { Effect, Data, Stream } from "effect";
+import { Effect, Data, Stream, Schema } from "effect";
 import { FileSystem } from "@effect/platform";
-import { Schema } from "@effect/schema";
 import * as tar from "tar";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
@@ -17,10 +16,10 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 			const fs = yield* FileSystem.FileSystem;
 
 			return {
-				readJson: Effect.fn("readJson")<A, I, R>(function* (
+				readJson: <A, I, R>(
 					path: string,
 					schema: Schema.Schema<A, I, R>,
-				) {
+				) => Effect.gen(function* () {
 					const content = yield* fs.readFileString(path).pipe(
 						Effect.mapError(
 							() =>
@@ -40,9 +39,9 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 								}),
 						),
 					);
-				}),
+				}).pipe(Effect.withSpan("readJson")),
 
-				writeJson: Effect.fn("writeJson")<A>(function* (path: string, data: A) {
+				writeJson: <A>(path: string, data: A) => Effect.gen(function* () {
 					yield* fs.writeFileString(path, JSON.stringify(data, null, 2)).pipe(
 						Effect.mapError(
 							() =>
@@ -52,7 +51,7 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 								}),
 						),
 					);
-				}),
+				}).pipe(Effect.withSpan("writeJson")),
 
 				exists: Effect.fn("exists")(function* (path: string) {
 					return yield* fs.exists(path).pipe(Effect.orElseSucceed(() => false));
@@ -127,10 +126,10 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 					);
 				}),
 
-				extractTarball: Effect.fn("extractTarball")<E>(function* (
+				extractTarball: <E>(
 					stream: Stream.Stream<Uint8Array, E, never>,
 					options?: { cwd?: string; strip?: number },
-				) {
+				) => Effect.gen(function* () {
 					// Convert Stream to ReadableStream
 					const readableStream = Stream.toReadableStream(stream);
 
@@ -149,7 +148,7 @@ export class FileSystemService extends Effect.Service<FileSystemService>()(
 								}),
 						),
 					);
-				}),
+				}).pipe(Effect.withSpan("extractTarball")),
 			};
 		}),
 	},

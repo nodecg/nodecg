@@ -1,7 +1,6 @@
-import { Effect, Data } from "effect";
+import { Effect, Data, Schema } from "effect";
 import { HttpService } from "./http.js";
 import { CommandService } from "./command.js";
-import { Schema } from "@effect/schema";
 
 export class NpmError extends Data.TaggedError("NpmError")<{
 	readonly message: string;

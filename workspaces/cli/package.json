@@ -28,7 +28,6 @@
     "@effect/cli": "^0.72.1",
     "@effect/platform": "^0.93.0",
     "@effect/platform-node": "^0.100.0",
-    "@effect/schema": "^0.75.5",
     "ajv": "^8.17.1",
     "effect": "^3.19.3",
     "hosted-git-info": "^8.0.2",

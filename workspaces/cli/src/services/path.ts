@@ -1,6 +1,5 @@
-import { Effect, Data } from "effect";
+import { Effect, Data, Schema } from "effect";
 import { FileSystemService } from "./file-system.js";
-import { Schema } from "@effect/schema";
 import path from "node:path";
 
 export class PathError extends Data.TaggedError("PathError")<{

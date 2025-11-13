@@ -1,6 +1,5 @@
-import { Effect, Data } from "effect";
+import { Effect, Data, Schema } from "effect";
 import { HttpClient, HttpClientRequest } from "@effect/platform";
-import { Schema } from "@effect/schema";
 
 export class HttpError extends Data.TaggedError("HttpError")<{
 	readonly message: string;
@@ -13,10 +12,10 @@ export class HttpService extends Effect.Service<HttpService>()("HttpService", {
 		const client = yield* HttpClient.HttpClient;
 
 		return {
-			fetchJson: Effect.fn("fetchJson")<A, I, R>(function* (
+			fetchJson: <A, I, R>(
 				url: string,
 				schema: Schema.Schema<A, I, R>,
-			) {
+			) => Effect.gen(function* () {
 				const response = yield* HttpClientRequest.get(url).pipe(
 					client.execute,
 					Effect.mapError(
@@ -43,7 +42,7 @@ export class HttpService extends Effect.Service<HttpService>()("HttpService", {
 						() => new HttpError({ message: `Invalid response schema`, url }),
 					),
 				);
-			}),
+			}).pipe(Effect.withSpan("fetchJson")),
 
 			fetchStream: Effect.fn("fetchStream")(function* (url: string) {
 				const response = yield* HttpClientRequest.get(url).pipe(

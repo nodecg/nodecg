@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Effect } from "effect";
-import { Schema } from "@effect/schema";
+import { Effect, Schema } from "effect";
 import { FileSystemService, FileSystemError } from "../../src/services/file-system.js";
 import { runEffect, runEffectExpectError } from "../helpers/test-runner.js";
 import { MockFileSystemServiceLayer } from "../helpers/mock-services.js";
