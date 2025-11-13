@@ -124,19 +124,18 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 	let loginPage: puppeteer.Page | null = null;
 
 	afterAll(async () => {
-		await server.stop();
-
 		// Restore original cwd
 		process.chdir(originalCwd);
 
 		await Promise.all([
+			browser?.close(),
+			server.stop(),
 			fs.promises
 				.rm(tmpDir, { recursive: true, force: true })
 				.catch((error) => {
 					// Ignore errors when cleaning up the temp folder
 					console.error(error);
 				}),
-			browser?.close(),
 		]);
 	});
 

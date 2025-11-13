@@ -80,16 +80,15 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 	let loginPage: puppeteer.Page | null = null;
 
 	afterAll(async () => {
-		await server.stop();
-
 		await Promise.all([
+			browser?.close(),
+			server.stop(),
 			fs.promises
 				.rm(tmpDir, { recursive: true, force: true })
 				.catch((error) => {
 					// Ignore errors when cleaning up the temp folder
 					console.error(error);
 				}),
-			browser?.close(),
 		]);
 	});
 
