@@ -147,6 +147,37 @@ import "../../test/mocks/foo-mock.js"; // Side-effect import
 - Tests must set `process.env.NODECG_ROOT` BEFORE importing any NodeCG modules
 - Use `getNodecgRoot()` function (respects NODECG_ROOT) instead of `rootPath` constant where appropriate
 
+## Effect-TS Migration
+
+NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for strategy and plans.
+
+**Migration Strategy**:
+- **Within packages**: Root-to-leaf (top-down) - single execution point at package boundary
+- **Across codebase**: Leaf-to-root (bottom-up) - extract isolated subsystems as workspace packages first
+- Each new package is fully Effect-native internally, called via `Effect.run*` from old code
+- Candidates listed in `docs/effect-migration/strategy.md` with complexity ratings
+
+**Effect Conventions**:
+- Top-level imports only: `"effect"`, `"@effect/platform"` (not subpaths)
+- Schemas suffix with `Schema`: `ConfigSchema` → `type Config`
+- Use `yield* Effect.log*()` for app logs, `yield* Console.*()` for debugging
+- Always use `Effect.fn("name")` for effect-returning functions (never `Effect.gen` for definitions)
+- Services created with `Effect.Service` (never Context API directly)
+- Tests use `@effect/vitest` for Effect testing utilities
+- Install Effect packages with `npm i @effect/package@latest` in workspace (never edit package.json directly)
+- No return type annotations (let TypeScript infer), no `any`, no type assertions
+- See `docs/effect-migration/strategy.md` for comprehensive coding guidelines
+
+**Migration Documentation**:
+- All migration work must be logged in `docs/effect-migration/log.md`
+- Log decisions, problems/solutions, patterns used, and lessons learned
+- See `docs/effect-migration/strategy.md` for migration approach and candidates
+
+**Existing fp-ts Code**:
+- `src/server/bundle-parser/` already uses fp-ts (IOEither, pipe, flow)
+- Migration from fp-ts → Effect is translation, not rewrite
+- Good reference for functional patterns in the codebase
+
 ## Common Pitfalls
 
 - Missing `.js` extension in imports (causes module resolution errors)
