@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { rootPaths } from "@nodecg/internal-util";
+import { rootPaths } from "@nodecg/internal-util/sync";
 import { argv } from "yargs";
 
 import { loadConfig } from "./loader";

@@ -1,7 +1,7 @@
 import * as os from "node:os";
 import * as path from "node:path";
 
-import { rootPaths } from "@nodecg/internal-util";
+import { rootPaths } from "@nodecg/internal-util/sync";
 import * as Sentry from "@sentry/node";
 import express from "express";
 

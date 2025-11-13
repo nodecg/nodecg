@@ -30,7 +30,6 @@ export default defineConfig({
 					name: "e2e-installed-mode",
 					include: ["workspaces/nodecg/test/installed-mode/**/*.test.{ts,tsx}"],
 					testTimeout: 30_000,
-					fileParallelism: false,
 				},
 			},
 			"workspaces/cli",

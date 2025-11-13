@@ -33,7 +33,7 @@ import fs = require("fs");
 import path = require("path");
 
 import { databaseAdapter as defaultAdapter } from "@nodecg/database-adapter-sqlite-legacy";
-import { rootPaths } from "@nodecg/internal-util";
+import { rootPaths } from "@nodecg/internal-util/sync";
 import bodyParser from "body-parser";
 import compression from "compression";
 import express from "express";

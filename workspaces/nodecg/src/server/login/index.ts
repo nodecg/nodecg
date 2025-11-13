@@ -6,7 +6,7 @@ import type {
 	Role,
 	User,
 } from "@nodecg/database-adapter-types";
-import { rootPaths } from "@nodecg/internal-util";
+import { rootPaths } from "@nodecg/internal-util/sync";
 import cookieParser from "cookie-parser";
 import express from "express";
 import expressSession from "express-session";

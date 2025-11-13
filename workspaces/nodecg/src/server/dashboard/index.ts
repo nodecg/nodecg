@@ -1,6 +1,6 @@
 import * as path from "node:path";
 
-import { rootPaths } from "@nodecg/internal-util";
+import { rootPaths } from "@nodecg/internal-util/sync";
 import express from "express";
 import { klona as clone } from "klona/json";
 

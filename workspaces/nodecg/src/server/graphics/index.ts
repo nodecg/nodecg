@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { isLegacyProject, rootPaths } from "@nodecg/internal-util";
+import { isLegacyProject, rootPaths } from "@nodecg/internal-util/sync";
 import express from "express";
 
 import type { RootNS } from "../../types/socket-protocol";

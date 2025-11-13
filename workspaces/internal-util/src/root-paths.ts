@@ -1,25 +1,31 @@
-import path from "node:path";
+import { Path } from "@effect/platform";
+import { Effect } from "effect";
 
-import { nearestProjectDirFromCwd } from "./find-nodejs-project.ts";
-import { isLegacyProject } from "./project-type.ts";
+import { findNodeJsProject } from "./find-project.ts";
+import { detectProjectType } from "./project-type.ts";
 
-const runtimeRootPath = nearestProjectDirFromCwd;
+export const getRuntimeRootPath = Effect.fn("getRuntimeRootPath")(function* (
+	cwd: string,
+) {
+	return yield* findNodeJsProject(cwd);
+});
 
-const nodecgInstalledPath = isLegacyProject
-	? path.join(runtimeRootPath, "workspaces/nodecg")
-	: path.join(runtimeRootPath, "node_modules/nodecg");
-
-export const rootPaths = {
-	runtimeRootPath,
-	nodecgInstalledPath,
-	/**
-	 * Allow overriding the runtime root path via environment variable mainly for tests
-	 */
-	getRuntimeRoot: () => {
-		const { NODECG_ROOT } = process.env;
-		if (NODECG_ROOT) {
-			return NODECG_ROOT;
-		}
-		return runtimeRootPath;
+export const getNodecgInstalledPath = Effect.fn("getNodecgInstalledPath")(
+	function* (cwd: string) {
+		const path = yield* Path.Path;
+		const projectRoot = yield* findNodeJsProject(cwd);
+		const projectType = yield* detectProjectType(projectRoot);
+		return projectType.isLegacyProject
+			? path.join(projectRoot, "workspaces/nodecg")
+			: path.join(projectRoot, "node_modules/nodecg");
 	},
-};
+);
+
+export const getRuntimeRoot = Effect.gen(function* () {
+	const nodecgRoot = process.env["NODECG_ROOT"];
+	if (nodecgRoot) {
+		return nodecgRoot;
+	}
+
+	return yield* getRuntimeRootPath(process.cwd());
+});

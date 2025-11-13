@@ -8,12 +8,13 @@
   },
   "type": "module",
   "exports": {
-    ".": "./dist/main.js",
+    ".": "./dist/index.js",
+    "./sync": "./dist/sync.js",
     "./package.json": "./package.json"
   },
-  "main": "./dist/main.js",
-  "module": "./dist/main.js",
-  "types": "./dist/main.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -24,11 +25,18 @@
     "typecheck-watch": "tsc --noEmit --watch --preserveWatchOutput",
     "watch": "tsdown --watch"
   },
+  "dependencies": {
+    "@effect/platform": "^0.93.1",
+    "@effect/platform-node": "^0.100.0",
+    "effect": "^3.19.3"
+  },
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.2",
+    "@effect/vitest": "^0.27.0",
     "publint": "^0.3.15",
     "tsdown": "^0.16.1",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
   },
   "publishConfig": {
     "access": "public",

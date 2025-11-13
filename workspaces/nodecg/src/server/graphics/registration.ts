@@ -1,4 +1,4 @@
-import { rootPaths } from "@nodecg/internal-util";
+import { rootPaths } from "@nodecg/internal-util/sync";
 import express from "express";
 import fs from "fs";
 import path from "path";

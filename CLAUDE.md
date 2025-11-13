@@ -7,7 +7,7 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - Core server (`src/server`)
 - CLI tools (`workspaces/cli`)
 - E2E tests using Puppeteer
-- Vitest 3.0.2 test framework
+- Vitest 3.2.4 test framework (downgraded from v4 for @effect/vitest compatibility)
 
 ## Project Structure
 
@@ -24,6 +24,8 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - **Output**: `workspaces/nodecg/dist/` (bundled server and client code as CommonJS)
 - **Required before tests**: Workspace packages must be built as tests import from their `dist/` directories
 - Build errors block test execution
+- **tsdown quirks**: Entry file named `index.ts` auto-generates proper `.` export; other names may need manual package.json config
+- **Package exports**: When adding subpath exports (e.g., `./sync`), ensure root `.` export exists and tsdown `exports: true` is enabled
 
 ## Test Infrastructure
 
@@ -183,9 +185,29 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Top-level imports only: `"effect"`, `"@effect/platform"` (not subpaths)
 - Schemas suffix with `Schema`: `ConfigSchema` → `type Config`
 - Use `yield* Effect.log*()` for app logs, `yield* Console.*()` for debugging
-- Always use `Effect.fn("name")` for effect-returning functions (never `Effect.gen` for definitions)
+- **Effect.fn syntax**: `Effect.fn("name")(function* (arg) { ... })` - NOT `Effect.fn("name", (arg) => Effect.gen(...))`
+  - `Effect.fn()` accepts additional arguments for piping: `Effect.fn(function* () { ... }, Effect.provide(layer))` instead of `.pipe(Effect.provide(layer))`
+- Prefer loops over recursion to avoid explicit return type annotations
 - Services created with `Effect.Service` (never Context API directly)
-- Tests use `@effect/vitest` for Effect testing utilities
+- Testing: Always use @effect/vitest for Effect tests (requires vitest 3.x, project uses 3.2.4)
+- **@effect/vitest test patterns**:
+  - `layer(SomeLayer)("suite", (it) => ...)` - Provide dependencies AND create describe block
+  - `describeWrapped("suite", (it) => ...)` - Create describe block without Layer
+  - `import { it } from "@effect/vitest"` - Top-level standalone tests
+  - **Always use parameter `it`** inside blocks (not imported `it`) for proper scoping and type inference
+  - Parameter `it` knows about Layer's provided services (TypeScript autocomplete works)
+  - Parameter `it` is scoped to describe block (hooks, context, lifecycle apply correctly)
+- **Test pattern (layer wrapper)**: `layer(TestLayer)("suite name", (it) => { it.effect("test", Effect.fn(function* () { ... }, provider)) })`
+  - `provider` is the test layer provider function (often passed automatically by the layer wrapper)
+  - Cleaner than manual `.pipe(Effect.provide(TestLayer))`
+  - Layer is automatically provided to all tests in the suite
+  - Use `Effect.fn` for test bodies (NOT `Effect.gen`)
+- **Error extraction in tests**: Use `Effect.flip` to extract failures
+  - `const error = yield* Effect.flip(someEffect)` - flips error channel to success, get error directly
+  - Simpler than `Effect.exit` (no Exit wrapper, no cause navigation)
+  - When providing custom layers: only provide additional/override layers, not ones already in suite's `layer()` wrapper
+  - Example: `yield* effect.pipe(Effect.provide(MockLayer), Effect.flip)` - don't re-provide layers from outer `layer()`
+  - Type narrowing: `assert(error instanceof ErrorType)` narrows TypeScript types automatically
 - Install Effect packages with `npm i @effect/package@latest` in workspace (never edit package.json directly)
 - No return type annotations (let TypeScript infer), no `any`, no type assertions
 - See `docs/effect-migration/strategy.md` for comprehensive coding guidelines

@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { isLegacyProject, rootPaths } from "@nodecg/internal-util";
+import { isLegacyProject, rootPaths } from "@nodecg/internal-util/sync";
 import $RefParser from "@nodecg/json-schema-lib";
 import hasha from "hasha";
 import { klona as clone } from "klona/json";
