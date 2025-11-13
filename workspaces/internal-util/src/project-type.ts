@@ -1,14 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { rootPath } from "./nodecg-root";
+import { nearestProjectDirFromCwd } from "./find-nodejs-project.ts";
 
-const rootPackageJson = fs.readFileSync(
-	path.join(rootPath, "package.json"),
-	"utf-8",
+const rootPackageJson = JSON.parse(
+	fs.readFileSync(path.join(nearestProjectDirFromCwd, "package.json"), "utf-8"),
 );
 
-export const isLegacyProject = JSON.parse(rootPackageJson).name === "nodecg";
+export const isLegacyProject = rootPackageJson.nodecgRoot === true;
 
 if (!isLegacyProject) {
 	console.warn(

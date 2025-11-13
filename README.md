@@ -22,6 +22,33 @@ Have questions about NodeCG, or just want to say 'hi'? [Join our Discord server]
 
 Full docs and API reference are available at https://nodecg.dev
 
+## Development
+
+To contribute to NodeCG development:
+
+```bash
+# Clone the repository
+git clone https://github.com/nodecg/nodecg.git
+cd nodecg
+
+# Install dependencies
+npm install
+
+# Run auto-rebuild + type-check on file changes
+npm run dev
+
+# Build all workspace packages
+npm run build
+
+# Run tests
+npx vitest run
+
+# Start NodeCG
+npm start
+```
+
+For more details on contributing to NodeCG core, see [the contributor guide on the official docs site](https://nodecg.dev/docs/working-on-nodecg-core)
+
 ## Goals
 
 The NodeCG project exists to accomplish the following goals:

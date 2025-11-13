@@ -2,13 +2,6 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
-
-		"noEmit": false,
-		"outDir": "dist",
-		"rootDir": "src",
-		"declaration": true,
-		"declarationMap": true,
-		"sourceMap": true
+		"experimentalDecorators": true
 	}
 }

@@ -11,34 +11,46 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 
 ## Project Structure
 
-- **Workspaces**: `workspaces/*` (internal-util, database-adapters, cli)
-- **Source**: `src/server`, `src/client`, `src/shared`
-- **Tests**: `test/**/*.test.ts` (E2E), `src/**/*.test.ts` (unit)
-- **Build output**: `out/` (server/client), `dist/` (compiled assets)
+- **Workspaces**: `workspaces/*` (nodecg, internal-util, database-adapters, cli)
+  - Main package is in `workspaces/nodecg/`
+- **Source**: `workspaces/nodecg/src/{server,client,shared}`
+- **Tests**: `workspaces/nodecg/test/**/*.test.ts` (E2E), `workspaces/nodecg/src/**/*.test.ts` (unit)
+- **Build output**: `workspaces/nodecg/dist/` (bundled server/client code)
+- **Root**: Minimal wrapper with `nodecgRoot: true` field, `index.js` wrapper pointing to workspace
 
 ## Build System
 
-- `npm run build` compiles TypeScript (`tsc`) and bundles client assets
-- **Output**: `out/` (compiled TS as CommonJS), `dist/` (client bundles)
-- **Required before tests**: Tests import from compiled `out/` directory
+- `npm run build` uses `tsdown` bundler to compile and bundle all workspaces
+- **Output**: `workspaces/nodecg/dist/` (bundled server and client code as CommonJS)
+- **Required before tests**: Workspace packages must be built as tests import from their `dist/` directories
 - Build errors block test execution
 
 ## Test Infrastructure
 
 ### Configuration
 
-- **Vitest config**: `vitest.config.mts` (base config)
-- **Vitest workspace**: `vitest.workspace.ts` (E2E serial, unit parallel)
-- **E2E tests**: Run serially (`maxWorkers: 1`) to avoid Puppeteer resource exhaustion
+- **Vitest config**: `vitest.config.mts` (base config at root)
+- **E2E tests**: Run serially to avoid Puppeteer resource exhaustion
 - **Unit tests**: Run in parallel (Vitest auto-scales based on CPU cores)
-- **Test setup**: `test/helpers/setup.ts` creates isolated temp directories per test file
+- **Test setup**: `workspaces/nodecg/test/helpers/setup.ts` creates isolated temp directories per test file
 - **E2E fixtures**: Browser pages are lazy-loaded and reused within test file
+- **Working directory**: Vitest runs from repo root, so all test paths must be `workspaces/nodecg/test/...`
+
+### Test Fixtures
+
+- **Location**: `workspaces/nodecg/test/fixtures/nodecg-core/`
+- **Test fixtures are version controlled**: node_modules in test fixtures are tracked by git
+- **Gitignore patterns**: `.gitignore` has negation patterns for test fixtures:
+  - `!**/test/**/node_modules/` - un-ignores node_modules in test directories
+  - `!**/test/**/node_modules/**/dist/` - un-ignores dist directories inside test node_modules
+- **Creating test packages**: When adding fixture packages, verify they're not gitignored with `git check-ignore -v <path>`
 
 ### Key Test Helpers
 
-- `test/helpers/setup.ts`: Creates NodeCG server + Puppeteer browser per test file
+- `workspaces/nodecg/test/helpers/setup.ts`: Creates NodeCG server + Puppeteer browser per test file
 - Each test file gets its own server instance, temp directory, and in-memory database
 - Browser pages are shared within a test file but not across files
+- Fixture paths in tests must be relative to repo root: `workspaces/nodecg/test/fixtures/...`
 
 ### Common Test Patterns
 
@@ -47,10 +59,18 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - **Waiting for changes**: Use Puppeteer's `page.waitForSelector()`, `page.waitForFunction()`
 - **Client-side evaluation**: `await page.evaluate(() => { ... })`
 
+### Test Coverage Guidelines
+
+- **Test nested paths thoroughly**: Express route parameters need tests for deeply nested paths (3+ levels)
+- **Test scoped packages**: Always include `@scope/package/file.js` patterns in route tests
+- **Dashboard routes**: `/node_modules/` route serves from nodecg installation to bundles
+- **Graphics routes**: `/bundles/:bundle/node_modules/` serves from bundle's own node_modules
+- **Legacy vs installed mode**: Test both modes separately as they have different node_modules resolution
+
 ### Build/Test Workflow
 
 1. `npm install` - Install dependencies
-2. `npm run build` - Build before testing
+2. `npm run build` - Build workspace packages before testing
 3. `npx vitest run` - Run tests in CI mode (not `npm test`)
 
 ## Codebase Patterns
@@ -140,9 +160,9 @@ import "../../test/mocks/foo-mock.js"; // Side-effect import
 
 ### Legacy vs Installed Mode
 
-- **Legacy mode**: NodeCG is the root project, bundles in `bundles/` directory
+- **Legacy mode**: Root package has `nodecgRoot: true`, bundles in `bundles/` directory
 - **Installed mode**: NodeCG installed as dependency in `node_modules`, project root IS the bundle
-- Mode determined by `isLegacyProject` check (package.json name === "nodecg")
+- Mode determined by `isLegacyProject` check (`package.json` has `nodecgRoot: true`)
 - **Critical**: `@nodecg/internal-util` caches `rootPath` and `isLegacyProject` at module load time
 - Tests must set `process.env.NODECG_ROOT` BEFORE importing any NodeCG modules
 - Use `getNodecgRoot()` function (respects NODECG_ROOT) instead of `rootPath` constant where appropriate
@@ -181,7 +201,7 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 ## Common Pitfalls
 
 - Missing `.js` extension in imports (causes module resolution errors)
-- Not running `npm run build` before tests (tests import stale/missing code)
+- Not running `npm run build` before tests (workspace packages export from `dist/`)
 - Using `npm test` instead of `npx vitest run` (wrong test runner)
 - Sharing state between test files (each file must be isolated)
 - Forgetting that array/object access returns `T | undefined` (`noUncheckedIndexedAccess`)

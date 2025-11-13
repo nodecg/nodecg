@@ -9,11 +9,11 @@ import {
 	PrimaryGeneratedColumn,
 } from "typeorm";
 
-import { ApiKey } from "./ApiKey";
-import { Identity } from "./Identity";
-import { Role } from "./Role";
+import { ApiKey } from "./ApiKey.ts";
+import { Identity } from "./Identity.ts";
+import { Role } from "./Role.ts";
 
-@Entity()
+@Entity({ name: "user" })
 export class User implements UserModel {
 	@PrimaryGeneratedColumn("uuid")
 	id!: string;

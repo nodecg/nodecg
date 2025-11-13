@@ -3,7 +3,7 @@
 import chalk from "chalk";
 import spawn from "nano-spawn";
 
-import { setupCLI } from "..";
+import { setupCLI } from "../index.js";
 
 try {
 	await spawn("git", ["--version"]);

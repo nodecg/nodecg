@@ -1,0 +1,14 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"module": "preserve",
+		"lib": ["ESNext", "DOM"],
+		"noPropertyAccessFromIndexSignature": false,
+
+		"baseUrl": ".",
+		"paths": {
+			"@polymer/polymer": ["./src/client/types/polymer-element.d.ts"]
+		}
+	},
+	"exclude": ["./typetest"]
+}
