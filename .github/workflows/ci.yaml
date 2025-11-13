@@ -43,8 +43,14 @@ jobs:
       - run: npm run build
       - run: npm run typetest
 
-  build-test:
-    runs-on: ubuntu-latest
+  build-test-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
@@ -78,6 +84,9 @@ jobs:
       - run: npm run build
 
       - run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
+        if: matrix.os == 'ubuntu-latest'
+      - run: npx vitest --reporter=default --reporter=junit --outputFile=test-report.junit.xml
+        if: matrix.os == 'windows-latest'
       - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
@@ -87,6 +96,13 @@ jobs:
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+  build-test:
+    needs: build-test-matrix
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 1
+        if: needs.build-test-matrix.result != 'success'
 
   container-build:
     runs-on: ubuntu-latest
@@ -120,9 +136,8 @@ jobs:
       - run: |
           npx tsx scripts/prepare-prerelease.ts --version 0.0.0-pr${{ github.event.number }}.${{ github.sha }}
           npm --workspaces publish --tag pr${{ github.event.number }}
-          npm publish --tag pr${{ github.event.number }}
-          npx tsx scripts/prepare-publish-types.ts
-          npm publish --tag pr${{ github.event.number }}
+          (cd workspaces/nodecg && npx tsx scripts/prepare-publish-types.ts)
+          (cd workspaces/nodecg && npm publish --tag pr${{ github.event.number }})
 
       - name: Comment PR with install instructions
         env:
@@ -207,11 +222,11 @@ jobs:
         name: Publish to NPM
         run: |
           echo '${{ needs.release-please.outputs.release_paths }}' | jq -r '.[]' | while read -r path; do
-            if [[ "$path" == "." ]]; then
-              npm publish
-              npx tsx scripts/prepare-publish-types.ts
-              npm publish
-            else
+            if [[ "$path" == "workspaces/nodecg" ]]; then
+              (cd "$path" && npm publish)
+              (cd "$path" && npx tsx scripts/prepare-publish-types.ts)
+              (cd "$path" && npm publish)
+            elif [[ "$path" != "." ]]; then
               (cd "$path" && npm publish)
             fi
           done
@@ -221,9 +236,8 @@ jobs:
         run: |
           npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
           npm --workspaces publish --tag canary
-          npm publish --tag canary
-          npx tsx scripts/prepare-publish-types.ts
-          npm publish --tag canary
+          (cd workspaces/nodecg && npx tsx scripts/prepare-publish-types.ts)
+          (cd workspaces/nodecg && npm -w nodecg publish --tag canary)
 
   docker-image:
     permissions:

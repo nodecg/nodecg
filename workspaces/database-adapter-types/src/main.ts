@@ -1,2 +1,2 @@
-export * from "./database-adapter";
-export * from "./models";
+export * from "./database-adapter.ts";
+export * from "./models.ts";

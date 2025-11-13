@@ -1,7 +1,5 @@
-/dist
-/out
 /.nyc_output
-/assets
+/workspaces/nodecg/assets/
 /bower_components
 /build
 /bundles
@@ -10,22 +8,22 @@
 /db
 /logs
 /media
-/node_modules
-/build-types
-/generated-types/*
-!/generated-types/index.d.ts
-!/generated-types/augment-window.d.ts
-!/generated-types/package.json
-!/generated-types/tsconfig.json
+node_modules/
+build-types/
+generated-types/*
+!generated-types/index.d.ts
+!generated-types/augment-window.d.ts
+!generated-types/package.json
+!generated-types/tsconfig.json
 .env
 package-lock.json
 CHANGELOG.md
 
 # Intentionally broken as part of tests
-/test/fixtures/bundle-parser/bad-json/bundleConfig.json
-/test/fixtures/bundle-parser/bad-schema/configschema.json
-/test/fixtures/bundle-parser/invalid-manifest-json/package.json
-/test/fixtures/nodecg-core/bundles/test-bundle/schemas/badSchema.json
-/test/fixtures/nodecg-core/cfg/invalidJSON.json
+workspaces/nodecg/test/fixtures/bundle-parser/bad-json/bundleConfig.json
+workspaces/nodecg/test/fixtures/bundle-parser/bad-schema/configschema.json
+workspaces/nodecg/test/fixtures/bundle-parser/invalid-manifest-json/package.json
+workspaces/nodecg/test/fixtures/nodecg-core/bundles/test-bundle/schemas/badSchema.json
+workspaces/nodecg/test/fixtures/nodecg-core/cfg/invalidJSON.json
 
 /coverage

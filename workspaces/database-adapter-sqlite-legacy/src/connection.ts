@@ -1,6 +1,4 @@
-import { dataSource } from "./datasource";
-
-export * from "./entity";
+import { dataSource } from "./datasource.ts";
 
 let initialized = false;
 

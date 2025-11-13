@@ -1,1 +1,1 @@
-require("./out/server/bootstrap.js");
+import "nodecg";

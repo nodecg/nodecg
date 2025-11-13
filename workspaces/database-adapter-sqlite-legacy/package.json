@@ -3,24 +3,27 @@
   "version": "2.6.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nodecg/nodecg.git",
+    "url": "git+https://github.com/nodecg/nodecg.git",
     "directory": "workspaces/database-adapter-sqlite-legacy"
   },
+  "type": "module",
   "exports": {
-    ".": {
-      "source": "./src/database-adapter.ts",
-      "default": "./dist/database-adapter.js"
-    }
+    ".": "./dist/database-adapter.js",
+    "./package.json": "./package.json"
   },
-  "main": "dist/database-adapter.js",
+  "main": "./dist/database-adapter.js",
+  "module": "./dist/database-adapter.js",
+  "types": "./dist/database-adapter.d.ts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
-    "build": "del-cli dist && tsc -b",
-    "dev": "del-cli dist && tsc -b --watch --preserveWatchOutput",
-    "generate-migrations": "typeorm-ts-node-commonjs migration:generate ./src/migration/rename-me -d ./src/datasource.ts"
+    "build": "tsdown",
+    "generate-migrations": "typeorm-ts-node-commonjs migration:generate ./src/migration/rename-me -d ./src/datasource.ts",
+    "typecheck": "tsc --noEmit",
+    "typecheck-watch": "tsc --noEmit --watch --preserveWatchOutput",
+    "watch": "tsdown --watch"
   },
   "dependencies": {
     "@nodecg/database-adapter-types": "2.6.1",
@@ -30,8 +33,11 @@
     "typeorm": "0.3.27"
   },
   "devDependencies": {
-    "del-cli": "^6.0.0",
-    "typescript": "~5.7.3"
+    "@arethetypeswrong/core": "^0.18.2",
+    "publint": "^0.3.15",
+    "ts-node": "^10.9.2",
+    "tsdown": "^0.16.1",
+    "typescript": "~5.9.3"
   },
   "publishConfig": {
     "access": "public",

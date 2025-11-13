@@ -3,22 +3,26 @@
   "version": "2.6.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nodecg/nodecg.git",
+    "url": "git+https://github.com/nodecg/nodecg.git",
     "directory": "workspaces/cli"
   },
   "type": "module",
-  "main": "dist/main.js",
+  "exports": {
+    ".": "./dist/nodecg.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/nodecg.js",
+  "module": "./dist/nodecg.js",
+  "types": "./dist/nodecg.d.ts",
   "files": [
     "dist",
     "src"
   ],
   "scripts": {
-    "build": "run-s build:*",
-    "build:tsc": "tsc -b",
-    "build:esbuild": "del-cli dist && esbuild src/bin/nodecg.ts --bundle --format=esm --sourcemap --platform=node --target=node18 --outfile=dist/main.js --packages=external",
-    "dev": "run-p dev:*",
-    "dev:tsc": "tsc -b --watch --preserveWatchOutput",
-    "dev:esbuild": "del-cli dist && npm run build:esbuild -- --watch"
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "typecheck-watch": "tsc --noEmit --watch --preserveWatchOutput",
+    "watch": "tsdown --watch"
   },
   "dependencies": {
     "@inquirer/prompts": "^7.2.1",
@@ -38,11 +42,10 @@
     "@types/node": "20",
     "@types/npm-package-arg": "^6.1.4",
     "@types/semver": "^7.5.8",
-    "del-cli": "^6.0.0",
-    "esbuild": "^0.25.11",
-    "npm-run-all2": "^7.0.2",
+    "publint": "^0.3.15",
+    "tsdown": "^0.16.1",
     "type-fest": "^4.33.0",
-    "typescript": "~5.7.3"
+    "typescript": "~5.9.3"
   },
   "publishConfig": {
     "access": "public",
