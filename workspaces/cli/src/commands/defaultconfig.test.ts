@@ -47,6 +47,13 @@ describe("when run with a bundle argument", () => {
 			path.resolve(process.cwd(), "./bundles/missing-schema-bundle"),
 			{ recursive: true },
 		);
+		fs.writeFileSync(
+			"./bundles/missing-schema-bundle/package.json",
+			JSON.stringify({
+				name: "missing-schema-bundle",
+				nodecg: { compatibleRange: "^2.0.0" },
+			}),
+		);
 		await program.runWith("defaultconfig missing-schema-bundle");
 		expect(spy.mock.calls[0]).toMatchInlineSnapshot(
 			`
@@ -170,6 +177,13 @@ describe("installed mode (NodeCG as dependency)", () => {
 	it("should still check bundles directory when bundle name doesn't match root", async () => {
 		// Create a bundle in bundles directory
 		fs.mkdirSync("./bundles/another-bundle", { recursive: true });
+		fs.writeFileSync(
+			"./bundles/another-bundle/package.json",
+			JSON.stringify({
+				name: "another-bundle",
+				nodecg: { compatibleRange: "^2.0.0" },
+			}),
+		);
 		fs.writeFileSync(
 			"./bundles/another-bundle/configschema.json",
 			JSON.stringify({
