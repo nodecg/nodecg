@@ -44,7 +44,13 @@ jobs:
       - run: npm run typetest
 
   build-test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v6
@@ -78,6 +84,9 @@ jobs:
       - run: npm run build
 
       - run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
+        if: matrix.os == 'ubuntu-latest'
+      - run: npx vitest --reporter=default --reporter=junit --outputFile=test-report.junit.xml
+        if: matrix.os == 'windows-latest'
       - if: success() || failure()
         uses: codecov/test-results-action@v1
         with:
