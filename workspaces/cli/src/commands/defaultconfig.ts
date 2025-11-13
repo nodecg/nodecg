@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { getNodecgRoot } from "@nodecg/internal-util";
+import { rootPaths } from "@nodecg/internal-util";
 import { Ajv, type JSONSchemaType } from "ajv";
 import chalk from "chalk";
 import { Command } from "commander";
@@ -18,17 +18,14 @@ export function defaultconfigCommand(program: Command) {
 }
 
 function getBundlePath(bundleName: string): string | null {
-	const rootPath = getNodecgRoot();
+	const rootPath = rootPaths.getRuntimeRoot();
 
 	// Check if root project itself is the bundle
-	const rootPjsonPath = path.join(rootPath, "package.json");
-	if (fs.existsSync(rootPjsonPath)) {
+	if (isBundleFolder(rootPath)) {
 		try {
+			const rootPjsonPath = path.join(rootPath, "package.json");
 			const rootPjson = JSON.parse(fs.readFileSync(rootPjsonPath, "utf8"));
-			if (
-				rootPjson.name === bundleName &&
-				typeof rootPjson.nodecg === "object"
-			) {
+			if (rootPjson.name === bundleName) {
 				return rootPath;
 			}
 		} catch {
@@ -38,7 +35,7 @@ function getBundlePath(bundleName: string): string | null {
 
 	// Otherwise check bundles directory
 	const bundlesPath = path.join(rootPath, "bundles", bundleName);
-	if (fs.existsSync(bundlesPath)) {
+	if (isBundleFolder(bundlesPath)) {
 		return bundlesPath;
 	}
 
@@ -47,7 +44,7 @@ function getBundlePath(bundleName: string): string | null {
 
 function action(bundleName?: string) {
 	const cwd = process.cwd();
-	const rootPath = getNodecgRoot();
+	const rootPath = rootPaths.getRuntimeRoot();
 
 	let resolvedBundleName: string;
 
