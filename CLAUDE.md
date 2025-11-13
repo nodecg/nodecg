@@ -172,12 +172,14 @@ import "../../test/mocks/foo-mock.js"; // Side-effect import
 NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for strategy and plans.
 
 **Migration Strategy**:
+
 - **Within packages**: Root-to-leaf (top-down) - single execution point at package boundary
 - **Across codebase**: Leaf-to-root (bottom-up) - extract isolated subsystems as workspace packages first
 - Each new package is fully Effect-native internally, called via `Effect.run*` from old code
 - Candidates listed in `docs/effect-migration/strategy.md` with complexity ratings
 
 **Effect Conventions**:
+
 - Top-level imports only: `"effect"`, `"@effect/platform"` (not subpaths)
 - Schemas suffix with `Schema`: `ConfigSchema` → `type Config`
 - Use `yield* Effect.log*()` for app logs, `yield* Console.*()` for debugging
@@ -189,11 +191,13 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - See `docs/effect-migration/strategy.md` for comprehensive coding guidelines
 
 **Migration Documentation**:
+
 - All migration work must be logged in `docs/effect-migration/log.md`
 - Log decisions, problems/solutions, patterns used, and lessons learned
 - See `docs/effect-migration/strategy.md` for migration approach and candidates
 
 **Existing fp-ts Code**:
+
 - `src/server/bundle-parser/` already uses fp-ts (IOEither, pipe, flow)
 - Migration from fp-ts → Effect is translation, not rewrite
 - Good reference for functional patterns in the codebase

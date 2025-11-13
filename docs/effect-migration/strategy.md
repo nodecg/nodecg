@@ -99,6 +99,7 @@ These guidelines ensure consistency and best practices across all migrated code.
 ### Function Definition
 
 - **Use `Effect.fn` for effect-returning functions**:
+
   ```typescript
   // ✅ Correct
   const myFunction = Effect.fn("myFunction")(function* (arg: string) {
@@ -106,10 +107,12 @@ These guidelines ensure consistency and best practices across all migrated code.
   });
 
   // ❌ Wrong - don't use Effect.gen for function definitions
-  const myFunction = (arg: string) => Effect.gen(function* () {
-    // ...
-  });
+  const myFunction = (arg: string) =>
+    Effect.gen(function* () {
+      // ...
+    });
   ```
+
 - **`Effect.gen` only for immediate instantiation** - Use it when you need to create and immediately execute an effect, not for defining reusable functions
 
 ### Dependencies & Packages

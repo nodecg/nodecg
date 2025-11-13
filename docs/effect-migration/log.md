@@ -24,22 +24,27 @@ When working on a migration:
 **Overview**: Brief description of what this subsystem does and why we're migrating it.
 
 **Key Decisions**:
+
 - Decision 1 and rationale
 - Decision 2 and rationale
 
 **Problems & Solutions**:
+
 - Problem: Description of issue encountered
   - Solution: How it was resolved
 
 **Effect Patterns Used**:
+
 - Pattern 1 (e.g., Effect.Schema for validation)
 - Pattern 2 (e.g., Layer pattern for dependency injection)
 
 **Lessons Learned**:
+
 - Insight 1
 - Insight 2
 
 **Next Steps** (if in progress):
+
 - [ ] Task 1
 - [ ] Task 2
 ```
