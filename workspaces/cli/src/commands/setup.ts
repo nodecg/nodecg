@@ -1,198 +1,147 @@
-import fs from "node:fs";
-import os from "node:os";
-import stream from "node:stream/promises";
-
-import { confirm } from "@inquirer/prompts";
-import chalk from "chalk";
-import { Command } from "commander";
-import spawn from "nano-spawn";
+import { Args, Command, Options } from "@effect/cli";
+import { Effect, Option } from "effect";
 import semver from "semver";
-import * as tar from "tar";
 
-import { listNpmVersions } from "../lib/list-npm-versions.js";
-import type { NpmRelease } from "../lib/sample/npm-release.js";
-import { getCurrentNodeCGVersion, pathContainsNodeCG } from "../lib/util.js";
+import { FileSystemService } from "../services/file-system.js";
+import { HttpService } from "../services/http.js";
+import { NpmService } from "../services/npm.js";
+import { PathService } from "../services/path.js";
+import { TerminalService } from "../services/terminal.js";
 
-export function setupCommand(program: Command) {
-	program
-		.command("setup [version]")
-		.option("-u, --update", "Update the local NodeCG installation")
-		.option("-k, --skip-dependencies", "Skip installing npm dependencies")
-		.description("Install a new NodeCG instance")
-		.action(decideActionVersion);
-}
+export const setupCommand = Command.make(
+	"setup",
+	{
+		version: Args.text({ name: "version" }).pipe(Args.optional),
+		update: Options.boolean("update").pipe(
+			Options.withAlias("u"),
+			Options.optional,
+		),
+		skipDependencies: Options.boolean("skip-dependencies").pipe(
+			Options.withAlias("k"),
+			Options.optional,
+		),
+	},
+	({ version, update, skipDependencies }) =>
+		Effect.gen(function* () {
+			const fs = yield* FileSystemService;
+			const terminal = yield* TerminalService;
+			const pathService = yield* PathService;
+			const npm = yield* NpmService;
+			const http = yield* HttpService;
 
-async function decideActionVersion(
-	version: string,
-	options: { update: boolean; skipDependencies: boolean },
-) {
-	// If NodeCG is already installed but the `-u` flag was not supplied, display an error and return.
-	let isUpdate = false;
+			const isUpdateFlag = Option.getOrElse(update, () => false);
+			const skipDeps = Option.getOrElse(skipDependencies, () => false);
+			const versionSpec = Option.getOrNull(version);
 
-	// If NodeCG exists in the cwd, but the `-u` flag was not supplied, display an error and return.
-	// If it was supplied, fetch the latest tags and set the `isUpdate` flag to true for later use.
-	// Else, if this is a clean, empty directory, then we need to clone a fresh copy of NodeCG into the cwd.
-	if (pathContainsNodeCG(process.cwd())) {
-		if (!options.update) {
-			console.error("NodeCG is already installed in this directory.");
-			console.error(
-				`Use ${chalk.cyan("nodecg setup [version] -u")} if you want update your existing install.`,
+			let isUpdate = false;
+
+			const containsNodeCG = yield* pathService.pathContainsNodeCG(
+				process.cwd(),
 			);
-			return;
-		}
+			if (containsNodeCG) {
+				if (!isUpdateFlag) {
+					yield* terminal.writeError(
+						"NodeCG is already installed in this directory.",
+					);
+					yield* terminal.write("Use ");
+					yield* terminal.writeColored("nodecg setup [version] -u", "cyan");
+					yield* terminal.writeLine(
+						" if you want update your existing install.",
+					);
+					return;
+				}
+				isUpdate = true;
+			}
 
-		isUpdate = true;
-	}
+			if (versionSpec) {
+				yield* terminal.write(
+					`Finding latest release that satisfies semver range `,
+				);
+				yield* terminal.writeColored(versionSpec, "magenta");
+				yield* terminal.write("... ");
+			} else if (isUpdate) {
+				yield* terminal.write("Checking against local install for updates... ");
+			} else {
+				yield* terminal.write("Finding latest release... ");
+			}
 
-	if (version) {
-		process.stdout.write(
-			`Finding latest release that satisfies semver range ${chalk.magenta(version)}... `,
-		);
-	} else if (isUpdate) {
-		process.stdout.write("Checking against local install for updates... ");
-	} else {
-		process.stdout.write("Finding latest release... ");
-	}
+			const tags = yield* npm.listVersions("nodecg");
 
-	let tags;
-	try {
-		tags = await listNpmVersions("nodecg");
-	} catch (error) {
-		process.stdout.write(chalk.red("failed!") + os.EOL);
-		console.error(error instanceof Error ? error.message : error);
-		return;
-	}
+			const target = semver.maxSatisfying(tags, versionSpec || "*");
 
-	let target: string;
-
-	// If a version (or semver range) was supplied, find the latest release that satisfies the range.
-	// Else, make the target the newest version.
-	if (version) {
-		const maxSatisfying = semver.maxSatisfying(tags, version);
-		if (!maxSatisfying) {
-			process.stdout.write(chalk.red("failed!") + os.EOL);
-			console.error(
-				`No releases match the supplied semver range (${chalk.magenta(version)})`,
-			);
-			return;
-		}
-
-		target = maxSatisfying;
-	} else {
-		target = semver.maxSatisfying(tags, "") ?? "";
-	}
-
-	process.stdout.write(chalk.green("done!") + os.EOL);
-
-	let current: string | undefined;
-	let downgrade = false;
-
-	if (isUpdate) {
-		current = getCurrentNodeCGVersion();
-
-		if (semver.eq(target, current)) {
-			console.log(
-				`The target version (${chalk.magenta(target)}) is equal to the current version (${chalk.magenta(current)}). No action will be taken.`,
-			);
-			return;
-		}
-
-		if (semver.lt(target, current)) {
-			console.log(
-				`${chalk.red("WARNING:")} The target version (${chalk.magenta(target)}) is older than the current version (${chalk.magenta(current)})`,
-			);
-
-			const answer = await confirm({
-				message: "Are you sure you wish to continue?",
-			});
-
-			if (!answer) {
-				console.log("Setup cancelled.");
+			if (!target) {
+				yield* terminal.writeColored("failed!", "red");
+				yield* terminal.writeLine("");
+				yield* terminal.writeError(
+					versionSpec
+						? `No releases match the supplied semver range (${versionSpec})`
+						: "Failed to find a suitable release",
+				);
 				return;
 			}
 
-			downgrade = true;
-		}
-	}
+			yield* terminal.writeColored("done!", "green");
+			yield* terminal.writeLine("");
 
-	if (semver.lt(target, "v2.0.0")) {
-		console.error("CLI does not support NodeCG versions older than v2.0.0.");
-		return;
-	}
+			let current: string | undefined;
+			let downgrade = false;
+			if (isUpdate) {
+				current = yield* pathService.getCurrentNodeCGVersion().pipe(
+					Effect.option,
+					Effect.map((opt) => Option.getOrElse(opt, () => undefined)),
+				);
+				if (current && semver.eq(current, target)) {
+					yield* terminal.writeLine(
+						`The target version (${target}) is equal to the current version (${current}). No action will be taken.`,
+					);
+					return;
+				}
+				if (current && semver.gte(current, target)) {
+					downgrade = true;
+					const msg = `You are about to downgrade from ${current} to ${target}. Are you sure?`;
+					const confirmed = yield* terminal.confirm(msg);
+					if (!confirmed) {
+						yield* terminal.writeLine("Aborting setup due to user response.");
+						return;
+					}
+				}
+			} else {
+				yield* terminal.write(`Installing NodeCG version `);
+				yield* terminal.writeColored(target, "magenta");
+				yield* terminal.write("... ");
+			}
 
-	await installNodecg(current, target, isUpdate);
+			const release = yield* npm.getRelease("nodecg", target);
 
-	// Install NodeCG's dependencies
-	// This operation takes a very long time, so we don't test it.
-	if (!options.skipDependencies) {
-		await installDependencies();
-	}
+			if (current) {
+				const verb = semver.lt(target, current) ? "Downgrading" : "Upgrading";
+				yield* terminal.write(`${verb} from `);
+				yield* terminal.writeColored(current, "magenta");
+				yield* terminal.write(` to `);
+				yield* terminal.writeColored(target, "magenta");
+				yield* terminal.write("... ");
+			}
 
-	if (isUpdate) {
-		const verb = downgrade ? "downgraded" : "upgraded";
-		console.log(`NodeCG ${verb} to ${chalk.magenta(target)}`);
-	} else {
-		console.log(`NodeCG (${target}) installed to ${process.cwd()}`);
-	}
-}
+			const tarballStream = yield* http.fetchStream(release.dist.tarball);
+			yield* fs.extractTarball(tarballStream, { strip: 1 });
 
-async function installNodecg(
-	current: string | undefined,
-	target: string,
-	isUpdate: boolean,
-) {
-	if (isUpdate) {
-		const deletingDirectories = [".git", "build", "scripts", "schemas"];
-		await Promise.all(
-			deletingDirectories.map((dir) =>
-				fs.promises.rm(dir, { recursive: true, force: true }),
-			),
-		);
-	}
+			// Install dependencies
+			if (!skipDeps) {
+				yield* terminal.write("Installing production npm dependencies... ");
+				yield* npm.install(process.cwd(), true);
+				yield* terminal.writeColored("done!", "green");
+				yield* terminal.writeLine("");
+			}
 
-	process.stdout.write(`Downloading ${target} from npm... `);
-
-	const targetVersion = semver.coerce(target)?.version;
-	if (!targetVersion) {
-		throw new Error(`Failed to determine target NodeCG version`);
-	}
-	const releaseResponse = await fetch(
-		`http://registry.npmjs.org/nodecg/${targetVersion}`,
-	);
-	if (!releaseResponse.ok) {
-		throw new Error(
-			`Failed to fetch NodeCG release information from npm, status code ${releaseResponse.status}`,
-		);
-	}
-	const release = (await releaseResponse.json()) as NpmRelease;
-
-	process.stdout.write(chalk.green("done!") + os.EOL);
-
-	if (current) {
-		const verb = semver.lt(target, current) ? "Downgrading" : "Upgrading";
-		process.stdout.write(
-			`${verb} from ${chalk.magenta(current)} to ${chalk.magenta(target)}... `,
-		);
-	}
-
-	const tarballResponse = await fetch(release.dist.tarball);
-	if (!tarballResponse.ok || !tarballResponse.body) {
-		throw new Error(
-			`Failed to fetch release tarball from ${release.dist.tarball}, status code ${tarballResponse.status}`,
-		);
-	}
-	await stream.pipeline(tarballResponse.body, tar.x({ strip: 1 }));
-}
-
-async function installDependencies() {
-	try {
-		process.stdout.write("Installing production npm dependencies... ");
-		await spawn("npm", ["install", "--production"]);
-
-		process.stdout.write(chalk.green("done!") + os.EOL);
-	} catch (e: any) {
-		process.stdout.write(chalk.red("failed!") + os.EOL);
-		console.error(e.stack);
-		return;
-	}
-}
+			if (isUpdate) {
+				const verb = downgrade ? "downgraded" : "upgraded";
+				yield* terminal.write(`NodeCG ${verb} to `);
+				yield* terminal.writeColored(target, "magenta");
+				yield* terminal.writeLine("");
+			} else {
+				yield* terminal.writeLine(
+					`NodeCG (${target}) installed to ${process.cwd()}`,
+				);
+			}
+		}),
+);

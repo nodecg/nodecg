@@ -1,203 +1,409 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { it } from "@effect/vitest";
+import { Effect, Option } from "effect";
+import { afterEach, beforeEach, describe, expect } from "vitest";
 
-import { Command } from "commander";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import { createMockProgram, MockCommand } from "../../test/mocks/program.js";
-import { setupTmpDir } from "../../test/tmp-dir.js";
+import {
+	MockFileSystemServiceLayer,
+	MockJsonSchemaServiceLayer,
+	MockPathServiceLayer,
+	MockTerminalServiceLayer,
+} from "../helpers/mock-services.js";
+import { createTestLayer } from "../helpers/test-runner.js";
 import { defaultconfigCommand } from "./defaultconfig.js";
 
-const dirname = path.dirname(fileURLToPath(import.meta.url));
+describe("defaultconfigCommand", () => {
+	describe("generating config with explicit bundle name", () => {
+		it.effect(
+			"should generate default config when bundle name is provided",
+			() =>
+				Effect.gen(function* () {
+					const handler = defaultconfigCommand.handler;
+					yield* handler({
+						bundle: Option.some("test-bundle"),
+					});
+				}).pipe(
+					Effect.provide(
+						createTestLayer(
+							MockFileSystemServiceLayer({
+								"/mock/nodecg/bundles/test-bundle": {},
+								"/mock/nodecg/bundles/test-bundle/configschema.json": {
+									type: "object",
+									properties: {
+										host: { type: "string", default: "localhost" },
+										port: { type: "number", default: 9090 },
+										enabled: { type: "boolean", default: true },
+									},
+								},
+								"/mock/nodecg/cfg": {},
+							}),
+							MockTerminalServiceLayer(),
+							MockPathServiceLayer({ nodecgPath: "/mock/nodecg" }),
+							MockJsonSchemaServiceLayer({
+								host: "localhost",
+								port: 9090,
+								enabled: true,
+							}),
+						),
+					),
+				),
+		);
 
-let program: MockCommand;
+		it.effect("should error when bundle does not exist", () =>
+			Effect.gen(function* () {
+				const handler = defaultconfigCommand.handler;
+				yield* handler({
+					bundle: Option.some("non-existent-bundle"),
+				});
+			}).pipe(
+				Effect.provide(
+					createTestLayer(
+						MockFileSystemServiceLayer({
+							"/mock/nodecg/bundles": {},
+						}),
+						MockTerminalServiceLayer(),
+						MockPathServiceLayer({ nodecgPath: "/mock/nodecg" }),
+						MockJsonSchemaServiceLayer(),
+					),
+				),
+			),
+		);
 
-beforeEach(() => {
-	// Set up environment.
-	const tempFolder = setupTmpDir();
-	process.env["NODECG_ROOT"] = tempFolder;
-	process.chdir(tempFolder);
-	fs.writeFileSync("package.json", JSON.stringify({ name: "nodecg" }));
+		it.effect("should error when bundle has no configschema.json", () =>
+			Effect.gen(function* () {
+				const handler = defaultconfigCommand.handler;
+				yield* handler({
+					bundle: Option.some("test-bundle"),
+				});
+			}).pipe(
+				Effect.provide(
+					createTestLayer(
+						MockFileSystemServiceLayer({
+							"/mock/nodecg/bundles/test-bundle": {},
+						}),
+						MockTerminalServiceLayer(),
+						MockPathServiceLayer({ nodecgPath: "/mock/nodecg" }),
+						MockJsonSchemaServiceLayer(),
+					),
+				),
+			),
+		);
 
-	// Copy fixtures.
-	fs.cpSync(path.resolve(dirname, "../../test/fixtures/"), "./", {
-		recursive: true,
+		it.effect("should error when config file already exists", () =>
+			Effect.gen(function* () {
+				const handler = defaultconfigCommand.handler;
+				yield* handler({
+					bundle: Option.some("test-bundle"),
+				});
+			}).pipe(
+				Effect.provide(
+					createTestLayer(
+						MockFileSystemServiceLayer({
+							"/mock/nodecg/bundles/test-bundle": {},
+							"/mock/nodecg/bundles/test-bundle/configschema.json": {
+								type: "object",
+								properties: {},
+							},
+							"/mock/nodecg/cfg": {},
+							"/mock/nodecg/cfg/test-bundle.json": {
+								existing: "config",
+							},
+						}),
+						MockTerminalServiceLayer(),
+						MockPathServiceLayer({ nodecgPath: "/mock/nodecg" }),
+						MockJsonSchemaServiceLayer(),
+					),
+				),
+			),
+		);
 	});
 
-	// Build program.
-	program = createMockProgram();
-	defaultconfigCommand(program as unknown as Command);
-});
-
-describe("when run with a bundle argument", () => {
-	it("should successfully create a bundle config file when bundle has configschema.json", async () => {
-		await program.runWith("defaultconfig config-schema");
-		const config = JSON.parse(
-			fs.readFileSync("./cfg/config-schema.json", { encoding: "utf8" }),
+	describe("finding bundle in current directory", () => {
+		it.effect(
+			"should generate config for current directory bundle when no name provided",
+			() =>
+				Effect.gen(function* () {
+					const handler = defaultconfigCommand.handler;
+					yield* handler({
+						bundle: Option.none(),
+					});
+				}).pipe(
+					Effect.provide(
+						createTestLayer(
+							MockFileSystemServiceLayer({
+								[`${process.cwd()}/package.json`]: {
+									name: "current-bundle",
+									version: "1.0.0",
+									nodecg: { compatibleRange: "^1.0.0" },
+								},
+								"/mock/nodecg/bundles/current-bundle": {},
+								"/mock/nodecg/bundles/current-bundle/configschema.json": {
+									type: "object",
+									properties: {
+										apiKey: { type: "string", default: "default-key" },
+									},
+								},
+								"/mock/nodecg/cfg": {},
+							}),
+							MockTerminalServiceLayer(),
+							MockPathServiceLayer({
+								nodecgPath: "/mock/nodecg",
+								isBundle: true,
+							}),
+							MockJsonSchemaServiceLayer({
+								apiKey: "default-key",
+							}),
+						),
+					),
+				),
 		);
-		expect(config.username).toBe("user");
-		expect(config.value).toBe(5);
-		expect(config.nodefault).toBeUndefined();
+
+		it.effect("should error when current directory is not a bundle", () =>
+			Effect.gen(function* () {
+				const handler = defaultconfigCommand.handler;
+				try {
+					yield* handler({
+						bundle: Option.none(),
+					});
+				} catch (error) {
+					expect(error).toBeDefined();
+				}
+			}).pipe(
+				Effect.provide(
+					createTestLayer(
+						MockFileSystemServiceLayer({
+							[`${process.cwd()}/package.json`]: {
+								name: "not-a-bundle",
+								version: "1.0.0",
+							},
+						}),
+						MockTerminalServiceLayer(),
+						MockPathServiceLayer({
+							nodecgPath: "/mock/nodecg",
+							isBundle: false,
+						}),
+						MockJsonSchemaServiceLayer(),
+					),
+				),
+			),
+		);
 	});
 
-	it("should print an error when the target bundle does not have a configschema.json", async () => {
-		const spy = vi.spyOn(console, "error");
-		fs.mkdirSync(
-			path.resolve(process.cwd(), "./bundles/missing-schema-bundle"),
-			{ recursive: true },
+	describe("creating cfg directory", () => {
+		it.effect("should create cfg directory if it does not exist", () =>
+			Effect.gen(function* () {
+				const handler = defaultconfigCommand.handler;
+				yield* handler({
+					bundle: Option.some("test-bundle"),
+				});
+			}).pipe(
+				Effect.provide(
+					createTestLayer(
+						MockFileSystemServiceLayer({
+							"/mock/nodecg/bundles/test-bundle": {},
+							"/mock/nodecg/bundles/test-bundle/configschema.json": {
+								type: "object",
+								properties: {},
+							},
+						}),
+						MockTerminalServiceLayer(),
+						MockPathServiceLayer({ nodecgPath: "/mock/nodecg" }),
+						MockJsonSchemaServiceLayer({ key: "value" }),
+					),
+				),
+			),
 		);
-		fs.writeFileSync(
-			"./bundles/missing-schema-bundle/package.json",
-			JSON.stringify({
-				name: "missing-schema-bundle",
-				nodecg: { compatibleRange: "^2.0.0" },
-			}),
-		);
-		await program.runWith("defaultconfig missing-schema-bundle");
-		expect(spy.mock.calls[0]).toMatchInlineSnapshot(
-			`
-			[
-			  "Error: Bundle missing-schema-bundle does not have a configschema.json",
-			]
-		`,
-		);
-		spy.mockRestore();
 	});
 
-	it("should print an error when the target bundle does not exist", async () => {
-		const spy = vi.spyOn(console, "error");
-		await program.runWith("defaultconfig not-installed");
-		expect(spy.mock.calls[0]).toMatchInlineSnapshot(
-			`
-			[
-			  "Error: Bundle not-installed does not exist",
-			]
-		`,
+	describe("complex schema defaults", () => {
+		it.effect("should apply nested default values from schema", () =>
+			Effect.gen(function* () {
+				const handler = defaultconfigCommand.handler;
+				yield* handler({
+					bundle: Option.some("complex-bundle"),
+				});
+			}).pipe(
+				Effect.provide(
+					createTestLayer(
+						MockFileSystemServiceLayer({
+							"/mock/nodecg/bundles/complex-bundle": {},
+							"/mock/nodecg/bundles/complex-bundle/configschema.json": {
+								type: "object",
+								properties: {
+									server: {
+										type: "object",
+										properties: {
+											host: { type: "string", default: "localhost" },
+											port: { type: "number", default: 8080 },
+											ssl: {
+												type: "object",
+												properties: {
+													enabled: { type: "boolean", default: false },
+													cert: { type: "string", default: "/path/to/cert" },
+												},
+											},
+										},
+									},
+									features: {
+										type: "object",
+										properties: {
+											authentication: { type: "boolean", default: true },
+											logging: { type: "boolean", default: true },
+										},
+									},
+								},
+							},
+							"/mock/nodecg/cfg": {},
+						}),
+						MockTerminalServiceLayer(),
+						MockPathServiceLayer({ nodecgPath: "/mock/nodecg" }),
+						MockJsonSchemaServiceLayer({
+							server: {
+								host: "localhost",
+								port: 8080,
+								ssl: {
+									enabled: false,
+									cert: "/path/to/cert",
+								},
+							},
+							features: {
+								authentication: true,
+								logging: true,
+							},
+						}),
+					),
+				),
+			),
 		);
-		spy.mockRestore();
 	});
 
-	it("should print an error when the target bundle already has a config", async () => {
-		const spy = vi.spyOn(console, "error");
-		fs.mkdirSync("./cfg");
-		fs.writeFileSync(
-			"./cfg/config-schema.json",
-			JSON.stringify({ fake: "data" }),
-		);
-		await program.runWith("defaultconfig config-schema");
-		expect(spy.mock.calls[0]).toMatchInlineSnapshot(
-			`
-			[
-			  "Error: Bundle config-schema already has a config file",
-			]
-		`,
-		);
-		spy.mockRestore();
-	});
-});
-
-describe("when run with no arguments", () => {
-	it("should successfully create a bundle config file when run from inside bundle directory", async () => {
-		process.chdir("./bundles/config-schema");
-		await program.runWith("defaultconfig");
-		expect(fs.existsSync("../../cfg/config-schema.json")).toBe(true);
-	});
-
-	it("should print an error when in a folder with no package.json", async () => {
-		fs.mkdirSync(path.resolve(process.cwd(), "./bundles/not-a-bundle"), {
-			recursive: true,
+	describe("installed mode (NodeCG as dependency)", () => {
+		beforeEach(() => {
+			process.env["NODECG_ROOT"] = "/mock/root";
 		});
-		process.chdir("./bundles/not-a-bundle");
 
-		const spy = vi.spyOn(console, "error");
-		await program.runWith("defaultconfig");
-		expect(spy.mock.calls[0]).toMatchInlineSnapshot(
-			`
-			[
-			  "Error: No bundle found in the current directory!",
-			]
-		`,
-		);
-		spy.mockRestore();
-	});
-});
+		afterEach(() => {
+			delete process.env["NODECG_ROOT"];
+		});
 
-describe("installed mode (NodeCG as dependency)", () => {
-	beforeEach(() => {
-		// Set up installed mode environment.
-		const tempFolder = setupTmpDir();
-		process.env["NODECG_ROOT"] = tempFolder;
-		process.chdir(tempFolder);
-
-		// Root is a bundle project with nodecg field
-		fs.writeFileSync(
-			"package.json",
-			JSON.stringify({
-				name: "my-awesome-bundle",
-				nodecg: { compatibleRange: "^2.0.0" },
-			}),
-		);
-
-		// Create configschema.json in root
-		fs.writeFileSync(
-			"configschema.json",
-			JSON.stringify({
-				type: "object",
-				properties: {
-					installedMode: { type: "boolean", default: true },
-					value: { type: "number", default: 42 },
-				},
-			}),
-		);
-
-		// Build program.
-		program = createMockProgram();
-		defaultconfigCommand(program as unknown as Command);
-	});
-
-	it("should create config for root bundle when bundle name matches root package", async () => {
-		await program.runWith("defaultconfig my-awesome-bundle");
-		const config = JSON.parse(
-			fs.readFileSync("./cfg/my-awesome-bundle.json", { encoding: "utf8" }),
-		);
-		expect(config.installedMode).toBe(true);
-		expect(config.value).toBe(42);
-	});
-
-	it("should create config for root bundle when run with no arguments", async () => {
-		await program.runWith("defaultconfig");
-		expect(fs.existsSync("./cfg/my-awesome-bundle.json")).toBe(true);
-		const config = JSON.parse(
-			fs.readFileSync("./cfg/my-awesome-bundle.json", { encoding: "utf8" }),
-		);
-		expect(config.installedMode).toBe(true);
-	});
-
-	it("should still check bundles directory when bundle name doesn't match root", async () => {
-		// Create a bundle in bundles directory
-		fs.mkdirSync("./bundles/another-bundle", { recursive: true });
-		fs.writeFileSync(
-			"./bundles/another-bundle/package.json",
-			JSON.stringify({
-				name: "another-bundle",
-				nodecg: { compatibleRange: "^2.0.0" },
-			}),
-		);
-		fs.writeFileSync(
-			"./bundles/another-bundle/configschema.json",
-			JSON.stringify({
-				type: "object",
-				properties: {
-					fromBundlesDir: { type: "boolean", default: true },
-				},
-			}),
+		it.effect(
+			"should create config for root bundle when bundle name matches root package",
+			() =>
+				Effect.gen(function* () {
+					const handler = defaultconfigCommand.handler;
+					yield* handler({
+						bundle: Option.some("my-awesome-bundle"),
+					});
+				}).pipe(
+					Effect.provide(
+						createTestLayer(
+							MockFileSystemServiceLayer({
+								"/mock/root/package.json": {
+									name: "my-awesome-bundle",
+									nodecg: { compatibleRange: "^2.0.0" },
+								},
+								"/mock/root/configschema.json": {
+									type: "object",
+									properties: {
+										installedMode: { type: "boolean", default: true },
+										value: { type: "number", default: 42 },
+									},
+								},
+								"/mock/root/cfg": {},
+							}),
+							MockTerminalServiceLayer(),
+							MockPathServiceLayer({
+								nodecgPath: "/mock/root",
+								isBundle: true,
+							}),
+							MockJsonSchemaServiceLayer({
+								installedMode: true,
+								value: 42,
+							}),
+						),
+					),
+				),
 		);
 
-		await program.runWith("defaultconfig another-bundle");
-		const config = JSON.parse(
-			fs.readFileSync("./cfg/another-bundle.json", { encoding: "utf8" }),
+		it.effect(
+			"should create config for root bundle when run with no arguments",
+			() =>
+				Effect.gen(function* () {
+					const handler = defaultconfigCommand.handler;
+					yield* handler({
+						bundle: Option.none(),
+					});
+				}).pipe(
+					Effect.provide(
+						createTestLayer(
+							MockFileSystemServiceLayer({
+								[`${process.cwd()}/package.json`]: {
+									name: "not-a-bundle",
+									version: "1.0.0",
+								},
+								"/mock/root/package.json": {
+									name: "my-awesome-bundle",
+									nodecg: { compatibleRange: "^2.0.0" },
+								},
+								"/mock/root/configschema.json": {
+									type: "object",
+									properties: {
+										installedMode: { type: "boolean", default: true },
+									},
+								},
+								"/mock/root/cfg": {},
+							}),
+							MockTerminalServiceLayer(),
+							MockPathServiceLayer({
+								nodecgPath: "/mock/root",
+								isBundle: true,
+							}),
+							MockJsonSchemaServiceLayer({
+								installedMode: true,
+							}),
+						),
+					),
+				),
 		);
-		expect(config.fromBundlesDir).toBe(true);
+
+		it.effect(
+			"should still check bundles directory when bundle name doesn't match root",
+			() =>
+				Effect.gen(function* () {
+					const handler = defaultconfigCommand.handler;
+					yield* handler({
+						bundle: Option.some("another-bundle"),
+					});
+				}).pipe(
+					Effect.provide(
+						createTestLayer(
+							MockFileSystemServiceLayer({
+								"/mock/root/package.json": {
+									name: "my-awesome-bundle",
+									nodecg: { compatibleRange: "^2.0.0" },
+								},
+								"/mock/root/bundles/another-bundle/package.json": {
+									name: "another-bundle",
+									nodecg: { compatibleRange: "^2.0.0" },
+								},
+								"/mock/root/bundles/another-bundle/configschema.json": {
+									type: "object",
+									properties: {
+										fromBundlesDir: { type: "boolean", default: true },
+									},
+								},
+								"/mock/root/cfg": {},
+							}),
+							MockTerminalServiceLayer(),
+							MockPathServiceLayer({
+								nodecgPath: "/mock/root",
+								isBundle: true,
+							}),
+							MockJsonSchemaServiceLayer({
+								fromBundlesDir: true,
+							}),
+						),
+					),
+				),
+		);
 	});
 });

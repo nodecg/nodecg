@@ -1,117 +1,134 @@
-import fs from "node:fs";
 import path from "node:path";
 
+import { Args, Command } from "@effect/cli";
 import { rootPaths } from "@nodecg/internal-util";
-import { Ajv, type JSONSchemaType } from "ajv";
-import chalk from "chalk";
-import { Command } from "commander";
+import { Effect, Option, Schema } from "effect";
 
-import { isBundleFolder } from "../lib/util.js";
+import { FileSystemService } from "../services/file-system.js";
+import { JsonSchemaService } from "../services/json-schema.js";
+import { PathService } from "../services/path.js";
+import { TerminalService } from "../services/terminal.js";
 
-const ajv = new Ajv({ useDefaults: true, strict: true });
+const PackageJsonSchema = Schema.Struct({
+	name: Schema.String,
+	version: Schema.String,
+	nodecg: Schema.optional(Schema.Unknown),
+});
 
-export function defaultconfigCommand(program: Command) {
-	program
-		.command("defaultconfig [bundle]")
-		.description("Generate default config from configschema.json")
-		.action(action);
-}
+export const defaultconfigCommand = Command.make(
+	"defaultconfig",
+	{
+		bundle: Args.text({ name: "bundle" }).pipe(Args.optional),
+	},
+	({ bundle: bundleName }) =>
+		Effect.gen(function* () {
+			const fs = yield* FileSystemService;
+			const terminal = yield* TerminalService;
+			const pathService = yield* PathService;
+			const jsonSchema = yield* JsonSchemaService;
 
-function getBundlePath(bundleName: string): string | null {
-	const rootPath = rootPaths.getRuntimeRoot();
+			const cwd = process.cwd();
+			const rootPath = rootPaths.getRuntimeRoot();
 
-	// Check if root project itself is the bundle
-	if (isBundleFolder(rootPath)) {
-		try {
-			const rootPjsonPath = path.join(rootPath, "package.json");
-			const rootPjson = JSON.parse(fs.readFileSync(rootPjsonPath, "utf8"));
-			if (rootPjson.name === bundleName) {
-				return rootPath;
+			// Helper to get bundle path (checks root first, then bundles dir)
+			const getBundlePath = Effect.fn("getBundlePath")(function* (
+				name: string,
+			) {
+				// Check if root project itself is the bundle
+				const rootIsBundle = yield* pathService.isBundleFolder(rootPath);
+				if (rootIsBundle) {
+					const rootPjsonPath = path.join(rootPath, "package.json");
+					const rootPjsonExists = yield* fs.exists(rootPjsonPath);
+					if (rootPjsonExists) {
+						const rootPjson = yield* fs.readJson(
+							rootPjsonPath,
+							PackageJsonSchema,
+						);
+						if (rootPjson.name === name) {
+							return rootPath;
+						}
+					}
+				}
+
+				// Otherwise check bundles directory
+				const bundlesPath = path.join(rootPath, "bundles", name);
+				const bundlesPathIsBundle =
+					yield* pathService.isBundleFolder(bundlesPath);
+				if (bundlesPathIsBundle) {
+					return bundlesPath;
+				}
+
+				return yield* Effect.fail(new Error(`Bundle ${name} not found`));
+			});
+
+			const finalBundleName = yield* Option.match(bundleName, {
+				onNone: Effect.fn("onNone")(function* () {
+					// Check if cwd is a bundle
+					const isCwdBundle = yield* pathService.isBundleFolder(cwd);
+					if (isCwdBundle) {
+						const pjsonPath = path.join(cwd, "package.json");
+						const pjson = yield* fs.readJson(pjsonPath, PackageJsonSchema);
+						return pjson.name;
+					}
+
+					// Check if root project is a bundle (installed mode)
+					const isRootBundle = yield* pathService.isBundleFolder(rootPath);
+					if (isRootBundle) {
+						const pjsonPath = path.join(rootPath, "package.json");
+						const pjson = yield* fs.readJson(pjsonPath, PackageJsonSchema);
+						return pjson.name;
+					}
+
+					yield* terminal.writeError(
+						"Error: No bundle found in the current directory!",
+					);
+					return yield* Effect.fail(
+						new Error("No bundle found in current directory"),
+					);
+				}),
+				onSome: (name) => Effect.succeed(name),
+			});
+
+			const bundlePath = yield* getBundlePath(finalBundleName).pipe(
+				Effect.catchAll(() =>
+					Effect.gen(function* () {
+						yield* terminal.writeError(
+							`Error: Bundle ${finalBundleName} does not exist`,
+						);
+						return yield* Effect.fail(new Error("Bundle not found"));
+					}),
+				),
+			);
+
+			const schemaPath = path.join(bundlePath, "configschema.json");
+			const cfgPath = path.join(rootPath, "cfg");
+
+			const schemaExists = yield* fs.exists(schemaPath);
+			if (!schemaExists) {
+				yield* terminal.writeError(
+					`Error: Bundle ${finalBundleName} does not have a configschema.json`,
+				);
+				return;
 			}
-		} catch {
-			// Ignore JSON parse errors
-		}
-	}
 
-	// Otherwise check bundles directory
-	const bundlesPath = path.join(rootPath, "bundles", bundleName);
-	if (isBundleFolder(bundlesPath)) {
-		return bundlesPath;
-	}
+			const cfgExists = yield* fs.exists(cfgPath);
+			if (!cfgExists) {
+				yield* fs.mkdir(cfgPath);
+			}
 
-	return null;
-}
+			const configPath = path.join(cfgPath, `${finalBundleName}.json`);
+			const configExists = yield* fs.exists(configPath);
 
-function action(bundleName?: string) {
-	const cwd = process.cwd();
-	const rootPath = rootPaths.getRuntimeRoot();
-
-	let resolvedBundleName: string;
-
-	if (!bundleName) {
-		// Check if cwd is a bundle
-		if (isBundleFolder(cwd)) {
-			const pjson = JSON.parse(
-				fs.readFileSync(path.join(cwd, "package.json"), "utf8"),
-			);
-			resolvedBundleName = pjson.name;
-		} else if (isBundleFolder(rootPath)) {
-			// Check if root project is a bundle (installed mode)
-			const pjson = JSON.parse(
-				fs.readFileSync(path.join(rootPath, "package.json"), "utf8"),
-			);
-			resolvedBundleName = pjson.name;
-		} else {
-			console.error(
-				`${chalk.red("Error:")} No bundle found in the current directory!`,
-			);
-			return;
-		}
-	} else {
-		resolvedBundleName = bundleName;
-	}
-
-	const bundlePath = getBundlePath(resolvedBundleName);
-	if (!bundlePath) {
-		console.error(
-			`${chalk.red("Error:")} Bundle ${resolvedBundleName} does not exist`,
-		);
-		return;
-	}
-
-	const schemaPath = path.join(bundlePath, "configschema.json");
-	if (!fs.existsSync(schemaPath)) {
-		console.error(
-			`${chalk.red("Error:")} Bundle ${resolvedBundleName} does not have a configschema.json`,
-		);
-		return;
-	}
-
-	const cfgPath = path.join(rootPath, "cfg");
-	if (!fs.existsSync(cfgPath)) {
-		fs.mkdirSync(cfgPath);
-	}
-
-	const schema: JSONSchemaType<unknown> = JSON.parse(
-		fs.readFileSync(schemaPath, "utf8"),
-	);
-	const configPath = path.join(cfgPath, `${resolvedBundleName}.json`);
-	if (fs.existsSync(configPath)) {
-		console.error(
-			`${chalk.red("Error:")} Bundle ${resolvedBundleName} already has a config file`,
-		);
-	} else {
-		try {
-			const validate = ajv.compile(schema);
-			const data = {};
-			validate(data);
-
-			fs.writeFileSync(configPath, JSON.stringify(data, null, 2));
-			console.log(
-				`${chalk.green("Success:")} Created ${chalk.bold(resolvedBundleName)}'s default config from schema\n`,
-			);
-		} catch (error) {
-			console.error(chalk.red("Error:"), error);
-		}
-	}
-}
+			if (configExists) {
+				yield* terminal.writeError(
+					`Error: Bundle ${finalBundleName} already has a config file`,
+				);
+			} else {
+				const data = yield* jsonSchema.applyDefaults(schemaPath);
+				yield* fs.writeJson(configPath, data);
+				yield* terminal.writeSuccess(
+					`Success: Created ${finalBundleName}'s default config from schema\n`,
+				);
+			}
+		}),
+);

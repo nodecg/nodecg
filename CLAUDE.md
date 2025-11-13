@@ -73,6 +73,14 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 2. `npm run build` - Build workspace packages before testing
 3. `npx vitest run` - Run tests in CI mode (not `npm test`)
 
+### Monorepo Command Execution
+
+- **ALWAYS work from monorepo root** (`/Users/hoishin/work/nodecg__nodecg2`) - never `cd` into workspaces
+- Run workspace-specific commands: `npm run build --workspace=@nodecg/cli`
+- Install in workspace: `npm i package@latest --workspace=@nodecg/cli`
+- Run tests from root: `npx vitest run workspaces/cli/src/commands/defaultconfig.test.ts`
+- Lint/fix from root: `npm run fix` (applies to all workspaces)
+
 ## Codebase Patterns
 
 ### Imports
@@ -177,6 +185,7 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - **Across codebase**: Leaf-to-root (bottom-up) - extract isolated subsystems as workspace packages first
 - Each new package is fully Effect-native internally, called via `Effect.run*` from old code
 - Candidates listed in `docs/effect-migration/strategy.md` with complexity ratings
+- **CLI workspace already migrated**: `workspaces/cli` is fully Effect-native with DI-based testing
 
 **Effect Conventions**:
 
@@ -185,10 +194,43 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Use `yield* Effect.log*()` for app logs, `yield* Console.*()` for debugging
 - Always use `Effect.fn("name")` for effect-returning functions (never `Effect.gen` for definitions)
 - Services created with `Effect.Service` (never Context API directly)
-- Tests use `@effect/vitest` for Effect testing utilities
+- **Tests use `@effect/vitest`** for Effect testing utilities (NOT plain vitest)
+- **Test files co-located**: Always place `.test.ts` files next to source files, not in separate `test/` directory
 - Install Effect packages with `npm i @effect/package@latest` in workspace (never edit package.json directly)
 - No return type annotations (let TypeScript infer), no `any`, no type assertions
+- **Exception**: Add explicit type annotations for recursive functions to avoid "implicitly has type 'any'" errors
 - See `docs/effect-migration/strategy.md` for comprehensive coding guidelines
+
+**CLI Testing with Effect**:
+
+- **MUST use `@effect/vitest`** for all Effect-based tests
+- Mock services use `Effect.Service.make()` to create instances
+- Use `createTestLayer()` to compose mock service layers
+- **Test runner must provide platform layers** - NodeContext.layer provides CommandExecutor and other platform dependencies
+- Mock service layers that wrap real services (Git, Npm) need `Layer.merge` with their dependencies (CommandService)
+- For generic methods (like `readJson<A>`), return `any` in mocks - TypeScript can't properly type these
+- **Use `Layer.mergeAll(...layers)`** for combining multiple layers - it's the correct Effect-TS API (production code in `bin/nodecg.ts` uses this)
+- Helper functions that accept rest parameters need `as any` cast: `Layer.mergeAll(...(layers as any))` due to TypeScript spread limitations
+
+**Test Pattern with @effect/vitest**:
+
+```typescript
+import { it } from "@effect/vitest";
+
+it.effect("should do something",
+  Effect.fn(function* () {
+    const service = yield* MyService;
+    yield* service.doSomething();
+    expect(result).toBe(expected);
+  }, Effect.provide(MockServiceLayer()))
+);
+```
+
+- Use `it.effect()` with `Effect.fn()` (not `Effect.gen().pipe()`)
+- Effect.fn can be nameless and takes generator as first arg
+- Additional functions (Effect.provide, etc.) passed as 2nd/3rd... params like pipe
+- Assertions go inside the generator function
+- Empty Effect functions cause eslint errors - use `Effect.succeed(value)` or `Effect.void` instead of `function* () {}`
 
 **Migration Documentation**:
 
@@ -202,6 +244,14 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Migration from fp-ts → Effect is translation, not rewrite
 - Good reference for functional patterns in the codebase
 
+**Applying Changes to Migrated Code**:
+
+- When porting changes from main branch (non-Effect) to migrated branches, translate patterns:
+  - Direct function calls → `yield* service.method()`
+  - Try/catch → `Effect.catchAll()` or proper error handling
+  - Plain objects in tests → Mock service layers with DI
+  - Helper functions → `Effect.fn("name")` definitions
+
 ## Common Pitfalls
 
 - Missing `.js` extension in imports (causes module resolution errors)
@@ -210,3 +260,6 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Sharing state between test files (each file must be isolated)
 - Forgetting that array/object access returns `T | undefined` (`noUncheckedIndexedAccess`)
 - Importing NodeCG modules before setting `NODECG_ROOT` env var (causes wrong root path to be cached)
+- **Effect-TS recursion**: Recursive Effect.fn functions cause "implicitly has type 'any'" - add explicit type annotation
+- **Effect service dependencies**: Services using @effect/platform commands need NodeContext.layer in tests for CommandExecutor
+- **Mock layer dependencies**: When mocking services that depend on other services, use `Layer.merge` to provide dependencies
