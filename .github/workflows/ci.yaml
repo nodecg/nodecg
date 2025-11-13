@@ -43,7 +43,7 @@ jobs:
       - run: npm run build
       - run: npm run typetest
 
-  build-test:
+  build-test-matrix:
     strategy:
       fail-fast: false
       matrix:
@@ -96,6 +96,13 @@ jobs:
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+  build-test:
+    needs: build-test-matrix
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 1
+        if: needs.build-test-matrix.result != 'success'
 
   container-build:
     runs-on: ubuntu-latest
