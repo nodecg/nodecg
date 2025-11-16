@@ -36,6 +36,7 @@ import { databaseAdapter as defaultAdapter } from "@nodecg/database-adapter-sqli
 import { rootPaths } from "@nodecg/internal-util";
 import bodyParser from "body-parser";
 import compression from "compression";
+import { Effect } from "effect";
 import express from "express";
 import transformMiddleware from "express-transform-bare-module-specifiers";
 import memoize from "fast-memoize";
@@ -96,6 +97,8 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 	// @ts-expect-error Used only by tests.
 	private _bundleManager: BundleManager;
 
+	private _stoppedEmitted = false;
+
 	constructor() {
 		super();
 
@@ -144,6 +147,10 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		});
 
 		this._server = server;
+
+		server.on("close", () => {
+			this.emitStoppedOnce();
+		});
 	}
 
 	async start(): Promise<void> {
@@ -465,7 +472,14 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 			this._replicator.saveAllReplicants();
 		}
 
-		this.emit("stopped");
+		this.emitStoppedOnce();
+	}
+
+	private emitStoppedOnce(): void {
+		if (!this._stoppedEmitted) {
+			this._stoppedEmitted = true;
+			this.emit("stopped");
+		}
 	}
 
 	getExtensions(): Record<string, unknown> {
@@ -482,3 +496,12 @@ export class NodeCGServer extends TypedEmitter<EventMap> {
 		return this._replicator?.saveAllReplicantsNow();
 	}
 }
+
+export const instantiateServer = Effect.fn("instantiateServer")(() =>
+	Effect.acquireRelease(
+		Effect.sync(() => new NodeCGServer()),
+		Effect.fn("instantiateServer/release")((server) =>
+			Effect.promise(() => server.stop()),
+		),
+	),
+);

@@ -34,6 +34,7 @@
   "prettier": {},
   "devDependencies": {
     "@effect/cli": "^0.72.1",
+    "@effect/language-service": "^0.55.5",
     "@effect/platform": "^0.93.0",
     "@effect/platform-node": "^0.100.0",
     "@eslint/js": "^9.39.0",

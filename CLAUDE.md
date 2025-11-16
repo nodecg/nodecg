@@ -190,6 +190,24 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - No return type annotations (let TypeScript infer), no `any`, no type assertions
 - See `docs/effect-migration/strategy.md` for comprehensive coding guidelines
 
+**Effect Layer Patterns**:
+
+- **Avoid top-level Effect execution**: Never use `Layer.unwrapEffect` at module top-level
+- **Lazy layer construction**: Use `Effect.fn` wrappers that capture runtime/context when called, not at module load
+- **Pattern**: `export const withXLive = Effect.fn(function* (effect) { ... yield* Effect.runtime() ... })`
+- **OpenTelemetry integration**: Span exporter needs runtime for Effect logging - capture via Effect.fn wrapper
+
+**Effect Patterns for Long-Running Servers**:
+
+- Use `Effect.never` to represent operations that run indefinitely (e.g., HTTP servers)
+- Listen to native events (e.g., HTTP server's 'close') instead of manually-emitted events for reliability
+- Use `Effect.raceFirst` (NOT `Effect.race`) when racing error handlers with indefinite operations
+  - `Effect.race` waits for first SUCCESS; hangs if one fails and one never completes
+  - `Effect.raceFirst` completes on first completion (success OR failure)
+- `Effect.async` suspension: Must call `resume()` to complete fiber; cleanup alone doesn't complete suspended fibers
+- Avoid arbitrary timeouts for servers - they should run forever, not timeout
+- When migrating from event-driven code, identify which events represent actual system state vs. manual notifications
+
 **Migration Documentation**:
 
 - All migration work must be logged in `docs/effect-migration/log.md`
@@ -201,6 +219,24 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - `src/server/bundle-parser/` already uses fp-ts (IOEither, pipe, flow)
 - Migration from fp-ts → Effect is translation, not rewrite
 - Good reference for functional patterns in the codebase
+
+## OpenTelemetry Integration
+
+- **Required packages**: `@effect/opentelemetry`, `@opentelemetry/sdk-trace-base`, `@opentelemetry/core`, `@opentelemetry/sdk-logs`, `@opentelemetry/sdk-metrics`, `@opentelemetry/sdk-trace-node`, `@opentelemetry/api`, `@opentelemetry/resources`, `@opentelemetry/semantic-conventions`, `@opentelemetry/sdk-trace-web`, `@opentelemetry/context-zone`, `@opentelemetry/instrumentation`
+- **Automatic span logging**: `Effect.fn("name")` automatically creates spans when OpenTelemetry is configured
+- **Span names**: First argument to `Effect.fn` becomes the span name (e.g., `Effect.fn("main")`)
+- **Runtime capture**: SpanExporter needs Effect Runtime to use Effect logging - capture via `Effect.runtime<never>()` inside Effect.fn wrapper
+- **Entry point**: `workspaces/nodecg/index.js` (not dist/index.js)
+
+### Custom Span Processors
+
+- **SpanProcessor vs SpanExporter**: Use `SpanProcessor` interface for lifecycle hooks (`onStart`, `onEnd`), not `SpanExporter` (only gets finished spans)
+- **Logging both start and end**: Implement `onStart()` for span begin, `onEnd()` for completion with duration
+- **Status codes**: Use `SpanStatusCode` enum from `@opentelemetry/api` (UNSET=0, OK=1, ERROR=2), not raw numbers
+- **Direct processor usage**: Pass processor directly to `spanProcessor` config, skip `BatchSpanProcessor` wrapper for immediate logging
+- **HrTime format**: `span.duration` is `[seconds, nanoseconds]` tuple - use `Duration.seconds().pipe(Duration.sum(Duration.nanos()))` to convert
+- **Duration formatting**: Use `Duration.format()` for human-readable output; round conditionally based on magnitude
+- **Reference**: See `workspaces/nodecg/src/server/_effect/span-logger.ts` for example implementation
 
 ## Common Pitfalls
 
