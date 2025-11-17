@@ -1,0 +1,14 @@
+.container {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.slider {
+	min-width: 200px;
+	flex-grow: 1;
+}
+
+.number-input {
+	width: 100px;
+}

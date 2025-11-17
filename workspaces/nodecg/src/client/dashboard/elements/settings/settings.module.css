@@ -1,0 +1,12 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	padding: 16px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.card {
+	background-color: #2e3b4e;
+	--paper-border-color: #d5d8dc !important;
+}

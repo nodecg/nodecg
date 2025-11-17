@@ -1,0 +1,18 @@
+.panel {
+	display: inline-block;
+}
+
+.header {
+	background-color: #516077;
+	font-weight: bold;
+	padding: var(--mantine-spacing-sm);
+	display: flex;
+	justify-content: space-between;
+}
+
+.iframe {
+	border: none;
+	/* overflow: hidden; */
+	/* overflow-y: scroll; */
+	scrollbar-width: none;
+}

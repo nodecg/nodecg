@@ -1,1 +1,1 @@
-import "../dashboard/elements/ncg-dashboard";
+import "../dashboard/elements/dashboard";

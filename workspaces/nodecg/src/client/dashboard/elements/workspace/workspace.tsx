@@ -1,0 +1,97 @@
+import { useParams } from "react-router-dom";
+
+import { Panel } from "./panel";
+
+import classes from "./workspace.module.css";
+import { PackeryGrid } from "./packery";
+import { Breadcrumbs } from "@mantine/core";
+
+function locationParser(url?: string): {
+	workspace: string;
+	isFullbleed: boolean;
+} {
+	if (!url) {
+		return {
+			workspace: "default",
+			isFullbleed: false,
+		};
+	}
+
+	const segments = url.split("/").filter((seg) => seg.length > 0);
+	let isFullbleed = false;
+	if (segments[0] === "fullbleed") {
+		isFullbleed = true;
+		segments.shift();
+	}
+
+	const workspace = segments.join("/") || "default";
+	return {
+		workspace,
+		isFullbleed,
+	};
+}
+
+export function Workspace() {
+	const { "*": splat } = useParams();
+	const { workspace, isFullbleed } = locationParser(splat);
+
+	const bundles = window.__renderData__.bundles;
+	// const isFullbleed = location.pathname.includes("fullbleed");
+
+	const workspacePanels =
+		bundles?.flatMap((bundle) =>
+			bundle.dashboard.panels.filter((panel) => {
+				if (panel.dialog) return false;
+
+				if (panel.fullbleed) {
+					if (!isFullbleed) return false;
+					return workspace === panel.name;
+				}
+
+				return panel.workspace === workspace;
+			}),
+		) ?? [];
+
+	if (isFullbleed) {
+		const fullbleedPanel = workspacePanels[0];
+		if (!fullbleedPanel) {
+			return (
+				<div>
+					Error: This page should be a fullbleed panel but no fullbleed panel
+					matching the url was found. Expected a panel named: {workspace}
+				</div>
+			);
+		}
+
+		return (
+			<div className={classes["fullbleed"]}>
+				<Panel key={fullbleedPanel.name} panel={fullbleedPanel} />
+			</div>
+		);
+	}
+
+	const splitWorkspace = workspace.split("/");
+
+	const breadcrumbs = splitWorkspace.map((part) => {
+		return <span>{part}</span>;
+	});
+
+	return (
+		<div className={classes["workspace"]}>
+			{breadcrumbs.length > 1 && <Breadcrumbs>{breadcrumbs}</Breadcrumbs>}
+			<h1>{splitWorkspace.at(-1)}</h1>
+			{/* <div style={{ display: "flex", flexWrap: "wrap", gap: 32 }} ref={containerRef}> */}
+			<PackeryGrid
+				itemSelector=".ncg-dashboard-panel"
+				gutter={16}
+				columnWidth={128}
+				containerStyle={{ position: "relative" }}
+			>
+				{workspacePanels.map((panel) => (
+					<Panel key={panel.name} panel={panel} />
+				))}
+			</PackeryGrid>
+			{/* </div> */}
+		</div>
+	);
+}

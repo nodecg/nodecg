@@ -1,0 +1,49 @@
+.header {
+	position: sticky;
+	top: 0;
+	background-color: #516077;
+	transition: box-shadow 150ms ease;
+
+	&::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border-bottom: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-3));
+	}
+}
+
+.scrolled {
+	box-shadow: var(--mantine-shadow-sm);
+}
+
+.metadata {
+	display: flex;
+	align-items: center;
+	margin: 16px 0;
+	gap: 8px;
+}
+
+.pill {
+	background-color: #516077;
+}
+
+.accordion-item {
+	background-color: #516077;
+	--item-border-color: #d5d8dc;
+
+	&[data-active=true] {
+		background-color: #2e3b4e;
+	}
+}
+
+.accordion-label {
+	font-weight: bold;
+	font-size: large;
+}
+
+.table {
+	border-radius: var(--mantine-radius-default);
+	--table-border-color: rgba(213, 216, 220, 0.3);
+}

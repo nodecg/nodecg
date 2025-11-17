@@ -1,0 +1,11 @@
+.file {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px;
+	border-radius: 4px;
+}
+
+.file:nth-child(odd) {
+	background-color: #212c3b;
+}

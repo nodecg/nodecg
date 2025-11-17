@@ -1,0 +1,26 @@
+.page {
+	padding: 32px;
+	margin: 0 auto;
+	width: 50%;
+}
+
+.wrapper {
+	position: relative;
+	margin-bottom: 30px;
+}
+
+.dropzone {
+	border-width: 1px;
+	padding-bottom: 50px;
+}
+
+.icon {
+	color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-3));
+}
+
+.control {
+	position: absolute;
+	width: 250px;
+	left: calc(50% - 125px);
+	bottom: -20px;
+}

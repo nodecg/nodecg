@@ -16,7 +16,8 @@
 			globalThis.ncgConfig = <%= JSON.stringify(publicConfig) %>;
 			window.__renderData__ = {
 				bundles: <%= JSON.stringify(bundles) %>,
-				workspaces: <%= JSON.stringify(workspaces) %>
+				workspaces: <%= JSON.stringify(workspaces) %>,
+				version: <%= JSON.stringify(version) %>,
 			};
 			Object.freeze(window.__renderData__);
 
@@ -53,7 +54,9 @@
 		<script src="/api.js"></script>
 
 		<!-- our custom dashboard elements -->
-		<script src="/dashboard.js"></script>
+		<script src="/dashboard.js" defer></script>
+		
+		<link rel="stylesheet" href="/dashboard.css">
 
 		<style>
 			body {
@@ -67,6 +70,6 @@
 		</style>
 	</head>
 	<body>
-		<ncg-dashboard id="nodecg_dashboard"></ncg-dashboard>
+		<div id="app"></div>
 	</body>
 </html>

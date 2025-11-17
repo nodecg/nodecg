@@ -1,0 +1,15 @@
+.workspace {
+	flex-grow: 1;
+	padding: var(--mantine-spacing-xl);
+}
+
+.workspace > h1 {
+	text-transform: capitalize;
+}
+
+.fullbleed {
+	padding: 0;
+	margin: 0;
+	height: 100vh;
+	width: 100%;
+}

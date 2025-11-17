@@ -6,9 +6,7 @@
 		"noPropertyAccessFromIndexSignature": false,
 
 		"baseUrl": ".",
-		"paths": {
-			"@polymer/polymer": ["./src/client/types/polymer-element.d.ts"]
-		}
+		"jsx": "react-jsx",
 	},
 	"exclude": ["./typetest"]
 }

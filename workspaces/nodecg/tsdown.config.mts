@@ -1,5 +1,6 @@
 import { globSync } from "tinyglobby";
 import { defineConfig, type UserConfig } from "tsdown";
+import LightningCSS from "unplugin-lightningcss/rolldown";
 
 const base = {
 	tsconfig: true,
@@ -60,6 +61,13 @@ const clientConfigs = clientEntries.map(
 							},
 						]
 					: undefined,
+			plugins: [
+				LightningCSS({
+					options: {
+						minify: true,
+					},
+				}),
+			],
 		}) satisfies UserConfig,
 );
 

@@ -1,0 +1,58 @@
+.wrapper {
+	position: relative;
+	margin-bottom: 30px;
+}
+
+.dropzone {
+	border-width: 1px;
+	padding-bottom: 50px;
+}
+
+.icon {
+	color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-3));
+}
+
+.accepted-types {
+	font-size: small;
+	color: #fff;
+	margin-top: 4px;
+}
+
+.button-stack {
+	flex-direction: column;
+	gap: 4px;
+}
+
+.control {
+	position: absolute;
+	width: 250px;
+	left: calc(50% - 125px);
+	bottom: -20px;
+}
+
+.asset-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.panel-content {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.accordion-item {
+	background-color: #516077;
+	--item-border-color: #d5d8dc;
+
+	&[data-active="true"] {
+		background-color: #2e3b4e;
+	}
+}
+
+.accordion-label {
+	font-weight: bold;
+	font-size: large;
+	text-transform: capitalize;
+}

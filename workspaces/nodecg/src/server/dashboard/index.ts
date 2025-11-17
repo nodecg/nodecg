@@ -11,6 +11,7 @@ import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
 import { sendFile } from "../util/send-file";
 import { sendNodeModulesFile } from "../util/send-node-modules-file";
+import { version } from "../../../package.json";
 
 type Workspace = NodeCG.Workspace;
 
@@ -20,6 +21,7 @@ interface DashboardContext {
 	privateConfig: typeof config;
 	workspaces: Workspace[];
 	sentryEnabled: boolean;
+	version: string;
 }
 
 const BUILD_PATH = path.join(rootPaths.nodecgInstalledPath, "dist/client");
@@ -120,6 +122,7 @@ function getDashboardContext(bundles: NodeCG.Bundle[]): DashboardContext {
 		privateConfig: config,
 		workspaces: parseWorkspaces(bundles),
 		sentryEnabled,
+		version,
 	};
 }
 
