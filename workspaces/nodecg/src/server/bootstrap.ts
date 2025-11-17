@@ -29,11 +29,12 @@ import { expectError } from "./_effect/expect-error";
 import { withLogLevelConfig } from "./_effect/log-level";
 import { withSpanProcessorLive } from "./_effect/span-logger";
 import { exitOnUncaught, sentryEnabled } from "./config";
-import { instantiateServer, NodeCGServer } from "./server";
+import { createServer, FileWatcherReadyTimeoutError } from "./server";
 import { nodecgPackageJson } from "./util/nodecg-package-json";
 
-const handleFloatingErrors = Effect.fn("handleFloatingErrors")(() =>
-	Effect.async<void, UnknownError>((resume) => {
+// TODO: Remove this in the next major release
+const handleFloatingErrors = () =>
+	Effect.async<never, UnknownError>((resume) => {
 		const uncaughtExceptionHandler = (err: Error) => {
 			if (!sentryEnabled) {
 				if (exitOnUncaught) {
@@ -45,7 +46,6 @@ const handleFloatingErrors = Effect.fn("handleFloatingErrors")(() =>
 				}
 			}
 		};
-		// TODO: Remove this handler in the next major release
 		const unhandledRejectionHandler = (err: unknown) => {
 			if (!sentryEnabled) {
 				console.error("UNHANDLED PROMISE REJECTION!");
@@ -59,47 +59,24 @@ const handleFloatingErrors = Effect.fn("handleFloatingErrors")(() =>
 		process.addListener("uncaughtException", uncaughtExceptionHandler);
 		process.addListener("unhandledRejection", unhandledRejectionHandler);
 		return Effect.sync(cleanup);
-	}),
-);
-
-const waitForServerStop = Effect.fn("waitForServerStop")(
-	(server: NodeCGServer) =>
-		Effect.async<void, UnknownError>((resume) => {
-			const errorHandler = (err: unknown) => {
-				resume(Effect.fail(new UnknownError(err)));
-			};
-			const stoppedHandler = () => {
-				resume(Effect.void);
-			};
-			server.addListener("error", errorHandler);
-			server.addListener("stopped", stoppedHandler);
-			return Effect.sync(() => {
-				server.removeListener("error", errorHandler);
-				server.removeListener("stopped", stoppedHandler);
-			});
-		}),
-);
+	});
 
 const main = Effect.fn("main")(function* () {
 	process.title = `NodeCG - ${nodecgPackageJson.version}`;
 
 	const handleFloatingErrorsFiber = yield* Effect.fork(handleFloatingErrors());
 
-	const server = yield* instantiateServer();
-	const waitForServerStopFiber = yield* Effect.fork(waitForServerStop(server));
+	const server = yield* createServer();
 
-	yield* Effect.promise(() => server.start());
-
-	yield* Effect.raceFirst(
-		Fiber.join(waitForServerStopFiber),
-		Fiber.join(handleFloatingErrorsFiber),
-	);
+	yield* Effect.raceFirst(server.run(), Fiber.join(handleFloatingErrorsFiber));
 }, Effect.scoped);
 
 NodeRuntime.runMain(
 	main().pipe(
 		withSpanProcessorLive,
 		withLogLevelConfig,
-		expectError<UnknownError | ConfigError.ConfigError>(),
+		expectError<
+			UnknownError | ConfigError.ConfigError | FileWatcherReadyTimeoutError
+		>(),
 	),
 );

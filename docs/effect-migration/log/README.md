@@ -6,18 +6,13 @@ This directory contains detailed log entries for the NodeCG Effect-TS migration.
 
 When working on a migration:
 
-1. Create a new file in this directory: `brief-description.md` (no dates - use git history)
-2. Use the template below
-3. Document a complete chunk of work, not daily progress
-4. Record key decisions, problems/solutions, patterns, and lessons learned
-5. Update status as the chunk progresses (In Progress → Completed)
-6. Add a link to the entry in this README
+1. **Before starting**: Create a new file `##-brief-description.md` (use next sequential number)
+2. **Document the plan**: Use the template below to write the implementation plan
+3. **During implementation**: Update with problems/solutions as they arise
+4. **On completion**: Update status to Completed and add lessons learned
+5. **Keep it focused**: Document complete chunks of work, not daily progress
 
-## Entries
-
-### Phase 1: Bootstrap Migration
-
-- **[phase-1-bootstrap.md](./phase-1-bootstrap.md)** - Complete migration of server entry point to Effect with single execution point, including OpenTelemetry integration, error handling patterns, and utility creation
+This approach ensures plans are reviewed before implementation and serves as both planning document and historical record.
 
 ---
 
@@ -25,7 +20,7 @@ When working on a migration:
 
 Use this template when creating new log entries:
 
-```markdown
+````markdown
 # [Chunk of Work Title]
 
 **Status**: In Progress | Completed | Blocked
@@ -59,9 +54,11 @@ What this chunk of work accomplished and why it was done.
 **Investigation**: How the problem was debugged/understood
 
 **Solution**: How it was resolved
+
 ```typescript
 // Code example if applicable
 ```
+````
 
 ## Implementation
 
@@ -72,6 +69,7 @@ Key implementation details, code patterns established, utilities created.
 Reusable patterns that were discovered/created during this work:
 
 ### Pattern Name
+
 Description and code example
 
 ## Lessons Learned
@@ -89,4 +87,7 @@ Description and code example
 ## Files Modified
 
 - `path/to/file.ts` - Description of changes
+
+```
+
 ```

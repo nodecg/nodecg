@@ -3,19 +3,30 @@ import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 
 import { getConnection } from "@nodecg/database-adapter-sqlite-legacy";
+import { Deferred, Effect, Fiber } from "effect";
 import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
 import { afterAll, test } from "vitest";
 
 import type { serverApiFactory } from "../../src/server/api.server";
-import type { NodeCGServer } from "../../src/server/server";
+import type { createServer } from "../../src/server/server";
 import { populateTestData } from "./populateTestData";
 import * as C from "./test-constants";
 import { testDirPath } from "./test-dir-path";
 import { createTmpDir } from "./tmp-dir";
 
+type ServerHandle = Effect.Effect.Success<ReturnType<typeof createServer>>;
+
+interface TestServerWrapper {
+	start: () => Promise<void>;
+	stop: () => Promise<void>;
+	getExtensions: ServerHandle["getExtensions"];
+	saveAllReplicantsNow: ServerHandle["saveAllReplicantsNow"];
+	handle: ServerHandle;
+}
+
 export interface SetupContext {
-	server: NodeCGServer;
+	server: TestServerWrapper;
 	apis: { extension: InstanceType<ReturnType<typeof serverApiFactory>> };
 	browser: puppeteer.Browser;
 	dashboard: puppeteer.Page;
@@ -26,6 +37,7 @@ export interface SetupContext {
 	database: Awaited<ReturnType<typeof getConnection>>;
 }
 
+// TODO: Replace with Effect-ful API
 export async function setupTest(nodecgConfigName = "nodecg.json") {
 	const tmpDir = createTmpDir();
 
@@ -65,10 +77,48 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 		"utf-8",
 	);
 
-	const { NodeCGServer } = await import("../../src/server/server");
-	const server = new NodeCGServer();
+	const { createServer } = await import("../../src/server/server");
 
-	await populateTestData();
+	let serverHandle: ServerHandle | null = null;
+	let mainFiber: Fiber.RuntimeFiber<void, unknown> | null = null;
+
+	const server: TestServerWrapper = {
+		start: async () => {
+			await populateTestData();
+
+			await Effect.runPromise(
+				Effect.gen(function* () {
+					const ready = yield* Deferred.make<void>();
+					mainFiber = yield* Effect.fork(
+						Effect.gen(function* () {
+							const handle = yield* createServer(ready);
+							serverHandle = handle;
+							yield* handle.run();
+						}).pipe(Effect.scoped),
+					);
+					yield* Deferred.await(ready);
+				}),
+			);
+		},
+		stop: async () => {
+			if (mainFiber) {
+				await Effect.runPromise(Fiber.interrupt(mainFiber));
+			}
+		},
+		getExtensions: () => {
+			if (!serverHandle) throw new Error("Server not started");
+			return serverHandle.getExtensions();
+		},
+		saveAllReplicantsNow: () => {
+			if (!serverHandle) throw new Error("Server not started");
+			return serverHandle.saveAllReplicantsNow();
+		},
+		get handle() {
+			if (!serverHandle) throw new Error("Server not started");
+			return serverHandle;
+		},
+	};
+
 	await server.start();
 
 	let browser: puppeteer.Browser | null = null;

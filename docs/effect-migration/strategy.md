@@ -27,6 +27,7 @@ Transform `workspaces/nodecg/src/server/bootstrap.ts` into an Effect program wit
 - Floating errors handled via `Effect.async` with proper fiber suspension/resume
 - Uses `Effect.raceFirst` to wait for either server stop or error
 - OpenTelemetry integration with custom span processor for trace logging
+- Conditional OpenTelemetry loading using Config + dynamic imports (zero overhead when disabled)
 - Log level configuration from `LOG_LEVEL` environment variable
 - Removed custom exit hooks - Effect's interruption handles SIGTERM/SIGINT
 
@@ -43,9 +44,54 @@ Transform `workspaces/nodecg/src/server/bootstrap.ts` into an Effect program wit
 - OpenTelemetry: `@opentelemetry/{api,core,resources,sdk-trace-base,sdk-trace-node,semantic-conventions}`
 - Dev: `@effect/language-service` (TypeScript plugin)
 
-See [migration log entry](./log/phase-1-bootstrap.md) for detailed implementation notes.
+See [migration log entry](./log/01-phase-1-bootstrap.md) for detailed implementation notes.
 
-### Phase 2: Core Services
+### Phase 2: Server Architecture Refactoring
+
+**Status**: ✅ Core Implementation Complete (testing in progress)
+
+Replace `NodeCGServer` class with functional Effect-based architecture.
+
+**Approach**:
+
+- Remove class-based design, use plain Effect functions
+- `createServer()` function sets up resources and returns handle with `run` Effect
+- Resources use `Effect.acquireRelease` for guaranteed cleanup
+- Cleanup logic from `stop()` method distributed into release functions
+- Tests use Promise wrapper that manages Effect fibers internally
+
+**Implementation**:
+
+- `createServer(isReady?: Deferred<void>)` - Sets up all resources, returns `{ run, getExtensions, saveAllReplicantsNow }`
+- Resources managed inline with `Effect.acquireRelease`:
+  - Socket.IO: acquire (create server), release (disconnect + close)
+  - Replicator: acquire (instantiate), release (saveAllReplicants)
+  - ExtensionManager: acquire (instantiate + emit extensionsLoaded), release (emit serverStopping)
+- Event listeners forked with `Effect.forkScoped` for automatic cleanup
+- `run` Effect - Waits for server close or error using `Effect.raceFirst`
+- Ready signaling via optional Deferred parameter (for test synchronization)
+- Bootstrap: `const server = yield* createServer()` then `yield* server.run()` (all within `Effect.scoped`)
+- Tests: Create Deferred, fork scoped Effect containing `createServer` + `run`, await ready
+
+**Key Patterns Established**:
+
+- **Separate create from run** - Resources created and returned in handle, run separately for long-lived servers
+- **Scope at call site** - `Effect.scoped` applied in caller (bootstrap, tests), not in `createServer`
+- **Bridging native callbacks** - Capture runtime with `yield* Effect.runtime()`, use `Runtime.runSync` in callbacks
+- **Test wrapper pattern** - Promise-based API wrapping Effect fibers for backward compatibility
+- **No classes in Effect** - Pure functional code, no class-based architecture
+
+**Benefits**:
+
+- No classes - pure functional Effect code
+- Automatic cleanup via `acquireRelease`
+- Clean test access via wrapper's `handle` property
+- Maintains all public APIs (ExtensionManager broadcasts)
+- Proper ready signaling for tests without race conditions
+
+See [migration log entry](./log/02-phase-2-server-refactor.md) for detailed implementation notes and patterns learned.
+
+### Phase 3: Core Services
 
 Convert subsystems into Effect services in dependency order:
 
@@ -57,7 +103,7 @@ Convert subsystems into Effect services in dependency order:
 
 Each service uses `Effect.Service` and provides its functionality through Effect.
 
-### Phase 3: HTTP Server Integration
+### Phase 4: HTTP Server Integration
 
 Use Effect Platform HTTP Server with Express as fallback for user routes:
 
@@ -66,7 +112,7 @@ Use Effect Platform HTTP Server with Express as fallback for user routes:
 - Users can still register custom routes via `nodecg.mount()`
 - Entire HTTP layer runs within Effect runtime
 
-### Phase 4: Route Handlers
+### Phase 5: Route Handlers
 
 Convert Express route handlers to Effect HTTP Router routes:
 
@@ -75,7 +121,7 @@ Convert Express route handlers to Effect HTTP Router routes:
 - Error handling unified through Effect error types
 - Request/response lifecycle managed with Effect scopes
 
-### Phase 5: Utility Functions
+### Phase 6: Utility Functions
 
 Migrate supporting functions as needed during service migration.
 
@@ -160,15 +206,16 @@ All migration work must be documented in `docs/effect-migration/log/`. Each entr
 
 **What to log**:
 
-- Date and subsystem being worked on
-- Key architectural decisions and rationale
-- Problems encountered and how they were solved
-- Effect patterns established or discovered
-- Lessons learned and gotchas
-- Migration status (in progress, completed, blocked)
+- **Plans** - Detailed implementation plans before starting work
+- **Decisions** - Key architectural decisions and rationale
+- **Problems & Solutions** - Issues encountered and how they were solved
+- **Patterns** - Effect patterns established or discovered
+- **Lessons learned** - Gotchas and insights from implementation
+- **Status** - Migration status (planned, in progress, completed, blocked)
 
 **Why we log**:
 
+- **Planning** - Document the plan before implementation for clarity and review
 - **Historical context** - Understand why decisions were made months later
 - **Pattern reference** - See how similar problems were solved before
 - **Knowledge sharing** - Team members can learn from each other's experiences
@@ -176,10 +223,11 @@ All migration work must be documented in `docs/effect-migration/log/`. Each entr
 
 **How to add entries**:
 
-1. Create new file in `log/` directory: `brief-description.md` (no dates)
+1. Create new file in `log/` directory: `##-brief-description.md` (sequential numbering)
 2. Use template from [log/README.md](./log/README.md)
-3. Document complete chunks of work, not daily updates
-4. Add link to the entry in [log/README.md](./log/README.md)
+3. **Start with the plan** - Document the approach before implementation
+4. **Update during work** - Add problems/solutions as they arise
+5. **Complete on finish** - Mark as completed and add lessons learned
 
 See the [migration log](./log/README.md) for all entries and the template.
 
