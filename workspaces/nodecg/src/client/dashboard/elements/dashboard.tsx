@@ -1,11 +1,12 @@
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
 import {
 	createTheme,
 	type MantineColorsTuple,
 	MantineProvider,
 } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
+import { notifications, Notifications } from "@mantine/notifications";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
@@ -15,6 +16,8 @@ import { Navbar } from "./navbar/navbar";
 import { Sound } from "./sound/sound";
 import { Workspace } from "./workspace/workspace";
 import { Settings } from "./settings/settings";
+import { useSocketEvent, useSocketIOEvent } from "./hooks/use-socket";
+import { CheckIcon, CloudOff } from "lucide-react";
 
 const nodecgColor: MantineColorsTuple = [
 	"#f2f4f8",
@@ -76,6 +79,44 @@ function Root() {
 }
 
 function NCGDashboard() {
+	useSocketEvent("disconnect", () => {
+		notifications.show({
+			title: "Disconnected",
+			message: "Lost connection to the NodeCG server.",
+			color: "red",
+			autoClose: false,
+			withCloseButton: false,
+			id: "nodecg-disconnected",
+			icon: <CloudOff />,
+		});
+	});
+
+	useSocketIOEvent("reconnect_attempt", () => {
+		notifications.update({
+			title: "Reconnecting...",
+			message: "Attempting to reconnect to the NodeCG server...",
+			color: "yellow",
+			autoClose: false,
+			withCloseButton: false,
+			loading: true,
+			id: "nodecg-disconnected",
+			icon: null,
+		});
+	});
+
+	useSocketIOEvent("reconnect", () => {
+		notifications.update({
+			title: "Reconnected",
+			message: "Reconnected to the NodeCG server.",
+			color: "green",
+			autoClose: 3000,
+			loading: false,
+			withCloseButton: true,
+			id: "nodecg-disconnected",
+			icon: <CheckIcon />,
+		});
+	});
+
 	return (
 		<MantineProvider theme={theme} defaultColorScheme="dark">
 			<Notifications />
