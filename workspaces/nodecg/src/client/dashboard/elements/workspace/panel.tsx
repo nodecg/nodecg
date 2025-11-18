@@ -16,7 +16,7 @@ import { initialize } from "@open-iframe-resizer/core";
 // 8 => 1136
 // 9 => 1280
 // 10 => 1424
-function nodecgWidthToPixel(width: number) {
+export function nodecgWidthToPixel(width: number) {
 	return 128 + (width - 1) * 144;
 }
 

@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom";
-
-import { Panel } from "./panel";
+import { Breadcrumbs } from "@mantine/core";
 
 import classes from "./workspace.module.css";
 import { PackeryGrid } from "./packery";
-import { Breadcrumbs } from "@mantine/core";
+import { Panel } from "./panel";
+import { NodeCGDialog } from "./dialog";
 
 function locationParser(url?: string): {
 	workspace: string;
@@ -36,7 +36,6 @@ export function Workspace() {
 	const { workspace, isFullbleed } = locationParser(splat);
 
 	const bundles = window.__renderData__.bundles;
-	// const isFullbleed = location.pathname.includes("fullbleed");
 
 	const workspacePanels =
 		bundles?.flatMap((bundle) =>
@@ -52,6 +51,10 @@ export function Workspace() {
 			}),
 		) ?? [];
 
+	const dialogPanels = bundles?.flatMap((bundle) =>
+		bundle.dashboard.panels.filter((panel) => panel.dialog),
+	);
+
 	if (isFullbleed) {
 		const fullbleedPanel = workspacePanels[0];
 		if (!fullbleedPanel) {
@@ -66,6 +69,9 @@ export function Workspace() {
 		return (
 			<div className={classes["fullbleed"]}>
 				<Panel key={fullbleedPanel.name} panel={fullbleedPanel} />
+				{dialogPanels.map((panel) => (
+					<NodeCGDialog key={panel.name} panel={panel} />
+				))}
 			</div>
 		);
 	}
@@ -80,7 +86,6 @@ export function Workspace() {
 		<div className={classes["workspace"]}>
 			{breadcrumbs.length > 1 && <Breadcrumbs>{breadcrumbs}</Breadcrumbs>}
 			<h1>{splitWorkspace.at(-1)}</h1>
-			{/* <div style={{ display: "flex", flexWrap: "wrap", gap: 32 }} ref={containerRef}> */}
 			<PackeryGrid
 				itemSelector=".ncg-dashboard-panel"
 				gutter={16}
@@ -91,7 +96,9 @@ export function Workspace() {
 					<Panel key={panel.name} panel={panel} />
 				))}
 			</PackeryGrid>
-			{/* </div> */}
+			{dialogPanels.map((panel) => (
+				<NodeCGDialog key={panel.name} panel={panel} />
+			))}
 		</div>
 	);
 }

@@ -2,7 +2,7 @@ import "@mantine/core/styles.css";
 
 import {
 	createTheme,
-	MantineColorsTuple,
+	type MantineColorsTuple,
 	MantineProvider,
 } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
@@ -37,36 +37,34 @@ const theme = createTheme({
 	primaryColor: "nodecg",
 });
 
-const router = createBrowserRouter(
-	[
-		{
-			path: "/",
-			Component: Root,
-			children: [
-				{
-					path: "dashboard/*",
-					Component: Workspace,
-				},
-				{
-					path: "graphics",
-					Component: Graphics,
-				},
-				{
-					path: "assets",
-					Component: Assets,
-				},
-				{
-					path: "sound",
-					Component: Sound,
-				},
-				{
-					path: "settings",
-					Component: Settings,
-				},
-			],
-		},
-	],
-);
+const router = createBrowserRouter([
+	{
+		path: "/",
+		Component: Root,
+		children: [
+			{
+				path: "dashboard/*",
+				Component: Workspace,
+			},
+			{
+				path: "graphics",
+				Component: Graphics,
+			},
+			{
+				path: "assets",
+				Component: Assets,
+			},
+			{
+				path: "sound",
+				Component: Sound,
+			},
+			{
+				path: "settings",
+				Component: Settings,
+			},
+		],
+	},
+]);
 
 function Root() {
 	return (
@@ -81,12 +79,7 @@ function NCGDashboard() {
 	return (
 		<MantineProvider theme={theme} defaultColorScheme="dark">
 			<Notifications />
-			<RouterProvider
-				router={router}
-				future={{
-					v7_startTransition: true,
-				}}
-			/>
+			<RouterProvider router={router} />
 		</MantineProvider>
 	);
 }
