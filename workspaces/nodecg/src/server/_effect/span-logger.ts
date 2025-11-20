@@ -19,8 +19,8 @@ export const withSpanProcessorLive = Effect.fn(function* <A, E, R>(
 		return yield* effect;
 	}
 
-	const { NodeSdk } = yield* Effect.promise(
-		() => import("@effect/opentelemetry"),
+	const NodeSdk = yield* Effect.promise(
+		() => import("@effect/opentelemetry/NodeSdk"),
 	);
 	const { SpanStatusCode } = yield* Effect.promise(
 		() => import("@opentelemetry/api"),

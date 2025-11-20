@@ -7,7 +7,7 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - Core server (`src/server`)
 - CLI tools (`workspaces/cli`)
 - E2E tests using Puppeteer
-- Vitest 3.0.2 test framework
+- Vitest 4.x test framework (currently without @effect/vitest due to peer dependency conflicts)
 
 ## Project Structure
 
@@ -85,7 +85,7 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 
 ### Module Resolution
 
-- **Always use `.js` extensions** in imports, even for `.ts` source files
+- **Always use `.js` extensions** in imports, even for `.ts` source files (applies to both production and test code)
 - Workspace packages (`@nodecg/*`) resolve via npm workspaces
 - Source uses ESM-style imports, compiled output is CommonJS
 - Tests import from compiled `out/` directory (CommonJS modules)

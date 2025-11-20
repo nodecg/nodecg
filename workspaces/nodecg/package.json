@@ -58,12 +58,9 @@
     "@nodecg/json-schema-defaults": "^1.0.4",
     "@nodecg/json-schema-lib": "0.1.0",
     "@open-iframe-resizer/core": "^1.6.0",
-    "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/core": "^2.2.0",
-    "@opentelemetry/resources": "^2.2.0",
-    "@opentelemetry/sdk-trace-base": "^2.2.0",
+    "@opentelemetry/sdk-logs": "^0.203.0",
+    "@opentelemetry/sdk-metrics": "^2.2.0",
     "@opentelemetry/sdk-trace-node": "^2.2.0",
-    "@opentelemetry/semantic-conventions": "^1.38.0",
     "@polymer/app-layout": "^3.1.0",
     "@polymer/app-route": "^3.0.2",
     "@polymer/iron-collapse": "^3.0.1",
@@ -168,7 +165,6 @@
     "tsdown": "^0.16.1",
     "tsx": "^4.19.2",
     "typescript": "~5.9.3",
-    "vitest": "^4.0.7",
     "vitest-mock-express": "^2.2.0"
   },
   "publishConfig": {

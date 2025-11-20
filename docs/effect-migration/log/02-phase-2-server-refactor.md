@@ -307,14 +307,16 @@ This caused cleanup to run immediately after `createServer()` completed, before 
 **Solution**: Run the scoped Effect in a fiber to keep scope alive:
 
 ```typescript
-mainFiber = yield* Effect.fork(
-  Effect.gen(function* () {
-    const handle = yield* createServer();
-    serverHandle = handle;
-    const serverFiber = yield* Effect.fork(handle.run);
-    yield* Fiber.join(serverFiber); // Keep scope alive
-  }).pipe(Effect.scoped),
-);
+mainFiber =
+  yield *
+  Effect.fork(
+    Effect.gen(function* () {
+      const handle = yield* createServer();
+      serverHandle = handle;
+      const serverFiber = yield* Effect.fork(handle.run);
+      yield* Fiber.join(serverFiber); // Keep scope alive
+    }).pipe(Effect.scoped),
+  );
 ```
 
 The scope stays open because the fiber waits on `Fiber.join(serverFiber)`. Interrupting `mainFiber` triggers cleanup.
@@ -326,8 +328,8 @@ The scope stays open because the fiber waits on `Fiber.join(serverFiber)`. Inter
 **Problem**: Tests need to know when the server is actually listening (to access `NODECG_TEST_PORT`), but initial implementation signaled ready immediately after forking `run`:
 
 ```typescript
-const serverFiber = yield* Effect.fork(handle.run);
-yield* Deferred.succeed(ready, undefined); // ❌ Too early!
+const serverFiber = yield * Effect.fork(handle.run);
+yield * Deferred.succeed(ready, undefined); // ❌ Too early!
 ```
 
 The `run` Effect starts the server asynchronously in the listen callback, but we signal before that happens.
@@ -342,13 +344,16 @@ The `run` Effect starts the server asynchronously in the listen callback, but we
 ```typescript
 // In createServer
 server.listen({ host, port }, () => {
-  Runtime.runSync(runtime, Effect.gen(function* () {
-    // Set NODECG_TEST_PORT for tests
-    if (isReady) {
-      yield* Deferred.succeed(isReady, undefined);
-    }
-    extensionManager.emitToAllInstances("serverStarted");
-  }))
+  Runtime.runSync(
+    runtime,
+    Effect.gen(function* () {
+      // Set NODECG_TEST_PORT for tests
+      if (isReady) {
+        yield* Deferred.succeed(isReady, undefined);
+      }
+      extensionManager.emitToAllInstances("serverStarted");
+    }),
+  );
 });
 ```
 
@@ -374,7 +379,7 @@ Tests use the wrapper's Promise API, while internally it manages Effect fibers. 
 
 **Pattern Learned**: When migrating from Promise to Effect incrementally, create thin wrapper layers that maintain the old interface while using Effect internally.
 
-### Issue 4: Effect.runFork vs yield* Effect.fork
+### Issue 4: Effect.runFork vs yield\* Effect.fork
 
 **Problem**: Used `Effect.runFork()` inside `Effect.gen`, which the linter flagged.
 
@@ -397,17 +402,20 @@ mainFiber = yield* Effect.fork(Effect.gen(...));
 **Solution**: Capture the Effect runtime with `yield* Effect.runtime()` and use `Runtime.runSync(runtime, effect)` in the callback:
 
 ```typescript
-const runtime = yield* Effect.runtime();
+const runtime = yield * Effect.runtime();
 
 const run = Effect.fn(function* () {
   server.listen({ host, port }, () =>
-    Runtime.runSync(runtime, Effect.gen(function* () {
-      // Effect code here
-      if (isReady) {
-        yield* Deferred.succeed(isReady, undefined);
-      }
-      extensionManager.emitToAllInstances("serverStarted");
-    }))
+    Runtime.runSync(
+      runtime,
+      Effect.gen(function* () {
+        // Effect code here
+        if (isReady) {
+          yield* Deferred.succeed(isReady, undefined);
+        }
+        extensionManager.emitToAllInstances("serverStarted");
+      }),
+    ),
   );
   // ...
 });
@@ -446,14 +454,17 @@ const run = Effect.fn(function* () {
 Instead of separate `make*` functions as originally planned, resources are managed directly in `createServer` using `Effect.acquireRelease`:
 
 1. **Socket.IO** (lines 137-151):
+
    - Acquire: Create Socket.IO server, set max listeners
    - Release: Disconnect all sockets, close server
 
 2. **Replicator** (lines 334-339):
+
    - Acquire: Create Replicator with adapter and persisted entities
    - Release: Call `saveAllReplicants()`
 
 3. **ExtensionManager** (lines 405-411):
+
    - Acquire: Create ExtensionManager, emit `extensionsLoaded`
    - Release: Emit `serverStopping` to all extensions
 
@@ -479,15 +490,16 @@ Tests use a Promise-based wrapper that internally manages Effect fibers:
 
 ```typescript
 interface TestServerWrapper {
-  start: () => Promise<void>;  // Creates ready Deferred, forks scoped Effect
-  stop: () => Promise<void>;   // Interrupts fiber (triggers cleanup)
+  start: () => Promise<void>; // Creates ready Deferred, forks scoped Effect
+  stop: () => Promise<void>; // Interrupts fiber (triggers cleanup)
   getExtensions: ServerHandle["getExtensions"];
   saveAllReplicantsNow: ServerHandle["saveAllReplicantsNow"];
-  handle: ServerHandle;  // Direct access to server internals
+  handle: ServerHandle; // Direct access to server internals
 }
 ```
 
 The wrapper:
+
 1. Creates a ready Deferred
 2. Forks the scoped Effect containing `createServer` and `run`
 3. Awaits the ready Deferred before returning from `start()`
