@@ -43,7 +43,7 @@ const command = cli.Command.make(
 					if (!workspacePackageJson.scripts?.[arg]) {
 						return;
 					}
-					const commandEffect = Command.make("node", "--run", arg).pipe(
+					const commandEffect = Command.make("npm", "run", arg).pipe(
 						Command.workingDirectory(workspacePath),
 						Command.stdout("inherit"),
 						Command.stderr("inherit"),

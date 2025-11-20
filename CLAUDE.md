@@ -7,7 +7,7 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - Core server (`src/server`)
 - CLI tools (`workspaces/cli`)
 - E2E tests using Puppeteer
-- Vitest 3.0.2 test framework
+- Vitest 4.x test framework (currently without @effect/vitest due to peer dependency conflicts)
 
 ## Project Structure
 
@@ -51,6 +51,8 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - Each test file gets its own server instance, temp directory, and in-memory database
 - Browser pages are shared within a test file but not across files
 - Fixture paths in tests must be relative to repo root: `workspaces/nodecg/test/fixtures/...`
+- **Test wrapper pattern**: Uses Promise-based wrapper (`TestServerWrapper`) around Effect-based server for backward compatibility
+- Tests access internal instances via `server.handle.bundleManager`, not type casting
 
 ### Common Test Patterns
 
@@ -83,7 +85,7 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 
 ### Module Resolution
 
-- **Always use `.js` extensions** in imports, even for `.ts` source files
+- **Always use `.js` extensions** in imports, even for `.ts` source files (applies to both production and test code)
 - Workspace packages (`@nodecg/*`) resolve via npm workspaces
 - Source uses ESM-style imports, compiled output is CommonJS
 - Tests import from compiled `out/` directory (CommonJS modules)
@@ -98,6 +100,7 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 ### Test Isolation
 
 - Dynamic port allocation: `process.env.NODECG_TEST` → OS assigns random port
+- `NODECG_TEST_PORT` set in server listen callback - tests depend on this for URL construction
 - In-memory database: `:memory:` SQLite per worker process
 - Temp directories: Unique per test file via `mkdtempSync(tmpdir() + "/")`
 - Process isolation: Vitest `forks` pool (separate Node.js processes)
@@ -184,23 +187,87 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Schemas suffix with `Schema`: `ConfigSchema` → `type Config`
 - Use `yield* Effect.log*()` for app logs, `yield* Console.*()` for debugging
 - Always use `Effect.fn("name")` for effect-returning functions (never `Effect.gen` for definitions)
+- **No classes in Effect** - use plain functions, not class-based architecture
 - Services created with `Effect.Service` (never Context API directly)
-- Tests use `@effect/vitest` for Effect testing utilities
+- **Testing**: Use `testEffect()` helper from `src/server/_effect/test-effect.ts` for running Effect tests in Vitest
+  - Helper accepts `Effect<A, E, Scope.Scope>` and wraps with `Effect.scoped`
+  - Works with both `never` and `Scope` requirements
+  - Provide layers before passing to helper: `.pipe(Effect.provide(layer))`
 - Install Effect packages with `npm i @effect/package@latest` in workspace (never edit package.json directly)
 - No return type annotations (let TypeScript infer), no `any`, no type assertions
 - See `docs/effect-migration/strategy.md` for comprehensive coding guidelines
 
+**Effect Layer Patterns**:
+
+- **Avoid top-level Effect execution**: Never use `Layer.unwrapEffect` at module top-level
+- **Lazy layer construction**: Use `Effect.fn` wrappers that capture runtime/context when called, not at module load
+- **Pattern**: `export const withXLive = Effect.fn(function* (effect) { ... yield* Effect.runtime() ... })`
+- **OpenTelemetry integration**: Span exporter needs runtime for Effect logging - capture via Effect.fn wrapper
+
+**Effect Patterns for Long-Running Servers**:
+
+- Use `Effect.async` to wait for server close/error, NOT `Effect.never`
+- Listen to native events (e.g., HTTP server's 'close', 'listening') instead of manually-emitted events for reliability
+- Use `Effect.raceFirst` (NOT `Effect.race`) when racing error handlers with indefinite operations
+  - `Effect.race` waits for first SUCCESS; hangs if one fails and one never completes
+  - `Effect.raceFirst` completes on first completion (success OR failure)
+- `Effect.async` suspension: Must call `resume()` to complete fiber; cleanup alone doesn't complete suspended fibers
+- Avoid arbitrary timeouts for servers - they should run forever, not timeout
+- When migrating from event-driven code, identify which events represent actual system state vs. manual notifications
+- **Separate create from run**: Return handle with resources + `run` Effect for external access pattern
+- **Distribute cleanup**: Use separate `Effect.acquireRelease` for each resource instead of monolithic cleanup
+- **Readiness signaling**: Accept optional `Deferred` parameter to signal completion; succeed it in callbacks when operation completes
+- **Bridging native callbacks to Effect**: Capture runtime with `yield* Effect.runtime()` before callback, use `Runtime.runSync(runtime, effect)` inside callback
+- **Test wrapper pattern**: When migrating class-based servers to Effect, create Promise-based wrapper that manages Effect fibers internally for backward compatibility
+- **Scope at call site**: Apply `Effect.scoped` in the caller (bootstrap, tests), not in resource creation functions - cleanup happens when outer scope closes
+- **Fork scoped listeners**: Use `Effect.forkScoped` to fork event listeners so they auto-cleanup when scope closes
+- **Daemon fibers for long-running servers**: Use `Effect.forkDaemon` (NOT `Effect.fork`) when forking server Effects that must survive parent Effect completion
+  - `Effect.fork` creates child fibers that are interrupted when parent completes
+  - `Effect.forkDaemon` creates daemon fibers that continue running after parent completes
+  - Essential for test setups where server must stay alive after ready signal
+
 **Migration Documentation**:
 
-- All migration work must be logged in `docs/effect-migration/log.md`
-- Log decisions, problems/solutions, patterns used, and lessons learned
-- See `docs/effect-migration/strategy.md` for migration approach and candidates
+- All migration work must be logged in `docs/effect-migration/log/` directory
+- **Document plans BEFORE implementation** - create log entry with detailed plan, then update during work
+- Each log entry is numbered sequentially: `##-brief-description.md`
+- Log structure: Plans → Decisions → Problems/Solutions → Patterns → Lessons Learned → Status
+- See `docs/effect-migration/strategy.md` for migration approach and phases
+- See `docs/effect-migration/log/README.md` for log template and guidelines
+- **Update both log and strategy docs** - When completing migration phases, update both the detailed log entry AND the phase summary in strategy.md to reflect actual implementation
+
+**Public API Preservation**:
+
+- Distinguish between **internal** and **public** APIs when refactoring
+- Check `docs/` directory (in separate `/nodecg/docs` repo) for documented APIs before removing
+- Example: ExtensionManager's `emitToAllInstances()` broadcasts are public API for bundle extensions
+- Verify external usage by searching documentation, not just internal code references
 
 **Existing fp-ts Code**:
 
 - `src/server/bundle-parser/` already uses fp-ts (IOEither, pipe, flow)
 - Migration from fp-ts → Effect is translation, not rewrite
 - Good reference for functional patterns in the codebase
+
+## OpenTelemetry Integration
+
+- **Required packages**: `@effect/opentelemetry`, `@opentelemetry/sdk-trace-base`, `@opentelemetry/core`, `@opentelemetry/sdk-logs`, `@opentelemetry/sdk-metrics`, `@opentelemetry/sdk-trace-node`, `@opentelemetry/api`, `@opentelemetry/resources`, `@opentelemetry/semantic-conventions`, `@opentelemetry/sdk-trace-web`, `@opentelemetry/context-zone`, `@opentelemetry/instrumentation`
+- **Automatic span logging**: `Effect.fn("name")` automatically creates spans when OpenTelemetry is configured
+- **Span names**: First argument to `Effect.fn` becomes the span name (e.g., `Effect.fn("main")`)
+- **Runtime capture**: SpanExporter needs Effect Runtime to use Effect logging - capture via `Effect.runtime<never>()` inside Effect.fn wrapper
+- **Entry point**: `workspaces/nodecg/index.js` (not dist/index.js)
+
+### Custom Span Processors
+
+- **SpanProcessor vs SpanExporter**: Use `SpanProcessor` interface for lifecycle hooks (`onStart`, `onEnd`), not `SpanExporter` (only gets finished spans)
+- **Logging both start and end**: Implement `onStart()` for span begin, `onEnd()` for completion with duration
+- **Status codes**: Use `SpanStatusCode` enum from `@opentelemetry/api` (UNSET=0, OK=1, ERROR=2), not raw numbers
+- **Direct processor usage**: Pass processor directly to `spanProcessor` config, skip `BatchSpanProcessor` wrapper for immediate logging
+- **HrTime format**: `span.duration` is `[seconds, nanoseconds]` tuple - Effect's `Duration.toMillis()` accepts this format directly
+- **Duration compatibility**: Effect's `DurationInput` type accepts `readonly [seconds: number, nanos: number]`, matching OpenTelemetry's HrTime
+- **Duration formatting**: Use `Duration.format()` for human-readable output; round conditionally based on magnitude
+- **Conditional loading**: Use `Config.boolean("LOG_SPAN")` with dynamic imports to avoid loading OpenTelemetry when disabled
+- **Reference**: See `workspaces/nodecg/src/server/_effect/span-logger.ts` for example implementation
 
 ## Common Pitfalls
 

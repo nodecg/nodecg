@@ -4,19 +4,31 @@ import { setTimeout } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
 
 import type { getConnection } from "@nodecg/database-adapter-sqlite-legacy";
+import { Deferred, Effect, Fiber } from "effect";
 import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
 import { afterAll, test } from "vitest";
 
 import type { serverApiFactory } from "../../src/server/api.server";
-import type { NodeCGServer } from "../../src/server/server";
+import type { createServer } from "../../src/server/server";
 import { populateTestData } from "../helpers/populateTestData";
 import * as C from "../helpers/test-constants";
 import { testDirPath } from "../helpers/test-dir-path";
 import { createTmpDir } from "../helpers/tmp-dir";
 
+type ServerHandle = Effect.Effect.Success<ReturnType<typeof createServer>>;
+
+interface TestServerWrapper {
+	start: () => Promise<void>;
+	stop: () => Promise<void>;
+	getExtensions: ServerHandle["getExtensions"];
+	saveAllReplicantsNow: ServerHandle["saveAllReplicantsNow"];
+	handle: ServerHandle;
+	bundleManager: ServerHandle["bundleManager"];
+}
+
 export interface SetupContext {
-	server: NodeCGServer;
+	server: TestServerWrapper;
 	apis: { extension: InstanceType<ReturnType<typeof serverApiFactory>> };
 	browser: puppeteer.Browser;
 	dashboard: puppeteer.Page;
@@ -101,17 +113,54 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 	process.chdir(tmpDir);
 	process.env.NODECG_ROOT = tmpDir;
 
-	// Dynamically import NodeCGServer from the installed location
+	// Dynamically import createServer from the installed location
 	const serverModulePath = pathToFileURL(
 		path.join(nodecgModulePath, "src/server/server/index.ts"),
 	).href;
-	const { NodeCGServer } = (await import(serverModulePath)) as {
-		NodeCGServer: typeof import("../../src/server/server").NodeCGServer;
+	const { createServer } = (await import(serverModulePath)) as {
+		createServer: typeof import("../../src/server/server").createServer;
 	};
 
-	const server = new NodeCGServer();
+	let serverHandle: ServerHandle;
+	let mainFiber: Fiber.RuntimeFiber<void, unknown> | null = null;
 
-	await populateTestData();
+	const server: TestServerWrapper = {
+		start: async () => {
+			await populateTestData();
+
+			await Effect.runPromise(
+				Effect.gen(function* () {
+					const ready = yield* Deferred.make<void>();
+					mainFiber = yield* Effect.forkDaemon(
+						Effect.gen(function* () {
+							const handle = yield* createServer(ready);
+							serverHandle = handle;
+							yield* handle.run();
+						}).pipe(Effect.scoped),
+					);
+					yield* Deferred.await(ready);
+				}),
+			);
+		},
+		stop: async () => {
+			if (mainFiber) {
+				await Effect.runPromise(Fiber.interrupt(mainFiber));
+			}
+		},
+		getExtensions: () => {
+			return serverHandle.getExtensions();
+		},
+		saveAllReplicantsNow: () => {
+			return serverHandle.saveAllReplicantsNow();
+		},
+		get handle() {
+			return serverHandle;
+		},
+		get bundleManager() {
+			return serverHandle.bundleManager;
+		},
+	};
+
 	await server.start();
 
 	let browser: puppeteer.Browser | null = null;

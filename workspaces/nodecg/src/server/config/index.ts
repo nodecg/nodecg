@@ -19,4 +19,5 @@ export { config, filteredConfig };
 
 export const exitOnUncaught = config.exitOnUncaught;
 
+// TODO: Remove this in the next major release
 export const sentryEnabled = config.sentry?.enabled;
