@@ -14,6 +14,6 @@
 
 .table-row {
 	&:where(tr):where([data-striped=odd]:nth-of-type(odd)) {
-		background-color: #222c3c;
+		/* background-color: #222c3c; */
 	}
 }

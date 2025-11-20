@@ -1,5 +1,5 @@
 .header {
-	position: sticky;
+	/* position: sticky;
 	top: 0;
 	background-color: #516077;
 	transition: box-shadow 150ms ease;
@@ -11,11 +11,11 @@
 		right: 0;
 		bottom: 0;
 		border-bottom: 1px solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-3));
-	}
+	} */
 }
 
 .scrolled {
-	box-shadow: var(--mantine-shadow-sm);
+	/* box-shadow: var(--mantine-shadow-sm); */
 }
 
 .metadata {
@@ -26,16 +26,16 @@
 }
 
 .pill {
-	background-color: #516077;
+	/* background-color: #516077; */
 }
 
 .accordion-item {
-	background-color: #516077;
+	/* background-color: #516077;
 	--item-border-color: #d5d8dc;
 
 	&[data-active=true] {
 		background-color: #2e3b4e;
-	}
+	} */
 }
 
 .accordion-label {
@@ -44,6 +44,6 @@
 }
 
 .table {
-	border-radius: var(--mantine-radius-default);
-	--table-border-color: rgba(213, 216, 220, 0.3);
+	/* border-radius: var(--mantine-radius-default);
+	--table-border-color: rgba(213, 216, 220, 0.3); */
 }

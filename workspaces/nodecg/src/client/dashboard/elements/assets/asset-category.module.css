@@ -9,7 +9,7 @@
 }
 
 .icon {
-	color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-3));
+	/* color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-3)); */
 }
 
 .accepted-types {
@@ -43,12 +43,12 @@
 }
 
 .accordion-item {
-	background-color: #516077;
+	/* background-color: #516077;
 	--item-border-color: #d5d8dc;
 
 	&[data-active="true"] {
 		background-color: #2e3b4e;
-	}
+	} */
 }
 
 .accordion-label {

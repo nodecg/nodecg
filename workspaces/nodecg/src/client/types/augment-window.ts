@@ -13,6 +13,7 @@ declare global {
 		__renderData__: {
 			bundles: NodeCG.Bundle[];
 			workspaces: NodeCG.Workspace[];
+			version: string;
 		};
 		WebComponentsReady: boolean;
 	}

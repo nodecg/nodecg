@@ -36,6 +36,7 @@ const theme = createTheme({
 	autoContrast: true,
 	colors: {
 		nodecg: nodecgColor,
+		// dark: nodecgColor,
 	},
 	primaryColor: "nodecg",
 });

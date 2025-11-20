@@ -1,14 +1,14 @@
 .table {
-	border-radius: var(--mantine-radius-default);
-	--table-border-color: rgba(213, 216, 220, 0.3);
+	/* border-radius: var(--mantine-radius-default);
+	--table-border-color: rgba(213, 216, 220, 0.3); */
 }
 
 .table-header {
-	background-color: #516077;
+	/* background-color: #516077; */
 }
 
 .table-row {
-	&:where(tr):where([data-striped=odd]:nth-of-type(odd)) {
+	/* &:where(tr):where([data-striped=odd]:nth-of-type(odd)) {
 		background-color: #222c3c;
-	}
+	} */
 }

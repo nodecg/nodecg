@@ -1,18 +1,18 @@
 .accordion-item {
-	background-color: #516077;
-	--item-border-color: #d5d8dc;
+	/* background-color: #516077;
+	--item-border-color: #d5d8dc; */
 
-	&[data-active=true] {
+	/* &[data-active=true] {
 		background-color: #2e3b4e;
-	}
+	} */
 }
 
 .accordion-label {
-	font-weight: bold;
-	font-size: large;
+	/* font-weight: bold;
+	font-size: large; */
 }
 
 .table {
-	border-radius: var(--mantine-radius-default);
-	--table-border-color: rgba(213, 216, 220, 0.3);
+	/* border-radius: var(--mantine-radius-default);
+	--table-border-color: rgba(213, 216, 220, 0.3); */
 }

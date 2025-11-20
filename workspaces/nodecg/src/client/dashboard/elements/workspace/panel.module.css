@@ -3,7 +3,7 @@
 }
 
 .header {
-	background-color: #516077;
+	/* background-color: #516077; */
 	font-weight: bold;
 	padding: var(--mantine-spacing-sm);
 	display: flex;

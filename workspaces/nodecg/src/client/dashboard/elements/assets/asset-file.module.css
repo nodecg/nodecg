@@ -7,5 +7,5 @@
 }
 
 .file:nth-child(odd) {
-	background-color: #212c3b;
+	/* background-color: #212c3b; */
 }
