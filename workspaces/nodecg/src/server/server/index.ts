@@ -110,7 +110,7 @@ export const createServer = Effect.fn("createServer")(function* (
 	});
 
 	// Fork to immediately start listening for events
-	// With scope so that it's cleand up when the server is closed
+	// With scope so that it's cleaned up when the server is closed
 	const waitForError = yield* Effect.forkScoped(
 		Effect.async<never, UnknownError>((resume) => {
 			const errorHandler = (err: unknown) => {
