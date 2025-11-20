@@ -24,6 +24,7 @@ interface TestServerWrapper {
 	getExtensions: ServerHandle["getExtensions"];
 	saveAllReplicantsNow: ServerHandle["saveAllReplicantsNow"];
 	handle: ServerHandle;
+	bundleManager: ServerHandle["bundleManager"];
 }
 
 export interface SetupContext {
@@ -120,7 +121,7 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 		createServer: typeof import("../../src/server/server").createServer;
 	};
 
-	let serverHandle: ServerHandle | null = null;
+	let serverHandle: ServerHandle;
 	let mainFiber: Fiber.RuntimeFiber<void, unknown> | null = null;
 
 	const server: TestServerWrapper = {
@@ -130,15 +131,13 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 			await Effect.runPromise(
 				Effect.gen(function* () {
 					const ready = yield* Deferred.make<void>();
-
-					mainFiber = yield* Effect.fork(
+					mainFiber = yield* Effect.forkDaemon(
 						Effect.gen(function* () {
 							const handle = yield* createServer(ready);
 							serverHandle = handle;
 							yield* handle.run();
 						}).pipe(Effect.scoped),
 					);
-
 					yield* Deferred.await(ready);
 				}),
 			);
@@ -149,16 +148,16 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 			}
 		},
 		getExtensions: () => {
-			if (!serverHandle) throw new Error("Server not started");
 			return serverHandle.getExtensions();
 		},
 		saveAllReplicantsNow: () => {
-			if (!serverHandle) throw new Error("Server not started");
 			return serverHandle.saveAllReplicantsNow();
 		},
 		get handle() {
-			if (!serverHandle) throw new Error("Server not started");
 			return serverHandle;
+		},
+		get bundleManager() {
+			return serverHandle.bundleManager;
 		},
 	};
 

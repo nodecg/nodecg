@@ -218,6 +218,10 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - **Test wrapper pattern**: When migrating class-based servers to Effect, create Promise-based wrapper that manages Effect fibers internally for backward compatibility
 - **Scope at call site**: Apply `Effect.scoped` in the caller (bootstrap, tests), not in resource creation functions - cleanup happens when outer scope closes
 - **Fork scoped listeners**: Use `Effect.forkScoped` to fork event listeners so they auto-cleanup when scope closes
+- **Daemon fibers for long-running servers**: Use `Effect.forkDaemon` (NOT `Effect.fork`) when forking server Effects that must survive parent Effect completion
+  - `Effect.fork` creates child fibers that are interrupted when parent completes
+  - `Effect.forkDaemon` creates daemon fibers that continue running after parent completes
+  - Essential for test setups where server must stay alive after ready signal
 
 **Migration Documentation**:
 

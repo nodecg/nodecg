@@ -454,6 +454,7 @@ export const createServer = Effect.fn("createServer")(function* (
 		run,
 		getExtensions: () => ({ ...extensionManager.extensions }),
 		saveAllReplicantsNow: () => replicator.saveAllReplicantsNow(),
+		bundleManager,
 	};
 });
 

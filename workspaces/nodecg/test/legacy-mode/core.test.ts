@@ -9,7 +9,7 @@ const test = await setupTest();
 test("should load bundles which have satisfied bundle dependencies", ({
 	server,
 }) => {
-	const allBundles: NodeCG.Bundle[] = (server as any)._bundleManager.all();
+	const allBundles: NodeCG.Bundle[] = server.bundleManager.all();
 	const foundBundle = allBundles.find(
 		(bundle) => bundle.name === "satisfied-bundle-deps",
 	);
@@ -19,7 +19,7 @@ test("should load bundles which have satisfied bundle dependencies", ({
 test("should not load bundles which have unsatisfied bundle dependencies", ({
 	server,
 }) => {
-	const allBundles: NodeCG.Bundle[] = (server as any)._bundleManager.all();
+	const allBundles: NodeCG.Bundle[] = server.bundleManager.all();
 	const foundBundle = allBundles.find(
 		(bundle) => bundle.name === "unsatisfied-bundle-deps",
 	);
