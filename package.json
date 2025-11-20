@@ -25,7 +25,7 @@
     "test": "vitest",
     "typetest": "npm -w nodecg run typetest",
     "lint": "run-s lint:*",
-    "lint:eslint": "eslint --cache",
+    "lint:eslint": "eslint",
     "lint:prettier": "prettier --check .",
     "fix": "run-s fix:*",
     "fix:eslint": "npm run lint:eslint -- --fix",

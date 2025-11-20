@@ -189,7 +189,10 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Always use `Effect.fn("name")` for effect-returning functions (never `Effect.gen` for definitions)
 - **No classes in Effect** - use plain functions, not class-based architecture
 - Services created with `Effect.Service` (never Context API directly)
-- Tests use `@effect/vitest` for Effect testing utilities
+- **Testing**: Use `testEffect()` helper from `src/server/_effect/test-effect.ts` for running Effect tests in Vitest
+  - Helper accepts `Effect<A, E, Scope.Scope>` and wraps with `Effect.scoped`
+  - Works with both `never` and `Scope` requirements
+  - Provide layers before passing to helper: `.pipe(Effect.provide(layer))`
 - Install Effect packages with `npm i @effect/package@latest` in workspace (never edit package.json directly)
 - No return type annotations (let TypeScript infer), no `any`, no type assertions
 - See `docs/effect-migration/strategy.md` for comprehensive coding guidelines

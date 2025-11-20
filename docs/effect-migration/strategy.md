@@ -36,7 +36,8 @@ Transform `workspaces/nodecg/src/server/bootstrap.ts` into an Effect program wit
 - `boundary.ts` - `UnknownError` for wrapping non-Effect exceptions
 - `expect-error.ts` - Type utility for documenting expected errors
 - `log-level.ts` - Environment-based log level configuration
-- `span-logger.ts` - OpenTelemetry span processor with Effect logging
+- `span-logger.ts` - OpenTelemetry span processor with Effect logging (with unit tests)
+- `test-effect.ts` - Vitest helper for running Effect tests (accepts `Effect<A, E, Scope.Scope>`)
 
 **Dependencies Added**:
 
@@ -188,7 +189,11 @@ These guidelines ensure consistency and best practices across all migrated code.
 
 ### Testing
 
-- **Use @effect/vitest** - Tests for Effect-TS code should use `@effect/vitest` for proper Effect testing utilities
+- **Test framework preference** - Try `@effect/vitest` first; if peer dependency conflicts with vitest v4, use `testEffect()` helper from `src/server/_effect/test-effect.ts`
+- **@effect/vitest patterns** - When available: `layer(TestLayer)("suite", (it) => { it.effect("test", Effect.fn(function* () { ... })) })`; pass Effect directly to `it.effect()`, not wrapped in arrow function
+- **testEffect() helper** - Accepts `Effect<A, E, Scope.Scope>` and automatically wraps with `Effect.scoped`; provide layers before passing: `testEffect(Effect.gen(...).pipe(Effect.provide(layer)))`
+- **Effect.gen vs Effect.fn** - Use `Effect.gen` for immediate instantiation in tests; use `Effect.fn` only when defining reusable effect-returning functions
+- **Test isolation** - Each test should have isolated state (e.g., separate logger instances, fresh arrays for capturing logs)
 - **Comprehensive unit tests** - Write unit tests for each service and domain logic
 - **E2E with DI** - E2E tests should utilize Effect-TS's dependency injection to properly test service interactions
 - **Maintain coverage** - Aim to maintain or improve existing test coverage during migration
