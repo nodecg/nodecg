@@ -327,9 +327,10 @@ export const createServer = Effect.fn("createServer")(function* (
 		app.use(sentryHelpers.app);
 	}
 
-	const persistedReplicantEntities = yield* Effect.promise(async () =>
-		databaseAdapter.getAllReplicants(),
-	);
+	const persistedReplicantEntities = yield* Effect.promise(async () => {
+		const replicants = await databaseAdapter.getAllReplicants();
+		return replicants;
+	});
 
 	const replicator = yield* Effect.acquireRelease(
 		Effect.sync(
