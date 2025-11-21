@@ -12,7 +12,5 @@
 
 .iframe {
 	border: none;
-	/* overflow: hidden; */
-	/* overflow-y: scroll; */
 	scrollbar-width: none;
 }

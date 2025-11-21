@@ -8,10 +8,6 @@
 	padding-bottom: 50px;
 }
 
-.icon {
-	/* color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-3)); */
-}
-
 .accepted-types {
 	font-size: small;
 	color: #fff;
@@ -40,15 +36,6 @@
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
-}
-
-.accordion-item {
-	/* background-color: #516077;
-	--item-border-color: #d5d8dc;
-
-	&[data-active="true"] {
-		background-color: #2e3b4e;
-	} */
 }
 
 .accordion-label {
