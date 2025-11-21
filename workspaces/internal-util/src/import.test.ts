@@ -1,0 +1,137 @@
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
+import { expect, test } from "vitest";
+
+test("internal-util can be imported from directories without package.json", async () => {
+	// Create a temporary directory without package.json
+	const tempDir = mkdtempSync(
+		path.join(tmpdir(), "nodecg-internal-util-test-"),
+	);
+	const originalCwd = process.cwd();
+
+	try {
+		// Change to the temp directory before importing
+		process.chdir(tempDir);
+
+		// This import should NOT throw "Could not find Node.js project" error
+		// The module should use lazy evaluation and only execute filesystem
+		// operations when functions are actually called, not on import
+		const importPromise = import("./main.js");
+
+		// The import itself should succeed without errors
+		await expect(importPromise).resolves.toBeDefined();
+
+		const module = await importPromise;
+
+		// Verify exports are available
+		expect(module.rootPaths).toBeDefined();
+		expect(module.isLegacyProject).toBeDefined();
+
+		// These are functions that should only execute when called
+		expect(typeof module.isLegacyProject).toBe("function");
+	} finally {
+		// Restore original working directory
+		process.chdir(originalCwd);
+
+		// Clean up temp directory
+		rmSync(tempDir, { recursive: true, force: true });
+	}
+});
+
+test("isLegacyProject throws error only when called, not on import", async () => {
+	// Create a temporary directory without package.json
+	const tempDir = mkdtempSync(
+		path.join(tmpdir(), "nodecg-internal-util-lazy-test-"),
+	);
+	const originalCwd = process.cwd();
+
+	try {
+		// Change to the temp directory before importing
+		process.chdir(tempDir);
+
+		// Import should succeed
+		const { isLegacyProject } = await import("./main.js");
+
+		// Calling the function should throw because there's no package.json
+		expect(() => isLegacyProject()).toThrow("Could not find Node.js project");
+	} finally {
+		// Restore original working directory
+		process.chdir(originalCwd);
+
+		// Clean up temp directory
+		rmSync(tempDir, { recursive: true, force: true });
+	}
+});
+
+test("rootPaths getters throw error only when accessed, not on import", async () => {
+	// Create a temporary directory without package.json
+	const tempDir = mkdtempSync(
+		path.join(tmpdir(), "nodecg-internal-util-rootpaths-test-"),
+	);
+	const originalCwd = process.cwd();
+
+	try {
+		// Change to the temp directory before importing
+		process.chdir(tempDir);
+
+		// Import should succeed
+		const { rootPaths } = await import("./main.js");
+
+		// Accessing the getters should throw because there's no package.json
+		expect(() => rootPaths.runtimeRootPath).toThrow(
+			"Could not find Node.js project",
+		);
+		expect(() => rootPaths.nodecgInstalledPath).toThrow(
+			"Could not find Node.js project",
+		);
+	} finally {
+		// Restore original working directory
+		process.chdir(originalCwd);
+
+		// Clean up temp directory
+		rmSync(tempDir, { recursive: true, force: true });
+	}
+});
+
+test("internal-util works correctly when package.json exists", async () => {
+	// Create a temporary directory WITH package.json
+	const tempDir = mkdtempSync(
+		path.join(tmpdir(), "nodecg-internal-util-valid-test-"),
+	);
+	const originalCwd = process.cwd();
+
+	try {
+		// Create a valid package.json
+		writeFileSync(
+			path.join(tempDir, "package.json"),
+			JSON.stringify({
+				name: "test-project",
+				version: "1.0.0",
+				nodecgRoot: true,
+			}),
+			"utf-8",
+		);
+
+		// Change to the temp directory
+		process.chdir(tempDir);
+
+		// Clear module cache to force re-evaluation
+		const modulePath = path.resolve("./main.js");
+		delete require.cache[modulePath];
+
+		// Import should succeed
+		const { isLegacyProject, rootPaths } = await import("./main.js");
+
+		// Should work correctly
+		expect(isLegacyProject()).toBe(true);
+		expect(rootPaths.runtimeRootPath).toBe(tempDir);
+	} finally {
+		// Restore original working directory
+		process.chdir(originalCwd);
+
+		// Clean up temp directory
+		rmSync(tempDir, { recursive: true, force: true });
+	}
+});
