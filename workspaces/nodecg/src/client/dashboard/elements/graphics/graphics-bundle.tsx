@@ -1,11 +1,11 @@
+import { useState } from "react";
 import { Accordion, Button, Pill, Table } from "@mantine/core";
+import { RefreshCw } from "lucide-react";
+
 import type { NodeCG } from "../../../../types/nodecg";
-import Graphic from "./graphic";
-import cx from "clsx";
 
 import classes from "./graphics-bundle.module.css";
-import { RefreshCw } from "lucide-react";
-import { useState } from "react";
+import Graphic from "./graphic";
 
 type GraphicsBundleProps = {
 	bundle: NodeCG.Bundle;
@@ -26,20 +26,21 @@ export default function GraphicsBundle({
 	}
 
 	return (
-		<Accordion.Item value={bundle.name} className={classes["accordion-item"]}>
+		<Accordion.Item value={bundle.name}>
 			<Accordion.Control classNames={{ label: classes["accordion-label"] }}>
 				{bundle.name}
 			</Accordion.Control>
 			<Accordion.Panel>
 				<div className={classes["metadata"]}>
-					<Pill className={classes["pill"]}>v{bundle.version}</Pill>
+					<Pill>v{bundle.version}</Pill>
 					{bundle.git && (
-						<Pill className={classes["pill"]}>
+						<Pill>
 							{bundle.git.branch} @ {bundle.git.shortHash}
 						</Pill>
 					)}
-					<Pill className={classes["pill"]}>
-						{bundle.graphics.length} Graphic{bundle.graphics.length !== 1 && "s"}
+					<Pill>
+						{bundle.graphics.length} Graphic
+						{bundle.graphics.length !== 1 && "s"}
 					</Pill>
 				</div>
 				<div className={classes["metadata"]}>
@@ -52,8 +53,8 @@ export default function GraphicsBundle({
 						Reload All
 					</Button>
 				</div>
-				<Table striped className={classes["table"]}>
-					<Table.Thead className={cx(classes["header"])}>
+				<Table striped>
+					<Table.Thead>
 						<Table.Tr>
 							<Table.Th>Graphic</Table.Th>
 							<Table.Th>Resolution</Table.Th>
