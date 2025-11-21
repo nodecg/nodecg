@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Group, Pill, useComputedColorScheme } from "@mantine/core";
+import {
+	Group,
+	Pill,
+	useComputedColorScheme,
+	UnstyledButton,
+	ActionIcon,
+	Affix,
+	Transition,
+} from "@mantine/core";
 import classes from "./navbar.module.css";
 import {
 	Eye,
@@ -8,6 +16,8 @@ import {
 	LogOut,
 	type LucideProps,
 	Settings,
+	ChevronsLeft,
+	ChevronsRight,
 } from "lucide-react";
 import { LinksGroup } from "../components/NavbarLinksGroup";
 import { Link } from "react-router-dom";
@@ -36,6 +46,7 @@ type NavbarProps = {
 
 export function Navbar({ workspaces }: NavbarProps) {
 	const [active, setActive] = useState("Main Dashboard");
+	const [collapsed, setCollapsed] = useState(false);
 	const computedColorScheme = useComputedColorScheme("light", {
 		getInitialValueInEffect: true,
 	});
@@ -106,52 +117,77 @@ export function Navbar({ workspaces }: NavbarProps) {
 	const isAuthEnabled = window.ncgConfig.login?.enabled ?? false;
 
 	return (
-		<nav className={classes["navbar"]}>
-			<div className={classes["navbarMain"]}>
-				<Group className={classes["header"]} justify="space-between">
-					<img
-						id="mainLogo"
-						className={classes["logo"]}
-						src={
-							computedColorScheme === "dark"
-								? "/dashboard/img/horiz-logo-2x.png"
-								: "/dashboard/img/horiz-logo-light-2x.png"
-						}
-						alt="NodeCG"
-					/>
-					<a
-						href="https://nodecg.dev"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<Pill variant="contrast">
-							v{window.__renderData__.version}
-						</Pill>
-					</a>
-				</Group>
-				{workspaceLinks}
-			</div>
-
-			<div className={classes["footer"]}>
-				{nodecgLinks}
-				{isAuthEnabled && (
-					<>
-						<div className={classes["divider"]}></div>
-
+		<>
+			<nav className={classes["navbar"]} data-collapsed={collapsed}>
+				<div className={classes["navbarMain"]}>
+					<Group className={classes["header"]} justify="space-between">
+						<img
+							id="mainLogo"
+							className={classes["logo"]}
+							src={
+								computedColorScheme === "dark"
+									? "/dashboard/img/horiz-logo-2x.png"
+									: "/dashboard/img/horiz-logo-light-2x.png"
+							}
+							alt="NodeCG"
+						/>
 						<a
-							href="#"
-							className={classes["link"]}
-							onClick={(event) => {
-								event.preventDefault();
-							}}
+							href="https://nodecg.dev"
+							target="_blank"
+							rel="noopener noreferrer"
 						>
-							<LogOut className={classes["linkIcon"]} />
-							<span>Logout</span>
+							<Pill variant="contrast">v{window.__renderData__.version}</Pill>
 						</a>
-					</>
-				)}
-			</div>
-		</nav>
+					</Group>
+					{workspaceLinks}
+				</div>
+
+				<div className={classes["footer"]}>
+					{nodecgLinks}
+					{isAuthEnabled && (
+						<>
+							<div className={classes["divider"]}></div>
+
+							<a
+								href="#"
+								className={classes["link"]}
+								onClick={(event) => {
+									event.preventDefault();
+								}}
+							>
+								<LogOut className={classes["linkIcon"]} />
+								<span>Logout</span>
+							</a>
+						</>
+					)}
+
+					<div className={classes["divider"]}></div>
+
+					<UnstyledButton
+						className={classes["link"]}
+						onClick={() => setCollapsed(true)}
+					>
+						<ChevronsLeft className={classes["linkIcon"]} />
+						<span>Collapse</span>
+					</UnstyledButton>
+				</div>
+			</nav>
+			<Affix position={{ bottom: 20, left: 20 }}>
+				<Transition transition="slide-right" mounted={collapsed}>
+					{(transitionStyles) => (
+						<ActionIcon
+							style={transitionStyles}
+							onClick={() => setCollapsed(false)}
+							size="xl"
+							radius="xl"
+							variant="filled"
+						>
+							<ChevronsRight />
+						</ActionIcon>
+					)}
+				</Transition>
+			</Affix>
+		</>
 	);
 }
 

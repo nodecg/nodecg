@@ -58,7 +58,9 @@ export function LinksGroup({
 								<Icon size={18} />
 							</ThemeIcon>
 						)}
-						<Box>{label}</Box>
+						<Box style={{ marginLeft: Icon ? "var(--mantine-spacing-md)" : 0 }}>
+							{label}
+						</Box>
 					</Box>
 					{hasLinks && (
 						<ChevronRight

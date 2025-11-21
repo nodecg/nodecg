@@ -5,6 +5,14 @@
 	display: flex;
 	flex-direction: column;
 	border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-1));
+	transition: width 300ms ease, padding 300ms ease;
+	overflow: hidden;
+}
+
+.navbar[data-collapsed="true"] {
+	width: 0;
+	padding: 0;
+	border: none;
 }
 
 .navbarMain {
@@ -39,7 +47,7 @@
 	font-weight: 500;
 	text-transform: capitalize;
 
-	@mixin hover {
+	&:hover {
 		background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
 		color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
 
