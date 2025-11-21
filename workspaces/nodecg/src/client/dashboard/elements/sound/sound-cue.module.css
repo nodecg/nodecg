@@ -1,0 +1,12 @@
+.sound-cue {
+	width: 100%;
+	display: grid;
+	grid-template-columns: 1fr 2fr 2fr auto;
+	align-items: center;
+	gap: 12px;
+}
+
+.centred {
+	text-align: center;
+	justify-self: center;
+}

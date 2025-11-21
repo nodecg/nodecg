@@ -30,7 +30,7 @@ export function BundleSounds({ bundle }: BundleSoundsProps) {
 					{bundle.name}
 				</span>
 			</Accordion.Control>
-			<Accordion.Panel>
+			<Accordion.Panel classNames={{ content: styles["sound-cues"] }}>
 				{soundCuesRep?.map((soundCue) => (
 					<SoundCue
 						key={soundCue.name}

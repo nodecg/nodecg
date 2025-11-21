@@ -78,7 +78,7 @@ export function AssetCategory({
 	}
 
 	return (
-		<Accordion.Item value={category.name} className={classes["accordion-item"]}>
+		<Accordion.Item value={category.name}>
 			<Accordion.Control classNames={{ label: classes["accordion-label"] }}>
 				{category.name} ({assets.length})
 			</Accordion.Control>
