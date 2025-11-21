@@ -36,7 +36,8 @@
     "schemas",
     "src",
     "types",
-    "cli.mjs"
+    "cli.mjs",
+    "index.js"
   ],
   "scripts": {
     "build": "tsdown",
