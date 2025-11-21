@@ -2,19 +2,32 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
-test("internal-util can be imported from directories without package.json", async () => {
-	// Create a temporary directory without package.json
-	const tempDir = mkdtempSync(
-		path.join(tmpdir(), "nodecg-internal-util-test-"),
-	);
-	const originalCwd = process.cwd();
+let tempDir: string;
+let originalCwd: string;
 
-	try {
+describe("import from directories without package.json", () => {
+	beforeEach(() => {
+		// Save original working directory
+		originalCwd = process.cwd();
+
+		// Create a temporary directory without package.json
+		tempDir = mkdtempSync(path.join(tmpdir(), "nodecg-internal-util-test-"));
+
 		// Change to the temp directory before importing
 		process.chdir(tempDir);
+	});
 
+	afterEach(() => {
+		// Restore original working directory
+		process.chdir(originalCwd);
+
+		// Clean up temp directory
+		rmSync(tempDir, { recursive: true, force: true });
+	});
+
+	test("internal-util can be imported without throwing errors", async () => {
 		// This import should NOT throw "Could not find Node.js project" error
 		// The module should use lazy evaluation and only execute filesystem
 		// operations when functions are actually called, not on import
@@ -31,51 +44,17 @@ test("internal-util can be imported from directories without package.json", asyn
 
 		// These are functions that should only execute when called
 		expect(typeof module.isLegacyProject).toBe("function");
-	} finally {
-		// Restore original working directory
-		process.chdir(originalCwd);
+	});
 
-		// Clean up temp directory
-		rmSync(tempDir, { recursive: true, force: true });
-	}
-});
-
-test("isLegacyProject throws error only when called, not on import", async () => {
-	// Create a temporary directory without package.json
-	const tempDir = mkdtempSync(
-		path.join(tmpdir(), "nodecg-internal-util-lazy-test-"),
-	);
-	const originalCwd = process.cwd();
-
-	try {
-		// Change to the temp directory before importing
-		process.chdir(tempDir);
-
+	test("isLegacyProject throws error only when called, not on import", async () => {
 		// Import should succeed
 		const { isLegacyProject } = await import("./main.js");
 
 		// Calling the function should throw because there's no package.json
 		expect(() => isLegacyProject()).toThrow("Could not find Node.js project");
-	} finally {
-		// Restore original working directory
-		process.chdir(originalCwd);
+	});
 
-		// Clean up temp directory
-		rmSync(tempDir, { recursive: true, force: true });
-	}
-});
-
-test("rootPaths getters throw error only when accessed, not on import", async () => {
-	// Create a temporary directory without package.json
-	const tempDir = mkdtempSync(
-		path.join(tmpdir(), "nodecg-internal-util-rootpaths-test-"),
-	);
-	const originalCwd = process.cwd();
-
-	try {
-		// Change to the temp directory before importing
-		process.chdir(tempDir);
-
+	test("rootPaths getters throw error only when accessed, not on import", async () => {
 		// Import should succeed
 		const { rootPaths } = await import("./main.js");
 
@@ -86,23 +65,19 @@ test("rootPaths getters throw error only when accessed, not on import", async ()
 		expect(() => rootPaths.nodecgInstalledPath).toThrow(
 			"Could not find Node.js project",
 		);
-	} finally {
-		// Restore original working directory
-		process.chdir(originalCwd);
-
-		// Clean up temp directory
-		rmSync(tempDir, { recursive: true, force: true });
-	}
+	});
 });
 
-test("internal-util works correctly when package.json exists", async () => {
-	// Create a temporary directory WITH package.json
-	const tempDir = mkdtempSync(
-		path.join(tmpdir(), "nodecg-internal-util-valid-test-"),
-	);
-	const originalCwd = process.cwd();
+describe("import from directories with package.json", () => {
+	beforeEach(() => {
+		// Save original working directory
+		originalCwd = process.cwd();
 
-	try {
+		// Create a temporary directory WITH package.json
+		tempDir = mkdtempSync(
+			path.join(tmpdir(), "nodecg-internal-util-valid-test-"),
+		);
+
 		// Create a valid package.json
 		writeFileSync(
 			path.join(tempDir, "package.json"),
@@ -116,22 +91,22 @@ test("internal-util works correctly when package.json exists", async () => {
 
 		// Change to the temp directory
 		process.chdir(tempDir);
+	});
 
-		// Clear module cache to force re-evaluation
-		const modulePath = path.resolve("./main.js");
-		delete require.cache[modulePath];
+	afterEach(() => {
+		// Restore original working directory
+		process.chdir(originalCwd);
 
+		// Clean up temp directory
+		rmSync(tempDir, { recursive: true, force: true });
+	});
+
+	test("internal-util works correctly when package.json exists", async () => {
 		// Import should succeed
 		const { isLegacyProject, rootPaths } = await import("./main.js");
 
 		// Should work correctly
 		expect(isLegacyProject()).toBe(true);
 		expect(rootPaths.runtimeRootPath).toBe(tempDir);
-	} finally {
-		// Restore original working directory
-		process.chdir(originalCwd);
-
-		// Clean up temp directory
-		rmSync(tempDir, { recursive: true, force: true });
-	}
+	});
 });
