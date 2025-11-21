@@ -6,10 +6,14 @@
 	padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
 	color: var(--mantine-color-text);
 	font-size: var(--mantine-font-size-sm);
+	border-radius: var(--mantine-radius-sm);
 
 	&:hover {
-		background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-1));
-		color: light-dark(var(--mantine-color-black), var(--mantine-color-dark-0));
+		background-color: light-dark(
+			var(--mantine-color-gray-0),
+			var(--mantine-color-dark-6)
+		);
+		color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
 	}
 }
 
@@ -23,16 +27,19 @@
 	margin-left: var(--mantine-spacing-xl);
 	font-size: var(--mantine-font-size-sm);
 	color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
-	border-left: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-2));
-	border-radius: 0 var(--mantine-radius-sm) var(--mantine-radius-sm) 0;
+	border-left: 1px solid
+		light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-2));
+	border-radius: var(--mantine-radius-sm);
 
 	&:hover {
-		background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-1));
-		color: light-dark(var(--mantine-color-black), var(--mantine-color-dark-0));
+		background-color: light-dark(
+			var(--mantine-color-gray-0),
+			var(--mantine-color-dark-6)
+		);
+		color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
 	}
 
-	&[data-active=true] {
-
+	&[data-active="true"] {
 		&,
 		&:hover {
 			background-color: var(--mantine-color-blue-light);
