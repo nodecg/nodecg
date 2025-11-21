@@ -1,7 +1,14 @@
 import { useState } from "react";
-import { Code, Group } from "@mantine/core";
+import { Group, Pill, useComputedColorScheme } from "@mantine/core";
 import classes from "./navbar.module.css";
-import { Eye, Volume2, Upload, LogOut, type LucideProps, Settings } from "lucide-react";
+import {
+	Eye,
+	Volume2,
+	Upload,
+	LogOut,
+	type LucideProps,
+	Settings,
+} from "lucide-react";
 import { LinksGroup } from "../components/NavbarLinksGroup";
 import { Link } from "react-router-dom";
 import type { NodeCG } from "../../../../types/nodecg";
@@ -29,6 +36,9 @@ type NavbarProps = {
 
 export function Navbar({ workspaces }: NavbarProps) {
 	const [active, setActive] = useState("Main Dashboard");
+	const computedColorScheme = useComputedColorScheme("light", {
+		getInitialValueInEffect: true,
+	});
 
 	const reformedWorkspaces = workspaces.map((workspace) => {
 		if (workspace.label.includes("/")) {
@@ -102,7 +112,11 @@ export function Navbar({ workspaces }: NavbarProps) {
 					<img
 						id="mainLogo"
 						className={classes["logo"]}
-						src="/dashboard/img/horiz-logo-2x.png"
+						src={
+							computedColorScheme === "dark"
+								? "/dashboard/img/horiz-logo-2x.png"
+								: "/dashboard/img/horiz-logo-light-2x.png"
+						}
 						alt="NodeCG"
 					/>
 					<a
@@ -110,9 +124,9 @@ export function Navbar({ workspaces }: NavbarProps) {
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<Code color="nodecg" fw={700}>
+						<Pill variant="contrast">
 							v{window.__renderData__.version}
-						</Code>
+						</Pill>
 					</a>
 				</Group>
 				{workspaceLinks}

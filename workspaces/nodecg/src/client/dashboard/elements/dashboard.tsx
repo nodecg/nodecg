@@ -32,11 +32,66 @@ const nodecgColor: MantineColorsTuple = [
 	"#3f516f",
 ];
 
+const debugColours: MantineColorsTuple = [
+	"#ff0000",
+	"#00ff00",
+	"#0000ff",
+	"#ffff00",
+	"#ff00ff",
+	"#00ffff",
+	"#ffa500",
+	"#800080",
+	"#ffffff",
+	"#000000",
+];
+
+const darkColours: MantineColorsTuple = [
+	"#fff",
+	"#00bebe",
+	"#00bebe",
+	"#00bebe",
+	"#1f3352ff",
+	"#203b63ff",
+	"#142d53ff",
+	"#091425",
+	"#000814ff",
+	"#000000ff",
+];
+
+
+
+const darkColoursV2: MantineColorsTuple = [
+	"#e0e7ff",   // brighter light blue
+	"#7f9cf5",   // vivid blue
+	"#4c51bf",   // strong blue
+	"#2b6cb0",   // bold blue
+	"#1a365d",   // deep blue
+	"#2c5282",   // rich blue
+	"#2a4365",   // dark blue
+	"#1a202c",   // dark neutral
+	"#0f172a",   // very dark blue
+	"#000000",   // black
+];
+
+const lightColours: MantineColorsTuple = [
+	"#000000",
+	"#1a202c",
+	"#2d3748",
+	"#4a5568",
+	"#718096",
+	"#a0aec0",
+	"#cbd5e0",
+	"#e2e8f0",
+	"#edf2f7",
+	"#f7fafc",
+];
+
 const theme = createTheme({
 	autoContrast: true,
 	colors: {
 		nodecg: nodecgColor,
-		// dark: nodecgColor,
+		dark: darkColoursV2,
+		light: lightColours,
 	},
 	primaryColor: "nodecg",
 });

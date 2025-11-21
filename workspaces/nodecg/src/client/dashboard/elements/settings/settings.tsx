@@ -1,5 +1,6 @@
 import classes from "./settings.module.css";
 import { AuthKey } from "./auth-key";
+import { ColourThemeToggle } from "./colour-theme-toggle";
 
 export function Settings() {
 	const isAuthEnabled = Boolean(
@@ -8,10 +9,8 @@ export function Settings() {
 
 	return (
 		<div className={classes["container"]}>
+			<ColourThemeToggle />
 			{isAuthEnabled && <AuthKey />}
-			{/* Temp */}
-			{!isAuthEnabled && <div>No settings available</div>}
 		</div>
 	);
 }
-

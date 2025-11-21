@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { CircleX, CloudUpload, Download, Upload } from "lucide-react";
 import { useDisclosure } from "@mantine/hooks";
-import { Dropzone, FileWithPath } from "@mantine/dropzone";
+import { Dropzone, type FileWithPath } from "@mantine/dropzone";
 import classes from "./asset-category.module.css";
 
 type AssetCategoryProps = {
