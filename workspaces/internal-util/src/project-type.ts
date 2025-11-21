@@ -1,16 +1,26 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { nearestProjectDirFromCwd } from "./find-nodejs-project.ts";
+import { getNearestProjectDirFromCwd } from "./find-nodejs-project.ts";
 
-const rootPackageJson = JSON.parse(
-	fs.readFileSync(path.join(nearestProjectDirFromCwd, "package.json"), "utf-8"),
-);
+let _cachedIsLegacyProject: boolean | undefined;
 
-export const isLegacyProject = rootPackageJson.nodecgRoot === true;
+export function isLegacyProject(): boolean {
+	if (_cachedIsLegacyProject === undefined) {
+		const rootPackageJson = JSON.parse(
+			fs.readFileSync(
+				path.join(getNearestProjectDirFromCwd(), "package.json"),
+				"utf-8",
+			),
+		);
 
-if (!isLegacyProject) {
-	console.warn(
-		"NodeCG is installed as a dependency. This is an experimental feature. Please report any issues you encounter.",
-	);
+		_cachedIsLegacyProject = rootPackageJson.nodecgRoot === true;
+
+		if (!_cachedIsLegacyProject) {
+			console.warn(
+				"NodeCG is installed as a dependency. This is an experimental feature. Please report any issues you encounter.",
+			);
+		}
+	}
+	return _cachedIsLegacyProject;
 }

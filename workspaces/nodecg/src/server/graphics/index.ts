@@ -115,7 +115,7 @@ export class GraphicsLib {
 
 				const filePath = req.params.filePath!;
 
-				if (isLegacyProject) {
+				if (isLegacyProject()) {
 					const parentDir = path.join(bundle.dir, "node_modules");
 					const fileLocation = path.join(parentDir, filePath);
 					sendFile(parentDir, fileLocation, res, next);

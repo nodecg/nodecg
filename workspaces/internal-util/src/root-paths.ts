@@ -1,17 +1,35 @@
 import path from "node:path";
 
-import { nearestProjectDirFromCwd } from "./find-nodejs-project.ts";
+import { getNearestProjectDirFromCwd } from "./find-nodejs-project.ts";
 import { isLegacyProject } from "./project-type.ts";
 
-const runtimeRootPath = nearestProjectDirFromCwd;
+let _cachedRuntimeRootPath: string | undefined;
+let _cachedNodecgInstalledPath: string | undefined;
 
-const nodecgInstalledPath = isLegacyProject
-	? path.join(runtimeRootPath, "workspaces/nodecg")
-	: path.join(runtimeRootPath, "node_modules/nodecg");
+function getRuntimeRootPath(): string {
+	if (_cachedRuntimeRootPath === undefined) {
+		_cachedRuntimeRootPath = getNearestProjectDirFromCwd();
+	}
+	return _cachedRuntimeRootPath;
+}
+
+function getNodecgInstalledPath(): string {
+	if (_cachedNodecgInstalledPath === undefined) {
+		const runtimeRoot = getRuntimeRootPath();
+		_cachedNodecgInstalledPath = isLegacyProject()
+			? path.join(runtimeRoot, "workspaces/nodecg")
+			: path.join(runtimeRoot, "node_modules/nodecg");
+	}
+	return _cachedNodecgInstalledPath;
+}
 
 export const rootPaths = {
-	runtimeRootPath,
-	nodecgInstalledPath,
+	get runtimeRootPath() {
+		return getRuntimeRootPath();
+	},
+	get nodecgInstalledPath() {
+		return getNodecgInstalledPath();
+	},
 	/**
 	 * Allow overriding the runtime root path via environment variable mainly for tests
 	 */
@@ -20,6 +38,6 @@ export const rootPaths = {
 		if (NODECG_ROOT) {
 			return NODECG_ROOT;
 		}
-		return runtimeRootPath;
+		return getRuntimeRootPath();
 	},
 };

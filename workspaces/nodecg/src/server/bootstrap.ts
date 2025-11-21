@@ -11,7 +11,7 @@
 
 import { isLegacyProject, rootPaths } from "@nodecg/internal-util";
 
-if (isLegacyProject) {
+if (isLegacyProject()) {
 	const cwd = process.cwd();
 	const runtimeRootPath = rootPaths.runtimeRootPath;
 	if (cwd !== runtimeRootPath) {
