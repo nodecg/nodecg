@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import Packery from "packery";
 import Draggabilly from "draggabilly";
 
@@ -63,6 +63,32 @@ export function PackeryGrid(props: PackeryGridProps) {
 			packeryRef.current?.off("dragItemPositioned", handler);
 		};
 	}, [props.children]);
+
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			packeryRef.current?.layout();
+		}, 250);
+
+		return () => {
+			clearTimeout(timeout);
+		};
+	}, []);
+
+	// Cursed but the original did this as well
+	useEffect(() => {
+		let timeout: number | undefined;
+		const handler = () => {
+			window.clearTimeout(timeout);
+			timeout = window.setTimeout(() => {
+				packeryRef.current?.layout();
+			}, 500);
+		};
+		document.addEventListener("click", handler, true);
+		return () => {
+			document.removeEventListener("click", handler, true);
+			window.clearTimeout(timeout);
+		};
+	}, []);
 
 	return <div ref={containerRef}>{props.children}</div>;
 }

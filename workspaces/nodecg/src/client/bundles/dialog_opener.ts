@@ -1,7 +1,6 @@
 document.addEventListener(
 	"click",
 	(e) => {
-		console.log("Clicked:", e);
 		const nodecg = window.nodecg;
 
 		const composedPath = e.composedPath();

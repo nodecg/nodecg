@@ -3,7 +3,7 @@
 }
 
 .header {
-	/* background-color: #516077; */
+	background-color: var(--mantine-color-dark-6);
 	font-weight: bold;
 	padding: var(--mantine-spacing-sm);
 	display: flex;

@@ -1,9 +1,14 @@
-import { useLayoutEffect, useRef } from "react";
+import {
+	useLayoutEffect,
+	useRef,
+	useState,
+	type ReactEventHandler,
+} from "react";
 import type { NodeCG } from "../../../../types/nodecg";
-import { ActionIcon } from "@mantine/core";
+import { ActionIcon, Collapse, Group } from "@mantine/core";
 
 import classes from "./panel.module.css";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { initialize } from "@open-iframe-resizer/core";
 
 // 1 => 128
@@ -25,7 +30,7 @@ interface PanelProps {
 }
 
 export function Panel(props: PanelProps) {
-	// const [panelCollapsed, setPanelCollapsed] = useState(false);
+	const [collapsed, setCollapsed] = useState(true);
 	const iframeRef = useRef<HTMLIFrameElement>(null);
 	const isFullbleed = props.panel.fullbleed ?? false;
 	const width = isFullbleed
@@ -65,43 +70,80 @@ export function Panel(props: PanelProps) {
 		}
 	}, [isFullbleed, iframeRef.current]);
 
+	function iframeLoadHandler(event: React.SyntheticEvent<HTMLIFrameElement>) {
+		if (isFullbleed) {
+			return;
+		}
+
+		const iframe = event.currentTarget;
+		if (iframe.contentWindow) {
+			const padding =
+				parseFloat(
+					window.getComputedStyle(iframe.contentWindow.document.body).marginTop,
+				) +
+				parseFloat(
+					window.getComputedStyle(iframe.contentWindow.document.body)
+						.marginBottom,
+				);
+			iframe.style.height = `${iframe.contentWindow.document.body.scrollHeight + padding}px`;
+		}
+	}
+
 	return (
 		<div style={{ width, height }} className="ncg-dashboard-panel">
 			<div className={`${classes["header"]} dragHandle`}>
 				<span>{panelTitle}</span>
-				<ActionIcon variant="transparent" onClick={openInNewTab}>
-					<ExternalLink />
-				</ActionIcon>
+				<Group gap="xs">
+					<ActionIcon variant="transparent" onClick={openInNewTab}>
+						<ExternalLink />
+					</ActionIcon>
+					{!isFullbleed && (
+						<ActionIcon
+							variant="transparent"
+							onClick={() => setCollapsed((c) => !c)}
+						>
+							{collapsed ? <ChevronDown /> : <ChevronUp />}
+						</ActionIcon>
+					)}
+				</Group>
 			</div>
-			<div style={{ padding: 0, height: "100%" }}>
-				<iframe
-					className={classes["iframe"]}
-					style={{ height: "100%", width }}
-					src={`/bundles/${props.panel.bundleName}/dashboard/${props.panel.file}`}
-					id={`${props.panel.bundleName}_${props.panel.name}_iframe`}
-					loading="lazy"
-					onLoad={(event) => {
-						if (isFullbleed) {
-							return;
-						}
-
-						const iframe = event.currentTarget;
-						if (iframe.contentWindow) {
-							const padding =
-								parseFloat(
-									window.getComputedStyle(iframe.contentWindow.document.body)
-										.marginTop,
-								) +
-								parseFloat(
-									window.getComputedStyle(iframe.contentWindow.document.body)
-										.marginBottom,
-								);
-							iframe.style.height = `${iframe.contentWindow.document.body.scrollHeight + padding}px`;
-						}
-					}}
+			{isFullbleed ? (
+				<PanelContent
+					panel={props.panel}
 					ref={iframeRef}
+					onLoad={iframeLoadHandler}
 				/>
-			</div>
+			) : (
+				<Collapse in={collapsed}>
+					<PanelContent
+						panel={props.panel}
+						ref={iframeRef}
+						onLoad={iframeLoadHandler}
+					/>
+				</Collapse>
+			)}
+		</div>
+	);
+}
+
+interface PanelContentProps {
+	panel: NodeCG.Bundle.Panel;
+	onLoad?: ReactEventHandler<HTMLIFrameElement>;
+	ref: React.Ref<HTMLIFrameElement>;
+}
+
+function PanelContent(props: PanelContentProps) {
+	return (
+		<div style={{ padding: 0, height: "100%" }}>
+			<iframe
+				className={classes["iframe"]}
+				style={{ height: "100%", width: "100%" }}
+				src={`/bundles/${props.panel.bundleName}/dashboard/${props.panel.file}`}
+				id={`${props.panel.bundleName}_${props.panel.name}_iframe`}
+				loading="lazy"
+				onLoad={props.onLoad}
+				ref={props.ref}
+			/>
 		</div>
 	);
 }
