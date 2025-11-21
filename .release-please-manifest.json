@@ -4,5 +4,5 @@
 	"workspaces/database-adapter-types": "2.7.0",
 	"workspaces/database-adapter-sqlite-legacy": "2.7.0",
 	"workspaces/cli": "2.7.0",
-	"workspaces/nodecg": "2.6.2"
+	"workspaces/nodecg": "2.6.3"
 }
