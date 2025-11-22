@@ -46,7 +46,7 @@ export class ServerReplicant<
 
 		function getBundlePath() {
 			const rootPath = rootPaths.runtimeRootPath;
-			if (isLegacyProject) {
+			if (isLegacyProject()) {
 				return path.join(rootPaths.getRuntimeRoot(), "bundles", namespace);
 			}
 			const rootPackageJson = fs.readFileSync(

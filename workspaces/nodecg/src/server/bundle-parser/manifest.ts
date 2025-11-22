@@ -14,7 +14,7 @@ export const parseManifest =
 			);
 		}
 
-		if (isLegacyProject) {
+		if (isLegacyProject()) {
 			if (!packageJson.nodecg) {
 				return IOE.left(
 					new Error(

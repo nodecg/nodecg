@@ -16,6 +16,11 @@ export function recursivelyFindNodeJSProject(dir: string) {
 	return recursivelyFindNodeJSProject(parentDir);
 }
 
-export const nearestProjectDirFromCwd = recursivelyFindNodeJSProject(
-	process.cwd(),
-);
+let _cachedNearestProjectDir: string | undefined;
+
+export function getNearestProjectDirFromCwd(): string {
+	if (_cachedNearestProjectDir === undefined) {
+		_cachedNearestProjectDir = recursivelyFindNodeJSProject(process.cwd());
+	}
+	return _cachedNearestProjectDir;
+}

@@ -84,7 +84,7 @@ export class BundleManager extends TypedEmitter<EventMap> {
 			this.emit("ready");
 		}, READY_WAIT_THRESHOLD);
 
-		const bundleRootPaths = isLegacyProject
+		const bundleRootPaths = isLegacyProject()
 			? bundlesPaths
 			: [rootPaths.runtimeRootPath, ...bundlesPaths];
 
@@ -194,7 +194,7 @@ export class BundleManager extends TypedEmitter<EventMap> {
 					loadBundleCfg(cfgPath, bundleName),
 				);
 
-				if (isLegacyProject) {
+				if (isLegacyProject()) {
 					if (!bundle.compatibleRange) {
 						log.error(
 							`${bundle.name}'s package.json does not have a "nodecg.compatibleRange" property.`,
