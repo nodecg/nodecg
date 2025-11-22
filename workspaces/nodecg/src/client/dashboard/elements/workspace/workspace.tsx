@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { Breadcrumbs } from "@mantine/core";
+import { Alert, Breadcrumbs } from "@mantine/core";
 
 import classes from "./workspace.module.css";
 import { PackeryGrid } from "./packery";
@@ -59,10 +59,10 @@ export function Workspace() {
 		const fullbleedPanel = workspacePanels[0];
 		if (!fullbleedPanel) {
 			return (
-				<div>
+				<Alert title="Error" color="red">
 					Error: This page should be a fullbleed panel but no fullbleed panel
 					matching the url was found. Expected a panel named: {workspace}
-				</div>
+				</Alert>
 			);
 		}
 
