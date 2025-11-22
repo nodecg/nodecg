@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.7.1](https://github.com/nodecg/nodecg/compare/database-adapter-sqlite-legacy-v2.7.0...database-adapter-sqlite-legacy-v2.7.1) (2025-11-22)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg/internal-util bumped from 2.7.0 to 2.7.1
+
 ## [2.7.0](https://github.com/nodecg/nodecg/compare/database-adapter-sqlite-legacy-v2.6.1...database-adapter-sqlite-legacy-v2.7.0) (2025-11-13)
 
 
