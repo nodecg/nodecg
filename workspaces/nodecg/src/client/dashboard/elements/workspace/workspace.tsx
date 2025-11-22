@@ -84,7 +84,9 @@ export function Workspace() {
 
 	return (
 		<div className={classes["workspace"]}>
-			{breadcrumbs.length > 1 && <Breadcrumbs>{breadcrumbs}</Breadcrumbs>}
+			{breadcrumbs.length > 1 && (
+				<Breadcrumbs className={classes.breadcrumbs}>{breadcrumbs}</Breadcrumbs>
+			)}
 			<h1>{splitWorkspace.at(-1)}</h1>
 			<PackeryGrid
 				itemSelector=".ncg-dashboard-panel"
