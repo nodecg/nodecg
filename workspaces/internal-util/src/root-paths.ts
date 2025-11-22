@@ -4,7 +4,6 @@ import { getNearestProjectDirFromCwd } from "./find-nodejs-project.ts";
 import { isLegacyProject } from "./project-type.ts";
 
 let _cachedRuntimeRootPath: string | undefined;
-let _cachedNodecgInstalledPath: string | undefined;
 
 function getRuntimeRootPath(): string {
 	if (_cachedRuntimeRootPath === undefined) {
@@ -12,6 +11,8 @@ function getRuntimeRootPath(): string {
 	}
 	return _cachedRuntimeRootPath;
 }
+
+let _cachedNodecgInstalledPath: string | undefined;
 
 function getNodecgInstalledPath(): string {
 	if (_cachedNodecgInstalledPath === undefined) {
