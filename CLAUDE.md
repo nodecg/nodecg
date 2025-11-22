@@ -226,6 +226,23 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
   - `Effect.forkDaemon` creates daemon fibers that continue running after parent completes
   - Essential for test setups where server must stay alive after ready signal
 
+**Effect Event Listener Patterns**:
+
+- **Eager vs Lazy Setup**:
+  - `Effect.async` runs setup eagerly when Effect is yielded
+  - `Stream.async`/`Stream.asyncPush` run setup lazily when stream is consumed
+  - For event listeners that must be registered immediately, use `Effect.gen` returning `Stream`, not bare `Stream` constructor
+- **One-time events**: Use `Effect.async<T>` with `eventEmitter.once()` for single-fire events
+- **Continuous events**: Use `Effect.gen(function* () { ... return Stream.fromQueue(queue) })` pattern
+  - Create bounded queue inside Effect.gen
+  - Register listener that offers to queue
+  - Register finalizer to remove listener
+  - Return Stream from queue
+- **Forking listener setup**: Run listener registration in main fiber before forking stream consumption
+  - Wrong: `yield* Effect.forkScoped(Effect.all([...listeners]).pipe(...))`
+  - Right: `const streams = yield* Effect.all([...listeners]); yield* Effect.forkScoped(Stream.runForEach(...))`
+- **Event emission verification**: When events are defined in EventMap, verify they're actually emitted in relevant methods
+
 **Migration Documentation**:
 
 - All migration work must be logged in `docs/effect-migration/log/` directory
@@ -235,6 +252,11 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - See `docs/effect-migration/strategy.md` for migration approach and phases
 - See `docs/effect-migration/log/README.md` for log template and guidelines
 - **Update both log and strategy docs** - When completing migration phases, update both the detailed log entry AND the phase summary in strategy.md to reflect actual implementation
+- **Concise documentation style**:
+  - Show function signatures, not full implementations with JSDoc
+  - Reference actual implementation files instead of duplicating code
+  - Avoid verbose code blocks - keep documentation scannable
+- **Log consolidation**: When work is prerequisite for a phase, document it in that phase's log file, not a separate entry
 
 **Public API Preservation**:
 

@@ -285,6 +285,7 @@ export class BundleManager extends TypedEmitter<EventMap> {
 
 			if (bundles[i]!.name === bundleName) {
 				bundles.splice(i, 1);
+				this.emit("bundleRemoved", bundleName);
 			}
 		}
 	}

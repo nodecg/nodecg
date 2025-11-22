@@ -92,39 +92,140 @@ Replace `NodeCGServer` class with functional Effect-based architecture.
 
 See [migration log entry](./log/02-phase-2-server-refactor.md) for detailed implementation notes and patterns learned.
 
-### Phase 3: Core Services
+### Phase 3: EventEmitter → Effect Utilities
 
-Convert subsystems into Effect services in dependency order:
+**Status**: 🔄 In Progress
 
-1. **Config loading** (`workspaces/nodecg/src/server/config/`) → `ConfigService`
-2. **Database connection** → `DatabaseService`
-3. **Bundle parsing** (`workspaces/nodecg/src/server/bundle-parser/`) → `BundleService`
-4. **Replicants system** (`workspaces/nodecg/src/server/replicant/`) → `ReplicantService`
-5. **Mount registration** (`workspaces/nodecg/src/server/mounts.ts`) → `MountService`
+Create general-purpose utilities for integrating EventEmitter with Effect, then clean up existing event listener patterns in the codebase.
 
-Each service uses `Effect.Service` and provides its functionality through Effect.
+**Current Problem**: Repeated pattern throughout codebase:
+```typescript
+// Pattern repeated many times in server/index.ts and elsewhere
+const listener = (data) => { /* handle */ };
+emitter.on("event", listener);
+yield* Effect.addFinalizer(() =>
+  Effect.sync(() => emitter.removeListener("event", listener))
+);
+```
 
-### Phase 4: HTTP Server Integration
+**Solution**: Create reusable utilities in `_effect/event-listener.ts`:
+- `waitForEvent<T>(eventEmitter, eventName)` - Single event → Effect<T>
+- `listenToEvent<T>(eventEmitter, eventName)` - Event stream → Effect<Stream<T>>
+- Automatic cleanup using `Effect.addFinalizer`
+- Type-safe event handling via `EventEmitterLike<T>` interface
 
-Use Effect Platform HTTP Server with Express as fallback for user routes:
+**Implementation**:
+- ✅ Create `_effect/event-listener.ts` with utilities (Step 1 - Complete)
+- ✅ Add comprehensive unit tests with cleanup verification (Step 1 - Complete)
+- 🔄 Refactor `server/index.ts` event listeners (Step 2 - Pending)
+  - Lines 114-124: Server error listener
+  - Lines 125-135: Server close listener
+  - Lines 268-286: BundleManager ready event
+  - Lines 399-402: BundleManager event listeners for replicant updates
+- Document patterns for EventEmitter integration
 
-- Effect HTTP Router handles core NodeCG routes
-- Express mounted as catchall fallback for unmatched routes
-- Users can still register custom routes via `nodecg.mount()`
-- Entire HTTP layer runs within Effect runtime
+**Benefits**:
+- Cleaner, more maintainable code
+- Reusable across entire codebase
+- Foundation for Phase 4 (BundleManager migration)
+- Eager listener registration prevents race conditions
+- Establishes EventEmitter → Effect patterns
 
-### Phase 5: Route Handlers
+**Complexity**: ⭐ Simple
 
-Convert Express route handlers to Effect HTTP Router routes:
+See [migration log entry](./log/03-event-emitter-utils.md) for detailed implementation notes and patterns.
 
-- All core NodeCG routes use Effect HTTP Router
-- Routes directly access Effect services (no `Effect.runPromise` needed)
-- Error handling unified through Effect error types
-- Request/response lifecycle managed with Effect scopes
+### Phase 4: BundleManager Migration
 
-### Phase 6: Utility Functions
+**Status**: Planned
 
-Migrate supporting functions as needed during service migration.
+Migrate BundleManager to Effect-based BundleService using EventEmitter utilities from Phase 3.
+
+**Implementation**:
+- **Location**: `workspaces/nodecg/src/server/bundle-manager.ts` → `bundle-service.ts`
+- **Complexity**: ⭐⭐⭐ Complex (file watching, event distribution, hot-reloading)
+- **Approach**:
+  - Use EventEmitter utilities from Phase 3
+  - `Ref<Array<NodeCG.Bundle>>` for mutable bundle list state
+  - `PubSub<BundleEvent>` for event distribution
+  - `Stream` for Chokidar file watching (general-purpose wrapper)
+  - `Effect.acquireRelease` for watcher lifecycle
+- **Consumers to migrate**: GraphicsLib, DashboardLib, ExtensionManager, SentryConfig, server/index.ts
+- **New utilities**:
+  - `_effect/file-watcher.ts` - Chokidar → Stream wrapper with retry logic
+  - `_effect/git-parser.ts` - Git parsing wrapper
+
+**Key Patterns**:
+- `Data.TaggedEnum` for event types
+- Chokidar → Stream conversion for file watching
+- EventEmitter → PubSub migration for event distribution
+- Stateful service with Ref for bundle list
+- Background stream processing with Effect.forkScoped
+
+See [migration log entry](./log/04-bundle-manager.md) for detailed implementation plan.
+
+### Phase 5: Route Libraries Migration
+
+Migrate route handler classes to Effect-based route services.
+
+**Candidates** (following execution order in createServer):
+1. **GraphicsLib** - Bundle graphics routes (already partially migrated in Phase 4 as BundleService consumer)
+2. **DashboardLib** - Bundle dashboard routes
+3. **MountsLib** - Static asset mounts
+4. **SoundsLib** - Sound file serving
+5. **AssetsMiddleware** - Asset serving middleware
+6. **SharedSourcesLib** - Shared source serving
+
+Each becomes a function returning Effect that sets up routes, replacing class-based design.
+
+### Phase 6: Login & Authentication
+
+Migrate login system to Effect.
+
+**Components**:
+- Login middleware (`workspaces/nodecg/src/server/login/`)
+- Session management (Passport integration)
+- Socket.IO authentication middleware
+
+### Phase 7: Replicator & State Management
+
+Migrate Replicator to Effect-based state management.
+
+**Components**:
+- Replicator class (`workspaces/nodecg/src/server/replicant/replicator.ts`)
+- ReplicantAPI
+- Database integration for persistence
+
+**Complexity**: ⭐⭐⭐⭐ Very Complex (real-time state sync, Socket.IO integration)
+
+### Phase 8: ExtensionManager
+
+Migrate ExtensionManager to Effect.
+
+**Components**:
+- Extension loading and lifecycle
+- Extension API provision
+- Event broadcasting to extensions
+
+### Phase 9: Supporting Services
+
+Migrate remaining subsystems as needed:
+
+1. **Config loading** - If needed, convert to ConfigService
+2. **Logger** - Consolidate with Effect logging
+3. **Utility functions** - Migrate as dependencies arise
+
+### Phase 10: HTTP Server Integration (Future)
+
+Evaluate whether to replace Express with Effect Platform HTTP Server.
+
+**Considerations**:
+- Effect HTTP Router for core routes
+- Express as fallback for user-registered routes via `nodecg.mount()`
+- Migration complexity vs benefits
+- Backward compatibility requirements
+
+**Decision**: Defer until other phases complete and benefits/tradeoffs are clearer.
 
 ## Architecture Principles
 
