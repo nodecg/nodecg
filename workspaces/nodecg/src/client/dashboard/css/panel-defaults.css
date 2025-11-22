@@ -1,5 +1,9 @@
+:root {
+	color-scheme: light dark;
+}
+
 body {
-	background-color: #2f3a4f;
-	color: white;
-	margin: 15px;
+	background-color: light-dark(#edf2f7, #0f172a);
+	color: light-dark(#000, #fff);
+	margin: 12px;
 }

@@ -1,9 +1,12 @@
 .panel {
-	display: inline-block;
+	overflow: hidden;
 }
 
 .header {
-	background-color: var(--mantine-color-dark-6);
+	background-color: light-dark(
+		var(--mantine-color-gray-0),
+		var(--mantine-color-dark-6)
+	);
 	font-weight: bold;
 	padding: var(--mantine-spacing-sm);
 	display: flex;
@@ -11,6 +14,16 @@
 }
 
 .iframe {
+	display: block;
 	border: none;
 	scrollbar-width: none;
+	height: 100%;
+	width: 100%;
+}
+
+.fullbleed {
+	border: none;
+	border-radius: 0;
+	height: 100%;
+	width: 100% !important;
 }
