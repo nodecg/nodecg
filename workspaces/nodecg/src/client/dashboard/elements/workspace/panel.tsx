@@ -1,6 +1,13 @@
 import { useState } from "react";
 import type { NodeCG } from "../../../../types/nodecg";
-import { ActionIcon, Collapse, Group, Paper } from "@mantine/core";
+import {
+	ActionIcon,
+	Collapse,
+	Group,
+	Paper,
+	Loader,
+	Center,
+} from "@mantine/core";
 
 import classes from "./panel.module.css";
 import { ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
@@ -26,6 +33,7 @@ interface PanelProps {
 
 export function Panel(props: PanelProps) {
 	const [collapsed, setCollapsed] = useState(true);
+	const [loading, setLoading] = useState(true);
 
 	const isFullbleed = props.panel.fullbleed ?? false;
 	const width = nodecgWidthToPixel(props.panel.width ?? 3);
@@ -35,6 +43,10 @@ export function Panel(props: PanelProps) {
 		src: `/bundles/${props.panel.bundleName}/dashboard/${props.panel.file}`,
 		id: `${props.panel.bundleName}_${props.panel.name}_iframe`,
 		loading: "lazy",
+		onLoad: () => setLoading(false),
+		style: {
+			height: loading ? 0 : "",
+		},
 	};
 
 	return (
@@ -66,6 +78,11 @@ export function Panel(props: PanelProps) {
 					)}
 				</Group>
 			</div>
+			{loading && (
+				<Center p="xl">
+					<Loader />
+				</Center>
+			)}
 			{isFullbleed ? (
 				<iframe {...iframeProps} />
 			) : (
