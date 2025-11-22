@@ -35,6 +35,20 @@ export class DashboardLib {
 	constructor(bundleManager: BundleManager) {
 		const { app } = this;
 
+		const serveDashboard = (_req: express.Request, res: express.Response) => {
+			if (!this.dashboardContext) {
+				this.dashboardContext = getDashboardContext(bundleManager.all());
+			}
+
+			res.render(
+				path.join(
+					rootPaths.nodecgInstalledPath,
+					"dist/server/templates/dashboard.tmpl",
+				),
+				this.dashboardContext,
+			);
+		};
+
 		app.use(express.static(BUILD_PATH));
 
 		app.use("/node_modules/:filePath(*)", (req, res, next) => {
@@ -48,24 +62,17 @@ export class DashboardLib {
 			res.redirect("/dashboard/");
 		});
 
-		app.get("/dashboard", authCheck, (req, res) => {
-			if (!req.url.endsWith("/")) {
-				res.redirect("/dashboard/");
-				return;
-			}
+		app.get("/dashboard", authCheck, serveDashboard);
+		
+		app.get("/dashboard/*", authCheck, serveDashboard);
+		
+		app.get("/assets", authCheck, serveDashboard);
 
-			if (!this.dashboardContext) {
-				this.dashboardContext = getDashboardContext(bundleManager.all());
-			}
+		app.get("/sound", authCheck, serveDashboard);
 
-			res.render(
-				path.join(
-					rootPaths.nodecgInstalledPath,
-					"dist/server/templates/dashboard.tmpl",
-				),
-				this.dashboardContext,
-			);
-		});
+		app.get("/settings", authCheck, serveDashboard);
+
+		app.get("/graphics", authCheck, serveDashboard);
 
 		app.get("/bundles/:bundleName/dashboard/*", authCheck, (req, res, next) => {
 			const { bundleName } = req.params;
