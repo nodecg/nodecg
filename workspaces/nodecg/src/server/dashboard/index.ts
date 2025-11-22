@@ -22,6 +22,7 @@ interface DashboardContext {
 	workspaces: Workspace[];
 	sentryEnabled: boolean;
 	version: string;
+	startTime: number;
 }
 
 const BUILD_PATH = path.join(rootPaths.nodecgInstalledPath, "dist/client");
@@ -123,6 +124,7 @@ function getDashboardContext(bundles: NodeCG.Bundle[]): DashboardContext {
 		workspaces: parseWorkspaces(bundles),
 		sentryEnabled,
 		version,
+		startTime: Date.now() - process.uptime() * 1000,
 	};
 }
 

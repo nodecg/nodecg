@@ -1,4 +1,5 @@
 .workspace {
+	position: relative;
 	flex-grow: 1;
 	padding: var(--mantine-spacing-md);
 	padding-top: var(--mantine-spacing-sm);

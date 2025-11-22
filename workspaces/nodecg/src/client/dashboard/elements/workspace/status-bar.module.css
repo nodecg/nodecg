@@ -1,0 +1,42 @@
+.status-bar {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+	font-size: var(--mantine-font-size-xs);
+	color: var(--mantine-color-dark-0);
+	background-color: var(--mantine-color-dark-3);
+	border-top: 1px solid var(--mantine-color-dark-4);
+	font-family: monospace;
+}
+
+.bundle-info {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.connected-status {
+	display: flex;
+	align-items: center;
+}
+
+.connection-indicator {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	margin-right: var(--mantine-spacing-xs);
+}
+
+.connected {
+	background-color: var(--mantine-color-green-6);
+}
+
+.disconnected {
+	background-color: var(--mantine-color-red-6);
+}

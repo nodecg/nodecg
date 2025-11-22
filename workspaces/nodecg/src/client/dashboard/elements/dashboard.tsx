@@ -18,6 +18,7 @@ import { Workspace } from "./workspace/workspace";
 import { Settings } from "./settings/settings";
 import { useSocketEvent, useSocketIOEvent } from "./hooks/use-socket";
 import { CheckIcon, CloudOff } from "lucide-react";
+import { useState } from "react";
 
 const nodecgColours: MantineColorsTuple = [
 	"#f2f4f8",
@@ -97,17 +98,16 @@ const router = createBrowserRouter([
 	},
 ]);
 
-function Root() {
-	return (
-		<div style={{ display: "flex" }}>
-			<Navbar workspaces={window.__renderData__.workspaces} />
-			<Outlet />
-		</div>
-	);
+export interface AppContext {
+	isConnected: boolean;
 }
 
-function NCGDashboard() {
+function Root() {
+	const [isConnected, setIsConnected] = useState(true);
+
 	useSocketEvent("disconnect", () => {
+		setIsConnected(false);
+
 		notifications.show({
 			title: "Disconnected",
 			message: "Lost connection to the NodeCG server.",
@@ -133,6 +133,8 @@ function NCGDashboard() {
 	});
 
 	useSocketIOEvent("reconnect", () => {
+		setIsConnected(true);
+
 		notifications.update({
 			title: "Reconnected",
 			message: "Reconnected to the NodeCG server.",
@@ -146,9 +148,18 @@ function NCGDashboard() {
 	});
 
 	return (
+		<div style={{ display: "flex" }}>
+			<Navbar workspaces={window.__renderData__.workspaces} />
+			<Outlet context={{ isConnected } satisfies AppContext} />
+		</div>
+	);
+}
+
+function NCGDashboard() {
+	return (
 		<MantineProvider theme={theme} defaultColorScheme="dark">
-			<Notifications />
 			<RouterProvider router={router} />
+			<Notifications />
 		</MantineProvider>
 	);
 }

@@ -14,6 +14,7 @@ declare global {
 			bundles: NodeCG.Bundle[];
 			workspaces: NodeCG.Workspace[];
 			version: string;
+			startTime: number;
 		};
 		WebComponentsReady: boolean;
 	}

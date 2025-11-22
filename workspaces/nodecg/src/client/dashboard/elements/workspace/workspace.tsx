@@ -5,6 +5,8 @@ import classes from "./workspace.module.css";
 import { PackeryGrid } from "./packery";
 import { Panel } from "./panel";
 import { NodeCGDialog } from "./dialog";
+import { StatusBar } from "./status-bar";
+import { useAppContext } from "../hooks/use-app-context";
 
 function locationParser(url?: string): {
 	workspace: string;
@@ -34,6 +36,7 @@ function locationParser(url?: string): {
 export function Workspace() {
 	const { "*": splat } = useParams();
 	const { workspace, isFullbleed } = locationParser(splat);
+	const { isConnected } = useAppContext();
 
 	const bundles = window.__renderData__.bundles;
 
@@ -98,6 +101,11 @@ export function Workspace() {
 					<Panel key={panel.name} panel={panel} />
 				))}
 			</PackeryGrid>
+			<StatusBar
+				bundles={bundles}
+				startTime={window.__renderData__.startTime}
+				isConnected={isConnected}
+			/>
 			{dialogPanels.map((panel) => (
 				<NodeCGDialog key={panel.name} panel={panel} />
 			))}
