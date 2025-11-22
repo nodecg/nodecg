@@ -1,15 +1,10 @@
-import {
-	useLayoutEffect,
-	useRef,
-	useState,
-	type ReactEventHandler,
-} from "react";
+import { useState } from "react";
 import type { NodeCG } from "../../../../types/nodecg";
 import { ActionIcon, Collapse, Group } from "@mantine/core";
 
 import classes from "./panel.module.css";
 import { ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
-import { initialize } from "@open-iframe-resizer/core";
+import { IframeResizer } from "@open-iframe-resizer/react";
 
 // 1 => 128
 // 2 => 272
@@ -31,7 +26,6 @@ interface PanelProps {
 
 export function Panel(props: PanelProps) {
 	const [collapsed, setCollapsed] = useState(true);
-	const iframeRef = useRef<HTMLIFrameElement>(null);
 	const isFullbleed = props.panel.fullbleed ?? false;
 	const width = isFullbleed
 		? "100%"
@@ -43,50 +37,6 @@ export function Panel(props: PanelProps) {
 	function openInNewTab() {
 		const url = `/bundles/${props.panel.bundleName}/dashboard/${props.panel.file}?standalone=true`;
 		window.open(url, "_blank", "noopener,noreferrer");
-	}
-
-	function attachIframeResizer(iframe: HTMLIFrameElement) {
-		initialize(
-			{
-				onIframeResize: (context) => {
-					// this.$.collapse.updateSize("auto", false);
-					context.iframe.dispatchEvent(new CustomEvent("iframe-resized"));
-				},
-			},
-			iframe,
-		);
-	}
-
-	useLayoutEffect(() => {
-		if (isFullbleed || !iframeRef.current) return;
-
-		if (iframeRef.current.contentWindow?.document.readyState === "complete") {
-			attachIframeResizer(iframeRef.current);
-		} else {
-			iframeRef.current.addEventListener("load", () => {
-				if (!iframeRef.current) return;
-				attachIframeResizer(iframeRef.current);
-			});
-		}
-	}, [isFullbleed, iframeRef.current]);
-
-	function iframeLoadHandler(event: React.SyntheticEvent<HTMLIFrameElement>) {
-		if (isFullbleed) {
-			return;
-		}
-
-		const iframe = event.currentTarget;
-		if (iframe.contentWindow) {
-			const padding =
-				parseFloat(
-					window.getComputedStyle(iframe.contentWindow.document.body).marginTop,
-				) +
-				parseFloat(
-					window.getComputedStyle(iframe.contentWindow.document.body)
-						.marginBottom,
-				);
-			iframe.style.height = `${iframe.contentWindow.document.body.scrollHeight + padding}px`;
-		}
 	}
 
 	return (
@@ -108,18 +58,10 @@ export function Panel(props: PanelProps) {
 				</Group>
 			</div>
 			{isFullbleed ? (
-				<PanelContent
-					panel={props.panel}
-					ref={iframeRef}
-					onLoad={iframeLoadHandler}
-				/>
+				<PanelContent panel={props.panel} />
 			) : (
 				<Collapse in={collapsed}>
-					<PanelContent
-						panel={props.panel}
-						ref={iframeRef}
-						onLoad={iframeLoadHandler}
-					/>
+					<PanelContent panel={props.panel} />
 				</Collapse>
 			)}
 		</div>
@@ -128,21 +70,17 @@ export function Panel(props: PanelProps) {
 
 interface PanelContentProps {
 	panel: NodeCG.Bundle.Panel;
-	onLoad?: ReactEventHandler<HTMLIFrameElement>;
-	ref: React.Ref<HTMLIFrameElement>;
 }
 
 function PanelContent(props: PanelContentProps) {
 	return (
 		<div style={{ padding: 0, height: "100%" }}>
-			<iframe
+			<IframeResizer
 				className={classes["iframe"]}
 				style={{ height: "100%", width: "100%" }}
 				src={`/bundles/${props.panel.bundleName}/dashboard/${props.panel.file}`}
 				id={`${props.panel.bundleName}_${props.panel.name}_iframe`}
 				loading="lazy"
-				onLoad={props.onLoad}
-				ref={props.ref}
 			/>
 		</div>
 	);
