@@ -1,6 +1,6 @@
 {
   "name": "@nodecg/database-adapter-sqlite-legacy",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nodecg/nodecg.git",
@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@nodecg/database-adapter-types": "2.7.0",
-    "@nodecg/internal-util": "2.7.0",
+    "@nodecg/internal-util": "2.7.1",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.4.1",
     "typeorm": "0.3.27"

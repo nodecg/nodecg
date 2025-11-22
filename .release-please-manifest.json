@@ -1,8 +1,8 @@
 {
 	".": "2.6.1",
-	"workspaces/internal-util": "2.7.0",
+	"workspaces/internal-util": "2.7.1",
 	"workspaces/database-adapter-types": "2.7.0",
-	"workspaces/database-adapter-sqlite-legacy": "2.7.0",
-	"workspaces/cli": "2.7.0",
-	"workspaces/nodecg": "2.6.3"
+	"workspaces/database-adapter-sqlite-legacy": "2.7.1",
+	"workspaces/cli": "2.7.1",
+	"workspaces/nodecg": "2.6.4"
 }

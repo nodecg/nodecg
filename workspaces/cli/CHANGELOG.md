@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.7.1](https://github.com/nodecg/nodecg/compare/cli-v2.7.0...cli-v2.7.1) (2025-11-22)
+
+
+### Bug Fixes
+
+* **CLI:** prevent setup command recursive node lookup ([#899](https://github.com/nodecg/nodecg/issues/899)) ([437b807](https://github.com/nodecg/nodecg/commit/437b807de71bbdf033f20a036a227bbfb4057e68))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg/internal-util bumped from 2.7.0 to 2.7.1
+
 ## [2.7.0](https://github.com/nodecg/nodecg/compare/cli-v2.6.1...cli-v2.7.0) (2025-11-13)
 
 
