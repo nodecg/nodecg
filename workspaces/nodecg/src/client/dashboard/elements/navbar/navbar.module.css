@@ -1,16 +1,18 @@
 .navbar {
 	height: 100vh;
+	width: 300px;
 	min-width: 300px;
 	padding: var(--mantine-spacing-md);
 	display: flex;
 	flex-direction: column;
 	border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-1));
-	transition: width 300ms ease, padding 300ms ease;
+	transition: width 300ms ease, min-width 300ms ease, padding 300ms ease;
 	overflow: hidden;
 }
 
 .navbar[data-collapsed="true"] {
 	width: 0;
+	min-width: 0px;
 	padding: 0;
 	border: none;
 }
