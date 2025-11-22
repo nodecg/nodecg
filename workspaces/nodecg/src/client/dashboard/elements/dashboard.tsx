@@ -19,7 +19,7 @@ import { Settings } from "./settings/settings";
 import { useSocketEvent, useSocketIOEvent } from "./hooks/use-socket";
 import { CheckIcon, CloudOff } from "lucide-react";
 
-const nodecgColor: MantineColorsTuple = [
+const nodecgColours: MantineColorsTuple = [
 	"#f2f4f8",
 	"#e4e5e8",
 	"#c4cad3",
@@ -32,45 +32,17 @@ const nodecgColor: MantineColorsTuple = [
 	"#3f516f",
 ];
 
-const debugColours: MantineColorsTuple = [
-	"#ff0000",
-	"#00ff00",
-	"#0000ff",
-	"#ffff00",
-	"#ff00ff",
-	"#00ffff",
-	"#ffa500",
-	"#800080",
-	"#ffffff",
-	"#000000",
-];
-
 const darkColours: MantineColorsTuple = [
-	"#fff",
-	"#00bebe",
-	"#00bebe",
-	"#00bebe",
-	"#1f3352ff",
-	"#203b63ff",
-	"#142d53ff",
-	"#091425",
-	"#000814ff",
-	"#000000ff",
-];
-
-
-
-const darkColoursV2: MantineColorsTuple = [
-	"#e0e7ff",   // brighter light blue
-	"#7f9cf5",   // vivid blue
-	"#4c51bf",   // strong blue
-	"#2b6cb0",   // bold blue
-	"#1a365d",   // deep blue
-	"#2c5282",   // rich blue
-	"#2a4365",   // dark blue
-	"#1a202c",   // dark neutral
-	"#0f172a",   // very dark blue
-	"#000000",   // black
+	"#e0e7ff",
+	"#7f9cf5",
+	"#4c51bf",
+	"#2b6cb0",
+	"#1a365d",
+	"#2c5282",
+	"#2a4365",
+	"#1a202c",
+	"#0f172a",
+	"#000000",
 ];
 
 const lightColours: MantineColorsTuple = [
@@ -89,8 +61,8 @@ const lightColours: MantineColorsTuple = [
 const theme = createTheme({
 	autoContrast: true,
 	colors: {
-		nodecg: nodecgColor,
-		dark: darkColoursV2,
+		nodecg: nodecgColours,
+		dark: darkColours,
 		light: lightColours,
 	},
 	primaryColor: "nodecg",
