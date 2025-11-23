@@ -377,10 +377,10 @@ export const createServer = Effect.fn("createServer")(function* (
 	};
 	const bundleManagerEvents = yield* Effect.all(
 		[
-			listenToEvent<[void]>(bundleManager, "ready"),
-			listenToEvent<[void]>(bundleManager, "bundleChanged"),
-			listenToEvent<[void]>(bundleManager, "gitChanged"),
-			listenToEvent<[void]>(bundleManager, "bundleRemoved"),
+			listenToEvent<[]>(bundleManager, "ready"),
+			listenToEvent<[]>(bundleManager, "bundleChanged"),
+			listenToEvent<[]>(bundleManager, "gitChanged"),
+			listenToEvent<[]>(bundleManager, "bundleRemoved"),
 		],
 		{ concurrency: "unbounded" },
 	).pipe(
