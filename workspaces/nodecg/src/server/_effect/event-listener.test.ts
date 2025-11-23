@@ -81,8 +81,6 @@ describe("listenToEvent", () => {
 					Effect.andThen(Chunk.toReadonlyArray),
 				);
 
-				console.log(pings);
-
 				expect(pings).toEqual([0, 1, 2]);
 
 				return ee;
