@@ -1,0 +1,12 @@
+{
+	"extends": "./tsconfig.json",
+	"include": [],
+	"references": [
+		{ "path": "workspaces/cli" },
+		{ "path": "workspaces/database-adapter-sqlite-legacy" },
+		{ "path": "workspaces/database-adapter-types" },
+		{ "path": "workspaces/internal-util" },
+		{ "path": "workspaces/nodecg/src" },
+		{ "path": "workspaces/nodecg/test" }
+	]
+}

@@ -6,7 +6,6 @@ export default defineConfig({
 			test: "true",
 			NODECG_TEST: "true",
 		},
-		exclude: ["**/node_modules/**", "**/dist/**", "**/out/**"],
 		coverage: {
 			include: ["workspaces/*/src"],
 			exclude: ["workspaces/nodecg/src/client"],
@@ -15,22 +14,21 @@ export default defineConfig({
 			{
 				test: {
 					name: "unit",
-					include: ["workspaces/nodecg/src/**/*.test.{ts,tsx}"],
+					dir: "workspaces/nodecg/src",
 				},
 			},
 			{
 				test: {
-					name: "e2e-legacy-mode",
-					include: ["workspaces/nodecg/test/legacy-mode/**/*.test.{ts,tsx}"],
+					name: "e2e-legacy",
+					dir: "workspaces/nodecg/test/legacy-mode",
 					testTimeout: 30_000,
 				},
 			},
 			{
 				test: {
-					name: "e2e-installed-mode",
-					include: ["workspaces/nodecg/test/installed-mode/**/*.test.{ts,tsx}"],
+					name: "e2e-installed",
+					dir: "workspaces/nodecg/test/installed-mode",
 					testTimeout: 30_000,
-					fileParallelism: false,
 				},
 			},
 			"workspaces/cli",

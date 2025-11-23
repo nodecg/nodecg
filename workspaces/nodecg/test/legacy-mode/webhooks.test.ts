@@ -3,8 +3,8 @@ import crypto from "node:crypto";
 import express from "express";
 import { expect } from "vitest";
 
-import { setupTest } from "./helpers/setup";
-import * as C from "./helpers/test-constants";
+import { setupTest } from "../helpers/setup";
+import * as C from "../helpers/test-constants";
 
 const test = await setupTest();
 

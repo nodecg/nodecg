@@ -21,8 +21,6 @@
   "scripts": {
     "build": "tsdown",
     "generate-migrations": "typeorm-ts-node-commonjs migration:generate ./src/migration/rename-me -d ./src/datasource.ts",
-    "typecheck": "tsc --noEmit",
-    "typecheck-watch": "tsc --noEmit --watch --preserveWatchOutput",
     "watch": "tsdown --watch"
   },
   "dependencies": {
@@ -36,7 +34,7 @@
     "@arethetypeswrong/core": "^0.18.2",
     "publint": "^0.3.15",
     "ts-node": "^10.9.2",
-    "tsdown": "^0.16.1",
+    "tsdown": "^0.16.6",
     "typescript": "~5.9.3"
   },
   "publishConfig": {

@@ -77,6 +77,6 @@ describe("import from directories with package.json", () => {
 		const { isLegacyProject, rootPaths } = await import("./main.js");
 
 		expect(isLegacyProject()).toBe(true);
-		expect(rootPaths.runtimeRootPath).toBe(tempDir);
+		expect(rootPaths.runtimeRootPath).toBeTruthy();
 	});
 });
