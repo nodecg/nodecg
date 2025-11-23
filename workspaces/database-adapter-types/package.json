@@ -20,14 +20,12 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "typecheck": "tsc --noEmit",
-    "typecheck-watch": "tsc --noEmit --watch --preserveWatchOutput",
     "watch": "tsdown --watch"
   },
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.2",
     "publint": "^0.3.15",
-    "tsdown": "^0.16.1",
+    "tsdown": "^0.16.6",
     "typescript": "~5.9.3"
   },
   "publishConfig": {
