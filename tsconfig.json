@@ -25,6 +25,7 @@
 		"noEmit": true,
 		"declaration": true,
 		"declarationMap": true,
+		"incremental": false,
 
 		"plugins": [{ "name": "@effect/language-service" }]
 	}
