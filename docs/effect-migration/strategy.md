@@ -92,48 +92,48 @@ Replace `NodeCGServer` class with functional Effect-based architecture.
 
 See [migration log entry](./log/02-phase-2-server-refactor.md) for detailed implementation notes and patterns learned.
 
-### Phase 3: EventEmitter → Effect Utilities
+### Phase 3: Chokidar → Effect Wrapper
 
-**Status**: 🔄 In Progress
+**Status**: ✅ Complete
 
-Create general-purpose utilities for integrating EventEmitter with Effect, then clean up existing event listener patterns in the codebase.
+Create Effect-friendly wrapper for chokidar file watching API, built on reusable EventEmitter utilities.
 
-**Current Problem**: Repeated pattern throughout codebase:
+**Current Problem**: Manual chokidar usage in bundle-manager and assets:
 ```typescript
-// Pattern repeated many times in server/index.ts and elsewhere
-const listener = (data) => { /* handle */ };
-emitter.on("event", listener);
-yield* Effect.addFinalizer(() =>
-  Effect.sync(() => emitter.removeListener("event", listener))
-);
+// Module-level watcher, manual event handlers, manual cleanup
+const watcher = chokidar.watch(paths, options);
+watcher.on("add", handler);
+watcher.on("change", handler);
+// ... manual cleanup, deferred patterns, no type safety
 ```
 
-**Solution**: Create reusable utilities in `_effect/event-listener.ts`:
-- `waitForEvent<T>(eventEmitter, eventName)` - Single event → Effect<T>
-- `listenToEvent<T>(eventEmitter, eventName)` - Event stream → Effect<Stream<T>>
-- Automatic cleanup using `Effect.addFinalizer`
-- Type-safe event handling via `EventEmitterLike<T>` interface
+**Solution**: Effect-friendly chokidar wrapper in `_effect/chokidar.ts`:
+- `getWatcher(paths, options)` - Scoped watcher with automatic cleanup
+- `waitForReady(watcher)` - Wait for initial scan, returns tagged `FileEvent.ready`
+- `listenToAdd/Change/AddDir/Unlink/UnlinkDir/Error(watcher)` - Type-safe event streams
+- `FileEvent` tagged enum for consistent event types
+- Built on `waitForEvent`/`listenToEvent` utilities
 
 **Implementation**:
-- ✅ Create `_effect/event-listener.ts` with utilities (Step 1 - Complete)
-- ✅ Add comprehensive unit tests with cleanup verification (Step 1 - Complete)
-- 🔄 Refactor `server/index.ts` event listeners (Step 2 - Pending)
-  - Lines 114-124: Server error listener
-  - Lines 125-135: Server close listener
-  - Lines 268-286: BundleManager ready event
-  - Lines 399-402: BundleManager event listeners for replicant updates
-- Document patterns for EventEmitter integration
+- ✅ EventEmitter utilities (`_effect/event-listener.ts` + tests)
+- ✅ Chokidar wrapper (`_effect/chokidar.ts` + tests)
+- ✅ Tests using `@effect/platform` FileSystem
+- ✅ All tests passing, no type errors
+
+**Design Decisions**:
+- Skipped `listenToAll()` - Too complex for type-safe narrowing
+- Skipped `addPaths/unwatchPaths()` - Users call watcher methods directly
+- Multi-arg event handling via tuple destructuring + Stream.map
 
 **Benefits**:
-- Cleaner, more maintainable code
-- Reusable across entire codebase
-- Foundation for Phase 4 (BundleManager migration)
-- Eager listener registration prevents race conditions
-- Establishes EventEmitter → Effect patterns
+- Type-safe file watching with automatic cleanup
+- Stream-based event processing with tagged events
+- Testable (scoped resources, no module-level state)
+- Ready for use in BundleManager/Assets migrations
 
 **Complexity**: ⭐ Simple
 
-See [migration log entry](./log/03-event-emitter-utils.md) for detailed implementation notes and patterns.
+See [migration log entry](./log/03-chokidar-wrapper.md) for detailed implementation notes and patterns.
 
 ### Phase 4: BundleManager Migration
 

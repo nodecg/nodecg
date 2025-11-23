@@ -20,8 +20,8 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "typecheck": "tsc --noEmit",
-    "typecheck-watch": "tsc --noEmit --watch --preserveWatchOutput",
+    "typecheck": "tsc -b --noEmit",
+    "typecheck-watch": "tsc -b --noEmit --watch --preserveWatchOutput",
     "watch": "tsdown --watch"
   },
   "devDependencies": {

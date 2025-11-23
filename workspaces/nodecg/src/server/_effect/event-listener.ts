@@ -1,4 +1,4 @@
-import { Effect, Queue, Stream } from "effect";
+import { Effect, Match, Predicate, Queue, Stream } from "effect";
 
 interface EventEmitterLike<T extends any[]> {
 	once(event: string, listener: (...args: T) => void): unknown;
@@ -6,23 +6,28 @@ interface EventEmitterLike<T extends any[]> {
 	removeListener(event: string, listener: (...args: T) => void): unknown;
 }
 
-export const waitForEvent = <T = never>(
-	eventEmitter: EventEmitterLike<[NoInfer<T>]>,
+export const waitForEvent = <T extends any[] = never[]>(
+	eventEmitter: EventEmitterLike<NoInfer<T>>,
 	eventName: string,
 ) =>
 	Effect.async<T>((resume) => {
-		eventEmitter.once(eventName, (payload: T) => {
+		eventEmitter.once(eventName, (...payload: T) => {
 			resume(Effect.succeed(payload));
 		});
 	});
 
-export const listenToEvent = <T = never>(
-	eventEmitter: EventEmitterLike<[NoInfer<T>]>,
+export const listenToEvent = <T extends any[] = never[]>(
+	eventEmitter: EventEmitterLike<NoInfer<T>>,
 	eventName: string,
+	boundary?: number,
 ) =>
 	Effect.gen(function* () {
-		const queue = yield* Queue.bounded<T>(100);
-		const handler = (payload: T) => {
+		const queue = yield* Match.value(boundary).pipe(
+			Match.when(Predicate.isNumber, (b) => Queue.bounded<T>(b)),
+			Match.when(Predicate.isUndefined, () => Queue.unbounded<T>()),
+			Match.exhaustive,
+		);
+		const handler = (...payload: T) => {
 			Queue.unsafeOffer(queue, payload);
 		};
 		eventEmitter.addListener(eventName, handler);

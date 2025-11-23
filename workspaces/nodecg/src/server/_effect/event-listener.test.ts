@@ -1,6 +1,6 @@
 import EventEmitter from "node:events";
 
-import { Chunk, Effect, Stream } from "effect";
+import { Array, Chunk, Effect, Option, Stream } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import { listenToEvent, waitForEvent } from "./event-listener";
@@ -44,9 +44,8 @@ describe("waitForEvent", () => {
 
 				ee.start();
 
-				const ping = yield* waitForEvent<number>(ee, "ping");
-
-				expect(ping).toBe(0);
+				const ping = yield* waitForEvent<[number]>(ee, "ping");
+				expect(ping).toEqual([0]);
 
 				return ee;
 			}).pipe(
@@ -71,11 +70,13 @@ describe("listenToEvent", () => {
 				vi.spyOn(ee, "stop");
 				vi.spyOn(ee, "removeListener");
 
-				const pingStream = yield* listenToEvent<number>(ee, "ping");
+				const pingStream = yield* listenToEvent<[number]>(ee, "ping");
 
 				ee.start();
 
 				const pings = yield* Stream.take(pingStream, 3).pipe(
+					Stream.map(Array.head),
+					Stream.map(Option.getOrThrow),
 					Stream.runCollect,
 					Effect.andThen(Chunk.toReadonlyArray),
 				);

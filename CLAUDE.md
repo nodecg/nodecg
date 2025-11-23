@@ -105,6 +105,11 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - Temp directories: Unique per test file via `mkdtempSync(tmpdir() + "/")`
 - Process isolation: Vitest `forks` pool (separate Node.js processes)
 
+### Test Naming Conventions
+
+- **Use `test()` not `it()`** - Prefer `test("description", ...)` over `it("description", ...)` for test definitions
+- Effect tests still use `testEffect()` helper but with `test()` as the outer function
+
 ## Vitest Gotchas
 
 ### vi.mock() Hoisting
@@ -241,7 +246,44 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - **Forking listener setup**: Run listener registration in main fiber before forking stream consumption
   - Wrong: `yield* Effect.forkScoped(Effect.all([...listeners]).pipe(...))`
   - Right: `const streams = yield* Effect.all([...listeners]); yield* Effect.forkScoped(Stream.runForEach(...))`
+- **Fiber execution model**: `Effect.forkScoped` creates a forked fiber that runs concurrently
+  - The forked fiber runs in the background, attached to the current scope
+  - Control returns to the main fiber after any synchronous portion of the forked effect
+  - Code after `yield* Effect.forkScoped(...)` runs concurrently with the forked fiber
+  - If listener registration is inside the fork, race conditions can occur
+- **Queue-based event streams**: Pattern for bridging EventEmitter → Stream
+  - Create bounded queue (`Queue.bounded<T>(100)`)
+  - Register EventEmitter listener that offers to queue (`Queue.unsafeOffer`)
+  - Register finalizer to remove listener when scope closes (`Effect.addFinalizer`)
+  - Return `Stream.fromQueue(queue)` for consumption
+  - Ensures backpressure handling, automatic cleanup, and eager listener registration
+- **eventEmitter.once() auto-cleanup**: `once()` automatically removes listener after firing
+  - No need for manual cleanup in the success path when using with `Effect.async`
+  - Only need cleanup handler for interruption cases (return value from `Effect.async`)
+- **EventEmitterLike interface**: Use generic interface instead of concrete `EventEmitter` type
+  - Enables broader compatibility (works with any object implementing the interface)
+  - Allows testing with custom implementations
+  - Type parameter `T extends any[]` enables type-safe event payloads
 - **Event emission verification**: When events are defined in EventMap, verify they're actually emitted in relevant methods
+
+**Effect Utilities Available**:
+
+- **EventEmitter utilities** (`src/server/_effect/event-listener.ts`):
+  - `waitForEvent<T>(emitter, eventName)` - One-time events as Effect
+  - `listenToEvent<T>(emitter, eventName)` - Continuous events as Effect<Stream>
+  - Returns event payloads as tuples for multi-arg events
+
+- **Chokidar wrapper** (`src/server/_effect/chokidar.ts`):
+  - `getWatcher(paths, options)` - Scoped file watcher with auto-cleanup
+  - `waitForReady(watcher)` - Returns tagged `FileEvent.ready` event
+  - `listenToAdd/Change/AddDir/Unlink/UnlinkDir/Error(watcher)` - Type-safe event streams
+  - All return `Effect<Stream<FileEvent>>` with tagged union types
+  - Multi-arg events transformed via tuple destructuring: `Stream.map(([path, stats]) => fileEvent.add({ path, stats }))`
+
+- **Test helpers** (`src/server/_effect/test-effect.ts`):
+  - `testEffect(effect)` - Wraps Effect for Vitest, handles scoping automatically
+  - Use `@effect/platform` FileSystem service with `NodeFileSystem.layer` for filesystem operations in tests
+  - `Chunk.head` pattern for getting first stream element (avoids array indexing with `noUncheckedIndexedAccess`)
 
 **Migration Documentation**:
 

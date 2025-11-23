@@ -113,12 +113,12 @@ export const createServer = Effect.fn("createServer")(function* (
 	// Fork to immediately start listening for events
 	// With scope so that it's cleaned up when the server is closed
 	const waitForError = yield* Effect.forkScoped(
-		waitForEvent<unknown>(server, "error").pipe(
+		waitForEvent<[void]>(server, "error").pipe(
 			Effect.andThen((err) => Effect.fail(new UnknownError(err))),
 		),
 	);
 	const waitForClose = yield* Effect.forkScoped(
-		waitForEvent<void>(server, "close"),
+		waitForEvent<[void]>(server, "close"),
 	);
 
 	const io = yield* Effect.acquireRelease(
@@ -253,7 +253,7 @@ export const createServer = Effect.fn("createServer")(function* (
 
 	// Wait for Chokidar to finish its initial scan.
 	if (!bundleManager.ready) {
-		yield* waitForEvent<void>(bundleManager, "ready").pipe(
+		yield* waitForEvent<[void]>(bundleManager, "ready").pipe(
 			Effect.timeoutFail({
 				duration: "15 seconds",
 				onTimeout: () => new FileWatcherReadyTimeoutError(),
@@ -281,9 +281,9 @@ export const createServer = Effect.fn("createServer")(function* (
 	log.trace(`Attempting to listen on ${config.host}:${config.port}`);
 
 	yield* Effect.forkScoped(
-		listenToEvent<Error>(server, "error").pipe(
+		listenToEvent<[Error]>(server, "error").pipe(
 			Effect.andThen(
-				Stream.runForEach((err) =>
+				Stream.runForEach(([err]) =>
 					Effect.sync(() => {
 						if ((err as NodeJS.ErrnoException).code === "EADDRINUSE") {
 							// There is a separate handling in NODECG_TEST
@@ -377,10 +377,10 @@ export const createServer = Effect.fn("createServer")(function* (
 	};
 	const bundleManagerEvents = yield* Effect.all(
 		[
-			listenToEvent<void>(bundleManager, "ready"),
-			listenToEvent<void>(bundleManager, "bundleChanged"),
-			listenToEvent<void>(bundleManager, "gitChanged"),
-			listenToEvent<void>(bundleManager, "bundleRemoved"),
+			listenToEvent<[void]>(bundleManager, "ready"),
+			listenToEvent<[void]>(bundleManager, "bundleChanged"),
+			listenToEvent<[void]>(bundleManager, "gitChanged"),
+			listenToEvent<[void]>(bundleManager, "bundleRemoved"),
 		],
 		{ concurrency: "unbounded" },
 	).pipe(
