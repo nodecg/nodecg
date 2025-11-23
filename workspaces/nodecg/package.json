@@ -43,8 +43,6 @@
     "build": "tsdown",
     "start": "node index.js",
     "test": "vitest",
-    "typecheck": "tsc -p src -p test --noEmit",
-    "typecheck-watch": "tsc -p src -p test --noEmit --watch --preserveWatchOutput",
     "typetest": "cd typetest/fake-bundle && npm run build",
     "watch": "tsdown --watch"
   },
