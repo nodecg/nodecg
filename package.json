@@ -21,7 +21,7 @@
     "watch": "tsdown --watch --no-clean",
     "typecheck-watch": "npm run typecheck -- --watch --preserveWatchOutput",
     "build": "tsdown",
-    "typecheck": "tsc -b workspaces/cli workspaces/database-adapter-types workspaces/database-adapter-sqlite-legacy workspaces/internal-util workspaces/nodecg/src workspaces/nodecg/test --noEmit",
+    "typecheck": "tsc -b tsconfig.typecheck.json",
     "test": "vitest",
     "typetest": "npm -w nodecg run typetest",
     "lint": "run-s lint:*",
