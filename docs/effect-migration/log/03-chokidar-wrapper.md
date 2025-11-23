@@ -20,31 +20,41 @@ Create Effect-friendly wrapper for chokidar file watching API, built on reusable
 Chokidar file watchers are used in multiple modules with manual event handling:
 
 **bundle-manager.ts** - Module-level watcher for bundle changes:
+
 ```typescript
 // Module-level watcher (difficult to manage lifecycle)
-const watcher = chokidar.watch([], {  // Empty array - paths added dynamically!
+const watcher = chokidar.watch([], {
+  // Empty array - paths added dynamically!
   persistent: true,
   ignoreInitial: true,
   followSymlinks: true,
-  ignored: [/\/node_modules\//, /\/.+\.lock/]
+  ignored: [/\/node_modules\//, /\/.+\.lock/],
 });
 
 // Manual event handlers with debouncing
-watcher.on("add", (path) => { /* handle add */ });
-watcher.on("change", (path) => { /* handle change with debounce */ });
-watcher.on("unlink", (path) => { /* handle unlink */ });
-watcher.on("error", (error) => { /* handle error */ });
+watcher.on("add", (path) => {
+  /* handle add */
+});
+watcher.on("change", (path) => {
+  /* handle change with debounce */
+});
+watcher.on("unlink", (path) => {
+  /* handle unlink */
+});
+watcher.on("error", (error) => {
+  /* handle error */
+});
 
 // CRITICAL PATTERN: Dynamic path addition after bundle validation
 const handleBundle = (bundlePath) => {
-  const bundle = parseBundle(bundlePath);  // Validate first
+  const bundle = parseBundle(bundlePath); // Validate first
   bundles.push(bundle);
 
   // Add paths AFTER successful validation
   watcher.add([
     path.join(bundlePath, ".git"),
     path.join(bundlePath, "dashboard"),
-    path.join(bundlePath, "package.json")
+    path.join(bundlePath, "package.json"),
   ]);
 };
 
@@ -53,12 +63,15 @@ watcher.close();
 ```
 
 **assets.ts** - Watcher for asset file changes:
+
 ```typescript
 // Deferred file collection pattern
 const deferredFiles: Map<string, string> = new Map();
 let ready = false;
 
-watcher.on("ready", () => { ready = true; /* process deferred */ });
+watcher.on("ready", () => {
+  ready = true; /* process deferred */
+});
 watcher.on("add", (path, stats) => {
   if (!ready) {
     deferredFiles.set(path, hash);
@@ -69,6 +82,7 @@ watcher.on("add", (path, stats) => {
 ```
 
 **Problems**:
+
 - Manual resource management (no automatic cleanup)
 - Module-level state (hard to test, no scoping)
 - Complex manual patterns (debouncing, deferred collection)
@@ -110,6 +124,7 @@ listenToError(watcher): Effect<Stream<FileEvent.error>, never, Scope>
 **Built on**: `_effect/event-listener.ts` utilities (`waitForEvent`, `listenToEvent`)
 
 **Key design decisions**:
+
 - Uses `Effect.acquireRelease` for automatic watcher cleanup
 - Transforms chokidar's multi-arg events `(path, stats?)` tuples → `{path, stats}` objects via destructuring
 - Returns `Effect<Stream>` for eager listener registration (avoids race conditions)
@@ -129,6 +144,7 @@ listenToError(watcher): Effect<Stream<FileEvent.error>, never, Scope>
 **Files**: `_effect/event-listener.ts` + tests
 
 **Utilities**:
+
 - `waitForEvent<T>(eventEmitter, eventName)` - One-time event → Effect
 - `listenToEvent<T>(eventEmitter, eventName)` - Continuous events → Effect<Stream>
 
@@ -141,6 +157,7 @@ See [Problems & Solutions](#problems--solutions) for implementation patterns lea
 **Files**: `_effect/chokidar.ts` + `_effect/chokidar.test.ts`
 
 **Core implementation**:
+
 - `getWatcher()` - Creates watcher with `Effect.acquireRelease` (auto-cleanup on scope close)
   - Uses `Effect.promise(() => watcher.close())` for async cleanup
 - `waitForReady()` - Uses `waitForEvent(watcher, "ready")`, returns tagged `FileEvent.ready` event
@@ -149,18 +166,22 @@ See [Problems & Solutions](#problems--solutions) for implementation patterns lea
   // Chokidar emits: (path: string, stats?: Stats)
   // Destructure tuple and wrap: {path, stats}
   listenToChokidarEvent(watcher, "add").pipe(
-    Effect.andThen(Stream.map(([path, stats]) => fileEvent.add({ path, stats })))
-  )
+    Effect.andThen(
+      Stream.map(([path, stats]) => fileEvent.add({ path, stats })),
+    ),
+  );
   ```
 - `FileEvent` tagged enum - Unified event types for all listeners
 
 **Design decisions**:
+
 - **Skipped `listenToAll()`** - Too complex to be type-safe with proper narrowing
 - **Skipped `addPaths/unwatchPaths()`** - Users can call `watcher.add()` / `watcher.unwatch()` directly
 - Generic `listenToChokidarEvent` helper for consistent multi-arg event handling
 - All listeners return same tagged union type for composability
 
 **Test coverage** (using `@effect/platform` FileSystem):
+
 - ✅ Watcher lifecycle (create, verify cleanup on scope close via `watcher.closed`)
 - ✅ `waitForReady()` - Returns tagged ready event
 - ✅ `listenToAdd()` - File creation events with path + stats
@@ -178,12 +199,14 @@ See [Problems & Solutions](#problems--solutions) for implementation patterns lea
 **Status**: Implemented in `_effect/event-listener.ts`
 
 **Key patterns established:**
+
 - `waitForEvent()` - One-time events using `Effect.async` with `eventEmitter.once()`
 - `listenToEvent()` - Continuous events via `Effect.gen` returning `Stream.fromQueue`
 - Eager listener registration (setup runs when Effect is yielded, not when Stream is consumed)
 - Listener setup must run in main fiber before forking stream consumption
 
 **Critical learnings:**
+
 - `Stream.async` is lazy (pull-based) - wrap in `Effect.gen` for eager setup
 - `Effect.all` runs in whichever fiber it's yielded in - keep outside `Effect.forkScoped`
 - `eventEmitter.once()` auto-removes listener - no manual cleanup needed
@@ -209,12 +232,13 @@ const listenToChokidarEvent = <K extends keyof FSWatcherEventMap>(
 export const listenToAdd = (watcher: FSWatcher) =>
   listenToChokidarEvent(watcher, "add").pipe(
     Effect.andThen(
-      Stream.map(([path, stats]) => fileEvent.add({ path, stats }))
-    )
+      Stream.map(([path, stats]) => fileEvent.add({ path, stats })),
+    ),
   );
 ```
 
 **Benefits**:
+
 - Reuses generic `listenToEvent` utility
 - Type-safe tuple destructuring
 - Consistent tagged event types across all listeners
@@ -229,7 +253,7 @@ export const listenToAdd = (watcher: FSWatcher) =>
 export const getWatcher = (paths, options) =>
   Effect.acquireRelease(
     Effect.sync(() => watch(paths, options)),
-    (watcher) => Effect.promise(() => watcher.close())
+    (watcher) => Effect.promise(() => watcher.close()),
   );
 ```
 
@@ -240,28 +264,31 @@ This ensures the watcher fully closes before the scope exits.
 **Decision**: Don't implement `listenToAll()` or `addPaths/unwatchPaths()` wrappers.
 
 **Rationale**:
+
 - **`listenToAll()`** - Type narrowing becomes too complex with merged streams. Users can compose individual streams if needed.
 - **`addPaths/unwatchPaths()`** - Thin wrappers around `watcher.add()` / `watcher.unwatch()` provide no value. Users can call watcher methods directly.
 
 **Alternative**: Users compose streams as needed:
-```typescript
-const [addStream, changeStream] = yield* Effect.all([
-  listenToAdd(watcher),
-  listenToChange(watcher),
-]);
 
-yield* Stream.merge(addStream, changeStream).pipe(
-  Stream.runForEach(event => handleEvent(event))
-);
+```typescript
+const [addStream, changeStream] =
+  yield * Effect.all([listenToAdd(watcher), listenToChange(watcher)]);
+
+yield *
+  Stream.merge(addStream, changeStream).pipe(
+    Stream.runForEach((event) => handleEvent(event)),
+  );
 ```
 
 ## Files Modified
 
 **New files**:
+
 - ✅ `_effect/event-listener.ts` + `_effect/event-listener.test.ts` - EventEmitter utilities
 - ✅ `_effect/chokidar.ts` + `_effect/chokidar.test.ts` - Chokidar wrapper
 
 **Future usage** (not part of this phase):
+
 - `server/bundle-manager.ts` - Can replace module-level watcher with scoped Effect
 - `server/assets.ts` - Can use chokidar wrapper for asset watching
 
@@ -275,12 +302,14 @@ yield* Stream.merge(addStream, changeStream).pipe(
 ## Benefits
 
 ### Immediate
+
 - Cleaner, more readable code in server/index.ts
 - Reduced boilerplate (50+ lines → ~10 lines)
 - Automatic cleanup (no memory leak risk)
 - Type-safe event handling
 
 ### Long-term
+
 - Reusable across entire codebase
 - Foundation for Phase 4 (BundleManager migration)
 - Establishes EventEmitter → Effect patterns
@@ -289,6 +318,7 @@ yield* Stream.merge(addStream, changeStream).pipe(
 ## Risks
 
 **Low risk** - Simple utilities, straightforward refactoring:
+
 - EventEmitter is standard Node.js API
 - Existing code already has manual event handling
 - Just wrapping in reusable utilities
@@ -298,6 +328,7 @@ yield* Stream.merge(addStream, changeStream).pipe(
 ## Completion Summary
 
 **Completed**:
+
 - ✅ Created `_effect/event-listener.ts` with EventEmitter utilities
 - ✅ Created `_effect/chokidar.ts` wrapper with tagged event types
 - ✅ Added tests using `@effect/platform` FileSystem
@@ -305,6 +336,7 @@ yield* Stream.merge(addStream, changeStream).pipe(
 - ✅ Documentation updated
 
 **Not implemented** (by design):
+
 - ❌ `listenToAll()` - Too complex for type-safe narrowing
 - ❌ `addPaths/unwatchPaths()` - Users call watcher methods directly
 
@@ -322,7 +354,7 @@ const program = Effect.fn(function* () {
   const watcher = yield* getWatcher([], {
     ignoreInitial: true,
     followSymlinks: true,
-    ignored: [/\/node_modules\//]
+    ignored: [/\/node_modules\//],
   });
 
   // Set up individual event listeners
@@ -335,22 +367,23 @@ const program = Effect.fn(function* () {
   // Merge streams and handle events
   yield* Effect.forkScoped(
     Stream.merge(addStream, Stream.merge(changeStream, unlinkStream)).pipe(
-      Stream.runForEach(event => handleFileChange(event.path))
-    )
+      Stream.runForEach((event) => handleFileChange(event.path)),
+    ),
   );
 
   // Add paths dynamically after bundle validation
   for (const bundlePath of validatedBundles) {
-    watcher.add([  // Call watcher method directly
+    watcher.add([
+      // Call watcher method directly
       path.join(bundlePath, ".git"),
       path.join(bundlePath, "dashboard"),
-      path.join(bundlePath, "package.json")
+      path.join(bundlePath, "package.json"),
     ]);
   }
 });
 
 // Watcher automatically closes when scope exits
-yield* Effect.scoped(program);
+yield * Effect.scoped(program);
 ```
 
 ### Pattern: Assets (Paths Upfront + Ready Event)
@@ -360,7 +393,7 @@ Traditional pattern - provide paths upfront, wait for ready:
 ```typescript
 const program = Effect.fn(function* () {
   const watcher = yield* getWatcher(assetPaths, {
-    ignoreInitial: false
+    ignoreInitial: false,
   });
 
   // Wait for chokidar's ready event (returns tagged event)
@@ -370,14 +403,12 @@ const program = Effect.fn(function* () {
   const addStream = yield* listenToAdd(watcher);
   yield* Effect.forkScoped(
     addStream.pipe(
-      Stream.runForEach((event) =>
-        Effect.log(`Asset added: ${event.path}`)
-      )
-    )
+      Stream.runForEach((event) => Effect.log(`Asset added: ${event.path}`)),
+    ),
   );
 });
 
-yield* Effect.scoped(program);
+yield * Effect.scoped(program);
 ```
 
 ### Pattern: Multiple Event Streams
@@ -402,8 +433,8 @@ const program = Effect.fn(function* () {
   // Option 2: Merge streams when shared handler
   yield* Effect.forkScoped(
     Stream.merge(addStream, Stream.merge(changeStream, unlinkStream)).pipe(
-      Stream.runForEach(event => handleFileChange(event))
-    )
+      Stream.runForEach((event) => handleFileChange(event)),
+    ),
   );
 
   yield* waitForReady(watcher);
@@ -423,9 +454,6 @@ const program = Effect.fn(function* () {
   watcher.add(["./bundle2/.git", "./bundle2/dashboard"]);
 
   const changeStream = yield* listenToChange(watcher);
-  yield* Effect.forkScoped(
-    changeStream.pipe(
-      Stream.runForEach(handleChange)
-    )
-  );
+  yield* Effect.forkScoped(changeStream.pipe(Stream.runForEach(handleChange)));
 });
+```

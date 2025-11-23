@@ -99,6 +99,7 @@ See [migration log entry](./log/02-phase-2-server-refactor.md) for detailed impl
 Create Effect-friendly wrapper for chokidar file watching API, built on reusable EventEmitter utilities.
 
 **Current Problem**: Manual chokidar usage in bundle-manager and assets:
+
 ```typescript
 // Module-level watcher, manual event handlers, manual cleanup
 const watcher = chokidar.watch(paths, options);
@@ -108,6 +109,7 @@ watcher.on("change", handler);
 ```
 
 **Solution**: Effect-friendly chokidar wrapper in `_effect/chokidar.ts`:
+
 - `getWatcher(paths, options)` - Scoped watcher with automatic cleanup
 - `waitForReady(watcher)` - Wait for initial scan, returns tagged `FileEvent.ready`
 - `listenToAdd/Change/AddDir/Unlink/UnlinkDir/Error(watcher)` - Type-safe event streams
@@ -115,17 +117,20 @@ watcher.on("change", handler);
 - Built on `waitForEvent`/`listenToEvent` utilities
 
 **Implementation**:
+
 - ✅ EventEmitter utilities (`_effect/event-listener.ts` + tests)
 - ✅ Chokidar wrapper (`_effect/chokidar.ts` + tests)
 - ✅ Tests using `@effect/platform` FileSystem
 - ✅ All tests passing, no type errors
 
 **Design Decisions**:
+
 - Skipped `listenToAll()` - Too complex for type-safe narrowing
 - Skipped `addPaths/unwatchPaths()` - Users call watcher methods directly
 - Multi-arg event handling via tuple destructuring + Stream.map
 
 **Benefits**:
+
 - Type-safe file watching with automatic cleanup
 - Stream-based event processing with tagged events
 - Testable (scoped resources, no module-level state)
@@ -142,6 +147,7 @@ See [migration log entry](./log/03-chokidar-wrapper.md) for detailed implementat
 Migrate BundleManager to Effect-based BundleService using EventEmitter utilities from Phase 3.
 
 **Implementation**:
+
 - **Location**: `workspaces/nodecg/src/server/bundle-manager.ts` → `bundle-service.ts`
 - **Complexity**: ⭐⭐⭐ Complex (file watching, event distribution, hot-reloading)
 - **Approach**:
@@ -156,6 +162,7 @@ Migrate BundleManager to Effect-based BundleService using EventEmitter utilities
   - `_effect/git-parser.ts` - Git parsing wrapper
 
 **Key Patterns**:
+
 - `Data.TaggedEnum` for event types
 - Chokidar → Stream conversion for file watching
 - EventEmitter → PubSub migration for event distribution
@@ -169,6 +176,7 @@ See [migration log entry](./log/04-bundle-manager.md) for detailed implementatio
 Migrate route handler classes to Effect-based route services.
 
 **Candidates** (following execution order in createServer):
+
 1. **GraphicsLib** - Bundle graphics routes (already partially migrated in Phase 4 as BundleService consumer)
 2. **DashboardLib** - Bundle dashboard routes
 3. **MountsLib** - Static asset mounts
@@ -183,6 +191,7 @@ Each becomes a function returning Effect that sets up routes, replacing class-ba
 Migrate login system to Effect.
 
 **Components**:
+
 - Login middleware (`workspaces/nodecg/src/server/login/`)
 - Session management (Passport integration)
 - Socket.IO authentication middleware
@@ -192,6 +201,7 @@ Migrate login system to Effect.
 Migrate Replicator to Effect-based state management.
 
 **Components**:
+
 - Replicator class (`workspaces/nodecg/src/server/replicant/replicator.ts`)
 - ReplicantAPI
 - Database integration for persistence
@@ -203,6 +213,7 @@ Migrate Replicator to Effect-based state management.
 Migrate ExtensionManager to Effect.
 
 **Components**:
+
 - Extension loading and lifecycle
 - Extension API provision
 - Event broadcasting to extensions
@@ -220,6 +231,7 @@ Migrate remaining subsystems as needed:
 Evaluate whether to replace Express with Effect Platform HTTP Server.
 
 **Considerations**:
+
 - Effect HTTP Router for core routes
 - Express as fallback for user-registered routes via `nodecg.mount()`
 - Migration complexity vs benefits

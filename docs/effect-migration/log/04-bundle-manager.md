@@ -72,20 +72,26 @@ class BundleService extends Effect.Service<BundleService>()("BundleService", {
     // Emit ready event after threshold
     yield* Effect.forkScoped(
       Effect.sleep("1 second").pipe(
-        Effect.flatMap(() => PubSub.publish(pubsub, { _tag: "ready" }))
-      )
+        Effect.flatMap(() => PubSub.publish(pubsub, { _tag: "ready" })),
+      ),
     );
 
     return {
       all: Effect.fn(() => Ref.get(bundles)),
       find: Effect.fn((name: string) =>
-        Ref.get(bundles).pipe(Effect.map(arr => arr.find(b => b.name === name)))
+        Ref.get(bundles).pipe(
+          Effect.map((arr) => arr.find((b) => b.name === name)),
+        ),
       ),
       subscribe: pubsub,
-      add: Effect.fn((bundle) => { /* update Ref */ }),
-      remove: Effect.fn((name) => { /* update Ref + publish event */ }),
+      add: Effect.fn((bundle) => {
+        /* update Ref */
+      }),
+      remove: Effect.fn((name) => {
+        /* update Ref + publish event */
+      }),
     };
-  })
+  }),
 }) {}
 ```
 
@@ -106,11 +112,11 @@ const BundleEvent = Data.taggedEnum<{
 type BundleEvent = Data.TaggedEnum.Value<typeof BundleEvent>;
 
 // Usage - constructors automatically created:
-BundleEvent.Ready({})
-BundleEvent.BundleChanged({ bundle })
-BundleEvent.GitChanged({ bundle })
-BundleEvent.InvalidBundle({ bundle, error })
-BundleEvent.BundleRemoved({ bundleName })
+BundleEvent.Ready({});
+BundleEvent.BundleChanged({ bundle });
+BundleEvent.GitChanged({ bundle });
+BundleEvent.InvalidBundle({ bundle, error });
+BundleEvent.BundleRemoved({ bundleName });
 ```
 
 ### Key Patterns
@@ -129,6 +135,7 @@ BundleEvent.BundleRemoved({ bundleName })
 **Decision**: Use `PubSub` for event distribution
 
 **Rationale**:
+
 - Multiple consumers need to receive the same events
 - Queue consumes messages (only one subscriber gets each event)
 - PubSub broadcasts to all subscribers (EventEmitter replacement)
@@ -139,6 +146,7 @@ BundleEvent.BundleRemoved({ bundleName })
 **Decision**: Pass parameters to layer creation function for now
 
 **Rationale**:
+
 - Config service migration is deferred (not prioritized for top-down approach)
 - BundleService needs bundle paths, cfgPath, version, config immediately
 - Layer creation function can accept these as parameters
@@ -149,6 +157,7 @@ BundleEvent.BundleRemoved({ bundleName })
 **Decision**: Create Effect wrapper that converts Chokidar events to Stream
 
 **Rationale**:
+
 - Chokidar is callback-based, needs Effect integration
 - Stream is perfect for continuous file events
 - `Effect.acquireRelease` ensures watcher cleanup
@@ -159,6 +168,7 @@ BundleEvent.BundleRemoved({ bundleName })
 **Decision**: Use `Effect.sleep` with Ref-based state tracking
 
 **Rationale**:
+
 - No global timer references (pure functional)
 - Ref tracks which bundles have pending changes
 - Sleep provides natural debounce window
@@ -206,14 +216,14 @@ export class FileWatchError extends Data.TaggedError("FileWatchError")<{
  */
 export const createWatcher = (
   paths: string | ReadonlyArray<string>,
-  options?: chokidar.WatchOptions
+  options?: chokidar.WatchOptions,
 ): Effect.Effect<chokidar.FSWatcher, FileWatchInitError, Scope.Scope> =>
   Effect.acquireRelease(
     Effect.try({
       try: () => chokidar.watch(paths, options),
       catch: (cause) => new FileWatchInitError({ cause }),
     }),
-    (watcher) => Effect.promise(() => watcher.close())
+    (watcher) => Effect.promise(() => watcher.close()),
   );
 
 /**
@@ -223,21 +233,19 @@ export const createWatcher = (
  * @fails FileWatchError - When filesystem errors occur during watching
  */
 export const toStream = (
-  watcher: chokidar.FSWatcher
+  watcher: chokidar.FSWatcher,
 ): Stream.Stream<FileEvent, FileWatchError> =>
   Stream.async<FileEvent, FileWatchError>((emit) => {
     const onAdd = (path: string, stats?: fs.Stats) =>
       emit.single(FileEvent.Add({ path, stats }));
     const onChange = (path: string, stats?: fs.Stats) =>
       emit.single(FileEvent.Change({ path, stats }));
-    const onUnlink = (path: string) =>
-      emit.single(FileEvent.Unlink({ path }));
+    const onUnlink = (path: string) => emit.single(FileEvent.Unlink({ path }));
     const onAddDir = (path: string, stats?: fs.Stats) =>
       emit.single(FileEvent.AddDir({ path, stats }));
     const onUnlinkDir = (path: string) =>
       emit.single(FileEvent.UnlinkDir({ path }));
-    const onReady = () =>
-      emit.single(FileEvent.Ready({}));
+    const onReady = () => emit.single(FileEvent.Ready({}));
     const onError = (error: Error) =>
       emit.fail(new FileWatchError({ cause: error }));
 
@@ -286,11 +294,15 @@ export const watch = (
   retryConfig?: {
     readonly maxRetries?: number;
     readonly baseDelay?: Duration.DurationInput;
-  }
-): Stream.Stream<FileEvent, FileWatchInitError | FileWatchError, Scope.Scope> => {
+  },
+): Stream.Stream<
+  FileEvent,
+  FileWatchInitError | FileWatchError,
+  Scope.Scope
+> => {
   const stream = Stream.acquireRelease(
     createWatcher(paths, options),
-    (watcher) => Effect.promise(() => watcher.close())
+    (watcher) => Effect.promise(() => watcher.close()),
   ).pipe(Stream.flatMap(toStream));
 
   // Apply retry if config provided
@@ -300,7 +312,7 @@ export const watch = (
 
     const retrySchedule = Schedule.exponential(baseDelay).pipe(
       Schedule.compose(Schedule.recurs(maxRetries)),
-      Schedule.jittered // Add randomness to prevent thundering herd
+      Schedule.jittered, // Add randomness to prevent thundering herd
     );
 
     return stream.pipe(Stream.retry(retrySchedule));
@@ -311,53 +323,58 @@ export const watch = (
 ```
 
 **Usage in BundleService**:
+
 ```typescript
 import * as FileWatcher from "../_effect/file-watcher";
 
 // Option 1: Simple watch (no retry)
-yield* Effect.forkScoped(
-  FileWatcher.watch(bundlePaths, {
-    ignored: /node_modules/,
-    ignoreInitial: true,
-  }).pipe(
-    Stream.filter(event => event._tag === "Change"),
-    Stream.runForEach(event => handleChange(event.path))
-  )
-);
-
-// Option 2: Watch with automatic retry (RECOMMENDED for production)
-yield* Effect.forkScoped(
-  FileWatcher.watch(
-    bundlePaths,
-    {
+yield *
+  Effect.forkScoped(
+    FileWatcher.watch(bundlePaths, {
       ignored: /node_modules/,
       ignoreInitial: true,
-    },
-    {
-      maxRetries: 5,
-      baseDelay: "1 second", // 1s, 2s, 4s, 8s, 16s (with jitter)
-    }
-  ).pipe(
-    Stream.runForEach(event => handleFileEvent(event))
-  )
-);
+    }).pipe(
+      Stream.filter((event) => event._tag === "Change"),
+      Stream.runForEach((event) => handleChange(event.path)),
+    ),
+  );
+
+// Option 2: Watch with automatic retry (RECOMMENDED for production)
+yield *
+  Effect.forkScoped(
+    FileWatcher.watch(
+      bundlePaths,
+      {
+        ignored: /node_modules/,
+        ignoreInitial: true,
+      },
+      {
+        maxRetries: 5,
+        baseDelay: "1 second", // 1s, 2s, 4s, 8s, 16s (with jitter)
+      },
+    ).pipe(Stream.runForEach((event) => handleFileEvent(event))),
+  );
 
 // Option 3: Manual control (create watcher separately)
-const watcher = yield* FileWatcher.createWatcher(bundlePaths, {
-  ignored: /node_modules/,
-  ignoreInitial: true,
-});
+const watcher =
+  yield *
+  FileWatcher.createWatcher(bundlePaths, {
+    ignored: /node_modules/,
+    ignoreInitial: true,
+  });
 
-yield* Effect.forkScoped(
-  FileWatcher.toStream(watcher).pipe(
-    Stream.runForEach(event => handleFileEvent(event))
-  )
-);
+yield *
+  Effect.forkScoped(
+    FileWatcher.toStream(watcher).pipe(
+      Stream.runForEach((event) => handleFileEvent(event)),
+    ),
+  );
 ```
 
 **New file**: `workspaces/nodecg/src/server/_effect/git-parser.ts`
 
 Effect wrapper for git parsing (isolates process.chdir side effect):
+
 ```typescript
 import { Effect } from "effect";
 import { parseBundleGit } from "../bundle-parser/git";
@@ -372,6 +389,7 @@ export const parseGit = Effect.fn("parseGit")(function* (bundleDir: string) {
 **New file**: `workspaces/nodecg/src/server/bundle-service.ts`
 
 Core service implementation with:
+
 - Initial bundle loading
 - Ref for bundle list state
 - PubSub for events
@@ -391,30 +409,38 @@ bundleManager.on("bundleChanged", (bundle) => {
 });
 
 // After (PubSub + Stream)
-yield* Effect.forkScoped(
-  Stream.fromPubSub(bundleService.subscribe).pipe(
-    Stream.filter(event => event._tag === "BundleChanged"),
-    Stream.runForEach(event => Effect.sync(() => {
-      // Handle change with event.bundle
-    }))
-  )
-);
+yield *
+  Effect.forkScoped(
+    Stream.fromPubSub(bundleService.subscribe).pipe(
+      Stream.filter((event) => event._tag === "BundleChanged"),
+      Stream.runForEach((event) =>
+        Effect.sync(() => {
+          // Handle change with event.bundle
+        }),
+      ),
+    ),
+  );
 
 // Or handle multiple event types
-yield* Effect.forkScoped(
-  Stream.fromPubSub(bundleService.subscribe).pipe(
-    Stream.filter(event =>
-      event._tag === "BundleChanged" || event._tag === "GitChanged"
+yield *
+  Effect.forkScoped(
+    Stream.fromPubSub(bundleService.subscribe).pipe(
+      Stream.filter(
+        (event) =>
+          event._tag === "BundleChanged" || event._tag === "GitChanged",
+      ),
+      Stream.runForEach((event) =>
+        Effect.sync(() => {
+          // Both events have bundle property
+          rebuildPanels(event.bundle);
+        }),
+      ),
     ),
-    Stream.runForEach(event => Effect.sync(() => {
-      // Both events have bundle property
-      rebuildPanels(event.bundle);
-    }))
-  )
-);
+  );
 ```
 
 **Files to update**:
+
 - `server/server/index.ts` - Replace BundleManager instantiation, update event listeners
 - `server/graphics/index.ts` - Migrate event listeners
 - `server/graphics/registration.ts` - Migrate event listeners
@@ -424,33 +450,34 @@ yield* Effect.forkScoped(
 ### Step 4: Provide BundleService Layer
 
 **Layer creation**:
+
 ```typescript
 export const makeBundleServiceLayer = (
   bundlesPaths: string[],
   cfgPath: string,
   nodecgVersion: string,
-  nodecgConfig: Record<string, any>
-) => Layer.scoped(BundleService, /* implementation */);
+  nodecgConfig: Record<string, any>,
+) => Layer.scoped(BundleService /* implementation */);
 ```
 
 **Bootstrap integration**:
+
 ```typescript
 // In bootstrap.ts
 const bundleServiceLayer = makeBundleServiceLayer(
   bundlesPaths,
   cfgPath,
   nodecgPackageJson.version,
-  config
+  config,
 );
 
-yield* createServer().pipe(
-  Effect.provide(bundleServiceLayer)
-);
+yield * createServer().pipe(Effect.provide(bundleServiceLayer));
 ```
 
 ### Step 5: Update Tests
 
 **Pattern**:
+
 ```typescript
 test("bundle loading", async () => {
   await testEffect(
@@ -465,35 +492,37 @@ test("bundle loading", async () => {
       yield* Effect.forkScoped(
         Stream.fromPubSub(bundleService.subscribe).pipe(
           Stream.take(1),
-          Stream.runForEach(event =>
-            Effect.sync(() => events.push(event))
-          )
-        )
+          Stream.runForEach((event) => Effect.sync(() => events.push(event))),
+        ),
       );
 
       // Trigger change, verify event received
-    }).pipe(Effect.provide(testBundleServiceLayer))
+    }).pipe(Effect.provide(testBundleServiceLayer)),
   );
 });
 ```
 
 **Files to update**:
+
 - `workspaces/nodecg/src/server/bundle-manager.test.ts` - Rewrite for Effect
 - `workspaces/nodecg/test/helpers/setup.ts` - Provide BundleService layer
 
 ### Step 6: Delete Old Code
 
 Once all consumers migrated and tests passing:
+
 - Delete `workspaces/nodecg/src/server/bundle-manager.ts`
 
 ## Files Modified
 
 **New files**:
+
 - `workspaces/nodecg/src/server/bundle-service.ts` - Main service
 - `workspaces/nodecg/src/server/_effect/file-watcher.ts` - Chokidar wrapper
 - `workspaces/nodecg/src/server/_effect/git-parser.ts` - Git parsing wrapper
 
 **Modified files**:
+
 - `workspaces/nodecg/src/server/server/index.ts` - Use BundleService
 - `workspaces/nodecg/src/server/graphics/index.ts` - Subscribe to events
 - `workspaces/nodecg/src/server/graphics/registration.ts` - Subscribe to events
@@ -503,6 +532,7 @@ Once all consumers migrated and tests passing:
 - `workspaces/nodecg/test/helpers/setup.ts` - Provide BundleService layer
 
 **Deleted files**:
+
 - `workspaces/nodecg/src/server/bundle-manager.ts` - Replaced by bundle-service.ts
 
 ## Testing Strategy

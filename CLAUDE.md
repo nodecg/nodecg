@@ -269,11 +269,13 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 **Effect Utilities Available**:
 
 - **EventEmitter utilities** (`src/server/_effect/event-listener.ts`):
+
   - `waitForEvent<T>(emitter, eventName)` - One-time events as Effect
   - `listenToEvent<T>(emitter, eventName)` - Continuous events as Effect<Stream>
   - Returns event payloads as tuples for multi-arg events
 
 - **Chokidar wrapper** (`src/server/_effect/chokidar.ts`):
+
   - `getWatcher(paths, options)` - Scoped file watcher with auto-cleanup
   - `waitForReady(watcher)` - Returns tagged `FileEvent.ready` event
   - `listenToAdd/Change/AddDir/Unlink/UnlinkDir/Error(watcher)` - Type-safe event streams
