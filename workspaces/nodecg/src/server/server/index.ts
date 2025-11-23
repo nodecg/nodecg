@@ -113,12 +113,12 @@ export const createServer = Effect.fn("createServer")(function* (
 	// Fork to immediately start listening for events
 	// With scope so that it's cleaned up when the server is closed
 	const waitForError = yield* Effect.forkScoped(
-		waitForEvent<[void]>(server, "error").pipe(
-			Effect.andThen((err) => Effect.fail(new UnknownError(err))),
+		waitForEvent<[unknown]>(server, "error").pipe(
+			Effect.andThen(([err]) => Effect.fail(new UnknownError(err))),
 		),
 	);
 	const waitForClose = yield* Effect.forkScoped(
-		waitForEvent<[void]>(server, "close"),
+		waitForEvent<[]>(server, "close"),
 	);
 
 	const io = yield* Effect.acquireRelease(
