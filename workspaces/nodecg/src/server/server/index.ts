@@ -52,17 +52,17 @@ import type {
 } from "../../types/socket-protocol";
 import { UnknownError } from "../_effect/boundary";
 import { listenToEvent, waitForEvent } from "../_effect/event-listener";
-import { createAssetsMiddleware } from "../assets";
+import { assetsRouter } from "../assets";
 import { BundleManager } from "../bundle-manager";
-import { DashboardLib } from "../dashboard";
-import { GraphicsLib } from "../graphics";
+import { dashboardRouter } from "../dashboard";
+import { graphicsRouter } from "../graphics";
 import { createLogger } from "../logger";
 import { createSocketAuthMiddleware } from "../login/socketAuthMiddleware";
-import { MountsLib } from "../mounts";
+import { mountsRouter } from "../mounts";
 import { Replicator } from "../replicant/replicator";
-import { SharedSourcesLib } from "../shared-sources";
-import { SoundsLib } from "../sounds";
-import { SentryConfig } from "../util/sentry-config";
+import { sharedSourceRouter } from "../shared-sources";
+import { soundsRouter } from "../sounds";
+import { sentryConfigRouter } from "../util/sentry-config";
 import { ExtensionManager } from "./extensions";
 import { socketApiMiddleware } from "./socketApiMiddleware";
 
@@ -302,8 +302,8 @@ export const createServer = Effect.fn("createServer")(function* (
 	);
 
 	if (sentryEnabled) {
-		const sentryHelpers = new SentryConfig(bundleManager);
-		app.use(sentryHelpers.app);
+		const sentryApp = yield* sentryConfigRouter(bundleManager);
+		app.use(sentryApp);
 	}
 
 	const persistedReplicantEntities = yield* Effect.promise(async () => {
@@ -318,23 +318,23 @@ export const createServer = Effect.fn("createServer")(function* (
 		(replicator) => Effect.sync(() => replicator.saveAllReplicants()),
 	);
 
-	const graphics = new GraphicsLib(io, bundleManager, replicator);
-	app.use(graphics.app);
+	const graphicsRoute = yield* graphicsRouter(io, bundleManager, replicator);
+	app.use(graphicsRoute);
 
-	const dashboard = new DashboardLib(bundleManager);
-	app.use(dashboard.app);
+	const dashboardRoute = yield* dashboardRouter(bundleManager);
+	app.use(dashboardRoute);
 
-	const mounts = new MountsLib(bundleManager.all());
-	app.use(mounts.app);
+	const mounts = yield* mountsRouter(bundleManager);
+	app.use(mounts);
 
-	const sounds = new SoundsLib(bundleManager.all(), replicator);
-	app.use(sounds.app);
+	const sounds = yield* soundsRouter(bundleManager, replicator);
+	app.use(sounds);
 
-	const assets = createAssetsMiddleware(bundleManager.all(), replicator);
+	const assets = yield* assetsRouter(bundleManager, replicator);
 	app.use("/assets", assets);
 
-	const sharedSources = new SharedSourcesLib(bundleManager.all());
-	app.use(sharedSources.app);
+	const sharedSources = yield* sharedSourceRouter(bundleManager);
+	app.use(sharedSources);
 
 	if (sentryEnabled) {
 		app.use(Sentry.Handlers.errorHandler());

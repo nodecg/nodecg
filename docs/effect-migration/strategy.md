@@ -49,7 +49,7 @@ See [migration log entry](./log/01-phase-1-bootstrap.md) for detailed implementa
 
 ### Phase 2: Server Architecture Refactoring
 
-**Status**: ✅ Core Implementation Complete (testing in progress)
+**Status**: ✅ Complete
 
 Replace `NodeCGServer` class with functional Effect-based architecture.
 
@@ -140,44 +140,29 @@ watcher.on("change", handler);
 
 See [migration log entry](./log/03-chokidar-wrapper.md) for detailed implementation notes and patterns.
 
-### Phase 4: BundleManager Migration
+### Phase 4: Bundle Consumer Migration
+
+**Status**: ✅ Complete
+
+**Complexity**: ⭐⭐ Moderate
+
+Converted bundle-consuming libraries to `Effect.fn` wrappers while keeping the legacy BundleManager class and events unchanged. Consumers now use `listenToEvent` streams inside Effect scopes, preparing for a service swap without breaking hot-reload behavior. Current state: `bundle-manager.ts` remains the active implementation with git-rev-sync + `process.chdir()` and global debounce state. See [migration log entry](./log/04-bundle-manager.md).
+
+### Phase 5: BundleService Migration
 
 **Status**: Planned
 
-Migrate BundleManager to Effect-based BundleService using EventEmitter utilities from Phase 3.
+**Complexity**: ⭐⭐⭐ Complex
 
-**Implementation**:
+Replace the legacy BundleManager with an Effect-based BundleService (Ref state + PubSub + chokidar streams) and an Effect-wrapped git parser (`isomorphic-git`). Preserve ready/debounce timing, remove global state, and update consumers/bootstrap/tests. See [migration log entry](./log/05-bundle-service.md).
 
-- **Location**: `workspaces/nodecg/src/server/bundle-manager.ts` → `bundle-service.ts`
-- **Complexity**: ⭐⭐⭐ Complex (file watching, event distribution, hot-reloading)
-- **Approach**:
-  - Use EventEmitter utilities from Phase 3
-  - `Ref<Array<NodeCG.Bundle>>` for mutable bundle list state
-  - `PubSub<BundleEvent>` for event distribution
-  - `Stream` for Chokidar file watching (general-purpose wrapper)
-  - `Effect.acquireRelease` for watcher lifecycle
-- **Consumers to migrate**: GraphicsLib, DashboardLib, ExtensionManager, SentryConfig, server/index.ts
-- **New utilities**:
-  - `_effect/file-watcher.ts` - Chokidar → Stream wrapper with retry logic
-  - `_effect/git-parser.ts` - Git parsing wrapper
-
-**Key Patterns**:
-
-- `Data.TaggedEnum` for event types
-- Chokidar → Stream conversion for file watching
-- EventEmitter → PubSub migration for event distribution
-- Stateful service with Ref for bundle list
-- Background stream processing with Effect.forkScoped
-
-See [migration log entry](./log/04-bundle-manager.md) for detailed implementation plan.
-
-### Phase 5: Route Libraries Migration
+### Phase 6: Route Libraries Migration
 
 Migrate route handler classes to Effect-based route services.
 
 **Candidates** (following execution order in createServer):
 
-1. **GraphicsLib** - Bundle graphics routes (already partially migrated in Phase 4 as BundleService consumer)
+1. **GraphicsLib** - Bundle graphics routes (already partially migrated in Phase 4 via Effect.fn consumer wrappers)
 2. **DashboardLib** - Bundle dashboard routes
 3. **MountsLib** - Static asset mounts
 4. **SoundsLib** - Sound file serving
@@ -186,7 +171,7 @@ Migrate route handler classes to Effect-based route services.
 
 Each becomes a function returning Effect that sets up routes, replacing class-based design.
 
-### Phase 6: Login & Authentication
+### Phase 7: Login & Authentication
 
 Migrate login system to Effect.
 
@@ -196,7 +181,7 @@ Migrate login system to Effect.
 - Session management (Passport integration)
 - Socket.IO authentication middleware
 
-### Phase 7: Replicator & State Management
+### Phase 8: Replicator & State Management
 
 Migrate Replicator to Effect-based state management.
 
@@ -208,7 +193,7 @@ Migrate Replicator to Effect-based state management.
 
 **Complexity**: ⭐⭐⭐⭐ Very Complex (real-time state sync, Socket.IO integration)
 
-### Phase 8: ExtensionManager
+### Phase 9: ExtensionManager
 
 Migrate ExtensionManager to Effect.
 
@@ -218,7 +203,7 @@ Migrate ExtensionManager to Effect.
 - Extension API provision
 - Event broadcasting to extensions
 
-### Phase 9: Supporting Services
+### Phase 10: Supporting Services
 
 Migrate remaining subsystems as needed:
 
@@ -226,7 +211,7 @@ Migrate remaining subsystems as needed:
 2. **Logger** - Consolidate with Effect logging
 3. **Utility functions** - Migrate as dependencies arise
 
-### Phase 10: HTTP Server Integration (Future)
+### Phase 11: HTTP Server Integration (Future)
 
 Evaluate whether to replace Express with Effect Platform HTTP Server.
 
