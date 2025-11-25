@@ -1,14 +1,16 @@
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
+import { useState } from "react";
+import { createRoot } from "react-dom/client";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import {
 	createTheme,
 	type MantineColorsTuple,
 	MantineProvider,
 } from "@mantine/core";
 import { notifications, Notifications } from "@mantine/notifications";
-import { createRoot } from "react-dom/client";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { CheckIcon, CloudOff } from "lucide-react";
 
 import { Assets } from "./assets/assets";
 import { Graphics } from "./graphics/graphics";
@@ -17,8 +19,8 @@ import { Sound } from "./sound/sound";
 import { Workspace } from "./workspace/workspace";
 import { Settings } from "./settings/settings";
 import { useSocketEvent, useSocketIOEvent } from "./hooks/use-socket";
-import { CheckIcon, CloudOff } from "lucide-react";
-import { useState } from "react";
+
+import notificationClasses from "./notifications/notifications.module.css";
 
 const nodecgColours: MantineColorsTuple = [
 	"#f2f4f8",
@@ -67,6 +69,13 @@ const theme = createTheme({
 		light: lightColours,
 	},
 	primaryColor: "nodecg",
+	components: {
+		Notification: {
+			classNames: {
+				description: notificationClasses["notification-description"],
+			},
+		},
+	},
 });
 
 const router = createBrowserRouter([
