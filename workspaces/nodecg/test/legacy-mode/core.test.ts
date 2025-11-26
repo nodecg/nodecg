@@ -1,6 +1,7 @@
+import { Effect } from "effect";
 import { expect } from "vitest";
 
-import type { NodeCG } from "../../src/types/nodecg";
+import { testEffect } from "../../src/server/_effect/test-effect";
 import { setupTest } from "../helpers/setup";
 import * as C from "../helpers/test-constants";
 
@@ -8,23 +9,29 @@ const test = await setupTest();
 
 test("should load bundles which have satisfied bundle dependencies", ({
 	server,
-}) => {
-	const allBundles: NodeCG.Bundle[] = server.bundleManager.all();
-	const foundBundle = allBundles.find(
-		(bundle) => bundle.name === "satisfied-bundle-deps",
-	);
-	expect(foundBundle).toBeTruthy();
-});
+}) =>
+	testEffect(
+		Effect.gen(function* () {
+			const allBundles = yield* server.bundleManager.all();
+			const foundBundle = allBundles.find(
+				(bundle) => bundle.name === "satisfied-bundle-deps",
+			);
+			expect(foundBundle).toBeTruthy();
+		}),
+	)());
 
 test("should not load bundles which have unsatisfied bundle dependencies", ({
 	server,
-}) => {
-	const allBundles: NodeCG.Bundle[] = server.bundleManager.all();
-	const foundBundle = allBundles.find(
-		(bundle) => bundle.name === "unsatisfied-bundle-deps",
-	);
-	expect(foundBundle).toBe(undefined);
-});
+}) =>
+	testEffect(
+		Effect.gen(function* () {
+			const allBundles = yield* server.bundleManager.all();
+			const foundBundle = allBundles.find(
+				(bundle) => bundle.name === "unsatisfied-bundle-deps",
+			);
+			expect(foundBundle).toBe(undefined);
+		}),
+	));
 
 test("should serve bundle-specific bower_components", async () => {
 	const response = await fetch(

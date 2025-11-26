@@ -53,18 +53,18 @@ import type {
 import { UnknownError } from "../_effect/boundary";
 import { listenToEvent, waitForEvent } from "../_effect/event-listener";
 import { createLogger } from "../logger";
+import { createSocketAuthMiddleware } from "../login/socketAuthMiddleware";
 import { Replicator } from "../replicant/replicator";
-import { createAssetsMiddleware } from "./assets";
+import { assetsRouter } from "./assets";
 import { BundleManager } from "./bundle-manager";
-import { DashboardLib } from "./dashboard";
-import { ExtensionManager } from "./extensions";
-import { GraphicsLib } from "./graphics";
-import { createSocketAuthMiddleware } from "./login/socketAuthMiddleware";
-import { MountsLib } from "./mounts";
-import { SentryConfig } from "./sentry-config";
-import { SharedSourcesLib } from "./shared-sources";
+import { dashboardRouter } from "./dashboard";
+import { createExtensionManager } from "./extensions";
+import { graphicsRouter } from "./graphics";
+import { mountsRouter } from "./mounts";
+import { sentryConfigRouter } from "./sentry-config";
+import { sharedSourceRouter } from "./shared-sources";
 import { socketApiMiddleware } from "./socketApiMiddleware";
-import { SoundsLib } from "./sounds";
+import { soundsRouter } from "./sounds";
 
 const renderTemplate = memoize((content, options) =>
 	template(content)(options),
@@ -178,20 +178,12 @@ export const createServer = Effect.fn("createServer")(function* (
 		});
 	});
 
-	const bundlesPaths = [
-		path.join(rootPaths.getRuntimeRoot(), "bundles"),
-	].concat(config.bundles?.paths ?? []);
-	const cfgPath = path.join(rootPaths.getRuntimeRoot(), "cfg");
-	const bundleManager = new BundleManager(
-		bundlesPaths,
-		cfgPath,
-		nodecgPackageJson.version,
-		config,
-	);
+	const bundleManager = yield* BundleManager;
 
 	let databaseAdapter = defaultAdapter;
 	let databaseAdapterExists = false;
-	for (const bundle of bundleManager.all()) {
+	const initialBundles = yield* bundleManager.all();
+	for (const bundle of initialBundles) {
 		if (bundle.nodecgBundleConfig.databaseAdapter) {
 			log.warn(
 				"`databaseAdapter` is an experimental feature and may be changed without major version bump.",
@@ -252,16 +244,15 @@ export const createServer = Effect.fn("createServer")(function* (
 	io.use(socketApiMiddleware);
 
 	// Wait for Chokidar to finish its initial scan.
-	if (!bundleManager.ready) {
-		yield* waitForEvent<[]>(bundleManager, "ready").pipe(
-			Effect.timeoutFail({
-				duration: "15 seconds",
-				onTimeout: () => new FileWatcherReadyTimeoutError(),
-			}),
-		);
-	}
+	yield* bundleManager.waitForReady().pipe(
+		Effect.timeoutFail({
+			duration: "15 seconds",
+			onTimeout: () => new FileWatcherReadyTimeoutError(),
+		}),
+	);
 
-	for (const bundle of bundleManager.all()) {
+	const allBundles = yield* bundleManager.all();
+	for (const bundle of allBundles) {
 		// TODO: remove this feature in v3
 		if (bundle.transformBareModuleSpecifiers) {
 			log.warn(
@@ -302,8 +293,8 @@ export const createServer = Effect.fn("createServer")(function* (
 	);
 
 	if (sentryEnabled) {
-		const sentryHelpers = new SentryConfig(bundleManager);
-		app.use(sentryHelpers.app);
+		const sentryApp = yield* sentryConfigRouter();
+		app.use(sentryApp);
 	}
 
 	const persistedReplicantEntities = yield* Effect.promise(async () => {
@@ -318,23 +309,23 @@ export const createServer = Effect.fn("createServer")(function* (
 		(replicator) => Effect.sync(() => replicator.saveAllReplicants()),
 	);
 
-	const graphics = new GraphicsLib(io, bundleManager, replicator);
-	app.use(graphics.app);
+	const graphicsRoute = yield* graphicsRouter(io, replicator);
+	app.use(graphicsRoute);
 
-	const dashboard = new DashboardLib(bundleManager);
-	app.use(dashboard.app);
+	const dashboardRoute = yield* dashboardRouter();
+	app.use(dashboardRoute);
 
-	const mounts = new MountsLib(bundleManager.all());
-	app.use(mounts.app);
+	const mounts = yield* mountsRouter();
+	app.use(mounts);
 
-	const sounds = new SoundsLib(bundleManager.all(), replicator);
-	app.use(sounds.app);
+	const sounds = yield* soundsRouter(replicator);
+	app.use(sounds);
 
-	const assets = createAssetsMiddleware(bundleManager.all(), replicator);
+	const assets = yield* assetsRouter(replicator);
 	app.use("/assets", assets);
 
-	const sharedSources = new SharedSourcesLib(bundleManager.all());
-	app.use(sharedSources.app);
+	const sharedSources = yield* sharedSourceRouter();
+	app.use(sharedSources);
 
 	if (sentryEnabled) {
 		app.use(Sentry.Handlers.errorHandler());
@@ -372,35 +363,31 @@ export const createServer = Effect.fn("createServer")(function* (
 		),
 		persistent: false,
 	});
-	const updateBundlesReplicant = () => {
-		bundlesReplicant.value = clone(bundleManager.all());
-	};
+	const updateBundlesReplicant = Effect.fn(function* () {
+		const bundles = yield* bundleManager.all();
+		bundlesReplicant.value = clone(bundles);
+	});
 	const bundleManagerEvents = yield* Effect.all(
 		[
-			listenToEvent<[]>(bundleManager, "ready"),
-			listenToEvent<[]>(bundleManager, "bundleChanged"),
-			listenToEvent<[]>(bundleManager, "gitChanged"),
-			listenToEvent<[]>(bundleManager, "bundleRemoved"),
+			bundleManager.listenTo("ready").pipe(Effect.map(Stream.as(null))),
+			bundleManager.listenTo("bundleChanged").pipe(Effect.map(Stream.as(null))),
+			bundleManager.listenTo("gitChanged").pipe(Effect.map(Stream.as(null))),
+			bundleManager.listenTo("bundleRemoved").pipe(Effect.map(Stream.as(null))),
 		],
 		{ concurrency: "unbounded" },
 	).pipe(
-		Effect.andThen(Stream.mergeAll({ concurrency: "unbounded" })),
+		Effect.map(Stream.mergeAll({ concurrency: "unbounded" })),
 		Effect.andThen(Stream.debounce("100 millis")),
 	);
 	yield* Effect.forkScoped(
-		Stream.runForEach(bundleManagerEvents, () =>
-			Effect.sync(updateBundlesReplicant),
-		),
+		Stream.runForEach(bundleManagerEvents, updateBundlesReplicant),
 	);
-	updateBundlesReplicant();
+	yield* updateBundlesReplicant();
 
 	const mount = (...args: any[]) => app.use(...args);
 	const extensionManager = yield* Effect.acquireRelease(
-		Effect.sync(
-			() => new ExtensionManager(io, bundleManager, replicator, mount),
-		),
-		(extensionManager) =>
-			Effect.sync(() => extensionManager.emitToAllInstances("serverStopping")),
+		createExtensionManager(io, replicator, mount),
+		(em) => Effect.sync(() => em.emitToAllInstances("serverStopping")),
 	);
 	extensionManager.emitToAllInstances("extensionsLoaded");
 
@@ -445,7 +432,7 @@ export const createServer = Effect.fn("createServer")(function* (
 
 	return {
 		run,
-		getExtensions: () => ({ ...extensionManager.extensions }),
+		getExtensions: () => extensionManager.getExtensions(),
 		saveAllReplicantsNow: () => replicator.saveAllReplicantsNow(),
 		bundleManager,
 	};

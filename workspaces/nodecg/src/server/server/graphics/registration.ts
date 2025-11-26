@@ -1,15 +1,16 @@
 import { rootPaths } from "@nodecg/internal-util";
+import { Effect, Layer, Runtime, Stream } from "effect";
 import express from "express";
 import fs from "fs";
 import path from "path";
 
 import type { NodeCG } from "../../../types/nodecg";
 import type { GraphicRegRequest, RootNS } from "../../../types/socket-protocol";
-import type { BundleManager } from "../bundle-manager";
 import type { Replicator } from "../../replicant/replicator";
 import type { ServerReplicant } from "../../replicant/server-replicant";
 import { injectScripts } from "../../util/injectscripts";
 import { isChildPath } from "../../util/is-child-path";
+import { BundleManager } from "../bundle-manager.js";
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 
@@ -18,117 +19,133 @@ const BUILD_PATH = path.join(
 	"dist/client/instance",
 );
 
-export class RegistrationCoordinator {
-	app = express();
+type InstanceRep = ServerReplicant<
+	GraphicsInstance[],
+	NodeCG.Replicant.OptionsWithDefault<GraphicsInstance[]>
+>;
 
-	private readonly _instancesRep: ServerReplicant<
-		GraphicsInstance[],
-		NodeCG.Replicant.OptionsWithDefault<GraphicsInstance[]>
-	>;
+export const registrationCoordinator = Effect.fn("registrationCoordinator")(
+	function* (io: RootNS, replicator: Replicator) {
+		const bundleManager = yield* BundleManager;
+		const runtime = yield* Effect.runtime();
+		const app = express();
 
-	private readonly _bundleManager: BundleManager;
+		const instancesRep: InstanceRep = replicator.declare(
+			"graphics:instances",
+			"nodecg",
+			{
+				schemaPath: path.join(
+					rootPaths.nodecgInstalledPath,
+					"schemas/graphics%3Ainstances.json",
+				),
+				persistent: false,
+				defaultValue: [],
+			},
+		);
 
-	constructor(
-		io: RootNS,
-		bundleManager: BundleManager,
-		replicator: Replicator,
-	) {
-		this._bundleManager = bundleManager;
-		const { app } = this;
-
-		this._instancesRep = replicator.declare("graphics:instances", "nodecg", {
-			schemaPath: path.join(
-				rootPaths.nodecgInstalledPath,
-				"schemas/graphics%3Ainstances.json",
+		const bundleChangedStream = yield* bundleManager.listenTo("bundleChanged");
+		yield* Effect.forkScoped(
+			bundleChangedStream.pipe(
+				Stream.runForEach(() => updateInstanceStatuses(instancesRep)),
 			),
-			persistent: false,
-			defaultValue: [],
-		});
+		);
 
-		bundleManager.on("bundleChanged", this._updateInstanceStatuses.bind(this));
-		bundleManager.on("gitChanged", this._updateInstanceStatuses.bind(this));
+		const gitChangedStream = yield* bundleManager.listenTo("gitChanged");
+		yield* Effect.forkScoped(
+			gitChangedStream.pipe(
+				Stream.runForEach(() => updateInstanceStatuses(instancesRep)),
+			),
+		);
 
 		io.on("connection", (socket) => {
-			socket.on("graphic:registerSocket", (regRequest, cb) => {
-				const { bundleName } = regRequest;
-				let { pathName } = regRequest;
-				if (pathName.endsWith(`/${bundleName}/graphics/`)) {
-					pathName += "index.html";
-				}
+			socket.on("graphic:registerSocket", (regRequest, cb) =>
+				Effect.gen(function* () {
+					const { bundleName } = regRequest;
+					let { pathName } = regRequest;
+					if (pathName.endsWith(`/${bundleName}/graphics/`)) {
+						pathName += "index.html";
+					}
 
-				const bundle = bundleManager.find(bundleName);
-				/* istanbul ignore if: simple error trapping */
-				if (!bundle) {
-					cb(undefined, false);
-					return;
-				}
-
-				const graphicManifest = this._findGraphicManifest({
-					bundleName,
-					pathName,
-				});
-
-				/* istanbul ignore if: simple error trapping */
-				if (!graphicManifest) {
-					cb(undefined, false);
-					return;
-				}
-
-				const existingSocketRegistration = this._findRegistrationBySocketId(
-					socket.id,
-				);
-				const existingPathRegistration =
-					this._findOpenRegistrationByPathName(pathName);
-
-				// If there is an existing registration with this pathName,
-				// and this is a singleInstance graphic,
-				// then deny the registration, unless the socket ID matches.
-				if (existingPathRegistration && graphicManifest.singleInstance) {
-					if (existingPathRegistration.socketId === socket.id) {
-						cb(undefined, true);
+					const bundle = yield* bundleManager.find(bundleName);
+					if (!bundle) {
+						cb(undefined, false);
 						return;
 					}
 
-					cb(undefined, !existingPathRegistration.open);
-					return;
-				}
-
-				if (existingSocketRegistration) {
-					existingSocketRegistration.open = true;
-				} else {
-					this._addRegistration({
-						...regRequest,
-						ipv4: socket.request.socket.remoteAddress!,
-						socketId: socket.id,
-						singleInstance: Boolean(graphicManifest.singleInstance),
-						potentiallyOutOfDate:
-							calcBundleGitMismatch(bundle, regRequest) ||
-							calcBundleVersionMismatch(bundle, regRequest),
-						open: true,
+					const graphicManifest = yield* findGraphicManifest({
+						bundleName,
+						pathName,
 					});
 
-					if (graphicManifest.singleInstance) {
-						app.emit("graphicOccupied", pathName);
+					if (!graphicManifest) {
+						cb(undefined, false);
+						return;
 					}
-				}
 
-				cb(undefined, true);
-			});
+					const existingSocketRegistration = findRegistrationBySocketId(
+						instancesRep,
+						socket.id,
+					);
+					const existingPathRegistration = findOpenRegistrationByPathName(
+						instancesRep,
+						pathName,
+					);
+
+					// If there is an existing registration with this pathName,
+					// and this is a singleInstance graphic,
+					// then deny the registration, unless the socket ID matches.
+					if (existingPathRegistration && graphicManifest.singleInstance) {
+						if (existingPathRegistration.socketId === socket.id) {
+							cb(undefined, true);
+							return;
+						}
+
+						cb(undefined, !existingPathRegistration.open);
+						return;
+					}
+
+					if (existingSocketRegistration) {
+						existingSocketRegistration.open = true;
+					} else {
+						addRegistration(instancesRep, {
+							...regRequest,
+							ipv4: socket.request.socket.remoteAddress!,
+							socketId: socket.id,
+							singleInstance: Boolean(graphicManifest.singleInstance),
+							potentiallyOutOfDate:
+								calcBundleGitMismatch(bundle, regRequest) ||
+								calcBundleVersionMismatch(bundle, regRequest),
+							open: true,
+						});
+
+						if (graphicManifest.singleInstance) {
+							app.emit("graphicOccupied", pathName);
+						}
+					}
+
+					cb(undefined, true);
+				}).pipe(
+					Effect.provide(Layer.succeed(BundleManager, bundleManager)),
+					Runtime.runPromise(runtime),
+				),
+			);
 
 			socket.on("graphic:queryAvailability", (pathName, cb) => {
-				cb(undefined, !this._findOpenRegistrationByPathName(pathName));
+				cb(undefined, !findOpenRegistrationByPathName(instancesRep, pathName));
 			});
 
-			socket.on("graphic:requestBundleRefresh", (bundleName, cb) => {
-				const bundle = bundleManager.find(bundleName);
-				if (!bundle) {
+			socket.on("graphic:requestBundleRefresh", (bundleName, cb) =>
+				Effect.gen(function* () {
+					const bundle = yield* bundleManager.find(bundleName);
+					if (!bundle) {
+						cb(undefined, undefined);
+						return;
+					}
+
+					io.emit("graphic:bundleRefresh", bundleName);
 					cb(undefined, undefined);
-					return;
-				}
-
-				io.emit("graphic:bundleRefresh", bundleName);
-				cb(undefined, undefined);
-			});
+				}).pipe(Runtime.runPromise(runtime)),
+			);
 
 			socket.on("graphic:requestRefreshAll", (graphic, cb) => {
 				io.emit("graphic:refreshAll", graphic);
@@ -149,7 +166,10 @@ export class RegistrationCoordinator {
 
 			socket.on("disconnect", () => {
 				// Unregister the socket.
-				const registration = this._findRegistrationBySocketId(socket.id);
+				const registration = findRegistrationBySocketId(
+					instancesRep,
+					socket.id,
+				);
 				if (!registration) {
 					return;
 				}
@@ -160,7 +180,7 @@ export class RegistrationCoordinator {
 				}
 
 				setTimeout(() => {
-					this._removeRegistration(socket.id);
+					removeRegistration(instancesRep, socket.id);
 				}, 1000);
 			});
 		});
@@ -181,85 +201,91 @@ export class RegistrationCoordinator {
 				next();
 			}
 		});
+
+		return app;
+	},
+);
+
+const addRegistration = (
+	instancesRep: InstanceRep,
+	registration: GraphicsInstance,
+): void => {
+	instancesRep.value.push({
+		...registration,
+		open: true,
+	});
+};
+
+const removeRegistration = (
+	instancesRep: InstanceRep,
+	socketId: string,
+): GraphicsInstance | false => {
+	const registrationIndex = instancesRep.value.findIndex(
+		(instance) => instance.socketId === socketId,
+	);
+
+	if (registrationIndex < 0) {
+		return false;
 	}
 
-	private _addRegistration(registration: GraphicsInstance): void {
-		this._instancesRep.value.push({
-			...registration,
-			open: true,
-		});
-	}
+	return instancesRep.value.splice(registrationIndex, 1)[0]!;
+};
 
-	private _removeRegistration(socketId: string): GraphicsInstance | false {
-		const registrationIndex = this._instancesRep.value.findIndex(
-			(instance) => instance.socketId === socketId,
-		);
+const findRegistrationBySocketId = (
+	instancesRep: InstanceRep,
+	socketId: string,
+): GraphicsInstance | undefined => {
+	return instancesRep.value.find((instance) => instance.socketId === socketId);
+};
 
-		/* istanbul ignore next: simple error trapping */
-		if (registrationIndex < 0) {
-			return false;
-		}
+const findOpenRegistrationByPathName = (
+	instancesRep: InstanceRep,
+	pathName: string,
+): GraphicsInstance | undefined => {
+	return instancesRep.value.find(
+		(instance) => instance.pathName === pathName && instance.open,
+	);
+};
 
-		return this._instancesRep.value.splice(registrationIndex, 1)[0]!;
-	}
-
-	private _findRegistrationBySocketId(
-		socketId: string,
-	): GraphicsInstance | undefined {
-		return this._instancesRep.value.find(
-			(instance) => instance.socketId === socketId,
-		);
-	}
-
-	private _findOpenRegistrationByPathName(
-		pathName: string,
-	): GraphicsInstance | undefined {
-		return this._instancesRep.value.find(
-			(instance) => instance.pathName === pathName && instance.open,
-		);
-	}
-
-	private _updateInstanceStatuses(): void {
-		this._instancesRep.value.forEach((instance) => {
-			const { bundleName, pathName } = instance;
-			const bundle = this._bundleManager.find(bundleName);
-			/* istanbul ignore next: simple error trapping */
-			if (!bundle) {
-				return;
-			}
-
-			const graphicManifest = this._findGraphicManifest({
-				bundleName,
-				pathName,
-			});
-			/* istanbul ignore next: simple error trapping */
-			if (!graphicManifest) {
-				return;
-			}
-
-			instance.potentiallyOutOfDate =
-				calcBundleGitMismatch(bundle, instance) ||
-				calcBundleVersionMismatch(bundle, instance);
-			instance.singleInstance = Boolean(graphicManifest.singleInstance);
-		});
-	}
-
-	private _findGraphicManifest({
-		pathName,
-		bundleName,
-	}: {
-		pathName: string;
-		bundleName: string;
-	}): NodeCG.Bundle.Graphic | undefined {
-		const bundle = this._bundleManager.find(bundleName);
-		/* istanbul ignore if: simple error trapping */
+const updateInstanceStatuses = Effect.fn(function* (instancesRep: InstanceRep) {
+	const bundleManager = yield* BundleManager;
+	for (const instance of instancesRep.value) {
+		const { bundleName, pathName } = instance;
+		const bundle = yield* bundleManager.find(bundleName);
 		if (!bundle) {
-			return;
+			continue;
 		}
 
-		return bundle.graphics.find((graphic) => graphic.url === pathName);
+		const graphicManifest = yield* findGraphicManifest({
+			bundleName,
+			pathName,
+		});
+		if (!graphicManifest) {
+			continue;
+		}
+
+		instance.potentiallyOutOfDate =
+			calcBundleGitMismatch(bundle, instance) ||
+			calcBundleVersionMismatch(bundle, instance);
+		instance.singleInstance = Boolean(graphicManifest.singleInstance);
 	}
-}
+});
+
+const findGraphicManifest = Effect.fn(function* ({
+	pathName,
+	bundleName,
+}: {
+	pathName: string;
+	bundleName: string;
+}) {
+	const bundleManager = yield* BundleManager;
+	const bundle = yield* bundleManager.find(bundleName);
+	if (!bundle) {
+		return;
+	}
+
+	return bundle.graphics.find((graphic) => graphic.url === pathName);
+});
 
 function calcBundleGitMismatch(
 	bundle: NodeCG.Bundle,

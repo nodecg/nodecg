@@ -14,170 +14,53 @@ This ensures full Effect benefits (context propagation, error handling, interrup
 
 ## Migration Phases
 
-### Phase 1: Server Entry Point ✅ COMPLETE
+### Phase 1: Server Entry Point
 
-**Status**: ✅ Completed (2025-11-15)
+**Status**: ✅ Complete
 
-Transform `workspaces/nodecg/src/server/bootstrap.ts` into an Effect program with single execution point.
+**Complexity**: ⭐ Simple
 
-**Implementation**:
-
-- Single `NodeRuntime.runMain` execution point in `bootstrap.ts`
-- Server lifecycle wrapped in `Effect.acquireRelease` for guaranteed cleanup
-- Floating errors handled via `Effect.async` with proper fiber suspension/resume
-- Uses `Effect.raceFirst` to wait for either server stop or error
-- OpenTelemetry integration with custom span processor for trace logging
-- Conditional OpenTelemetry loading using Config + dynamic imports (zero overhead when disabled)
-- Log level configuration from `LOG_LEVEL` environment variable
-- Removed custom exit hooks - Effect's interruption handles SIGTERM/SIGINT
-
-**Utilities Created** (`workspaces/nodecg/src/server/_effect/`):
-
-- `boundary.ts` - `UnknownError` for wrapping non-Effect exceptions
-- `expect-error.ts` - Type utility for documenting expected errors
-- `log-level.ts` - Environment-based log level configuration
-- `span-logger.ts` - OpenTelemetry span processor with Effect logging (with unit tests)
-- `test-effect.ts` - Vitest helper for running Effect tests (accepts `Effect<A, E, Scope.Scope>`)
-
-**Dependencies Added**:
-
-- Effect: `effect`, `@effect/platform`, `@effect/platform-node`, `@effect/opentelemetry`
-- OpenTelemetry: `@opentelemetry/{api,core,resources,sdk-trace-base,sdk-trace-node,semantic-conventions}`
-- Dev: `@effect/language-service` (TypeScript plugin)
-
-See [migration log entry](./log/01-phase-1-bootstrap.md) for detailed implementation notes.
+Transformed `bootstrap.ts` into an Effect program with single `NodeRuntime.runMain` execution point. Server lifecycle wrapped in `Effect.acquireRelease`, floating errors handled via `Effect.async`, OpenTelemetry integration with conditional loading, and environment-based log level configuration. See [migration log entry](./log/01-phase-1-bootstrap.md).
 
 ### Phase 2: Server Architecture Refactoring
 
-**Status**: ✅ Core Implementation Complete (testing in progress)
+**Status**: ✅ Complete
 
-Replace `NodeCGServer` class with functional Effect-based architecture.
+**Complexity**: ⭐⭐ Moderate
 
-**Approach**:
-
-- Remove class-based design, use plain Effect functions
-- `createServer()` function sets up resources and returns handle with `run` Effect
-- Resources use `Effect.acquireRelease` for guaranteed cleanup
-- Cleanup logic from `stop()` method distributed into release functions
-- Tests use Promise wrapper that manages Effect fibers internally
-
-**Implementation**:
-
-- `createServer(isReady?: Deferred<void>)` - Sets up all resources, returns `{ run, getExtensions, saveAllReplicantsNow }`
-- Resources managed inline with `Effect.acquireRelease`:
-  - Socket.IO: acquire (create server), release (disconnect + close)
-  - Replicator: acquire (instantiate), release (saveAllReplicants)
-  - ExtensionManager: acquire (instantiate + emit extensionsLoaded), release (emit serverStopping)
-- Event listeners forked with `Effect.forkScoped` for automatic cleanup
-- `run` Effect - Waits for server close or error using `Effect.raceFirst`
-- Ready signaling via optional Deferred parameter (for test synchronization)
-- Bootstrap: `const server = yield* createServer()` then `yield* server.run()` (all within `Effect.scoped`)
-- Tests: Create Deferred, fork scoped Effect containing `createServer` + `run`, await ready
-
-**Key Patterns Established**:
-
-- **Separate create from run** - Resources created and returned in handle, run separately for long-lived servers
-- **Scope at call site** - `Effect.scoped` applied in caller (bootstrap, tests), not in `createServer`
-- **Bridging native callbacks** - Capture runtime with `yield* Effect.runtime()`, use `Runtime.runSync` in callbacks
-- **Test wrapper pattern** - Promise-based API wrapping Effect fibers for backward compatibility
-- **No classes in Effect** - Pure functional code, no class-based architecture
-
-**Benefits**:
-
-- No classes - pure functional Effect code
-- Automatic cleanup via `acquireRelease`
-- Clean test access via wrapper's `handle` property
-- Maintains all public APIs (ExtensionManager broadcasts)
-- Proper ready signaling for tests without race conditions
-
-See [migration log entry](./log/02-phase-2-server-refactor.md) for detailed implementation notes and patterns learned.
+Replaced `NodeCGServer` class with functional Effect-based architecture. `createServer()` returns handle with `run` Effect, resources use `Effect.acquireRelease` for guaranteed cleanup, tests use Promise-based wrapper managing Effect fibers internally. See [migration log entry](./log/02-phase-2-server-refactor.md).
 
 ### Phase 3: Chokidar → Effect Wrapper
 
 **Status**: ✅ Complete
 
-Create Effect-friendly wrapper for chokidar file watching API, built on reusable EventEmitter utilities.
-
-**Current Problem**: Manual chokidar usage in bundle-manager and assets:
-
-```typescript
-// Module-level watcher, manual event handlers, manual cleanup
-const watcher = chokidar.watch(paths, options);
-watcher.on("add", handler);
-watcher.on("change", handler);
-// ... manual cleanup, deferred patterns, no type safety
-```
-
-**Solution**: Effect-friendly chokidar wrapper in `_effect/chokidar.ts`:
-
-- `getWatcher(paths, options)` - Scoped watcher with automatic cleanup
-- `waitForReady(watcher)` - Wait for initial scan, returns tagged `FileEvent.ready`
-- `listenToAdd/Change/AddDir/Unlink/UnlinkDir/Error(watcher)` - Type-safe event streams
-- `FileEvent` tagged enum for consistent event types
-- Built on `waitForEvent`/`listenToEvent` utilities
-
-**Implementation**:
-
-- ✅ EventEmitter utilities (`_effect/event-listener.ts` + tests)
-- ✅ Chokidar wrapper (`_effect/chokidar.ts` + tests)
-- ✅ Tests using `@effect/platform` FileSystem
-- ✅ All tests passing, no type errors
-
-**Design Decisions**:
-
-- Skipped `listenToAll()` - Too complex for type-safe narrowing
-- Skipped `addPaths/unwatchPaths()` - Users call watcher methods directly
-- Multi-arg event handling via tuple destructuring + Stream.map
-
-**Benefits**:
-
-- Type-safe file watching with automatic cleanup
-- Stream-based event processing with tagged events
-- Testable (scoped resources, no module-level state)
-- Ready for use in BundleManager/Assets migrations
-
 **Complexity**: ⭐ Simple
 
-See [migration log entry](./log/03-chokidar-wrapper.md) for detailed implementation notes and patterns.
+Created Effect-friendly chokidar wrapper with scoped watcher, type-safe event streams (`listenToAdd/Change/AddDir/Unlink/UnlinkDir/Error`), and `FileEvent` tagged enum. Built on reusable EventEmitter utilities (`waitForEvent`, `listenToEvent`). See [migration log entry](./log/03-chokidar-wrapper.md).
 
-### Phase 4: BundleManager Migration
+### Phase 4: Bundle Manager Consumer
 
-**Status**: Planned
+**Status**: ✅ Complete
 
-Migrate BundleManager to Effect-based BundleService using EventEmitter utilities from Phase 3.
+**Complexity**: ⭐⭐ Moderate
 
-**Implementation**:
+Converted bundle-consuming libraries to `Effect.fn` wrappers while keeping the legacy BundleManager class and events unchanged. Consumers now use `listenToEvent` streams inside Effect scopes, preparing for a service swap without breaking hot-reload behavior. Current state: `bundle-manager.ts` remains the active implementation with git-rev-sync + `process.chdir()` and global debounce state. See [migration log entry](./log/04-bundle-manager-consumer.md).
 
-- **Location**: `workspaces/nodecg/src/server/bundle-manager.ts` → `bundle-service.ts`
-- **Complexity**: ⭐⭐⭐ Complex (file watching, event distribution, hot-reloading)
-- **Approach**:
-  - Use EventEmitter utilities from Phase 3
-  - `Ref<Array<NodeCG.Bundle>>` for mutable bundle list state
-  - `PubSub<BundleEvent>` for event distribution
-  - `Stream` for Chokidar file watching (general-purpose wrapper)
-  - `Effect.acquireRelease` for watcher lifecycle
-- **Consumers to migrate**: GraphicsLib, DashboardLib, ExtensionManager, SentryConfig, server/index.ts
-- **New utilities**:
-  - `_effect/file-watcher.ts` - Chokidar → Stream wrapper with retry logic
-  - `_effect/git-parser.ts` - Git parsing wrapper
+### Phase 5: Bundle Manager Service
 
-**Key Patterns**:
+**Status**: TEST FAILING
 
-- `Data.TaggedEnum` for event types
-- Chokidar → Stream conversion for file watching
-- EventEmitter → PubSub migration for event distribution
-- Stateful service with Ref for bundle list
-- Background stream processing with Effect.forkScoped
+**Complexity**: ⭐⭐⭐ Complex
 
-See [migration log entry](./log/04-bundle-manager.md) for detailed implementation plan.
+Replaced the legacy BundleManager class with an Effect-based `BundleManager` service using `Effect.Service` with scoped option. State managed via `Ref<Array<NodeCG.Bundle>>`, events via `PubSub<BundleEvent>`, file watching via Phase 3 chokidar wrapper. GitService provides `isomorphic-git` integration for git metadata. Consumers updated to use service pattern (`yield* BundleManager`). ExtensionManager decoupled to accept bundles array + removeBundle callback. Test helpers provide BundleManager layer. See [migration log entry](./log/05-bundle-manager-service.md).
 
-### Phase 5: Route Libraries Migration
+### Phase 6: Route Libraries Migration
 
 Migrate route handler classes to Effect-based route services.
 
 **Candidates** (following execution order in createServer):
 
-1. **GraphicsLib** - Bundle graphics routes (already partially migrated in Phase 4 as BundleService consumer)
+1. **GraphicsLib** - Bundle graphics routes (already partially migrated in Phase 4 via Effect.fn consumer wrappers)
 2. **DashboardLib** - Bundle dashboard routes
 3. **MountsLib** - Static asset mounts
 4. **SoundsLib** - Sound file serving
@@ -186,7 +69,7 @@ Migrate route handler classes to Effect-based route services.
 
 Each becomes a function returning Effect that sets up routes, replacing class-based design.
 
-### Phase 6: Login & Authentication
+### Phase 7: Login & Authentication
 
 Migrate login system to Effect.
 
@@ -196,7 +79,7 @@ Migrate login system to Effect.
 - Session management (Passport integration)
 - Socket.IO authentication middleware
 
-### Phase 7: Replicator & State Management
+### Phase 8: Replicator & State Management
 
 Migrate Replicator to Effect-based state management.
 
@@ -208,7 +91,7 @@ Migrate Replicator to Effect-based state management.
 
 **Complexity**: ⭐⭐⭐⭐ Very Complex (real-time state sync, Socket.IO integration)
 
-### Phase 8: ExtensionManager
+### Phase 9: ExtensionManager
 
 Migrate ExtensionManager to Effect.
 
@@ -218,7 +101,7 @@ Migrate ExtensionManager to Effect.
 - Extension API provision
 - Event broadcasting to extensions
 
-### Phase 9: Supporting Services
+### Phase 10: Supporting Services
 
 Migrate remaining subsystems as needed:
 
@@ -226,7 +109,7 @@ Migrate remaining subsystems as needed:
 2. **Logger** - Consolidate with Effect logging
 3. **Utility functions** - Migrate as dependencies arise
 
-### Phase 10: HTTP Server Integration (Future)
+### Phase 11: HTTP Server Integration (Future)
 
 Evaluate whether to replace Express with Effect Platform HTTP Server.
 

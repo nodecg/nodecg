@@ -2,379 +2,501 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { isLegacyProject, rootPaths } from "@nodecg/internal-util";
-import chokidar from "chokidar";
 import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
-import { debounce } from "lodash";
+import {
+	Chunk,
+	Data,
+	Effect,
+	GroupBy,
+	Option,
+	PubSub,
+	Queue,
+	Stream,
+} from "effect";
 import semver from "semver";
 
-import { TypedEmitter } from "../../shared/typed-emitter";
 import type { NodeCG } from "../../types/nodecg";
+import {
+	getWatcher,
+	listenToAdd,
+	listenToChange,
+	listenToError,
+	listenToUnlink,
+} from "../_effect/chokidar.js";
+import { GitService } from "../_effect/git-service.js";
+import { NodecgVersion } from "../_effect/nodecg-version.js";
 import { parseBundle } from "../bundle-parser";
-import { parseGit as parseBundleGit } from "../bundle-parser/git";
+import { config } from "../config";
 import { createLogger } from "../logger";
 import { isChildPath } from "../util/is-child-path";
 
-/**
- * Milliseconds
- */
+// Timing constants (milliseconds)
 const READY_WAIT_THRESHOLD = 1000;
-
-// Start up the watcher, but don't watch any files yet.
-// We'll add the files we want to watch later, in the init() method.
-const watcher = chokidar.watch([], {
-	persistent: true,
-	ignoreInitial: true,
-	followSymlinks: true,
-	ignored: [
-		/\/.+___jb_.+___/, // Ignore temp files created by JetBrains IDEs
-		/\/node_modules\//, // Ignore node_modules folders
-		/\/bower_components\//, // Ignore bower_components folders
-		/\/.+\.lock/, // Ignore lockfiles
-	],
-});
+const CHANGE_INITIAL_DELAY = 100;
+const BACKOFF_DELAY = 500;
+const GIT_DEBOUNCE_DELAY = 250;
 
 const blacklistedBundleDirectories = ["node_modules", "bower_components"];
-
-const bundles: NodeCG.Bundle[] = [];
 const log = createLogger("bundle-manager");
-const hasChanged = new Set<string>();
-let backoffTimer: NodeJS.Timeout | undefined;
 
-interface EventMap {
-	bundleRemoved: (bundleName: string) => void;
-	gitChanged: (bundle: NodeCG.Bundle) => void;
-	bundleChanged: (reparsedBundle: NodeCG.Bundle) => void;
-	invalidBundle: (bundle: NodeCG.Bundle, error: Error) => void;
-	ready: () => void;
+// Tick marker for timing (no payload needed)
+interface Tick {
+	readonly _tag: "Tick";
+}
+const Tick = Data.tagged<Tick>("Tick");
+
+// BundleEvent tagged union
+export type BundleEvent = Data.TaggedEnum<{
+	ready: object;
+	bundleChanged: { bundle: NodeCG.Bundle };
+	invalidBundle: { bundle: NodeCG.Bundle; error: Error };
+	bundleRemoved: { bundleName: string };
+	gitChanged: { bundle: NodeCG.Bundle };
+}>;
+export const bundleEvent = Data.taggedEnum<BundleEvent>();
+
+// File change event for internal routing
+interface FileChange {
+	readonly bundleName: string;
+	readonly bundlePath: string;
+	readonly filePath: string;
+	readonly type: "manifest" | "panel" | "git";
 }
 
-export class BundleManager extends TypedEmitter<EventMap> {
-	bundles: NodeCG.Bundle[] = [];
+export class BundleManager extends Effect.Service<BundleManager>()(
+	"BundleManager",
+	{
+		scoped: Effect.gen(function* () {
+			const gitService = yield* GitService;
+			const { version: nodecgVersion } = yield* NodecgVersion;
 
-	get ready() {
-		return this._ready;
-	}
+			// Config derived from existing imports
+			// Resolve relative paths to absolute paths based on NODECG_ROOT
+			const bundlesPaths = [
+				path.join(rootPaths.getRuntimeRoot(), "bundles"),
+				...(config.bundles?.paths ?? []).map((p) =>
+					path.isAbsolute(p) ? p : path.join(rootPaths.getRuntimeRoot(), p),
+				),
+			];
+			const cfgPath = path.join(rootPaths.getRuntimeRoot(), "cfg");
+			const nodecgConfig = config;
 
-	private _ready = false;
+			// State (mutable)
+			let bundles: NodeCG.Bundle[] = [];
+			const bundlePaths = new Map<string, string>();
 
-	private readonly _cfgPath: string;
+			const events = yield* PubSub.unbounded<BundleEvent>();
 
-	private readonly _debouncedGitChangeHandler = debounce((bundleName) => {
-		const bundle = this.find(bundleName);
-		if (!bundle) {
-			return;
-		}
+			// Separate queues for different event types (can't share queue between multiple consumers)
+			const bundleChangeQueue = yield* Queue.unbounded<FileChange>(); // manifest + panel
+			const gitChangeQueue = yield* Queue.unbounded<FileChange>(); // git
+			const readyTickQueue = yield* Queue.unbounded<Tick>();
 
-		bundle.git = parseBundleGit(bundle.dir);
-		this.emit("gitChanged", bundle);
-	}, 250);
-
-	constructor(
-		bundlesPaths: string[],
-		cfgPath: string,
-		nodecgVersion: string,
-		nodecgConfig: Record<string, any>,
-	) {
-		super();
-
-		this._cfgPath = cfgPath;
-
-		const readyTimeout = setTimeout(() => {
-			this._ready = true;
-			this.emit("ready");
-		}, READY_WAIT_THRESHOLD);
-
-		const bundleRootPaths = isLegacyProject()
-			? bundlesPaths
-			: [rootPaths.runtimeRootPath, ...bundlesPaths];
-
-		bundleRootPaths.forEach((bundlesPath) => {
-			log.trace(`Loading bundles from ${bundlesPath}`);
-
-			/* istanbul ignore next */
-			watcher.on("add", (filePath) => {
-				const bundleName = getParentProjectName(filePath, bundlesPath);
-				if (!bundleName) {
-					return;
-				}
-
-				// In theory, the bundle parser would have thrown an error long before this block would execute,
-				// because in order for us to be adding a panel HTML file, that means that the file would have been missing,
-				// which the parser does not allow and would throw an error for.
-				// Just in case though, its here.
-				if (this.isPanelHTMLFile(bundleName, filePath)) {
-					this.handleChange(bundleName);
-				} else if (isGitData(bundleName, filePath)) {
-					this._debouncedGitChangeHandler(bundleName);
-				}
-
-				if (!this.ready) {
-					readyTimeout.refresh();
-				}
-			});
-
-			watcher.on("change", (filePath) => {
-				const bundleName = getParentProjectName(filePath, bundlesPath);
-				if (!bundleName) {
-					return;
-				}
-
-				if (
-					isManifest(bundleName, filePath) ||
-					this.isPanelHTMLFile(bundleName, filePath)
-				) {
-					this.handleChange(bundleName);
-				} else if (isGitData(bundleName, filePath)) {
-					this._debouncedGitChangeHandler(bundleName);
-				}
-			});
-
-			watcher.on("unlink", (filePath) => {
-				const bundleName = getParentProjectName(filePath, bundlesPath);
-				if (!bundleName) {
-					return;
-				}
-
-				if (this.isPanelHTMLFile(bundleName, filePath)) {
-					// This will cause NodeCG to crash, because the parser will throw an error due to
-					// a panel's HTML file no longer being present.
-					this.handleChange(bundleName);
-				} else if (isGitData(bundleName, filePath)) {
-					this._debouncedGitChangeHandler(bundleName);
-				}
-			});
-
-			/* istanbul ignore next */
-			watcher.on("error", (error) => {
-				log.error((error as Error).stack);
-			});
-
-			const handleBundle = (bundlePath: string) => {
-				if (!fs.statSync(bundlePath).isDirectory()) {
-					return;
-				}
-
-				// Prevent attempting to load unwanted directories. Those specified above and all dot-prefixed.
-				const bundleFolderName = path.basename(bundlePath);
-				if (
-					blacklistedBundleDirectories.includes(bundleFolderName) ||
-					bundleFolderName.startsWith(".")
-				) {
-					return;
-				}
-
-				const bundlePackageJson = fs.readFileSync(
-					path.join(bundlePath, "package.json"),
-					"utf-8",
+			// Helper: check if a path is a panel HTML file
+			const isPanelHTMLFile = (bundleName: string, filePath: string) => {
+				const bundle = bundles.find((b) => b.name === bundleName);
+				if (!bundle) return false;
+				// Compare using relative path from dashboard to avoid /tmp vs /private/tmp issues on macOS
+				return bundle.dashboard.panels.some((panel) =>
+					filePath.endsWith(path.join("dashboard", panel.file)),
 				);
-				const bundleName = JSON.parse(bundlePackageJson).name;
-
-				if (nodecgConfig?.bundles?.disabled?.includes(bundleName)) {
-					log.debug(
-						`Not loading bundle ${bundleName} as it is disabled in config`,
-					);
-					return;
-				}
-
-				if (
-					nodecgConfig?.bundles?.enabled &&
-					!nodecgConfig?.bundles.enabled.includes(bundleName)
-				) {
-					log.debug(
-						`Not loading bundle ${bundleName} as it is not enabled in config`,
-					);
-					return;
-				}
-
-				log.debug(`Loading bundle ${bundleName}`);
-
-				// Parse each bundle and push the result onto the bundles array
-				const bundle = parseBundle(
-					bundlePath,
-					loadBundleCfg(cfgPath, bundleName),
-				);
-
-				if (isLegacyProject()) {
-					if (!bundle.compatibleRange) {
-						log.error(
-							`${bundle.name}'s package.json does not have a "nodecg.compatibleRange" property.`,
-						);
-						return;
-					}
-					// Check if the bundle is compatible with this version of NodeCG
-					if (!semver.satisfies(nodecgVersion, bundle.compatibleRange)) {
-						log.error(
-							`${bundle.name} requires NodeCG version ${bundle.compatibleRange}, current version is ${nodecgVersion}`,
-						);
-						return;
-					}
-				}
-
-				bundles.push(bundle);
-
-				// Use `chokidar` to watch for file changes within bundles.
-				// Workaround for https://github.com/paulmillr/chokidar/issues/419
-				// This workaround is necessary to fully support symlinks.
-				// This is applied after the bundle has been validated and loaded.
-				// Bundles that do not properly load upon startup are not recognized for updates.
-				watcher.add([
-					path.join(bundlePath, ".git"), // Watch `.git` directories.
-					path.join(bundlePath, "dashboard"), // Watch `dashboard` directories.
-					path.join(bundlePath, "package.json"), // Watch each bundle's `package.json`.
-				]);
 			};
 
-			if (bundlesPath === rootPaths.runtimeRootPath) {
-				handleBundle(rootPaths.runtimeRootPath);
-			} else if (fs.existsSync(bundlesPath)) {
-				const bundleFolders = fs.readdirSync(bundlesPath);
-				bundleFolders.forEach((bundleFolderName) => {
-					const bundlePath = path.join(bundlesPath, bundleFolderName);
-					handleBundle(bundlePath);
+			// Helper: add or replace bundle
+			const addBundle = (bundle: NodeCG.Bundle) => {
+				bundles = bundles.filter((b) => b.name !== bundle.name);
+				bundles.push(bundle);
+			};
+
+			// Helper: remove bundle
+			const removeBundle = Effect.fn("BundleManager.remove")(function* (
+				bundleName: string,
+			) {
+				bundles = bundles.filter((b) => b.name !== bundleName);
+				yield* PubSub.publish(
+					events,
+					bundleEvent.bundleRemoved({ bundleName }),
+				);
+			});
+
+			// Parse and load a single bundle
+			const loadBundle = (bundlePath: string) =>
+				Effect.sync(() => {
+					if (!fs.statSync(bundlePath).isDirectory()) {
+						return Option.none<NodeCG.Bundle>();
+					}
+
+					const bundleFolderName = path.basename(bundlePath);
+					if (
+						blacklistedBundleDirectories.includes(bundleFolderName) ||
+						bundleFolderName.startsWith(".")
+					) {
+						return Option.none<NodeCG.Bundle>();
+					}
+
+					const bundlePackageJson = fs.readFileSync(
+						path.join(bundlePath, "package.json"),
+						"utf-8",
+					);
+					const bundleName = JSON.parse(bundlePackageJson).name;
+
+					if (nodecgConfig?.bundles?.disabled?.includes(bundleName)) {
+						log.debug(
+							`Not loading bundle ${bundleName} as it is disabled in config`,
+						);
+						return Option.none<NodeCG.Bundle>();
+					}
+
+					if (
+						nodecgConfig?.bundles?.enabled &&
+						!nodecgConfig?.bundles.enabled.includes(bundleName)
+					) {
+						log.debug(
+							`Not loading bundle ${bundleName} as it is not enabled in config`,
+						);
+						return Option.none<NodeCG.Bundle>();
+					}
+
+					log.debug(`Loading bundle ${bundleName}`);
+
+					const bundle = parseBundle(
+						bundlePath,
+						loadBundleCfg(cfgPath, bundleName),
+					);
+
+					if (isLegacyProject()) {
+						if (!bundle.compatibleRange) {
+							log.error(
+								`${bundle.name}'s package.json does not have a "nodecg.compatibleRange" property.`,
+							);
+							return Option.none<NodeCG.Bundle>();
+						}
+						if (!semver.satisfies(nodecgVersion, bundle.compatibleRange)) {
+							log.error(
+								`${bundle.name} requires NodeCG version ${bundle.compatibleRange}, current version is ${nodecgVersion}`,
+							);
+							return Option.none<NodeCG.Bundle>();
+						}
+					}
+
+					return Option.some(bundle);
 				});
-			}
-		});
-	}
 
-	/**
-	 * Returns a shallow-cloned array of all currently active bundles.
-	 * @returns {Array.<Object>}
-	 */
-	all(): NodeCG.Bundle[] {
-		return bundles.slice(0);
-	}
+			// Compute bundle root paths
+			const bundleRootPaths = isLegacyProject()
+				? bundlesPaths
+				: [rootPaths.runtimeRootPath, ...bundlesPaths];
 
-	/**
-	 * Returns the bundle with the given name. undefined if not found.
-	 * @param name {String} - The name of the bundle to find.
-	 * @returns {Object|undefined}
-	 */
-	find(name: string): NodeCG.Bundle | undefined {
-		return bundles.find((b) => b.name === name);
-	}
+			// Collect all watch paths and load initial bundles
+			const watchPaths: string[] = [];
+			const initialBundles: NodeCG.Bundle[] = [];
+			const bundlePathMap = new Map<string, string>();
 
-	/**
-	 * Adds a bundle to the internal list, replacing any existing bundle with the same name.
-	 * @param bundle {Object}
-	 */
-	add(bundle: NodeCG.Bundle): void {
-		/* istanbul ignore if: Again, it shouldn't be possible for "bundle" to be undefined, but just in case... */
-		if (!bundle) {
-			return;
-		}
+			for (const bundlesPath of bundleRootPaths) {
+				log.trace(`Loading bundles from ${bundlesPath}`);
 
-		// Remove any existing bundles with this name
-		if (this.find(bundle.name)) {
-			this.remove(bundle.name);
-		}
+				const handleBundlePath = (bundlePath: string) => {
+					try {
+						const result = Effect.runSync(loadBundle(bundlePath));
+						if (Option.isSome(result)) {
+							const bundle = result.value;
+							initialBundles.push(bundle);
+							bundlePathMap.set(bundle.name, bundlePath);
+							watchPaths.push(
+								path.join(bundlePath, ".git"),
+								path.join(bundlePath, "dashboard"),
+								path.join(bundlePath, "package.json"),
+							);
+						}
+					} catch (e) {
+						log.error(`Failed to load bundle at ${bundlePath}:`, e);
+					}
+				};
 
-		bundles.push(bundle);
-	}
-
-	/**
-	 * Removes a bundle with the given name from the internal list. Does nothing if no match found.
-	 * @param bundleName {String}
-	 */
-	remove(bundleName: string): void {
-		const len = bundles.length;
-		for (let i = 0; i < len; i++) {
-			// TODO: this check shouldn't have to happen, idk why things in this array can sometimes be undefined
-			if (!bundles[i]) {
-				continue;
+				if (bundlesPath === rootPaths.runtimeRootPath) {
+					handleBundlePath(rootPaths.runtimeRootPath);
+				} else if (fs.existsSync(bundlesPath)) {
+					const bundleFolders = fs.readdirSync(bundlesPath);
+					for (const bundleFolderName of bundleFolders) {
+						const bundlePath = path.join(bundlesPath, bundleFolderName);
+						handleBundlePath(bundlePath);
+					}
+				}
 			}
 
-			if (bundles[i]!.name === bundleName) {
-				bundles.splice(i, 1);
-				this.emit("bundleRemoved", bundleName);
-				return;
-			}
-		}
-	}
-
-	handleChange(bundleName: string): void {
-		setTimeout(() => {
-			this._handleChange(bundleName);
-		}, 100);
-	}
-
-	/**
-	 * Resets the backoff timer used to avoid event thrashing when many files change rapidly.
-	 */
-	resetBackoffTimer(): void {
-		clearTimeout(backoffTimer as any); // Typedefs for clearTimeout are always wonky
-		backoffTimer = setTimeout(() => {
-			backoffTimer = undefined;
-			for (const bundleName of hasChanged) {
-				log.debug("Backoff finished, emitting change event for", bundleName);
-				this.handleChange(bundleName);
+			// Initialize state
+			bundles = initialBundles;
+			for (const [name, bundlePath] of bundlePathMap) {
+				bundlePaths.set(name, bundlePath);
 			}
 
-			hasChanged.clear();
-		}, 500);
-	}
+			// Start file watcher
+			const watcher = yield* getWatcher(watchPaths, {
+				persistent: true,
+				ignoreInitial: true,
+				followSymlinks: true,
+				ignored: [
+					/\/.+___jb_.+___/, // JetBrains temp files
+					/\/node_modules\//,
+					/\/bower_components\//,
+					/\/.+\.lock/,
+				],
+			});
 
-	/**
-	 * Checks if a given path is a panel HTML file of a given bundle.
-	 * @param bundleName {String}
-	 * @param filePath {String}
-	 * @returns {Boolean}
-	 * @private
-	 */
-	isPanelHTMLFile(bundleName: string, filePath: string): boolean {
-		const bundle = this.find(bundleName);
-		if (bundle) {
-			return bundle.dashboard.panels.some((panel) =>
-				panel.path.endsWith(filePath),
-			);
-		}
+			// Helper to safely resolve symlinks, returns original path on error
+			const safeRealpath = (p: string) => {
+				try {
+					return fs.realpathSync(p);
+				} catch {
+					return p;
+				}
+			};
 
-		return false;
-	}
+			// Process file events and route to appropriate queues
+			const processFileEvent = (
+				filePath: string,
+				eventType: "add" | "change" | "unlink",
+			) =>
+				Effect.gen(function* () {
+					// Normalize path for consistent comparison (handles /tmp vs /private/tmp on macOS)
+					const normalizedPath = safeRealpath(filePath);
 
-	/**
-	 * Only used by tests.
-	 */
-	_stopWatching(): void {
-		void watcher.close();
-	}
+					// Find which bundle this file belongs to
+					let foundBundle: { name: string; path: string } | undefined;
 
-	private _handleChange(bundleName: string): void {
-		const bundle = this.find(bundleName);
+					for (const [bundleName, bundlePath] of bundlePaths) {
+						// Resolve both paths for comparison to handle symlinks
+						const normalizedBundlePath = safeRealpath(bundlePath);
+						if (normalizedPath.startsWith(normalizedBundlePath)) {
+							foundBundle = { name: bundleName, path: bundlePath };
+							break;
+						}
+					}
 
-		/* istanbul ignore if: It's rare for `bundle` to be undefined here, but it can happen when using black/whitelisting. */
-		if (!bundle) {
-			return;
-		}
+					if (!foundBundle) {
+						// Try to find parent project name
+						for (const bundlesPath of bundleRootPaths) {
+							const bundleName = getParentProjectName(filePath, bundlesPath);
+							if (bundleName) {
+								const bundlePath = bundlePaths.get(bundleName);
+								if (bundlePath) {
+									foundBundle = { name: bundleName, path: bundlePath };
+									break;
+								}
+							}
+						}
+					}
 
-		if (backoffTimer) {
-			log.debug(
-				"Backoff active, delaying processing of change detected in",
-				bundleName,
-			);
-			hasChanged.add(bundleName);
-			this.resetBackoffTimer();
-		} else {
-			log.debug("Processing change event for", bundleName);
-			this.resetBackoffTimer();
+					if (!foundBundle) return;
 
-			try {
-				const reparsedBundle = parseBundle(
-					bundle.dir,
-					loadBundleCfg(this._cfgPath, bundle.name),
+					const { name: bundleName, path: bundlePath } = foundBundle;
+
+					// Determine change type and route to appropriate queue
+					if (isGitData(bundleName, filePath)) {
+						yield* Queue.offer(gitChangeQueue, {
+							bundleName,
+							bundlePath,
+							filePath,
+							type: "git",
+						});
+					} else if (isManifest(bundleName, filePath)) {
+						yield* Queue.offer(bundleChangeQueue, {
+							bundleName,
+							bundlePath,
+							filePath,
+							type: "manifest",
+						});
+					} else if (isPanelHTMLFile(bundleName, filePath)) {
+						yield* Queue.offer(bundleChangeQueue, {
+							bundleName,
+							bundlePath,
+							filePath,
+							type: "panel",
+						});
+					}
+
+					// For "add" events, signal ready tick
+					if (eventType === "add") {
+						yield* Queue.offer(readyTickQueue, Tick());
+					}
+				});
+
+			// Set up file event listeners
+			const [addStream, changeStream, unlinkStream, errorStream] =
+				yield* Effect.all(
+					[
+						listenToAdd(watcher),
+						listenToChange(watcher),
+						listenToUnlink(watcher),
+						listenToError(watcher),
+					],
+					{ concurrency: "unbounded" },
 				);
-				this.add(reparsedBundle);
-				this.emit("bundleChanged", reparsedBundle);
-			} catch (error: any) {
-				log.warn(
-					'Unable to handle the bundle "%s" change:\n%s',
-					bundleName,
-					error.stack,
-				);
-				this.emit("invalidBundle", bundle, error);
-			}
-		}
-	}
-}
+
+			// Fork add event processing
+			yield* Effect.forkScoped(
+				addStream.pipe(
+					Stream.runForEach((event) => processFileEvent(event.path, "add")),
+				),
+			);
+
+			// Fork change event processing
+			yield* Effect.forkScoped(
+				changeStream.pipe(
+					Stream.runForEach((event) => processFileEvent(event.path, "change")),
+				),
+			);
+
+			// Fork unlink event processing
+			yield* Effect.forkScoped(
+				unlinkStream.pipe(
+					Stream.runForEach((event) => processFileEvent(event.path, "unlink")),
+				),
+			);
+
+			// Fork error handling
+			yield* Effect.forkScoped(
+				errorStream.pipe(
+					Stream.runForEach((event) =>
+						Effect.sync(() => {
+							log.error("Watcher error:", event.error);
+						}),
+					),
+				),
+			);
+
+			// Ready event: fires 1000ms after last add event, or initial 1000ms if no adds
+			yield* Effect.forkScoped(
+				Effect.gen(function* () {
+					yield* Stream.fromQueue(readyTickQueue).pipe(
+						Stream.prepend(Chunk.of(Tick())),
+						Stream.debounce(`${READY_WAIT_THRESHOLD} millis`),
+						Stream.take(1),
+						Stream.runDrain,
+					);
+					yield* PubSub.publish(events, bundleEvent.ready());
+				}),
+			);
+
+			// Handle bundle changes with debounce per bundle (500ms backoff)
+			yield* Effect.forkScoped(
+				Stream.fromQueue(bundleChangeQueue).pipe(
+					Stream.groupByKey((fc) => fc.bundleName),
+					GroupBy.evaluate((bundleName, stream) =>
+						stream.pipe(
+							Stream.debounce(`${BACKOFF_DELAY} millis`),
+							Stream.runForEach(() =>
+								Effect.gen(function* () {
+									yield* Effect.sleep(`${CHANGE_INITIAL_DELAY} millis`);
+
+									const bundle = bundles.find((b) => b.name === bundleName);
+									if (!bundle) return;
+
+									log.debug("Processing change event for", bundleName);
+
+									try {
+										const reparsedBundle = parseBundle(
+											bundle.dir,
+											loadBundleCfg(cfgPath, bundle.name),
+										);
+										addBundle(reparsedBundle);
+										yield* PubSub.publish(
+											events,
+											bundleEvent.bundleChanged({ bundle: reparsedBundle }),
+										);
+									} catch (error: unknown) {
+										log.warn(
+											'Unable to handle the bundle "%s" change:\n%s',
+											bundleName,
+											error instanceof Error ? error.stack : String(error),
+										);
+										yield* PubSub.publish(
+											events,
+											bundleEvent.invalidBundle({
+												bundle,
+												error:
+													error instanceof Error
+														? error
+														: new Error(String(error)),
+											}),
+										);
+									}
+								}),
+							),
+						),
+					),
+					Stream.runDrain,
+				),
+			);
+
+			// Handle git changes with debounce per bundle (250ms)
+			yield* Effect.forkScoped(
+				Stream.fromQueue(gitChangeQueue).pipe(
+					Stream.groupByKey((fc) => fc.bundleName),
+					GroupBy.evaluate((bundleName, stream) =>
+						stream.pipe(
+							Stream.debounce(`${GIT_DEBOUNCE_DELAY} millis`),
+							Stream.runForEach((fc) =>
+								Effect.gen(function* () {
+									const bundle = bundles.find((b) => b.name === bundleName);
+									if (!bundle) return;
+
+									const gitHead = yield* gitService
+										.getGitHead(fc.bundlePath)
+										.pipe(Effect.catchAll(() => Effect.succeed(Option.none())));
+
+									if (Option.isSome(gitHead)) {
+										const gitData = gitHead.value;
+										bundle.git = {
+											branch: Option.getOrElse(gitData.branch, () => ""),
+											hash: gitData.hash,
+											shortHash: gitData.shortHash,
+											date: gitData.date,
+											message: gitData.message,
+										};
+									} else {
+										bundle.git = undefined;
+									}
+
+									yield* PubSub.publish(
+										events,
+										bundleEvent.gitChanged({ bundle }),
+									);
+								}),
+							),
+						),
+					),
+					Stream.runDrain,
+				),
+			);
+
+			// Subscribe and filter by tag - each call creates fresh scoped subscription
+			const listenTo = <Tag extends BundleEvent["_tag"]>(tag: Tag) =>
+				Effect.gen(function* () {
+					const queue = yield* PubSub.subscribe(events);
+					return Stream.fromQueue(queue).pipe(
+						Stream.filter(
+							(e): e is Extract<BundleEvent, { _tag: Tag }> => e._tag === tag,
+						),
+					);
+				});
+
+			return {
+				all: () => Effect.succeed(bundles),
+				find: (name: string) =>
+					Effect.succeed(bundles.find((b) => b.name === name)),
+				remove: removeBundle,
+				listenTo,
+				waitForReady: () =>
+					listenTo("ready").pipe(
+						Effect.andThen(Stream.take(1)),
+						Effect.andThen(Stream.runDrain),
+					),
+			};
+		}),
+		dependencies: [GitService.Default],
+	},
+) {}
 
 /**
  * Checks if a given path is the manifest file for a given bundle.

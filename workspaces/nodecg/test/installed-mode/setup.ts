@@ -4,9 +4,10 @@ import { setTimeout } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
 
 import type { getConnection } from "@nodecg/database-adapter-sqlite-legacy";
-import { Deferred, Effect, Fiber } from "effect";
+import { Deferred, Effect, Fiber, Layer } from "effect";
 import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
+import { NodecgVersion } from "src/server/_effect/nodecg-version";
 import { afterAll, test } from "vitest";
 
 import type { serverApiFactory } from "../../src/server/api.server";
@@ -120,6 +121,12 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 	const { createServer } = (await import(serverModulePath)) as {
 		createServer: typeof import("../../src/server/server").createServer;
 	};
+	const bundleManagerModulePath = pathToFileURL(
+		path.join(nodecgModulePath, "src/server/server/bundle-manager.ts"),
+	).href;
+	const { BundleManager } = (await import(bundleManagerModulePath)) as {
+		BundleManager: typeof import("../../src/server/server/bundle-manager").BundleManager;
+	};
 
 	let serverHandle: ServerHandle;
 	let mainFiber: Fiber.RuntimeFiber<void, unknown> | null = null;
@@ -136,7 +143,12 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 							const handle = yield* createServer(ready);
 							serverHandle = handle;
 							yield* handle.run();
-						}).pipe(Effect.scoped),
+						}).pipe(
+							Effect.scoped,
+							Effect.provide(
+								BundleManager.Default.pipe(Layer.provide(NodecgVersion.Default)),
+							),
+						),
 					);
 					yield* Deferred.await(ready);
 				}),
