@@ -1,5 +1,5 @@
 // Minimal imports for first setup
-import "../util/sentry-config";
+import "./sentry-config";
 
 import * as Sentry from "@sentry/node";
 import * as os from "os";
@@ -52,19 +52,19 @@ import type {
 } from "../../types/socket-protocol";
 import { UnknownError } from "../_effect/boundary";
 import { listenToEvent, waitForEvent } from "../_effect/event-listener";
-import { assetsRouter } from "../assets";
-import { BundleManager } from "../bundle-manager";
-import { dashboardRouter } from "../dashboard";
-import { graphicsRouter } from "../graphics";
 import { createLogger } from "../logger";
 import { createSocketAuthMiddleware } from "../login/socketAuthMiddleware";
-import { mountsRouter } from "../mounts";
 import { Replicator } from "../replicant/replicator";
-import { sharedSourceRouter } from "../shared-sources";
-import { soundsRouter } from "../sounds";
-import { sentryConfigRouter } from "../util/sentry-config";
+import { assetsRouter } from "./assets";
+import { BundleManager } from "./bundle-manager";
+import { dashboardRouter } from "./dashboard";
 import { ExtensionManager } from "./extensions";
+import { graphicsRouter } from "./graphics";
+import { mountsRouter } from "./mounts";
+import { sentryConfigRouter } from "./sentry-config";
+import { sharedSourceRouter } from "./shared-sources";
 import { socketApiMiddleware } from "./socketApiMiddleware";
+import { soundsRouter } from "./sounds";
 
 const renderTemplate = memoize((content, options) =>
 	template(content)(options),

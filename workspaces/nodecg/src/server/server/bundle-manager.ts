@@ -7,12 +7,12 @@ import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
 import { debounce } from "lodash";
 import semver from "semver";
 
-import { TypedEmitter } from "../shared/typed-emitter";
-import type { NodeCG } from "../types/nodecg";
-import { parseBundle } from "./bundle-parser";
-import { parseGit as parseBundleGit } from "./bundle-parser/git";
-import { createLogger } from "./logger";
-import { isChildPath } from "./util/is-child-path";
+import { TypedEmitter } from "../../shared/typed-emitter";
+import type { NodeCG } from "../../types/nodecg";
+import { parseBundle } from "../bundle-parser";
+import { parseGit as parseBundleGit } from "../bundle-parser/git";
+import { createLogger } from "../logger";
+import { isChildPath } from "../util/is-child-path";
 
 /**
  * Milliseconds

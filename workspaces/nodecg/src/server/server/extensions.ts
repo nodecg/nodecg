@@ -8,7 +8,7 @@ import { stringifyError } from "../../shared/utils/errors";
 import type { NodeCG } from "../../types/nodecg";
 import type { RootNS } from "../../types/socket-protocol";
 import { serverApiFactory } from "../api.server";
-import type { BundleManager } from "../bundle-manager";
+import type { BundleManager } from "./bundle-manager";
 import { sentryEnabled } from "../config";
 import { createLogger } from "../logger";
 import type { Replicator } from "../replicant/replicator";

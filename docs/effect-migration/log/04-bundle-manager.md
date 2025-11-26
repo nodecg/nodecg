@@ -18,24 +18,26 @@ Converted bundle-consuming route handlers to `Effect.fn` wrappers while keeping 
 
 ### Consumer Files Migrated
 
-| File | Pattern | Event Handling |
-|------|---------|----------------|
+| File                 | Pattern     | Event Handling                                           |
+| -------------------- | ----------- | -------------------------------------------------------- |
 | `dashboard/index.ts` | `Effect.fn` | `listenToEvent("bundleChanged")` - clears cached context |
-| `graphics/index.ts` | `Effect.fn` | None - stateless lookups |
-| `sentry-config.ts` | `Effect.fn` | `waitForEvent("ready")` + `listenToEvent("gitChanged")` |
-| `assets.ts` | `Effect.fn` | Uses Phase 3 chokidar wrapper directly |
-| `sounds.ts` | `Effect.fn` | None - setup only |
-| `mounts.ts` | `Effect.fn` | None - setup only |
-| `shared-sources.ts` | `Effect.fn` | None - setup only |
+| `graphics/index.ts`  | `Effect.fn` | None - stateless lookups                                 |
+| `sentry-config.ts`   | `Effect.fn` | `waitForEvent("ready")` + `listenToEvent("gitChanged")`  |
+| `assets.ts`          | `Effect.fn` | Uses Phase 3 chokidar wrapper directly                   |
+| `sounds.ts`          | `Effect.fn` | None - setup only                                        |
+| `mounts.ts`          | `Effect.fn` | None - setup only                                        |
+| `shared-sources.ts`  | `Effect.fn` | None - setup only                                        |
 
 ### Pattern Used
 
 All consumers:
+
 1. Accept `BundleManager` as parameter
 2. Call `.all()` or `.find()` synchronously
 3. Return Express router
 
 Event-driven consumers fork scoped listeners:
+
 ```typescript
 const stream = yield* listenToEvent<[]>(bundleManager, "bundleChanged");
 yield* Effect.forkScoped(

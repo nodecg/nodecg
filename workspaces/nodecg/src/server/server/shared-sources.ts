@@ -3,8 +3,8 @@ import express from "express";
 import path from "path";
 
 import type { BundleManager } from "./bundle-manager";
-import { authCheck } from "./util/authcheck";
-import { sendFile } from "./util/send-file";
+import { authCheck } from "../util/authcheck";
+import { sendFile } from "../util/send-file";
 
 export const sharedSourceRouter = Effect.fn("sharedSourceRouter")(function* (
 	bundleManager: BundleManager,

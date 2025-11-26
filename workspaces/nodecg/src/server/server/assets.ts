@@ -8,8 +8,8 @@ import hasha from "hasha";
 import multer from "multer";
 import { z } from "zod";
 
-import { stringifyError } from "../shared/utils/errors";
-import type { NodeCG } from "../types/nodecg";
+import { stringifyError } from "../../shared/utils/errors";
+import type { NodeCG } from "../../types/nodecg";
 import {
 	getWatcher,
 	listenToAdd,
@@ -17,13 +17,13 @@ import {
 	listenToError,
 	listenToUnlink,
 	waitForReady,
-} from "./_effect/chokidar";
+} from "../_effect/chokidar";
 import type { BundleManager } from "./bundle-manager";
-import { createLogger } from "./logger";
-import type { Replicator } from "./replicant/replicator";
-import type { ServerReplicant } from "./replicant/server-replicant";
-import { authCheck } from "./util/authcheck";
-import { sendFile } from "./util/send-file";
+import { createLogger } from "../logger";
+import type { Replicator } from "../replicant/replicator";
+import type { ServerReplicant } from "../replicant/server-replicant";
+import { authCheck } from "../util/authcheck";
+import { sendFile } from "../util/send-file";
 
 interface Collection {
 	name: string;

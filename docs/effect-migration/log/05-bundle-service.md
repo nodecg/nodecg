@@ -116,7 +116,7 @@ addStream.pipe(
   Stream.debounce("1000 millis"),
   Stream.take(1),
   Stream.runForEach(() => PubSub.publish(events, bundleEvent.ready())),
-)
+);
 ```
 
 ### Initial Bundle Loading

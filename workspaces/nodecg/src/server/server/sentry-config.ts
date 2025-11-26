@@ -6,12 +6,12 @@ import * as Sentry from "@sentry/node";
 import { Effect, Stream } from "effect";
 import express from "express";
 
-import type { NodeCG } from "../../types/nodecg";
+import type { NodeCG } from "../../types/nodecg.js";
 import { listenToEvent, waitForEvent } from "../_effect/event-listener.js";
-import type { BundleManager } from "../bundle-manager";
-import { config } from "../config";
-import { authCheck } from "../util/authcheck";
-import { nodecgPackageJson } from "./nodecg-package-json";
+import { config } from "../config/index.js";
+import { authCheck } from "../util/authcheck.js";
+import { nodecgPackageJson } from "../util/nodecg-package-json.js";
+import type { BundleManager } from "./bundle-manager.js";
 
 const baseSentryConfig = {
 	dsn: config.sentry.enabled ? config.sentry.dsn : "",

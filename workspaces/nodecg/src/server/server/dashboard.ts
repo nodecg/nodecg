@@ -7,7 +7,7 @@ import { klona as clone } from "klona/json";
 
 import type { NodeCG } from "../../types/nodecg";
 import { listenToEvent } from "../_effect/event-listener";
-import type { BundleManager } from "../bundle-manager";
+import type { BundleManager } from "./bundle-manager";
 import { config, filteredConfig, sentryEnabled } from "../config";
 import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";

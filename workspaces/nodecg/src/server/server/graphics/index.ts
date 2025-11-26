@@ -5,13 +5,13 @@ import { isLegacyProject, rootPaths } from "@nodecg/internal-util";
 import { Effect } from "effect";
 import express from "express";
 
-import type { RootNS } from "../../types/socket-protocol";
+import type { RootNS } from "../../../types/socket-protocol";
 import type { BundleManager } from "../bundle-manager";
-import type { Replicator } from "../replicant/replicator";
-import { authCheck } from "../util/authcheck";
-import { injectScripts } from "../util/injectscripts";
-import { sendFile } from "../util/send-file";
-import { sendNodeModulesFile } from "../util/send-node-modules-file";
+import type { Replicator } from "../../replicant/replicator";
+import { authCheck } from "../../util/authcheck";
+import { injectScripts } from "../../util/injectscripts";
+import { sendFile } from "../../util/send-file";
+import { sendNodeModulesFile } from "../../util/send-node-modules-file";
 import { RegistrationCoordinator } from "./registration";
 
 export const graphicsRouter = Effect.fn("graphicsRouter")(function* (
