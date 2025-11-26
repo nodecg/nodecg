@@ -1,9 +1,9 @@
 import express from "express";
 import path from "path";
 
-import type { NodeCG } from "../types/nodecg";
-import { authCheck } from "./util/authcheck";
-import { sendFile } from "./util/send-file";
+import type { NodeCG } from "../../types/nodecg";
+import { authCheck } from "../util/authcheck";
+import { sendFile } from "../util/send-file";
 
 export class MountsLib {
 	app = express();

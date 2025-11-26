@@ -6,10 +6,10 @@ import * as Sentry from "@sentry/node";
 import express from "express";
 
 import type { NodeCG } from "../../types/nodecg";
-import type { BundleManager } from "../bundle-manager";
 import { config } from "../config";
+import type { BundleManager } from "./bundle-manager";
 import { authCheck } from "../util/authcheck";
-import { nodecgPackageJson } from "./nodecg-package-json";
+import { nodecgPackageJson } from "../util/nodecg-package-json";
 
 const baseSentryConfig = {
 	dsn: config.sentry.enabled ? config.sentry.dsn : "",
