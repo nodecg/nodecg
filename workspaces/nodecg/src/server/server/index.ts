@@ -5,8 +5,8 @@ import * as Sentry from "@sentry/node";
 import * as os from "os";
 
 import { config, filteredConfig, sentryEnabled } from "../config";
-import * as login from "../login";
 import { nodecgPackageJson } from "../util/nodecg-package-json";
+import * as login from "./login";
 
 if (config.sentry?.enabled) {
 	Sentry.init({

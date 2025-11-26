@@ -1,4 +1,4 @@
-import type { UnAuthErrCode } from "../../types/socket-protocol";
+import type { UnAuthErrCode } from "../../../types/socket-protocol";
 
 export class UnauthorizedError extends Error {
 	serialized: {
