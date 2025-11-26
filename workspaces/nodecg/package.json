@@ -118,6 +118,7 @@
     "hasha": "^5.2.2",
     "httpolyglot": "^0.1.2",
     "is-error": "^2.2.2",
+    "isomorphic-git": "^1.35.1",
     "json-ptr": "^3.1.1",
     "klona": "^2.0.6",
     "lodash": "^4.17.21",

@@ -24,12 +24,8 @@
     "typecheck": "tsc -b tsconfig.typecheck.json",
     "test": "vitest",
     "typetest": "npm -w nodecg run typetest",
-    "lint": "run-s lint:*",
-    "lint:eslint": "eslint",
-    "lint:prettier": "prettier --check .",
-    "fix": "run-s fix:*",
-    "fix:eslint": "npm run lint:eslint -- --fix",
-    "fix:prettier": "prettier --write ."
+    "lint": "eslint && prettier --check .",
+    "fix": "eslint --fix && prettier --write ."
   },
   "prettier": {},
   "devDependencies": {
