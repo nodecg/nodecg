@@ -21,12 +21,14 @@ export default defineConfig({
 				test: {
 					name: "e2e-legacy",
 					dir: "workspaces/nodecg/test/legacy-mode",
+					testTimeout: 15_000,
 				},
 			},
 			{
 				test: {
 					name: "e2e-installed",
 					dir: "workspaces/nodecg/test/installed-mode",
+					testTimeout: 15_000,
 				},
 			},
 			"workspaces/cli",
