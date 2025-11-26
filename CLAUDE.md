@@ -257,9 +257,10 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
   - Register finalizer to remove listener when scope closes (`Effect.addFinalizer`)
   - Return `Stream.fromQueue(queue)` for consumption
   - Ensures backpressure handling, automatic cleanup, and eager listener registration
-- **eventEmitter.once() auto-cleanup**: `once()` automatically removes listener after firing
-  - No need for manual cleanup in the success path when using with `Effect.async`
-  - Only need cleanup handler for interruption cases (return value from `Effect.async`)
+- **Effect.async cleanup for interruption**: When using `Effect.async` with `eventEmitter.once()`:
+  - `once()` auto-removes listener after firing (success path handled)
+  - Must return cleanup Effect to remove listener on interruption (memory leak otherwise)
+  - Define handler before `once()` so same reference can be used for registration and cleanup
 - **EventEmitterLike interface**: Use generic interface instead of concrete `EventEmitter` type
   - Enables broader compatibility (works with any object implementing the interface)
   - Allows testing with custom implementations
