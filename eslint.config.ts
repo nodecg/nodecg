@@ -14,6 +14,8 @@ export default defineConfig(
 		],
 		rules: {
 			"no-empty-pattern": "off",
+			"require-yield": "off",
+
 			"@typescript-eslint/no-explicit-any": "off",
 			"@typescript-eslint/no-unused-vars": "off",
 			"@typescript-eslint/no-unsafe-return": "off",
