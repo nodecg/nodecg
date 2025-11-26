@@ -1,7 +1,7 @@
 import EventEmitter from "node:events";
 
 import { Array, Chunk, Effect, Option, Stream } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { listenToEvent, waitForEvent } from "./event-listener";
 import { testEffect } from "./test-effect";
@@ -33,7 +33,7 @@ const getNewEE = () =>
 	);
 
 describe("waitForEvent", () => {
-	it(
+	test(
 		"waits for single event",
 		testEffect(
 			Effect.gen(function* () {
@@ -61,7 +61,7 @@ describe("waitForEvent", () => {
 });
 
 describe("listenToEvent", () => {
-	it(
+	test(
 		"streams multiple events",
 		testEffect(
 			Effect.gen(function* () {

@@ -11,8 +11,12 @@ export const waitForEvent = <T extends any[] = never[]>(
 	eventName: string,
 ) =>
 	Effect.async<T>((resume) => {
-		eventEmitter.once(eventName, (...payload: T) => {
+		const handler = (...payload: T) => {
 			resume(Effect.succeed(payload));
+		};
+		eventEmitter.once(eventName, handler);
+		return Effect.sync(() => {
+			eventEmitter.removeListener(eventName, handler);
 		});
 	});
 

@@ -253,7 +253,7 @@ export const createServer = Effect.fn("createServer")(function* (
 
 	// Wait for Chokidar to finish its initial scan.
 	if (!bundleManager.ready) {
-		yield* waitForEvent<[void]>(bundleManager, "ready").pipe(
+		yield* waitForEvent<[]>(bundleManager, "ready").pipe(
 			Effect.timeoutFail({
 				duration: "15 seconds",
 				onTimeout: () => new FileWatcherReadyTimeoutError(),
