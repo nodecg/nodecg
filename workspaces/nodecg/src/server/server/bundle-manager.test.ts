@@ -6,8 +6,8 @@ import { setTimeout } from "node:timers/promises";
 
 import { afterAll, beforeAll, expect, test } from "vitest";
 
-import { testDirPath } from "../../test/helpers/test-dir-path";
-import { createTmpDir } from "../../test/helpers/tmp-dir";
+import { testDirPath } from "../../../test/helpers/test-dir-path";
+import { createTmpDir } from "../../../test/helpers/tmp-dir";
 import type { BundleManager as BundleManagerTypeOnly } from "./bundle-manager";
 
 const tmpDir = createTmpDir();

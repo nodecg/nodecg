@@ -5,12 +5,12 @@ import express from "express";
 import { klona as clone } from "klona/json";
 
 import type { NodeCG } from "../../types/nodecg";
-import type { BundleManager } from "../bundle-manager";
 import { config, filteredConfig, sentryEnabled } from "../config";
 import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
 import { sendFile } from "../util/send-file";
 import { sendNodeModulesFile } from "../util/send-node-modules-file";
+import type { BundleManager } from "./bundle-manager";
 
 type Workspace = NodeCG.Workspace;
 

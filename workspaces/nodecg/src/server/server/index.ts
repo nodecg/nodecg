@@ -1,12 +1,12 @@
 // Minimal imports for first setup
-import "../util/sentry-config";
+import "./sentry-config";
 
 import * as Sentry from "@sentry/node";
 import * as os from "os";
 
 import { config, filteredConfig, sentryEnabled } from "../config";
-import * as login from "../login";
 import { nodecgPackageJson } from "../util/nodecg-package-json";
+import * as login from "./login";
 
 if (config.sentry?.enabled) {
 	Sentry.init({
@@ -52,19 +52,19 @@ import type {
 } from "../../types/socket-protocol";
 import { UnknownError } from "../_effect/boundary";
 import { listenToEvent, waitForEvent } from "../_effect/event-listener";
-import { createAssetsMiddleware } from "../assets";
-import { BundleManager } from "../bundle-manager";
-import { DashboardLib } from "../dashboard";
-import { GraphicsLib } from "../graphics";
 import { createLogger } from "../logger";
-import { createSocketAuthMiddleware } from "../login/socketAuthMiddleware";
-import { MountsLib } from "../mounts";
 import { Replicator } from "../replicant/replicator";
-import { SharedSourcesLib } from "../shared-sources";
-import { SoundsLib } from "../sounds";
-import { SentryConfig } from "../util/sentry-config";
+import { createAssetsMiddleware } from "./assets";
+import { BundleManager } from "./bundle-manager";
+import { DashboardLib } from "./dashboard";
 import { ExtensionManager } from "./extensions";
+import { GraphicsLib } from "./graphics";
+import { createSocketAuthMiddleware } from "./login/socketAuthMiddleware";
+import { MountsLib } from "./mounts";
+import { SentryConfig } from "./sentry-config";
+import { SharedSourcesLib } from "./shared-sources";
 import { socketApiMiddleware } from "./socketApiMiddleware";
+import { SoundsLib } from "./sounds";
 
 const renderTemplate = memoize((content, options) =>
 	template(content)(options),

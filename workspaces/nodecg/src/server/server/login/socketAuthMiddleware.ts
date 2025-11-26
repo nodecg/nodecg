@@ -2,11 +2,11 @@ import type { DatabaseAdapter } from "@nodecg/database-adapter-types";
 import { serializeError } from "serialize-error";
 import type { ExtendedError } from "socket.io";
 
-import type { TypedServerSocket } from "../../types/socket-protocol";
-import { UnAuthErrCode } from "../../types/socket-protocol";
-import { config } from "../config";
-import { createLogger } from "../logger";
-import { UnauthorizedError } from "../login/UnauthorizedError";
+import type { TypedServerSocket } from "../../../types/socket-protocol";
+import { UnAuthErrCode } from "../../../types/socket-protocol";
+import { config } from "../../config";
+import { createLogger } from "../../logger";
+import { UnauthorizedError } from "./UnauthorizedError";
 
 const log = createLogger("socket-auth");
 const socketsByKey = new Map<string, Set<TypedServerSocket>>();

@@ -16,8 +16,8 @@ import { Strategy as LocalStrategy } from "passport-local";
 import SteamStrategy from "passport-steam";
 import { Strategy as TwitchStrategy } from "passport-twitch-helix";
 
-import { config } from "../config";
-import { createLogger } from "../logger";
+import { config } from "../../config";
+import { createLogger } from "../../logger";
 
 type StrategyDoneCb = (
 	error: NodeJS.ErrnoException | undefined,
