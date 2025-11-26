@@ -5,11 +5,11 @@ import path from "path";
 
 import type { NodeCG } from "../../../types/nodecg";
 import type { GraphicRegRequest, RootNS } from "../../../types/socket-protocol";
-import type { BundleManager } from "../bundle-manager";
 import type { Replicator } from "../../replicant/replicator";
 import type { ServerReplicant } from "../../replicant/server-replicant";
 import { injectScripts } from "../../util/injectscripts";
 import { isChildPath } from "../../util/is-child-path";
+import type { BundleManager } from "../bundle-manager";
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 

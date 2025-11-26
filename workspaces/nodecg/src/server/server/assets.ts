@@ -18,12 +18,12 @@ import {
 	listenToUnlink,
 	waitForReady,
 } from "../_effect/chokidar";
-import type { BundleManager } from "./bundle-manager";
 import { createLogger } from "../logger";
 import type { Replicator } from "../replicant/replicator";
 import type { ServerReplicant } from "../replicant/server-replicant";
 import { authCheck } from "../util/authcheck";
 import { sendFile } from "../util/send-file";
+import type { BundleManager } from "./bundle-manager";
 
 interface Collection {
 	name: string;

@@ -7,10 +7,10 @@ import hasha from "hasha";
 import { klona as clone } from "klona/json";
 
 import type { NodeCG } from "../../types/nodecg";
-import type { BundleManager } from "./bundle-manager";
 import type { Replicator } from "../replicant/replicator";
 import type { ServerReplicant } from "../replicant/server-replicant";
 import { sendFile } from "../util/send-file";
+import type { BundleManager } from "./bundle-manager";
 
 export const soundsRouter = Effect.fn("soundsRouter")(function* (
 	bundleManager: BundleManager,

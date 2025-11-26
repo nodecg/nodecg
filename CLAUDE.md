@@ -194,6 +194,8 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Always use `Effect.fn("name")` for effect-returning functions (never `Effect.gen` for definitions)
 - **No classes in Effect** - use plain functions, not class-based architecture
 - Services created with `Effect.Service` (never Context API directly)
+- **Effect.Service official patterns only** - use `effect`/`scoped` options with `dependencies`, never custom static `layer()` methods or `Layer.scoped(Tag, ...)` directly
+- **Avoid service parameterization** - prefer reading config from existing imports (e.g., `rootPaths`, `config`) rather than passing parameters to layer factories
 - **Testing**: Use `testEffect()` helper from `src/server/_effect/test-effect.ts` for running Effect tests in Vitest
   - Helper accepts `Effect<A, E, Scope.Scope>` and wraps with `Effect.scoped`
   - Works with both `never` and `Scope` requirements
@@ -282,6 +284,12 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
   - `listenToAdd/Change/AddDir/Unlink/UnlinkDir/Error(watcher)` - Type-safe event streams
   - All return `Effect<Stream<FileEvent>>` with tagged union types
   - Multi-arg events transformed via tuple destructuring: `Stream.map(([path, stats]) => fileEvent.add({ path, stats }))`
+
+**Stream.debounce for Timing Patterns**:
+
+- **Ready/idle detection**: `Stream.debounce("1000 millis")` + `Stream.take(1)` emits after period of inactivity
+- **Per-key debounce**: `Stream.groupByKey(keyFn)` + `Stream.debounce` for debouncing per bundle/entity
+- **Replaces setTimeout.refresh()**: Stream.debounce automatically resets timer on each new event
 
 - **Test helpers** (`src/server/_effect/test-effect.ts`):
   - `testEffect(effect)` - Wraps Effect for Vitest, handles scoping automatically

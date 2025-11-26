@@ -3,9 +3,9 @@ import path from "node:path";
 import { Effect } from "effect";
 import express from "express";
 
-import type { BundleManager } from "./bundle-manager";
 import { authCheck } from "../util/authcheck";
 import { sendFile } from "../util/send-file";
+import type { BundleManager } from "./bundle-manager";
 
 export const mountsRouter = Effect.fn("mountsRouter")(function* (
 	bundleManager: BundleManager,
