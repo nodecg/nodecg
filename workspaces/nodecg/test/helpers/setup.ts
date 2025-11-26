@@ -3,13 +3,15 @@ import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 
 import { getConnection } from "@nodecg/database-adapter-sqlite-legacy";
-import { Deferred, Effect, Fiber } from "effect";
+import { Deferred, Effect, Fiber, Layer } from "effect";
 import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
 import { afterAll, test } from "vitest";
 
+import { NodecgVersion } from "../../src/server/_effect/nodecg-version.js";
 import type { serverApiFactory } from "../../src/server/api.server";
 import type { createServer } from "../../src/server/server";
+import { BundleManager } from "../../src/server/server/bundle-manager.js";
 import { populateTestData } from "./populateTestData";
 import * as C from "./test-constants";
 import { testDirPath } from "./test-dir-path";
@@ -95,7 +97,12 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 							const handle = yield* createServer(ready);
 							serverHandle = handle;
 							yield* handle.run();
-						}).pipe(Effect.scoped),
+						}).pipe(
+							Effect.scoped,
+							Effect.provide(
+								BundleManager.Default.pipe(Layer.provide(NodecgVersion.Default)),
+							),
+						),
 					);
 					yield* Deferred.await(ready);
 				}),

@@ -23,7 +23,7 @@ import type { Replicator } from "../replicant/replicator";
 import type { ServerReplicant } from "../replicant/server-replicant";
 import { authCheck } from "../util/authcheck";
 import { sendFile } from "../util/send-file";
-import type { BundleManager } from "./bundle-manager";
+import { BundleManager } from "./bundle-manager.js";
 
 interface Collection {
 	name: string;
@@ -62,9 +62,9 @@ const prepareNamespaceAssetsPath = (namespace: string) => {
 };
 
 export const assetsRouter = Effect.fn("assetsRouter")(function* (
-	bundleManager: BundleManager,
 	replicator: Replicator,
 ) {
+	const bundleManager = yield* BundleManager;
 	const repsByNamespace = new Map<
 		string,
 		Map<
@@ -80,7 +80,7 @@ export const assetsRouter = Effect.fn("assetsRouter")(function* (
 		return repsByNamespace.get(namespace)?.get(category);
 	};
 
-	const bundles = bundleManager.all();
+	const bundles = yield* bundleManager.all();
 	const assetsPath = getAssetsPath();
 	if (!fs.existsSync(assetsPath)) {
 		fs.mkdirSync(assetsPath);

@@ -10,20 +10,20 @@ import type { NodeCG } from "../../types/nodecg";
 import type { Replicator } from "../replicant/replicator";
 import type { ServerReplicant } from "../replicant/server-replicant";
 import { sendFile } from "../util/send-file";
-import type { BundleManager } from "./bundle-manager";
+import { BundleManager } from "./bundle-manager.js";
 
 export const soundsRouter = Effect.fn("soundsRouter")(function* (
-	bundleManager: BundleManager,
 	replicator: Replicator,
 ) {
+	const bundleManager = yield* BundleManager;
 	const app = express();
-	const bundles = bundleManager.all();
+	const bundles = yield* bundleManager.all();
 	const cueRepsByBundle = new Map<string, ServerReplicant<NodeCG.SoundCue[]>>();
 
 	// Create the replicant for the "Master Fader"
 	replicator.declare("volume:master", "_sounds", { defaultValue: 100 });
 
-	bundles.forEach((bundle) => {
+	for (const bundle of bundles) {
 		// If this bundle has sounds
 		if (bundle.soundCues.length > 0) {
 			// Create an array replicant that will hold all this bundle's sound cues.
@@ -84,7 +84,7 @@ export const soundsRouter = Effect.fn("soundsRouter")(function* (
 				defaultValue: 100,
 			});
 		}
-	});
+	}
 
 	function serveDefault(
 		req: express.Request,

@@ -4,12 +4,11 @@ import path from "path";
 
 import { authCheck } from "../util/authcheck";
 import { sendFile } from "../util/send-file";
-import type { BundleManager } from "./bundle-manager";
+import { BundleManager } from "./bundle-manager.js";
 
-export const sharedSourceRouter = Effect.fn("sharedSourceRouter")(function* (
-	bundleManager: BundleManager,
-) {
-	const bundles = bundleManager.all();
+export const sharedSourceRouter = Effect.fn("sharedSourceRouter")(function* () {
+	const bundleManager = yield* BundleManager;
+	const bundles = yield* bundleManager.all();
 	const app = express();
 
 	app.get("/bundles/:bundleName/shared/*", authCheck, (req, res, next) => {

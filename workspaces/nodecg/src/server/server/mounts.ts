@@ -5,15 +5,15 @@ import express from "express";
 
 import { authCheck } from "../util/authcheck";
 import { sendFile } from "../util/send-file";
-import type { BundleManager } from "./bundle-manager";
+import { BundleManager } from "./bundle-manager.js";
 
-export const mountsRouter = Effect.fn("mountsRouter")(function* (
-	bundleManager: BundleManager,
-) {
+export const mountsRouter = Effect.fn("mountsRouter")(function* () {
+	const bundleManager = yield* BundleManager;
 	const app = express();
 
-	bundleManager.all().forEach((bundle) => {
-		bundle.mount.forEach((mount) => {
+	const bundles = yield* bundleManager.all();
+	for (const bundle of bundles) {
+		for (const mount of bundle.mount) {
 			app.get(
 				`/bundles/${bundle.name}/${mount.endpoint}/*`,
 				authCheck,
@@ -24,8 +24,8 @@ export const mountsRouter = Effect.fn("mountsRouter")(function* (
 					sendFile(parentDir, fileLocation, res, next);
 				},
 			);
-		});
-	});
+		}
+	}
 
 	return app;
 });

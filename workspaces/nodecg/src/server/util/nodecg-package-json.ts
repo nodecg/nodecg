@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-function recursivelyFindPackageJson(dir: string) {
+export function recursivelyFindPackageJson(dir = __dirname) {
 	const packageJsonPath = path.join(dir, "package.json");
 	if (fs.existsSync(packageJsonPath)) {
 		const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));

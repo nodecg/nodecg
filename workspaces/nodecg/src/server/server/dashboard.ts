@@ -1,18 +1,17 @@
 import * as path from "node:path";
 
 import { rootPaths } from "@nodecg/internal-util";
-import { Effect, Stream } from "effect";
+import { Effect, Runtime, Stream } from "effect";
 import express from "express";
 import { klona as clone } from "klona/json";
 
 import type { NodeCG } from "../../types/nodecg";
-import { listenToEvent } from "../_effect/event-listener";
 import { config, filteredConfig, sentryEnabled } from "../config";
 import { authCheck } from "../util/authcheck";
 import { injectScripts } from "../util/injectscripts";
 import { sendFile } from "../util/send-file";
 import { sendNodeModulesFile } from "../util/send-node-modules-file";
-import type { BundleManager } from "./bundle-manager";
+import { BundleManager } from "./bundle-manager.js";
 
 type Workspace = NodeCG.Workspace;
 
@@ -24,9 +23,9 @@ interface DashboardContext {
 	sentryEnabled: boolean;
 }
 
-export const dashboardRouter = Effect.fn("dashboardRouter")(function* (
-	bundleManager: BundleManager,
-) {
+export const dashboardRouter = Effect.fn("dashboardRouter")(function* () {
+	const bundleManager = yield* BundleManager;
+	const runtime = yield* Effect.runtime();
 	const BUILD_PATH = path.join(rootPaths.nodecgInstalledPath, "dist/client");
 
 	const app = express();
@@ -52,7 +51,8 @@ export const dashboardRouter = Effect.fn("dashboardRouter")(function* (
 		}
 
 		if (!dashboardContext) {
-			dashboardContext = getDashboardContext(bundleManager.all());
+			const bundles = Runtime.runSync(runtime, bundleManager.all());
+			dashboardContext = getDashboardContext(bundles);
 		}
 
 		res.render(
@@ -66,7 +66,7 @@ export const dashboardRouter = Effect.fn("dashboardRouter")(function* (
 
 	app.get("/bundles/:bundleName/dashboard/*", authCheck, (req, res, next) => {
 		const { bundleName } = req.params;
-		const bundle = bundleManager.find(bundleName!);
+		const bundle = Runtime.runSync(runtime, bundleManager.find(bundleName!));
 		if (!bundle) {
 			next();
 			return;
@@ -97,10 +97,7 @@ export const dashboardRouter = Effect.fn("dashboardRouter")(function* (
 	});
 
 	// When a bundle changes, delete the cached dashboard context
-	const bundleChangedStream = yield* listenToEvent<[]>(
-		bundleManager,
-		"bundleChanged",
-	);
+	const bundleChangedStream = yield* bundleManager.listenTo("bundleChanged");
 	yield* Effect.forkScoped(
 		bundleChangedStream.pipe(
 			Stream.runForEach(() =>

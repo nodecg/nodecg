@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { isLegacyProject, rootPaths } from "@nodecg/internal-util";
-import { Effect } from "effect";
+import { Effect, Runtime } from "effect";
 import express from "express";
 
 import type { RootNS } from "../../../types/socket-protocol";
@@ -11,23 +11,25 @@ import { authCheck } from "../../util/authcheck";
 import { injectScripts } from "../../util/injectscripts";
 import { sendFile } from "../../util/send-file";
 import { sendNodeModulesFile } from "../../util/send-node-modules-file";
-import type { BundleManager } from "../bundle-manager";
-import { RegistrationCoordinator } from "./registration";
+import { BundleManager } from "../bundle-manager.js";
+import { registrationCoordinator } from "./registration.js";
 
 export const graphicsRouter = Effect.fn("graphicsRouter")(function* (
 	io: RootNS,
-	bundleManager: BundleManager,
 	replicator: Replicator,
 ) {
+	const bundleManager = yield* BundleManager;
+	const runtime = yield* Effect.runtime();
 	const app = express();
 
 	// Start up the registration lib, which tracks how many instances of
 	// a graphic are open, and enforces singleInstance behavior.
-	app.use(new RegistrationCoordinator(io, bundleManager, replicator).app);
+	const registrationApp = yield* registrationCoordinator(io, replicator);
+	app.use(registrationApp);
 
 	app.get("/bundles/:bundleName/graphics*", authCheck, (req, res, next) => {
 		const { bundleName } = req.params as Record<string, string>;
-		const bundle = bundleManager.find(bundleName!);
+		const bundle = Runtime.runSync(runtime, bundleManager.find(bundleName!));
 		if (!bundle) {
 			next();
 			return;
@@ -83,7 +85,7 @@ export const graphicsRouter = Effect.fn("graphicsRouter")(function* (
 		"/bundles/:bundleName/bower_components/:filePath(*)",
 		(req, res, next) => {
 			const { bundleName } = req.params;
-			const bundle = bundleManager.find(bundleName!);
+			const bundle = Runtime.runSync(runtime, bundleManager.find(bundleName!));
 			if (!bundle) {
 				next();
 				return;
@@ -105,7 +107,7 @@ export const graphicsRouter = Effect.fn("graphicsRouter")(function* (
 				next();
 				return;
 			}
-			const bundle = bundleManager.find(bundleName);
+			const bundle = Runtime.runSync(runtime, bundleManager.find(bundleName));
 			if (!bundle) {
 				next();
 				return;

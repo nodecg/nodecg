@@ -60,6 +60,8 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - **Server URL**: `server.getUrl()` or `server.getUrl('/path')`
 - **Waiting for changes**: Use Puppeteer's `page.waitForSelector()`, `page.waitForFunction()`
 - **Client-side evaluation**: `await page.evaluate(() => { ... })`
+- **Test library wrappers with real tools**: When testing code that wraps an external library (e.g., `isomorphic-git`), use real external tools (e.g., actual `git` commands via `@effect/platform` Command) for test setup - avoids testing the library against itself
+- **Git object files are read-only**: Real git creates object files with read-only permissions - use `chmod` before overwriting in corruption tests
 
 ### Test Coverage Guidelines
 
@@ -196,6 +198,7 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Services created with `Effect.Service` (never Context API directly)
 - **Effect.Service official patterns only** - use `effect`/`scoped` options with `dependencies`, never custom static `layer()` methods or `Layer.scoped(Tag, ...)` directly
 - **Avoid service parameterization** - prefer reading config from existing imports (e.g., `rootPaths`, `config`) rather than passing parameters to layer factories
+- **Effect.fn over Effect.Service for factory functions** - when a function needs tracing/spans but not full service semantics, use `Effect.fn("name")(function* (...) { ... })` instead of creating an Effect.Service
 - **Testing**: Use `testEffect()` helper from `src/server/_effect/test-effect.ts` for running Effect tests in Vitest
   - Helper accepts `Effect<A, E, Scope.Scope>` and wraps with `Effect.scoped`
   - Works with both `never` and `Scope` requirements
@@ -271,6 +274,21 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 
 **Effect Utilities Available**:
 
+- **GitService** (`src/server/_effect/git-service.ts`):
+
+  - `getGitHead(bundlePath)` - Returns `Effect<Option<GitHeadData>, GitError>`
+  - `GitHeadData`: `{ hash, shortHash, date, message, branch: Option<string> }` (branch is `Option.none()` for detached HEAD)
+  - `GitError`: `GitBranchReadError | GitHeadReadError | GitDateParseError` (concrete errors with `path` + `cause` or `timestamp`, each has descriptive `message`)
+  - Returns `Option.none()` for: no .git directory, no commits
+  - Uses `isomorphic-git` (replaces `git-rev-sync` which requires `process.chdir`)
+  - Requires `FileSystem.FileSystem` and `Path.Path` dependencies - provide `NodeFileSystem.layer` and `NodePath.layer`
+  - Test layer pattern: `Layer.merge(GitService.Default.pipe(Layer.provide(NodeFileSystem.layer)), NodeFileSystem.layer)`
+
+- **isomorphic-git patterns**:
+
+  - Error classes available via `git.Errors.*` (e.g., `git.Errors.NotFoundError`)
+  - Use `instanceof git.Errors.NotFoundError` for clean error type checking
+
 - **EventEmitter utilities** (`src/server/_effect/event-listener.ts`):
 
   - `waitForEvent<T>(emitter, eventName)` - One-time events as Effect
@@ -300,6 +318,7 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 
 - All migration work must be logged in `docs/effect-migration/log/` directory
 - **Document plans BEFORE implementation** - create log entry with detailed plan, then update during work
+- **Update docs step-by-step during implementation** - mark checklist items complete as work progresses, don't batch updates
 - Each log entry is numbered sequentially: `##-brief-description.md`
 - Log structure: Plans → Decisions → Problems/Solutions → Patterns → Lessons Learned → Status
 - See `docs/effect-migration/strategy.md` for migration approach and phases
@@ -352,3 +371,5 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Sharing state between test files (each file must be isolated)
 - Forgetting that array/object access returns `T | undefined` (`noUncheckedIndexedAccess`)
 - Importing NodeCG modules before setting `NODECG_ROOT` env var (causes wrong root path to be cached)
+- **Array mutation from services** - when getting arrays from services (e.g., `bundleManager.all()`), always clone before mutating with `splice()` etc.: `[...(yield* service.all())]`
+- **Closure forward references work with const** - callbacks can reference `const` variables declared later in code because closures capture variable bindings, not values at definition time

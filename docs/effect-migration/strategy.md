@@ -48,11 +48,11 @@ Converted bundle-consuming libraries to `Effect.fn` wrappers while keeping the l
 
 ### Phase 5: Bundle Manager Service
 
-**Status**: Planned
+**Status**: TEST FAILING
 
 **Complexity**: ⭐⭐⭐ Complex
 
-Replace the legacy BundleManager with an Effect-based `BundleManager` service (Ref state + PubSub + chokidar streams) and an Effect-wrapped git parser (`isomorphic-git`). Preserve ready/debounce timing, remove global state, and update consumers/bootstrap/tests. See [migration log entry](./log/05-bundle-manager-service.md).
+Replaced the legacy BundleManager class with an Effect-based `BundleManager` service using `Effect.Service` with scoped option. State managed via `Ref<Array<NodeCG.Bundle>>`, events via `PubSub<BundleEvent>`, file watching via Phase 3 chokidar wrapper. GitService provides `isomorphic-git` integration for git metadata. Consumers updated to use service pattern (`yield* BundleManager`). ExtensionManager decoupled to accept bundles array + removeBundle callback. Test helpers provide BundleManager layer. See [migration log entry](./log/05-bundle-manager-service.md).
 
 ### Phase 6: Route Libraries Migration
 

@@ -22,14 +22,16 @@ if (isLegacyProject()) {
 }
 
 import { NodeRuntime } from "@effect/platform-node";
-import { ConfigError, Effect, Fiber } from "effect";
+import { ConfigError, Effect, Fiber, Layer } from "effect";
 
 import { UnknownError } from "./_effect/boundary";
 import { expectError } from "./_effect/expect-error";
 import { withLogLevelConfig } from "./_effect/log-level";
+import { NodecgVersion } from "./_effect/nodecg-version.js";
 import { withSpanProcessorLive } from "./_effect/span-logger";
 import { exitOnUncaught, sentryEnabled } from "./config";
 import { createServer, FileWatcherReadyTimeoutError } from "./server";
+import { BundleManager } from "./server/bundle-manager.js";
 import { nodecgPackageJson } from "./util/nodecg-package-json";
 
 // TODO: Remove this in the next major release
@@ -71,8 +73,11 @@ const main = Effect.fn("main")(function* () {
 	yield* Effect.raceFirst(server.run(), Fiber.join(handleFloatingErrorsFiber));
 }, Effect.scoped);
 
+const MainLayer = BundleManager.Default.pipe(Layer.provide(NodecgVersion.Default));
+
 NodeRuntime.runMain(
 	main().pipe(
+		Effect.provide(MainLayer),
 		withSpanProcessorLive,
 		withLogLevelConfig,
 		expectError<
