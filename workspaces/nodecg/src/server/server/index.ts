@@ -36,13 +36,13 @@ import { databaseAdapter as defaultAdapter } from "@nodecg/database-adapter-sqli
 import { rootPaths } from "@nodecg/internal-util";
 import bodyParser from "body-parser";
 import compression from "compression";
-import { Data, Deferred, Effect, Runtime } from "effect";
+import { Data, Deferred, Effect, Runtime, Stream } from "effect";
 import express from "express";
 import transformMiddleware from "express-transform-bare-module-specifiers";
 import memoize from "fast-memoize";
 import type { Server } from "http";
 import { klona as clone } from "klona/json";
-import { debounce, template } from "lodash";
+import { template } from "lodash";
 import passport from "passport";
 import * as SocketIO from "socket.io";
 
@@ -51,6 +51,7 @@ import type {
 	ServerToClientEvents,
 } from "../../types/socket-protocol";
 import { UnknownError } from "../_effect/boundary";
+import { listenToEvent, waitForEvent } from "../_effect/event-listener";
 import { createAssetsMiddleware } from "../assets";
 import { BundleManager } from "../bundle-manager";
 import { DashboardLib } from "../dashboard";
@@ -112,26 +113,12 @@ export const createServer = Effect.fn("createServer")(function* (
 	// Fork to immediately start listening for events
 	// With scope so that it's cleaned up when the server is closed
 	const waitForError = yield* Effect.forkScoped(
-		Effect.async<never, UnknownError>((resume) => {
-			const errorHandler = (err: unknown) => {
-				resume(Effect.fail(new UnknownError(err)));
-			};
-			server.on("error", errorHandler);
-			return Effect.sync(() => {
-				server.removeListener("error", errorHandler);
-			});
-		}),
+		waitForEvent<[unknown]>(server, "error").pipe(
+			Effect.andThen(([err]) => Effect.fail(new UnknownError(err))),
+		),
 	);
 	const waitForClose = yield* Effect.forkScoped(
-		Effect.async<void>((resume) => {
-			const closeHandler = () => {
-				resume(Effect.void);
-			};
-			server.on("close", closeHandler);
-			return Effect.sync(() => {
-				server.removeListener("close", closeHandler);
-			});
-		}),
+		waitForEvent<[]>(server, "close"),
 	);
 
 	const io = yield* Effect.acquireRelease(
@@ -265,25 +252,14 @@ export const createServer = Effect.fn("createServer")(function* (
 	io.use(socketApiMiddleware);
 
 	// Wait for Chokidar to finish its initial scan.
-	yield* Effect.async<void>((resume) => {
-		if (bundleManager.ready) {
-			resume(Effect.void);
-			return;
-		}
-
-		const succeed = () => {
-			resume(Effect.void);
-		};
-		bundleManager.once("ready", succeed);
-		return Effect.sync(() => {
-			bundleManager.removeListener("ready", succeed);
-		});
-	}).pipe(
-		Effect.timeoutFail({
-			duration: "15 seconds",
-			onTimeout: () => new FileWatcherReadyTimeoutError(),
-		}),
-	);
+	if (!bundleManager.ready) {
+		yield* waitForEvent<[]>(bundleManager, "ready").pipe(
+			Effect.timeoutFail({
+				duration: "15 seconds",
+				onTimeout: () => new FileWatcherReadyTimeoutError(),
+			}),
+		);
+	}
 
 	for (const bundle of bundleManager.all()) {
 		// TODO: remove this feature in v3
@@ -303,23 +279,26 @@ export const createServer = Effect.fn("createServer")(function* (
 	}
 
 	log.trace(`Attempting to listen on ${config.host}:${config.port}`);
-	const errorHandler = (err: Error) => {
-		if ((err as NodeJS.ErrnoException).code === "EADDRINUSE") {
-			// There is a separate handling in NODECG_TEST
-			if (!process.env.NODECG_TEST) {
-				log.error(
-					`Listen ${config.host}:${config.port} in use, is NodeCG already running? NodeCG will now exit.`,
-				);
-			}
-		} else {
-			log.error("Unhandled error!", err);
-		}
-	};
-	server.addListener("error", errorHandler);
-	yield* Effect.addFinalizer(() =>
-		Effect.sync(() => {
-			server.removeListener("error", errorHandler);
-		}),
+
+	yield* Effect.forkScoped(
+		listenToEvent<[Error]>(server, "error").pipe(
+			Effect.andThen(
+				Stream.runForEach(([err]) =>
+					Effect.sync(() => {
+						if ((err as NodeJS.ErrnoException).code === "EADDRINUSE") {
+							// There is a separate handling in NODECG_TEST
+							if (!process.env.NODECG_TEST) {
+								log.error(
+									`Listen ${config.host}:${config.port} in use, is NodeCG already running? NodeCG will now exit.`,
+								);
+							}
+						} else {
+							log.error("Unhandled error!", err);
+						}
+					}),
+				),
+			),
+		),
 	);
 
 	if (sentryEnabled) {
@@ -393,13 +372,26 @@ export const createServer = Effect.fn("createServer")(function* (
 		),
 		persistent: false,
 	});
-	const updateBundlesReplicant = debounce(() => {
+	const updateBundlesReplicant = () => {
 		bundlesReplicant.value = clone(bundleManager.all());
-	}, 100);
-	bundleManager.on("ready", updateBundlesReplicant);
-	bundleManager.on("bundleChanged", updateBundlesReplicant);
-	bundleManager.on("gitChanged", updateBundlesReplicant);
-	bundleManager.on("bundleRemoved", updateBundlesReplicant);
+	};
+	const bundleManagerEvents = yield* Effect.all(
+		[
+			listenToEvent<[]>(bundleManager, "ready"),
+			listenToEvent<[]>(bundleManager, "bundleChanged"),
+			listenToEvent<[]>(bundleManager, "gitChanged"),
+			listenToEvent<[]>(bundleManager, "bundleRemoved"),
+		],
+		{ concurrency: "unbounded" },
+	).pipe(
+		Effect.andThen(Stream.mergeAll({ concurrency: "unbounded" })),
+		Effect.andThen(Stream.debounce("100 millis")),
+	);
+	yield* Effect.forkScoped(
+		Stream.runForEach(bundleManagerEvents, () =>
+			Effect.sync(updateBundlesReplicant),
+		),
+	);
 	updateBundlesReplicant();
 
 	const mount = (...args: any[]) => app.use(...args);

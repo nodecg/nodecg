@@ -105,6 +105,11 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - Temp directories: Unique per test file via `mkdtempSync(tmpdir() + "/")`
 - Process isolation: Vitest `forks` pool (separate Node.js processes)
 
+### Test Naming Conventions
+
+- **Use `test()` not `it()`** - Prefer `test("description", ...)` over `it("description", ...)` for test definitions
+- Effect tests still use `testEffect()` helper but with `test()` as the outer function
+
 ## Vitest Gotchas
 
 ### vi.mock() Hoisting
@@ -226,6 +231,63 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
   - `Effect.forkDaemon` creates daemon fibers that continue running after parent completes
   - Essential for test setups where server must stay alive after ready signal
 
+**Effect Event Listener Patterns**:
+
+- **Eager vs Lazy Setup**:
+  - `Effect.async` runs setup eagerly when Effect is yielded
+  - `Stream.async`/`Stream.asyncPush` run setup lazily when stream is consumed
+  - For event listeners that must be registered immediately, use `Effect.gen` returning `Stream`, not bare `Stream` constructor
+- **One-time events**: Use `Effect.async<T>` with `eventEmitter.once()` for single-fire events
+- **Continuous events**: Use `Effect.gen(function* () { ... return Stream.fromQueue(queue) })` pattern
+  - Create bounded queue inside Effect.gen
+  - Register listener that offers to queue
+  - Register finalizer to remove listener
+  - Return Stream from queue
+- **Forking listener setup**: Run listener registration in main fiber before forking stream consumption
+  - Wrong: `yield* Effect.forkScoped(Effect.all([...listeners]).pipe(...))`
+  - Right: `const streams = yield* Effect.all([...listeners]); yield* Effect.forkScoped(Stream.runForEach(...))`
+- **Fiber execution model**: `Effect.forkScoped` creates a forked fiber that runs concurrently
+  - The forked fiber runs in the background, attached to the current scope
+  - Control returns to the main fiber after any synchronous portion of the forked effect
+  - Code after `yield* Effect.forkScoped(...)` runs concurrently with the forked fiber
+  - If listener registration is inside the fork, race conditions can occur
+- **Queue-based event streams**: Pattern for bridging EventEmitter → Stream
+  - Create bounded queue (`Queue.bounded<T>(100)`)
+  - Register EventEmitter listener that offers to queue (`Queue.unsafeOffer`)
+  - Register finalizer to remove listener when scope closes (`Effect.addFinalizer`)
+  - Return `Stream.fromQueue(queue)` for consumption
+  - Ensures backpressure handling, automatic cleanup, and eager listener registration
+- **Effect.async cleanup for interruption**: When using `Effect.async` with `eventEmitter.once()`:
+  - `once()` auto-removes listener after firing (success path handled)
+  - Must return cleanup Effect to remove listener on interruption (memory leak otherwise)
+  - Define handler before `once()` so same reference can be used for registration and cleanup
+- **EventEmitterLike interface**: Use generic interface instead of concrete `EventEmitter` type
+  - Enables broader compatibility (works with any object implementing the interface)
+  - Allows testing with custom implementations
+  - Type parameter `T extends any[]` enables type-safe event payloads
+- **Event emission verification**: When events are defined in EventMap, verify they're actually emitted in relevant methods
+
+**Effect Utilities Available**:
+
+- **EventEmitter utilities** (`src/server/_effect/event-listener.ts`):
+
+  - `waitForEvent<T>(emitter, eventName)` - One-time events as Effect
+  - `listenToEvent<T>(emitter, eventName)` - Continuous events as Effect<Stream>
+  - Returns event payloads as tuples for multi-arg events
+
+- **Chokidar wrapper** (`src/server/_effect/chokidar.ts`):
+
+  - `getWatcher(paths, options)` - Scoped file watcher with auto-cleanup
+  - `waitForReady(watcher)` - Returns tagged `FileEvent.ready` event
+  - `listenToAdd/Change/AddDir/Unlink/UnlinkDir/Error(watcher)` - Type-safe event streams
+  - All return `Effect<Stream<FileEvent>>` with tagged union types
+  - Multi-arg events transformed via tuple destructuring: `Stream.map(([path, stats]) => fileEvent.add({ path, stats }))`
+
+- **Test helpers** (`src/server/_effect/test-effect.ts`):
+  - `testEffect(effect)` - Wraps Effect for Vitest, handles scoping automatically
+  - Use `@effect/platform` FileSystem service with `NodeFileSystem.layer` for filesystem operations in tests
+  - `Chunk.head` pattern for getting first stream element (avoids array indexing with `noUncheckedIndexedAccess`)
+
 **Migration Documentation**:
 
 - All migration work must be logged in `docs/effect-migration/log/` directory
@@ -235,6 +297,11 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - See `docs/effect-migration/strategy.md` for migration approach and phases
 - See `docs/effect-migration/log/README.md` for log template and guidelines
 - **Update both log and strategy docs** - When completing migration phases, update both the detailed log entry AND the phase summary in strategy.md to reflect actual implementation
+- **Concise documentation style**:
+  - Show function signatures, not full implementations with JSDoc
+  - Reference actual implementation files instead of duplicating code
+  - Avoid verbose code blocks - keep documentation scannable
+- **Log consolidation**: When work is prerequisite for a phase, document it in that phase's log file, not a separate entry
 
 **Public API Preservation**:
 
