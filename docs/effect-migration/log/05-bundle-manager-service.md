@@ -79,10 +79,10 @@ export class BundleManager extends Effect.Service<BundleManager>()("BundleManage
       all: Effect.fn(function* () { return yield* Ref.get(bundlesRef); }),
       find: Effect.fn(function* (name: string) { ... }),
       listenTo,  // bundleManager.listenTo("bundleChanged")
-      waitForReady: () => listenTo("ready").pipe(
-        Effect.andThen(Stream.take(1)),
-        Effect.andThen(Stream.runDrain),
-      ),
+      waitForReady: () => Effect.gen(function* () {
+        const stream = yield* listenTo("ready");
+        yield* stream.pipe(Stream.take(1), Stream.runDrain);
+      }),
     };
   }),
   dependencies: [GitService.Default],
@@ -93,7 +93,7 @@ export class BundleManager extends Effect.Service<BundleManager>()("BundleManage
 
 ```typescript
 export type BundleEvent = Data.TaggedEnum<{
-  ready: object;
+  ready: {};
   bundleChanged: { bundle: NodeCG.Bundle };
   invalidBundle: { bundle: NodeCG.Bundle; error: Error };
   bundleRemoved: { bundleName: string };
@@ -155,7 +155,20 @@ changeStream.pipe(
 
 ### Initial Bundle Loading
 
-Bundles loaded synchronously during `scoped` initialization (same as current behavior).
+Layer provided inside `createServer`, not at bootstrap level:
+- Matches current timing (bundles loaded during server setup)
+- Layer scope = server lifecycle
+- Consumers inside server use `yield* BundleManager`
+
+```typescript
+// in createServer
+const main = Effect.gen(function* () {
+  const bundleManager = yield* BundleManager;
+  // ... rest of server setup
+}).pipe(
+  Effect.provide(BundleManager.Default)
+);
+```
 
 ## Key Decisions
 
@@ -165,7 +178,7 @@ Bundles loaded synchronously during `scoped` initialization (same as current beh
 4. **PubSub.unbounded** - Events are infrequent, subscriber queues bounded by consumption rate
 5. **Ref for state** - Atomic updates, type-safe, scoped lifecycle
 6. **Stream.debounce for timing** - Ready (1000ms with prepend), backoff (500ms via GroupBy.evaluate), git (250ms via GroupBy.evaluate)
-7. **Sync initial loading** - Bundles loaded during `scoped` initialization
+7. **Layer inside createServer** - Bundles loaded during server setup, layer scope = server lifecycle
 
 ## Implementation Plan
 
@@ -226,6 +239,8 @@ Bundles loaded synchronously during `scoped` initialization (same as current beh
 - [ ] Update server/index.ts to use `yield* BundleManager` pattern
 - [ ] Update ExtensionManager to accept bundles array + removeBundle callback
 - [ ] Remove direct BundleManager parameter passing from routers
+
+_Note: "Already migrated" routers (listed below) currently use `Effect.fn` but still receive legacy `BundleManager` as a parameter. After this phase, they will use `yield* BundleManager` pattern instead._
 
 ### 8. Testing
 
