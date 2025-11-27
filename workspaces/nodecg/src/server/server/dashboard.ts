@@ -1,16 +1,17 @@
 import * as path from "node:path";
 
 import { rootPaths } from "@nodecg/internal-util";
+import { Effect } from "effect";
 import express from "express";
 import { klona as clone } from "klona/json";
 
-import type { NodeCG } from "../../types/nodecg";
-import { config, filteredConfig, sentryEnabled } from "../config";
-import { authCheck } from "../util/authcheck";
-import { injectScripts } from "../util/injectscripts";
-import { sendFile } from "../util/send-file";
-import { sendNodeModulesFile } from "../util/send-node-modules-file";
-import type { BundleManager } from "./bundle-manager";
+import type { NodeCG } from "../../types/nodecg.js";
+import { config, filteredConfig, sentryEnabled } from "../config/index.js";
+import { authCheck } from "../util/authcheck.js";
+import { injectScripts } from "../util/injectscripts.js";
+import { sendFile } from "../util/send-file/index.js";
+import { sendNodeModulesFile } from "../util/send-node-modules-file/index.js";
+import type { BundleManager } from "./bundle-manager.js";
 
 type Workspace = NodeCG.Workspace;
 
@@ -22,86 +23,86 @@ interface DashboardContext {
 	sentryEnabled: boolean;
 }
 
-const BUILD_PATH = path.join(rootPaths.nodecgInstalledPath, "dist/client");
+export const dashboardRouter = Effect.fn("dashboardRouter")(function* (
+	bundleManager: BundleManager,
+) {
+	const BUILD_PATH = path.join(rootPaths.nodecgInstalledPath, "dist/client");
 
-export class DashboardLib {
-	app = express();
+	const app = express();
 
-	dashboardContext: DashboardContext | undefined = undefined;
+	let dashboardContext: DashboardContext | undefined = undefined;
 
-	constructor(bundleManager: BundleManager) {
-		const { app } = this;
+	app.use(express.static(BUILD_PATH));
 
-		app.use(express.static(BUILD_PATH));
+	app.use("/node_modules/:filePath(*)", (req, res, next) => {
+		const startDir = rootPaths.nodecgInstalledPath;
+		const limitDir = rootPaths.runtimeRootPath;
+		const filePath = req.params.filePath!;
+		sendNodeModulesFile(startDir, limitDir, filePath, res, next);
+	});
 
-		app.use("/node_modules/:filePath(*)", (req, res, next) => {
-			const startDir = rootPaths.nodecgInstalledPath;
-			const limitDir = rootPaths.runtimeRootPath;
-			const filePath = req.params.filePath!;
-			sendNodeModulesFile(startDir, limitDir, filePath, res, next);
-		});
+	app.get("/", (_, res) => {
+		res.redirect("/dashboard/");
+	});
 
-		app.get("/", (_, res) => {
+	app.get("/dashboard", authCheck, (req, res) => {
+		if (!req.url.endsWith("/")) {
 			res.redirect("/dashboard/");
-		});
+			return;
+		}
 
-		app.get("/dashboard", authCheck, (req, res) => {
-			if (!req.url.endsWith("/")) {
-				res.redirect("/dashboard/");
-				return;
-			}
+		if (!dashboardContext) {
+			dashboardContext = getDashboardContext(bundleManager.all());
+		}
 
-			if (!this.dashboardContext) {
-				this.dashboardContext = getDashboardContext(bundleManager.all());
-			}
+		res.render(
+			path.join(
+				rootPaths.nodecgInstalledPath,
+				"dist/server/templates/dashboard.tmpl",
+			),
+			dashboardContext,
+		);
+	});
 
-			res.render(
-				path.join(
-					rootPaths.nodecgInstalledPath,
-					"dist/server/templates/dashboard.tmpl",
-				),
-				this.dashboardContext,
+	app.get("/bundles/:bundleName/dashboard/*", authCheck, (req, res, next) => {
+		const { bundleName } = req.params;
+		const bundle = bundleManager.find(bundleName!);
+		if (!bundle) {
+			next();
+			return;
+		}
+
+		const resName = req.params[0]!;
+		// If the target file is a panel or dialog, inject the appropriate scripts.
+		// Else, serve the file as-is.
+		const panel = bundle.dashboard.panels.find((p) => p.file === resName);
+		if (panel) {
+			const resourceType = panel.dialog ? "dialog" : "panel";
+			injectScripts(
+				panel.html,
+				resourceType,
+				{
+					createApiInstance: bundle,
+					standalone: Boolean(req.query.standalone),
+					fullbleed: panel.fullbleed,
+					sound: bundle.soundCues && bundle.soundCues.length > 0,
+				},
+				(html) => res.send(html),
 			);
-		});
+		} else {
+			const parentDir = bundle.dashboard.dir;
+			const fileLocation = path.join(parentDir, resName);
+			sendFile(parentDir, fileLocation, res, next);
+		}
+	});
 
-		app.get("/bundles/:bundleName/dashboard/*", authCheck, (req, res, next) => {
-			const { bundleName } = req.params;
-			const bundle = bundleManager.find(bundleName!);
-			if (!bundle) {
-				next();
-				return;
-			}
+	// When a bundle changes, delete the cached dashboard context
+	bundleManager.on("bundleChanged", () => {
+		dashboardContext = undefined;
+	});
 
-			const resName = req.params[0]!;
-			// If the target file is a panel or dialog, inject the appropriate scripts.
-			// Else, serve the file as-is.
-			const panel = bundle.dashboard.panels.find((p) => p.file === resName);
-			if (panel) {
-				const resourceType = panel.dialog ? "dialog" : "panel";
-				injectScripts(
-					panel.html,
-					resourceType,
-					{
-						createApiInstance: bundle,
-						standalone: Boolean(req.query.standalone),
-						fullbleed: panel.fullbleed,
-						sound: bundle.soundCues && bundle.soundCues.length > 0,
-					},
-					(html) => res.send(html),
-				);
-			} else {
-				const parentDir = bundle.dashboard.dir;
-				const fileLocation = path.join(parentDir, resName);
-				sendFile(parentDir, fileLocation, res, next);
-			}
-		});
-
-		// When a bundle changes, delete the cached dashboard context
-		bundleManager.on("bundleChanged", () => {
-			this.dashboardContext = undefined;
-		});
-	}
-}
+	return app;
+});
 
 function getDashboardContext(bundles: NodeCG.Bundle[]): DashboardContext {
 	return {
