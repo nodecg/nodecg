@@ -1,12 +1,12 @@
 // Minimal imports for first setup
-import "./sentry-config";
+import "./sentry-config.js";
 
 import * as Sentry from "@sentry/node";
 import * as os from "os";
 
-import { config, filteredConfig, sentryEnabled } from "../config";
-import { nodecgPackageJson } from "../util/nodecg-package-json";
-import * as login from "./login";
+import { config, filteredConfig, sentryEnabled } from "../config/index.js";
+import { nodecgPackageJson } from "../util/nodecg-package-json.js";
+import * as login from "./login/index.js";
 
 if (config.sentry?.enabled) {
 	Sentry.init({
@@ -49,22 +49,22 @@ import * as SocketIO from "socket.io";
 import type {
 	ClientToServerEvents,
 	ServerToClientEvents,
-} from "../../types/socket-protocol";
-import { UnknownError } from "../_effect/boundary";
-import { listenToEvent, waitForEvent } from "../_effect/event-listener";
-import { createLogger } from "../logger";
-import { Replicator } from "../replicant/replicator";
-import { createAssetsMiddleware } from "./assets";
-import { BundleManager } from "./bundle-manager";
-import { DashboardLib } from "./dashboard";
-import { ExtensionManager } from "./extensions";
-import { GraphicsLib } from "./graphics";
-import { createSocketAuthMiddleware } from "./login/socketAuthMiddleware";
-import { MountsLib } from "./mounts";
-import { SentryConfig } from "./sentry-config";
-import { SharedSourcesLib } from "./shared-sources";
-import { socketApiMiddleware } from "./socketApiMiddleware";
-import { SoundsLib } from "./sounds";
+} from "../../types/socket-protocol.js";
+import { UnknownError } from "../_effect/boundary.js";
+import { listenToEvent, waitForEvent } from "../_effect/event-listener.js";
+import { createLogger } from "../logger/index.js";
+import { Replicator } from "../replicant/replicator.js";
+import { assetsRouter } from "./assets.js";
+import { BundleManager } from "./bundle-manager.js";
+import { dashboardRouter } from "./dashboard.js";
+import { createExtensionManager } from "./extensions.js";
+import { graphicsRouter } from "./graphics/index.js";
+import { createSocketAuthMiddleware } from "./login/socketAuthMiddleware.js";
+import { mountsRouter } from "./mounts.js";
+import { sentryConfigRouter } from "./sentry-config.js";
+import { sharedSourceRouter } from "./shared-sources.js";
+import { socketApiMiddleware } from "./socketApiMiddleware.js";
+import { soundsRouter } from "./sounds.js";
 
 const renderTemplate = memoize((content, options) =>
 	template(content)(options),
@@ -302,8 +302,8 @@ export const createServer = Effect.fn("createServer")(function* (
 	);
 
 	if (sentryEnabled) {
-		const sentryHelpers = new SentryConfig(bundleManager);
-		app.use(sentryHelpers.app);
+		const sentryApp = yield* sentryConfigRouter(bundleManager);
+		app.use(sentryApp);
 	}
 
 	const persistedReplicantEntities = yield* Effect.promise(async () => {
@@ -318,23 +318,23 @@ export const createServer = Effect.fn("createServer")(function* (
 		(replicator) => Effect.sync(() => replicator.saveAllReplicants()),
 	);
 
-	const graphics = new GraphicsLib(io, bundleManager, replicator);
-	app.use(graphics.app);
+	const graphicsRoute = yield* graphicsRouter(io, bundleManager, replicator);
+	app.use(graphicsRoute);
 
-	const dashboard = new DashboardLib(bundleManager);
-	app.use(dashboard.app);
+	const dashboardRoute = yield* dashboardRouter(bundleManager);
+	app.use(dashboardRoute);
 
-	const mounts = new MountsLib(bundleManager.all());
-	app.use(mounts.app);
+	const mounts = yield* mountsRouter(bundleManager.all());
+	app.use(mounts);
 
-	const sounds = new SoundsLib(bundleManager.all(), replicator);
-	app.use(sounds.app);
+	const sounds = yield* soundsRouter(bundleManager.all(), replicator);
+	app.use(sounds);
 
-	const assets = createAssetsMiddleware(bundleManager.all(), replicator);
+	const assets = yield* assetsRouter(bundleManager.all(), replicator);
 	app.use("/assets", assets);
 
-	const sharedSources = new SharedSourcesLib(bundleManager.all());
-	app.use(sharedSources.app);
+	const sharedSources = yield* sharedSourceRouter(bundleManager.all());
+	app.use(sharedSources);
 
 	if (sentryEnabled) {
 		app.use(Sentry.Handlers.errorHandler());
@@ -372,9 +372,10 @@ export const createServer = Effect.fn("createServer")(function* (
 		),
 		persistent: false,
 	});
-	const updateBundlesReplicant = () => {
-		bundlesReplicant.value = clone(bundleManager.all());
-	};
+	const updateBundlesReplicant = Effect.fn(function* () {
+		const bundles = bundleManager.all();
+		bundlesReplicant.value = clone(bundles);
+	});
 	const bundleManagerEvents = yield* Effect.all(
 		[
 			listenToEvent<[]>(bundleManager, "ready"),
@@ -384,21 +385,17 @@ export const createServer = Effect.fn("createServer")(function* (
 		],
 		{ concurrency: "unbounded" },
 	).pipe(
-		Effect.andThen(Stream.mergeAll({ concurrency: "unbounded" })),
+		Effect.map(Stream.mergeAll({ concurrency: "unbounded" })),
 		Effect.andThen(Stream.debounce("100 millis")),
 	);
 	yield* Effect.forkScoped(
-		Stream.runForEach(bundleManagerEvents, () =>
-			Effect.sync(updateBundlesReplicant),
-		),
+		Stream.runForEach(bundleManagerEvents, updateBundlesReplicant),
 	);
-	updateBundlesReplicant();
+	yield* updateBundlesReplicant();
 
 	const mount = (...args: any[]) => app.use(...args);
 	const extensionManager = yield* Effect.acquireRelease(
-		Effect.sync(
-			() => new ExtensionManager(io, bundleManager, replicator, mount),
-		),
+		createExtensionManager(io, bundleManager, replicator, mount),
 		(extensionManager) =>
 			Effect.sync(() => extensionManager.emitToAllInstances("serverStopping")),
 	);
@@ -445,7 +442,7 @@ export const createServer = Effect.fn("createServer")(function* (
 
 	return {
 		run,
-		getExtensions: () => ({ ...extensionManager.extensions }),
+		getExtensions: () => extensionManager.getExtensions(),
 		saveAllReplicantsNow: () => replicator.saveAllReplicantsNow(),
 		bundleManager,
 	};

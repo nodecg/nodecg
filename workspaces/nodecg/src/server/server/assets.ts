@@ -2,20 +2,27 @@ import fs from "node:fs";
 import path, { extname } from "node:path";
 
 import { rootPaths } from "@nodecg/internal-util";
-import chokidar from "chokidar";
+import { Array, Effect, GroupBy, Stream } from "effect";
 import express from "express";
 import hasha from "hasha";
 import multer from "multer";
 import { z } from "zod";
 
-import { stringifyError } from "../../shared/utils/errors";
-import type { NodeCG } from "../../types/nodecg";
-import { createLogger } from "../logger";
-import type { Replicator } from "../replicant/replicator";
-import type { ServerReplicant } from "../replicant/server-replicant";
-import { authCheck } from "../util/authcheck";
-import { debounceName } from "../util/debounce-name";
-import { sendFile } from "../util/send-file";
+import { stringifyError } from "../../shared/utils/errors.js";
+import type { NodeCG } from "../../types/nodecg.js";
+import {
+	getWatcher,
+	listenToAdd,
+	listenToChange,
+	listenToError,
+	listenToUnlink,
+	waitForReady,
+} from "../_effect/chokidar.js";
+import { createLogger } from "../logger/index.js";
+import type { Replicator } from "../replicant/replicator.js";
+import type { ServerReplicant } from "../replicant/server-replicant.js";
+import { authCheck } from "../util/authcheck.js";
+import { sendFile } from "../util/send-file/index.js";
 
 interface Collection {
 	name: string;
@@ -53,50 +60,25 @@ const prepareNamespaceAssetsPath = (namespace: string) => {
 	return assetsPath;
 };
 
-const repsByNamespace = new Map<
-	string,
-	Map<
-		string,
-		ServerReplicant<
-			NodeCG.AssetFile[],
-			NodeCG.Replicant.OptionsWithDefault<NodeCG.AssetFile[]>
-		>
-	>
->();
-
-const getCollectRep = (namespace: string, category: string) => {
-	return repsByNamespace.get(namespace)?.get(category);
-};
-
-const resolveDeferreds = (
-	deferredFiles: Map<string, NodeCG.AssetFile | undefined>,
-) => {
-	let foundNull = false;
-	deferredFiles.forEach((uf) => {
-		if (uf === null) {
-			foundNull = true;
-		}
-	});
-
-	if (!foundNull) {
-		deferredFiles.forEach((uploadedFile) => {
-			if (!uploadedFile) {
-				return;
-			}
-
-			const rep = getCollectRep(uploadedFile.namespace, uploadedFile.category);
-			if (rep) {
-				rep.value.push(uploadedFile);
-			}
-		});
-		deferredFiles.clear();
-	}
-};
-
-export const createAssetsMiddleware = (
+export const assetsRouter = Effect.fn("assetsRouter")(function* (
 	bundles: NodeCG.Bundle[],
 	replicator: Replicator,
-) => {
+) {
+	const repsByNamespace = new Map<
+		string,
+		Map<
+			string,
+			ServerReplicant<
+				NodeCG.AssetFile[],
+				NodeCG.Replicant.OptionsWithDefault<NodeCG.AssetFile[]>
+			>
+		>
+	>();
+
+	const getCollectRep = (namespace: string, category: string) => {
+		return repsByNamespace.get(namespace)?.get(category);
+	};
+
 	const assetsPath = getAssetsPath();
 	if (!fs.existsSync(assetsPath)) {
 		fs.mkdirSync(assetsPath);
@@ -186,11 +168,11 @@ export const createAssetsMiddleware = (
 	}
 
 	// Chokidar does not accept Windows-style path separators when using globs
-	const fixedPaths = Array.from(watchDirs).map((pattern) => ({
+	const fixedPaths = Array.map(watchDirs, (pattern) => ({
 		...pattern,
 		path: pattern.path.replace(/\\/g, "/"),
 	}));
-	const watcher = chokidar.watch(
+	const watcher = yield* getWatcher(
 		fixedPaths.map((path) => path.path),
 		{
 			ignored: (val, stats) => {
@@ -208,95 +190,116 @@ export const createAssetsMiddleware = (
 		},
 	);
 
-	/**
-	 * When the Chokidar watcher first starts up, it will fire an 'add' event for each file found.
-	 * After that, it will emit the 'ready' event.
-	 * To avoid thrashing the replicant, we want to add all of these first files at once.
-	 * This is what the ready Boolean, deferredFiles Map, and resolveDeferreds function are for.
-	 */
-	let ready = false;
-	const deferredFiles = new Map<string, NodeCG.AssetFile | undefined>();
-	watcher.on("add", async (filepath) => {
-		if (!ready) {
-			deferredFiles.set(filepath, undefined);
-		}
+	const addStream = yield* listenToAdd(watcher);
+	const changeStream = yield* listenToChange(watcher);
+	const unlinkStream = yield* listenToUnlink(watcher);
+	const errorStream = yield* listenToError(watcher);
 
-		try {
-			const sum = await hasha.fromFile(filepath, { algorithm: "sha1" });
-			const uploadedFile = createAssetFile(filepath, sum);
-			if (deferredFiles) {
-				deferredFiles.set(filepath, uploadedFile);
-				resolveDeferreds(deferredFiles);
-			} else {
-				const rep = getCollectRep(
-					uploadedFile.namespace,
-					uploadedFile.category,
-				);
-				if (rep) {
-					rep.value.push(uploadedFile);
-				}
-			}
-		} catch (err: unknown) {
-			if (deferredFiles) {
-				deferredFiles.delete(filepath);
-			}
+	yield* Effect.forkScoped(
+		Effect.gen(function* () {
+			// When the Chokidar watcher first starts up, it will fire an 'add' event for each file found.
+			// After that, it will emit the 'ready' event.
+			// To avoid thrashing the replicant, we want to add all of these first files at once.
+			yield* waitForReady(watcher);
+			yield* addStream.pipe(
+				Stream.map(({ path: filepath }) =>
+					Effect.tryPromise({
+						try: async () => {
+							const sum = await hasha.fromFile(filepath, {
+								algorithm: "sha1",
+							});
+							const uploadedFile = createAssetFile(filepath, sum);
+							const rep = getCollectRep(
+								uploadedFile.namespace,
+								uploadedFile.category,
+							);
+							if (rep) {
+								rep.value.push(uploadedFile);
+							}
+						},
+						catch: (err) => {
+							logger.error(stringifyError(err));
+						},
+					}),
+				),
+				Stream.runForEachChunk((chunk) =>
+					Effect.all(chunk, { concurrency: "unbounded" }),
+				),
+			);
+		}),
+	);
 
-			logger.error(stringifyError(err));
-		}
-	});
+	yield* Effect.forkScoped(
+		changeStream.pipe(
+			Stream.groupByKey((event) => event.path),
+			GroupBy.evaluate((_path, stream) =>
+				stream.pipe(
+					Stream.debounce("500 millis"),
+					Stream.runForEach((event) =>
+						Effect.tryPromise({
+							try: async () => {
+								const sum = await hasha.fromFile(event.path, {
+									algorithm: "sha1",
+								});
+								const newUploadedFile = createAssetFile(event.path, sum);
+								const rep = getCollectRep(
+									newUploadedFile.namespace,
+									newUploadedFile.category,
+								);
+								if (!rep) {
+									throw new Error("should have had a replicant here");
+								}
 
-	watcher.on("ready", () => {
-		ready = true;
-	});
+								const index = rep.value.findIndex(
+									(uf) => uf.url === newUploadedFile.url,
+								);
+								if (index > -1) {
+									rep.value.splice(index, 1, newUploadedFile);
+								} else {
+									rep.value.push(newUploadedFile);
+								}
+							},
+							catch: (err) => {
+								logger.error(stringifyError(err));
+							},
+						}),
+					),
+				),
+			),
+			Stream.runDrain,
+		),
+	);
 
-	watcher.on("change", (filepath) => {
-		debounceName(filepath, async () => {
-			try {
-				const sum = await hasha.fromFile(filepath, { algorithm: "sha1" });
-				const newUploadedFile = createAssetFile(filepath, sum);
-				const rep = getCollectRep(
-					newUploadedFile.namespace,
-					newUploadedFile.category,
-				);
+	// Setup unlink event listener
+	yield* Effect.forkScoped(
+		Stream.runForEach(unlinkStream, (event) =>
+			Effect.sync(() => {
+				const deletedFile = createAssetFile(event.path, "temp");
+				const rep = getCollectRep(deletedFile.namespace, deletedFile.category);
 				if (!rep) {
-					throw new Error("should have had a replicant here");
+					return;
 				}
 
-				const index = rep.value.findIndex(
-					(uf) => uf.url === newUploadedFile.url,
-				);
-				if (index > -1) {
-					rep.value.splice(index, 1, newUploadedFile);
-				} else {
-					rep.value.push(newUploadedFile);
-				}
-			} catch (err: unknown) {
-				logger.error(stringifyError(err));
-			}
-		});
-	});
+				rep.value.some((assetFile, index) => {
+					if (assetFile.url === deletedFile.url) {
+						rep.value.splice(index, 1);
+						logger.debug('"%s" was deleted', deletedFile.url);
+						return true;
+					}
 
-	watcher.on("unlink", (filepath) => {
-		const deletedFile = createAssetFile(filepath, "temp");
-		const rep = getCollectRep(deletedFile.namespace, deletedFile.category);
-		if (!rep) {
-			return;
-		}
+					return false;
+				});
+			}),
+		),
+	);
 
-		rep.value.some((assetFile, index) => {
-			if (assetFile.url === deletedFile.url) {
-				rep.value.splice(index, 1);
-				logger.debug('"%s" was deleted', deletedFile.url);
-				return true;
-			}
-
-			return false;
-		});
-	});
-
-	watcher.on("error", (e) => {
-		logger.error((e as Error).stack);
-	});
+	yield* Effect.forkScoped(
+		Stream.runForEach(errorStream, ({ error: e }) =>
+			Effect.sync(() => {
+				logger.error((e as Error).stack);
+			}),
+		),
+	);
 
 	const assetsRouter = express.Router();
 
@@ -412,4 +415,4 @@ export const createAssetsMiddleware = (
 	);
 
 	return assetsRouter;
-};
+});

@@ -85,7 +85,9 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 
 ### Module Resolution
 
+- **ESM compatibility goal**: Codebase is moving towards ESM compatibility without bundlers
 - **Always use `.js` extensions** in imports, even for `.ts` source files (applies to both production and test code)
+- **Directory modules need explicit `/index.js`**: ESM doesn't auto-resolve directory imports
 - Workspace packages (`@nodecg/*`) resolve via npm workspaces
 - Source uses ESM-style imports, compiled output is CommonJS
 - Tests import from compiled `out/` directory (CommonJS modules)

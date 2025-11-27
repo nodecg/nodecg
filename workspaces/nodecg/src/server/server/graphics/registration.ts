@@ -1,15 +1,19 @@
 import { rootPaths } from "@nodecg/internal-util";
+import { Effect } from "effect";
 import express from "express";
 import fs from "fs";
 import path from "path";
 
-import type { NodeCG } from "../../../types/nodecg";
-import type { GraphicRegRequest, RootNS } from "../../../types/socket-protocol";
-import type { BundleManager } from "../bundle-manager";
-import type { Replicator } from "../../replicant/replicator";
-import type { ServerReplicant } from "../../replicant/server-replicant";
-import { injectScripts } from "../../util/injectscripts";
-import { isChildPath } from "../../util/is-child-path";
+import type { NodeCG } from "../../../types/nodecg.js";
+import type {
+	GraphicRegRequest,
+	RootNS,
+} from "../../../types/socket-protocol.js";
+import type { Replicator } from "../../replicant/replicator.js";
+import type { ServerReplicant } from "../../replicant/server-replicant.js";
+import { injectScripts } from "../../util/injectscripts.js";
+import { isChildPath } from "../../util/is-child-path.js";
+import { BundleManager } from "../bundle-manager.js";
 
 type GraphicsInstance = NodeCG.GraphicsInstance;
 
@@ -18,35 +22,30 @@ const BUILD_PATH = path.join(
 	"dist/client/instance",
 );
 
-export class RegistrationCoordinator {
-	app = express();
+type InstanceRep = ServerReplicant<
+	GraphicsInstance[],
+	NodeCG.Replicant.OptionsWithDefault<GraphicsInstance[]>
+>;
 
-	private readonly _instancesRep: ServerReplicant<
-		GraphicsInstance[],
-		NodeCG.Replicant.OptionsWithDefault<GraphicsInstance[]>
-	>;
+export const registrationCoordinator = Effect.fn("registrationCoordinator")(
+	function* (io: RootNS, bundleManager: BundleManager, replicator: Replicator) {
+		const app = express();
 
-	private readonly _bundleManager: BundleManager;
+		const instancesRep: InstanceRep = replicator.declare(
+			"graphics:instances",
+			"nodecg",
+			{
+				schemaPath: path.join(
+					rootPaths.nodecgInstalledPath,
+					"schemas/graphics%3Ainstances.json",
+				),
+				persistent: false,
+				defaultValue: [],
+			},
+		);
 
-	constructor(
-		io: RootNS,
-		bundleManager: BundleManager,
-		replicator: Replicator,
-	) {
-		this._bundleManager = bundleManager;
-		const { app } = this;
-
-		this._instancesRep = replicator.declare("graphics:instances", "nodecg", {
-			schemaPath: path.join(
-				rootPaths.nodecgInstalledPath,
-				"schemas/graphics%3Ainstances.json",
-			),
-			persistent: false,
-			defaultValue: [],
-		});
-
-		bundleManager.on("bundleChanged", this._updateInstanceStatuses.bind(this));
-		bundleManager.on("gitChanged", this._updateInstanceStatuses.bind(this));
+		bundleManager.on("bundleChanged", updateInstanceStatuses);
+		bundleManager.on("gitChanged", updateInstanceStatuses);
 
 		io.on("connection", (socket) => {
 			socket.on("graphic:registerSocket", (regRequest, cb) => {
@@ -57,28 +56,26 @@ export class RegistrationCoordinator {
 				}
 
 				const bundle = bundleManager.find(bundleName);
-				/* istanbul ignore if: simple error trapping */
 				if (!bundle) {
 					cb(undefined, false);
 					return;
 				}
 
-				const graphicManifest = this._findGraphicManifest({
+				const graphicManifest = findGraphicManifest({
 					bundleName,
 					pathName,
 				});
 
-				/* istanbul ignore if: simple error trapping */
 				if (!graphicManifest) {
 					cb(undefined, false);
 					return;
 				}
 
-				const existingSocketRegistration = this._findRegistrationBySocketId(
+				const existingSocketRegistration = findRegistrationBySocketId(
 					socket.id,
 				);
 				const existingPathRegistration =
-					this._findOpenRegistrationByPathName(pathName);
+					findOpenRegistrationByPathName(pathName);
 
 				// If there is an existing registration with this pathName,
 				// and this is a singleInstance graphic,
@@ -96,7 +93,7 @@ export class RegistrationCoordinator {
 				if (existingSocketRegistration) {
 					existingSocketRegistration.open = true;
 				} else {
-					this._addRegistration({
+					addRegistration({
 						...regRequest,
 						ipv4: socket.request.socket.remoteAddress!,
 						socketId: socket.id,
@@ -116,7 +113,7 @@ export class RegistrationCoordinator {
 			});
 
 			socket.on("graphic:queryAvailability", (pathName, cb) => {
-				cb(undefined, !this._findOpenRegistrationByPathName(pathName));
+				cb(undefined, !findOpenRegistrationByPathName(pathName));
 			});
 
 			socket.on("graphic:requestBundleRefresh", (bundleName, cb) => {
@@ -149,7 +146,7 @@ export class RegistrationCoordinator {
 
 			socket.on("disconnect", () => {
 				// Unregister the socket.
-				const registration = this._findRegistrationBySocketId(socket.id);
+				const registration = findRegistrationBySocketId(socket.id);
 				if (!registration) {
 					return;
 				}
@@ -160,7 +157,7 @@ export class RegistrationCoordinator {
 				}
 
 				setTimeout(() => {
-					this._removeRegistration(socket.id);
+					removeRegistration(socket.id);
 				}, 1000);
 			});
 		});
@@ -181,85 +178,83 @@ export class RegistrationCoordinator {
 				next();
 			}
 		});
-	}
 
-	private _addRegistration(registration: GraphicsInstance): void {
-		this._instancesRep.value.push({
-			...registration,
-			open: true,
-		});
-	}
-
-	private _removeRegistration(socketId: string): GraphicsInstance | false {
-		const registrationIndex = this._instancesRep.value.findIndex(
-			(instance) => instance.socketId === socketId,
-		);
-
-		/* istanbul ignore next: simple error trapping */
-		if (registrationIndex < 0) {
-			return false;
+		function addRegistration(registration: GraphicsInstance): void {
+			instancesRep.value.push({
+				...registration,
+				open: true,
+			});
 		}
 
-		return this._instancesRep.value.splice(registrationIndex, 1)[0]!;
-	}
+		function removeRegistration(socketId: string): GraphicsInstance | false {
+			const registrationIndex = instancesRep.value.findIndex(
+				(instance) => instance.socketId === socketId,
+			);
 
-	private _findRegistrationBySocketId(
-		socketId: string,
-	): GraphicsInstance | undefined {
-		return this._instancesRep.value.find(
-			(instance) => instance.socketId === socketId,
-		);
-	}
+			if (registrationIndex < 0) {
+				return false;
+			}
 
-	private _findOpenRegistrationByPathName(
-		pathName: string,
-	): GraphicsInstance | undefined {
-		return this._instancesRep.value.find(
-			(instance) => instance.pathName === pathName && instance.open,
-		);
-	}
+			return instancesRep.value.splice(registrationIndex, 1)[0]!;
+		}
 
-	private _updateInstanceStatuses(): void {
-		this._instancesRep.value.forEach((instance) => {
-			const { bundleName, pathName } = instance;
-			const bundle = this._bundleManager.find(bundleName);
-			/* istanbul ignore next: simple error trapping */
+		function findRegistrationBySocketId(
+			socketId: string,
+		): GraphicsInstance | undefined {
+			return instancesRep.value.find(
+				(instance) => instance.socketId === socketId,
+			);
+		}
+
+		function findOpenRegistrationByPathName(
+			pathName: string,
+		): GraphicsInstance | undefined {
+			return instancesRep.value.find(
+				(instance) => instance.pathName === pathName && instance.open,
+			);
+		}
+
+		function updateInstanceStatuses(): void {
+			instancesRep.value.forEach((instance) => {
+				const { bundleName, pathName } = instance;
+				const bundle = bundleManager.find(bundleName);
+				if (!bundle) {
+					return;
+				}
+
+				const graphicManifest = findGraphicManifest({
+					bundleName,
+					pathName,
+				});
+				if (!graphicManifest) {
+					return;
+				}
+
+				instance.potentiallyOutOfDate =
+					calcBundleGitMismatch(bundle, instance) ||
+					calcBundleVersionMismatch(bundle, instance);
+				instance.singleInstance = Boolean(graphicManifest.singleInstance);
+			});
+		}
+
+		function findGraphicManifest({
+			pathName,
+			bundleName,
+		}: {
+			pathName: string;
+			bundleName: string;
+		}): NodeCG.Bundle.Graphic | undefined {
+			const bundle = bundleManager.find(bundleName);
 			if (!bundle) {
 				return;
 			}
 
-			const graphicManifest = this._findGraphicManifest({
-				bundleName,
-				pathName,
-			});
-			/* istanbul ignore next: simple error trapping */
-			if (!graphicManifest) {
-				return;
-			}
-
-			instance.potentiallyOutOfDate =
-				calcBundleGitMismatch(bundle, instance) ||
-				calcBundleVersionMismatch(bundle, instance);
-			instance.singleInstance = Boolean(graphicManifest.singleInstance);
-		});
-	}
-
-	private _findGraphicManifest({
-		pathName,
-		bundleName,
-	}: {
-		pathName: string;
-		bundleName: string;
-	}): NodeCG.Bundle.Graphic | undefined {
-		const bundle = this._bundleManager.find(bundleName);
-		/* istanbul ignore if: simple error trapping */
-		if (!bundle) {
-			return;
+			return bundle.graphics.find((graphic) => graphic.url === pathName);
 		}
 
-		return bundle.graphics.find((graphic) => graphic.url === pathName);
-	}
-}
+		return app;
+	},
+);
 
 function calcBundleGitMismatch(
 	bundle: NodeCG.Bundle,
