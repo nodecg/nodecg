@@ -52,7 +52,7 @@ test("picks up pre-existing files on startup", async ({ apis }) => {
 	});
 });
 
-test.for([0, 1])(`uploading twice`, async (i, { apis, dashboard }) => {
+test.for([0, 1])(`uploading and re-uploading file`, async (i, { apis, dashboard }) => {
 	const assetRep =
 		apis.extension.Replicant<NodeCG.AssetFile[]>("assets:assets");
 
