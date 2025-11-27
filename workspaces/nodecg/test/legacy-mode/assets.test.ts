@@ -52,102 +52,105 @@ test("picks up pre-existing files on startup", async ({ apis }) => {
 	});
 });
 
-test.for([0, 1])(`uploading and re-uploading file`, async (i, { apis, dashboard }) => {
-	const assetRep =
-		apis.extension.Replicant<NodeCG.AssetFile[]>("assets:assets");
+test.for([0, 1])(
+	`uploading and re-uploading file`,
+	async (i, { apis, dashboard }) => {
+		const assetRep =
+			apis.extension.Replicant<NodeCG.AssetFile[]>("assets:assets");
 
-	// Make sure the file to upload does not exist first
-	if (i === 0) {
-		expect(fs.existsSync(TWITTER_BANNER_PATH)).toBe(false);
-		// 1 file from pre-existing initial.png
-		expect(assetRep.value ?? []).toHaveLength(1);
-	} else {
-		// Second upload: file already exists, verify replicant has initial + first upload
+		// Make sure the file to upload does not exist first
+		if (i === 0) {
+			expect(fs.existsSync(TWITTER_BANNER_PATH)).toBe(false);
+			// 1 file from pre-existing initial.png
+			expect(assetRep.value ?? []).toHaveLength(1);
+		} else {
+			// Second upload: file already exists, verify replicant has initial + first upload
+			expect(fs.existsSync(TWITTER_BANNER_PATH)).toBe(true);
+			expect(assetRep.value ?? []).toHaveLength(2);
+			expect(
+				assetRep.value?.find((f) => f.name === "#twitter_banner"),
+			).toBeTruthy();
+		}
+
+		const assetTab = await util.shadowSelector(
+			dashboard,
+			"ncg-dashboard",
+			'paper-tab[data-route="assets"]',
+		);
+		await assetTab.click();
+		const assetCategoryEl = await util.shadowSelector(
+			dashboard,
+			"ncg-dashboard",
+			"ncg-assets",
+			'ncg-asset-category[collection-name="test-bundle"][category-name="assets"]',
+		);
+		const addEl: puppeteer.ElementHandle = (await dashboard.evaluateHandle(
+			(el: any) => el.$.add,
+			assetCategoryEl,
+		)) as any;
+		await addEl.click();
+		const fileInputEl = await dashboard.evaluateHandle(
+			(el: any) => el.$.uploader.$.fileInput,
+			assetCategoryEl,
+		);
+
+		// Upload the file
+		(fileInputEl as any).uploadFile(UPLOAD_SOURCE_PATH);
+
+		// Wait for upload to complete on the server
+		await dashboard.evaluate(
+			async (assetCategoryEl: any) =>
+				new Promise<void>((resolve) => {
+					if (assetCategoryEl._successfulUploads === 1) {
+						resolve();
+					} else {
+						assetCategoryEl.$.uploader.addEventListener(
+							"upload-success",
+							resolve,
+							{
+								once: true,
+								passive: true,
+							},
+						);
+					}
+				}),
+			assetCategoryEl,
+		);
+
 		expect(fs.existsSync(TWITTER_BANNER_PATH)).toBe(true);
-		expect(assetRep.value ?? []).toHaveLength(2);
-		expect(
-			assetRep.value?.find((f) => f.name === "#twitter_banner"),
-		).toBeTruthy();
-	}
 
-	const assetTab = await util.shadowSelector(
-		dashboard,
-		"ncg-dashboard",
-		'paper-tab[data-route="assets"]',
-	);
-	await assetTab.click();
-	const assetCategoryEl = await util.shadowSelector(
-		dashboard,
-		"ncg-dashboard",
-		"ncg-assets",
-		'ncg-asset-category[collection-name="test-bundle"][category-name="assets"]',
-	);
-	const addEl: puppeteer.ElementHandle = (await dashboard.evaluateHandle(
-		(el: any) => el.$.add,
-		assetCategoryEl,
-	)) as any;
-	await addEl.click();
-	const fileInputEl = await dashboard.evaluateHandle(
-		(el: any) => el.$.uploader.$.fileInput,
-		assetCategoryEl,
-	);
-
-	// Upload the file
-	(fileInputEl as any).uploadFile(UPLOAD_SOURCE_PATH);
-
-	// Wait for upload to complete on the server
-	await dashboard.evaluate(
-		async (assetCategoryEl: any) =>
-			new Promise<void>((resolve) => {
-				if (assetCategoryEl._successfulUploads === 1) {
-					resolve();
-				} else {
-					assetCategoryEl.$.uploader.addEventListener(
-						"upload-success",
-						resolve,
-						{
-							once: true,
-							passive: true,
-						},
-					);
+		await new Promise<void>((resolve) => {
+			let isInitial = true;
+			const handler = () => {
+				if (i === 0 && isInitial) {
+					isInitial = false;
+					return;
 				}
-			}),
-		assetCategoryEl,
-	);
+				assetRep.off("change", handler);
+				resolve();
+			};
+			assetRep.on("change", handler);
+		});
 
-	expect(fs.existsSync(TWITTER_BANNER_PATH)).toBe(true);
+		// Verify replicant was updated correctly (initial.png + #twitter_banner.png)
+		expect(assetRep.value).toHaveLength(2);
+		const uploadedFile = assetRep.value?.find(
+			(f) => f.name === "#twitter_banner",
+		);
+		expect(uploadedFile).toMatchObject({
+			name: "#twitter_banner",
+			category: "assets",
+			namespace: "test-bundle",
+		});
 
-	await new Promise<void>((resolve) => {
-		let isInitial = true;
-		const handler = () => {
-			if (i === 0 && isInitial) {
-				isInitial = false;
-				return;
-			}
-			assetRep.off("change", handler);
-			resolve();
-		};
-		assetRep.on("change", handler);
-	});
-
-	// Verify replicant was updated correctly (initial.png + #twitter_banner.png)
-	expect(assetRep.value).toHaveLength(2);
-	const uploadedFile = assetRep.value?.find(
-		(f) => f.name === "#twitter_banner",
-	);
-	expect(uploadedFile).toMatchObject({
-		name: "#twitter_banner",
-		category: "assets",
-		namespace: "test-bundle",
-	});
-
-	// On second upload, verify the change handler updated the existing entry
-	// (not added a duplicate) and recalculated the hash
-	if (i === 1) {
-		expect(assetRep.value ?? []).toHaveLength(2); // Still only 2 files (initial + twitter_banner)
-		expect(uploadedFile?.sum).toBeTruthy(); // Hash was recalculated
-	}
-});
+		// On second upload, verify the change handler updated the existing entry
+		// (not added a duplicate) and recalculated the hash
+		if (i === 1) {
+			expect(assetRep.value ?? []).toHaveLength(2); // Still only 2 files (initial + twitter_banner)
+			expect(uploadedFile?.sum).toBeTruthy(); // Hash was recalculated
+		}
+	},
+);
 
 test("retrieval - 200", async () => {
 	const response = await fetch(
