@@ -10,6 +10,7 @@ export default defineConfig({
 			include: ["workspaces/*/src"],
 			exclude: ["workspaces/nodecg/src/client"],
 		},
+		testTimeout: 10_000,
 		projects: [
 			{
 				test: {

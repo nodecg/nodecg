@@ -222,6 +222,13 @@ Created `workspaces/nodecg/src/server/_effect/` directory with reusable Effect u
 - Uses Config-based conditional loading to avoid OpenTelemetry overhead when disabled
 - Dynamic imports load telemetry packages only when `LOG_SPAN=true`
 
+**5. `test-effect.ts`** - Vitest test helper
+
+- `testEffect(effect)` - Wraps Effect for Vitest, handles scoping automatically
+- Accepts `Effect<A, E, Scope.Scope>` and wraps with `Effect.scoped`
+- Works with both `never` and `Scope` requirements
+- Provide layers before passing to helper: `.pipe(Effect.provide(layer))`
+
 ### Core Implementation
 
 **bootstrap.ts** - Complete rewrite:
@@ -412,14 +419,6 @@ const { Module } = yield * Effect.promise(() => import("heavy-package"));
 - `scripts/workspaces-parallel.ts` - Changed from `node --run` to `npm run` for compatibility
 - `.node-version` - Set to Node 20
 
-## Next Steps
-
-- [x] Phase 1: Server Entry Point - ✅ COMPLETE
-- [ ] Phase 2: Core Services - Extract Config, Database, Bundles as Effect services
-- [ ] Phase 3: HTTP Server Integration - Effect HTTP Router with Express fallback
-- [ ] Phase 4: Route Handlers - Convert Express routes to Effect HTTP Router
-- [ ] Phase 5: Utility Functions - Migrate supporting functions
-
 ## Files Modified
 
 - `workspaces/nodecg/src/server/bootstrap.ts`
@@ -429,6 +428,7 @@ const { Module } = yield * Effect.promise(() => import("heavy-package"));
 - `workspaces/nodecg/src/server/_effect/expect-error.ts` (new)
 - `workspaces/nodecg/src/server/_effect/log-level.ts` (new)
 - `workspaces/nodecg/src/server/_effect/span-logger.ts` (new)
+- `workspaces/nodecg/src/server/_effect/test-effect.ts` (new)
 - `workspaces/nodecg/package.json`
 - `package.json`
 - `scripts/workspaces-parallel.ts`

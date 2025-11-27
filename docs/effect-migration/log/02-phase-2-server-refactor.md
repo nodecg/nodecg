@@ -1,6 +1,6 @@
 # Phase 2: Server Architecture Refactoring
 
-**Status**: In Progress
+**Status**: ✅ Complete
 **Complexity**: ⭐⭐ Moderate
 
 ## Overview
@@ -440,12 +440,12 @@ const run = Effect.fn(function* () {
 - [x] Use `Effect.forkScoped` to fork error/close listeners so they're cleaned up with server
 - [x] Use `Runtime.runSync` with captured runtime for listen callback (bridges native callback to Effect)
 
-### Remaining
+### Notes
 
-- [ ] Expose `bundleManager` in createServer return value (if tests need direct access)
-- [ ] Run full test suite to verify all functionality works
-- [ ] Verify ExtensionManager broadcasts still work for bundle extensions
-- [ ] Document pattern: capturing runtime with `yield* Effect.runtime()` for use in native callbacks
+- `bundleManager` is accessed by tests via direct instantiation in `createServer` (not exposed in handle - tests use the instance created within)
+- Full test suite passes
+- ExtensionManager broadcasts verified working (public API preserved)
+- Runtime capture pattern documented in "Implementation Issues & Solutions" section above
 
 ## Key Implementation Details
 
