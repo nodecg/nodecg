@@ -330,11 +330,6 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
   - Uses `SynchronizedRef` + fiber interrupt pattern for race-condition safety
   - Uses `Effect.forkIn(scope)` to fork timers into captured scope
 
-- **Type constraint utility** (`src/server/_effect/expect-requirement.ts`):
-  - `expectRequirement<Service>()` - Asserts Effect has required service at compile time
-  - Usage: `.pipe(expectRequirement<FooService>())` or as Effect.fn argument
-  - Shows `MissingRequirement<Service>` branded error type on failure
-
 **Migration Documentation**:
 
 - All migration work must be logged in `docs/effect-migration/log/` directory
