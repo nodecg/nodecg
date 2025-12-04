@@ -1,7 +1,7 @@
 import * as path from "node:path";
 
 import { rootPaths } from "@nodecg/internal-util";
-import { Effect } from "effect";
+import { Effect, Stream } from "effect";
 import express from "express";
 import { klona as clone } from "klona/json";
 
@@ -30,6 +30,7 @@ export const dashboardRouter = Effect.fn("dashboardRouter")(function* (
 
 	const app = express();
 
+	// TODO: Use Ref or something safer
 	let dashboardContext: DashboardContext | undefined = undefined;
 
 	app.use(express.static(BUILD_PATH));
@@ -97,9 +98,18 @@ export const dashboardRouter = Effect.fn("dashboardRouter")(function* (
 	});
 
 	// When a bundle changes, delete the cached dashboard context
-	bundleManager.on("bundleChanged", () => {
-		dashboardContext = undefined;
-	});
+	const bundleChangedEvents = yield* bundleManager
+		.subscribe()
+		.pipe(Effect.map(Stream.filter((event) => event._tag === "bundleChanged")));
+	yield* Effect.forkScoped(
+		bundleChangedEvents.pipe(
+			Stream.runForEach(() =>
+				Effect.sync(() => {
+					dashboardContext = undefined;
+				}),
+			),
+		),
+	);
 
 	return app;
 });

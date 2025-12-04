@@ -15,6 +15,7 @@ import { populateTestData } from "../helpers/populateTestData";
 import * as C from "../helpers/test-constants";
 import { testDirPath } from "../helpers/test-dir-path";
 import { createTmpDir } from "../helpers/tmp-dir";
+import { NodecgPackageJson } from "../../src/server/_effect/nodecg-package-json.ts";
 
 type ServerHandle = Effect.Effect.Success<ReturnType<typeof createServer>>;
 
@@ -139,7 +140,12 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 						}).pipe(Effect.scoped),
 					);
 					yield* Deferred.await(ready);
-				}),
+				}).pipe(
+					Effect.provideService(
+						NodecgPackageJson,
+						NodecgPackageJson.make({ version: "0.0.0" }),
+					),
+				),
 			);
 		},
 		stop: async () => {

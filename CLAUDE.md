@@ -205,6 +205,7 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
   - Provide layers before passing to helper: `.pipe(Effect.provide(layer))`
 - Install Effect packages with `npm i @effect/package@latest` in workspace (never edit package.json directly)
 - No return type annotations (let TypeScript infer), no `any`, no type assertions
+- **TaggedEnum empty payloads**: Use `object` instead of `{}` for events with no data (e.g., `ready: object` not `ready: {}`)
 - See `docs/effect-migration/strategy.md` for comprehensive coding guidelines
 
 **Effect Layer Patterns**:
@@ -315,11 +316,24 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - **Ready/idle detection**: `Stream.debounce("1000 millis")` + `Stream.take(1)` emits after period of inactivity
 - **Per-key debounce**: `Stream.groupByKey(keyFn)` + `Stream.debounce` for debouncing per bundle/entity
 - **Replaces setTimeout.refresh()**: Stream.debounce automatically resets timer on each new event
+- **Transforming streams inside Effects**: Use `Effect.andThen(Stream.operator)` to apply Stream operators to streams returned by Effects (e.g., `listenToAdd(watcher).pipe(Effect.andThen(Stream.prepend(...)))`)
+- **Nested groupByKey for multi-level debouncing**: Use nested `Stream.groupByKey` + `GroupBy.evaluate` when same stream needs different debounce durations based on event category (e.g., 500ms for bundle parsing, 250ms for git changes)
 
 - **Test helpers** (`src/server/_effect/test-effect.ts`):
   - `testEffect(effect)` - Wraps Effect for Vitest, handles scoping automatically
   - Use `@effect/platform` FileSystem service with `NodeFileSystem.layer` for filesystem operations in tests
   - `Chunk.head` pattern for getting first stream element (avoids array indexing with `noUncheckedIndexedAccess`)
+
+- **Debounced signal** (`src/server/_effect/debounced-signal.ts`):
+  - `debouncedSignal(duration)` - Creates signal that completes after inactivity period
+  - Returns `{ reset, await }` - call `reset` to restart timer, `await` to wait for completion
+  - Uses `SynchronizedRef` + fiber interrupt pattern for race-condition safety
+  - Uses `Effect.forkIn(scope)` to fork timers into captured scope
+
+- **Type constraint utility** (`src/server/_effect/expect-requirement.ts`):
+  - `expectRequirement<Service>()` - Asserts Effect has required service at compile time
+  - Usage: `.pipe(expectRequirement<FooService>())` or as Effect.fn argument
+  - Shows `MissingRequirement<Service>` branded error type on failure
 
 **Migration Documentation**:
 
@@ -336,6 +350,10 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
   - Reference actual implementation files instead of duplicating code
   - Avoid verbose code blocks - keep documentation scannable
 - **Log consolidation**: When work is prerequisite for a phase, document it in that phase's log file, not a separate entry
+- **Timer migration doc structure**:
+  - Pair "Legacy" code blocks with "Effect Implementation" sections
+  - Summary tables should have descriptive "Effect" column (e.g., `Stream.prepend + Stream.debounce`), not status checkmarks
+  - Keep Effect explanations to code + one brief sentence
 
 **Public API Preservation**:
 

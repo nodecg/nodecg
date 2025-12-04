@@ -31,6 +31,7 @@ import { withSpanProcessorLive } from "./_effect/span-logger";
 import { exitOnUncaught, sentryEnabled } from "./config";
 import { createServer, FileWatcherReadyTimeoutError } from "./server";
 import { nodecgPackageJson } from "./util/nodecg-package-json";
+import { NodecgPackageJson } from "./_effect/nodecg-package-json.ts";
 
 // TODO: Remove this in the next major release
 const handleFloatingErrors = () =>
@@ -61,15 +62,24 @@ const handleFloatingErrors = () =>
 		return Effect.sync(cleanup);
 	});
 
-const main = Effect.fn("main")(function* () {
-	process.title = `NodeCG - ${nodecgPackageJson.version}`;
+const main = Effect.fn("main")(
+	function* () {
+		process.title = `NodeCG - ${nodecgPackageJson.version}`;
 
-	const handleFloatingErrorsFiber = yield* Effect.fork(handleFloatingErrors());
+		const handleFloatingErrorsFiber = yield* Effect.fork(
+			handleFloatingErrors(),
+		);
 
-	const server = yield* createServer();
+		const server = yield* createServer();
 
-	yield* Effect.raceFirst(server.run(), Fiber.join(handleFloatingErrorsFiber));
-}, Effect.scoped);
+		yield* Effect.raceFirst(
+			server.run(),
+			Fiber.join(handleFloatingErrorsFiber),
+		);
+	},
+	Effect.scoped,
+	Effect.provide(NodecgPackageJson.Default),
+);
 
 NodeRuntime.runMain(
 	main().pipe(

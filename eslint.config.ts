@@ -15,6 +15,10 @@ export default defineConfig(
 		rules: {
 			"no-empty-pattern": "off",
 			"require-yield": "off",
+			"@typescript-eslint/no-empty-object-type": [
+				"error",
+				{ allowInterfaces: "with-single-extends", allowObjectTypes: "allow" },
+			],
 
 			"@typescript-eslint/no-explicit-any": "off",
 			"@typescript-eslint/no-unused-vars": "off",
@@ -49,8 +53,8 @@ export default defineConfig(
 			"simple-import-sort": simpleImportSort,
 		},
 		rules: {
-			"simple-import-sort/imports": "warn",
-			"simple-import-sort/exports": "warn",
+			"simple-import-sort/imports": "error",
+			"simple-import-sort/exports": "error",
 		},
 	},
 	configPrettier,
