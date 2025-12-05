@@ -3,7 +3,7 @@ import path from "node:path";
 import { setTimeout } from "node:timers/promises";
 
 import { getConnection } from "@nodecg/database-adapter-sqlite-legacy";
-import { Deferred, Effect, Fiber } from "effect";
+import { Deferred, Effect, Fiber, Layer } from "effect";
 import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
 import { afterAll, test } from "vitest";
@@ -79,7 +79,13 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 		"utf-8",
 	);
 
-	const { createServer } = await import("../../src/server/server");
+	// Dynamic imports AFTER NODECG_ROOT is set to ensure config loads from tmpDir
+	const [{ createServer }, { NodecgConfig }, { BundleManager }] =
+		await Promise.all([
+			import("../../src/server/server"),
+			import("../../src/server/_effect/nodecg-config.ts"),
+			import("../../src/server/server/bundle-manager.ts"),
+		]);
 
 	let serverHandle: ServerHandle;
 	let mainFiber: Fiber.RuntimeFiber<void, unknown> | null = null;
@@ -87,6 +93,15 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 	const server: TestServerWrapper = {
 		start: async () => {
 			await populateTestData();
+
+			const TestNodecgPackageJsonLayer = Layer.succeed(
+				NodecgPackageJson,
+				NodecgPackageJson.make({ version: "0.0.0" }),
+			);
+			const testLayer = Layer.provideMerge(
+				BundleManager.Default,
+				Layer.merge(NodecgConfig.Default, TestNodecgPackageJsonLayer),
+			);
 
 			await Effect.runPromise(
 				Effect.gen(function* () {
@@ -96,15 +111,10 @@ export async function setupTest(nodecgConfigName = "nodecg.json") {
 							const handle = yield* createServer(ready);
 							serverHandle = handle;
 							yield* handle.run();
-						}).pipe(Effect.scoped),
+						}).pipe(Effect.scoped, Effect.provide(testLayer)),
 					);
 					yield* Deferred.await(ready);
-				}).pipe(
-					Effect.provideService(
-						NodecgPackageJson,
-						NodecgPackageJson.make({ version: "0.0.0" }),
-					),
-				),
+				}),
 			);
 		},
 		stop: async () => {

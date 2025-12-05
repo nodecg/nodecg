@@ -36,7 +36,7 @@ import { databaseAdapter as defaultAdapter } from "@nodecg/database-adapter-sqli
 import { rootPaths } from "@nodecg/internal-util";
 import bodyParser from "body-parser";
 import compression from "compression";
-import { Data, Deferred, Effect, Layer, Runtime, Stream } from "effect";
+import { Data, Deferred, Effect, Runtime, Stream } from "effect";
 import express from "express";
 import transformMiddleware from "express-transform-bare-module-specifiers";
 import memoize from "fast-memoize";
@@ -52,8 +52,6 @@ import type {
 } from "../../types/socket-protocol.js";
 import { UnknownError } from "../_effect/boundary.js";
 import { listenToEvent, waitForEvent } from "../_effect/event-listener.js";
-import { NodecgConfig } from "../_effect/nodecg-config.js";
-import { NodecgPackageJson } from "../_effect/nodecg-package-json.js";
 import { createLogger } from "../logger/index.js";
 import { Replicator } from "../replicant/replicator.js";
 import { assetsRouter } from "./assets.js";
@@ -74,377 +72,371 @@ const renderTemplate = memoize((content, options) =>
 
 const log = createLogger("server");
 
-export const createServer = Effect.fn("createServer")(
-	function* (isReady?: Deferred.Deferred<void>) {
-		const app = express();
+export const createServer = Effect.fn("createServer")(function* (
+	isReady?: Deferred.Deferred<void>,
+) {
+	const app = express();
 
-		/**
-		 * HTTP(S) server setup
-		 */
-		const server = yield* Effect.promise(async (): Promise<Server> => {
-			if (
-				config.ssl.enabled &&
-				config.ssl.keyPath &&
-				config.ssl.certificatePath
-			) {
-				const sslOpts: { key: Buffer; cert: Buffer; passphrase?: string } = {
-					key: fs.readFileSync(config.ssl.keyPath),
-					cert: fs.readFileSync(config.ssl.certificatePath),
-				};
-				if (config.ssl.passphrase) {
-					sslOpts.passphrase = config.ssl.passphrase;
-				}
+	/**
+	 * HTTP(S) server setup
+	 */
+	const server = yield* Effect.promise(async (): Promise<Server> => {
+		if (
+			config.ssl.enabled &&
+			config.ssl.keyPath &&
+			config.ssl.certificatePath
+		) {
+			const sslOpts: { key: Buffer; cert: Buffer; passphrase?: string } = {
+				key: fs.readFileSync(config.ssl.keyPath),
+				cert: fs.readFileSync(config.ssl.certificatePath),
+			};
+			if (config.ssl.passphrase) {
+				sslOpts.passphrase = config.ssl.passphrase;
+			}
 
-				// If we allow HTTP on the same port, use httpolyglot
-				// otherwise, standard https server
-				if (config.ssl.allowHTTP) {
-					// TODO: Remove this
-					const { createServer } = await import("httpolyglot");
-					return createServer(sslOpts, app);
-				} else {
-					const { createServer } = await import("https");
-					return createServer(sslOpts, app);
-				}
+			// If we allow HTTP on the same port, use httpolyglot
+			// otherwise, standard https server
+			if (config.ssl.allowHTTP) {
+				// TODO: Remove this
+				const { createServer } = await import("httpolyglot");
+				return createServer(sslOpts, app);
 			} else {
-				const { createServer } = await import("http");
-				return createServer(app);
+				const { createServer } = await import("https");
+				return createServer(sslOpts, app);
 			}
-		});
-
-		// Fork to immediately start listening for events
-		// With scope so that it's cleaned up when the server is closed
-		const waitForError = yield* Effect.forkScoped(
-			waitForEvent<[unknown]>(server, "error").pipe(
-				Effect.andThen(([err]) => Effect.fail(new UnknownError(err))),
-			),
-		);
-		const waitForClose = yield* Effect.forkScoped(
-			waitForEvent<[]>(server, "close"),
-		);
-
-		const io = yield* Effect.acquireRelease(
-			Effect.sync(() => {
-				const io = new SocketIO.Server<
-					ClientToServerEvents,
-					ServerToClientEvents
-				>(server);
-				io.setMaxListeners(75);
-				return io;
-			}),
-			(io) =>
-				Effect.promise(async () => {
-					io.disconnectSockets(true);
-					await io.close();
-				}),
-		).pipe(Effect.map((io) => io.of("/")));
-
-		log.info(
-			`Starting NodeCG ${nodecgPackageJson.version} (Running on Node.js ${process.version})`,
-		);
-
-		if (sentryEnabled) {
-			app.use(Sentry.Handlers.requestHandler());
-		}
-
-		// Set up Express
-		app.use(compression());
-		app.use(
-			bodyParser.json({
-				// The verify callback receives the raw request object (IncomingMessage)
-				// before body-parser processes it. We use 'any' here because we're
-				// augmenting it with a property that will be available on Express.Request.
-				verify: (req: any, _res, buf) => {
-					req.rawBody = buf;
-				},
-			}),
-		);
-		app.use(
-			bodyParser.urlencoded({
-				extended: true,
-				verify: (req: any, _res, buf) => {
-					req.rawBody = buf;
-				},
-			}),
-		);
-
-		app.set("trust proxy", true);
-
-		app.engine("tmpl", (filePath: string, options: any, callback: any) => {
-			fs.readFile(filePath, (error, content) => {
-				if (error) {
-					return callback(error);
-				}
-
-				return callback(null, renderTemplate(content, options));
-			});
-		});
-
-		const bundleManager = yield* BundleManager;
-
-		let databaseAdapter = defaultAdapter;
-		let databaseAdapterExists = false;
-		for (const bundle of bundleManager.all()) {
-			if (bundle.nodecgBundleConfig.databaseAdapter) {
-				log.warn(
-					"`databaseAdapter` is an experimental feature and may be changed without major version bump.",
-				);
-				if (databaseAdapterExists) {
-					throw new Error(
-						"Multiple bundles are attempting to set the database adapter.",
-					);
-				}
-				databaseAdapter = bundle.nodecgBundleConfig.databaseAdapter;
-				databaseAdapterExists = true;
-			}
-		}
-
-		app.use((_, res, next) => {
-			res.locals.databaseAdapter = databaseAdapter;
-			next();
-		});
-
-		if (config.login?.enabled) {
-			log.info("Login security enabled");
-			const { app: loginMiddleware, sessionMiddleware } =
-				login.createMiddleware(databaseAdapter, {
-					onLogin: (user) => {
-						// If the user had no roles, then that means they "logged in"
-						// with a third-party auth provider but weren't able to
-						// get past the login page because the NodeCG config didn't allow that user.
-						// At this time, we only tell extensions about users that are valid.
-						if (user.roles.length > 0) {
-							extensionManager.emitToAllInstances("login", user);
-						}
-					},
-					onLogout: (user) => {
-						if (user.roles.length > 0) {
-							extensionManager.emitToAllInstances("logout", user);
-						}
-					},
-				});
-			app.use(loginMiddleware);
-
-			// convert a connect middleware to a Socket.IO middleware
-			const wrap = (middleware: any) => (socket: SocketIO.Socket, next: any) =>
-				middleware(socket.request, {}, next);
-
-			io.use(wrap(sessionMiddleware));
-			io.use(wrap(passport.initialize()));
-			io.use(wrap(passport.session()));
-
-			io.use(createSocketAuthMiddleware(databaseAdapter));
 		} else {
-			app.get("/login*", (_, res) => {
-				res.redirect("/dashboard");
-			});
+			const { createServer } = await import("http");
+			return createServer(app);
 		}
+	});
 
-		io.use(socketApiMiddleware);
+	// Fork to immediately start listening for events
+	// With scope so that it's cleaned up when the server is closed
+	const waitForError = yield* Effect.forkScoped(
+		waitForEvent<[unknown]>(server, "error").pipe(
+			Effect.andThen(([err]) => Effect.fail(new UnknownError(err))),
+		),
+	);
+	const waitForClose = yield* Effect.forkScoped(
+		waitForEvent<[]>(server, "close"),
+	);
 
-		// Wait for Chokidar to finish its initial scan.
-		yield* bundleManager.waitForReady().pipe(
-			Effect.timeoutFail({
-				duration: "15 seconds",
-				onTimeout: () => new FileWatcherReadyTimeoutError(),
+	const io = yield* Effect.acquireRelease(
+		Effect.sync(() => {
+			const io = new SocketIO.Server<
+				ClientToServerEvents,
+				ServerToClientEvents
+			>(server);
+			io.setMaxListeners(75);
+			return io;
+		}),
+		(io) =>
+			Effect.promise(async () => {
+				io.disconnectSockets(true);
+				await io.close();
 			}),
-		);
+	).pipe(Effect.map((io) => io.of("/")));
 
-		for (const bundle of bundleManager.all()) {
-			// TODO: remove this feature in v3
-			if (bundle.transformBareModuleSpecifiers) {
-				log.warn(
-					`${bundle.name} uses the deprecated "transformBareModuleSpecifiers" feature. ` +
-						"This feature will be removed in NodeCG v3. " +
-						"Please migrate to using browser-native import maps instead: " +
-						"https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap",
-				);
-				const opts = {
-					rootDir: rootPaths.getRuntimeRoot(),
-					modulesUrl: `/bundles/${bundle.name}/node_modules`,
-				};
-				app.use(`/bundles/${bundle.name}/*`, transformMiddleware(opts));
+	log.info(
+		`Starting NodeCG ${nodecgPackageJson.version} (Running on Node.js ${process.version})`,
+	);
+
+	if (sentryEnabled) {
+		app.use(Sentry.Handlers.requestHandler());
+	}
+
+	// Set up Express
+	app.use(compression());
+	app.use(
+		bodyParser.json({
+			// The verify callback receives the raw request object (IncomingMessage)
+			// before body-parser processes it. We use 'any' here because we're
+			// augmenting it with a property that will be available on Express.Request.
+			verify: (req: any, _res, buf) => {
+				req.rawBody = buf;
+			},
+		}),
+	);
+	app.use(
+		bodyParser.urlencoded({
+			extended: true,
+			verify: (req: any, _res, buf) => {
+				req.rawBody = buf;
+			},
+		}),
+	);
+
+	app.set("trust proxy", true);
+
+	app.engine("tmpl", (filePath: string, options: any, callback: any) => {
+		fs.readFile(filePath, (error, content) => {
+			if (error) {
+				return callback(error);
 			}
-		}
 
-		log.trace(`Attempting to listen on ${config.host}:${config.port}`);
-
-		yield* Effect.forkScoped(
-			listenToEvent<[Error]>(server, "error").pipe(
-				Effect.andThen(
-					Stream.runForEach(([err]) =>
-						Effect.sync(() => {
-							if ((err as NodeJS.ErrnoException).code === "EADDRINUSE") {
-								// There is a separate handling in NODECG_TEST
-								if (!process.env.NODECG_TEST) {
-									log.error(
-										`Listen ${config.host}:${config.port} in use, is NodeCG already running? NodeCG will now exit.`,
-									);
-								}
-							} else {
-								log.error("Unhandled error!", err);
-							}
-						}),
-					),
-				),
-			),
-		);
-
-		if (sentryEnabled) {
-			const sentryApp = yield* sentryConfigRouter();
-			app.use(sentryApp);
-		}
-
-		const persistedReplicantEntities = yield* Effect.promise(async () => {
-			const replicants = await databaseAdapter.getAllReplicants();
-			return replicants;
+			return callback(null, renderTemplate(content, options));
 		});
+	});
 
-		const replicator = yield* Effect.acquireRelease(
-			Effect.sync(
-				() => new Replicator(io, databaseAdapter, persistedReplicantEntities),
-			),
-			(replicator) => Effect.sync(() => replicator.saveAllReplicants()),
-		);
+	const bundleManager = yield* BundleManager;
 
-		const graphicsRoute = yield* graphicsRouter(io, replicator);
-		app.use(graphicsRoute);
-
-		const dashboardRoute = yield* dashboardRouter(bundleManager);
-		app.use(dashboardRoute);
-
-		const mounts = yield* mountsRouter(bundleManager.all());
-		app.use(mounts);
-
-		const sounds = yield* soundsRouter(bundleManager.all(), replicator);
-		app.use(sounds);
-
-		const assets = yield* assetsRouter(bundleManager.all(), replicator);
-		app.use("/assets", assets);
-
-		const sharedSources = yield* sharedSourceRouter(bundleManager.all());
-		app.use(sharedSources);
-
-		if (sentryEnabled) {
-			app.use(Sentry.Handlers.errorHandler());
+	let databaseAdapter = defaultAdapter;
+	let databaseAdapterExists = false;
+	for (const bundle of bundleManager.all()) {
+		if (bundle.nodecgBundleConfig.databaseAdapter) {
+			log.warn(
+				"`databaseAdapter` is an experimental feature and may be changed without major version bump.",
+			);
+			if (databaseAdapterExists) {
+				throw new Error(
+					"Multiple bundles are attempting to set the database adapter.",
+				);
+			}
+			databaseAdapter = bundle.nodecgBundleConfig.databaseAdapter;
+			databaseAdapterExists = true;
 		}
+	}
 
-		// Fallthrough error handler,
-		// Taken from https://docs.sentry.io/platforms/node/express/
-		app.use(
-			(
-				err: unknown,
-				_req: express.Request,
-				res: express.Response,
-				_next: express.NextFunction,
-			) => {
-				res.statusCode = 500;
-				if (sentryEnabled) {
-					// The error id is attached to `res.sentry` to be returned
-					// and optionally displayed to the user for support.
-					res.end(
-						`Internal error\nSentry issue ID: ${String((res as any).sentry)}\n`,
-					);
-				} else {
-					res.end("Internal error");
-				}
+	app.use((_, res, next) => {
+		res.locals.databaseAdapter = databaseAdapter;
+		next();
+	});
 
-				log.error(err);
+	if (config.login?.enabled) {
+		log.info("Login security enabled");
+		const { app: loginMiddleware, sessionMiddleware } = login.createMiddleware(
+			databaseAdapter,
+			{
+				onLogin: (user) => {
+					// If the user had no roles, then that means they "logged in"
+					// with a third-party auth provider but weren't able to
+					// get past the login page because the NodeCG config didn't allow that user.
+					// At this time, we only tell extensions about users that are valid.
+					if (user.roles.length > 0) {
+						extensionManager.emitToAllInstances("login", user);
+					}
+				},
+				onLogout: (user) => {
+					if (user.roles.length > 0) {
+						extensionManager.emitToAllInstances("logout", user);
+					}
+				},
 			},
 		);
+		app.use(loginMiddleware);
 
-		// Set up "bundles" Replicant.
-		const bundlesReplicant = replicator.declare("bundles", "nodecg", {
-			schemaPath: path.join(
-				rootPaths.nodecgInstalledPath,
-				"schemas/bundles.json",
-			),
-			persistent: false,
+		// convert a connect middleware to a Socket.IO middleware
+		const wrap = (middleware: any) => (socket: SocketIO.Socket, next: any) =>
+			middleware(socket.request, {}, next);
+
+		io.use(wrap(sessionMiddleware));
+		io.use(wrap(passport.initialize()));
+		io.use(wrap(passport.session()));
+
+		io.use(createSocketAuthMiddleware(databaseAdapter));
+	} else {
+		app.get("/login*", (_, res) => {
+			res.redirect("/dashboard");
 		});
-		const updateBundlesReplicant = Effect.fn(function* () {
-			const bundles = bundleManager.all();
-			bundlesReplicant.value = clone(bundles);
-		});
-		const bundleManagerEvents = yield* bundleManager
-			.subscribe()
-			.pipe(
-				Effect.map(
-					Stream.filter(
-						(event) =>
-							event._tag === "bundleChanged" ||
-							event._tag === "gitChanged" ||
-							event._tag === "bundleRemoved",
-					),
-				),
-				Effect.map(Stream.debounce("100 millis")),
+	}
+
+	io.use(socketApiMiddleware);
+
+	// Wait for Chokidar to finish its initial scan.
+	yield* bundleManager.waitForReady().pipe(
+		Effect.timeoutFail({
+			duration: "15 seconds",
+			onTimeout: () => new FileWatcherReadyTimeoutError(),
+		}),
+	);
+
+	for (const bundle of bundleManager.all()) {
+		// TODO: remove this feature in v3
+		if (bundle.transformBareModuleSpecifiers) {
+			log.warn(
+				`${bundle.name} uses the deprecated "transformBareModuleSpecifiers" feature. ` +
+					"This feature will be removed in NodeCG v3. " +
+					"Please migrate to using browser-native import maps instead: " +
+					"https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap",
 			);
-		yield* Effect.forkScoped(
-			Stream.runForEach(bundleManagerEvents, updateBundlesReplicant),
-		);
-		yield* updateBundlesReplicant();
+			const opts = {
+				rootDir: rootPaths.getRuntimeRoot(),
+				modulesUrl: `/bundles/${bundle.name}/node_modules`,
+			};
+			app.use(`/bundles/${bundle.name}/*`, transformMiddleware(opts));
+		}
+	}
 
-		const mount = (...args: any[]) => app.use(...args);
-		const extensionManager = yield* Effect.acquireRelease(
-			createExtensionManager(io, replicator, mount),
-			(extensionManager) =>
-				Effect.sync(() =>
-					extensionManager.emitToAllInstances("serverStopping"),
-				),
-		);
-		extensionManager.emitToAllInstances("extensionsLoaded");
+	log.trace(`Attempting to listen on ${config.host}:${config.port}`);
 
-		const runtime = yield* Effect.runtime();
-
-		const run = Effect.fn(function* () {
-			server.listen(
-				{
-					host: config.host,
-					port: process.env.NODECG_TEST ? undefined : config.port,
-				},
-				() =>
-					Runtime.runSync(
-						runtime,
-						Effect.gen(function* () {
-							if (process.env.NODECG_TEST) {
-								const addrInfo = server.address();
-								if (typeof addrInfo !== "object" || addrInfo === null) {
-									throw new Error("couldn't get port number");
-								}
-
-								const { port } = addrInfo;
-								log.warn(
-									`Test mode active, using automatic listen port: ${port}`,
+	yield* Effect.forkScoped(
+		listenToEvent<[Error]>(server, "error").pipe(
+			Effect.andThen(
+				Stream.runForEach(([err]) =>
+					Effect.sync(() => {
+						if ((err as NodeJS.ErrnoException).code === "EADDRINUSE") {
+							// There is a separate handling in NODECG_TEST
+							if (!process.env.NODECG_TEST) {
+								log.error(
+									`Listen ${config.host}:${config.port} in use, is NodeCG already running? NodeCG will now exit.`,
 								);
-								config.port = port;
-								filteredConfig.port = port;
-								process.env.NODECG_TEST_PORT = String(port);
 							}
-
-							const protocol = config.ssl?.enabled ? "https" : "http";
-							log.info("NodeCG running on %s://%s", protocol, config.baseURL);
-							if (isReady) {
-								yield* Deferred.succeed(isReady, undefined);
-							}
-							extensionManager.emitToAllInstances("serverStarted");
-						}),
-					),
-			);
-			return yield* Effect.raceFirst(waitForError, waitForClose);
-		});
-
-		return {
-			run,
-			getExtensions: () => extensionManager.getExtensions(),
-			saveAllReplicantsNow: () => replicator.saveAllReplicantsNow(),
-			bundleManager,
-		};
-	},
-	Effect.provide(
-		Layer.provideMerge(
-			BundleManager.Default,
-			Layer.merge(NodecgConfig.Default, NodecgPackageJson.Default),
+						} else {
+							log.error("Unhandled error!", err);
+						}
+					}),
+				),
+			),
 		),
-	),
-);
+	);
+
+	if (sentryEnabled) {
+		const sentryApp = yield* sentryConfigRouter();
+		app.use(sentryApp);
+	}
+
+	const persistedReplicantEntities = yield* Effect.promise(async () => {
+		const replicants = await databaseAdapter.getAllReplicants();
+		return replicants;
+	});
+
+	const replicator = yield* Effect.acquireRelease(
+		Effect.sync(
+			() => new Replicator(io, databaseAdapter, persistedReplicantEntities),
+		),
+		(replicator) => Effect.sync(() => replicator.saveAllReplicants()),
+	);
+
+	const graphicsRoute = yield* graphicsRouter(io, replicator);
+	app.use(graphicsRoute);
+
+	const dashboardRoute = yield* dashboardRouter(bundleManager);
+	app.use(dashboardRoute);
+
+	const mounts = yield* mountsRouter(bundleManager.all());
+	app.use(mounts);
+
+	const sounds = yield* soundsRouter(bundleManager.all(), replicator);
+	app.use(sounds);
+
+	const assets = yield* assetsRouter(bundleManager.all(), replicator);
+	app.use("/assets", assets);
+
+	const sharedSources = yield* sharedSourceRouter(bundleManager.all());
+	app.use(sharedSources);
+
+	if (sentryEnabled) {
+		app.use(Sentry.Handlers.errorHandler());
+	}
+
+	// Fallthrough error handler,
+	// Taken from https://docs.sentry.io/platforms/node/express/
+	app.use(
+		(
+			err: unknown,
+			_req: express.Request,
+			res: express.Response,
+			_next: express.NextFunction,
+		) => {
+			res.statusCode = 500;
+			if (sentryEnabled) {
+				// The error id is attached to `res.sentry` to be returned
+				// and optionally displayed to the user for support.
+				res.end(
+					`Internal error\nSentry issue ID: ${String((res as any).sentry)}\n`,
+				);
+			} else {
+				res.end("Internal error");
+			}
+
+			log.error(err);
+		},
+	);
+
+	// Set up "bundles" Replicant.
+	const bundlesReplicant = replicator.declare("bundles", "nodecg", {
+		schemaPath: path.join(
+			rootPaths.nodecgInstalledPath,
+			"schemas/bundles.json",
+		),
+		persistent: false,
+	});
+	const updateBundlesReplicant = Effect.fn(function* () {
+		const bundles = bundleManager.all();
+		bundlesReplicant.value = clone(bundles);
+	});
+	const bundleManagerEvents = yield* bundleManager
+		.subscribe()
+		.pipe(
+			Effect.map(
+				Stream.filter(
+					(event) =>
+						event._tag === "bundleChanged" ||
+						event._tag === "gitChanged" ||
+						event._tag === "bundleRemoved",
+				),
+			),
+			Effect.map(Stream.debounce("100 millis")),
+		);
+	yield* Effect.forkScoped(
+		Stream.runForEach(bundleManagerEvents, updateBundlesReplicant),
+	);
+	yield* updateBundlesReplicant();
+
+	const mount = (...args: any[]) => app.use(...args);
+	const extensionManager = yield* Effect.acquireRelease(
+		createExtensionManager(io, replicator, mount),
+		(extensionManager) =>
+			Effect.sync(() => extensionManager.emitToAllInstances("serverStopping")),
+	);
+	extensionManager.emitToAllInstances("extensionsLoaded");
+
+	const runtime = yield* Effect.runtime();
+
+	const run = Effect.fn(function* () {
+		server.listen(
+			{
+				host: config.host,
+				port: process.env.NODECG_TEST ? undefined : config.port,
+			},
+			() =>
+				Runtime.runSync(
+					runtime,
+					Effect.gen(function* () {
+						if (process.env.NODECG_TEST) {
+							const addrInfo = server.address();
+							if (typeof addrInfo !== "object" || addrInfo === null) {
+								throw new Error("couldn't get port number");
+							}
+
+							const { port } = addrInfo;
+							log.warn(
+								`Test mode active, using automatic listen port: ${port}`,
+							);
+							config.port = port;
+							filteredConfig.port = port;
+							process.env.NODECG_TEST_PORT = String(port);
+						}
+
+						const protocol = config.ssl?.enabled ? "https" : "http";
+						log.info("NodeCG running on %s://%s", protocol, config.baseURL);
+						if (isReady) {
+							yield* Deferred.succeed(isReady, undefined);
+						}
+						extensionManager.emitToAllInstances("serverStarted");
+					}),
+				),
+		);
+		return yield* Effect.raceFirst(waitForError, waitForClose);
+	});
+
+	return {
+		run,
+		getExtensions: () => extensionManager.getExtensions(),
+		saveAllReplicantsNow: () => replicator.saveAllReplicantsNow(),
+		bundleManager,
+	};
+});
 
 export class FileWatcherReadyTimeoutError extends Data.TaggedError(
 	"FileWatcherReadyTimeoutError",

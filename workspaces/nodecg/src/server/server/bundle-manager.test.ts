@@ -216,6 +216,9 @@ test(
 		Effect.gen(function* () {
 			const bundleManager = yield* BundleManager;
 
+			// Wait for the watcher to be ready
+			yield* bundleManager.waitForReady();
+
 			// Subscribe to events before making the change
 			const eventStream = yield* bundleManager.subscribe();
 
@@ -262,6 +265,9 @@ if (os.platform() !== "win32") {
 			Effect.gen(function* () {
 				const bundleManager = yield* BundleManager;
 
+				// Wait for the watcher to be ready
+				yield* bundleManager.waitForReady();
+
 				// Subscribe to events before making the change
 				const eventStream = yield* bundleManager.subscribe();
 
@@ -305,6 +311,9 @@ test(
 	testEffect(
 		Effect.gen(function* () {
 			const bundleManager = yield* BundleManager;
+
+			// Wait for the watcher to be ready
+			yield* bundleManager.waitForReady();
 
 			const manifest = JSON.parse(
 				fs.readFileSync(`${tmpDir}/bundles/change-config/package.json`, "utf8"),

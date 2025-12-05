@@ -4,7 +4,7 @@ import { setTimeout } from "node:timers/promises";
 import { pathToFileURL } from "node:url";
 
 import type { getConnection } from "@nodecg/database-adapter-sqlite-legacy";
-import { Deferred, Effect, Fiber } from "effect";
+import { Deferred, Effect, Fiber, Layer } from "effect";
 import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
 import { afterAll, test } from "vitest";
@@ -114,6 +114,12 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 	process.chdir(tmpDir);
 	process.env.NODECG_ROOT = tmpDir;
 
+	// Dynamic imports AFTER NODECG_ROOT is set to ensure config loads from tmpDir
+	const [{ NodecgConfig }, { BundleManager }] = await Promise.all([
+		import("../../src/server/_effect/nodecg-config.ts"),
+		import("../../src/server/server/bundle-manager.ts"),
+	]);
+
 	// Dynamically import createServer from the installed location
 	const serverModulePath = pathToFileURL(
 		path.join(nodecgModulePath, "src/server/server/index.ts"),
@@ -129,6 +135,15 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 		start: async () => {
 			await populateTestData();
 
+			const TestNodecgPackageJsonLayer = Layer.succeed(
+				NodecgPackageJson,
+				NodecgPackageJson.make({ version: "0.0.0" }),
+			);
+			const testLayer = Layer.provideMerge(
+				BundleManager.Default,
+				Layer.merge(NodecgConfig.Default, TestNodecgPackageJsonLayer),
+			);
+
 			await Effect.runPromise(
 				Effect.gen(function* () {
 					const ready = yield* Deferred.make<void>();
@@ -137,15 +152,10 @@ export async function setupInstalledModeTest(nodecgConfigName = "nodecg.json") {
 							const handle = yield* createServer(ready);
 							serverHandle = handle;
 							yield* handle.run();
-						}).pipe(Effect.scoped),
+						}).pipe(Effect.scoped, Effect.provide(testLayer)),
 					);
 					yield* Deferred.await(ready);
-				}).pipe(
-					Effect.provideService(
-						NodecgPackageJson,
-						NodecgPackageJson.make({ version: "0.0.0" }),
-					),
-				),
+				}),
 			);
 		},
 		stop: async () => {

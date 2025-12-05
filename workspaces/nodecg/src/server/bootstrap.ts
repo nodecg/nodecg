@@ -22,16 +22,18 @@ if (isLegacyProject()) {
 }
 
 import { NodeRuntime } from "@effect/platform-node";
-import { ConfigError, Effect, Fiber } from "effect";
+import { ConfigError, Effect, Fiber, Layer } from "effect";
 
 import { UnknownError } from "./_effect/boundary";
 import { expectError } from "./_effect/expect-error";
 import { withLogLevelConfig } from "./_effect/log-level";
 import { withSpanProcessorLive } from "./_effect/span-logger";
 import { exitOnUncaught, sentryEnabled } from "./config";
+import { NodecgConfig } from "./_effect/nodecg-config";
+import { NodecgPackageJson } from "./_effect/nodecg-package-json";
+import { BundleManager } from "./server/bundle-manager";
 import { createServer, FileWatcherReadyTimeoutError } from "./server";
 import { nodecgPackageJson } from "./util/nodecg-package-json";
-import { NodecgPackageJson } from "./_effect/nodecg-package-json.ts";
 
 // TODO: Remove this in the next major release
 const handleFloatingErrors = () =>
@@ -78,7 +80,12 @@ const main = Effect.fn("main")(
 		);
 	},
 	Effect.scoped,
-	Effect.provide(NodecgPackageJson.Default),
+	Effect.provide(
+		Layer.provideMerge(
+			BundleManager.Default,
+			Layer.merge(NodecgConfig.Default, NodecgPackageJson.Default),
+		),
+	),
 );
 
 NodeRuntime.runMain(

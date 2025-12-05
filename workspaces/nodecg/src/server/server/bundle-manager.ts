@@ -5,7 +5,6 @@ import { isLegacyProject, rootPaths } from "@nodecg/internal-util";
 import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
 import {
 	Chunk,
-	Console,
 	Data,
 	Deferred,
 	Duration,
@@ -111,7 +110,6 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 				[addStream, changeStream, unlinkStream],
 				{ concurrency: "unbounded" },
 			).pipe(
-				Stream.tap(Console.log),
 				Stream.filterMap(({ path: filePath, _tag }) => {
 					const bundleName = findBundleName(bundleRootPaths, filePath);
 					if (!bundleName) {
@@ -250,7 +248,6 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 						path.join(bundlePath, "dashboard"), // Watch `dashboard` directories.
 						path.join(bundlePath, "package.json"), // Watch each bundle's `package.json`.
 					]);
-					console.log(watcher.getWatched());
 				};
 
 				if (bundlesPath === rootPaths.runtimeRootPath) {
