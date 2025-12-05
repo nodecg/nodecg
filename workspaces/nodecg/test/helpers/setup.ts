@@ -8,13 +8,13 @@ import isCi from "is-ci";
 import * as puppeteer from "puppeteer";
 import { afterAll, test } from "vitest";
 
+import { NodecgPackageJson } from "../../src/server/_effect/nodecg-package-json.ts";
 import type { serverApiFactory } from "../../src/server/api.server";
 import type { createServer } from "../../src/server/server";
 import { populateTestData } from "./populateTestData";
 import * as C from "./test-constants";
 import { testDirPath } from "./test-dir-path";
 import { createTmpDir } from "./tmp-dir";
-import { NodecgPackageJson } from "../../src/server/_effect/nodecg-package-json.ts";
 
 type ServerHandle = Effect.Effect.Success<ReturnType<typeof createServer>>;
 

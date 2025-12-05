@@ -179,14 +179,14 @@ import "../../test/mocks/foo-mock.js"; // Side-effect import
 
 ## Effect-TS Migration
 
-NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for strategy and plans.
+NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration.md` for strategy and completed phases.
 
 **Migration Strategy**:
 
 - **Within packages**: Root-to-leaf (top-down) - single execution point at package boundary
 - **Across codebase**: Leaf-to-root (bottom-up) - extract isolated subsystems as workspace packages first
 - Each new package is fully Effect-native internally, called via `Effect.run*` from old code
-- Candidates listed in `docs/effect-migration/strategy.md` with complexity ratings
+- Phases 1-5 complete, see `docs/effect-migration.md` for details
 
 **Effect Conventions**:
 
@@ -206,7 +206,7 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Install Effect packages with `npm i @effect/package@latest` in workspace (never edit package.json directly)
 - No return type annotations (let TypeScript infer), no `any`, no type assertions
 - **TaggedEnum empty payloads**: Use `object` instead of `{}` for events with no data (e.g., `ready: object` not `ready: {}`)
-- See `docs/effect-migration/strategy.md` for comprehensive coding guidelines
+- See `docs/effect-migration.md` for comprehensive coding guidelines
 
 **Effect Layer Patterns**:
 
@@ -332,23 +332,9 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 
 **Migration Documentation**:
 
-- All migration work must be logged in `docs/effect-migration/log/` directory
-- **Document plans BEFORE implementation** - create log entry with detailed plan, then update during work
-- **Update docs step-by-step during implementation** - mark checklist items complete as work progresses, don't batch updates
-- Each log entry is numbered sequentially: `##-brief-description.md`
-- Log structure: Plans → Decisions → Problems/Solutions → Patterns → Lessons Learned → Status
-- See `docs/effect-migration/strategy.md` for migration approach and phases
-- See `docs/effect-migration/log/README.md` for log template and guidelines
-- **Update both log and strategy docs** - When completing migration phases, update both the detailed log entry AND the phase summary in strategy.md to reflect actual implementation
-- **Concise documentation style**:
-  - Show function signatures, not full implementations with JSDoc
-  - Reference actual implementation files instead of duplicating code
-  - Avoid verbose code blocks - keep documentation scannable
-- **Log consolidation**: When work is prerequisite for a phase, document it in that phase's log file, not a separate entry
-- **Timer migration doc structure**:
-  - Pair "Legacy" code blocks with "Effect Implementation" sections
-  - Summary tables should have descriptive "Effect" column (e.g., `Stream.prepend + Stream.debounce`), not status checkmarks
-  - Keep Effect explanations to code + one brief sentence
+- All migration documentation consolidated in `docs/effect-migration.md`
+- **Concise documentation style**: Function signatures over full implementations, reference source files
+- Update migration doc when completing phases
 
 **Public API Preservation**:
 

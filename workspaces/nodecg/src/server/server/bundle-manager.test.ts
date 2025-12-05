@@ -11,9 +11,9 @@ import { NodecgConfig } from "../_effect/nodecg-config.js";
 import { NodecgPackageJson } from "../_effect/nodecg-package-json.js";
 import { testEffect } from "../_effect/test-effect.js";
 import {
-	BundleManager,
-	bundleEvent,
 	type BundleEvent,
+	bundleEvent,
+	BundleManager,
 } from "./bundle-manager.js";
 
 const tmpDir = createTmpDir();

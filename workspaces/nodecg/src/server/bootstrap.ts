@@ -27,12 +27,12 @@ import { ConfigError, Effect, Fiber, Layer } from "effect";
 import { UnknownError } from "./_effect/boundary";
 import { expectError } from "./_effect/expect-error";
 import { withLogLevelConfig } from "./_effect/log-level";
-import { withSpanProcessorLive } from "./_effect/span-logger";
-import { exitOnUncaught, sentryEnabled } from "./config";
 import { NodecgConfig } from "./_effect/nodecg-config";
 import { NodecgPackageJson } from "./_effect/nodecg-package-json";
-import { BundleManager } from "./server/bundle-manager";
+import { withSpanProcessorLive } from "./_effect/span-logger";
+import { exitOnUncaught, sentryEnabled } from "./config";
 import { createServer, FileWatcherReadyTimeoutError } from "./server";
+import { BundleManager } from "./server/bundle-manager";
 import { nodecgPackageJson } from "./util/nodecg-package-json";
 
 // TODO: Remove this in the next major release
