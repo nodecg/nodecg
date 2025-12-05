@@ -320,6 +320,7 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration.md` f
 - **Nested groupByKey for multi-level debouncing**: Use nested `Stream.groupByKey` + `GroupBy.evaluate` when same stream needs different debounce durations based on event category (e.g., 500ms for bundle parsing, 250ms for git changes)
 
 - **Test helpers** (`src/server/_effect/test-effect.ts`):
+
   - `testEffect(effect)` - Wraps Effect for Vitest, handles scoping automatically
   - Use `@effect/platform` FileSystem service with `NodeFileSystem.layer` for filesystem operations in tests
   - `Chunk.head` pattern for getting first stream element (avoids array indexing with `noUncheckedIndexedAccess`)

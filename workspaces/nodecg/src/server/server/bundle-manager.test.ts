@@ -90,7 +90,7 @@ afterAll(async () => {
 	}
 });
 
-beforeAll(async () => {
+beforeAll(() => {
 	process.env.NODECG_ROOT = tmpDir;
 	fs.cpSync(testDirPath("fixtures/bundle-manager"), tmpDir, {
 		recursive: true,
