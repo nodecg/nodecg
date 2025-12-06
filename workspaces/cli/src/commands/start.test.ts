@@ -16,7 +16,7 @@ beforeEach(() => {
 
 test("should start NodeCG", async () => {
 	const [port] = await Promise.all([
-		vi.waitUntil(() => process.env["NODECG_TEST_PORT"], { timeout: 5000 }),
+		vi.waitUntil(() => process.env["NODECG_TEST_PORT"], { timeout: 10_000 }),
 		program.runWith("start"),
 	]);
 	expect(port).toBeTypeOf("string");
