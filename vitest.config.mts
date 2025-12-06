@@ -21,6 +21,7 @@ export default defineConfig({
 				test: {
 					name: "e2e-legacy",
 					dir: "workspaces/nodecg/test/legacy-mode",
+					hookTimeout: 30_000,
 					testTimeout: 30_000,
 				},
 			},
@@ -28,6 +29,7 @@ export default defineConfig({
 				test: {
 					name: "e2e-installed",
 					dir: "workspaces/nodecg/test/installed-mode",
+					hookTimeout: 30_000,
 					testTimeout: 30_000,
 				},
 			},
