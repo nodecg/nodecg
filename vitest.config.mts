@@ -10,7 +10,6 @@ export default defineConfig({
 			include: ["workspaces/*/src"],
 			exclude: ["workspaces/nodecg/src/client"],
 		},
-		testTimeout: 10_000,
 		projects: [
 			{
 				test: {
@@ -32,7 +31,13 @@ export default defineConfig({
 					testTimeout: 30_000,
 				},
 			},
-			"workspaces/cli",
+			{
+				test: {
+					name: "cli",
+					dir: "workspaces/cli",
+					testTimeout: 10_000,
+				},
+			},
 			"workspaces/database-adapter-sqlite-legacy",
 			"workspaces/database-adapter-types",
 			"workspaces/internal-util",
