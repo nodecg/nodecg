@@ -1,5 +1,5 @@
 import { rootPaths } from "@nodecg/internal-util";
-import { Effect } from "effect";
+import { Effect, Stream } from "effect";
 import express from "express";
 import fs from "fs";
 import path from "path";
@@ -28,7 +28,9 @@ type InstanceRep = ServerReplicant<
 >;
 
 export const registrationCoordinator = Effect.fn("registrationCoordinator")(
-	function* (io: RootNS, bundleManager: BundleManager, replicator: Replicator) {
+	function* (io: RootNS, replicator: Replicator) {
+		const bundleManager = yield* BundleManager;
+
 		const app = express();
 
 		const instancesRep: InstanceRep = replicator.declare(
@@ -44,8 +46,21 @@ export const registrationCoordinator = Effect.fn("registrationCoordinator")(
 			},
 		);
 
-		bundleManager.on("bundleChanged", updateInstanceStatuses);
-		bundleManager.on("gitChanged", updateInstanceStatuses);
+		const bundleEvents = yield* bundleManager
+			.subscribe()
+			.pipe(
+				Effect.map(
+					Stream.filter(
+						(event) =>
+							event._tag === "bundleChanged" || event._tag === "gitChanged",
+					),
+				),
+			);
+		yield* Effect.forkScoped(
+			bundleEvents.pipe(
+				Stream.runForEach(() => Effect.sync(updateInstanceStatuses)),
+			),
+		);
 
 		io.on("connection", (socket) => {
 			socket.on("graphic:registerSocket", (regRequest, cb) => {

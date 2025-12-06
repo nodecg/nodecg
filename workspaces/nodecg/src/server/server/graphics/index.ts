@@ -16,18 +16,14 @@ import { registrationCoordinator } from "./registration.js";
 
 export const graphicsRouter = Effect.fn("graphicsRouter")(function* (
 	io: RootNS,
-	bundleManager: BundleManager,
 	replicator: Replicator,
 ) {
+	const bundleManager = yield* BundleManager;
 	const app = express();
 
 	// Start up the registration lib, which tracks how many instances of
 	// a graphic are open, and enforces singleInstance behavior.
-	const registrationApp = yield* registrationCoordinator(
-		io,
-		bundleManager,
-		replicator,
-	);
+	const registrationApp = yield* registrationCoordinator(io, replicator);
 	app.use(registrationApp);
 
 	app.get("/bundles/:bundleName/graphics*", authCheck, (req, res, next) => {

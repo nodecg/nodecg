@@ -7,11 +7,10 @@ import { Effect, Stream } from "effect";
 import express from "express";
 
 import type { NodeCG } from "../../types/nodecg.js";
-import { listenToEvent, waitForEvent } from "../_effect/event-listener.js";
 import { config } from "../config/index.js";
 import { authCheck } from "../util/authcheck.js";
 import { nodecgPackageJson } from "../util/nodecg-package-json.js";
-import type { BundleManager, BundleManagerEventMap } from "./bundle-manager.js";
+import { BundleManager } from "./bundle-manager.js";
 
 const baseSentryConfig = {
 	dsn: config.sentry.enabled ? config.sentry.dsn : "",
@@ -19,9 +18,8 @@ const baseSentryConfig = {
 	version: nodecgPackageJson.version,
 };
 
-export const sentryConfigRouter = Effect.fn("sentryConfigRouter")(function* (
-	bundleManager: BundleManager,
-) {
+export const sentryConfigRouter = Effect.fn("sentryConfigRouter")(function* () {
+	const bundleManager = yield* BundleManager;
 	const bundleMetadata: {
 		name: string;
 		git: NodeCG.Bundle.GitData;
@@ -30,7 +28,7 @@ export const sentryConfigRouter = Effect.fn("sentryConfigRouter")(function* (
 	const app = express();
 
 	yield* Effect.forkScoped(
-		waitForEvent(bundleManager, "ready").pipe(
+		bundleManager.waitForReady().pipe(
 			Effect.andThen(() =>
 				Effect.sync(() => {
 					Sentry.configureScope((scope) => {
@@ -48,12 +46,12 @@ export const sentryConfigRouter = Effect.fn("sentryConfigRouter")(function* (
 		),
 	);
 
-	const gitChangedStream = yield* listenToEvent<
-		Parameters<BundleManagerEventMap["gitChanged"]>
-	>(bundleManager, "gitChanged");
+	const gitChangedStream = yield* bundleManager
+		.subscribe()
+		.pipe(Effect.map(Stream.filter((event) => event._tag === "gitChanged")));
 	yield* Effect.forkScoped(
 		gitChangedStream.pipe(
-			Stream.runForEach(([bundle]) =>
+			Stream.runForEach(({ bundle }) =>
 				Effect.sync(() => {
 					const metadataToUpdate = bundleMetadata.find(
 						(data) => data.name === bundle.name,
