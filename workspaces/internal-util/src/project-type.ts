@@ -14,7 +14,8 @@ export function isLegacyProject(): boolean {
 			),
 		);
 
-		_cachedIsLegacyProject = rootPackageJson.nodecgRoot === true;
+		_cachedIsLegacyProject =
+			rootPackageJson.nodecgRoot === true || rootPackageJson.name === "nodecg";
 
 		if (!_cachedIsLegacyProject) {
 			console.warn(
