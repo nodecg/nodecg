@@ -10,6 +10,7 @@ export default defineConfig({
 			include: ["workspaces/*/src"],
 			exclude: ["workspaces/nodecg/src/client"],
 		},
+		maxWorkers: "50%",
 		projects: [
 			{
 				test: {
@@ -21,23 +22,20 @@ export default defineConfig({
 				test: {
 					name: "e2e-legacy",
 					dir: "workspaces/nodecg/test/legacy-mode",
-					hookTimeout: 30_000,
-					testTimeout: 30_000,
+					testTimeout: 15_000,
 				},
 			},
 			{
 				test: {
 					name: "e2e-installed",
 					dir: "workspaces/nodecg/test/installed-mode",
-					hookTimeout: 30_000,
-					testTimeout: 30_000,
+					testTimeout: 15_000,
 				},
 			},
 			{
 				test: {
 					name: "cli",
 					dir: "workspaces/cli",
-					testTimeout: 10_000,
 				},
 			},
 			"workspaces/database-adapter-sqlite-legacy",

@@ -77,6 +77,10 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 			const nodecgPackageJson = yield* NodecgPackageJson;
 			const nodecgVersion = nodecgPackageJson.version;
 
+			const bundleRootPaths = isLegacyProject()
+				? bundlesPaths
+				: [rootPaths.runtimeRootPath, ...bundlesPaths];
+
 			const gitChangeHandler = Effect.fn("gitChangeHandler")(function* (
 				bundle: NodeCG.Bundle,
 			) {
@@ -87,6 +91,7 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 			const ready = yield* Deferred.make();
 			const addStreamForReady = yield* listenToAdd(watcher);
 			yield* addStreamForReady.pipe(
+				Stream.filter(({ path: p }) => findBundleName(bundleRootPaths, p) !== false),
 				Stream.as(null),
 				Stream.prepend(Chunk.of(null)),
 				Stream.debounce(Duration.seconds(1)),
@@ -95,10 +100,6 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 				Effect.andThen(() => Deferred.succeed(ready, undefined)),
 				Effect.forkScoped,
 			);
-
-			const bundleRootPaths = isLegacyProject()
-				? bundlesPaths
-				: [rootPaths.runtimeRootPath, ...bundlesPaths];
 
 			const addStream = yield* listenToAdd(watcher);
 			const changeStream = yield* listenToChange(watcher);
