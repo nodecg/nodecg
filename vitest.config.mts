@@ -10,6 +10,7 @@ export default defineConfig({
 			include: ["workspaces/*/src"],
 			exclude: ["workspaces/nodecg/src/client"],
 		},
+		maxWorkers: "50%",
 		projects: [
 			{
 				test: {
