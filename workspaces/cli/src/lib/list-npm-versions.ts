@@ -10,7 +10,9 @@ export async function listNpmVersions(packageName: string) {
 export async function listNpmDistTags(
 	packageName: string,
 ): Promise<Record<string, string>> {
-	const res = await fetch(`https://registry.npmjs.org/-/package/${packageName}/dist-tags`);
+	const res = await fetch(
+		`https://registry.npmjs.org/-/package/${packageName}/dist-tags`,
+	);
 	if (!res.ok) {
 		throw new Error(`Failed to fetch dist-tags for ${packageName}`);
 	}

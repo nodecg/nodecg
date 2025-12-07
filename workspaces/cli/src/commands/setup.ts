@@ -9,10 +9,7 @@ import spawn from "nano-spawn";
 import semver from "semver";
 import * as tar from "tar";
 
-import {
-	listNpmDistTags,
-	listNpmVersions,
-} from "../lib/list-npm-versions.js";
+import { listNpmDistTags, listNpmVersions } from "../lib/list-npm-versions.js";
 import type { NpmRelease } from "../lib/sample/npm-release.js";
 import { getCurrentNodeCGVersion, pathContainsNodeCG } from "../lib/util.js";
 
@@ -53,9 +50,7 @@ async function decideActionVersion(
 
 	if (version) {
 		if (isDistTag) {
-			process.stdout.write(
-				`Resolving dist-tag ${chalk.magenta(version)}... `,
-			);
+			process.stdout.write(`Resolving dist-tag ${chalk.magenta(version)}... `);
 		} else {
 			process.stdout.write(
 				`Finding latest release that satisfies semver range ${chalk.magenta(version)}... `,
