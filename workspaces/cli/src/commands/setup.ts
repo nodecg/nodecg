@@ -9,7 +9,7 @@ import spawn from "nano-spawn";
 import semver from "semver";
 import * as tar from "tar";
 
-import { listNpmVersions } from "../lib/list-npm-versions.js";
+import { listNpmDistTags, listNpmVersions } from "../lib/list-npm-versions.js";
 import type { NpmRelease } from "../lib/sample/npm-release.js";
 import { getCurrentNodeCGVersion, pathContainsNodeCG } from "../lib/util.js";
 
@@ -44,10 +44,18 @@ async function decideActionVersion(
 		isUpdate = true;
 	}
 
+	// Check if version is a dist-tag (e.g., "latest", "next", "canary")
+	// Dist-tags are not valid semver ranges
+	const isDistTag = version && !semver.validRange(version);
+
 	if (version) {
-		process.stdout.write(
-			`Finding latest release that satisfies semver range ${chalk.magenta(version)}... `,
-		);
+		if (isDistTag) {
+			process.stdout.write(`Resolving dist-tag ${chalk.magenta(version)}... `);
+		} else {
+			process.stdout.write(
+				`Finding latest release that satisfies semver range ${chalk.magenta(version)}... `,
+			);
+		}
 	} else if (isUpdate) {
 		process.stdout.write("Checking against local install for updates... ");
 	} else {
@@ -66,18 +74,42 @@ async function decideActionVersion(
 	let target: string;
 
 	// If a version (or semver range) was supplied, find the latest release that satisfies the range.
+	// If it's a dist-tag, resolve it to the actual version.
 	// Else, make the target the newest version.
 	if (version) {
-		const maxSatisfying = semver.maxSatisfying(tags, version);
-		if (!maxSatisfying) {
-			process.stdout.write(chalk.red("failed!") + os.EOL);
-			console.error(
-				`No releases match the supplied semver range (${chalk.magenta(version)})`,
-			);
-			return;
-		}
+		if (isDistTag) {
+			// Resolve dist-tag to actual version
+			let distTags;
+			try {
+				distTags = await listNpmDistTags("nodecg");
+			} catch (error) {
+				process.stdout.write(chalk.red("failed!") + os.EOL);
+				console.error(error instanceof Error ? error.message : error);
+				return;
+			}
 
-		target = maxSatisfying;
+			const resolvedVersion = distTags[version];
+			if (!resolvedVersion) {
+				process.stdout.write(chalk.red("failed!") + os.EOL);
+				console.error(
+					`Unknown dist-tag: ${chalk.magenta(version)}. Available tags: ${Object.keys(distTags).join(", ")}`,
+				);
+				return;
+			}
+
+			target = resolvedVersion;
+		} else {
+			const maxSatisfying = semver.maxSatisfying(tags, version);
+			if (!maxSatisfying) {
+				process.stdout.write(chalk.red("failed!") + os.EOL);
+				console.error(
+					`No releases match the supplied semver range (${chalk.magenta(version)})`,
+				);
+				return;
+			}
+
+			target = maxSatisfying;
+		}
 	} else {
 		target = semver.maxSatisfying(tags, "") ?? "";
 	}
@@ -115,7 +147,9 @@ async function decideActionVersion(
 		}
 	}
 
-	if (semver.lt(target, "v2.0.0")) {
+	// Allow canary/PR releases (0.0.0-*) which are test releases for newer versions
+	const isCanaryRelease = /^v?0\.0\.0-.+/.test(target);
+	if (!isCanaryRelease && semver.lt(target, "v2.0.0")) {
 		console.error("CLI does not support NodeCG versions older than v2.0.0.");
 		return;
 	}
@@ -152,7 +186,10 @@ async function installNodecg(
 
 	process.stdout.write(`Downloading ${target} from npm... `);
 
-	const targetVersion = semver.coerce(target)?.version;
+	// Use semver.parse first to preserve prerelease info (e.g., 0.0.0-canary.abc123)
+	// Fall back to semver.coerce for non-standard version formats
+	const targetVersion =
+		semver.parse(target)?.version ?? semver.coerce(target)?.version;
 	if (!targetVersion) {
 		throw new Error(`Failed to determine target NodeCG version`);
 	}
