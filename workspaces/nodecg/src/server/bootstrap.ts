@@ -31,7 +31,7 @@ import { NodecgConfig } from "./_effect/nodecg-config";
 import { NodecgPackageJson } from "./_effect/nodecg-package-json";
 import { withSpanProcessorLive } from "./_effect/span-logger";
 import { exitOnUncaught, sentryEnabled } from "./config";
-import { createServer, FileWatcherReadyTimeoutError } from "./server";
+import { createServer } from "./server";
 import { BundleManager } from "./server/bundle-manager";
 import { nodecgPackageJson } from "./util/nodecg-package-json";
 
@@ -88,12 +88,4 @@ const main = Effect.fn("main")(
 	),
 );
 
-NodeRuntime.runMain(
-	main().pipe(
-		withSpanProcessorLive,
-		withLogLevelConfig,
-		expectError<
-			UnknownError | ConfigError.ConfigError | FileWatcherReadyTimeoutError
-		>(),
-	),
-);
+NodeRuntime.runMain(main().pipe(withSpanProcessorLive, withLogLevelConfig));

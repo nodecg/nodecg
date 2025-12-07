@@ -27,24 +27,16 @@ export const sentryConfigRouter = Effect.fn("sentryConfigRouter")(function* () {
 	}[] = [];
 	const app = express();
 
-	yield* Effect.forkScoped(
-		bundleManager.waitForReady().pipe(
-			Effect.andThen(() =>
-				Effect.sync(() => {
-					Sentry.configureScope((scope) => {
-						bundleManager.all().forEach((bundle) => {
-							bundleMetadata.push({
-								name: bundle.name,
-								git: bundle.git,
-								version: bundle.version,
-							});
-						});
-						scope.setExtra("bundles", bundleMetadata);
-					});
-				}),
-			),
-		),
-	);
+	Sentry.configureScope((scope) => {
+		bundleManager.all().forEach((bundle) => {
+			bundleMetadata.push({
+				name: bundle.name,
+				git: bundle.git,
+				version: bundle.version,
+			});
+		});
+		scope.setExtra("bundles", bundleMetadata);
+	});
 
 	const gitChangedStream = yield* bundleManager
 		.subscribe()

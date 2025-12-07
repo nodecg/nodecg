@@ -4,9 +4,7 @@ import path from "node:path";
 import { isLegacyProject, rootPaths } from "@nodecg/internal-util";
 import { cosmiconfigSync as cosmiconfig } from "cosmiconfig";
 import {
-	Chunk,
 	Data,
-	Deferred,
 	Duration,
 	Effect,
 	GroupBy,
@@ -24,6 +22,7 @@ import {
 	listenToChange,
 	listenToError,
 	listenToUnlink,
+	waitForReady,
 } from "../_effect/chokidar.ts";
 import { NodecgConfig } from "../_effect/nodecg-config.ts";
 import { NodecgPackageJson } from "../_effect/nodecg-package-json.ts";
@@ -45,20 +44,6 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 	"BundleManager",
 	{
 		scoped: Effect.gen(function* () {
-			// Start up the watcher, but don't watch any files yet.
-			// We'll add the files we want to watch later, in the init() method.
-			const watcher = yield* getWatcher([], {
-				persistent: true,
-				ignoreInitial: true,
-				followSymlinks: true,
-				ignored: [
-					/\/.+___jb_.+___/, // Ignore temp files created by JetBrains IDEs
-					/\/node_modules\//, // Ignore node_modules folders
-					/\/bower_components\//, // Ignore bower_components folders
-					/\/.+\.lock/, // Ignore lockfiles
-				],
-			});
-
 			const events = yield* PubSub.unbounded<BundleEvent>();
 
 			const blacklistedBundleDirectories = ["node_modules", "bower_components"];
@@ -68,7 +53,6 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 
 			const nodecgConfig = yield* NodecgConfig;
 
-			// TODO: These are leftover from previous class implementation constructor
 			const bundlesPaths = [
 				path.join(rootPaths.getRuntimeRoot(), "bundles"),
 				...(nodecgConfig.bundles?.paths ?? []),
@@ -88,20 +72,107 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 				yield* events.publish(bundleEvent.gitChanged({ bundle }));
 			});
 
-			const ready = yield* Deferred.make();
-			const addStreamForReady = yield* listenToAdd(watcher);
-			yield* addStreamForReady.pipe(
-				Stream.filter(
-					({ path: p }) => findBundleName(bundleRootPaths, p) !== false,
-				),
-				Stream.as(null),
-				Stream.prepend(Chunk.of(null)),
-				Stream.debounce(Duration.seconds(1)),
-				Stream.take(1),
-				Stream.runDrain,
-				Effect.andThen(() => Deferred.succeed(ready, undefined)),
-				Effect.forkScoped,
-			);
+			const discoveredBundles: { bundlePath: string; bundleName: string }[] =
+				[];
+			const watchPaths: string[] = [];
+
+			bundleRootPaths.forEach((bundlesPath) => {
+				log.trace(`Loading bundles from ${bundlesPath}`);
+
+				const discoverBundle = (bundlePath: string) => {
+					if (!fs.statSync(bundlePath).isDirectory()) {
+						return;
+					}
+
+					const bundleFolderName = path.basename(bundlePath);
+					if (
+						blacklistedBundleDirectories.includes(bundleFolderName) ||
+						bundleFolderName.startsWith(".")
+					) {
+						return;
+					}
+
+					const bundlePackageJson = fs.readFileSync(
+						path.join(bundlePath, "package.json"),
+						"utf-8",
+					);
+					const bundleName = JSON.parse(bundlePackageJson).name;
+
+					if (nodecgConfig?.bundles?.disabled?.includes(bundleName)) {
+						log.debug(
+							`Not loading bundle ${bundleName} as it is disabled in config`,
+						);
+						return;
+					}
+
+					if (
+						nodecgConfig?.bundles?.enabled &&
+						!nodecgConfig?.bundles.enabled.includes(bundleName)
+					) {
+						log.debug(
+							`Not loading bundle ${bundleName} as it is not enabled in config`,
+						);
+						return;
+					}
+
+					discoveredBundles.push({ bundlePath, bundleName });
+					watchPaths.push(
+						path.join(bundlePath, ".git"),
+						path.join(bundlePath, "dashboard"),
+						path.join(bundlePath, "package.json"),
+					);
+				};
+
+				if (bundlesPath === rootPaths.runtimeRootPath) {
+					discoverBundle(rootPaths.runtimeRootPath);
+				} else if (fs.existsSync(bundlesPath)) {
+					const bundleFolders = fs.readdirSync(bundlesPath);
+					bundleFolders.forEach((bundleFolderName) => {
+						const bundlePath = path.join(bundlesPath, bundleFolderName);
+						discoverBundle(bundlePath);
+					});
+				}
+			});
+
+			const watcher = yield* getWatcher(watchPaths, {
+				persistent: true,
+				ignoreInitial: true,
+				followSymlinks: true,
+				ignored: [
+					/\/.+___jb_.+___/, // Ignore temp files created by JetBrains IDEs
+					/\/node_modules\//, // Ignore node_modules folders
+					/\/bower_components\//, // Ignore bower_components folders
+					/\/.+\.lock/, // Ignore lockfiles
+				],
+			});
+
+			yield* waitForReady(watcher);
+
+			for (const { bundlePath, bundleName } of discoveredBundles) {
+				log.debug(`Loading bundle ${bundleName}`);
+
+				const bundle = parseBundle(
+					bundlePath,
+					loadBundleCfg(cfgPath, bundleName),
+				);
+
+				if (isLegacyProject()) {
+					if (!bundle.compatibleRange) {
+						log.error(
+							`${bundle.name}'s package.json does not have a "nodecg.compatibleRange" property.`,
+						);
+						continue;
+					}
+					if (!semver.satisfies(nodecgVersion, bundle.compatibleRange)) {
+						log.error(
+							`${bundle.name} requires NodeCG version ${bundle.compatibleRange}, current version is ${nodecgVersion}`,
+						);
+						continue;
+					}
+				}
+
+				bundles.push(bundle);
+			}
 
 			const addStream = yield* listenToAdd(watcher);
 			const changeStream = yield* listenToChange(watcher);
@@ -174,95 +245,6 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 					Stream.runDrain,
 				),
 			);
-
-			bundleRootPaths.forEach((bundlesPath) => {
-				log.trace(`Loading bundles from ${bundlesPath}`);
-
-				const handleBundle = (bundlePath: string) => {
-					if (!fs.statSync(bundlePath).isDirectory()) {
-						return;
-					}
-
-					// Prevent attempting to load unwanted directories. Those specified above and all dot-prefixed.
-					const bundleFolderName = path.basename(bundlePath);
-					if (
-						blacklistedBundleDirectories.includes(bundleFolderName) ||
-						bundleFolderName.startsWith(".")
-					) {
-						return;
-					}
-
-					const bundlePackageJson = fs.readFileSync(
-						path.join(bundlePath, "package.json"),
-						"utf-8",
-					);
-					const bundleName = JSON.parse(bundlePackageJson).name;
-
-					if (nodecgConfig?.bundles?.disabled?.includes(bundleName)) {
-						log.debug(
-							`Not loading bundle ${bundleName} as it is disabled in config`,
-						);
-						return;
-					}
-
-					if (
-						nodecgConfig?.bundles?.enabled &&
-						!nodecgConfig?.bundles.enabled.includes(bundleName)
-					) {
-						log.debug(
-							`Not loading bundle ${bundleName} as it is not enabled in config`,
-						);
-						return;
-					}
-
-					log.debug(`Loading bundle ${bundleName}`);
-
-					// Parse each bundle and push the result onto the bundles array
-					const bundle = parseBundle(
-						bundlePath,
-						loadBundleCfg(cfgPath, bundleName),
-					);
-
-					if (isLegacyProject()) {
-						if (!bundle.compatibleRange) {
-							log.error(
-								`${bundle.name}'s package.json does not have a "nodecg.compatibleRange" property.`,
-							);
-							return;
-						}
-						// Check if the bundle is compatible with this version of NodeCG
-						if (!semver.satisfies(nodecgVersion, bundle.compatibleRange)) {
-							log.error(
-								`${bundle.name} requires NodeCG version ${bundle.compatibleRange}, current version is ${nodecgVersion}`,
-							);
-							return;
-						}
-					}
-
-					bundles.push(bundle);
-
-					// Use `chokidar` to watch for file changes within bundles.
-					// Workaround for https://github.com/paulmillr/chokidar/issues/419
-					// This workaround is necessary to fully support symlinks.
-					// This is applied after the bundle has been validated and loaded.
-					// Bundles that do not properly load upon startup are not recognized for updates.
-					watcher.add([
-						path.join(bundlePath, ".git"), // Watch `.git` directories.
-						path.join(bundlePath, "dashboard"), // Watch `dashboard` directories.
-						path.join(bundlePath, "package.json"), // Watch each bundle's `package.json`.
-					]);
-				};
-
-				if (bundlesPath === rootPaths.runtimeRootPath) {
-					handleBundle(rootPaths.runtimeRootPath);
-				} else if (fs.existsSync(bundlesPath)) {
-					const bundleFolders = fs.readdirSync(bundlesPath);
-					bundleFolders.forEach((bundleFolderName) => {
-						const bundlePath = path.join(bundlesPath, bundleFolderName);
-						handleBundle(bundlePath);
-					});
-				}
-			});
 
 			/**
 			 * Returns a shallow-cloned array of all currently active bundles.
@@ -367,9 +349,7 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 				return Stream.fromQueue(queue);
 			});
 
-			const waitForReady = () => Deferred.await(ready);
-
-			return { find, all, remove, subscribe, waitForReady };
+			return { find, all, remove, subscribe };
 		}),
 	},
 ) {}

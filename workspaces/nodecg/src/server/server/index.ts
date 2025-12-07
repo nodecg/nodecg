@@ -36,7 +36,7 @@ import { databaseAdapter as defaultAdapter } from "@nodecg/database-adapter-sqli
 import { rootPaths } from "@nodecg/internal-util";
 import bodyParser from "body-parser";
 import compression from "compression";
-import { Data, Deferred, Effect, Runtime, Stream } from "effect";
+import { Deferred, Effect, Runtime, Stream } from "effect";
 import express from "express";
 import transformMiddleware from "express-transform-bare-module-specifiers";
 import memoize from "fast-memoize";
@@ -242,14 +242,6 @@ export const createServer = Effect.fn("createServer")(function* (
 
 	io.use(socketApiMiddleware);
 
-	// Wait for Chokidar to finish its initial scan.
-	yield* bundleManager.waitForReady().pipe(
-		Effect.timeoutFail({
-			duration: "15 seconds",
-			onTimeout: () => new FileWatcherReadyTimeoutError(),
-		}),
-	);
-
 	for (const bundle of bundleManager.all()) {
 		// TODO: remove this feature in v3
 		if (bundle.transformBareModuleSpecifiers) {
@@ -437,9 +429,3 @@ export const createServer = Effect.fn("createServer")(function* (
 		bundleManager,
 	};
 });
-
-export class FileWatcherReadyTimeoutError extends Data.TaggedError(
-	"FileWatcherReadyTimeoutError",
-) {
-	override readonly message = "Timed out waiting for file watcher to be ready";
-}
