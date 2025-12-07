@@ -60,6 +60,8 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 - **Server URL**: `server.getUrl()` or `server.getUrl('/path')`
 - **Waiting for changes**: Use Puppeteer's `page.waitForSelector()`, `page.waitForFunction()`
 - **Client-side evaluation**: `await page.evaluate(() => { ... })`
+- **Test library wrappers with real tools**: When testing code that wraps an external library (e.g., `isomorphic-git`), use real external tools (e.g., actual `git` commands via `@effect/platform` Command) for test setup - avoids testing the library against itself
+- **Git object files are read-only**: Real git creates object files with read-only permissions - use `chmod` before overwriting in corruption tests
 
 ### Test Coverage Guidelines
 
@@ -85,9 +87,7 @@ NodeCG is a broadcast graphics framework. This codebase includes:
 
 ### Module Resolution
 
-- **ESM compatibility goal**: Codebase is moving towards ESM compatibility without bundlers
 - **Always use `.js` extensions** in imports, even for `.ts` source files (applies to both production and test code)
-- **Directory modules need explicit `/index.js`**: ESM doesn't auto-resolve directory imports
 - Workspace packages (`@nodecg/*`) resolve via npm workspaces
 - Source uses ESM-style imports, compiled output is CommonJS
 - Tests import from compiled `out/` directory (CommonJS modules)
@@ -196,6 +196,9 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Always use `Effect.fn("name")` for effect-returning functions (never `Effect.gen` for definitions)
 - **No classes in Effect** - use plain functions, not class-based architecture
 - Services created with `Effect.Service` (never Context API directly)
+- **Effect.Service official patterns only** - use `effect`/`scoped` options with `dependencies`, never custom static `layer()` methods or `Layer.scoped(Tag, ...)` directly
+- **Avoid service parameterization** - prefer reading config from existing imports (e.g., `rootPaths`, `config`) rather than passing parameters to layer factories
+- **Effect.fn over Effect.Service for factory functions** - when a function needs tracing/spans but not full service semantics, use `Effect.fn("name")(function* (...) { ... })` instead of creating an Effect.Service
 - **Testing**: Use `testEffect()` helper from `src/server/_effect/test-effect.ts` for running Effect tests in Vitest
   - Helper accepts `Effect<A, E, Scope.Scope>` and wraps with `Effect.scoped`
   - Works with both `never` and `Scope` requirements
@@ -271,10 +274,32 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 
 **Effect Utilities Available**:
 
+- **GitService** (`src/server/_effect/git-service.ts`):
+
+  - `getGitHead(bundlePath)` - Returns `Effect<Option<GitHeadData>, GitError>`
+  - `GitHeadData`: `{ hash, shortHash, date, message, branch: Option<string> }` (branch is `Option.none()` for detached HEAD)
+  - `GitError`: `GitBranchReadError | GitHeadReadError | GitDateParseError` (concrete errors with `path` + `cause` or `timestamp`, each has descriptive `message`)
+  - Returns `Option.none()` for: no .git directory, no commits
+  - Uses `isomorphic-git` (replaces `git-rev-sync` which requires `process.chdir`)
+  - Dependencies included via `dependencies` option: `NodeFileSystem.layer`, `NodePath.layer`
+  - Use `GitService.Default` layer directly - dependencies are bundled
+
+- **NodecgVersion** (`src/server/_effect/nodecg-version.ts`):
+
+  - Simple service providing `{ version: string }` from NodeCG's package.json
+  - Uses `sync` option (not `effect`) since it reads synchronously at startup
+  - Example: `const { version } = yield* NodecgVersion`
+
+- **isomorphic-git patterns**:
+
+  - Error classes available via `git.Errors.*` (e.g., `git.Errors.NotFoundError`)
+  - Use `instanceof git.Errors.NotFoundError` for clean error type checking
+
 - **EventEmitter utilities** (`src/server/_effect/event-listener.ts`):
 
-  - `waitForEvent<T>(emitter, eventName)` - One-time events as Effect
-  - `listenToEvent<T>(emitter, eventName)` - Continuous events as Effect<Stream>
+  - `waitForEvent<T>(emitter, eventName)` - One-time events as Effect, auto-cleans on interruption
+  - `listenToEvent<T>(emitter, eventName, boundary?)` - Continuous events as Effect<Stream>
+    - Optional `boundary` parameter for bounded queue (default: unbounded)
   - Returns event payloads as tuples for multi-arg events
 
 - **Chokidar wrapper** (`src/server/_effect/chokidar.ts`):
@@ -285,6 +310,12 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
   - All return `Effect<Stream<FileEvent>>` with tagged union types
   - Multi-arg events transformed via tuple destructuring: `Stream.map(([path, stats]) => fileEvent.add({ path, stats }))`
 
+**Stream.debounce for Timing Patterns**:
+
+- **Ready/idle detection**: `Stream.debounce("1000 millis")` + `Stream.take(1)` emits after period of inactivity
+- **Per-key debounce**: `Stream.groupByKey(keyFn)` + `Stream.debounce` for debouncing per bundle/entity
+- **Replaces setTimeout.refresh()**: Stream.debounce automatically resets timer on each new event
+
 - **Test helpers** (`src/server/_effect/test-effect.ts`):
   - `testEffect(effect)` - Wraps Effect for Vitest, handles scoping automatically
   - Use `@effect/platform` FileSystem service with `NodeFileSystem.layer` for filesystem operations in tests
@@ -294,6 +325,7 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 
 - All migration work must be logged in `docs/effect-migration/log/` directory
 - **Document plans BEFORE implementation** - create log entry with detailed plan, then update during work
+- **Update docs step-by-step during implementation** - mark checklist items complete as work progresses, don't batch updates
 - Each log entry is numbered sequentially: `##-brief-description.md`
 - Log structure: Plans → Decisions → Problems/Solutions → Patterns → Lessons Learned → Status
 - See `docs/effect-migration/strategy.md` for migration approach and phases
@@ -346,3 +378,5 @@ NodeCG is incrementally migrating to Effect-TS. See `docs/effect-migration/` for
 - Sharing state between test files (each file must be isolated)
 - Forgetting that array/object access returns `T | undefined` (`noUncheckedIndexedAccess`)
 - Importing NodeCG modules before setting `NODECG_ROOT` env var (causes wrong root path to be cached)
+- **Array mutation from services** - when getting arrays from services (e.g., `bundleManager.all()`), always clone before mutating with `splice()` etc.: `[...(yield* service.all())]`
+- **Closure forward references work with const** - callbacks can reference `const` variables declared later in code because closures capture variable bindings, not values at definition time
