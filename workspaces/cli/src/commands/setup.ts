@@ -115,7 +115,9 @@ async function decideActionVersion(
 		}
 	}
 
-	if (semver.lt(target, "v2.0.0")) {
+	// Allow canary/PR releases (0.0.0-*) which are test releases for newer versions
+	const isCanaryRelease = /^v?0\.0\.0-.+/.test(target);
+	if (!isCanaryRelease && semver.lt(target, "v2.0.0")) {
 		console.error("CLI does not support NodeCG versions older than v2.0.0.");
 		return;
 	}
@@ -152,7 +154,10 @@ async function installNodecg(
 
 	process.stdout.write(`Downloading ${target} from npm... `);
 
-	const targetVersion = semver.coerce(target)?.version;
+	// Use semver.parse first to preserve prerelease info (e.g., 0.0.0-canary.abc123)
+	// Fall back to semver.coerce for non-standard version formats
+	const targetVersion =
+		semver.parse(target)?.version ?? semver.coerce(target)?.version;
 	if (!targetVersion) {
 		throw new Error(`Failed to determine target NodeCG version`);
 	}
