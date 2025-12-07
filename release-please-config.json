@@ -7,17 +7,23 @@
 	"plugins": [
 		{
 			"type": "node-workspace",
-			"updatePeerDependencies": true
+			"updatePeerDependencies": true,
+			"merge": false
+		},
+		{
+			"type": "linked-versions",
+			"groupName": "nodecg",
+			"components": ["cli", "nodecg"]
 		}
 	],
 	"packages": {
-		"workspaces/nodecg": {},
 		"workspaces/internal-util": {
 			"skip-changelog": true
 		},
 		"workspaces/database-adapter-types": {},
 		"workspaces/database-adapter-sqlite-legacy": {},
-		"workspaces/cli": {}
+		"workspaces/cli": { "component": "cli" },
+		"workspaces/nodecg": { "component": "nodecg" }
 	},
 	"bootstrap-sha": "ae3433f07d41ccf0b7406ae60425e9730e65e0d0"
 }
