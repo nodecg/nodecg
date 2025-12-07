@@ -91,7 +91,9 @@ export class BundleManager extends Effect.Service<BundleManager>()(
 			const ready = yield* Deferred.make();
 			const addStreamForReady = yield* listenToAdd(watcher);
 			yield* addStreamForReady.pipe(
-				Stream.filter(({ path: p }) => findBundleName(bundleRootPaths, p) !== false),
+				Stream.filter(
+					({ path: p }) => findBundleName(bundleRootPaths, p) !== false,
+				),
 				Stream.as(null),
 				Stream.prepend(Chunk.of(null)),
 				Stream.debounce(Duration.seconds(1)),
