@@ -28,14 +28,27 @@ vi.spyOn(globalThis, "fetch").mockImplementation(async (url) => {
 					"2.0.0": {},
 					"2.1.0": {},
 					"2.6.1": {},
+					"0.0.0-canary.abc123": {},
+					"0.0.0-pr.456.commit.def789": {},
 				},
 			}),
 		);
 	}
 
-	// Mock package metadata
-	if (/registry\.npmjs\.org\/nodecg\/\d/.exec(urlString)) {
-		const version = /nodecg\/([\d.]+)/.exec(urlString)?.[1];
+	// Mock npm dist-tags endpoint
+	if (/registry\.npmjs\.org\/-\/package\/nodecg\/dist-tags/.exec(urlString)) {
+		return new Response(
+			JSON.stringify({
+				latest: "2.6.1",
+				next: "0.0.0-canary.abc123",
+				canary: "0.0.0-canary.abc123",
+			}),
+		);
+	}
+
+	// Mock package metadata (matches both regular versions like 2.0.0 and canary like 0.0.0-canary.abc)
+	if (/registry\.npmjs\.org\/nodecg\/[\d]/.exec(urlString)) {
+		const version = /nodecg\/([\d.]+(?:-[a-zA-Z0-9.-]+)?)/.exec(urlString)?.[1];
 		return new Response(
 			JSON.stringify({
 				dist: {
@@ -47,7 +60,9 @@ vi.spyOn(globalThis, "fetch").mockImplementation(async (url) => {
 
 	// Mock tarball download
 	if (urlString.includes("mock-registry.test")) {
-		const version = /nodecg-([\d.]+)\.tgz/.exec(urlString)?.[1] ?? "2.0.0";
+		const version =
+			/nodecg-([\d.]+(?:-[a-zA-Z0-9.-]+)?)\.tgz/.exec(urlString)?.[1] ??
+			"2.0.0";
 
 		// Create minimal gzipped tar archive with package/package.json
 		const tar = await import("tar");
@@ -185,5 +200,49 @@ test("should print an error and exit, when nodecg is already installed in the cu
 	await program.runWith("setup 2.0.0 --skip-dependencies");
 	await program.runWith("setup 2.0.0 --skip-dependencies");
 	expect(spy).toBeCalledWith("NodeCG is already installed in this directory.");
+	spy.mockRestore();
+});
+
+test("should install canary versions (0.0.0-*)", async () => {
+	chdir();
+	await program.runWith("setup 0.0.0-canary.abc123 --skip-dependencies");
+	expect(readPackageJson().name).toBe("nodecg");
+	expect(readPackageJson().version).toBe("0.0.0-canary.abc123");
+});
+
+test("should install PR release versions (0.0.0-pr.*)", async () => {
+	chdir();
+	await program.runWith("setup 0.0.0-pr.456.commit.def789 --skip-dependencies");
+	expect(readPackageJson().name).toBe("nodecg");
+	expect(readPackageJson().version).toBe("0.0.0-pr.456.commit.def789");
+});
+
+test("should install using 'latest' dist-tag", async () => {
+	chdir();
+	await program.runWith("setup latest --skip-dependencies");
+	expect(readPackageJson().name).toBe("nodecg");
+	expect(readPackageJson().version).toBe("2.6.1");
+});
+
+test("should install using 'next' dist-tag", async () => {
+	chdir();
+	await program.runWith("setup next --skip-dependencies");
+	expect(readPackageJson().name).toBe("nodecg");
+	expect(readPackageJson().version).toBe("0.0.0-canary.abc123");
+});
+
+test("should install using 'canary' dist-tag", async () => {
+	chdir();
+	await program.runWith("setup canary --skip-dependencies");
+	expect(readPackageJson().name).toBe("nodecg");
+	expect(readPackageJson().version).toBe("0.0.0-canary.abc123");
+});
+
+test("should print an error for unknown dist-tag", async () => {
+	chdir();
+	const spy = vi.spyOn(console, "error");
+	await program.runWith("setup nonexistent-tag --skip-dependencies");
+	expect(spy.mock.calls[0]?.[0]).toContain("Unknown dist-tag");
+	expect(spy.mock.calls[0]?.[0]).toContain("nonexistent-tag");
 	spy.mockRestore();
 });
