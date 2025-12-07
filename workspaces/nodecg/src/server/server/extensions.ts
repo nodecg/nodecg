@@ -11,7 +11,7 @@ import { serverApiFactory } from "../api.server.js";
 import { sentryEnabled } from "../config/index.js";
 import { createLogger } from "../logger/index.js";
 import type { Replicator } from "../replicant/replicator.js";
-import type { BundleManager } from "./bundle-manager.js";
+import { BundleManager } from "./bundle-manager.js";
 
 const log = createLogger("extensions");
 
@@ -24,12 +24,8 @@ export interface ExtensionEventMap {
 }
 
 export const createExtensionManager = Effect.fn("createExtensionManager")(
-	function* (
-		io: RootNS,
-		bundleManager: BundleManager,
-		replicator: Replicator,
-		mount: NodeCG.Middleware,
-	) {
+	function* (io: RootNS, replicator: Replicator, mount: NodeCG.Middleware) {
+		const bundleManager = yield* BundleManager;
 		const extensions: Record<string, unknown> = {};
 		const apiInstances = new Set<
 			InstanceType<ReturnType<typeof serverApiFactory>>
@@ -110,7 +106,7 @@ export const createExtensionManager = Effect.fn("createExtensionManager")(
 						bundle.name,
 						unsatisfiedDeps.join(", "),
 					);
-					bundleManager.remove(bundle.name);
+					yield* bundleManager.remove(bundle.name);
 				}
 
 				log.error(
@@ -135,6 +131,7 @@ export const createExtensionManager = Effect.fn("createExtensionManager")(
 		function loadExtension(bundle: NodeCG.Bundle) {
 			return Effect.gen(function* () {
 				const extPath = path.join(bundle.dir, "extension");
+				// TODO: convert to Effect.try
 				try {
 					const requireFunc = process.env.NODECG_TEST
 						? require
@@ -152,7 +149,7 @@ export const createExtensionManager = Effect.fn("createExtensionManager")(
 					log.info("Mounted %s extension", bundle.name);
 					extensions[bundle.name] = extension;
 				} catch (err: unknown) {
-					bundleManager.remove(bundle.name);
+					yield* bundleManager.remove(bundle.name);
 					log.warn(
 						"Failed to mount %s extension:\n",
 						bundle.name,

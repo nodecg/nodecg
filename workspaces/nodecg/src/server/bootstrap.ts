@@ -22,14 +22,16 @@ if (isLegacyProject()) {
 }
 
 import { NodeRuntime } from "@effect/platform-node";
-import { ConfigError, Effect, Fiber } from "effect";
+import { Effect, Fiber, Layer } from "effect";
 
 import { UnknownError } from "./_effect/boundary";
-import { expectError } from "./_effect/expect-error";
 import { withLogLevelConfig } from "./_effect/log-level";
+import { NodecgConfig } from "./_effect/nodecg-config";
+import { NodecgPackageJson } from "./_effect/nodecg-package-json";
 import { withSpanProcessorLive } from "./_effect/span-logger";
 import { exitOnUncaught, sentryEnabled } from "./config";
-import { createServer, FileWatcherReadyTimeoutError } from "./server";
+import { createServer } from "./server";
+import { BundleManager } from "./server/bundle-manager";
 import { nodecgPackageJson } from "./util/nodecg-package-json";
 
 // TODO: Remove this in the next major release
@@ -61,22 +63,28 @@ const handleFloatingErrors = () =>
 		return Effect.sync(cleanup);
 	});
 
-const main = Effect.fn("main")(function* () {
-	process.title = `NodeCG - ${nodecgPackageJson.version}`;
+const main = Effect.fn("main")(
+	function* () {
+		process.title = `NodeCG - ${nodecgPackageJson.version}`;
 
-	const handleFloatingErrorsFiber = yield* Effect.fork(handleFloatingErrors());
+		const handleFloatingErrorsFiber = yield* Effect.fork(
+			handleFloatingErrors(),
+		);
 
-	const server = yield* createServer();
+		const server = yield* createServer();
 
-	yield* Effect.raceFirst(server.run(), Fiber.join(handleFloatingErrorsFiber));
-}, Effect.scoped);
-
-NodeRuntime.runMain(
-	main().pipe(
-		withSpanProcessorLive,
-		withLogLevelConfig,
-		expectError<
-			UnknownError | ConfigError.ConfigError | FileWatcherReadyTimeoutError
-		>(),
+		yield* Effect.raceFirst(
+			server.run(),
+			Fiber.join(handleFloatingErrorsFiber),
+		);
+	},
+	Effect.scoped,
+	Effect.provide(
+		Layer.provideMerge(
+			BundleManager.Default,
+			Layer.merge(NodecgConfig.Default, NodecgPackageJson.Default),
+		),
 	),
 );
+
+NodeRuntime.runMain(main().pipe(withSpanProcessorLive, withLogLevelConfig));

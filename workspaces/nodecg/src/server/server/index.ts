@@ -36,7 +36,7 @@ import { databaseAdapter as defaultAdapter } from "@nodecg/database-adapter-sqli
 import { rootPaths } from "@nodecg/internal-util";
 import bodyParser from "body-parser";
 import compression from "compression";
-import { Data, Deferred, Effect, Runtime, Stream } from "effect";
+import { Deferred, Effect, Runtime, Stream } from "effect";
 import express from "express";
 import transformMiddleware from "express-transform-bare-module-specifiers";
 import memoize from "fast-memoize";
@@ -178,16 +178,7 @@ export const createServer = Effect.fn("createServer")(function* (
 		});
 	});
 
-	const bundlesPaths = [
-		path.join(rootPaths.getRuntimeRoot(), "bundles"),
-	].concat(config.bundles?.paths ?? []);
-	const cfgPath = path.join(rootPaths.getRuntimeRoot(), "cfg");
-	const bundleManager = new BundleManager(
-		bundlesPaths,
-		cfgPath,
-		nodecgPackageJson.version,
-		config,
-	);
+	const bundleManager = yield* BundleManager;
 
 	let databaseAdapter = defaultAdapter;
 	let databaseAdapterExists = false;
@@ -251,16 +242,6 @@ export const createServer = Effect.fn("createServer")(function* (
 
 	io.use(socketApiMiddleware);
 
-	// Wait for Chokidar to finish its initial scan.
-	if (!bundleManager.ready) {
-		yield* waitForEvent<[]>(bundleManager, "ready").pipe(
-			Effect.timeoutFail({
-				duration: "15 seconds",
-				onTimeout: () => new FileWatcherReadyTimeoutError(),
-			}),
-		);
-	}
-
 	for (const bundle of bundleManager.all()) {
 		// TODO: remove this feature in v3
 		if (bundle.transformBareModuleSpecifiers) {
@@ -302,7 +283,7 @@ export const createServer = Effect.fn("createServer")(function* (
 	);
 
 	if (sentryEnabled) {
-		const sentryApp = yield* sentryConfigRouter(bundleManager);
+		const sentryApp = yield* sentryConfigRouter();
 		app.use(sentryApp);
 	}
 
@@ -318,7 +299,7 @@ export const createServer = Effect.fn("createServer")(function* (
 		(replicator) => Effect.sync(() => replicator.saveAllReplicants()),
 	);
 
-	const graphicsRoute = yield* graphicsRouter(io, bundleManager, replicator);
+	const graphicsRoute = yield* graphicsRouter(io, replicator);
 	app.use(graphicsRoute);
 
 	const dashboardRoute = yield* dashboardRouter(bundleManager);
@@ -376,18 +357,19 @@ export const createServer = Effect.fn("createServer")(function* (
 		const bundles = bundleManager.all();
 		bundlesReplicant.value = clone(bundles);
 	});
-	const bundleManagerEvents = yield* Effect.all(
-		[
-			listenToEvent<[]>(bundleManager, "ready"),
-			listenToEvent<[]>(bundleManager, "bundleChanged"),
-			listenToEvent<[]>(bundleManager, "gitChanged"),
-			listenToEvent<[]>(bundleManager, "bundleRemoved"),
-		],
-		{ concurrency: "unbounded" },
-	).pipe(
-		Effect.map(Stream.mergeAll({ concurrency: "unbounded" })),
-		Effect.andThen(Stream.debounce("100 millis")),
-	);
+	const bundleManagerEvents = yield* bundleManager
+		.subscribe()
+		.pipe(
+			Effect.map(
+				Stream.filter(
+					(event) =>
+						event._tag === "bundleChanged" ||
+						event._tag === "gitChanged" ||
+						event._tag === "bundleRemoved",
+				),
+			),
+			Effect.map(Stream.debounce("100 millis")),
+		);
 	yield* Effect.forkScoped(
 		Stream.runForEach(bundleManagerEvents, updateBundlesReplicant),
 	);
@@ -395,7 +377,7 @@ export const createServer = Effect.fn("createServer")(function* (
 
 	const mount = (...args: any[]) => app.use(...args);
 	const extensionManager = yield* Effect.acquireRelease(
-		createExtensionManager(io, bundleManager, replicator, mount),
+		createExtensionManager(io, replicator, mount),
 		(extensionManager) =>
 			Effect.sync(() => extensionManager.emitToAllInstances("serverStopping")),
 	);
@@ -447,9 +429,3 @@ export const createServer = Effect.fn("createServer")(function* (
 		bundleManager,
 	};
 });
-
-export class FileWatcherReadyTimeoutError extends Data.TaggedError(
-	"FileWatcherReadyTimeoutError",
-) {
-	override readonly message = "Timed out waiting for file watcher to be ready";
-}

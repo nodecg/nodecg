@@ -32,7 +32,12 @@ export default defineConfig({
 					testTimeout: 15_000,
 				},
 			},
-			"workspaces/cli",
+			{
+				test: {
+					name: "cli",
+					dir: "workspaces/cli",
+				},
+			},
 			"workspaces/database-adapter-sqlite-legacy",
 			"workspaces/database-adapter-types",
 			"workspaces/internal-util",

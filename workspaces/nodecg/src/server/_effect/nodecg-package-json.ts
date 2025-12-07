@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import { recursivelyFindPackageJson } from "../util/nodecg-package-json.js";
 
-export class NodecgVersion extends Effect.Service<NodecgVersion>()(
-	"NodecgVersion",
+export class NodecgPackageJson extends Effect.Service<NodecgPackageJson>()(
+	"NodecgPackageJson",
 	{
 		sync: () => {
 			const packageJson = recursivelyFindPackageJson();
