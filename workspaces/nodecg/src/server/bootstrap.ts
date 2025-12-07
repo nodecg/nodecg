@@ -22,10 +22,9 @@ if (isLegacyProject()) {
 }
 
 import { NodeRuntime } from "@effect/platform-node";
-import { ConfigError, Effect, Fiber, Layer } from "effect";
+import { Effect, Fiber, Layer } from "effect";
 
 import { UnknownError } from "./_effect/boundary";
-import { expectError } from "./_effect/expect-error";
 import { withLogLevelConfig } from "./_effect/log-level";
 import { NodecgConfig } from "./_effect/nodecg-config";
 import { NodecgPackageJson } from "./_effect/nodecg-package-json";
