@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.8.0](https://github.com/nodecg/nodecg/compare/cli-v2.7.1...cli-v2.8.0) (2025-12-08)
+
+
+### Features
+
+* **CLI:** allow setup command to install canary releases ([#914](https://github.com/nodecg/nodecg/issues/914)) ([336f2dd](https://github.com/nodecg/nodecg/commit/336f2dd77ec50c193503330a5957c81bb0261af6))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg/internal-util bumped from 2.7.1 to 2.7.2
+
 ## [2.7.1](https://github.com/nodecg/nodecg/compare/cli-v2.7.0...cli-v2.7.1) (2025-11-22)
 
 
