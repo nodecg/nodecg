@@ -237,7 +237,7 @@ jobs:
           npx tsx scripts/prepare-prerelease.ts --version 0.0.0-canary.${{ github.sha }}
           npm --workspaces publish --tag canary
           (cd workspaces/nodecg && npx tsx scripts/prepare-publish-types.ts)
-          (cd workspaces/nodecg && npm -w nodecg publish --tag canary)
+          (cd workspaces/nodecg && npm publish --tag canary)
 
   docker-image:
     permissions:

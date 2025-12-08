@@ -1,6 +1,5 @@
 {
   "name": "nodecg-monorepo",
-  "version": "2.6.1",
   "private": true,
   "repository": {
     "type": "git",
