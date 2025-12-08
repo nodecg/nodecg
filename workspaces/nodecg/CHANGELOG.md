@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.8.0](https://github.com/nodecg/nodecg/compare/nodecg-v2.6.4...nodecg-v2.8.0) (2025-12-08)
+
+
+### Miscellaneous Chores
+
+* **nodecg:** Synchronize nodecg versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @nodecg/cli bumped from 2.7.1 to 2.8.0
+    * @nodecg/database-adapter-sqlite-legacy bumped from 2.7.1 to 2.7.2
+    * @nodecg/internal-util bumped from 2.7.1 to 2.7.2
+
 ## [2.6.4](https://github.com/nodecg/nodecg/compare/nodecg-v2.6.3...nodecg-v2.6.4) (2025-11-22)
 
 
