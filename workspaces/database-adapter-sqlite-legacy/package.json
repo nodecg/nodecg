@@ -1,26 +1,45 @@
 {
   "name": "@nodecg/database-adapter-sqlite-legacy",
-  "version": "2.6.1",
-  "main": "dist/database-adapter.js",
+  "version": "2.7.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nodecg/nodecg.git",
+    "directory": "workspaces/database-adapter-sqlite-legacy"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/database-adapter.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/database-adapter.js",
+  "module": "./dist/database-adapter.js",
+  "types": "./dist/database-adapter.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
-    "build": "del-cli dist && tsc -b",
-    "dev": "del-cli dist && tsc -b --watch --preserveWatchOutput",
-    "generate-migrations": "typeorm-ts-node-commonjs migration:generate ./src/migration/rename-me -d ./src/datasource.ts"
+    "build": "tsdown",
+    "generate-migrations": "typeorm-ts-node-commonjs migration:generate ./src/migration/rename-me -d ./src/datasource.ts",
+    "watch": "tsdown --watch"
   },
   "dependencies": {
-    "@nodecg/database-adapter-types": "2.6.1",
-    "@nodecg/internal-util": "2.6.1",
-    "better-sqlite3": "^11.10.0",
-    "typeorm": "0.3.24"
+    "@nodecg/database-adapter-types": "2.7.0",
+    "@nodecg/internal-util": "2.7.1",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.4.1",
+    "typeorm": "0.3.27"
   },
   "devDependencies": {
-    "del-cli": "^6.0.0",
-    "typescript": "~5.7.3"
+    "@arethetypeswrong/core": "^0.18.2",
+    "publint": "^0.3.15",
+    "ts-node": "^10.9.2",
+    "tsdown": "^0.16.6",
+    "typescript": "~5.9.3"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org"
   }
 }

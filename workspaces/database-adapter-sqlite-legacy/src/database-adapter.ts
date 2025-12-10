@@ -1,13 +1,13 @@
+import "reflect-metadata";
+
 import type { DatabaseAdapter } from "@nodecg/database-adapter-types";
 
-import {
-	ApiKey,
-	getConnection,
-	Identity,
-	Replicant,
-	Role,
-	User,
-} from "./connection";
+import { getConnection } from "./connection.ts";
+import { ApiKey } from "./entity/ApiKey.ts";
+import { Identity } from "./entity/Identity.ts";
+import { Replicant } from "./entity/Replicant.ts";
+import { Role } from "./entity/Role.ts";
+import { User } from "./entity/User.ts";
 
 export { ApiKey, getConnection, Identity, Replicant, Role, User };
 

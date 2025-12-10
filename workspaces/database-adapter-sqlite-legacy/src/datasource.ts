@@ -1,19 +1,23 @@
-import "reflect-metadata";
-
 import path from "node:path";
 
+import { rootPaths } from "@nodecg/internal-util";
+import sqlite3 from "better-sqlite3";
 import { DataSource } from "typeorm";
-export * from "./entity";
-import { getNodecgRoot } from "@nodecg/internal-util";
 
-import { ApiKey, Identity, Permission, Replicant, Role, User } from "./entity";
-import { initialize1669424617013 } from "./migration/1669424617013-initialize";
-import { defaultRoles1669424781583 } from "./migration/1669424781583-default-roles";
+import { ApiKey } from "./entity/ApiKey.ts";
+import { Identity } from "./entity/Identity.ts";
+import { Permission } from "./entity/Permission.ts";
+import { Replicant } from "./entity/Replicant.ts";
+import { Role } from "./entity/Role.ts";
+import { User } from "./entity/User.ts";
+import { initialize1669424617013 } from "./migration/1669424617013-initialize.ts";
+import { defaultRoles1669424781583 } from "./migration/1669424781583-default-roles.ts";
 
 const testing = process.env["NODECG_TEST"]?.toLowerCase() === "true";
 
 export const dataSource = new DataSource({
 	type: "better-sqlite3",
+	driver: sqlite3,
 
 	/**
 	 * TypeORM has this special :memory: key which indicates
@@ -28,7 +32,7 @@ export const dataSource = new DataSource({
 	 */
 	database: testing
 		? ":memory:"
-		: path.join(getNodecgRoot(), "db/nodecg.sqlite3"),
+		: path.join(rootPaths.getRuntimeRoot(), "db/nodecg.sqlite3"),
 	logging: false,
 	entities: [ApiKey, Identity, Permission, Replicant, Role, User],
 	migrations: [initialize1669424617013, defaultRoles1669424781583],

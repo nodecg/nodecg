@@ -1,13 +1,14 @@
 dist/
-/out
+!**/test/**/node_modules/**/dist/
+out/
 .eslintcache
 *.tsbuildinfo
 
 # Node / Bower
-bower_components
-node_modules
-!src/**/node_modules
-!test/**/node_modules
+bower_components/
+node_modules/
+!src/**/node_modules/
+!**/test/**/node_modules/
 npm-debug.log
 yarn-error.log
 
@@ -42,7 +43,6 @@ yarn-error.log
 
 # Docs
 checkout
-docs
 .grunt
 
 # Assets

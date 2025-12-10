@@ -1,3 +1,2 @@
-export { nodecgPath } from "./nodecg-path";
-export { getNodecgRoot, rootPath } from "./nodecg-root";
-export { isLegacyProject } from "./project-type";
+export { isLegacyProject } from "./project-type.ts";
+export { rootPaths } from "./root-paths.ts";

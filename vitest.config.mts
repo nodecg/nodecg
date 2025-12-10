@@ -2,18 +2,40 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
 	test: {
-		testTimeout: 15_000,
-		hookTimeout: 30_000,
-		maxWorkers: 1,
-		minWorkers: 1,
 		env: {
 			test: "true",
 			NODECG_TEST: "true",
 		},
-		exclude: ["**/node_modules/**", "**/dist/**", "**/out/**"],
 		coverage: {
-			include: ["src", "workspaces/*/src"],
-			exclude: ["src/client"],
+			include: ["workspaces/*/src"],
+			exclude: ["workspaces/nodecg/src/client"],
 		},
+		maxWorkers: "50%",
+		projects: [
+			{
+				test: {
+					name: "unit",
+					dir: "workspaces/nodecg/src",
+				},
+			},
+			{
+				test: {
+					name: "e2e-legacy",
+					dir: "workspaces/nodecg/test/legacy-mode",
+					testTimeout: 15_000,
+				},
+			},
+			{
+				test: {
+					name: "e2e-installed",
+					dir: "workspaces/nodecg/test/installed-mode",
+					testTimeout: 15_000,
+				},
+			},
+			"workspaces/cli",
+			"workspaces/database-adapter-sqlite-legacy",
+			"workspaces/database-adapter-types",
+			"workspaces/internal-util",
+		],
 	},
 });

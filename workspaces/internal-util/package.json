@@ -1,19 +1,36 @@
 {
   "name": "@nodecg/internal-util",
-  "version": "2.6.1",
+  "version": "2.7.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nodecg/nodecg.git",
+    "directory": "workspaces/internal-util"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/main.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/main.js",
+  "module": "./dist/main.js",
+  "types": "./dist/main.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
-  "main": "dist/main.js",
   "scripts": {
-    "build": "del-cli dist && tsc -b",
-    "dev": "del-cli dist && tsc -b --watch --preserveWatchOutput"
+    "build": "tsdown",
+    "watch": "tsdown --watch"
   },
   "devDependencies": {
-    "del-cli": "^6.0.0",
-    "typescript": "~5.7.3"
+    "@arethetypeswrong/core": "^0.18.2",
+    "publint": "^0.3.15",
+    "tsdown": "^0.16.6",
+    "typescript": "~5.9.3"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org"
   }
 }

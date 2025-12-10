@@ -2,11 +2,9 @@
 	"compilerOptions": {
 		"target": "ES2022",
 		"lib": ["ES2022"],
-
-		"module": "commonjs",
-		"moduleResolution": "node10",
-		"esModuleInterop": true,
-		"resolveJsonModule": true,
+		"module": "node20",
+		"allowImportingTsExtensions": true,
+		"rewriteRelativeImportExtensions": true,
 
 		"strict": true,
 		"noUnusedLocals": true,
@@ -17,9 +15,18 @@
 		"noImplicitOverride": true,
 		"noPropertyAccessFromIndexSignature": true,
 
+		"forceConsistentCasingInFileNames": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"noUncheckedSideEffectImports": true,
+
 		"skipLibCheck": true,
 
+		"noEmit": true,
 		"declaration": true,
-		"sourceMap": true
+		"declarationMap": true,
+		"incremental": false,
+
+		"plugins": [{ "name": "@effect/language-service" }]
 	}
 }
