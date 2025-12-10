@@ -141,8 +141,13 @@ export namespace NodeCG {
 
 		export type Graphic = {
 			url: string;
-		} & Required<Omit<Manifest.UnparsedGraphic, 'name' | 'description' | 'group' | 'order'>> &
-			Pick<Manifest.UnparsedGraphic, 'name' | 'description' | 'group' | 'order'>;
+		} & Required<
+			Omit<Manifest.UnparsedGraphic, "name" | "description" | "group" | "order">
+		> &
+			Pick<
+				Manifest.UnparsedGraphic,
+				"name" | "description" | "group" | "order"
+			>;
 
 		export type Panel = Manifest.UnparsedPanel & {
 			path: string;

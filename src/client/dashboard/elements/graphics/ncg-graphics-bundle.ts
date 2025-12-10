@@ -199,25 +199,44 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 		return groups;
 	}
 
+	/**
+	 * Returns the sort category for an order value:
+	 * - 0: positive/zero (appears first)
+	 * - 1: undefined (appears in middle)
+	 * - 2: negative (appears last)
+	 */
+	_getOrderCategory(order: number | undefined): number {
+		if (order === undefined) return 1;
+		if (order >= 0) return 0;
+		return 2;
+	}
+
 	_sortGraphics(graphics: NodeCG.Bundle.Graphic[]) {
+		// Sorting categories: positive/zero orders (front) → no order (middle) → negative orders (end)
+		// This allows negative numbers to be used like Python's arr[-1] to place items at the end
 		return graphics.slice().sort((a, b) => {
-			// Items with order should come before items without order
-			if (a.order !== undefined && b.order === undefined) {
-				return -1;
+			const orderA = a.order;
+			const orderB = b.order;
+
+			const categoryA = this._getOrderCategory(orderA);
+			const categoryB = this._getOrderCategory(orderB);
+
+			// Different categories: sort by category
+			if (categoryA !== categoryB) {
+				return categoryA - categoryB;
 			}
-			if (a.order === undefined && b.order !== undefined) {
-				return 1;
+
+			// Same category: if both undefined, sort by name
+			if (categoryA === 1) {
+				const nameA = a.name ?? a.file;
+				const nameB = b.name ?? b.file;
+				return nameA.localeCompare(nameB);
 			}
-			
-			// Both have order - sort by order value
-			if (a.order !== undefined && b.order !== undefined) {
-				if (a.order !== b.order) {
-					return a.order - b.order;
-				}
-				// If orders are equal, fall through to name sorting
+
+			// Both have orders in same category: sort numerically, then by name
+			if (orderA !== orderB) {
+				return orderA! - orderB!;
 			}
-			
-			// Sort by name (using display name if available, otherwise file name)
 			const nameA = a.name ?? a.file;
 			const nameB = b.name ?? b.file;
 			return nameA.localeCompare(nameB);

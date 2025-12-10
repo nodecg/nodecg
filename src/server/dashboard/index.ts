@@ -14,6 +14,18 @@ import { sendNodeModulesFile } from "../util/send-node-modules-file";
 
 type Workspace = NodeCG.Workspace;
 
+/**
+ * Returns the sort category for an order value:
+ * - 0: positive/zero (appears first)
+ * - 1: undefined (appears in middle)
+ * - 2: negative (appears last)
+ */
+function getOrderCategory(order: number | undefined): number {
+	if (order === undefined) return 1;
+	if (order >= 0) return 0;
+	return 2;
+}
+
 interface DashboardContext {
 	bundles: NodeCG.Bundle[];
 	publicConfig: typeof filteredConfig;
@@ -129,7 +141,7 @@ export function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 	const workspaces: Workspace[] = [];
 	const workspaceNames = new Set<string>();
 	const workspaceOrders = new Map<string, number>();
-	
+
 	bundles.forEach((bundle) => {
 		bundle.dashboard.panels.forEach((panel) => {
 			if (panel.dialog) {
@@ -145,7 +157,7 @@ export function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 					route: `fullbleed/${panel.name}`,
 					fullbleed: true,
 				});
-				
+
 				// Track order for fullbleed panels too
 				if (panel.workspaceOrder !== undefined) {
 					workspaceOrders.set(workspaceName, panel.workspaceOrder);
@@ -155,11 +167,14 @@ export function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 			} else {
 				workspaceNames.add(panel.workspace);
 				otherWorkspacesHavePanels = true;
-				
+
 				// Track the minimum order value for each workspace
 				if (panel.workspaceOrder !== undefined) {
 					const currentOrder = workspaceOrders.get(panel.workspace);
-					if (currentOrder === undefined || panel.workspaceOrder < currentOrder) {
+					if (
+						currentOrder === undefined ||
+						panel.workspaceOrder < currentOrder
+					) {
 						workspaceOrders.set(panel.workspace, panel.workspaceOrder);
 					}
 				}
@@ -176,27 +191,29 @@ export function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 	});
 
 	// Sort workspaces by order first, then alphabetically
+	// Sorting categories: positive/zero orders (front) → no order (middle) → negative orders (end)
+	// This allows negative numbers to be used like Python's arr[-1] to place items at the end
 	workspaces.sort((a, b) => {
 		const orderA = workspaceOrders.get(a.name);
 		const orderB = workspaceOrders.get(b.name);
 
-		// Both have orders: sort by order, then alphabetically if same order
-		if (orderA !== undefined && orderB !== undefined) {
-			if (orderA !== orderB) {
-				return orderA - orderB;
-			}
-			// Same order: fall through to alphabetical sorting
-		}
-		// Only A has order: A comes first
-		else if (orderA !== undefined) {
-			return -1;
-		}
-		// Only B has order: B comes first
-		else if (orderB !== undefined) {
-			return 1;
+		const categoryA = getOrderCategory(orderA);
+		const categoryB = getOrderCategory(orderB);
+
+		// Different categories: sort by category
+		if (categoryA !== categoryB) {
+			return categoryA - categoryB;
 		}
 
-		// Both have same order or neither has order: sort alphabetically
+		// Same category: if both undefined, sort alphabetically
+		if (categoryA === 1) {
+			return a.label.localeCompare(b.label);
+		}
+
+		// Both have orders in same category: sort numerically, then alphabetically
+		if (orderA !== orderB) {
+			return orderA! - orderB!;
+		}
 		return a.label.localeCompare(b.label);
 	});
 

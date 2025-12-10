@@ -140,14 +140,20 @@ class NcgGraphicsGroup extends MutableData(Polymer.PolymerElement) {
 		return `${bundleName}_${groupName}_graphics_group_opened`;
 	}
 
-	_calcGraphicInstances(bundleName: string, graphic: NodeCG.Bundle.Graphic, instances?: NodeCG.GraphicsInstance[]) {
+	_calcGraphicInstances(
+		bundleName: string,
+		graphic: NodeCG.Bundle.Graphic,
+		instances?: NodeCG.GraphicsInstance[],
+	) {
 		if (!instances) {
 			return [];
 		}
 
 		return instances.filter((instance) => {
-			return instance.bundleName === bundleName && 
-				   instance.pathName.endsWith(graphic.file);
+			return (
+				instance.bundleName === bundleName &&
+				instance.pathName.endsWith(graphic.file)
+			);
 		});
 	}
 }

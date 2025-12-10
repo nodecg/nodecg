@@ -122,23 +122,31 @@ test("when a panel has a workspace that begins with __nodecg, throw an error", (
 test("should parse workspaceOrder property when present", () => {
 	const parsedBundle = parseBundle("./test/fixtures/bundle-parser/good-bundle");
 	const workspacePanels = parsedBundle.dashboard.panels.filter(
-		(panel) => panel.workspace === "foo"
+		(panel) => panel.workspace === "foo",
 	);
 	expect(workspacePanels).toHaveLength(1);
 	expect(workspacePanels[0]!.workspaceOrder).toBeUndefined();
 });
 
 test("should pass through workspaceOrder for regular panels", () => {
-	const parsedBundle = parseBundle("./test/fixtures/bundle-parser/workspace-order-test");
-	const panel = parsedBundle.dashboard.panels.find(p => p.name === "test-panel");
+	const parsedBundle = parseBundle(
+		"./test/fixtures/bundle-parser/workspace-order-test",
+	);
+	const panel = parsedBundle.dashboard.panels.find(
+		(p) => p.name === "test-panel",
+	);
 	expect(panel).toBeDefined();
 	expect(panel!.workspaceOrder).toBe(5);
 	expect(panel!.workspace).toBe("ordered");
 });
 
 test("should pass through workspaceOrder for fullbleed panels", () => {
-	const parsedBundle = parseBundle("./test/fixtures/bundle-parser/fullbleed-order-test");
-	const panel = parsedBundle.dashboard.panels.find(p => p.name === "fullbleed-panel");
+	const parsedBundle = parseBundle(
+		"./test/fixtures/bundle-parser/fullbleed-order-test",
+	);
+	const panel = parsedBundle.dashboard.panels.find(
+		(p) => p.name === "fullbleed-panel",
+	);
 	expect(panel).toBeDefined();
 	expect(panel!.fullbleed).toBe(true);
 	expect(panel!.workspaceOrder).toBe(3);
