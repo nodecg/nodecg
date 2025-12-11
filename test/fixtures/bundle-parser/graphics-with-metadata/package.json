@@ -1,0 +1,21 @@
+{
+  "name": "graphics-with-metadata",
+  "version": "0.0.1",
+  "nodecg": {
+    "compatibleRange": "~0.7.0",
+    "graphics": [
+      {
+        "file": "overlay.html",
+        "width": 1920,
+        "height": 1080,
+        "name": "Game Overlay",
+        "description": "Main overlay displaying game state and scores"
+      },
+      {
+        "file": "simple.html",
+        "width": 800,
+        "height": 600
+      }
+    ]
+  }
+}

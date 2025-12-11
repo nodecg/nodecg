@@ -1,6 +1,7 @@
 import "@polymer/paper-button/paper-button.js";
 import "@polymer/paper-dialog/paper-dialog.js";
 import "./ncg-graphic";
+import "./ncg-graphics-group";
 
 import * as Polymer from "@polymer/polymer";
 import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
@@ -93,9 +94,20 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 			</paper-button>
 		</div>
 
-		<template is="dom-repeat" items="[[bundle.graphics]]" as="graphic" mutable-data="">
+		<!-- Ungrouped graphics -->
+		<template is="dom-repeat" items="[[_ungroupedGraphics]]" as="graphic" mutable-data="">
 			<ncg-graphic graphic="[[graphic]]" instances="[[_calcGraphicInstances(bundle, graphic, instances)]]">
 			</ncg-graphic>
+		</template>
+
+		<!-- Grouped graphics -->
+		<template is="dom-repeat" items="[[_graphicsGroups]]" as="group" mutable-data="">
+			<ncg-graphics-group 
+				bundle-name="[[bundle.name]]" 
+				group-name="[[group.name]]" 
+				graphics="[[group.graphics]]" 
+				instances="[[instances]]">
+			</ncg-graphics-group>
 		</template>
 
 		<paper-dialog id="reloadAllConfirmDialog" on-iron-overlay-closed="_handleReloadAllConfirmDialogClose">
@@ -119,6 +131,14 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 		return {
 			bundle: Object,
 			instances: Array,
+			_ungroupedGraphics: {
+				type: Array,
+				computed: "_computeUngroupedGraphics(bundle.graphics)",
+			},
+			_graphicsGroups: {
+				type: Array,
+				computed: "_computeGraphicsGroups(bundle.graphics)",
+			},
 		};
 	}
 
@@ -140,6 +160,83 @@ class NcgGraphicsBundle extends MutableData(Polymer.PolymerElement) {
 				instance.bundleName === bundle.name &&
 				instance.pathName === graphic.url,
 		);
+	}
+
+	_computeUngroupedGraphics(graphics?: NodeCG.Bundle.Graphic[]) {
+		if (!graphics) {
+			return [];
+		}
+		const ungrouped = graphics.filter((graphic) => !graphic.group);
+		return this._sortGraphics(ungrouped);
+	}
+
+	_computeGraphicsGroups(graphics?: NodeCG.Bundle.Graphic[]) {
+		if (!graphics) {
+			return [];
+		}
+
+		const groupedGraphics = graphics.filter((graphic) => graphic.group);
+		const groupsMap = new Map<string, NodeCG.Bundle.Graphic[]>();
+
+		groupedGraphics.forEach((graphic) => {
+			const groupName = graphic.group!;
+			if (!groupsMap.has(groupName)) {
+				groupsMap.set(groupName, []);
+			}
+			groupsMap.get(groupName)!.push(graphic);
+		});
+
+		const groups = Array.from(groupsMap.entries()).map(([name, graphics]) => ({
+			name,
+			graphics: this._sortGraphics(graphics),
+		}));
+
+		groups.sort((a, b) => a.name.localeCompare(b.name));
+		return groups;
+	}
+
+	/**
+	 * Returns the sort category for an order value:
+	 * - 0: positive/zero (appears first)
+	 * - 1: undefined (appears in middle)
+	 * - 2: negative (appears last)
+	 */
+	_getOrderCategory(order: number | undefined): number {
+		if (order === undefined) return 1;
+		if (order >= 0) return 0;
+		return 2;
+	}
+
+	_sortGraphics(graphics: NodeCG.Bundle.Graphic[]) {
+		// Sorting categories: positive/zero orders (front) → no order (middle) → negative orders (end)
+		// This allows negative numbers to be used like Python's arr[-1] to place items at the end
+		return graphics.slice().sort((a, b) => {
+			const orderA = a.order;
+			const orderB = b.order;
+
+			const categoryA = this._getOrderCategory(orderA);
+			const categoryB = this._getOrderCategory(orderB);
+
+			// Different categories: sort by category
+			if (categoryA !== categoryB) {
+				return categoryA - categoryB;
+			}
+
+			// Same category: if both undefined, sort by name
+			if (categoryA === 1) {
+				const nameA = a.name ?? a.file;
+				const nameB = b.name ?? b.file;
+				return nameA.localeCompare(nameB);
+			}
+
+			// Both have orders in same category: sort numerically, then by name
+			if (orderA !== orderB) {
+				return orderA! - orderB!;
+			}
+			const nameA = a.name ?? a.file;
+			const nameB = b.name ?? b.file;
+			return nameA.localeCompare(nameB);
+		});
 	}
 
 	_handleReloadAllConfirmDialogClose(e: any) {

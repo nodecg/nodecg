@@ -1,0 +1,17 @@
+{
+  "name": "workspace-order-test",
+  "version": "0.0.1",
+  "nodecg": {
+    "compatibleRange": "~0.7.0",
+    "dashboardPanels": [
+      {
+        "name": "test-panel",
+        "title": "Test Panel",
+        "width": 1,
+        "file": "panel.html",
+        "workspace": "ordered",
+        "workspaceOrder": 5
+      }
+    ]
+  }
+}

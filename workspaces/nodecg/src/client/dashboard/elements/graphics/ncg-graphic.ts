@@ -192,6 +192,21 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 			:host(:not([responsive-mode="narrow"])) #counter {
 				padding-right: 8px;
 			}
+
+			#description {
+				background-color: #3F4A5F;
+				margin: 0 1px 1px 1px;
+				padding: 12px 16px;
+			}
+
+			#descriptionText {
+				color: #FFFFFF;
+				font-size: 14px;
+				font-style: normal;
+				font-weight: 400;
+				line-height: 1.4;
+				word-wrap: break-word;
+			}
 		</style>
 
 		<iron-media-query query="(min-width: 641px)" query-matches="{{_wide}}"></iron-media-query>
@@ -205,7 +220,7 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 
 			<div id="urlAndResolution">
 				<a id="url" href\$="[[_computeFullGraphicUrl(graphic.url)]]" target="_blank" title="[[_calcShortUrl(graphic.url)]]">
-					[[_calcShortUrl(graphic.url)]]
+					[[_calcDisplayName(graphic.name, graphic.url)]]
 				</a>
 				<div id="resolution">[[graphic.width]]x[[graphic.height]]</div>
 			</div>
@@ -226,6 +241,9 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 		</div>
 
 		<iron-collapse id="instancesCollapse" opened="{{_collapseOpened}}" no-animation="">
+			<div id="description" hidden="[[!graphic.description]]">
+				<div id="descriptionText">[[graphic.description]]</div>
+			</div>
 			<template is="dom-repeat" items="[[instances]]" as="instance" mutable-data="">
 				<ncg-graphic-instance responsive-mode="[[responsiveMode]]" graphic="[[graphic]]" instance="[[instance]]">
 				</ncg-graphic-instance>
@@ -325,6 +343,13 @@ class NcgGraphic extends MutableData(Polymer.PolymerElement) {
 
 	_calcShortUrl(graphicUrl: string) {
 		return graphicUrl.split("/").slice(4).join("/");
+	}
+
+	_calcDisplayName(name?: string, graphicUrl?: string) {
+		if (name) {
+			return name;
+		}
+		return graphicUrl ? this._calcShortUrl(graphicUrl) : "";
 	}
 
 	_computeFullGraphicUrl(url: string) {
