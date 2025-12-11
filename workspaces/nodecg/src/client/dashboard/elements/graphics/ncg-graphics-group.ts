@@ -125,11 +125,11 @@ class NcgGraphicsGroup extends MutableData(Polymer.PolymerElement) {
 	}
 
 	toggleCollapse() {
-		this.$["collapse"].toggle();
+		this.$.collapse.toggle();
 	}
 
 	_initializeDefaultOpened() {
-		this["_opened"] = true;
+		this._opened = true;
 	}
 
 	_computeCollapseIcon(opened: boolean) {
