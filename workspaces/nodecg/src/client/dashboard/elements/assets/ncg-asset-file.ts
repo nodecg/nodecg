@@ -1,18 +1,24 @@
-import "@polymer/iron-flex-layout/iron-flex-layout.js";
-import "@polymer/iron-icons/iron-icons.js";
-import "@polymer/paper-button/paper-button.js";
-import "@polymer/paper-spinner/paper-spinner-lite.js";
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../../css/nodecg-theme";
+import { icon } from "../../icons";
 
-import * as Polymer from "@polymer/polymer";
+class NcgAssetFile extends LitElement {
+	static override properties = {
+		file: { type: Object },
+		deleting: { type: Boolean },
+	};
 
-class NcgAssetFile extends Polymer.PolymerElement {
-	static get template() {
-		return Polymer.html`
-		<style include="nodecg-theme">
+	file: { url: string; base: string } = { url: "", base: "" };
+	deleting = false;
+
+	static override styles = [
+		nodecgTheme,
+		css`
 			:host {
-				@apply --layout-center;
-				@apply --layout-horizontal;
-				@apply --layout-justified;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
 				margin: 4px 0;
 			}
 
@@ -23,56 +29,60 @@ class NcgAssetFile extends Polymer.PolymerElement {
 				text-transform: none;
 			}
 
-			#delete {
-				align-items: center;
+			.controls {
 				display: flex;
+				flex-direction: row;
+				align-items: center;
 				flex-shrink: 0;
 				margin-right: 21px;
+				gap: 8px;
 			}
 
-			#spinner {
-				--paper-spinner-color: var(--nodecg-reject-color);
-				pointer-events: none;
-				position: absolute;
-				right: 78px;
+			.spinner {
+				width: 24px;
+				height: 24px;
+				border: 3px solid rgba(163, 59, 59, 0.3);
+				border-top-color: var(--nodecg-reject-color);
+				border-radius: 50%;
+				animation: spin 0.8s linear infinite;
 			}
-		</style>
 
-		<a id="name" href="[[file.url]]" target="_blank">[[file.base]]</a>
-		<paper-spinner-lite id="spinner" alt="Deleting" active=""></paper-spinner-lite>
-		<paper-button id="delete" class="nodecg-reject" on-click="_handleDeleteClick">
-			<iron-icon icon="delete"></iron-icon>
-			&nbsp;Delete
-		</paper-button>
-`;
-	}
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
 
-	static get is() {
-		return "ncg-asset-file";
-	}
+			button {
+				display: none;
+			}
 
-	static get properties() {
-		return {
-			deleting: {
-				type: Boolean,
-				observer: "_deletingChanged",
-				value: false,
-			},
-		};
-	}
+			:host(:not([deleting])) .spinner {
+				display: none;
+			}
 
-	_deletingChanged(newVal: string) {
-		this.$.spinner.style.display = newVal ? "block" : "none";
-		this.$.delete.style.visibility = newVal ? "hidden" : "visible";
-	}
+			:host(:not([deleting])) button {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				background: var(--nodecg-reject-color);
+				border: none;
+				border-radius: 0;
+				color: white;
+				cursor: pointer;
+				font-size: 14px;
+				padding: 6px 12px;
+			}
+		`,
+	];
 
-	_handleDeleteClick() {
+	private async _handleDeleteClick() {
 		this.deleting = true;
-
-		void fetch(this.file.url, {
-			method: "DELETE",
-			credentials: "include",
-		}).then((response) => {
+		try {
+			const response = await fetch(this.file.url, {
+				method: "DELETE",
+				credentials: "include",
+			});
 			if (response.status === 410 || response.status === 200) {
 				this.dispatchEvent(
 					new CustomEvent("deleted", { bubbles: true, composed: true }),
@@ -82,9 +92,22 @@ class NcgAssetFile extends Polymer.PolymerElement {
 					new CustomEvent("deletion-failed", { bubbles: true, composed: true }),
 				);
 			}
-
+		} finally {
 			this.deleting = false;
-		});
+		}
+	}
+
+	override render() {
+		return html`
+			<a id="name" href=${this.file.url} target="_blank">${this.file.base}</a>
+			<div class="controls">
+				${this.deleting ? html`<div class="spinner" aria-label="Deleting"></div>` : html`
+					<button @click=${this._handleDeleteClick}>
+						${icon("delete")} Delete
+					</button>
+				`}
+			</div>
+		`;
 	}
 }
 

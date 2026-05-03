@@ -1,24 +1,3 @@
-import "@webcomponents/webcomponentsjs/webcomponents-loader";
-import "@webcomponents/shadycss/apply-shim.min.js";
-import "@polymer/app-layout/app-layout.js";
-import "@polymer/app-route/app-location.js";
-import "@polymer/app-route/app-route.js";
-import "@polymer/iron-flex-layout/iron-flex-layout.js";
-import "@polymer/iron-icons/av-icons.js";
-import "@polymer/iron-icons/communication-icons.js";
-import "@polymer/iron-icons/image-icons.js";
-import "@polymer/iron-icons/iron-icons.js";
-import "@polymer/iron-image/iron-image.js";
-import "@polymer/iron-media-query/iron-media-query.js";
-import "@polymer/iron-pages/iron-pages.js";
-import "@polymer/iron-selector/iron-selector.js";
-import "@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js";
-import "@polymer/paper-dialog/paper-dialog.js";
-import "@polymer/paper-icon-button/paper-icon-button.js";
-import "@polymer/paper-item/paper-icon-item.js";
-import "@polymer/paper-tabs/paper-tabs.js";
-import "@polymer/paper-toast/paper-toast.js";
-import "@polymer/polymer/lib/elements/custom-style.js";
 import "../css/nodecg-theme";
 import "./assets/ncg-assets";
 import "./graphics/ncg-graphics";
@@ -27,181 +6,247 @@ import "./ncg-dialog";
 import "./ncg-workspace";
 import "./settings/ncg-settings";
 
-import * as Polymer from "@polymer/polymer";
-import { timeOut } from "@polymer/polymer/lib/utils/async.js";
-import { Debouncer } from "@polymer/polymer/lib/utils/debounce.js";
-
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../css/nodecg-theme";
+import { icon } from "../icons";
 import type { NodeCG } from "../../../types/nodecg";
 
-class NcgDashboard extends Polymer.PolymerElement {
-	static get template() {
-		return Polymer.html`
-		<style include="nodecg-theme">
+function debounce(fn: () => void, delay: number): () => void {
+	let timer: ReturnType<typeof setTimeout> | null = null;
+	return () => {
+		if (timer !== null) clearTimeout(timer);
+		timer = setTimeout(() => {
+			timer = null;
+			fn();
+		}, delay);
+	};
+}
+
+class NcgDashboard extends LitElement {
+	static override properties = {
+		_route: { state: true },
+		_smallScreen: { state: true },
+		_drawerOpen: { state: true },
+		_mainToastText: { state: true },
+		_mainToastVisible: { state: true },
+		_reconnectToastVisible: { state: true },
+	};
+
+	private _route = "";
+	private _smallScreen = false;
+	private _drawerOpen = false;
+	private _mainToastText = "";
+	private _mainToastVisible = false;
+	private _reconnectToastVisible = false;
+	private _toastTimer: ReturnType<typeof setTimeout> | null = null;
+	private _fixPathDebounce: (() => void);
+
+	private readonly _loginDisabled = !window.ncgConfig.login?.enabled;
+	private readonly _workspaces = window.__renderData__.workspaces;
+	private readonly _bundles = window.__renderData__.bundles;
+
+	private readonly _pages = (() => {
+		const pages: { name: string; route: string; iconName: string }[] = [
+			{ name: "Graphics", route: "graphics", iconName: "visibility" },
+			{ name: "Mixer", route: "mixer", iconName: "volume-up" },
+			{ name: "Assets", route: "assets", iconName: "file-upload" },
+		];
+		if (window.ncgConfig.login?.enabled) {
+			pages.push({ name: "Settings", route: "settings", iconName: "settings" });
+		}
+		return pages;
+	})();
+
+	constructor() {
+		super();
+		this._fixPathDebounce = debounce(() => this._fixPath(), 100);
+	}
+
+	static override styles = [
+		nodecgTheme,
+		css`
 			:host {
 				-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-				@apply --layout-fullbleed;
+				position: fixed;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
 				overflow: hidden;
+				display: flex;
+				flex-direction: column;
 			}
 
-			app-drawer-layout,
-			app-header-layout {
-				height: 100%;
-			}
-
-			app-header {
-				background-color: #2F3A4F;
-				--app-header-shadow: {
-					box-shadow: inset 0 5px 6px -3px rgba(0, 0, 0, 0.2);
-					height: 10px;
-					bottom: -10px;
-				};
-			}
-
-			app-drawer {
-				--app-drawer-content-container: {
-					background-color: #2F3A4F;
-				};
-			}
-
-			.spacer {
-				@apply --layout-center-center;
-				@apply --layout-flex-auto;
-				@apply --layout;
-			}
-
-			paper-tabs {
-				@apply --layout-center;
-				@apply --layout-horizontal;
-				height: 100%;
-				--paper-tabs-selection-bar-color: var(--nodecg-brand-blue);
-				--paper-tabs-selection-bar: {
-					border-bottom-width: 5px;
-				};
-			}
-
-			paper-tab {
-				@apply --layout-flex-none;
-				font-size: 12px;
-				text-transform: uppercase;
-				user-select: none;
-				--paper-tab-ink: var(--nodecg-brand-blue);
-				--paper-tab-content: {
-					font-weight: 500!important; /* don't bold when focused */
-					color: var(--nodecg-brand-blue);
-					@apply --layout-vertical;
-					@apply --layout-center-center;
-				};
-				--paper-tab-content-unselected: {
-					color: white;
-				};
-			}
-
-			.workspaceTab {
-				font-size: 16px;
-			}
-
-			paper-icon-button {
-				--paper-icon-button-ink-color: var(--nodecg-brand-blue);
-				color: white;
+			header {
+				background-color: #2f3a4f;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				height: 64px;
+				flex: none;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+				z-index: 10;
+				padding: 0 8px;
+				gap: 4px;
 			}
 
 			#mainLogo {
 				height: 48px;
 				width: 48px;
+				flex: none;
 			}
 
-			#drawerToolbar {
-				@apply --layout-horizontal;
-				@apply --layout-center;
-			}
-
-			#drawerLogo {
-				height: 28px;
-				padding-left: 16px;
-				width: 83px;
-			}
-
-			.button-label {
+			.workspace-tabs {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				height: 100%;
+				flex: 1;
 				overflow: hidden;
-				text-overflow: ellipsis;
+			}
+
+			.page-tabs {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				height: 100%;
+				flex: none;
+			}
+
+			.tab {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				background: none;
+				border: none;
+				border-bottom: 5px solid transparent;
+				color: white;
+				cursor: pointer;
+				font-size: 12px;
+				font-weight: 500;
+				height: 100%;
+				padding: 0 12px;
+				text-transform: uppercase;
+				user-select: none;
+				gap: 2px;
 				white-space: nowrap;
 			}
 
-			paper-icon-item {
-				--paper-item-icon: {
-					min-width: 56px;
-				}
+			.tab:hover {
+				color: var(--nodecg-brand-blue);
 			}
 
-			.list {
-				margin-left: 20px;
-				margin-right: 20px;
+			.tab.active {
+				border-bottom-color: var(--nodecg-brand-blue);
+				color: var(--nodecg-brand-blue);
 			}
 
-			.list a {
+			.workspace-tab {
+				font-size: 16px;
+			}
+
+			.icon-btn {
+				background: none;
+				border: none;
 				color: white;
-				display: block;
-				line-height: 40px;
-				text-decoration: none;
-				text-transform: uppercase;
+				cursor: pointer;
+				padding: 8px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex: none;
 			}
 
-			.list a.iron-selected {
-				background-color: #525F78;
-			}
-
-			.list a.iron-selected paper-icon-item {
-				font-weight: bold;
-			}
-
-			ncg-dialog paper-dialog-scrollable {
-				--paper-dialog-scrollable: {
-					max-width: none!important;
-				}
+			#pages {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				overflow: auto;
+				box-sizing: border-box;
+				height: 1px;
 			}
 
 			section {
-				@apply --layout-flex;
+				flex: 1;
 				box-sizing: border-box;
+				display: none;
 			}
 
-			section:not(.section-workspace) {
-				@apply --layout-center;
-				@apply --layout-vertical;
-				padding: 32px;
+			section.active {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
 			}
 
 			section.section-workspace {
 				height: 1px;
 			}
 
-			#pages {
-				@apply --layout-flex-auto;
-				@apply --layout-vertical;
-				box-sizing: border-box;
-				height: 1px; /* just need to specify *any* height, the rest is then taken care of somehow? */
-				overflow: auto;
+			section.section-workspace.active {
+				display: block;
 			}
 
-			#reconnectToast {
-				@apply --layout-center;
-				@apply --layout-horizontal;
+			section:not(.section-workspace).active {
+				padding: 32px;
 			}
 
-			#reconnectToast paper-spinner {
-				margin-left: 1em;
+			/* Drawer */
+			.drawer-backdrop {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, 0.5);
+				z-index: 100;
 			}
 
-			paper-spinner {
-				--paper-spinner-layer-1-color: #645BA6;
-				--paper-spinner-layer-2-color: #A50074;
-				--paper-spinner-layer-3-color: #5BA664;
-				--paper-spinner-layer-4-color: #C9513E;
-				--paper-spinner-stroke-width: 5px;
+			.drawer {
+				position: fixed;
+				top: 0;
+				left: 0;
+				bottom: 0;
+				width: 288px;
+				background-color: #2f3a4f;
+				z-index: 101;
+				display: flex;
+				flex-direction: column;
+				overflow-y: auto;
 			}
 
-			[hidden] {
-				display: none !important;
+			.drawer-toolbar {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				padding: 8px;
+				gap: 8px;
+			}
+
+			#drawerLogo {
+				height: 28px;
+				width: 83px;
+			}
+
+			.drawer-list {
+				margin: 0 20px;
+				list-style: none;
+				padding: 0;
+			}
+
+			.drawer-list a {
+				color: white;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 12px;
+				line-height: 40px;
+				padding: 0 8px;
+				text-decoration: none;
+				text-transform: uppercase;
+				font-size: 14px;
+			}
+
+			.drawer-list a.selected {
+				background-color: #525f78;
+				font-weight: bold;
 			}
 
 			#dialogs iframe {
@@ -211,268 +256,146 @@ class NcgDashboard extends Polymer.PolymerElement {
 				width: 100%;
 			}
 
-			/**
-			 * Phone
-			 */
+			/* Toast styles */
+			.toast {
+				position: fixed;
+				bottom: 16px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: #323232;
+				color: white;
+				padding: 12px 24px;
+				border-radius: 2px;
+				z-index: 200;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+				pointer-events: none;
+				white-space: nowrap;
+			}
+
+			.toast.visible {
+				opacity: 1;
+			}
+
+			.reconnect-toast {
+				position: fixed;
+				bottom: 16px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: #323232;
+				color: white;
+				padding: 12px 24px;
+				border-radius: 2px;
+				z-index: 200;
+				display: none;
+				flex-direction: row;
+				align-items: center;
+				gap: 12px;
+			}
+
+			.reconnect-toast.visible {
+				display: flex;
+			}
+
+			.reconnect-spinner {
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				border: 3px solid rgba(255, 255, 255, 0.3);
+				border-top-color: white;
+				animation: spin 0.8s linear infinite;
+			}
+
+			@keyframes spin {
+				to { transform: rotate(360deg); }
+			}
+
+			[hidden] {
+				display: none !important;
+			}
+
+			/* Mobile */
 			@media (max-width: 640px) {
-				section {
-					padding: 0!important;
+				section:not(.section-workspace).active {
+					padding: 0 !important;
 				}
 
-				ncg-workspace:not([fullbleed]) {
-					padding: 6px;
-				}
-
-				paper-tabs {
+				.workspace-tabs,
+				.page-tabs {
 					display: none;
 				}
 
 				#mainLogo {
-					/* makes the menu button have equal negative space on the left and the right */
 					padding-left: 16px;
 				}
 			}
-		</style>
+		`,
+	];
 
-		<app-location route="{{route}}" use-hash-as-path=""></app-location>
-		<app-route route="{{route}}" pattern=":page" data="{{routeData}}" tail="{{subRoute}}"></app-route>
+	override connectedCallback() {
+		super.connectedCallback();
 
-		<iron-media-query query="max-width: 640px" query-matches="{{smallScreen}}"></iron-media-query>
+		this._route = window.location.hash.slice(1) || "";
+		window.addEventListener("hashchange", this._onHashChange);
 
-		<app-drawer-layout drawer-width="288px" force-narrow="">
-			<!-- navigation drawer for small screen sizes -->
-			<app-drawer id="drawer" swipe-open="[[smallScreen]]" slot="drawer">
-				<template is="dom-if" if="[[smallScreen]]">
-					<app-toolbar id="drawerToolbar">
-						<paper-icon-button icon="close" aria-label="Close" drawer-toggle=""></paper-icon-button>
-						<img id="drawerLogo" src="/dashboard/img/horiz-logo-2x.png" alt="NodeCG">
-					</app-toolbar>
+		// Media query for small screen
+		const mql = window.matchMedia("(max-width: 640px)");
+		this._smallScreen = mql.matches;
+		mql.addEventListener("change", (e) => {
+			this._smallScreen = e.matches;
+			if (!e.matches) this._drawerOpen = false;
+		});
 
-					<iron-selector class="list" selected="[[routeData.page]]" attr-for-selected="data-route">
-						<template is="dom-repeat" items="[[workspaces]]" as="workspace" initial-count="1">
-							<a data-route\$="[[workspace.route]]" href="#[[workspace.route]]" aria-label="[[workspace.name]]" on-tap="closeDrawer">
-								<paper-icon-item>
-									<iron-icon slot="item-icon" icon="dashboard"></iron-icon>
-									<span class="button-label">[[workspace.label]]</span>
-								</paper-icon-item>
-							</a>
-						</template>
-
-						<template is="dom-repeat" items="[[pages]]" as="page" initial-count="1">
-							<a data-route\$="[[page.route]]" href="#[[page.route]]" aria-label="[[page.name]]" on-tap="closeDrawer">
-								<paper-icon-item>
-									<iron-icon slot="item-icon" icon="[[page.icon]]"></iron-icon>
-									[[page.name]]
-								</paper-icon-item>
-							</a>
-						</template>
-					</iron-selector>
-				</template>
-			</app-drawer>
-
-			<app-header-layout fullbleed="">
-				<!-- main header -->
-				<app-header id="header" shadow="" slot="header">
-					<app-toolbar id="mainToolbar">
-						<paper-icon-button icon="menu" drawer-toggle="" alt="Toogle navigation menu" hidden="[[!smallScreen]]"></paper-icon-button>
-
-						<img id="mainLogo" src="/dashboard/img/square-logo.png" alt="NodeCG">
-
-						<template is="dom-if" if="[[!smallScreen]]">
-							<paper-tabs class="spacer" scrollable="" selected="[[routeData.page]]" attr-for-selected="route">
-								<template is="dom-repeat" items="[[workspaces]]" as="workspace" on-dom-change="_fixTabs">
-									<paper-tab class="workspaceTab" data-route\$="[[workspace.route]]" route="[[workspace.route]]" aria-label="[[workspace.name]]" on-tap="_selectRoute">
-										[[workspace.label]]
-									</paper-tab>
-								</template>
-							</paper-tabs>
-
-							<paper-tabs selected="[[routeData.page]]" attr-for-selected="route">
-								<template is="dom-repeat" items="[[pages]]" as="page" initial-count="1">
-									<paper-tab data-route\$="[[page.route]]" route="[[page.route]]" aria-label="[[page.name]]" on-tap="_selectRoute">
-										<iron-icon icon="[[page.icon]]"></iron-icon>
-										[[page.name]]
-									</paper-tab>
-								</template>
-
-								<paper-tab hidden="[[loginDisabled]]" aria-label="Sign Out" on-tap="logout">
-									<iron-icon icon="exit-to-app"></iron-icon>
-									Sign Out
-								</paper-tab>
-							</paper-tabs>
-						</template>
-					</app-toolbar>
-				</app-header>
-
-				<iron-pages id="pages" selected="[[route.path]]" attr-for-selected="route">
-					<template is="dom-repeat" items="[[workspaces]]" as="workspace">
-						<section route="[[workspace.route]]" class="section-workspace">
-							<ncg-workspace workspace="[[workspace]]" route="[[route]]"></ncg-workspace>
-						</section>
-					</template>
-
-					<section route="graphics">
-						<ncg-graphics></ncg-graphics>
-					</section>
-
-					<section route="mixer">
-						<ncg-mixer></ncg-mixer>
-					</section>
-
-					<section route="assets">
-						<ncg-assets></ncg-assets>
-					</section>
-
-					<section route="settings">
-						<ncg-settings></ncg-settings>
-					</section>
-				</iron-pages>
-
-			</app-header-layout>
-		</app-drawer-layout>
-
-		<div id="dialogs">
-			<template is="dom-repeat" items="[[dialogs]]" as="dialog">
-				<ncg-dialog id="[[dialog.bundleName]]_[[dialog.name]]" bundle="[[dialog.bundleName]]" panel="[[dialog.name]]" width="[[dialog.width]]" with-backdrop="">
-					<h2 hidden="[[_falsey(dialog.title)]]">[[dialog.title]]</h2>
-
-					<paper-dialog-scrollable>
-						<iframe src="/bundles/[[dialog.bundleName]]/dashboard/[[dialog.file]]" frameborder="0" scrolling="no" id="[[dialog.bundleName]]_[[dialog.name]]_iframe" loading="lazy">
-						</iframe>
-					</paper-dialog-scrollable>
-
-					<div class="buttons" hidden="[[_falsey(dialog.dialogButtons)]]">
-						<template is="dom-repeat" items="[[dialog.dialogButtons]]" as="button">
-							<paper-button class\$="[[_calcButtonClass(button.type)]]" dialog-confirm\$="[[_equal(button.type, 'confirm')]]" dialog-dismiss\$="[[_equal(button.type, 'dismiss')]]">
-								[[button.name]]
-							</paper-button>
-						</template>
-					</div>
-				</ncg-dialog>
-			</template>
-		</div>
-
-		<paper-toast id="mainToast"></paper-toast>
-		<paper-toast id="reconnectToast" text="Attempting to reconnect to NodeCG server..." duration="0">
-			<paper-spinner active="[[disconnected]]"></paper-spinner>
-		</paper-toast>
-`;
+		// Default to first workspace if no route set
+		if (
+			this._route === "" &&
+			window.__renderData__.workspaces[0]!.route !== ""
+		) {
+			window.location.hash = window.__renderData__.workspaces[0]!.route;
+		}
 	}
 
-	static get is() {
-		return "ncg-dashboard";
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		window.removeEventListener("hashchange", this._onHashChange);
 	}
 
-	static get properties() {
-		return {
-			route: {
-				type: Object,
-				observer: "_routeChanged",
-			},
-			smallScreen: {
-				type: Boolean,
-				observer: "_smallScreenChanged",
-			},
-			loginDisabled: {
-				type: Boolean,
-				value: !window.ncgConfig.login?.enabled,
-			},
-			bundles: {
-				type: Array,
-				value: window.__renderData__.bundles,
-			},
-			workspaces: {
-				type: Array,
-				value: window.__renderData__.workspaces,
-			},
-			dialogs: {
-				type: Array,
-				computed: "_computeDialogs(bundles)",
-			},
-			pages: {
-				type: Array,
-				value() {
-					const pages = [
-						{
-							name: "Graphics",
-							route: "graphics",
-							icon: "visibility",
-						},
-						{
-							name: "Mixer",
-							route: "mixer",
-							icon: "av:volume-up",
-						},
-						{
-							name: "Assets",
-							route: "assets",
-							icon: "file-upload",
-						},
-					];
+	private _onHashChange = () => {
+		this._route = window.location.hash.slice(1);
+		this._fixPathDebounce();
+	};
 
-					// For the time being, the "Settings" button is only relevant
-					// when login security is enabled.
-					if (window.ncgConfig.login?.enabled) {
-						pages.push({
-							name: "Settings",
-							route: "settings",
-							icon: "settings",
-						});
-					}
-
-					return pages;
-				},
-			},
-		};
-	}
-
-	override ready(): void {
-		super.ready();
-
-		// Images are stored as data URIs so that they can be displayed even with no connection to the server
-		let FAIL_URI: string;
-		let SUCCESS_URI: string;
+	override firstUpdated() {
+		let FAIL_URI = "";
+		let SUCCESS_URI = "";
 		let notified = false;
 
-		getImageDataURI("img/notifications/standard/fail.png", (err, result) => {
-			/* istanbul ignore if: hard-to-hit error */
-			if (err) {
-				console.error(err);
-			} else {
-				FAIL_URI = result!.data;
-			}
+		getImageDataURI("img/notifications/standard/fail.png", (_err, result) => {
+			if (result) FAIL_URI = result.data;
 		});
-
-		getImageDataURI("img/notifications/standard/success.png", (err, result) => {
-			/* istanbul ignore if: hard-to-hit error */
-			if (err) {
-				console.error(err);
-			} else {
-				SUCCESS_URI = result!.data;
-			}
-		});
+		getImageDataURI(
+			"img/notifications/standard/success.png",
+			(_err, result) => {
+				if (result) SUCCESS_URI = result.data;
+			},
+		);
 
 		window.socket.on("protocol_error", (err) => {
-			/* istanbul ignore next: coverage is buggy here */
 			if (err.type === "UnauthorizedError") {
 				window.location.href = `/authError?code=${err.code}&message=${err.message}`;
 			} else {
 				console.error("Unhandled socket error:", err);
-				this.$.mainToast.show("Unhandled socket error!");
+				this._showMainToast("Unhandled socket error!");
 			}
 		});
 
 		window.socket.on("disconnect", () => {
-			this.$.mainToast.show("Lost connection to NodeCG server!");
+			this._showMainToast("Lost connection to NodeCG server!");
 			notified = false;
-			this.disconnected = true;
 		});
 
 		window.socket.io.on("reconnect_attempt", (attempts) => {
-			if (!this.$.reconnectToast.opened) {
-				this.$.reconnectToast.open();
-			}
-
+			this._reconnectToastVisible = true;
 			if (attempts >= 3 && !notified) {
 				notified = true;
 				notify("Disconnected", {
@@ -484,9 +407,8 @@ class NcgDashboard extends Polymer.PolymerElement {
 		});
 
 		window.socket.io.on("reconnect", (attempts) => {
-			this.$.mainToast.show("Reconnected to NodeCG server!");
-			this.$.reconnectToast.hide();
-			this.disconnected = false;
+			this._showMainToast("Reconnected to NodeCG server!");
+			this._reconnectToastVisible = false;
 
 			if (attempts >= 3) {
 				notify("Reconnected", {
@@ -498,8 +420,7 @@ class NcgDashboard extends Polymer.PolymerElement {
 		});
 
 		window.socket.io.on("reconnect_failed", () => {
-			this.$.mainToast.show("Failed to reconnect to NodeCG server!");
-
+			this._showMainToast("Failed to reconnect to NodeCG server!");
 			notify("Reconnection Failed", {
 				body: "Could not reconnect to NodeCG after the maximum number of attempts.",
 				icon: FAIL_URI,
@@ -508,147 +429,267 @@ class NcgDashboard extends Polymer.PolymerElement {
 		});
 	}
 
-	override connectedCallback(): void {
-		super.connectedCallback();
-
-		// If the default workspace is hidden (due to it having no panels),
-		// show the next workspace by default.
-		if (
-			this.route.path === "" &&
-			window.__renderData__.workspaces[0]!.route !== ""
-		) {
-			window.location.hash = window.__renderData__.workspaces[0]!.route;
-		}
-
-		if (!this.routeData) {
-			this.routeData = {};
-		}
-
-		if (!this.routeData.page) {
-			this.set("routeData.page", "");
-		}
-
-		this._fixTabs();
+	private _showMainToast(text: string) {
+		this._mainToastText = text;
+		this._mainToastVisible = true;
+		if (this._toastTimer !== null) clearTimeout(this._toastTimer);
+		this._toastTimer = setTimeout(() => {
+			this._mainToastVisible = false;
+		}, 3000);
 	}
 
-	/* istanbul ignore next: can't cover since it navigates the page */
-	logout() {
+	private _navigate(route: string) {
+		window.location.hash = route;
+	}
+
+	private _openDrawer() {
+		this._drawerOpen = true;
+	}
+
+	private _closeDrawer() {
+		this._drawerOpen = false;
+	}
+
+	private _logout() {
 		window.location.href = "/logout";
 	}
 
-	closeDrawer() {
-		this.$.drawer.close();
-	}
-
-	_smallScreenChanged(newVal: boolean) {
-		if (!newVal) {
-			this.closeDrawer();
+	private _fixPath() {
+		const allRoutes = [
+			...this._workspaces.map((w) => w.route),
+			...this._pages.map((p) => p.route),
+		];
+		if (!allRoutes.includes(this._route)) {
+			window.location.hash = this._workspaces[0]!.route;
 		}
 	}
 
-	_equal(a: any, b: any) {
-		return a === b;
-	}
-
-	_selectRoute(e: any) {
-		window.location.hash = e.target.closest("paper-tab").route;
-	}
-
-	_routeChanged() {
-		this._fixTabs();
-		this._fixPathDebounce = Debouncer.debounce(
-			this._fixPathDebounce,
-			timeOut.after(100),
-			this._fixPath.bind(this),
-		);
-	}
-
-	_fixTabs() {
-		// For some reason, our paper-tabs elements need a little help
-		// to know when the route has changed and when they should deselect their tabs.
-		const tabs = this.shadowRoot!.querySelectorAll("paper-tabs");
-		if (tabs) {
-			tabs.forEach((tabSet) => {
-				if (tabSet.selected !== this.route.path) {
-					tabSet.selected = this.route.path;
-				}
-			});
-		}
-	}
-
-	_fixPath() {
-		// If the current hash points to a route that doesn't exist, (such as
-		// after a refresh which removed a workspace), default to the first workspace.
-		if (!this.$.pages.selectedItem) {
-			window.location.hash = window.__renderData__.workspaces[0]!.route;
-		}
-	}
-
-	_computeDialogs(bundles: NodeCG.Bundle[]) {
-		const dialogs: any[] = [];
+	private _computeDialogs(bundles: NodeCG.Bundle[]) {
+		const dialogs: NodeCG.Bundle.Panel[] = [];
 		bundles.forEach((bundle) => {
 			bundle.dashboard.panels.forEach((panel) => {
-				if (panel.dialog) {
-					dialogs.push(panel);
-				}
+				if (panel.dialog) dialogs.push(panel);
 			});
 		});
 		return dialogs;
 	}
 
-	_falsey(value: any) {
-		return !value;
+	private _calcButtonClass(buttonType: string) {
+		return buttonType === "confirm" ? "nodecg-accept" : "nodecg-reject";
 	}
 
-	_calcButtonClass(buttonType: string) {
-		return buttonType === "confirm" ? "nodecg-accept" : "nodecg-reject";
+	override render() {
+		const dialogs = this._computeDialogs(this._bundles);
+
+		return html`
+			<header>
+				${this._smallScreen
+					? html`
+							<button class="icon-btn" @click=${this._openDrawer}>
+								${icon("menu")}
+							</button>
+						`
+					: ""}
+
+				<img id="mainLogo" src="/dashboard/img/square-logo.png" alt="NodeCG" />
+
+				${!this._smallScreen
+					? html`
+							<div class="workspace-tabs">
+								${this._workspaces.map(
+									(ws) => html`
+										<button
+											class="tab workspace-tab ${this._route === ws.route ? "active" : ""}"
+											@click=${() => this._navigate(ws.route)}
+										>
+											${ws.label}
+										</button>
+									`,
+								)}
+							</div>
+							<div class="page-tabs">
+								${this._pages.map(
+									(page) => html`
+										<button
+											class="tab ${this._route === page.route ? "active" : ""}"
+											@click=${() => this._navigate(page.route)}
+										>
+											${icon(page.iconName)}
+											${page.name}
+										</button>
+									`,
+								)}
+								${!this._loginDisabled
+									? html`
+											<button class="tab" @click=${this._logout}>
+												${icon("exit-to-app")}
+												Sign Out
+											</button>
+										`
+									: ""}
+							</div>
+						`
+					: ""}
+			</header>
+
+			<div id="pages">
+				${this._workspaces.map(
+					(ws) => html`
+						<section
+							class="section-workspace ${this._route === ws.route ? "active" : ""}"
+						>
+							<ncg-workspace
+								.workspace=${ws}
+								.route=${this._route}
+							></ncg-workspace>
+						</section>
+					`,
+				)}
+
+				<section class="${this._route === "graphics" ? "active" : ""}">
+					<ncg-graphics></ncg-graphics>
+				</section>
+
+				<section class="${this._route === "mixer" ? "active" : ""}">
+					<ncg-mixer></ncg-mixer>
+				</section>
+
+				<section class="${this._route === "assets" ? "active" : ""}">
+					<ncg-assets></ncg-assets>
+				</section>
+
+				<section class="${this._route === "settings" ? "active" : ""}">
+					<ncg-settings></ncg-settings>
+				</section>
+			</div>
+
+			<div id="dialogs">
+				${dialogs.map(
+					(dialog) => html`
+						<ncg-dialog
+							id="${dialog.bundleName}_${dialog.name}"
+							bundle=${dialog.bundleName}
+							panel=${dialog.name}
+							width=${dialog.width}
+						>
+							${dialog.title ? html`<h2>${dialog.title}</h2>` : ""}
+							<div class="dialog-scrollable">
+								<iframe
+									src="/bundles/${dialog.bundleName}/dashboard/${dialog.file}"
+									frameborder="0"
+									scrolling="no"
+									id="${dialog.bundleName}_${dialog.name}_iframe"
+									loading="lazy"
+								></iframe>
+							</div>
+							${dialog.dialogButtons?.length
+								? html`
+										<div class="buttons">
+											${dialog.dialogButtons.map(
+												(btn) => html`
+													<button
+														class="${this._calcButtonClass(btn.type)}"
+														?dialog-confirm=${btn.type === "confirm"}
+														?dialog-dismiss=${btn.type === "dismiss"}
+													>
+														${btn.name}
+													</button>
+												`,
+											)}
+										</div>
+									`
+								: ""}
+						</ncg-dialog>
+					`,
+				)}
+			</div>
+
+			${this._drawerOpen
+				? html`
+						<div class="drawer-backdrop" @click=${this._closeDrawer}></div>
+						<nav class="drawer">
+							<div class="drawer-toolbar">
+								<button class="icon-btn" @click=${this._closeDrawer}>
+									${icon("close")}
+								</button>
+								<img
+									id="drawerLogo"
+									src="/dashboard/img/horiz-logo-2x.png"
+									alt="NodeCG"
+								/>
+							</div>
+							<ul class="drawer-list">
+								${this._workspaces.map(
+									(ws) => html`
+										<li>
+											<a
+												href="#${ws.route}"
+												class="${this._route === ws.route ? "selected" : ""}"
+												@click=${this._closeDrawer}
+											>
+												${icon("dashboard")}
+												${ws.label}
+											</a>
+										</li>
+									`,
+								)}
+								${this._pages.map(
+									(page) => html`
+										<li>
+											<a
+												href="#${page.route}"
+												class="${this._route === page.route ? "selected" : ""}"
+												@click=${this._closeDrawer}
+											>
+												${icon(page.iconName)}
+												${page.name}
+											</a>
+										</li>
+									`,
+								)}
+							</ul>
+						</nav>
+					`
+				: ""}
+
+			<div class="toast ${this._mainToastVisible ? "visible" : ""}">
+				${this._mainToastText}
+			</div>
+
+			<div class="reconnect-toast ${this._reconnectToastVisible ? "visible" : ""}">
+				Attempting to reconnect to NodeCG server...
+				<div class="reconnect-spinner"></div>
+			</div>
+		`;
 	}
 }
 
 function getImageDataURI(
 	url: string,
 	cb: (
-		error: NodeJS.ErrnoException | undefined,
+		error: Error | undefined,
 		result?: { image: HTMLImageElement; data: string },
 	) => void,
 ) {
-	let data;
-	let canvas;
-	let ctx;
 	const img = new Image();
 	img.onload = function () {
-		// Create the canvas element.
-		canvas = document.createElement("canvas");
+		const canvas = document.createElement("canvas");
 		canvas.width = img.width;
 		canvas.height = img.height;
-		// Get '2d' context and draw the image.
-		ctx = canvas.getContext("2d");
-		if (!ctx) {
-			cb(new Error("Could not create canvas context"));
-			return;
-		}
+		const ctx = canvas.getContext("2d");
+		if (!ctx) { cb(new Error("Could not create canvas context")); return; }
 		ctx.drawImage(img, 0, 0);
-		// Get canvas data URL
 		try {
-			data = canvas.toDataURL();
-			cb(undefined, {
-				image: img,
-				data,
-			});
-		} catch (e: any) {
-			/* istanbul ignore next: hard-to-test error */
-			cb(e);
+			cb(undefined, { image: img, data: canvas.toDataURL() });
+		} catch (e: unknown) {
+			cb(e as Error);
 		}
-
 		canvas.remove();
 	};
-
-	// Load image URL.
 	try {
 		img.src = url;
-	} catch (e: any) {
-		/* istanbul ignore next: hard-to-test error */
-		cb(e);
+	} catch (e: unknown) {
+		cb(e as Error);
 	}
 }
 
@@ -656,39 +697,18 @@ function notify(
 	title: string,
 	options: { body?: string; icon?: string; tag?: string } = {},
 ) {
-	// Let's check if the browser supports notifications
-	if (!("Notification" in window)) {
-		return;
-	}
-
-	// Let's check if the user is okay to get some notification.
-	// Otherwise, we need to ask the user for permission.
-	// Note, Chrome does not implement the permission static property.
-	// So we have to check for NOT 'denied' instead of 'default'.
+	if (!("Notification" in window)) return;
 	if (window.Notification.permission === "granted") {
-		// If it's okay let's create a notification
-		const notification = new window.Notification(title, options);
-		setTimeout(() => {
-			notification.close();
-		}, 5000);
+		const n = new window.Notification(title, options);
+		setTimeout(() => n.close(), 5000);
 	} else if (window.Notification.permission !== "denied") {
 		void window.Notification.requestPermission((permission) => {
-			// If the user is okay, let's create a notification
 			if (permission === "granted") {
-				const notification = new window.Notification(title, options);
-				setTimeout(
-					(n) => {
-						n.close();
-					},
-					5000,
-					notification,
-				);
+				const n = new window.Notification(title, options);
+				setTimeout(() => n.close(), 5000);
 			}
 		});
 	}
-
-	// At last, if the user already denied any notification, and you
-	// want to be respectful there is no need to bother them any more.
 }
 
 customElements.define("ncg-dashboard", NcgDashboard);

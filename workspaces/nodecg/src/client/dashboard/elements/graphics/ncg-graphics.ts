@@ -1,65 +1,96 @@
-import "@polymer/paper-toast/paper-toast.js";
 import "./ncg-graphics-bundle";
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../../css/nodecg-theme";
+import type { NodeCG } from "../../../../types/nodecg";
 
-import * as Polymer from "@polymer/polymer";
-import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
+class NcgGraphics extends LitElement {
+	static override properties = {
+		bundlesWithGraphics: { type: Array },
+		_graphicInstances: { state: true },
+		_toastText: { state: true },
+		_showToast: { state: true },
+	};
 
-/**
- * @customElement
- * @polymer
- * @appliesMixin MutableData
- */
-class NcgGraphics extends MutableData(Polymer.PolymerElement) {
-	static get template() {
-		return Polymer.html`
-		<style include="nodecg-theme">
+	bundlesWithGraphics = window.__renderData__.bundles.filter(
+		(bundle) => bundle.graphics && bundle.graphics.length > 0,
+	);
+	private _graphicInstances: NodeCG.GraphicsInstance[] = [];
+	private _toastText = "";
+	private _showToast = false;
+	private _toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+	static override styles = [
+		nodecgTheme,
+		css`
 			:host {
-				@apply --layout-vertical;
+				display: flex;
+				flex-direction: column;
 				font-family: Roboto, Noto, sans-serif;
 				max-width: 800px;
 				width: 100%;
 			}
-		</style>
 
-		<template is="dom-repeat" items="[[bundlesWithGraphics]]" as="bundle" mutable-data="">
-			<ncg-graphics-bundle bundle="[[bundle]]" instances="[[_graphicInstances]]">
-			</ncg-graphics-bundle>
-		</template>
+			.toast {
+				position: fixed;
+				bottom: 16px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: #323232;
+				color: white;
+				padding: 12px 24px;
+				border-radius: 2px;
+				z-index: 1000;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+				pointer-events: none;
+			}
 
-		<paper-toast id="copyToast"></paper-toast>
-`;
-	}
+			.toast.visible {
+				opacity: 1;
+			}
+		`,
+	];
 
-	static get is() {
-		return "ncg-graphics";
-	}
-
-	static get properties() {
-		return {
-			bundlesWithGraphics: {
-				type: Array,
-				value: window.__renderData__.bundles.filter(
-					(bundle) => bundle.graphics && bundle.graphics.length > 0,
-				),
-			},
-			_graphicInstances: Array,
-		};
-	}
-
-	override ready(): void {
-		super.ready();
-		const instancesRep = NodeCG.Replicant("graphics:instances", "nodecg");
-
+	override firstUpdated() {
+		const instancesRep = window.NodeCG.Replicant<NodeCG.GraphicsInstance[]>(
+			"graphics:instances",
+			"nodecg",
+		);
 		instancesRep.on("change", (newVal) => {
-			this._graphicInstances = newVal;
+			this._graphicInstances = newVal ?? [];
 		});
 
 		this.addEventListener("url-copy-success", () => {
-			this.$.copyToast.show("Graphic URL copied to clipboard.");
+			this._showMessage("Graphic URL copied to clipboard.");
 		});
 		this.addEventListener("url-copy-error", () => {
-			this.$.copyToast.show("Failed to copy graphic URL to clipboard!");
+			this._showMessage("Failed to copy graphic URL to clipboard!");
 		});
+	}
+
+	private _showMessage(text: string) {
+		this._toastText = text;
+		this._showToast = true;
+		if (this._toastTimer !== null) clearTimeout(this._toastTimer);
+		this._toastTimer = setTimeout(() => {
+			this._showToast = false;
+		}, 3000);
+	}
+
+	override render() {
+		return html`
+			${this.bundlesWithGraphics.map(
+				(bundle) => html`
+					<ncg-graphics-bundle
+						.bundle=${bundle}
+						.instances=${this._graphicInstances}
+					></ncg-graphics-bundle>
+				`,
+			)}
+			<div class="toast ${this._showToast ? "visible" : ""}">
+				${this._toastText}
+			</div>
+		`;
 	}
 }
 

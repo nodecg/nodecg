@@ -1,192 +1,284 @@
-import "@polymer/iron-flex-layout/iron-flex-layout.js";
-import "@polymer/iron-icons/iron-icons.js";
-import "@polymer/paper-card/paper-card.js";
-import "@polymer/paper-dialog-scrollable/paper-dialog-scrollable.js";
-import "@polymer/paper-dialog/paper-dialog.js";
-import "@polymer/paper-toast/paper-toast.js";
-import "@vaadin/vaadin-upload/vaadin-upload.js";
-import "../util-scrollable";
 import "./ncg-asset-file";
+import "../util-scrollable";
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../../css/nodecg-theme";
+import { icon } from "../../icons";
+import type { NodeCG as NCGTypes } from "../../../../types/nodecg";
 
-import * as Polymer from "@polymer/polymer";
-import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
+class NcgAssetCategory extends LitElement {
+	static override properties = {
+		files: { type: Array },
+		collectionName: { type: String, reflect: true },
+		category: { type: Object },
+		_toastText: { state: true },
+		_showToast: { state: true },
+	};
 
-class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
-	static get template(): HTMLTemplateElement {
-		return Polymer.html`
-		<style include="nodecg-theme">
+	files: NCGTypes.AssetFile[] = [];
+	collectionName = "";
+	category: { name: string; title: string; allowedTypes: string[] } = {
+		name: "",
+		title: "",
+		allowedTypes: [],
+	};
+	private _toastText = "";
+	private _showToast = false;
+	private _assetCategoryReplicant: ReturnType<
+		typeof NodeCG.Replicant<NCGTypes.AssetFile[]>
+	> | null = null;
+	private _assetCategoryChangeHandler: ((newVal: NCGTypes.AssetFile[] | undefined) => void) | null = null;
+	private _toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+	static override styles = [
+		nodecgTheme,
+		css`
 			:host {
 				display: block;
 				width: 100%;
 				box-sizing: border-box;
 			}
 
-			#add {
-				display: flex;
-				align-items: center;
-			}
-
-			paper-card {
-				width: 100%;
-			}
-
 			#header {
-				@apply --layout-vertical;
-				background-color: #525F78;
+				display: flex;
+				flex-direction: column;
+				background-color: #525f78;
 				padding: 12px 0;
 			}
 
 			#header-main {
-				@apply --layout-center;
-				@apply --layout-horizontal;
-				@apply --layout-justified;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				padding: 0 16px;
 			}
 
 			#title {
-				@apply --paper-font-headline;
+				font-size: 24px;
+				font-weight: 400;
+				line-height: 32px;
 			}
 
-			#files {
-				background-color: #2F3A4F;
+			#add-btn {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				background: var(--nodecg-accept-color);
+				border: none;
+				border-radius: 0;
+				color: white;
+				cursor: pointer;
+				font-size: 14px;
+				padding: 6px 12px;
+			}
+
+			#empty {
+				padding: 8px 16px;
+				color: #aaa;
+				font-size: 14px;
+			}
+
+			util-scrollable {
+				background-color: #2f3a4f;
 				max-height: 400px;
-				margin: 0 -16px;
-				padding-left: 16px;
-				--util-scrollable: {
-					padding: 0;
-				};
-				@apply --layout-vertical;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
 			}
 
-			vaadin-upload {
-				width: 400px;
-				margin: 16px;
-				--lumo-primary-text-color: var(--nodecg-brand-blue);
-				--lumo-secondary-text-color: darkgray;
+			.toast {
+				position: fixed;
+				bottom: 16px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: #323232;
+				color: white;
+				padding: 12px 24px;
+				border-radius: 2px;
+				z-index: 1000;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+				pointer-events: none;
 			}
 
-			#acceptsMsg {
-				margin-top: 8px;
+			.toast.visible {
+				opacity: 1;
+			}
+
+			dialog {
+				background: #2f3a4f;
+				color: white;
+				border: none;
+				padding: 24px;
+				max-width: 500px;
+				width: 90vw;
+			}
+
+			dialog::backdrop {
+				background: rgba(0, 0, 0, 0.5);
+			}
+
+			.dialog-buttons {
+				display: flex;
+				justify-content: flex-end;
+				margin-top: 16px;
+			}
+
+			.close-btn {
+				background: var(--nodecg-benign-color);
+				border: none;
+				border-radius: 0;
+				color: white;
+				cursor: pointer;
+				font-size: 14px;
+				padding: 8px 16px;
+			}
+
+			.upload-area {
+				border: 2px dashed var(--nodecg-brand-blue);
+				padding: 24px;
 				text-align: center;
+				margin: 16px 0;
 			}
 
-			#add {
-				--nodecg-background-color: #00A651;
+			.upload-area label {
+				cursor: pointer;
+				color: var(--nodecg-brand-blue);
 			}
 
-			#add iron-icon {
-				position: relative;
-				top: -1px;
+			#fileInput {
+				display: none;
 			}
-		</style>
 
-		<paper-toast id="toast"></paper-toast>
+			.accepts-msg {
+				color: #aaa;
+				font-size: 12px;
+				margin-top: 8px;
+			}
 
-		<div id="header">
-			<div id="header-main">
-				<span id="title">[[category.title]]</span>
-				<paper-button id="add" on-click="openUploadDialog">
-					<iron-icon icon="add"></iron-icon>
-					Add File(s)
-				</paper-button>
-			</div>
+			.file-list {
+				margin-top: 8px;
+				font-size: 14px;
+			}
 
+			.progress-item {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin: 4px 0;
+			}
 
-			<div id="empty">
-				There are no assets in this category.
-			</div>
-		</div>
+			.progress-item progress {
+				flex: 1;
+				accent-color: var(--nodecg-brand-blue);
+			}
+		`,
+	];
 
-		<util-scrollable id="files">
-			<template is="dom-repeat" items="[[files]]" as="file" mutable-data="">
-				<ncg-asset-file file="[[file]]" on-deleted="_handleDeleted" on-deletion-failed="_handleDeletionFailed">
-				</ncg-asset-file>
-			</template>
-		</util-scrollable>
-
-		<!-- 2017/03/18: Had to remove with-backdrop during the dashboard re-write -->
-		<paper-dialog id="uploadDialog">
-			<paper-dialog-scrollable>
-				<vaadin-upload id="uploader" target="/assets/[[collectionName]]/[[category.name]]" on-upload-start="refitUploadDialog" on-file-reject="_onFileReject" on-upload-success="_onUploadSuccess">
-					<template is="dom-if" if="[[category.allowedTypes.length]]">
-						<div id="acceptsMsg">[[acceptsMsg]]</div>
-					</template>
-				</vaadin-upload>
-			</paper-dialog-scrollable>
-
-			<div class="buttons">
-				<paper-button dialog-dismiss="">Close</paper-button>
-			</div>
-		</paper-dialog>
-`;
+	override updated(changedProps: Map<string, unknown>) {
+		if (changedProps.has("category") || changedProps.has("collectionName")) {
+			this._computeAssetCategoryReplicant(
+				this.category?.name,
+				this.collectionName,
+			);
+		}
+		if (changedProps.has("category")) {
+			const input = this.shadowRoot?.querySelector<HTMLInputElement>("#fileInput");
+			if (input && this.category?.allowedTypes?.length) {
+				input.accept = this.category.allowedTypes.map((t) => "." + t).join(",");
+			}
+		}
 	}
 
-	static get is(): string {
-		return "ncg-asset-category";
-	}
+	private _computeAssetCategoryReplicant(
+		categoryName: string,
+		collectionName: string,
+	) {
+		if (!categoryName || !collectionName) return;
 
-	static get properties() {
-		return {
-			files: Array,
-			collectionName: {
-				type: String,
-				reflectToAttribute: true,
-			},
-			category: Object,
-			categoryName: {
-				type: String,
-				reflectToAttribute: true,
-				computed: "_computeCategoryName(category.name)",
-			},
-			acceptsMsg: {
-				type: String,
-				computed: "_computeAcceptsMsg(category.allowedTypes)",
-			},
-			_successfulUploads: {
-				type: Number,
-				value: 0,
-			},
-			_assetCategoryReplicant: {
-				type: Object,
-			},
+		if (this._assetCategoryReplicant && this._assetCategoryChangeHandler) {
+			this._assetCategoryReplicant.removeListener("change", this._assetCategoryChangeHandler);
+		}
+
+		const newRep = NodeCG.Replicant<NCGTypes.AssetFile[]>(
+			`assets:${categoryName}`,
+			collectionName,
+		);
+		this._assetCategoryChangeHandler = (newVal) => {
+			this.files = newVal ?? [];
 		};
+		newRep.on("change", this._assetCategoryChangeHandler);
+		this._assetCategoryReplicant = newRep;
 	}
 
-	static get observers(): string[] {
-		return [
-			"_onAllowedTypesChanged(category.allowedTypes)",
-			"_computeAssetCategoryReplicant(category.name, collectionName)",
-		];
+	private _showMessage(text: string) {
+		this._toastText = text;
+		this._showToast = true;
+		if (this._toastTimer !== null) clearTimeout(this._toastTimer);
+		this._toastTimer = setTimeout(() => {
+			this._showToast = false;
+		}, 3000);
 	}
 
-	override connectedCallback(): void {
-		super.connectedCallback();
-		this.$.uploadDialog.fitInto = document.body
-			.querySelector("ncg-dashboard")!
-			.shadowRoot!.getElementById("pages");
-		this.$.uploadDialog.resetFit();
+	private _handleDeleted(e: Event) {
+		const target = e.target as HTMLElement & { file: { base: string } };
+		this._showMessage(`Deleted ${target.file.base}`);
 	}
 
-	refitUploadDialog(): void {
-		this.$.uploadDialog.refit();
+	private _handleDeletionFailed(e: Event) {
+		const target = e.target as HTMLElement & { file: { base: string } };
+		this._showMessage(`Failed to delete ${target.file.base}`);
 	}
 
-	_onAllowedTypesChanged(allowedTypes: string[]): void {
-		const prefixed = allowedTypes.map((type) => "." + type);
-		this.$.uploader.accept = prefixed.join(",");
+	private _openUploadDialog() {
+		this.shadowRoot?.querySelector<HTMLDialogElement>("dialog")?.showModal();
 	}
 
-	_computeAcceptsMsg(allowedTypes: string[]): string {
+	private _closeUploadDialog() {
+		this.shadowRoot?.querySelector<HTMLDialogElement>("dialog")?.close();
+	}
+
+	private async _onFileSelect(e: Event) {
+		const input = e.target as HTMLInputElement;
+		if (!input.files) return;
+
+		const uploads = Array.from(input.files).map((file) =>
+			this._uploadFile(file),
+		);
+		await Promise.allSettled(uploads);
+		input.value = "";
+	}
+
+	private async _uploadFile(file: File) {
+		const formData = new FormData();
+		formData.append("file", file);
+		try {
+			const response = await fetch(
+				`/assets/${this.collectionName}/${this.category.name}`,
+				{
+					method: "POST",
+					body: formData,
+					credentials: "include",
+				},
+			);
+			if (!response.ok) {
+				this._showMessage(`${file.name} error: Upload failed (${response.status})`);
+			}
+		} catch (err) {
+			this._showMessage(`${file.name} error: ${String(err)}`);
+		}
+	}
+
+	private _computeAcceptsMsg(allowedTypes: string[]): string {
+		if (!allowedTypes?.length) return "";
 		let msg = "Accepts ";
 		allowedTypes.forEach((type, index) => {
 			type = type.toUpperCase();
 			if (index === 0) {
 				msg += type;
 			} else if (index === allowedTypes.length - 1) {
-				if (index === 1) {
-					msg += " and " + type;
-				} else {
-					msg += ", and " + type;
-				}
+				msg += (index === 1 ? " and " : ", and ") + type;
 			} else {
 				msg += ", " + type;
 			}
@@ -194,55 +286,55 @@ class NcgAssetCategory extends MutableData(Polymer.PolymerElement) {
 		return msg;
 	}
 
-	_handleDeleted(e: any): void {
-		this.$.toast.text = `Deleted ${e.target.file.base}`;
-		this.$.toast.show();
-	}
+	override render() {
+		const hasFiles = Array.isArray(this.files) && this.files.length > 0;
+		const acceptsMsg = this._computeAcceptsMsg(this.category?.allowedTypes ?? []);
 
-	_handleDeletionFailed(e: any): void {
-		this.$.toast.text = `Failed to delete ${e.target.file.base}`;
-		this.$.toast.show();
-	}
+		return html`
+			<div class="toast ${this._showToast ? "visible" : ""}">${this._toastText}</div>
 
-	openUploadDialog(): void {
-		this.$.uploadDialog.open();
-		this.refitUploadDialog();
-	}
+			<div id="header">
+				<div id="header-main">
+					<span id="title">${this.category?.title ?? ""}</span>
+					<button id="add-btn" @click=${this._openUploadDialog}>
+						${icon("add")} Add File(s)
+					</button>
+				</div>
+				${!hasFiles ? html`<div id="empty">There are no assets in this category.</div>` : ""}
+			</div>
 
-	_onFileReject(event: any): void {
-		this.refitUploadDialog();
-		this.$.toast.text = `${event.detail.file.name} error: ${event.detail.error}`;
-		this.$.toast.open();
-	}
+			<util-scrollable>
+				${this.files.map(
+					(file) => html`
+						<ncg-asset-file
+							.file=${file}
+							@deleted=${this._handleDeleted}
+							@deletion-failed=${this._handleDeletionFailed}
+						></ncg-asset-file>
+					`,
+				)}
+			</util-scrollable>
 
-	_onUploadSuccess(): void {
-		this._successfulUploads++;
-	}
-
-	_computeCategoryName(categoryName: string): string {
-		return categoryName;
-	}
-
-	_computeAssetCategoryReplicant(
-		categoryName: string,
-		collectionName: string,
-	): void {
-		const newRep = NodeCG.Replicant(`assets:${categoryName}`, collectionName);
-		const oldRep = this._assetCategoryReplicant;
-		if (oldRep) {
-			oldRep.removeEventListener("change");
-		}
-
-		newRep.on("change", (newVal) => {
-			this.files = newVal;
-			if (Array.isArray(newVal) && newVal.length > 0) {
-				this.$.empty.style.display = "none";
-			} else {
-				this.$.empty.style.display = "block";
-			}
-		});
-		this._assetCategoryReplicant = newRep;
+			<dialog>
+				<div class="upload-area">
+					<input
+						id="fileInput"
+						type="file"
+						multiple
+						@change=${this._onFileSelect}
+					/>
+					<label for="fileInput">
+						${icon("file-upload", 32)}<br />
+						Drop files here or click to browse
+					</label>
+					${acceptsMsg ? html`<div class="accepts-msg">${acceptsMsg}</div>` : ""}
+				</div>
+				<div class="dialog-buttons">
+					<button class="close-btn" @click=${this._closeUploadDialog}>Close</button>
+				</div>
+			</dialog>
+		`;
 	}
 }
 
-customElements.define(NcgAssetCategory.is, NcgAssetCategory);
+customElements.define("ncg-asset-category", NcgAssetCategory);

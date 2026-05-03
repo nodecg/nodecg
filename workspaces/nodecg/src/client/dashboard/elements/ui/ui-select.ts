@@ -1,8 +1,27 @@
-import * as Polymer from "@polymer/polymer";
-class UiSelect extends Polymer.PolymerElement {
-	static get template() {
-		return Polymer.html`
-        <style include="nodecg-theme">
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../../css/nodecg-theme";
+
+export class UiSelect extends LitElement {
+	static override properties = {
+		name: { type: String },
+		required: { type: Boolean },
+		label: { type: String },
+		value: { type: String },
+	};
+
+	name = "";
+	required = false;
+	label = "";
+	value = "";
+
+	static override styles = [
+		nodecgTheme,
+		css`
+			:host {
+				display: block;
+				position: relative;
+			}
+
 			#label {
 				color: #a9a9a9;
 				cursor: default;
@@ -10,9 +29,6 @@ class UiSelect extends Polymer.PolymerElement {
 				pointer-events: none;
 				position: absolute;
 				top: 11px;
-				-moz-user-select: none;
-				-ms-user-select: none;
-				-webkit-user-select: none;
 				user-select: none;
 			}
 
@@ -20,8 +36,8 @@ class UiSelect extends Polymer.PolymerElement {
 				-moz-appearance: none;
 				-webkit-appearance: none;
 				appearance: none;
-				background-color: #525F78;
-				background-image: url('/dashboard/img/select-arrow.png');
+				background-color: #525f78;
+				background-image: url("/dashboard/img/select-arrow.png");
 				background-position: calc(93% + 2px) 8px;
 				background-repeat: no-repeat;
 				border: none;
@@ -39,71 +55,66 @@ class UiSelect extends Polymer.PolymerElement {
 			select:focus {
 				outline: 1px solid var(--nodecg-brand-blue);
 			}
-		</style>
+		`,
+	];
 
-		<div id="label" hidden="[[value]]">[[label]]</div>
-		<select id="select" title="[[label]]" name="[[name]]" required="[[required]]" value="{{value::change}}" on-change="_selectChanged">
-		</select>
-
-		<!-- Just used as an insertion point, we'll move these inserted nodes into #select in the \`attached\` callback -->
-		<content></content>
-`;
+	private get _select(): HTMLSelectElement {
+		return this.shadowRoot!.querySelector<HTMLSelectElement>("select")!;
 	}
 
-	static get is() {
-		return "ui-select";
+	item(index: number) {
+		return this._select.item(index);
 	}
 
-	static get properties() {
-		return {
-			name: String,
-			required: Boolean,
-			label: String,
-			value: {
-				type: String,
-				notify: true,
-			},
-		};
+	add(option: HTMLOptionElement, before?: HTMLElement | number) {
+		this._select.add(option, before as any);
 	}
 
-	override ready(): void {
-		super.ready();
-		["item", "add", "remove"].forEach((methodToForward) => {
-			this[methodToForward] = this.$.select[methodToForward].bind(
-				this.$.select,
-			);
-		});
+	removeOptionAt(index: number) {
+		this._select.remove(index);
 	}
 
-	override connectedCallback(): void {
-		super.connectedCallback();
+	get selectedOptions() {
+		return this._select?.selectedOptions;
+	}
 
+	set selectedOptions(_v: HTMLCollectionOf<HTMLOptionElement>) {
+		// read-only on native select; setter kept for compatibility
+	}
+
+	override firstUpdated() {
 		if (this.label) {
 			const labelOption = document.createElement("option");
 			labelOption.label = `-- Select a ${this.label} --`;
 			labelOption.value = "";
-			this.$.select.add(labelOption);
+			this._select.add(labelOption);
 		}
 
-		// Move all Light DOM <option> elements into the local Shadow DOM.
 		const options = this.querySelectorAll("option");
-		options.forEach((option) => {
-			this.$.select.add(option);
-		});
+		options.forEach((option) => this._select.add(option));
 
-		this.$.select.selectedIndex = -1;
+		this._select.selectedIndex = -1;
 	}
 
-	_selectChanged(e: any) {
-		if (!e.target.value) {
-			this.$.select.selectedIndex = -1;
+	private _selectChanged(e: Event) {
+		const select = e.target as HTMLSelectElement;
+		if (!select.value) {
+			select.selectedIndex = -1;
 		}
+		this.value = select.value;
+		this.dispatchEvent(new CustomEvent("change", { bubbles: true, composed: true }));
+	}
 
-		this.value = this.$.select.value;
-		this.selectedOptions = this.$.select.selectedOptions;
-		this.dispatchEvent(
-			new CustomEvent("change", { bubbles: true, composed: true }),
-		);
+	override render() {
+		return html`
+			<div id="label" ?hidden=${!!this.value}>${this.label}</div>
+			<select
+				.name=${this.name}
+				title=${this.label}
+				?required=${this.required}
+				@change=${this._selectChanged}
+			></select>
+		`;
 	}
 }
 

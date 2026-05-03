@@ -1,161 +1,285 @@
-import "@polymer/iron-flex-layout/iron-flex-layout.js";
-import "@polymer/iron-icons/iron-icons.js";
-import "@polymer/paper-button/paper-button.js";
-import "@polymer/paper-card/paper-card.js";
-import "@polymer/paper-dialog/paper-dialog.js";
-import "@polymer/paper-toast/paper-toast.js";
-
-import * as Polymer from "@polymer/polymer";
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../../css/nodecg-theme";
+import { icon } from "../../icons";
 import Clipboard from "clipboard";
-class NcgSettings extends Polymer.PolymerElement {
-	static get template() {
-		return Polymer.html`
-		<style include="nodecg-theme">
+
+class NcgSettings extends LitElement {
+	static override properties = {
+		_toastText: { state: true },
+		_showToast: { state: true },
+	};
+
+	private _toastText = "";
+	private _showToast = false;
+	private _toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+	static override styles = [
+		nodecgTheme,
+		css`
 			:host {
-				@apply --layout-vertical;
+				display: flex;
+				flex-direction: column;
 				max-width: 600px;
 				width: 100%;
 			}
 
+			.card {
+				background-color: #2f3a4f;
+				width: 100%;
+				box-shadow:
+					0 2px 2px 0 rgba(0, 0, 0, 0.14),
+					0 1px 5px 0 rgba(0, 0, 0, 0.12),
+					0 3px 1px -2px rgba(0, 0, 0, 0.2);
+			}
+
+			.card-header {
+				background-color: #525f78;
+				border-bottom: 5px solid var(--nodecg-brand-blue);
+				color: white;
+				font-size: 20px;
+				font-weight: bold;
+				padding: 16px;
+			}
+
+			.card-content {
+				padding: 16px;
+			}
+
 			.card-actions {
-				padding: 0;
 				padding-top: 8px;
-				@apply --layout-horizontal;
-				@apply --layout-center;
-				@apply --layout-end-justified;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: flex-end;
+				gap: 8px;
 			}
 
-			paper-button {
-				@apply --layout-horizontal;
-				@apply --layout-center-center;
-			}
-
-			paper-button iron-icon {
-				margin-right: 0.5em;
-			}
-
-			paper-button span {
+			button.action-btn {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+				gap: 0.5em;
+				background: var(--nodecg-background-color, #525f78);
+				border: none;
+				border-radius: 0;
+				color: white;
+				cursor: pointer;
+				font-size: 16px;
+				font-weight: 300;
+				padding: 8px 16px;
 				white-space: nowrap;
 			}
 
-			paper-button:first-of-type {
-				margin-left: 0;
-			}
-
-			paper-button:last-of-type {
-				margin-right: 0;
-			}
+			button.nodecg-benign { --nodecg-background-color: var(--nodecg-benign-color); }
+			button.nodecg-configure { --nodecg-background-color: var(--nodecg-configure-color); }
+			button.nodecg-reject { --nodecg-background-color: var(--nodecg-reject-color); }
 
 			@media (max-width: 400px) {
-				paper-button iron-icon {
+				button.action-btn svg {
 					display: none;
 				}
 			}
-		</style>
 
-		<paper-card heading="Your Key">
-			<div class="card-content">
-				<p class="paper-font-body1" style="margin-top: 0; padding: 0">
-					Resetting your key will disrupt all current sessions using it.<br>
-					When you reset your key, the dashboard will be refreshed so that a new key can be obtained.
-				</p>
-				<div class="card-actions">
-					<paper-button raised="" id="copyKey" class="nodecg-benign">
-						<iron-icon icon="icons:content-copy"></iron-icon>
-						<span>Copy Key</span>
-					</paper-button>
-					<paper-button raised="" id="showKey" class="nodecg-configure" title="Show Key" on-tap="openShowKeyDialog">
-						<iron-icon icon="communication:vpn-key"></iron-icon>
-						<span>Show Key</span>
-					</paper-button>
-					<paper-button raised="" id="resetKey" class="nodecg-reject" on-tap="openResetKeyDialog">
-						<iron-icon icon="icons:refresh"></iron-icon>
-						<span>Reset Key</span>
-					</paper-button>
-				</div>
-			</div>
-		</paper-card>
+			dialog {
+				background: #2f3a4f;
+				color: white;
+				border: none;
+				padding: 24px;
+				min-width: 300px;
+			}
 
-		<!-- 2017/03/18: Had to remove with-backdrop during the dashboard re-write -->
-		<paper-dialog id="showKeyDialog">
-			<h2>NodeCG Key</h2>
-			<div>
-				<code id="key" class="paper-font-code1"></code>
-				<p class="text-warning paper-font-body1">
-					<b>Do not</b> give this key to anyone or show it on stream!<br>
-					If you accidentally reveal it, <b>reset it immediately!</b>
-				</p>
-			</div>
-			<div class="buttons">
-				<paper-button dialog-dismiss="dialog-dismiss">Close</paper-button>
-			</div>
-		</paper-dialog>
+			dialog::backdrop {
+				background: rgba(0, 0, 0, 0.5);
+			}
 
-		<paper-dialog id="resetKeyDialog">
-			<h2>Reset NodeCG Key</h2>
-			<div>
-				<p class="text-warning paper-font-body1">
-					Are you sure you wish to reset your <b>NodeCG key</b>?<br>
-					Doing so will invalidate all URLs currently loaded into your streaming software!
-				</p>
-			</div>
-			<div class="buttons">
-				<paper-button dialog-dismiss="dialog-dismiss">No, Cancel</paper-button>
-				<paper-button dialog-dismiss="dialog-confirm" on-tap="resetKey">Yes, reset</paper-button>
-			</div>
-		</paper-dialog>
+			dialog h2 { margin-top: 0; }
 
-		<paper-toast id="settingsToast"></paper-toast>
-`;
-	}
+			code {
+				font-family: monospace;
+				font-size: 14px;
+				word-break: break-all;
+			}
 
-	static get is() {
-		return "ncg-settings";
-	}
+			.text-warning b {
+				color: #ffc700;
+			}
 
-	static get properties() {
-		return {};
-	}
+			.dialog-buttons {
+				display: flex;
+				gap: 8px;
+				justify-content: flex-end;
+				margin-top: 16px;
+			}
 
-	override ready(): void {
-		super.ready();
+			.btn-close {
+				background: var(--nodecg-benign-color);
+				border: none;
+				border-radius: 0;
+				color: white;
+				cursor: pointer;
+				padding: 8px 16px;
+			}
+
+			.btn-confirm {
+				background: var(--nodecg-reject-color);
+				border: none;
+				border-radius: 0;
+				color: white;
+				cursor: pointer;
+				padding: 8px 16px;
+			}
+
+			.toast {
+				position: fixed;
+				bottom: 16px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: #323232;
+				color: white;
+				padding: 12px 24px;
+				border-radius: 2px;
+				z-index: 1000;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+				pointer-events: none;
+			}
+
+			.toast.visible {
+				opacity: 1;
+			}
+		`,
+	];
+
+	override firstUpdated() {
+		const copyKeyBtn =
+			this.shadowRoot!.querySelector<HTMLButtonElement>("#copyKey")!;
 
 		if (window.ncgConfig.login?.enabled && window.token) {
-			this.$.key.textContent = window.token;
-			this.$.copyKey.setAttribute("data-clipboard-text", window.token);
+			copyKeyBtn.setAttribute("data-clipboard-text", window.token);
 		}
 
-		const clipboard = new Clipboard(this.$.copyKey);
-		clipboard.on(
-			"success",
-			/* istanbul ignore next: hard to test clipboard things */ () => {
-				this.$.settingsToast.show("Key copied to clipboard.");
-			},
-		);
+		const clipboard = new Clipboard(copyKeyBtn);
+		clipboard.on("success", () => {
+			this._showMessage("Key copied to clipboard.");
+		});
 	}
 
-	/* istanbul ignore next: trivial */
-	openShowKeyDialog() {
-		this.$.showKeyDialog.open();
+	private _showMessage(text: string) {
+		this._toastText = text;
+		this._showToast = true;
+		if (this._toastTimer !== null) clearTimeout(this._toastTimer);
+		this._toastTimer = setTimeout(() => {
+			this._showToast = false;
+		}, 3000);
 	}
 
-	/* istanbul ignore next: trivial */
-	openResetKeyDialog() {
-		this.$.resetKeyDialog.open();
+	private _openShowKeyDialog() {
+		this.shadowRoot?.querySelector<HTMLDialogElement>("#showKeyDialog")?.showModal();
 	}
 
-	resetKey() {
-		window.socket.emit(
-			"regenerateToken",
-			/* istanbul ignore next */ (err) => {
-				if (err) {
-					console.error(err);
-					return;
-				}
+	private _openResetKeyDialog() {
+		this.shadowRoot?.querySelector<HTMLDialogElement>("#resetKeyDialog")?.showModal();
+	}
 
-				document.location.reload();
-			},
-		);
+	private _closeDialog(dialogId: string) {
+		this.shadowRoot?.querySelector<HTMLDialogElement>(`#${dialogId}`)?.close();
+	}
+
+	private _resetKey() {
+		window.socket.emit("regenerateToken", (err) => {
+			if (err) {
+				console.error(err);
+				return;
+			}
+			document.location.reload();
+		});
+	}
+
+	override render() {
+		return html`
+			<div class="card">
+				<div class="card-header">Your Key</div>
+				<div class="card-content">
+					<p style="margin-top: 0; padding: 0; font-size: 14px;">
+						Resetting your key will disrupt all current sessions using it.<br />
+						When you reset your key, the dashboard will be refreshed so that a
+						new key can be obtained.
+					</p>
+					<div class="card-actions">
+						<button
+							id="copyKey"
+							class="action-btn nodecg-benign"
+						>
+							${icon("content-copy")}
+							<span>Copy Key</span>
+						</button>
+						<button
+							class="action-btn nodecg-configure"
+							@click=${this._openShowKeyDialog}
+						>
+							${icon("vpn-key")}
+							<span>Show Key</span>
+						</button>
+						<button
+							class="action-btn nodecg-reject"
+							@click=${this._openResetKeyDialog}
+						>
+							${icon("refresh")}
+							<span>Reset Key</span>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<dialog id="showKeyDialog">
+				<h2>NodeCG Key</h2>
+				<div>
+					<code>${window.token ?? ""}</code>
+					<p class="text-warning" style="font-size: 14px;">
+						<b>Do not</b> give this key to anyone or show it on stream!<br />
+						If you accidentally reveal it, <b>reset it immediately!</b>
+					</p>
+				</div>
+				<div class="dialog-buttons">
+					<button
+						class="btn-close"
+						@click=${() => this._closeDialog("showKeyDialog")}
+					>
+						Close
+					</button>
+				</div>
+			</dialog>
+
+			<dialog id="resetKeyDialog">
+				<h2>Reset NodeCG Key</h2>
+				<div>
+					<p class="text-warning" style="font-size: 14px;">
+						Are you sure you wish to reset your <b>NodeCG key</b>?<br />
+						Doing so will invalidate all URLs currently loaded into your
+						streaming software!
+					</p>
+				</div>
+				<div class="dialog-buttons">
+					<button
+						class="btn-close"
+						@click=${() => this._closeDialog("resetKeyDialog")}
+					>
+						No, Cancel
+					</button>
+					<button
+						class="btn-confirm"
+						@click=${this._resetKey}
+					>
+						Yes, reset
+					</button>
+				</div>
+			</dialog>
+
+			<div class="toast ${this._showToast ? "visible" : ""}">
+				${this._toastText}
+			</div>
+		`;
 	}
 }
 

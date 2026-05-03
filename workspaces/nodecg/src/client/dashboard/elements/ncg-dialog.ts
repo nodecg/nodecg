@@ -1,202 +1,177 @@
-/*
-You may notice some oddness with this element. Namely that the `.buttons` div appears before the
-`paper-dialog-scrollable` element in `dashboard.pug`, but in the below `<style>` tag I've forced
-`.buttons` to have an `order` of `3`, making it appear after `paper-dialog-scrollable`.
-
-This was done to fix a bizarre issue wherein any nodes placed after the `paper-dialog-scrollable`
-were not appearing in the DOM. I do not know how or why this was happening, so this flexbox hack
-is the only thing I could come up with. Let us never speak of this again.
-
-Lange - 1/28/2016
-*/
-
-import "@polymer/paper-dialog-behavior/paper-dialog-shared-styles.js";
-
 import { initialize } from "@open-iframe-resizer/core";
-import { NeonAnimationRunnerBehavior } from "@polymer/neon-animation/neon-animation-runner-behavior.js";
-import { PaperDialogBehavior } from "@polymer/paper-dialog-behavior/paper-dialog-behavior.js";
-import * as Polymer from "@polymer/polymer";
-import { mixinBehaviors } from "@polymer/polymer/lib/legacy/class.js";
-import { afterNextRender } from "@polymer/polymer/lib/utils/render-status.js";
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../css/nodecg-theme";
 
-class NcgDialog extends mixinBehaviors(
-	[NeonAnimationRunnerBehavior, PaperDialogBehavior],
-	Polymer.PolymerElement,
-) {
-	static get template() {
-		return Polymer.html`
-		<style include="nodecg-theme paper-dialog-shared-styles">
+export class NcgDialog extends LitElement {
+	static override properties = {
+		bundle: { type: String, reflect: true },
+		panel: { type: String, reflect: true },
+		width: { type: Number, reflect: true },
+		opened: { type: Boolean, reflect: true },
+	};
+
+	bundle = "";
+	panel = "";
+	width = 0;
+	opened = false;
+
+	static override styles = [
+		nodecgTheme,
+		css`
 			:host {
-				background-color: #2F3A4F;
+				display: contents;
+			}
+
+			dialog {
+				background-color: #2f3a4f;
+				color: white;
+				border: none;
 				display: flex;
 				flex-direction: column;
 				max-width: 100%;
-				--paper-dialog-scrollable: {
-					max-width: none;
-				}
+				padding: 0;
 			}
 
-			:host([width="1"]) {
-				width: 128px;
+			dialog::backdrop {
+				background: rgba(0, 0, 0, 0.5);
 			}
 
-			:host([width="2"]) {
-				width: 272px;
+			:host([width="1"]) dialog { width: 128px; }
+			:host([width="2"]) dialog { width: 272px; }
+			:host([width="3"]) dialog { width: 416px; }
+			:host([width="4"]) dialog { width: 560px; }
+			:host([width="5"]) dialog { width: 704px; }
+			:host([width="6"]) dialog { width: 848px; }
+			:host([width="7"]) dialog { width: 992px; }
+			:host([width="8"]) dialog { width: 1136px; }
+			:host([width="9"]) dialog { width: 1280px; }
+			:host([width="10"]) dialog { width: 1424px; }
+
+			.dialog-scrollable {
+				overflow-y: auto;
+				max-height: 80vh;
+				padding: 0 24px;
 			}
 
-			:host([width="3"]) {
-				width: 416px;
+			::slotted(iframe) {
+				box-sizing: border-box;
+				margin: 0 !important;
+				padding: 0 !important;
+				width: 100%;
 			}
 
-			:host([width="4"]) {
-				width: 560px;
+			::slotted(h2) {
+				margin: 0;
+				padding: 16px 24px 0;
 			}
 
-			:host([width="5"]) {
-				width: 704px;
+			::slotted(.buttons) {
+				display: flex;
+				justify-content: flex-end;
+				gap: 8px;
+				padding: 16px 24px;
 			}
+		`,
+	];
 
-			:host([width="6"]) {
-				width: 848px;
-			}
-
-			:host([width="7"]) {
-				width: 992px;
-			}
-
-			:host([width="8"]) {
-				width: 1136px;
-			}
-
-			:host([width="9"]) {
-				width: 1280px;
-			}
-
-			:host([width="10"]) {
-				width: 1424px;
-			}
-
-			:host > ::slotted(*:last-child) {
-				margin-bottom: 0;
-			}
-		</style>
-
-		<slot id="slot"></slot>
-`;
+	private get _dialog(): HTMLDialogElement {
+		return this.shadowRoot!.querySelector<HTMLDialogElement>("dialog")!;
 	}
 
-	static get is() {
-		return "ncg-dialog";
+	open() {
+		this.opened = true;
+		this._dialog.showModal();
+		this._onDialogOpened();
 	}
 
-	static get properties() {
-		return {
-			bundle: {
-				type: String,
-				reflectToAttribute: true,
-			},
-			panel: {
-				type: String,
-				reflectToAttribute: true,
-			},
-			width: {
-				type: Number,
-				reflectToAttribute: true,
-			},
-		};
+	close() {
+		this._dialog.close();
 	}
 
-	override ready(): void {
-		super.ready();
+	refit() {
+		// Native <dialog> positions itself; no-op
+	}
 
-		this.addEventListener("neon-animation-finish", this._onNeonAnimationFinish);
-		this.addEventListener("iron-overlay-opened", this._onIronOverlayOpened);
-		this.addEventListener("iron-overlay-closed", this._onIronOverlayClosed);
+	override firstUpdated() {
+		this._dialog.addEventListener("close", () => {
+			const wasOpened = this.opened;
+			this.opened = false;
+			if (wasOpened) {
+				this._onDialogClosed(false);
+			}
+		});
 
-		afterNextRender(this, async () => {
-			const iframe = this.querySelector("iframe")!;
+		// Handle dialog-confirm / dialog-dismiss clicks in slotted content
+		this.addEventListener("click", (e: Event) => {
+			const target = e.target as HTMLElement;
+			const btn = target.closest("[dialog-confirm],[dialog-dismiss]");
+			if (!btn) return;
+			const confirmed = btn.hasAttribute("dialog-confirm");
+			this._dialog.close();
+			this.opened = false;
+			this._onDialogClosed(confirmed);
+		});
 
-			// If Sentry is enabled, use it to report errors in panels to Sentry.io.
-			if (window.ncgConfig.sentry.enabled) {
-				const Sentry = await import("@sentry/browser");
-				iframe.contentWindow!.addEventListener("error", (event: any) => {
-					Sentry.captureException(event.error);
-				});
-				iframe.contentWindow!.addEventListener(
-					"unhandledrejection",
-					(err: any) => {
-						Sentry.captureException(err.reason);
+		const iframe = this.querySelector("iframe");
+		if (iframe) {
+			iframe.addEventListener("iframe-resized", () => {
+				// Native dialog auto-positions; no explicit refit needed
+			});
+
+			void this._attachSentryAndResize(iframe);
+		}
+	}
+
+	private async _attachSentryAndResize(iframe: HTMLIFrameElement) {
+		if (window.ncgConfig.sentry.enabled) {
+			const Sentry = await import("@sentry/browser");
+			iframe.contentWindow?.addEventListener("error", (event: any) => {
+				Sentry.captureException(event.error);
+			});
+			iframe.contentWindow?.addEventListener("unhandledrejection", (err: any) => {
+				Sentry.captureException(err.reason);
+			});
+		}
+
+		const attach = () => {
+			initialize(
+				{
+					onIframeResize(context) {
+						context.iframe.dispatchEvent(new CustomEvent("iframe-resized"));
 					},
-				);
-			}
-
-			if (iframe.contentWindow!.document.readyState === "complete") {
-				this._attachIframeResize(iframe);
-			} else {
-				iframe.addEventListener("load", () => {
-					this._attachIframeResize(iframe);
-				});
-			}
-		});
-	}
-
-	override connectedCallback(): void {
-		super.connectedCallback();
-
-		const iframe = this.querySelector("iframe")!;
-		iframe.addEventListener("iframe-resized", () => {
-			this.refit();
-		});
-	}
-
-	_attachIframeResize(iframe: HTMLIFrameElement) {
-		initialize(
-			{
-				onIframeResize(context) {
-					context.iframe.dispatchEvent(new CustomEvent("iframe-resized"));
 				},
-			},
-			iframe,
-		);
-	}
+				iframe,
+			);
+		};
 
-	_renderOpened() {
-		if (this.withBackdrop) {
-			this.backdropElement.open();
-		}
-
-		this.playAnimation("entry");
-	}
-
-	_renderClosed() {
-		if (this.withBackdrop) {
-			this.backdropElement.close();
-		}
-
-		this.playAnimation("exit");
-	}
-
-	_onNeonAnimationFinish() {
-		if (this.opened) {
-			this._finishRenderOpened();
+		if (iframe.contentWindow?.document.readyState === "complete") {
+			attach();
 		} else {
-			this._finishRenderClosed();
+			iframe.addEventListener("load", attach);
 		}
 	}
 
-	_onIronOverlayOpened() {
-		const iframeDocument = this.querySelector("iframe")!.contentDocument!;
-		iframeDocument.dispatchEvent(new CustomEvent("dialog-opened"));
+	private _onDialogOpened() {
+		const iframeDoc = this.querySelector("iframe")?.contentDocument;
+		iframeDoc?.dispatchEvent(new CustomEvent("dialog-opened"));
 	}
 
-	_onIronOverlayClosed(e: any) {
-		const iframeDocument = this.querySelector("iframe")!.contentDocument!;
-		if (e.detail.confirmed && !e.detail.canceled) {
-			iframeDocument.dispatchEvent(new CustomEvent("dialog-confirmed"));
+	private _onDialogClosed(confirmed: boolean) {
+		const iframeDoc = this.querySelector("iframe")?.contentDocument;
+		if (confirmed) {
+			iframeDoc?.dispatchEvent(new CustomEvent("dialog-confirmed"));
 		} else {
-			iframeDocument.dispatchEvent(new CustomEvent("dialog-dismissed"));
+			iframeDoc?.dispatchEvent(new CustomEvent("dialog-dismissed"));
 		}
+	}
+
+	override render() {
+		return html`
+			<dialog>
+				<slot></slot>
+			</dialog>
+		`;
 	}
 }
 
-customElements.define("ncg-dialog", NcgDialog as any);
+customElements.define("ncg-dialog", NcgDialog);

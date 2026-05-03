@@ -5,9 +5,7 @@
 		"lib": ["ESNext", "DOM"],
 		"noPropertyAccessFromIndexSignature": false,
 
-		"paths": {
-			"@polymer/polymer": ["./src/client/types/polymer-element.d.ts"]
-		}
+
 	},
 	"exclude": ["./typetest"]
 }

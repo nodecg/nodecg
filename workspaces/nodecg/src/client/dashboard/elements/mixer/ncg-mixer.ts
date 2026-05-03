@@ -1,33 +1,45 @@
 import "./ncg-sounds";
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../../css/nodecg-theme";
 
-import * as Polymer from "@polymer/polymer";
+class NcgMixer extends LitElement {
+	static override properties = {
+		bundlesWithSounds: { type: Array },
+	};
 
-class NcgMixer extends Polymer.PolymerElement {
-	static get template() {
-		return Polymer.html`
-		<style include="nodecg-theme">
+	bundlesWithSounds = window.__renderData__.bundles.filter(
+		(bundle) => bundle.soundCues && bundle.soundCues.length > 0,
+	);
+
+	static override styles = [
+		nodecgTheme,
+		css`
 			:host {
 				white-space: nowrap;
 				width: 100%;
 				max-width: 600px;
-				@apply --layout-vertical;
-				@apply --layout-stretch;
+				display: flex;
+				flex-direction: column;
+				align-items: stretch;
 			}
 
-			#mixer-masterCard {
-				background-color: #525F78;
+			.master-card {
+				background-color: #525f78;
 				border-bottom: 5px solid var(--nodecg-brand-blue);
 				margin-bottom: 16px;
-			}
-
-			#mixer-masterCard .card-content {
-				@apply --layout-horizontal;
+				padding: 16px;
+				display: flex;
+				flex-direction: row;
 				align-items: center;
+				box-shadow:
+					0 2px 2px 0 rgba(0, 0, 0, 0.14),
+					0 1px 5px 0 rgba(0, 0, 0, 0.12),
+					0 3px 1px -2px rgba(0, 0, 0, 0.2);
 			}
 
-			#mixer-masterCard span {
-				@apply --paper-font-title;
+			.master-card span {
 				font-size: 28px;
+				font-weight: 500;
 				flex-grow: 1;
 				flex-shrink: 0;
 				overflow: hidden;
@@ -35,62 +47,51 @@ class NcgMixer extends Polymer.PolymerElement {
 			}
 
 			#masterFader {
-				background-color: #525F78;
-				color: white;
 				flex-shrink: 1;
-				width: 250px;
-				--paper-slider-input: {
-					width: 80px;
-				};
+				width: 170px;
+				accent-color: white;
 			}
 
-			paper-card {
+			ncg-sounds {
 				margin-bottom: 12px;
 			}
-		</style>
+		`,
+	];
 
-		<paper-card id="mixer-masterCard">
-			<div class="card-content">
-				<span>Master Fader</span>
-				<paper-slider id="masterFader" min="0" max="100" step="1" editable=""></paper-slider>
-			</div>
-		</paper-card>
-
-		<template is="dom-repeat" items="[[bundlesWithSounds]]" as="bundle">
-			<ncg-sounds bundle-name="[[bundle.name]]">
-			</ncg-sounds>
-		</template>
-`;
-	}
-
-	static get is() {
-		return "ncg-mixer";
-	}
-
-	static get properties() {
-		return {
-			bundlesWithSounds: {
-				type: Array,
-				value: window.__renderData__.bundles.filter(
-					(bundle) => bundle.soundCues && bundle.soundCues.length > 0,
-				),
-			},
-		};
-	}
-
-	override ready(): void {
-		super.ready();
-
-		const { masterFader } = this.$;
+	override firstUpdated() {
+		const masterFader = this.shadowRoot!.querySelector<HTMLInputElement>(
+			"#masterFader",
+		)!;
 		const masterVolume = NodeCG.Replicant("volume:master", "_sounds");
 
-		masterFader.addEventListener("change", (e: any) => {
-			masterVolume.value = e.target.value;
+		masterFader.addEventListener("change", (e) => {
+			masterVolume.value = Number((e.target as HTMLInputElement).value);
 		});
 
 		masterVolume.on("change", (newVal) => {
-			masterFader.value = newVal;
+			masterFader.value = String(newVal);
 		});
+	}
+
+	override render() {
+		return html`
+			<div class="master-card">
+				<span>Master Fader</span>
+				<input
+					id="masterFader"
+					type="range"
+					min="0"
+					max="100"
+					step="1"
+				/>
+			</div>
+
+			${this.bundlesWithSounds.map(
+				(bundle) => html`
+					<ncg-sounds bundle-name=${bundle.name}></ncg-sounds>
+				`,
+			)}
+		`;
 	}
 }
 

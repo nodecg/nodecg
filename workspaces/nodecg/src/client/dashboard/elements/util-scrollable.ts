@@ -1,18 +1,17 @@
-import "@polymer/iron-flex-layout/iron-flex-layout.js";
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../css/nodecg-theme";
 
-import * as Polymer from "@polymer/polymer";
-
-class UtilScrollable extends Polymer.PolymerElement {
-	static get template() {
-		return Polymer.html`
-		<style include="nodecg-theme">
+class UtilScrollable extends LitElement {
+	static override styles = [
+		nodecgTheme,
+		css`
 			:host {
 				display: block;
-				@apply --layout-relative;
+				position: relative;
 			}
 
 			:host(.is-scrolled:not(:first-child))::before {
-				content: '';
+				content: "";
 				position: absolute;
 				top: 0;
 				left: 0;
@@ -22,7 +21,7 @@ class UtilScrollable extends Polymer.PolymerElement {
 			}
 
 			:host(.can-scroll:not(.scrolled-to-bottom):not(:last-child))::after {
-				content: '';
+				content: "";
 				position: absolute;
 				bottom: 0;
 				left: 0;
@@ -33,44 +32,38 @@ class UtilScrollable extends Polymer.PolymerElement {
 
 			.scrollable {
 				padding: 0 24px;
-				@apply --layout-scroll;
-				@apply --util-scrollable;
+				overflow: auto;
 			}
-		</style>
+		`,
+	];
 
-		<div id="scrollable" class="scrollable" on-scroll="updateScrollState">
-			<slot></slot>
-		</div>
-`;
+	get scrollTarget(): HTMLDivElement {
+		return this.shadowRoot!.querySelector<HTMLDivElement>(".scrollable")!;
 	}
 
-	static get is() {
-		return "util-scrollable";
-	}
-
-	/**
-	 * Returns the scrolling element.
-	 */
-	get scrollTarget() {
-		return this.$.scrollable;
-	}
-
-	attached() {
-		requestAnimationFrame(this.updateScrollState.bind(this));
+	override firstUpdated() {
+		requestAnimationFrame(() => this.updateScrollState());
 	}
 
 	updateScrollState() {
-		this.classList.toggle("is-scrolled", this.scrollTarget.scrollTop > 0);
+		const t = this.scrollTarget;
+		this.classList.toggle("is-scrolled", t.scrollTop > 0);
 		this.classList.toggle(
 			"can-scroll",
-			this.scrollTarget.offsetHeight < this.scrollTarget.scrollHeight,
+			t.offsetHeight < t.scrollHeight,
 		);
 		this.classList.toggle(
 			"scrolled-to-bottom",
-
-			this.scrollTarget.scrollTop + this.scrollTarget.offsetHeight >=
-				this.scrollTarget.scrollHeight,
+			t.scrollTop + t.offsetHeight >= t.scrollHeight,
 		);
+	}
+
+	override render() {
+		return html`
+			<div class="scrollable" @scroll=${this.updateScrollState}>
+				<slot></slot>
+			</div>
+		`;
 	}
 }
 

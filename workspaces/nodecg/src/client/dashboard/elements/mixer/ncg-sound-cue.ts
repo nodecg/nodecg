@@ -1,105 +1,106 @@
-import "@polymer/iron-flex-layout/iron-flex-layout.js";
-import "@polymer/paper-slider/paper-slider.js";
-import "@polymer/paper-styles/typography.js";
 import "../ui/ui-select";
-
-import * as Polymer from "@polymer/polymer";
-
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../../css/nodecg-theme";
+import type { UiSelect } from "../ui/ui-select";
 import type { NodeCG as NCGTypes } from "../../../../types/nodecg";
-export class NcgSoundCue extends Polymer.PolymerElement {
-	static get template() {
-		return Polymer.html`
-		<style include="nodecg-theme">
+
+export class NcgSoundCue extends LitElement {
+	static override properties = {
+		name: { type: String },
+		bundleName: { type: String },
+		assignable: { type: Boolean },
+		file: { type: Object },
+		defaultFile: { type: Object },
+		volume: { type: Number },
+		_cueRef: { type: Object },
+		soundFiles: { type: Array },
+	};
+
+	name = "";
+	bundleName = "";
+	assignable = false;
+	file: NCGTypes.CueFile | null = null;
+	defaultFile: NCGTypes.CueFile | null = null;
+	volume = 0;
+	_cueRef: NCGTypes.SoundCue | null = null;
+	soundFiles: NCGTypes.AssetFile[] = [];
+
+	private _assetsRepInitialized = false;
+
+	static override styles = [
+		nodecgTheme,
+		css`
 			:host {
-				@apply --layout-horizontal;
+				display: flex;
+				flex-direction: row;
 				align-items: center;
 			}
 
 			#leftWrapper {
 				min-width: 0;
 				padding-right: 8px;
-				@apply --layout-vertical;
-				@apply --layout-flex;
-				@apply --layout-center-justified;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				flex: 1;
 			}
 
 			#name {
-				@apply --paper-font-title;
+				font-size: 20px;
+				font-weight: 500;
+				line-height: 28px;
 				overflow: hidden;
 				text-overflow: ellipsis;
 			}
 
-			#select {
+			ui-select {
 				display: none;
 				width: 150px;
-				@apply --layout-flex-none;
+				flex: none;
 			}
 
-			paper-slider {
-				@apply --layout-flex-none;
-				--paper-slider-input: {
-					width: 80px;
-				}
+			ui-select.assignable {
+				display: block;
+			}
+
+			input[type="range"] {
+				flex: none;
+				width: 180px;
+				accent-color: white;
 			}
 
 			@media (max-width: 500px) {
-				#select {
+				ui-select {
 					width: 120px;
 				}
 
-				paper-slider {
+				input[type="range"] {
 					width: 150px;
 				}
 			}
-		</style>
+		`,
+	];
 
-		<div id="leftWrapper">
-			<span id="name">[[name]]</span>
-		</div>
-
-		<ui-select id="select" on-change="_retargetFile"></ui-select>
-		<paper-slider id="slider" min="0" max="100" step="1" on-change="_onSliderChange" editable=""></paper-slider>
-`;
-	}
-
-	static get is() {
-		return "ncg-sound-cue";
-	}
-
-	static get properties() {
-		return {
-			name: String,
-			bundleName: {
-				type: String,
-				observer: "_bundleNameChanged",
-			},
-			assignable: {
-				type: Boolean,
-				observer: "_assignableChanged",
-			},
-			file: {
-				type: Object,
-				observer: "_fileChanged",
-			},
-			defaultFile: Object,
-			volume: {
-				type: Number,
-				observer: "_volumeChanged",
-			},
-			_cueRef: Object,
-			soundFiles: Array,
-			createdTimestamp: {
-				type: Number,
-			},
-		};
-	}
-
-	_bundleNameChanged(bundleName: string) {
-		if (this._assetsRepInitialized) {
-			return;
+	override updated(changedProps: Map<string, unknown>) {
+		if (changedProps.has("bundleName")) {
+			this._bundleNameChanged(this.bundleName);
 		}
+		if (changedProps.has("assignable")) {
+			// CSS class handles visibility
+		}
+		if (changedProps.has("file")) {
+			this._fileChanged(this.file);
+		}
+		if (changedProps.has("volume")) {
+			const slider = this.shadowRoot?.querySelector<HTMLInputElement>("#slider");
+			if (slider) slider.value = String(this.volume);
+		}
+	}
 
+	private _bundleNameChanged(bundleName: string) {
+		if (!bundleName || this._assetsRepInitialized) return;
 		this._assetsRepInitialized = true;
+
 		const assetsRep = NodeCG.Replicant<NCGTypes.AssetFile[]>(
 			"assets:sounds",
 			bundleName,
@@ -113,56 +114,41 @@ export class NcgSoundCue extends Polymer.PolymerElement {
 		});
 	}
 
-	_assignableChanged(newVal: boolean) {
-		this.$.select.style.display = newVal ? "block" : "none";
-	}
-
-	_fileChanged(newVal: NCGTypes.CueFile) {
+	private _fileChanged(newVal: NCGTypes.CueFile | null) {
+		const select =
+			this.shadowRoot?.querySelector("ui-select") as unknown as UiSelect | null;
+		if (!select) return;
 		if (newVal) {
-			if (newVal.default) {
-				this.$.select.value = "default";
-			} else {
-				this.$.select.value = newVal.base;
-			}
+			select.value = newVal.default ? "default" : newVal.base;
 		} else {
-			this.$.select.value = "none";
+			select.value = "none";
 		}
 	}
 
-	_volumeChanged(newVal: number) {
-		this.$.slider.value = newVal;
-	}
+	private _generateOptions(soundFiles: NCGTypes.AssetFile[]) {
+		const select =
+			this.shadowRoot?.querySelector("ui-select") as unknown as UiSelect | null;
+		if (!select) return;
 
-	_generateOptions(soundFiles: NCGTypes.AssetFile[]) {
-		// Remove all existing options
-		while (this.$.select.item(0)) {
-			this.$.select.remove(0);
+		while (select.item(0)) {
+			select.removeOptionAt(0);
 		}
 
-		// Create "none" option.
 		const noneOption = document.createElement("option");
 		noneOption.innerText = "None";
 		noneOption.value = "none";
-		if (!this.file) {
-			noneOption.setAttribute("selected", "true");
-		}
+		if (!this.file) noneOption.setAttribute("selected", "true");
+		select.add(noneOption);
 
-		this.$.select.add(noneOption);
-
-		// Create "default" option, if applicable.
 		if (this.defaultFile) {
 			const defaultOption = document.createElement("option");
 			defaultOption.value = "default";
 			defaultOption.innerText = "Default";
-			if (this.file?.default) {
-				defaultOption.setAttribute("selected", "true");
-			}
-
-			this.$.select.add(defaultOption);
+			if (this.file?.default) defaultOption.setAttribute("selected", "true");
+			select.add(defaultOption);
 		}
 
-		// Add options for each uploaded sound file.
-		if (soundFiles instanceof Array) {
+		if (Array.isArray(soundFiles)) {
 			soundFiles.forEach((f, index) => {
 				const option = document.createElement("option");
 				option.value = f.base;
@@ -171,26 +157,53 @@ export class NcgSoundCue extends Polymer.PolymerElement {
 				if (this.file && f.base === this.file.base) {
 					option.setAttribute("selected", "true");
 				}
-
-				this.$.select.add(option);
+				select.add(option);
 			});
 		}
 	}
 
-	_retargetFile() {
-		const selectValue = this.$.select.value;
+	private _retargetFile() {
+		const select =
+			this.shadowRoot?.querySelector("ui-select") as unknown as UiSelect | null;
+		if (!select || !this._cueRef) return;
+		const selectValue = select.value;
 		if (selectValue === "none") {
-			this._cueRef.file = null;
+			this._cueRef.file = undefined;
 		} else if (selectValue === "default") {
-			this._cueRef.file = this.defaultFile;
+			this._cueRef.file = this.defaultFile ?? undefined;
 		} else {
-			this._cueRef.file =
-				this.soundFiles[this.$.select.selectedOptions[0].replicantIndex];
+			const idx = select.selectedOptions[0]
+				? (select.selectedOptions[0] as any).replicantIndex
+				: -1;
+			this._cueRef.file = (this.soundFiles[idx] as unknown as NCGTypes.CueFile | undefined) ?? undefined;
 		}
 	}
 
-	_onSliderChange(e: any) {
-		this._cueRef.volume = e.target.value;
+	private _onSliderChange(e: Event) {
+		if (this._cueRef) {
+			this._cueRef.volume = Number((e.target as HTMLInputElement).value);
+		}
+	}
+
+	override render() {
+		return html`
+			<div id="leftWrapper">
+				<span id="name">${this.name}</span>
+			</div>
+			<ui-select
+				class=${this.assignable ? "assignable" : ""}
+				@change=${this._retargetFile}
+			></ui-select>
+			<input
+				id="slider"
+				type="range"
+				min="0"
+				max="100"
+				step="1"
+				.value=${String(this.volume)}
+				@change=${this._onSliderChange}
+			/>
+		`;
 	}
 }
 

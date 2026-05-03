@@ -1,43 +1,43 @@
-import "@polymer/iron-icons/device-icons.js";
-import "@polymer/iron-icons/iron-icons.js";
-import "@polymer/paper-button/paper-button.js";
 import "./ncg-graphic-instance-diff";
-
-import * as Polymer from "@polymer/polymer";
-import { MutableData } from "@polymer/polymer/lib/mixins/mutable-data";
-
+import { LitElement, html, css } from "lit";
+import { nodecgTheme } from "../../css/nodecg-theme";
+import { icon } from "../../icons";
 import type { NodeCG } from "../../../../types/nodecg";
 
 const pulseElement = document.createElement("div");
-
 setInterval(() => {
 	pulseElement.dispatchEvent(
-		new CustomEvent("pulse", {
-			detail: {
-				timestamp: Date.now(),
-			},
-		}),
+		new CustomEvent("pulse", { detail: { timestamp: Date.now() } }),
 	);
 }, 1000);
 
-/**
- * @customElement
- * @polymer
- * @appliesMixin MutableData
- */
-class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
-	static get template() {
-		return Polymer.html`
-		<style include="nodecg-theme">
+class NcgGraphicInstance extends LitElement {
+	static override properties = {
+		responsiveMode: { type: String, reflect: true },
+		graphic: { type: Object },
+		instance: { type: Object },
+		status: { type: String, reflect: true },
+		statusHover: { type: Boolean, reflect: true },
+	};
+
+	responsiveMode = "";
+	graphic: NodeCG.Bundle.Graphic | null = null;
+	instance: NodeCG.GraphicsInstance | null = null;
+	status = "";
+	statusHover = false;
+	private _offTimeout: ReturnType<typeof setTimeout> | null = null;
+
+	static override styles = [
+		nodecgTheme,
+		css`
 			:host {
-				@apply --layout-flex-none;
-				@apply --layout-horizontal;
+				display: flex;
+				flex-direction: row;
+				flex: none;
 				box-sizing: border-box;
 				font-size: 18px;
-				font-style: normal;
 				font-weight: 500;
 				height: 35px;
-				line-height: normal;
 				margin-bottom: 5px;
 				margin-left: 8px;
 				margin-right: 8px;
@@ -50,35 +50,38 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 			}
 
 			#indicator {
-				@apply --layout-flex-none;
-				background-color: #CACACA;
+				flex: none;
+				background-color: #cacaca;
 				width: 8px;
 			}
 
 			:host([status="nominal"]) #indicator {
-				background-color: #00A651;
+				background-color: #00a651;
 			}
 
 			:host([status="out-of-date"]) #indicator {
-				background-color: #FFC700;
+				background-color: #ffc700;
 			}
 
 			#indicatorIcon {
-				@apply --layout-center-center;
-				@apply --layout-flex-none;
-				@apply --layout-horizontal;
-				background: #525F78;
-				border-right: 1px solid #6F7D99;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+				flex: none;
+				background: #525f78;
+				border-right: 1px solid #6f7d99;
 				width: 38px;
+				cursor: default;
 			}
 
 			:host([status="nominal"]) #indicatorIcon {
-				color: #00A651;
+				color: #00a651;
 			}
 
 			:host([status="out-of-date"]) #indicatorIcon,
 			:host([status="out-of-date"]) #status {
-				color: #FFC700;
+				color: #ffc700;
 			}
 
 			:host([status="out-of-date"]) #status {
@@ -88,15 +91,16 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 			#ip,
 			#status,
 			#duration {
-				@apply --layout-center;
-				@apply --layout-horizontal;
-				background: #525F78;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				background: #525f78;
 				padding: 0 16px;
 			}
 
 			#ip {
-				@apply --layout-flex;
-				border-right: 1px solid #6F7D99;
+				flex: 1;
+				border-right: 1px solid #6f7d99;
 				min-width: 0;
 			}
 
@@ -106,50 +110,53 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 			}
 
 			#status {
-				@apply --layout-flex-none;
-				border-right: 1px solid #6F7D99;
+				flex: none;
+				border-right: 1px solid #6f7d99;
 				width: 187px;
 			}
 
 			#duration {
-				@apply --layout-flex-none;
+				flex: none;
 				width: 120px;
 				margin-right: 1px;
+				gap: 6px;
 			}
 
-			#duration-icon {
-				margin-right: 6px;
-				margin-top: -1px;
-			}
-
-			#reloadButton {
-				--nodecg-background-color: #6155BD;
-			}
-
-			#killButton {
-				--nodecg-background-color: #FF7575;
-			}
-
-			#diff {
-				transition: opacity 150ms ease-in-out;
-				z-index: 1;
-				top: 38px;
-				left: 40px
-			}
-
-			paper-button {
-				@apply --layout-center-center;
-				@apply --layout-flex-none;
-				@apply --layout-horizontal;
+			button {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+				flex: none;
+				background: var(--btn-color, #6155bd);
+				border: none;
 				border-radius: 0;
+				color: white;
+				cursor: pointer;
 				margin: 0 1px;
 				min-width: 0;
 				padding: 0;
 				width: 40px;
 			}
 
-			paper-button:last-child {
+			button:last-child {
 				margin-right: 0;
+			}
+
+			button:disabled {
+				opacity: 0.5;
+				cursor: default;
+			}
+
+			#killButton {
+				--btn-color: #ff7575;
+			}
+
+			#diff {
+				transition: opacity 150ms ease-in-out;
+				z-index: 1;
+				top: 38px;
+				left: 40px;
 			}
 
 			:host([responsive-mode="medium"]) #status {
@@ -188,213 +195,158 @@ class NcgGraphicInstance extends MutableData(Polymer.PolymerElement) {
 				transition: opacity 0.9s ease-out;
 			}
 
-			:host(:not([status="out-of-date"])) #diff {
-				display: none;
+			ncg-graphic-instance-diff {
+				position: absolute;
 			}
 
-			:host([status="out-of-date"][status-hover]) #diff {
-				opacity: 1;
-				pointer-events: initial;
-			}
-
-			:host(:not([status-hover])) #diff {
+			:host(:not([status="out-of-date"])) ncg-graphic-instance-diff,
+			:host(:not([status-hover])) ncg-graphic-instance-diff {
 				display: none;
 				opacity: 0;
 				pointer-events: none;
 			}
-		</style>
 
-		<div id="indicator"></div>
+			:host([status="out-of-date"][status-hover]) ncg-graphic-instance-diff {
+				display: flex;
+				opacity: 1;
+				pointer-events: initial;
+			}
+		`,
+	];
 
-		<div id="indicatorIcon">
-			<iron-icon icon="[[_calcIndicatorIcon(status)]]"></iron-icon>
-		</div>
-
-		<div id="ip">
-			<div id="ip-actual" title="[[instance.ipv4]]">[[instance.ipv4]]</div>
-		</div>
-
-		<div id="status">[[_calcStatusMessage(status, responsiveMode)]]</div>
-
-		<div id="duration">
-			<iron-icon id="duration-icon" icon="device:access-time"></iron-icon>
-			<span id="duration-text">[[_calcTimeSince(instance.timestamp, _pulse)]]</span>
-		</div>
-
-		<paper-button id="reloadButton" on-tap="reload">
-			<iron-icon icon="refresh"></iron-icon>
-		</paper-button>
-
-		<paper-button id="killButton" on-tap="kill" hidden="[[!graphic.singleInstance]]">
-			<iron-icon icon="close"></iron-icon>
-		</paper-button>
-
-		<ncg-graphic-instance-diff id="diff" instance="[[instance]]"></ncg-graphic-instance-diff>
-`;
-	}
-
-	static get is() {
-		return "ncg-graphic-instance";
-	}
-
-	static get properties() {
-		return {
-			responsiveMode: {
-				type: String,
-				reflectToAttribute: true,
-			},
-			graphic: Object,
-			instance: Object,
-			status: {
-				type: String,
-				reflectToAttribute: true,
-				computed: "_computeStatus(instance)",
-			},
-			statusHover: {
-				type: Boolean,
-				reflectToAttribute: true,
-				value: false,
-			},
-		};
-	}
-
-	override ready(): void {
-		super.ready();
-		pulseElement.addEventListener("pulse", (e: any) => {
-			this._pulse = e.detail.timestamp;
+	override firstUpdated() {
+		pulseElement.addEventListener("pulse", () => {
+			this.requestUpdate();
 		});
 
 		const showDiff = () => {
-			clearTimeout(this._offTimeout);
-			this._offTimeout = null;
+			if (this._offTimeout) { clearTimeout(this._offTimeout); this._offTimeout = null; }
 			this.statusHover = true;
 		};
 
 		const hideDiff = (immediate: boolean) => {
 			if (immediate) {
-				clearTimeout(this._offTimeout);
-				this._offTimeout = null;
+				if (this._offTimeout) { clearTimeout(this._offTimeout); this._offTimeout = null; }
 				this.statusHover = false;
 			} else if (!this._offTimeout) {
 				this._offTimeout = setTimeout(() => {
-					clearTimeout(this._offTimeout);
 					this._offTimeout = null;
 					this.statusHover = false;
 				}, 250);
 			}
 		};
 
-		this.$.indicatorIcon.addEventListener("mouseenter", () => {
-			if (this.responsiveMode === "narrow") {
-				showDiff();
-			}
-		});
-		this.$.status.addEventListener("mouseenter", showDiff);
-		this.$.diff.addEventListener("mouseenter", showDiff);
+		const indicatorIcon = this.shadowRoot!.querySelector<HTMLDivElement>("#indicatorIcon")!;
+		const statusEl = this.shadowRoot!.querySelector<HTMLDivElement>("#status")!;
+		const diffEl = this.shadowRoot!.querySelector<HTMLElement>("ncg-graphic-instance-diff")!;
 
-		this.$.indicatorIcon.addEventListener("mouseleave", () => {
-			if (this.responsiveMode === "narrow") {
-				hideDiff(false);
-			}
-		});
-		this.$.status.addEventListener("mouseleave", () => {
-			hideDiff(false);
-		});
-		this.$.diff.addEventListener("mouseleave", () => {
-			hideDiff(false);
-		});
-		this.$.diff.addEventListener("close", () => {
-			hideDiff(true);
-		});
+		indicatorIcon.addEventListener("mouseenter", () => { if (this.responsiveMode === "narrow") showDiff(); });
+		statusEl.addEventListener("mouseenter", showDiff);
+		diffEl.addEventListener("mouseenter", showDiff);
+
+		indicatorIcon.addEventListener("mouseleave", () => { if (this.responsiveMode === "narrow") hideDiff(false); });
+		statusEl.addEventListener("mouseleave", () => hideDiff(false));
+		diffEl.addEventListener("mouseleave", () => hideDiff(false));
+		diffEl.addEventListener("close", () => hideDiff(true));
 	}
 
-	reload() {
-		this.$.reloadButton.disabled = true;
+	override updated(changedProps: Map<string, unknown>) {
+		if (changedProps.has("instance")) {
+			this.status = this._computeStatus(this.instance ?? undefined);
+		}
+	}
+
+	private reload() {
+		if (!this.instance) return;
+		const btn = this.shadowRoot!.querySelector<HTMLButtonElement>("#reloadButton")!;
+		btn.disabled = true;
 		window.socket.emit("graphic:requestRefresh", this.instance, () => {
-			this.$.reloadButton.disabled = false;
+			btn.disabled = false;
 		});
 	}
 
-	kill() {
-		this.$.killButton.disabled = true;
+	private kill() {
+		if (!this.instance) return;
+		const btn = this.shadowRoot!.querySelector<HTMLButtonElement>("#killButton")!;
+		btn.disabled = true;
 		window.socket.emit("graphic:requestKill", this.instance, () => {
-			this.$.killButton.disabled = false;
+			btn.disabled = false;
 		});
 	}
 
-	_computeStatus(instance?: NodeCG.GraphicsInstance) {
-		if (!instance) {
-			return "";
-		}
-
-		if (!instance.open) {
-			return "closed";
-		}
-
+	private _computeStatus(instance?: NodeCG.GraphicsInstance) {
+		if (!instance) return "";
+		if (!instance.open) return "closed";
 		return instance.potentiallyOutOfDate ? "out-of-date" : "nominal";
 	}
 
-	_calcIndicatorIcon(status: string) {
+	private _calcIndicatorIcon(status: string) {
 		switch (status) {
-			case "nominal":
-				return "check";
-			case "out-of-date":
-				return "warning";
-			default:
-				return "close";
+			case "nominal": return "check";
+			case "out-of-date": return "warning";
+			default: return "close";
 		}
 	}
 
-	_calcStatusMessage(status: string, responsiveMode: string) {
+	private _calcStatusMessage(status: string, responsiveMode: string) {
 		switch (status) {
-			case "nominal":
-				return "Latest";
+			case "nominal": return "Latest";
 			case "out-of-date":
-				return responsiveMode === "wide"
-					? "Potentially Out of Date"
-					: "Out of Date";
-			case "closed":
-				return "Closed";
-			default:
-				return "Error";
+				return responsiveMode === "wide" ? "Potentially Out of Date" : "Out of Date";
+			case "closed": return "Closed";
+			default: return "Error";
 		}
 	}
 
-	_calcTimeSince(timestamp: number) {
-		return timeSince(timestamp);
+	override render() {
+		return html`
+			<div id="indicator"></div>
+			<div id="indicatorIcon">
+				${icon(this._calcIndicatorIcon(this.status))}
+			</div>
+			<div id="ip">
+				<div id="ip-actual" title=${this.instance?.ipv4 ?? ""}>
+					${this.instance?.ipv4 ?? ""}
+				</div>
+			</div>
+			<div id="status">
+				${this._calcStatusMessage(this.status, this.responsiveMode)}
+			</div>
+			<div id="duration">
+				<span id="duration-icon">${icon("access-time", 20)}</span>
+				<span>${timeSince(this.instance?.timestamp ?? 0)}</span>
+			</div>
+			<button id="reloadButton" @click=${this.reload}>
+				${icon("refresh")}
+			</button>
+			<button
+				id="killButton"
+				@click=${this.kill}
+				?hidden=${!this.graphic?.singleInstance}
+			>
+				${icon("close")}
+			</button>
+			<ncg-graphic-instance-diff
+				id="diff"
+				.instance=${this.instance}
+			></ncg-graphic-instance-diff>
+		`;
 	}
 }
 
-customElements.define(NcgGraphicInstance.is, NcgGraphicInstance);
+customElements.define("ncg-graphic-instance", NcgGraphicInstance);
 
-/* istanbul ignore next: not really easy or that important to test */
 function timeSince(date: number) {
-	const seconds = Math.floor(new Date().getTime() / 1000 - date / 1000);
+	const seconds = Math.floor(Date.now() / 1000 - date / 1000);
 	let interval = Math.floor(seconds / 31536000);
-
-	if (interval > 1) {
-		return `${interval} year`;
-	}
-
+	if (interval > 1) return `${interval} year`;
 	interval = Math.floor(seconds / 2592000);
-	if (interval > 1) {
-		return `${interval} month`;
-	}
-
+	if (interval > 1) return `${interval} month`;
 	interval = Math.floor(seconds / 86400);
-	if (interval >= 1) {
-		return `${interval} day`;
-	}
-
+	if (interval >= 1) return `${interval} day`;
 	interval = Math.floor(seconds / 3600);
-	if (interval >= 1) {
-		return `${interval} hour`;
-	}
-
+	if (interval >= 1) return `${interval} hour`;
 	interval = Math.floor(seconds / 60);
-	if (interval > 1) {
-		return `${interval} min`;
-	}
-
+	if (interval > 1) return `${interval} min`;
 	return `${Math.floor(seconds)} sec`;
 }
