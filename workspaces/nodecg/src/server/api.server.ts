@@ -145,7 +145,7 @@ export function serverApiFactory(
 		 *     // Now I can use `otherBundle`!
 		 * }
 		 */
-		readonly extension = extensions;
+		readonly extensions = extensions;
 
 		/**
 		 * _Extension only_<br/>

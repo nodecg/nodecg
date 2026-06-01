@@ -1,5 +1,7 @@
 FROM node:22-slim AS base
 
+ENV PUPPETEER_SKIP_DOWNLOAD true
+
 
 FROM base AS build
 
