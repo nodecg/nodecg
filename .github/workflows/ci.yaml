@@ -83,6 +83,9 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - name: Install Chrome for Puppeteer
+        run: npx puppeteer browsers install chrome
+
       - run: npx vitest --coverage --reporter=default --reporter=junit --outputFile=test-report.junit.xml
         if: matrix.os == 'ubuntu-latest'
       - run: npx vitest --reporter=default --reporter=junit --outputFile=test-report.junit.xml
