@@ -270,6 +270,11 @@ test("server - #bundleGit", ({ apis }) => {
 	`);
 });
 
+test("server - #extensions", ({ apis }) => {
+	expect(apis.extension.extensions).toBeTypeOf("object");
+	expect(apis.extension.extensions[C.bundleName()]).toBe(apis.extension);
+});
+
 test("bundles replicant", ({ apis }) => {
 	const bundlesRep = apis.extension.Replicant<NodeCG.Bundle[]>(
 		"bundles",
