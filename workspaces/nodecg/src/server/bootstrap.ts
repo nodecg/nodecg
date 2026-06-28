@@ -21,7 +21,7 @@ if (isLegacyProject()) {
 	}
 }
 
-import { NodeRuntime } from "@effect/platform-node";
+import * as NodeRuntime from "@effect/platform-node/NodeRuntime";
 import { ConfigError, Effect, Fiber } from "effect";
 
 import { UnknownError } from "./_effect/boundary";
