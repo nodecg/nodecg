@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
-		"target": "ES2022",
-		"lib": ["ES2022"],
+		"target": "ES2023",
+		"lib": ["ES2023"],
 		"module": "node20",
 		"allowImportingTsExtensions": true,
 		"rewriteRelativeImportExtensions": true,
