@@ -9,12 +9,14 @@
         "width": 1920,
         "height": 1080,
         "name": "Game Overlay",
-        "description": "Main overlay displaying game state and scores"
+        "description": "Main overlay displaying game state and scores",
+        "order": 1
       },
       {
         "file": "simple.html",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "order": 1
       }
     ]
   }

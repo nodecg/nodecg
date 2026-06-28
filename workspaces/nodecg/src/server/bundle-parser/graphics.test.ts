@@ -56,7 +56,7 @@ test("when two graphics have the same file, throw an error", () => {
 
 test("should parse graphics with name and description fields", () => {
 	const parsedBundle = parseBundle(
-		"./test/fixtures/bundle-parser/graphics-with-metadata",
+		testDirPath("fixtures/bundle-parser/graphics-with-metadata"),
 	);
 	expect(parsedBundle.graphics).toHaveLength(2);
 
@@ -85,7 +85,7 @@ test("should parse graphics with name and description fields", () => {
 
 test("should handle graphics with only name field", () => {
 	const parsedBundle = parseBundle(
-		"./test/fixtures/bundle-parser/graphics-name-only",
+		testDirPath("fixtures/bundle-parser/graphics-name-only"),
 	);
 	expect(parsedBundle.graphics).toHaveLength(1);
 
@@ -98,7 +98,7 @@ test("should handle graphics with only name field", () => {
 
 test("should handle graphics with only description field", () => {
 	const parsedBundle = parseBundle(
-		"./test/fixtures/bundle-parser/graphics-description-only",
+		testDirPath("fixtures/bundle-parser/graphics-description-only"),
 	);
 	expect(parsedBundle.graphics).toHaveLength(1);
 
@@ -111,7 +111,7 @@ test("should handle graphics with only description field", () => {
 
 test("should parse graphics with order values for sorting stability", () => {
 	const parsedBundle = parseBundle(
-		"./test/fixtures/bundle-parser/graphics-with-metadata",
+		testDirPath("fixtures/bundle-parser/graphics-with-metadata"),
 	);
 	expect(parsedBundle.graphics).toHaveLength(2);
 
