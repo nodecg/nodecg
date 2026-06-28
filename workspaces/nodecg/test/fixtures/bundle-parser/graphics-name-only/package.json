@@ -1,0 +1,15 @@
+{
+  "name": "graphics-name-only",
+  "version": "0.0.1",
+  "nodecg": {
+    "compatibleRange": "~0.7.0",
+    "graphics": [
+      {
+        "file": "named.html",
+        "width": 1280,
+        "height": 720,
+        "name": "Named Graphic"
+      }
+    ]
+  }
+}

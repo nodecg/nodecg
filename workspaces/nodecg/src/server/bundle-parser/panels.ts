@@ -152,6 +152,7 @@ export function parsePanels(
 			...workspaceInfo,
 			path: filePath,
 			headerColor: panel.headerColor ?? "#525F78",
+			workspaceOrder: panel.workspaceOrder,
 			bundleName,
 			html: $.html(),
 		};

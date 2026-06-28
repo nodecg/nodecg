@@ -15,6 +15,18 @@ import type { BundleManager } from "./bundle-manager.js";
 
 type Workspace = NodeCG.Workspace;
 
+/**
+ * Returns the sort category for an order value:
+ * - 0: positive/zero (appears first)
+ * - 1: undefined (appears in middle)
+ * - 2: negative (appears last)
+ */
+function getOrderCategory(order: number | undefined): number {
+	if (order === undefined) return 1;
+	if (order >= 0) return 0;
+	return 2;
+}
+
 interface DashboardContext {
 	bundles: NodeCG.Bundle[];
 	publicConfig: typeof filteredConfig;
@@ -124,11 +136,27 @@ function getDashboardContext(bundles: NodeCG.Bundle[]): DashboardContext {
 	};
 }
 
-function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
+/**
+ * Parse workspaces from bundles, supporting:
+ * - workspaceOrder property for custom ordering
+ * - Negative order values to place workspaces at the end (like arr.at(-1))
+ * - Alphabetical sorting for workspaces without order
+ *
+ * Workspaces are sorted in three categories:
+ * 1. Positive/zero order values (sorted ascending)
+ * 2. No order value (sorted alphabetically)
+ * 3. Negative order values (sorted ascending, so -2 comes before -1)
+ *
+ * When multiple panels in different bundles define the same workspace with different orders,
+ * they are sorted alphabetically by label as a secondary criterion.
+ */
+export function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 	let defaultWorkspaceHasPanels = false;
 	let otherWorkspacesHavePanels = false;
 	const workspaces: Workspace[] = [];
 	const workspaceNames = new Set<string>();
+	const workspaceOrders = new Map<string, number>();
+
 	bundles.forEach((bundle) => {
 		bundle.dashboard.panels.forEach((panel) => {
 			if (panel.dialog) {
@@ -144,11 +172,27 @@ function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 					route: `fullbleed/${panel.name}`,
 					fullbleed: true,
 				});
+
+				// Track order for fullbleed panels too
+				if (panel.workspaceOrder !== undefined) {
+					workspaceOrders.set(workspaceName, panel.workspaceOrder);
+				}
 			} else if (panel.workspace === "default") {
 				defaultWorkspaceHasPanels = true;
 			} else {
 				workspaceNames.add(panel.workspace);
 				otherWorkspacesHavePanels = true;
+
+				// Track the minimum order value for each workspace
+				if (panel.workspaceOrder !== undefined) {
+					const currentOrder = workspaceOrders.get(panel.workspace);
+					if (
+						currentOrder === undefined ||
+						panel.workspaceOrder < currentOrder
+					) {
+						workspaceOrders.set(panel.workspace, panel.workspaceOrder);
+					}
+				}
 			}
 		});
 	});
@@ -161,7 +205,32 @@ function parseWorkspaces(bundles: NodeCG.Bundle[]): Workspace[] {
 		});
 	});
 
-	workspaces.sort((a, b) => a.label.localeCompare(b.label));
+	// Sort workspaces by order first, then alphabetically
+	// Sorting categories: positive/zero orders (front) → no order (middle) → negative orders (end)
+	// This allows negative numbers to be used like JavaScript's arr.at(-1) to place items at the end
+	workspaces.sort((a, b) => {
+		const orderA = workspaceOrders.get(a.name);
+		const orderB = workspaceOrders.get(b.name);
+
+		const categoryA = getOrderCategory(orderA);
+		const categoryB = getOrderCategory(orderB);
+
+		// Different categories: sort by category
+		if (categoryA !== categoryB) {
+			return categoryA - categoryB;
+		}
+
+		// Same category: if both undefined, sort alphabetically
+		if (categoryA === 1) {
+			return a.label.localeCompare(b.label);
+		}
+
+		// Both have orders in same category: sort numerically, then alphabetically
+		if (orderA !== orderB) {
+			return orderA! - orderB!;
+		}
+		return a.label.localeCompare(b.label);
+	});
 
 	if (defaultWorkspaceHasPanels || !otherWorkspacesHavePanels) {
 		workspaces.unshift({
