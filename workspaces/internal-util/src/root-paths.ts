@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import { getNearestProjectDirFromCwd } from "./find-nodejs-project.ts";
-import { isLegacyProject } from "./project-type.ts";
+import { getProjectType } from "./project-type.ts";
 
 let _cachedRuntimeRootPath: string | undefined;
 
@@ -17,9 +17,23 @@ let _cachedNodecgInstalledPath: string | undefined;
 function getNodecgInstalledPath(): string {
 	if (_cachedNodecgInstalledPath === undefined) {
 		const runtimeRoot = getRuntimeRootPath();
-		_cachedNodecgInstalledPath = isLegacyProject()
-			? path.join(runtimeRoot, "workspaces/nodecg")
-			: path.join(runtimeRoot, "node_modules/nodecg");
+		switch (getProjectType()) {
+			case "monorepo":
+				_cachedNodecgInstalledPath = path.join(
+					runtimeRoot,
+					"workspaces/nodecg",
+				);
+				break;
+			case "standalone":
+				_cachedNodecgInstalledPath = runtimeRoot;
+				break;
+			case "dependency":
+				_cachedNodecgInstalledPath = path.join(
+					runtimeRoot,
+					"node_modules/nodecg",
+				);
+				break;
+		}
 	}
 	return _cachedNodecgInstalledPath;
 }
