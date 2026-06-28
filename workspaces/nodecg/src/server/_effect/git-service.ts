@@ -1,7 +1,8 @@
 import nodeFs from "node:fs";
 
 import { FileSystem, Path } from "@effect/platform";
-import { NodeFileSystem, NodePath } from "@effect/platform-node";
+import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
+import * as NodePath from "@effect/platform-node/NodePath";
 import { Array, Data, DateTime, Effect, Match, Option } from "effect";
 import git from "isomorphic-git";
 

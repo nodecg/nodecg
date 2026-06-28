@@ -31,6 +31,19 @@ export default defineConfig(
 			"@typescript-eslint/prefer-promise-reject-errors": "off",
 			"@typescript-eslint/unbound-method": "off",
 			"@typescript-eslint/prefer-nullish-coalescing": "off",
+
+			"@typescript-eslint/no-restricted-imports": [
+				"error",
+				{
+					paths: [
+						{
+							name: "@effect/platform-node",
+							message:
+								'Import a specific submodule (e.g. "@effect/platform-node/NodeRuntime")',
+						},
+					],
+				},
+			],
 		},
 		languageOptions: {
 			parserOptions: {
