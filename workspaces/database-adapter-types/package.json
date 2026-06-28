@@ -7,6 +7,9 @@
     "directory": "workspaces/database-adapter-types"
   },
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "exports": {
     ".": "./dist/main.js",
     "./package.json": "./package.json"

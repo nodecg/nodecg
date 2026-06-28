@@ -7,6 +7,9 @@
     "directory": "workspaces/database-adapter-sqlite-legacy"
   },
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "exports": {
     ".": "./dist/database-adapter.js",
     "./package.json": "./package.json"
@@ -27,7 +30,7 @@
     "@nodecg/database-adapter-types": "2.7.0",
     "@nodecg/internal-util": "2.7.1",
     "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^12.4.1",
+    "better-sqlite3": "^12.10.1",
     "typeorm": "0.3.27"
   },
   "devDependencies": {

@@ -7,6 +7,9 @@
     "directory": "workspaces/internal-util"
   },
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "exports": {
     ".": "./dist/main.js",
     "./package.json": "./package.json"
