@@ -1,6 +1,7 @@
 import * as cli from "@effect/cli";
 import { Command, FileSystem, Path } from "@effect/platform";
-import { NodeContext, NodeRuntime } from "@effect/platform-node";
+import NodeContext from "@effect/platform-node/NodeContext";
+import NodeRuntime from "@effect/platform-node/NodeRuntime";
 import { Array, Data, Effect, Fiber, Predicate, Schema } from "effect";
 
 const arg = cli.Args.text({ name: "command" });
