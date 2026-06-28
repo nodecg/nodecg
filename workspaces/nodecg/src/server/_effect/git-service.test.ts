@@ -1,7 +1,8 @@
 import * as path from "node:path";
 
 import { Command, FileSystem } from "@effect/platform";
-import { NodeContext, NodeFileSystem } from "@effect/platform-node";
+import * as NodeContext from "@effect/platform-node/NodeContext";
+import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import { Chunk, Data, Effect, Layer, Option, Stream } from "effect";
 import { assert, describe, expect, test } from "vitest";
 

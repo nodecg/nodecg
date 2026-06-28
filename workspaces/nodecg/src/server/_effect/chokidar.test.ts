@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import { FileSystem } from "@effect/platform";
-import { NodeFileSystem } from "@effect/platform-node";
+import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import { Chunk, Effect, Fiber, Stream } from "effect";
 import { describe, expect, test } from "vitest";
 
