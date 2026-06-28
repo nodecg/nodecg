@@ -1,6 +1,6 @@
 {
   "name": "nodecg",
-  "version": "2.6.4",
+  "version": "2.8.0",
   "description": "Dynamic broadcast graphics rendered in a browser",
   "keywords": [
     "graphics",
@@ -50,10 +50,10 @@
     "@effect/opentelemetry": "^0.59.1",
     "@effect/platform": "^0.93.1",
     "@effect/platform-node": "^0.100.0",
-    "@nodecg/cli": "2.7.1",
-    "@nodecg/database-adapter-sqlite-legacy": "2.7.1",
+    "@nodecg/cli": "2.8.0",
+    "@nodecg/database-adapter-sqlite-legacy": "2.7.2",
     "@nodecg/database-adapter-types": "2.7.0",
-    "@nodecg/internal-util": "2.7.1",
+    "@nodecg/internal-util": "2.7.2",
     "@nodecg/json-schema-defaults": "^1.0.4",
     "@nodecg/json-schema-lib": "0.1.0",
     "@open-iframe-resizer/core": "^1.6.0",
