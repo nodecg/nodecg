@@ -1,5 +1,7 @@
 import express from "express";
+import type * as ExpressCore from "express-serve-static-core";
 import isError from "is-error";
+import type * as qs from "qs";
 import { serializeError } from "serialize-error";
 import type { DeepReadonly } from "ts-essentials";
 
@@ -13,12 +15,60 @@ import type { ServerReplicant } from "./replicant/server-replicant";
 import type { ExtensionEventMap } from "./server/extensions";
 import { authCheck } from "./util/authcheck";
 
+export interface ServerApi<
+ C extends Record<string, any> = NodeCG.Bundle.UnknownConfig,
+> extends NodeCGAPIBase<"server", C, ExtensionEventMap> {
+ readonly Logger: typeof Logger;
+ readonly log: Logger;
+ readonly config: DeepReadonly<typeof config>;
+ readonly Router: typeof express.Router;
+ util: {
+  authCheck: typeof authCheck;
+ };
+ readonly extensions: Record<string, unknown>;
+ mount: NodeCG.Middleware;
+ readonly getSocketIOServer: () => RootNS;
+ sendMessageToBundle(
+  messageName: string,
+  bundleName: string,
+  data?: unknown,
+ ): void;
+ sendMessage(messageName: string, data?: unknown): void;
+ readReplicant<T = unknown>(
+  name: string,
+  param2?: string | NodeCG.Bundle,
+ ): T | undefined;
+}
+
+export interface ServerApiConstructor {
+ new <C extends Record<string, any> = NodeCG.Bundle.UnknownConfig>(
+  bundle: NodeCG.Bundle,
+ ): ServerApi<C>;
+ sendMessageToBundle(
+  messageName: string,
+  bundleName: string,
+  data?: unknown,
+ ): void;
+ readReplicant<T = unknown>(
+  name: string,
+  namespace: string,
+ ): T | undefined;
+ Replicant<
+  V,
+  O extends NodeCG.Replicant.Options<V> = NodeCG.Replicant.Options<V>,
+ >(
+  name: string,
+  namespace: string,
+  opts?: O,
+ ): ServerReplicant<V, O>;
+}
+
 export function serverApiFactory(
-	io: RootNS,
-	replicator: Replicator,
-	extensions: Record<string, unknown>,
-	mount: NodeCG.Middleware,
-) {
+ io: RootNS,
+ replicator: Replicator,
+ extensions: Record<string, unknown>,
+ mount: NodeCG.Middleware,
+): ServerApiConstructor {
 	const apiContexts = new Set<
 		NodeCGAPIBase<"server", Record<string, any>, ExtensionEventMap>
 	>();
