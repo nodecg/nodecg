@@ -1,11 +1,13 @@
 import type {
+	CustomRouteManifest,
 	WidestChildManifests,
+	WidestCustomRoutes,
 	EmptyNamespaceFields,
 	WidestNamespaceFields,
 	NamespaceManifest,
 } from "@nodecg-next/core";
-import type { Updater } from "@nodecg-next/internal";
-import { mergeRecords } from "@nodecg-next/internal/utils";
+import type { Identity, Updater } from "@nodecg-next/internal";
+import { mergeRecords, type NestedValues } from "@nodecg-next/internal/utils";
 import type { Schema } from "effect";
 import type { Promisable, SetOptional } from "type-fest";
 
@@ -184,6 +186,36 @@ export type ImplementRpc<S extends WidestNamespaceFields> = {
 	) => Promisable<S["rpc"][K]["response"]>;
 };
 
+export type CustomRouteContext<S extends WidestNamespaceFields> =
+	OnLoadContext<S> & {
+		readonly caller: Identity;
+	};
+
+export type CustomRouteHandler<S extends WidestNamespaceFields> = (
+	request: Request,
+	ctx: CustomRouteContext<S>,
+) => Promisable<Response>;
+
+export type ImplementCustomRoute<
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
+> = {
+	readonly [R in keyof CustomRoutes]: {
+		readonly [M in keyof CustomRoutes[R]]: CustomRouteHandler<S>;
+	};
+};
+
+type UnchangedCustomRoutes<
+	CustomRoutes extends WidestCustomRoutes,
+	BaseRoutes extends NestedValues<WidestCustomRoutes, CustomRouteManifest>,
+> = {
+	[R in keyof CustomRoutes & keyof BaseRoutes]: [
+		keyof CustomRoutes[R],
+	] extends [keyof BaseRoutes[R]]
+		? R
+		: never;
+}[keyof CustomRoutes & keyof BaseRoutes];
+
 export type NamespaceOptions<in out S extends WidestNamespaceFields> = {
 	readonly seedReplicant?: SeedReplicant<S["replicant"]>;
 	readonly implementComputed?: ImplementComputed<S["replicant"], S["computed"]>;
@@ -218,13 +250,21 @@ export type ImplementedChildren<Children extends WidestChildManifests> = {
 
 export interface ImplementedNamespace<
 	in out S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes = WidestCustomRoutes,
 	out Children extends WidestChildManifests = WidestChildManifests,
 > {
-	readonly manifest: NamespaceManifest<string, S, string, Children>;
+	readonly manifest: NamespaceManifest<
+		string,
+		S,
+		string,
+		CustomRoutes,
+		Children
+	>;
 	readonly impl:
 		| (NamespaceOptions<S> & {
 				readonly frontend?: FrontendConfig;
 				readonly children?: ImplementedChildren<Children>;
+				readonly implementCustomRoute?: ImplementCustomRoute<S, CustomRoutes>;
 		  })
 		| undefined;
 }
@@ -244,13 +284,15 @@ export interface WidenedImplementedNamespace {
 
 export function implementNamespace<
 	S extends WidestNamespaceFields = EmptyNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes = {},
 	Children extends WidestChildManifests = {},
 >(
-	manifest: NamespaceManifest<string, S, string, Children>,
+	manifest: NamespaceManifest<string, S, string, CustomRoutes, Children>,
 	...rest: [
 		| keyof S["replicant"]
 		| keyof S["computed"]
 		| keyof S["rpc"]
+		| keyof CustomRoutes
 		| keyof Children,
 	] extends [never]
 		? [
@@ -265,12 +307,17 @@ export function implementNamespace<
 						"children",
 						keyof Children,
 						ImplementedChildren<Children>
+					> &
+					RequiredIfAnyKey<
+						"implementCustomRoute",
+						keyof CustomRoutes,
+						ImplementCustomRoute<S, CustomRoutes>
 					> & {
 						readonly frontend?: FrontendConfig;
 						readonly onLoad?: OnLoad<S>;
 					},
 			]
-): ImplementedNamespace<S, Children> {
+): ImplementedNamespace<S, CustomRoutes, Children> {
 	const [impl] = rest;
 	return { manifest, impl };
 }
@@ -281,10 +328,12 @@ type RequiredIfAnyKey<Name extends string, Keys, Value> = [Keys] extends [never]
 
 type ExtensionSupplement<
 	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
 	Children extends WidestChildManifests,
 	BaseReplicantKeys extends keyof S["replicant"] & string,
 	BaseComputedKeys extends keyof S["computed"] & string,
 	BaseRpcKeys extends keyof S["rpc"] & string,
+	BaseCustomRouteKeys extends keyof CustomRoutes,
 	BaseChildKeys extends keyof Children & string,
 > = RequiredIfAnyKey<
 	"seedReplicant",
@@ -303,6 +352,11 @@ type ExtensionSupplement<
 		"implementRpc",
 		keyof Omit<S["rpc"], BaseRpcKeys>,
 		SetOptional<ImplementRpc<S>, BaseRpcKeys>
+	> &
+	RequiredIfAnyKey<
+		"implementCustomRoute",
+		Exclude<keyof CustomRoutes, BaseCustomRouteKeys>,
+		SetOptional<ImplementCustomRoute<S, CustomRoutes>, BaseCustomRouteKeys>
 	> &
 	RequiredIfAnyKey<
 		"children",
@@ -331,22 +385,25 @@ const combineOnLoad = <S extends WidestNamespaceFields>(
 
 export function implementExtendedNamespace<
 	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
 	Children extends WidestChildManifests,
 	const Base extends ImplementedNamespace<any>,
 >(
-	manifest: NamespaceManifest<string, S, string, Children>,
+	manifest: NamespaceManifest<string, S, string, CustomRoutes, Children>,
 	implemented: Base,
 	additional: ExtensionSupplement<
 		S,
+		CustomRoutes,
 		Children,
 		keyof Base["manifest"]["replicant"] & keyof S["replicant"] & string,
 		keyof Base["manifest"]["computed"] & keyof S["computed"] & string,
 		keyof Base["manifest"]["rpc"] & keyof S["rpc"] & string,
+		UnchangedCustomRoutes<CustomRoutes, Base["manifest"]["customRoute"]>,
 		keyof NonNullable<NonNullable<Base["impl"]>["children"]> &
 			keyof Children &
 			string
 	>,
-): ImplementedNamespace<S, Children> {
+): ImplementedNamespace<S, CustomRoutes, Children> {
 	const baseFrontend = implemented.impl?.frontend;
 	const frontend =
 		baseFrontend && additional.frontend
@@ -369,6 +426,10 @@ export function implementExtendedNamespace<
 			implementRpc: mergeRecords<ImplementRpc<S>>(
 				implemented.impl?.implementRpc,
 				additional.implementRpc,
+			),
+			implementCustomRoute: mergeRecords<ImplementCustomRoute<S, CustomRoutes>>(
+				implemented.impl?.implementCustomRoute,
+				additional.implementCustomRoute,
 			),
 			onLoad: combineOnLoad(implemented.impl?.onLoad, additional.onLoad),
 			frontend,

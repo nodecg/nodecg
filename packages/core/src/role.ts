@@ -16,6 +16,7 @@ export const ROLE_CAPABILITY = [
 	"topic-subscribe",
 	"topic-publish",
 	"rpc-call",
+	"custom-route-request",
 ] as const;
 
 export type RoleCapability = (typeof ROLE_CAPABILITY)[number];
@@ -245,6 +246,18 @@ export const rpcPermission = (
 	canRead: absentOperation,
 	canWrite: (caller: Identity): boolean =>
 		can(call, caller, namespace, namedRoles),
+});
+
+export const customRoutePermission = (
+	request: Access,
+	namespace: string,
+	namedRoles: ReadonlySet<RoleName>,
+): ResolvedPermission => ({
+	read: EMPTY_ACCESS,
+	write: request,
+	canRead: absentOperation,
+	canWrite: (caller: Identity): boolean =>
+		can(request, caller, namespace, namedRoles),
 });
 
 export const topicPermission = (

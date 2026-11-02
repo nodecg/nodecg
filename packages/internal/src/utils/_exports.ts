@@ -11,7 +11,11 @@ export { findInheritedKey, isInheritedKey } from "./inherited-key.ts";
 export {
 	mapValues,
 	mapEffectValues,
+	mapNestedValues,
+	type MergedNestedKeys,
+	mergeNestedValues,
 	mergeRecords,
+	type NestedValues,
 	zipEffectValues,
 	type AddedSchemas,
 	mapSchemaValues,

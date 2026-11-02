@@ -40,18 +40,15 @@ export const UserAuthenticationMiddlewareLive = Layer.effect(
 			cookie: (httpEffect, { credential }) =>
 				Effect.gen(function* () {
 					const value = Redacted.value(credential);
-					const caller =
-						value.length > 0
-							? yield* resolveSessionCaller(value).pipe(
-									Effect.provide(context),
-									Effect.tapCause((cause) =>
-										Effect.logError("Session lookup failed", cause),
-									),
-									Effect.catchTag("BackendError", () =>
-										HttpApiError.InternalServerError.make(),
-									),
-								)
-							: Option.none();
+					const caller = yield* resolveSessionCaller(value).pipe(
+						Effect.provide(context),
+						Effect.tapCause((cause) =>
+							Effect.logError("Session lookup failed", cause),
+						),
+						Effect.catchTag("BackendError", () =>
+							HttpApiError.InternalServerError.make(),
+						),
+					);
 					if (Option.isNone(caller) && requireAuth) {
 						return yield* HttpApiError.Unauthorized.make();
 					}
@@ -125,18 +122,15 @@ export const ServiceAccountAuthenticationMiddlewareLive = Layer.effect(
 			bearer: (httpEffect, { credential }) =>
 				Effect.gen(function* () {
 					const value = Redacted.value(credential);
-					const caller =
-						value.length > 0
-							? yield* resolveServiceAccountCaller(value).pipe(
-									Effect.provide(context),
-									Effect.tapCause((cause) =>
-										Effect.logError("API key lookup failed", cause),
-									),
-									Effect.catchTag("BackendError", () =>
-										HttpApiError.InternalServerError.make(),
-									),
-								)
-							: Option.none();
+					const caller = yield* resolveServiceAccountCaller(value).pipe(
+						Effect.provide(context),
+						Effect.tapCause((cause) =>
+							Effect.logError("API key lookup failed", cause),
+						),
+						Effect.catchTag("BackendError", () =>
+							HttpApiError.InternalServerError.make(),
+						),
+					);
 					if (Option.isNone(caller)) {
 						return yield* HttpApiError.Unauthorized.make();
 					}

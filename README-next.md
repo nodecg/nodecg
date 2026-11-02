@@ -394,6 +394,24 @@ For datasets too large to keep in memory. Unlike Replicant, which is mirrored in
   - built static directory in production
   - optionally Vite dev server (HMR) for development
 
+### ✅ Custom routes
+
+- A namespace can declare custom HTTP routes, served under `/namespaces/{namespace}/custom/{name}/`
+  ```ts
+  const scoreboard = defineNamespace("scoreboard", {
+    customRoute: {
+      webhook: { post: { permission: { write: { everyone: "allow" } } } },
+    },
+  });
+
+  implementNamespace(scoreboard, {
+    implementCustomRoute: {
+      webhook: { post: (request) => new Response("ok") },
+    },
+  });
+  ```
+- Libraries like srvx can be used to implement the routes with Express middlewares
+
 ### ✅ Server configuration
 
 The server reads its settings from environment variables.

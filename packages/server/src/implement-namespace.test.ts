@@ -39,6 +39,25 @@ describe("implementNamespace", () => {
 		expect(implemented.impl).toEqual({ seedReplicant });
 	});
 
+	test("requires a handler for each declared custom route", () => {
+		const manifest = defineNamespace("ns", {
+			customRoute: { webhook: { post: {} } },
+		});
+		const post = () => new Response("ok");
+
+		const implemented = implementNamespace(manifest, {
+			implementCustomRoute: { webhook: { post } },
+		});
+
+		expect(implemented.impl?.implementCustomRoute?.webhook.post).toBe(post);
+		// @ts-expect-error implementCustomRoute is required
+		implementNamespace(manifest, {});
+		// @ts-expect-error webhook has no handler
+		implementNamespace(manifest, { implementCustomRoute: {} });
+		// @ts-expect-error webhook has no post handler
+		implementNamespace(manifest, { implementCustomRoute: { webhook: {} } });
+	});
+
 	test("takes no impl when there is nothing to implement", () => {
 		const manifest = defineNamespace("ns", {
 			topic: { goal: { schema: Schema.String } },
@@ -134,6 +153,62 @@ describe("implementExtendedNamespace", () => {
 	});
 	const baseImplemented = implementNamespace(base, {
 		seedReplicant: { score: () => 10, label: () => "m1" },
+	});
+
+	test("merges custom routes and lets the supplement replace a handler", () => {
+		const routeBase = defineNamespace("match", {
+			customRoute: { webhook: { post: {} }, backup: { get: {} } },
+		});
+		const post = () => new Response("base");
+		const get = () => new Response("base");
+		const replacement = () => new Response("extended");
+		const download = () => new Response("extended");
+		const extended = extendNamespace(routeBase, {
+			customRoute: { download: { get: {} } },
+		});
+
+		const implemented = implementExtendedNamespace(
+			extended,
+			implementNamespace(routeBase, {
+				implementCustomRoute: { webhook: { post }, backup: { get } },
+			}),
+			{
+				implementCustomRoute: {
+					backup: { get: replacement },
+					download: { get: download },
+				},
+			},
+		);
+
+		expect(implemented.impl?.implementCustomRoute).toStrictEqual({
+			webhook: { post },
+			backup: { get: replacement },
+			download: { get: download },
+		});
+	});
+
+	test("requires every handler of a route that gains a method", () => {
+		const routeBase = defineNamespace("match", {
+			customRoute: { asset: { get: {} } },
+		});
+		const get = () => new Response("base");
+		const post = () => new Response("extended");
+		const extended = extendNamespace(routeBase, {
+			customRoute: { asset: { post: {} } },
+		});
+		const base = implementNamespace(routeBase, {
+			implementCustomRoute: { asset: { get } },
+		});
+
+		const implemented = implementExtendedNamespace(extended, base, {
+			implementCustomRoute: { asset: { get, post } },
+		});
+
+		expect(implemented.impl?.implementCustomRoute).toStrictEqual({
+			asset: { get, post },
+		});
+		// @ts-expect-error asset gained post, so the supplement names the whole route
+		implementExtendedNamespace(extended, base, {});
 	});
 
 	testInMemory(

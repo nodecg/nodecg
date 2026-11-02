@@ -1,6 +1,7 @@
 import type { RoleName } from "@nodecg-next/internal";
-import { Context, Effect, Layer } from "effect";
+import { Context, Effect, HashSet, Layer } from "effect";
 
+import type { CustomRoute } from "./build-custom-routes.ts";
 import { type BuiltNamespace } from "./build-fields.ts";
 import { fieldInternal } from "./field-builders/field-internal-key.ts";
 import type { FrontendConfig } from "./implement-namespace.ts";
@@ -31,6 +32,7 @@ export interface NamespaceRegistry {
 	>;
 	readonly topic: ReadonlyMap<string, ReadonlyMap<string, TopicFieldInternal>>;
 	readonly rpc: ReadonlyMap<string, ReadonlyMap<string, RpcFieldInternal>>;
+	readonly customRoute: ReadonlyMap<string, HashSet.HashSet<CustomRoute>>;
 	readonly declaredRoles: ReadonlyMap<string, ReadonlySet<RoleName>>;
 	readonly frontend: ReadonlyMap<string, FrontendConfig>;
 }
@@ -39,6 +41,7 @@ export interface RegisteredNamespace {
 	readonly namespace: string;
 	readonly declaredRoles: ReadonlySet<RoleName>;
 	readonly frontend?: FrontendConfig;
+	readonly customRoute?: HashSet.HashSet<CustomRoute>;
 	readonly fields: {
 		readonly replicant: Record<
 			string,
@@ -71,6 +74,7 @@ export class NamespaceRegistryService extends Context.Service<NamespaceRegistryS
 				const computed = new Map<string, Map<string, ComputedFieldInternal>>();
 				const topic = new Map<string, Map<string, TopicFieldInternal>>();
 				const rpc = new Map<string, Map<string, RpcFieldInternal>>();
+				const customRoute = new Map<string, HashSet.HashSet<CustomRoute>>();
 				const declaredRoles = new Map<string, ReadonlySet<RoleName>>();
 				const frontend = new Map<string, FrontendConfig>();
 				for (const registered of namespaces) {
@@ -99,8 +103,17 @@ export class NamespaceRegistryService extends Context.Service<NamespaceRegistryS
 						rpcFields.set(name, field[fieldInternal]);
 					}
 					rpc.set(namespace, rpcFields);
+					customRoute.set(namespace, registered.customRoute ?? HashSet.empty());
 				}
-				return { replicant, computed, topic, rpc, declaredRoles, frontend };
+				return {
+					replicant,
+					computed,
+					topic,
+					rpc,
+					customRoute,
+					declaredRoles,
+					frontend,
+				};
 			}),
 	},
 ) {

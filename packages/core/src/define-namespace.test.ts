@@ -316,6 +316,59 @@ describe("defineNamespace", () => {
 				'Replicant "homescore" in "show" differs from "homeScore" only in case',
 			);
 		});
+
+		test("rejects a custom route name outside the allowed characters", () => {
+			expect(() =>
+				defineNamespace("show", {
+					customRoute: {
+						// @ts-expect-error a slash is not allowed
+						"a/b": { get: {} },
+					},
+				}),
+			).toThrow(
+				'Custom route "a/b" in "show" must use only A-Z, a-z, 0-9, "_" and "-", and not be a Windows device name',
+			);
+		});
+
+		test("rejects custom route names that differ only in case", () => {
+			expect(() =>
+				defineNamespace("show", {
+					customRoute: {
+						// @ts-expect-error differs from Webhook only in case
+						webhook: { get: {} },
+						// @ts-expect-error differs from webhook only in case
+						Webhook: { post: {} },
+					},
+				}),
+			).toThrow(
+				'Custom route "Webhook" in "show" differs from "webhook" only in case',
+			);
+		});
+
+		test("rejects a custom route method that is not HTTP", () => {
+			expect(() =>
+				defineNamespace("show", {
+					// @ts-expect-error fetch is not an HTTP method
+					customRoute: { backup: { fetch: {} } },
+				}),
+			).toThrow('Custom route "backup" in "show" has unknown method "fetch"');
+		});
+
+		test("rejects trace as a custom route method", () => {
+			expect(() =>
+				defineNamespace("show", {
+					// @ts-expect-error trace can't reach a handler
+					customRoute: { backup: { trace: {} } },
+				}),
+			).toThrow('Custom route "backup" in "show" has unknown method "trace"');
+		});
+
+		test("types refuse the wildcard beside another custom route method", () => {
+			defineNamespace("show", {
+				// @ts-expect-error the wildcard stands alone
+				customRoute: { backup: { "*": {}, get: {} } },
+			});
+		});
 	});
 
 	describe("a replicant writer is a reader", () => {
@@ -438,6 +491,86 @@ describe("defineNamespace", () => {
 				roles: new Set(["producer"]),
 				rolesDenied: new Set(["operator"]),
 			});
+		});
+	});
+
+	describe("custom route permission resolution", () => {
+		test("custom-route-request bakes into write", () => {
+			const manifest = defineNamespace("match", {
+				roles: {
+					operator: { permission: ["custom-route-request"] },
+					viewer: { permission: ["rpc-call"] },
+				},
+				customRoute: { backup: { get: {} } },
+			});
+
+			expect(manifest.customRoute.backup.get.permission.write).toEqual({
+				roles: new Set(["operator"]),
+				rolesDenied: new Set(),
+			});
+			expect(manifest.customRoute.backup.get.permission.read).toEqual({
+				roles: new Set(),
+				rolesDenied: new Set(),
+			});
+		});
+
+		test("each method keeps its own permission", () => {
+			const manifest = defineNamespace("match", {
+				roles: {
+					operator: { permission: ["custom-route-request"] },
+					producer: { permission: ["custom-route-request"] },
+				},
+				customRoute: {
+					asset: {
+						get: { permission: { write: { deny: ["operator"] } } },
+						post: {},
+					},
+					webhook: {
+						"*": { permission: { write: { everyone: "allow" } } },
+					},
+				},
+			});
+
+			expect(manifest.customRoute.asset.get.permission.write).toEqual({
+				roles: new Set(["producer"]),
+				rolesDenied: new Set(["operator"]),
+			});
+			expect(manifest.customRoute.asset.post.permission.write).toEqual({
+				roles: new Set(["operator", "producer"]),
+				rolesDenied: new Set(),
+			});
+			expect(manifest.customRoute.webhook["*"].permission.write).toEqual({
+				roles: new Set(["operator", "producer"]),
+				rolesDenied: new Set(),
+				everyone: "allow",
+			});
+		});
+
+		test("a method set to undefined resolves like an empty one", () => {
+			const manifest = defineNamespace("match", {
+				roles: { operator: { permission: ["custom-route-request"] } },
+				customRoute: { backup: { get: undefined } },
+			});
+
+			expect(manifest.customRoute.backup.get.permission.write).toEqual({
+				roles: new Set(["operator"]),
+				rolesDenied: new Set(),
+			});
+		});
+
+		test("rejects a role the namespace does not declare", () => {
+			expect(() =>
+				defineNamespace("match", {
+					customRoute: {
+						backup: {
+							get: {
+								// @ts-expect-error ghost is not declared
+								permission: { write: { allow: ["ghost"] } },
+							},
+						},
+					},
+				}),
+			).toThrow('Unknown role "ghost" in customRoute "backup" get write.allow');
 		});
 	});
 
@@ -1061,6 +1194,145 @@ describe("extendNamespace", () => {
 				roles: new Set(),
 				rolesDenied: new Set(),
 			});
+		});
+
+		test("adds a custom route with its permission", () => {
+			const extended = extendNamespace(base, {
+				roles: { operator: { permission: ["custom-route-request"] } },
+				customRoute: {
+					backup: {
+						get: { permission: { write: { allow: ["operator"] } } },
+					},
+				},
+			});
+
+			expect(extended.customRoute.backup.get.permission.write).toEqual({
+				roles: new Set(["operator"]),
+				rolesDenied: new Set(),
+			});
+		});
+
+		test("overrides a custom route's permission and keeps its denials", () => {
+			const routeBase = defineNamespace("match", {
+				roles: {
+					operator: { permission: ["custom-route-request"] },
+					producer: { permission: ["custom-route-request"] },
+				},
+				customRoute: {
+					backup: {
+						get: { permission: { write: { deny: ["operator"] } } },
+					},
+				},
+			});
+
+			const extended = extendNamespace(routeBase, {
+				customRoute: {
+					backup: {
+						get: { permission: { write: { everyone: "allow" } } },
+					},
+				},
+			});
+
+			expect(extended.customRoute.backup.get.permission.write).toEqual({
+				roles: new Set(["producer"]),
+				rolesDenied: new Set(["operator"]),
+				everyone: "allow",
+			});
+		});
+
+		test("a custom route's explicit allow follows role changes like an rpc's", () => {
+			const routeBase = defineNamespace("match", {
+				roles: {
+					operator: { permission: ["rpc-call", "custom-route-request"] },
+				},
+				rpc: {
+					restart: {
+						schema: { request: Schema.Finite, response: Schema.Finite },
+						permission: { write: { allow: ["operator"] } },
+					},
+				},
+				customRoute: {
+					backup: {
+						get: { permission: { write: { allow: ["operator"] } } },
+					},
+				},
+			});
+
+			const granted = extendNamespace(routeBase, {
+				roles: {
+					producer: { permission: ["rpc-call", "custom-route-request"] },
+				},
+			});
+			const grantedRoute = granted.customRoute.backup.get.permission;
+			expect(grantedRoute.write).toEqual({
+				roles: new Set(["operator", "producer"]),
+				rolesDenied: new Set(),
+			});
+			expect(grantedRoute.write).toEqual(granted.rpc.restart.permission.write);
+
+			const vetoed = extendNamespace(granted, {
+				roles: { operator: { permission: [] } },
+			});
+			const vetoedRoute = vetoed.customRoute.backup.get.permission;
+			expect(vetoedRoute.write).toEqual({
+				roles: new Set(["producer"]),
+				rolesDenied: new Set(),
+			});
+			expect(vetoedRoute.write).toEqual(vetoed.rpc.restart.permission.write);
+		});
+
+		test("adds a method to a precedent's custom route", () => {
+			const routeBase = defineNamespace("match", {
+				customRoute: {
+					asset: { get: { permission: { write: { everyone: "allow" } } } },
+				},
+			});
+
+			const extended = extendNamespace(routeBase, {
+				customRoute: {
+					asset: { post: {} },
+				},
+			});
+
+			expect(extended.customRoute.asset.get.permission.write).toEqual({
+				roles: new Set(),
+				rolesDenied: new Set(),
+				everyone: "allow",
+			});
+			expect(extended.customRoute.asset.post.permission.write).toEqual({
+				roles: new Set(),
+				rolesDenied: new Set(),
+			});
+		});
+
+		test("rejects an added custom route name that differs from an existing one only in case", () => {
+			const routeBase = defineNamespace("match", {
+				customRoute: { webhook: { get: {} } },
+			});
+
+			expect(() =>
+				extendNamespace(routeBase, {
+					customRoute: {
+						// @ts-expect-error differs from webhook only in case
+						Webhook: { post: {} },
+					},
+				}),
+			).toThrow(
+				'Custom route "Webhook" in "match" differs from "webhook" only in case',
+			);
+		});
+
+		test("rejects an added custom route name outside the allowed characters", () => {
+			expect(() =>
+				extendNamespace(base, {
+					customRoute: {
+						// @ts-expect-error a slash is not allowed
+						"a/b": { get: {} },
+					},
+				}),
+			).toThrow(
+				'Custom route "a/b" in "match" must use only A-Z, a-z, 0-9, "_" and "-", and not be a Windows device name',
+			);
 		});
 
 		test("re-lists a role to re-bake rpc write, and grants retroactively", () => {

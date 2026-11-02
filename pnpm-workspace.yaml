@@ -30,12 +30,12 @@ allowBuilds:
   msgpackr-extract: false
 
 minimumReleaseAge: 4320
-
 minimumReleaseAgeExclude:
   - "@effect/platform-node-shared@4.1.1"
   - "@effect/platform-node@4.1.1"
   - "@effect/sql-sqlite-node@4.1.1"
   - "@effect/vitest@4.1.1"
   - "effect@4.1.1"
+  - "hono@4.13.16"
 
 verifyDepsBeforeRun: warn

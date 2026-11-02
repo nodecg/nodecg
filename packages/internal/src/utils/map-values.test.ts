@@ -4,9 +4,12 @@ import { describe, expect, expectTypeOf, test } from "vitest";
 
 import {
 	mapEffectValues,
+	mapNestedValues,
 	mapSchemaValues,
 	mapValues,
+	mergeNestedValues,
 	mergeRecords,
+	type NestedValues,
 	zipEffectValues,
 } from "./map-values.ts";
 
@@ -585,6 +588,84 @@ describe("mapSchemaValues", () => {
 			{ bogus: 123 },
 			(value) => [value.schema],
 		);
+	});
+});
+
+describe("mapNestedValues", () => {
+	test("maps each inner value and keeps both key levels", () => {
+		const result = mapNestedValues<number>()(
+			{ a: { x: 1, y: 2 }, b: { z: 3 } },
+			(value, outerKey) => `${outerKey}=${value}`,
+		);
+
+		expect(result).toStrictEqual({
+			a: { x: "a=1", y: "a=2" },
+			b: { z: "b=3" },
+		});
+	});
+
+	test("keeps an optional inner key optional in the type", () => {
+		const input: { readonly a: { readonly x?: number } } = { a: {} };
+
+		const result = mapNestedValues<number>()(input, () => "mapped");
+
+		expectTypeOf(result).toEqualTypeOf<{
+			readonly a: { readonly x?: string };
+		}>();
+		expect(result).toStrictEqual({ a: {} });
+	});
+
+	test("transforms an inner value that is undefined", () => {
+		const result = mapNestedValues<number>()(
+			{ a: { x: 1, y: undefined } },
+			(value) => (value ?? 0) + 1,
+		);
+
+		expectTypeOf(result).toEqualTypeOf<{
+			readonly a: { readonly x: number; readonly y: number };
+		}>();
+		expect(result).toStrictEqual({ a: { x: 2, y: 1 } });
+	});
+
+	test("maps nothing when the input is undefined", () => {
+		const result = mapNestedValues<number>()(undefined, (value) => value);
+
+		expect(result).toStrictEqual({});
+	});
+});
+
+describe("mergeNestedValues", () => {
+	test("passes each side of every inner key to the transform", () => {
+		const base: NestedValues<{ a: { x: unknown; y: unknown } }, number> = {
+			a: { x: 1, y: 2 },
+		};
+
+		const result = mergeNestedValues<boolean>()(
+			base,
+			{ a: { y: true }, b: { z: false } },
+			(baseValue, extra, outerKey) => `${outerKey}:${baseValue}/${extra}`,
+		);
+
+		expectTypeOf(result).toEqualTypeOf<{
+			readonly a: { readonly x: string; readonly y: string };
+			readonly b: { readonly z: string };
+		}>();
+		expect(result).toStrictEqual({
+			a: { x: "a:1/undefined", y: "a:2/true" },
+			b: { z: "b:undefined/false" },
+		});
+	});
+
+	test("transforms every base value when extra is undefined", () => {
+		const base: NestedValues<{ a: { x: unknown } }, number> = { a: { x: 1 } };
+
+		const result = mergeNestedValues<never>()(
+			base,
+			undefined,
+			(value) => (value ?? 0) + 1,
+		);
+
+		expect(result).toStrictEqual({ a: { x: 2 } });
 	});
 });
 

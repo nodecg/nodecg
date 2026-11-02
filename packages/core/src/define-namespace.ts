@@ -19,18 +19,24 @@ import {
 	type FileSafeName,
 	findCaseClash,
 	isFileSafeName,
+	mapNestedValues,
 	mapRpcValues,
 	mapSchemaValues,
 	mapValues,
+	type MergedNestedKeys,
+	mergeNestedValues,
 	mergeRecords,
+	type NestedValues,
 	type UnsafeNameKeys,
 } from "@nodecg-next/internal/utils";
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { type HKT, Option, Record, Schema } from "effect";
+import { type HKT, Option, Record, Schema, String } from "effect";
+import { HttpMethod } from "effect/http";
 
 import { makeCodec, type FieldCodec } from "./field-codec.ts";
 import {
 	computedPermission,
+	customRoutePermission,
 	replicantPermission,
 	rpcPermission,
 	topicPermission,
@@ -65,6 +71,31 @@ export interface RpcFieldManifest<Request, Response> {
 	readonly permission: ResolvedPermission;
 }
 
+type HttpMethodKey = Lowercase<Exclude<HttpMethod.HttpMethod, "TRACE">>;
+
+export type CustomRouteMethod = HttpMethodKey | "*";
+
+export interface CustomRouteManifest {
+	readonly name: string;
+	readonly permission: ResolvedPermission;
+}
+
+type CustomRouteMethodOption<P extends WriteOnlyPermissionArg<string>> = {
+	readonly permission?: P;
+};
+
+type CustomRouteOption<P extends WriteOnlyPermissionArg<string>> =
+	| ({ readonly [M in HttpMethodKey]?: CustomRouteMethodOption<P> } & {
+			readonly "*"?: never;
+	  })
+	| ({ readonly [M in HttpMethodKey]?: never } & {
+			readonly "*": CustomRouteMethodOption<P>;
+	  });
+
+export type WidestCustomRoutes = Readonly<
+	Record<string, CustomRouteOption<WriteOnlyPermissionArg<string>>>
+>;
+
 export type WidestRpcField = {
 	readonly request: unknown;
 	readonly response: unknown;
@@ -95,14 +126,13 @@ export interface NamespaceManifest<
 	Namespace extends string,
 	S extends WidestNamespaceFields,
 	RoleNames extends string,
+	CustomRoutes extends WidestCustomRoutes = WidestCustomRoutes,
 	Children extends WidestChildManifests = WidestChildManifests,
 > {
 	readonly namespace: Namespace;
 	readonly roles: Readonly<
 		Record<RoleNames, NamespaceRole<Namespace, RoleNames>>
 	>;
-	readonly [manifestRolesKey]: RoleRegistry;
-	readonly [manifestChildrenKey]: Children;
 
 	readonly replicant: {
 		[K in keyof S["replicant"] & string]: ReplicantFieldManifest<
@@ -121,6 +151,10 @@ export interface NamespaceManifest<
 			S["rpc"][K]["response"]
 		>;
 	};
+	readonly customRoute: NestedValues<CustomRoutes, CustomRouteManifest>;
+
+	readonly [manifestRolesKey]: RoleRegistry;
+	readonly [manifestChildrenKey]: Children;
 }
 
 type FieldDecoded<S> = S extends Schema.Top
@@ -354,34 +388,42 @@ type FieldPermissionOptions = {
 	};
 };
 
+const validatePermission = (
+	label: string,
+	permission: FieldPermissionOptions["permission"],
+	roles: ReadonlyMap<RoleName, RoleManifest>,
+): void => {
+	for (const operation of ["read", "write"] as const) {
+		const rule = permission?.[operation];
+		if (typeof rule === "undefined") {
+			continue;
+		}
+		for (const principal of UndeniablePrincipalNameSchema.literals) {
+			if (principal in rule) {
+				throw new Error(
+					`Undeniable principal "${principal}" in ${label} ${operation}`,
+				);
+			}
+		}
+		for (const kind of ["allow", "deny"] as const) {
+			for (const token of rule[kind] ?? []) {
+				if (!roles.has(RoleName(token))) {
+					throw new Error(
+						`Unknown role "${token}" in ${label} ${operation}.${kind}`,
+					);
+				}
+			}
+		}
+	}
+};
+
 const validatePermissionTokens = (
 	group: "replicant" | "computed" | "topic" | "rpc",
 	fields: Readonly<Record<string, FieldPermissionOptions>> | undefined,
 	roles: ReadonlyMap<RoleName, RoleManifest>,
 ): void => {
 	for (const [name, field] of Object.entries(fields ?? {})) {
-		for (const operation of ["read", "write"] as const) {
-			const rule = field.permission?.[operation];
-			if (typeof rule === "undefined") {
-				continue;
-			}
-			for (const principal of UndeniablePrincipalNameSchema.literals) {
-				if (principal in rule) {
-					throw new Error(
-						`Undeniable principal "${principal}" in ${group} "${name}" ${operation}`,
-					);
-				}
-			}
-			for (const kind of ["allow", "deny"] as const) {
-				for (const token of rule[kind] ?? []) {
-					if (!roles.has(RoleName(token))) {
-						throw new Error(
-							`Unknown role "${token}" in ${group} "${name}" ${operation}.${kind}`,
-						);
-					}
-				}
-			}
-		}
+		validatePermission(`${group} "${name}"`, field.permission, roles);
 	}
 };
 
@@ -403,6 +445,57 @@ const validateReplicantNames = (
 		throw new Error(
 			`Replicant "${clash.value.name}" in "${namespace}" differs from "${clash.value.clash}" only in case`,
 		);
+	}
+};
+
+const isCustomRouteMethod = Schema.is(
+	Schema.Literals([
+		"*",
+		...Array.from(HttpMethod.all)
+			.filter((method) => method !== "TRACE")
+			.map((method) => String.toLowerCase(method)),
+	]),
+);
+
+const validateCustomRouteNames = (
+	namespace: string,
+	customRoute: Readonly<Record<string, unknown>> | undefined,
+	existing: ReadonlyArray<string>,
+): void => {
+	const names = Object.keys(customRoute ?? {});
+	for (const name of names) {
+		if (!isFileSafeName(name)) {
+			throw new Error(
+				`Custom route "${name}" in "${namespace}" must use only A-Z, a-z, 0-9, "_" and "-", and not be a Windows device name`,
+			);
+		}
+	}
+	const clash = findCaseClash(names, existing);
+	if (Option.isSome(clash)) {
+		throw new Error(
+			`Custom route "${clash.value.name}" in "${namespace}" differs from "${clash.value.clash}" only in case`,
+		);
+	}
+};
+
+const validateCustomRouteMethods = (
+	namespace: string,
+	customRoute: WidestCustomRoutes | undefined,
+	roles: ReadonlyMap<RoleName, RoleManifest>,
+): void => {
+	for (const [name, methods] of Object.entries(customRoute ?? {})) {
+		for (const [key, option] of Object.entries(methods)) {
+			if (!isCustomRouteMethod(key)) {
+				throw new Error(
+					`Custom route "${name}" in "${namespace}" has unknown method "${key}"`,
+				);
+			}
+			validatePermission(
+				`customRoute "${name}" ${key}`,
+				option?.permission,
+				roles,
+			);
+		}
 	}
 };
 
@@ -505,6 +598,10 @@ export function defineNamespace<
 		string,
 		RpcFieldOption<WriteOnlyPermissionArg<DeclaredRoleName>>
 	> = {},
+	const CustomRoute extends Record<
+		string,
+		CustomRouteOption<WriteOnlyPermissionArg<DeclaredRoleName>>
+	> = {},
 	const DeclaredRoleName extends string = never,
 	Children extends WidestChildManifests = {},
 >(
@@ -523,6 +620,9 @@ export function defineNamespace<
 		computed?: FieldOptions<Computed, ReadOnlyPermissionArg<DeclaredRoleName>>;
 		topic?: FieldOptions<Topic, PermissionArg<DeclaredRoleName>>;
 		rpc?: Rpc;
+		customRoute?: CustomRoute &
+			UnsafeNameKeys<CustomRoute> &
+			CaseClashingKeys<CustomRoute>;
 		children?: Children;
 	},
 ): NamespaceManifest<
@@ -534,6 +634,7 @@ export function defineNamespace<
 		rpc: AddedRpcDecoded<Rpc>;
 	},
 	DeclaredRoleName,
+	CustomRoute,
 	Children
 > {
 	if (!isFileSafeName(namespace)) {
@@ -541,7 +642,10 @@ export function defineNamespace<
 			`Namespace "${namespace}" must use only A-Z, a-z, 0-9, "_" and "-", and not be a Windows device name`,
 		);
 	}
+
+	// Check names are file path and URL safe
 	validateReplicantNames(namespace, defineOption.replicant, []);
+	validateCustomRouteNames(namespace, defineOption.customRoute, []);
 
 	const children = defineOption.children ?? ({} as Children);
 
@@ -558,6 +662,11 @@ export function defineNamespace<
 	validatePermissionTokens("computed", defineOption.computed, registry.roles);
 	validatePermissionTokens("topic", defineOption.topic, registry.roles);
 	validatePermissionTokens("rpc", defineOption.rpc, registry.roles);
+	validateCustomRouteMethods(
+		namespace,
+		defineOption.customRoute,
+		registry.roles,
+	);
 
 	const resolve = (
 		capability: RoleCapability,
@@ -621,6 +730,18 @@ export function defineNamespace<
 		),
 	}));
 
+	const declaredRoutes: CustomRoute | undefined = defineOption.customRoute;
+	const customRoute = mapNestedValues<
+		CustomRouteMethodOption<WriteOnlyPermissionArg<DeclaredRoleName>>
+	>()(declaredRoutes, (option, name) => ({
+		name,
+		permission: customRoutePermission(
+			resolve("custom-route-request", option?.permission?.write),
+			namespace,
+			namedRoles,
+		),
+	}));
+
 	return {
 		namespace,
 		roles: Record.map(
@@ -632,6 +753,7 @@ export function defineNamespace<
 		computed,
 		topic,
 		rpc,
+		customRoute,
 		[manifestRolesKey]: registry,
 		[manifestChildrenKey]: children,
 	};
@@ -683,6 +805,7 @@ export function extendNamespace<
 	PTopic extends Record<string, unknown>,
 	PRpc extends WidestRpcFields,
 	PRoleNames extends string,
+	PCustomRoutes extends WidestCustomRoutes,
 	PChildren extends WidestChildManifests,
 	const EReplicant extends Record<
 		string,
@@ -701,6 +824,7 @@ export function extendNamespace<
 		ExtendRpcFieldOption<WriteOnlyPermissionArg<string>>
 	> = {},
 	const ERoleName extends string = never,
+	const ECustomRoute extends WidestCustomRoutes = {},
 	EChildren extends WidestChildManifests = {},
 >(
 	manifest: NamespaceManifest<
@@ -712,6 +836,7 @@ export function extendNamespace<
 			rpc: PRpc;
 		},
 		PRoleNames,
+		PCustomRoutes,
 		PChildren
 	>,
 	extendOptionOrFn:
@@ -727,6 +852,9 @@ export function extendNamespace<
 				readonly computed?: EComputed;
 				readonly topic?: ETopic;
 				readonly rpc?: ERpc;
+				readonly customRoute?: ECustomRoute &
+					UnsafeNameKeys<ECustomRoute> &
+					CaseClashingKeys<ECustomRoute, keyof PCustomRoutes & string>;
 				readonly children?: EChildren &
 					RedeclaredKeys<EChildren, keyof PChildren>;
 		  }
@@ -740,6 +868,7 @@ export function extendNamespace<
 						rpc: PRpc;
 					},
 					PRoleNames,
+					PCustomRoutes,
 					PChildren
 				>,
 		  ) => {
@@ -754,6 +883,9 @@ export function extendNamespace<
 				readonly computed?: EComputed;
 				readonly topic?: ETopic;
 				readonly rpc?: ERpc;
+				readonly customRoute?: ECustomRoute &
+					UnsafeNameKeys<ECustomRoute> &
+					CaseClashingKeys<ECustomRoute, keyof PCustomRoutes & string>;
 				readonly children?: EChildren &
 					RedeclaredKeys<EChildren, keyof PChildren>;
 		  }),
@@ -766,6 +898,7 @@ export function extendNamespace<
 		rpc: Override<PRpc, AddedRpcDecoded<ERpc>>;
 	},
 	PRoleNames | ERoleName,
+	MergedNestedKeys<PCustomRoutes, ECustomRoute>,
 	Override<PChildren, EChildren>
 > {
 	type Extended = {
@@ -777,7 +910,9 @@ export function extendNamespace<
 	type ExtendedManifest = NamespaceManifest<
 		PNamespace,
 		Extended,
-		PRoleNames | ERoleName
+		PRoleNames | ERoleName,
+		MergedNestedKeys<PCustomRoutes, ECustomRoute>,
+		Override<PChildren, EChildren>
 	>;
 
 	const extendOption =
@@ -789,6 +924,11 @@ export function extendNamespace<
 		manifest.namespace,
 		extendOption.replicant,
 		Object.keys(manifest.replicant),
+	);
+	validateCustomRouteNames(
+		manifest.namespace,
+		extendOption.customRoute,
+		Object.keys(manifest.customRoute),
 	);
 
 	const children = mergeRecords<Override<PChildren, EChildren>>(
@@ -809,6 +949,11 @@ export function extendNamespace<
 	validatePermissionTokens("computed", extendOption.computed, registry.roles);
 	validatePermissionTokens("topic", extendOption.topic, registry.roles);
 	validatePermissionTokens("rpc", extendOption.rpc, registry.roles);
+	validateCustomRouteMethods(
+		manifest.namespace,
+		extendOption.customRoute,
+		registry.roles,
+	);
 
 	const resolve = (
 		capability: RoleCapability,
@@ -976,6 +1121,24 @@ export function extendNamespace<
 	}));
 	const rpc = mergeRecords<ExtendedManifest["rpc"]>(rpcRemap, rpcAdded);
 
+	const addedRoutes: ECustomRoute | undefined = extendOption.customRoute;
+	const customRoute = mergeNestedValues<
+		CustomRouteMethodOption<WriteOnlyPermissionArg<string>>
+	>()(manifest.customRoute, addedRoutes, (route, option, name) => ({
+		name,
+		permission: customRoutePermission(
+			typeof route === "undefined"
+				? resolve("custom-route-request", option?.permission?.write)
+				: remap(
+						"custom-route-request",
+						route.permission.write,
+						option?.permission?.write,
+					),
+			manifest.namespace,
+			namedRoles,
+		),
+	}));
+
 	return {
 		namespace: manifest.namespace,
 		roles: {
@@ -986,11 +1149,12 @@ export function extendNamespace<
 				(_, name) => ({ namespace: manifest.namespace, name }),
 			),
 		},
-		[manifestRolesKey]: registry,
-		[manifestChildrenKey]: children,
-		replicant: replicant,
+		replicant,
 		computed,
 		topic,
 		rpc,
+		customRoute,
+		[manifestRolesKey]: registry,
+		[manifestChildrenKey]: children,
 	};
 }

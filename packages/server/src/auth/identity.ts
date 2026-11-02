@@ -3,8 +3,10 @@ import {
 	AnonymousIdentitySchema,
 	type CurrentSessionUser,
 	ServiceAccount,
+	sessionCookieSecurity,
 } from "@nodecg-next/internal";
-import { Array, Effect, Option } from "effect";
+import { Array, Effect, Option, Redacted } from "effect";
+import { HttpApiBuilder, HttpApiSecurity } from "effect/http-api";
 
 import { ConfiguredSuperadmins } from "../configured-superadmins.ts";
 import { ServiceAccountRepositoryService } from "../services/repository/service-account/service-account-repository.ts";
@@ -15,8 +17,19 @@ import { hashSessionToken } from "./session.ts";
 
 export const anonymousIdentity = AnonymousIdentitySchema.make({});
 
+export const readSessionToken = HttpApiBuilder.securityDecode(
+	sessionCookieSecurity,
+).pipe(Effect.map(Redacted.value));
+
+export const readBearerToken = HttpApiBuilder.securityDecode(
+	HttpApiSecurity.bearer,
+).pipe(Effect.map(Redacted.value));
+
 export const resolveSessionCaller = Effect.fn("resolveSessionCaller")(
 	function* (token: string) {
+		if (token.length === 0) {
+			return Option.none();
+		}
 		const sessions = yield* SessionRepositoryService;
 		const superadmins = yield* ConfiguredSuperadmins;
 		const links = yield* RoleLinks;
@@ -47,6 +60,9 @@ export const resolveSessionCaller = Effect.fn("resolveSessionCaller")(
 export const resolveServiceAccountCaller = Effect.fn(
 	"resolveServiceAccountCaller",
 )(function* (token: string) {
+	if (token.length === 0) {
+		return Option.none();
+	}
 	const serviceAccounts = yield* ServiceAccountRepositoryService;
 	const links = yield* RoleLinks;
 	const hash = yield* hashApiKey(token);
@@ -67,3 +83,16 @@ export const resolveServiceAccountCaller = Effect.fn(
 
 export const getSessionIdentity = (caller: CurrentSessionUser["Service"]) =>
 	caller.pipe(Option.getOrElse(() => anonymousIdentity));
+
+export const resolveRequestIdentity = Effect.gen(function* () {
+	const bearer = yield* readBearerToken;
+	if (bearer.length > 0) {
+		const account = yield* resolveServiceAccountCaller(bearer);
+		return account.pipe(Option.getOrElse(() => anonymousIdentity));
+	}
+	return getSessionIdentity(
+		yield* resolveSessionCaller(yield* readSessionToken),
+	);
+}).pipe(
+	Effect.tapCause((cause) => Effect.logError("Caller lookup failed", cause)),
+);

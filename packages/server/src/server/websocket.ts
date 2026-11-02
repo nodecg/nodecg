@@ -10,7 +10,6 @@ import {
 	type ReplicantFieldIdentifier,
 	ReplicantSnapshotMessage,
 	ServerMessage,
-	sessionCookieSecurity,
 	SubscribeRejectedMessage,
 	type TopicFieldIdentifier,
 } from "@nodecg-next/internal";
@@ -22,17 +21,17 @@ import {
 	HashMap,
 	Match,
 	Option,
-	Redacted,
 	Schema,
 	Stream,
 	SynchronizedRef,
 } from "effect";
 import { HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/http";
-import { HttpApiBuilder, HttpApiSecurity } from "effect/http-api";
 import type { Socket } from "effect/socket";
 
 import {
 	getSessionIdentity,
+	readBearerToken,
+	readSessionToken,
 	resolveServiceAccountCaller,
 	resolveSessionCaller,
 } from "../auth/identity.ts";
@@ -314,12 +313,7 @@ export const websocketRoute = HttpRouter.use((router) =>
 			"GET",
 			"/ws/internal",
 			Effect.gen(function* () {
-				const credential = yield* HttpApiBuilder.securityDecode(
-					sessionCookieSecurity,
-				);
-				const value = Redacted.value(credential);
-				const caller =
-					value.length > 0 ? yield* resolveSessionCaller(value) : Option.none();
+				const caller = yield* resolveSessionCaller(yield* readSessionToken);
 				if (Option.isNone(caller) && requireAuth) {
 					return HttpServerResponse.empty({ status: 401 });
 				}
@@ -333,14 +327,9 @@ export const websocketRoute = HttpRouter.use((router) =>
 			"GET",
 			"/ws/v0",
 			Effect.gen(function* () {
-				const credential = yield* HttpApiBuilder.securityDecode(
-					HttpApiSecurity.bearer,
+				const caller = yield* resolveServiceAccountCaller(
+					yield* readBearerToken,
 				);
-				const value = Redacted.value(credential);
-				const caller =
-					value.length > 0
-						? yield* resolveServiceAccountCaller(value)
-						: Option.none();
 				if (Option.isNone(caller)) {
 					return HttpServerResponse.empty({ status: 401 });
 				}

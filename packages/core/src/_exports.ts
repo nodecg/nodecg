@@ -1,6 +1,9 @@
 export {
 	defineNamespace,
 	extendNamespace,
+	type CustomRouteMethod,
+	type CustomRouteManifest,
+	type WidestCustomRoutes,
 	type FieldManifest,
 	type ReplicantFieldManifest,
 	type WidestChildManifests,

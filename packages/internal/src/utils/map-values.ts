@@ -1,4 +1,4 @@
-import { Effect, type HKT } from "effect";
+import { Effect, HashSet, type HKT } from "effect";
 
 import type { WidestFieldSchema } from "./field-schema.ts";
 
@@ -104,13 +104,13 @@ export type AddedSchemas<In> = {
 
 export const mapSchemaValues =
 	<
-		Option extends { readonly schema?: WidestFieldSchema },
+		FieldOption extends { readonly schema?: WidestFieldSchema },
 		G extends HKT.TypeLambda,
 	>() =>
-	<In extends Record<string, Option>>(
+	<In extends Record<string, FieldOption>>(
 		obj: In | undefined,
 		transform: (
-			value: Option & { readonly schema: WidestFieldSchema },
+			value: FieldOption & { readonly schema: WidestFieldSchema },
 			key: string,
 		) => HKT.Kind<G, unknown, never, never, WidestFieldSchema>,
 	): ApplyLambdaToObjectValues<G, AddedSchemas<In>> => {
@@ -149,13 +149,13 @@ export type AddedRpcSchemas<In> = {
 
 export const mapRpcValues =
 	<
-		Option extends { readonly schema?: RpcSchemaSlot },
+		FieldOption extends { readonly schema?: RpcSchemaSlot },
 		G extends HKT.TypeLambda,
 	>() =>
-	<In extends Record<string, Option>>(
+	<In extends Record<string, FieldOption>>(
 		obj: In | undefined,
 		transform: (
-			value: Option & { readonly schema: RpcSchemaSlot },
+			value: FieldOption & { readonly schema: RpcSchemaSlot },
 			key: string,
 		) => HKT.Kind<G, unknown, never, never, RpcSchemaSlot>,
 	): ApplyLambdaToObjectValues<G, AddedRpcSchemas<In>> => {
@@ -175,6 +175,85 @@ export const mapRpcValues =
 		}
 		return result as ApplyLambdaToObjectValues<G, AddedRpcSchemas<In>>;
 	};
+
+export type NestedValues<In, Output> = {
+	readonly [K in keyof In & string]: {
+		readonly [L in keyof In[K]]: Output;
+	};
+};
+
+export const mapNestedValues =
+	<Value>() =>
+	<
+		In extends Readonly<
+			Record<string, Readonly<Record<string, Value | undefined>>>
+		>,
+		Output,
+	>(
+		obj: In | undefined,
+		transform: (value: Value | undefined, outerKey: string) => Output,
+	) =>
+		Object.fromEntries(
+			Object.entries(obj ?? {}).map(([outerKey, inner]) => {
+				const innerEntries = Object.entries(inner).map(
+					([innerKey, value]) =>
+						[innerKey, transform(value, outerKey)] as const,
+				);
+				return [outerKey, Object.fromEntries(innerEntries)] as const;
+			}),
+		) as NestedValues<In, Output>;
+
+export type MergedNestedKeys<Base, Extra> = {
+	readonly [K in (keyof Base | keyof Extra) & string]: {
+		readonly [L in
+			| (K extends keyof Base ? keyof Base[K] : never)
+			| (K extends keyof Extra ? keyof Extra[K] : never)]: never;
+	};
+};
+
+const unionKeys = (left: object, right: object) =>
+	HashSet.union(
+		HashSet.fromIterable(Object.keys(left)),
+		HashSet.fromIterable(Object.keys(right)),
+	);
+
+export const mergeNestedValues =
+	<ExtraValue>() =>
+	<
+		BaseValue,
+		Base extends Readonly<Record<string, Readonly<Record<string, unknown>>>>,
+		Extra extends Readonly<
+			Record<string, Readonly<Record<string, ExtraValue | undefined>>>
+		>,
+		Output,
+	>(
+		base: NestedValues<Base, BaseValue>,
+		extra: Extra | undefined,
+		transform: (
+			baseValue: BaseValue | undefined,
+			extraValue: ExtraValue | undefined,
+			outerKey: string,
+		) => Output,
+	) =>
+		Object.fromEntries(
+			Array.from(unionKeys(base, extra ?? {}), (outerKey) => {
+				const baseRecord: Readonly<
+					Record<string, Readonly<Record<string, BaseValue | undefined>>>
+				> = base;
+				const baseInner = baseRecord[outerKey] ?? {};
+				const extraInner: Readonly<Record<string, ExtraValue | undefined>> =
+					extra?.[outerKey] ?? {};
+				const inner = Array.from(
+					unionKeys(baseInner, extraInner),
+					(innerKey) =>
+						[
+							innerKey,
+							transform(baseInner[innerKey], extraInner[innerKey], outerKey),
+						] as const,
+				);
+				return [outerKey, Object.fromEntries(inner)] as const;
+			}),
+		) as NestedValues<MergedNestedKeys<Base, Extra>, Output>;
 
 // TODO: nowhere near type safe. Result can do anything.
 export function mergeRecords<Result>(

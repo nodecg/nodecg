@@ -42,6 +42,7 @@ import {
 	AuthProviderRegistry,
 } from "./auth/auth-provider.ts";
 import { normalizeRoleLinks, RoleLinks } from "./auth/role-links.ts";
+import { buildCustomRoutes } from "./build-custom-routes.ts";
 import {
 	BuiltNamespaceRegistry,
 	LoadedNamespacesService,
@@ -53,6 +54,7 @@ import {
 	type ImplementedChildren,
 	type ImplementedNamespace,
 	type LoadedNamespace,
+	type OnLoadContext,
 	type WidenedImplementedNamespace,
 } from "./implement-namespace.ts";
 import {
@@ -187,23 +189,18 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 	const loaded = yield* Effect.serviceOption(LoadedNamespacesService);
 	const built = yield* buildNamespace(implemented);
 	const handle = yield* adaptNamespace(built);
+	const ctx: OnLoadContext<S> = {
+		...handle,
+		use: (cross) =>
+			makeCrossNamespaceHandle(contextForUse, registry, loaded, cross),
+	};
 	const onLoad = implemented.impl?.onLoad;
 	const runOnLoad =
 		typeof onLoad === "undefined"
 			? Effect.void
 			: Effect.gen(function* () {
 					const cleanup = yield* Effect.tryPromise({
-						try: async () =>
-							onLoad({
-								...handle,
-								use: (cross) =>
-									makeCrossNamespaceHandle(
-										contextForUse,
-										registry,
-										loaded,
-										cross,
-									),
-							}),
+						try: async () => onLoad(ctx),
 						catch: (error) =>
 							OnLoadError.make({
 								namespace: implemented.manifest.namespace,
@@ -236,6 +233,7 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 				implemented.manifest[manifestRolesKey].roles.keys(),
 			),
 			frontend: implemented.impl?.frontend,
+			customRoute: yield* buildCustomRoutes(implemented, ctx),
 			fields: built,
 		},
 		loaded: handle,

@@ -161,9 +161,29 @@ describe("resolveSessionCaller", () => {
 			expect(caller).toStrictEqual(Option.none());
 		}),
 	);
+
+	test(
+		"resolves nothing for an empty token without a lookup",
+		Effect.gen(function* () {
+			const caller = yield* resolveSessionCaller("");
+
+			expect(caller).toStrictEqual(Option.none());
+			expect(resolve).not.toHaveBeenCalled();
+		}),
+	);
 });
 
 describe("resolveServiceAccountCaller", () => {
+	test(
+		"resolves nothing for an empty token without a lookup",
+		Effect.gen(function* () {
+			const caller = yield* resolveServiceAccountCaller("");
+
+			expect(caller).toStrictEqual(Option.none());
+			expect(resolveByKeyHash).not.toHaveBeenCalled();
+		}),
+	);
+
 	test(
 		"adds linked roles",
 		Effect.gen(function* () {
