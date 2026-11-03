@@ -30,4 +30,5 @@ export {
 	type RoleArg,
 	type RoleCapability,
 	type ResolvedPermission,
+	type WriteOnlyPermissionArg,
 } from "./role.ts";
