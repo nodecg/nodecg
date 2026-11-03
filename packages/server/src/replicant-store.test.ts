@@ -19,6 +19,7 @@ import { afterEach, assert, describe, expect, vi } from "vitest";
 import {
 	ComputedComputeError,
 	type ComputedResult,
+	ReplicantAlreadyRegistered,
 	ReplicantStoreService,
 	type ReplicantFrame,
 	ReplicantLoadError,
@@ -858,6 +859,42 @@ describe("initializeReplicant", () => {
 			expect(error).toMatchObject({ namespace: "ns", name: "a" });
 			assert(Schema.is(DecodeError)(error.cause));
 			expect(repository.write).not.toHaveBeenCalled();
+		}),
+	);
+
+	testStubbed(
+		"fails a duplicate registration as already registered",
+		Effect.gen(function* () {
+			const scope = yield* Scope.make();
+			repository.read.mockReturnValue(Effect.succeed(42));
+			const store = yield* storeIn(scope);
+			yield* store.initializeReplicant("ns", "a", Effect.succeed, 0, true);
+			const invalid = FieldDecodeError.make({
+				fieldName: "a",
+				value: 42,
+				cause: new Error("Expected a string"),
+			});
+			const error = yield* store
+				.initializeReplicant("ns", "a", () => invalid, "", true)
+				.pipe(Effect.flip);
+
+			expect(error).toEqual(
+				ReplicantAlreadyRegistered.make({ namespace: "ns", name: "a" }),
+			);
+		}),
+	);
+
+	testStubbed(
+		"does not read storage for a duplicate registration",
+		Effect.gen(function* () {
+			const scope = yield* Scope.make();
+			const store = yield* storeIn(scope);
+			yield* store.initializeReplicant("ns", "a", Effect.succeed, 0, true);
+			yield* store
+				.initializeReplicant("ns", "a", Effect.succeed, 0, true)
+				.pipe(Effect.flip);
+
+			expect(repository.read).toHaveBeenCalledTimes(1);
 		}),
 	);
 });

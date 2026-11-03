@@ -214,6 +214,10 @@ export class ReplicantStoreService extends Context.Service<ReplicantStoreService
 				defaultValue: Schema.Json,
 				persistent: boolean,
 			) {
+				const key = fieldKey(namespace, name);
+				if (HashMap.has(yield* SynchronizedRef.get(replicants), key)) {
+					return yield* ReplicantAlreadyRegistered.make({ namespace, name });
+				}
 				const persistedValue = persistent
 					? yield* repository.read(namespace, name).pipe(
 							Effect.asSome,
@@ -237,17 +241,8 @@ export class ReplicantStoreService extends Context.Service<ReplicantStoreService
 						),
 				});
 				const replicant = signal(makeLeafValue(initial, 0));
-				yield* SynchronizedRef.updateEffect(replicants, (map) =>
-					Effect.gen(function* () {
-						const key = fieldKey(namespace, name);
-						if (HashMap.has(map, key)) {
-							return yield* ReplicantAlreadyRegistered.make({
-								namespace,
-								name,
-							});
-						}
-						return HashMap.set(map, key, { signal: replicant, persistent });
-					}),
+				yield* SynchronizedRef.update(replicants, (map) =>
+					HashMap.set(map, key, { signal: replicant, persistent }),
 				);
 				if (persistent && Option.isNone(persistedValue)) {
 					yield* repository
