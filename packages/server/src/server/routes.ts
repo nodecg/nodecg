@@ -9,6 +9,7 @@ import {
 } from "../auth/middleware.ts";
 import { ConfiguredSuperadmins } from "../configured-superadmins.ts";
 import { basePathRouter } from "./base-path.ts";
+import { otlpProxyRoute } from "./browser-telemetry.ts";
 import { customRoutes } from "./custom-routes.ts";
 import { frontendRoutes } from "./frontend-serving.ts";
 import { RootApiLive } from "./http-api/build-root-api.ts";
@@ -28,6 +29,7 @@ const services = Layer.mergeAll(
 
 export const routes = Layer.mergeAll(
 	RootApiLive,
+	otlpProxyRoute,
 	websocketRoute,
 	frontendRoutes,
 	customRoutes,

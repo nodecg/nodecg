@@ -1,3 +1,5 @@
+import { createServer } from "node:http";
+
 import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeRuntime from "@effect/platform-node/NodeRuntime";
 import * as NodeServices from "@effect/platform-node/NodeServices";
@@ -10,6 +12,7 @@ import {
 	OperatingSystemService,
 } from "@nodecg-next/server";
 import {
+	Config,
 	ConfigProvider,
 	Effect,
 	Exit,
@@ -33,11 +36,33 @@ const tracer = Tracer.make({
 	},
 });
 
+const bodies: Array<Buffer> = [];
+
+const collector = createServer((request, response) => {
+	const chunks: Array<Buffer> = [];
+	request.on("data", (chunk: Buffer) => {
+		chunks.push(chunk);
+	});
+	request.on("end", () => {
+		bodies.push(Buffer.concat(chunks));
+		response.end();
+	});
+});
+
+const endpoint = await Effect.runPromise(
+	Effect.gen(function* () {
+		return yield* Config.String("OTEL_EXPORTER_OTLP_ENDPOINT");
+	}),
+);
+collector.listen(Number(new URL(endpoint).port));
+
 const isString = Schema.is(Schema.String);
 
 const telemetry = implementNamespace(telemetryManifest, {
 	seedReplicant: { score: () => 0 },
 	implementRpc: {
+		hasExport: (text) =>
+			bodies.some((body) => body.includes("-browser") && body.includes(text)),
 		endedSpans: (name) =>
 			spans.flatMap(({ name: spanName, status, parent, attributes }) => {
 				if (spanName !== name || status._tag !== "Ended") {

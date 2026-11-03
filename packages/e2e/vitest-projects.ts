@@ -20,6 +20,9 @@ export const projects = await Promise.all(
 				port: await getPort(),
 				superadmins: suite.config.superadmins.join(","),
 				baseUrl: `http://localhost:${vitePort}/s/${suite.name}`,
+				otlpEndpoint: suite.config.collector
+					? `http://localhost:${await getPort()}`
+					: "",
 			})),
 		);
 		const proxy = Object.fromEntries(

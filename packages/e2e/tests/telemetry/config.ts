@@ -1,0 +1,1 @@
+export default { collector: true };

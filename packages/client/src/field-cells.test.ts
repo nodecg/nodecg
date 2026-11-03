@@ -13,10 +13,12 @@ import {
 	Context,
 	Effect,
 	Layer,
+	Option,
 	PubSub,
 	Schema,
 	Stream,
 	SubscriptionRef,
+	Tracer,
 } from "effect";
 import { afterEach, describe, expect, onTestFinished, vi } from "vitest";
 
@@ -101,6 +103,31 @@ const ready = (decoded: number, encoded: string, revision: number) =>
 	});
 
 describe("FieldCellsService", () => {
+	test(
+		"sends outside the span that built the cells",
+		Effect.gen(function* () {
+			const hasParent: Array<boolean> = [];
+			channel.send.mockImplementation(() =>
+				Effect.serviceOption(Tracer.ParentSpan).pipe(
+					Effect.map((parent) => {
+						hasParent.push(Option.isSome(parent));
+					}),
+				),
+			);
+			const cells = yield* makeCells.pipe(Effect.withSpan("load"));
+			const cell = yield* cells.replicant(
+				"match",
+				"scoreLeft",
+				namespace.replicant.scoreLeft,
+			);
+
+			observe(cell.signal);
+			yield* waitFor(() => {
+				expect(hasParent).toEqual([false]);
+			});
+		}),
+	);
+
 	test(
 		"subscribes on the first watcher and goes Ready when a publish arrives",
 		Effect.gen(function* () {

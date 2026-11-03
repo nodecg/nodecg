@@ -1,3 +1,4 @@
+import { reportPageErrors } from "@nodecg-next/browser";
 import { loadNodeCG } from "@nodecg-next/client";
 import { describe, expect, onTestFinished, test, vi } from "vitest";
 
@@ -70,6 +71,44 @@ describe("telemetry", () => {
 			);
 			expect(sockets).not.toHaveLength(0);
 			expect(sockets.map(({ failed }) => failed)).not.toContain(true);
+		});
+	});
+
+	test("leaves telemetry posts out of the server's traces", async () => {
+		const { telemetry } = (await load()).namespaces;
+
+		const first = await load();
+		first.reportError(new Error("first post"));
+		first.dispose();
+		await vi.waitFor(async () => {
+			expect(await telemetry.rpc.hasExport.call("first post")).toBe(true);
+		});
+
+		const second = await load();
+		second.reportError(new Error("second post"));
+		second.dispose();
+		await vi.waitFor(async () => {
+			expect(await telemetry.rpc.hasExport.call("second post")).toBe(true);
+		});
+
+		const spans = await telemetry.rpc.endedSpans.call("POST");
+		expect(
+			spans.filter(({ path }) => path?.includes("/telemetry/v1/")),
+		).toEqual([]);
+	});
+
+	test("exports an uncaught page error", async () => {
+		const { telemetry } = (await load()).namespaces;
+		const page = await load();
+		onTestFinished(reportPageErrors(page));
+
+		window.dispatchEvent(
+			new ErrorEvent("error", { error: new Error("uncaught failure") }),
+		);
+		page.dispose();
+
+		await vi.waitFor(async () => {
+			expect(await telemetry.rpc.hasExport.call("uncaught failure")).toBe(true);
 		});
 	});
 });

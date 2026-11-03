@@ -32,6 +32,7 @@ const BackendSchema = Schema.Struct({
 	port: Schema.Int,
 	superadmins: Schema.String,
 	baseUrl: Schema.String,
+	otlpEndpoint: Schema.String,
 });
 export type Backend = typeof BackendSchema.Type;
 
@@ -71,6 +72,7 @@ const forkServer = (backend: Backend, dataDir: string) =>
 					NODECG_BASE_URL: backend.baseUrl,
 					NODECG_DATA_DIR: dataDir,
 					NODECG_SUPERADMINS: backend.superadmins,
+					OTEL_EXPORTER_OTLP_ENDPOINT: backend.otlpEndpoint,
 				},
 				stdio: ["ignore", "inherit", "inherit", "ipc"],
 			});

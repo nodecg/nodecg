@@ -297,11 +297,39 @@ const RolesGroup = HttpApiGroup.make("Roles")
 	)
 	.middleware(AdminTierMiddleware);
 
+export const TelemetrySignal = Schema.Literals(["traces", "logs", "metrics"]);
+
+const TelemetryStatus = Schema.Option(
+	Schema.Struct({
+		serviceName: Schema.String,
+		signals: Schema.Array(TelemetrySignal),
+		compression: Schema.Record(
+			TelemetrySignal,
+			Schema.Literals(["gzip", "none"]),
+		),
+		exportIntervals: Schema.Record(
+			TelemetrySignal,
+			Schema.Option(Schema.DurationFromMillis),
+		),
+		maxBatchSizes: Schema.Struct({
+			traces: Schema.Option(Schema.Int),
+			logs: Schema.Option(Schema.Int),
+		}),
+		metricsTemporality: Schema.Literals(["cumulative", "delta"]),
+		resourceAttributes: Schema.Record(Schema.String, Schema.String),
+	}),
+);
+
+const TelemetryGroup = HttpApiGroup.make("Telemetry").add(
+	HttpApiEndpoint.get("status", "/telemetry", { success: TelemetryStatus }),
+);
+
 export const InternalApi = HttpApi.make("InternalApi")
 	.add(fieldGroup("Field"))
 	.add(AuthenticationGroup)
 	.add(ServiceAccountsGroup)
 	.add(UsersGroup)
 	.add(RolesGroup)
+	.add(TelemetryGroup)
 	.middleware(UserAuthenticationMiddleware)
 	.prefix("/api/internal");

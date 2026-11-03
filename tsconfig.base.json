@@ -127,7 +127,10 @@
 					"lazyEffect": "suggestion",
 					"missedPipeableOpportunity": "suggestion",
 					"newSchemaClass": "suggestion",
-					"preferSchemaOverJson": "suggestion"
+					"preferSchemaOverJson": "suggestion",
+
+					// Off
+					"unstableApiUsage": "off"
 				},
 				"overrides": [
 					{

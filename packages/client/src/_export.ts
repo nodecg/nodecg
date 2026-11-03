@@ -27,6 +27,7 @@ export {
 	type LoadedNodeCG,
 	type LoadNodeCGOptions,
 } from "./load-nodecg.ts";
+export { otlpTelemetry } from "./otlp-telemetry.ts";
 export { type FieldFailure, type TerminalFieldFailure } from "./field-cells.ts";
 export {
 	FieldNotFound,

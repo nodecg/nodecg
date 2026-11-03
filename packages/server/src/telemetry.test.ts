@@ -66,9 +66,7 @@ describe("OtlpTelemetry", () => {
 		"names the service after the project's package.json",
 		Effect.gen(function* () {
 			const fetch = makeFetch();
-			const project = yield* inProject(
-				'{ "name": "@test-scope/package", "version": "1.2.3" }',
-			);
+			const project = yield* inProject('{ "name": "@test-scope/package" }');
 
 			yield* run(
 				telemetry(fetch, { OTEL_EXPORTER_OTLP_ENDPOINT: endpoint }).pipe(
@@ -76,9 +74,7 @@ describe("OtlpTelemetry", () => {
 				),
 			);
 
-			const body = firstBody(fetch);
-			expect(body.includes("@test-scope/package")).toBe(true);
-			expect(body.includes("1.2.3")).toBe(true);
+			expect(firstBody(fetch).includes("@test-scope/package")).toBe(true);
 		}),
 	);
 
@@ -115,7 +111,26 @@ describe("OtlpTelemetry", () => {
 	);
 
 	test(
-		"prefers the operator's service name and version",
+		"prefers the operator's service name",
+		Effect.gen(function* () {
+			const fetch = makeFetch();
+			const project = yield* inProject('{ "name": "@test-scope/package" }');
+
+			yield* run(
+				telemetry(fetch, {
+					OTEL_EXPORTER_OTLP_ENDPOINT: endpoint,
+					OTEL_SERVICE_NAME: "operator-name",
+				}).pipe(Layer.provide(project)),
+			);
+
+			const body = firstBody(fetch);
+			expect(body.includes("operator-name")).toBe(true);
+			expect(body.includes("@test-scope/package")).toBe(false);
+		}),
+	);
+
+	test(
+		"reads the version from the resource attributes",
 		Effect.gen(function* () {
 			const fetch = makeFetch();
 			const project = yield* inProject(
@@ -125,15 +140,12 @@ describe("OtlpTelemetry", () => {
 			yield* run(
 				telemetry(fetch, {
 					OTEL_EXPORTER_OTLP_ENDPOINT: endpoint,
-					OTEL_SERVICE_NAME: "operator-name",
-					OTEL_SERVICE_VERSION: "9.9.9",
+					OTEL_RESOURCE_ATTRIBUTES: "service.version=9.9.9",
 				}).pipe(Layer.provide(project)),
 			);
 
 			const body = firstBody(fetch);
-			expect(body.includes("operator-name")).toBe(true);
 			expect(body.includes("9.9.9")).toBe(true);
-			expect(body.includes("@test-scope/package")).toBe(false);
 			expect(body.includes("1.2.3")).toBe(false);
 		}),
 	);

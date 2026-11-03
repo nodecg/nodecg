@@ -27,6 +27,7 @@ import {
 	type LoadedNamespace,
 	loadNamespaceEffect,
 } from "./load-namespace.ts";
+import { otlpTelemetry } from "./otlp-telemetry.ts";
 import { httpFieldTransport } from "./services/field-transport/http-field-transport.ts";
 import { webSocketMessageChannel } from "./services/message-channel/websocket-message-channel.ts";
 
@@ -38,6 +39,13 @@ export class DuplicateNamespace extends Schema.TaggedError<DuplicateNamespace>()
 		this.namespace === this.clash
 			? `Namespace "${this.namespace}" was loaded twice`
 			: `Namespace "${this.namespace}" differs from "${this.clash}" only in case`;
+}
+
+class ReportedError extends Schema.TaggedError<ReportedError>()(
+	"ReportedError",
+	{ cause: Schema.Defect() },
+) {
+	override readonly message = String(this.cause);
 }
 
 export type LoadNodeCGOptions<
@@ -73,7 +81,7 @@ interface NamespaceHandleLambda extends HKT.TypeLambda {
 	readonly type: NamespaceHandle<this["Target"]>;
 }
 
-export const loadNodeCGEffect = Effect.fn("loadNodeCGEffect")(function* <
+const loadNamespaces = Effect.fnUntraced(function* <
 	Shapes extends Record<string, WidestNamespaceFields>,
 >(options: LoadNodeCGOptions<Shapes>) {
 	const widened: Readonly<
@@ -103,6 +111,16 @@ export const loadNodeCGEffect = Effect.fn("loadNodeCGEffect")(function* <
 	return { namespaces, auth };
 });
 
+export const loadNodeCGEffect = Effect.fnUntraced(function* <
+	Shapes extends Record<string, WidestNamespaceFields>,
+>(options: LoadNodeCGOptions<Shapes>) {
+	const telemetry = yield* Layer.build(otlpTelemetry(options.baseUrl));
+	return yield* loadNamespaces(options).pipe(
+		Effect.withSpan("loadNodeCG"),
+		Effect.provide(telemetry),
+	);
+});
+
 export interface LoadedNodeCG<
 	Shapes extends Record<string, WidestNamespaceFields>,
 > {
@@ -110,6 +128,7 @@ export interface LoadedNodeCG<
 		readonly [K in keyof Shapes & string]: NamespaceHandle<Shapes[K]>;
 	};
 	readonly auth: ReturnType<typeof adaptAuthClient>;
+	readonly reportError: (error: unknown) => void;
 	readonly dispose: () => void;
 }
 
@@ -124,11 +143,13 @@ export async function loadNodeCG<
 			httpFieldTransport(options.baseUrl),
 			webSocketMessageChannel(options.baseUrl),
 			FetchHttpClient.layer,
+			otlpTelemetry(options.baseUrl),
 		).pipe(Layer.provide(Path.layer)),
 	);
 
 	const { namespaces, auth } = await runtime.runPromise(
-		loadNodeCGEffect(options).pipe(
+		loadNamespaces(options).pipe(
+			Effect.withSpan("loadNodeCG"),
 			Scope.provide(runtime.scope),
 			Effect.onError(() => runtime.disposeEffect),
 		),
@@ -139,6 +160,14 @@ export async function loadNodeCG<
 			(built) => adaptNamespace(runtime, built),
 		)(namespaces),
 		auth: adaptAuthClient(runtime, Effect.succeed(auth)),
+		reportError: (error) => {
+			runtime.runFork(
+				ReportedError.make({ cause: error }).pipe(
+					Effect.withSpan("reportError"),
+					Effect.exit,
+				),
+			);
+		},
 		dispose: runtime.dispose,
 	};
 }

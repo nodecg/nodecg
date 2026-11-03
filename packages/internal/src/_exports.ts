@@ -8,6 +8,7 @@ export {
 	MePayload,
 	RoleAssignmentsDocument,
 	SuperadminRevokeRefused,
+	TelemetrySignal,
 	TooManyRequests,
 } from "./api/api-internal.ts";
 export { PublicApi } from "./api/api-v0.ts";

@@ -62,6 +62,10 @@ import {
 	type RegisteredNamespace,
 } from "./namespace-registry.ts";
 import { ReplicantStoreService } from "./replicant-store.ts";
+import {
+	disableTelemetryRouteTracing,
+	OtlpEnvironment,
+} from "./server/browser-telemetry.ts";
 import { makeNodeHttpServer } from "./server/node-http-server.ts";
 import { routes } from "./server/routes.ts";
 import { OperatingSystemService } from "./services/operating-system/operating-system.ts";
@@ -356,6 +360,8 @@ export const loadNodeCGEffect = Effect.fn(
 					Layer.merge(NodeCrypto.layerDigest, NodeCrypto.layerSecureRandom),
 				),
 				Layer.provide(Layer.succeed(UrlParams.CurrentRedactedNames, [/.*/])),
+				Layer.provide(disableTelemetryRouteTracing),
+				Layer.provide(Layer.succeed(OtlpEnvironment, ConfigProvider.fromEnv())),
 			);
 			const contextForServer =
 				yield* Effect.context<Layer.Services<typeof ServerLive>>();

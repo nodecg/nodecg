@@ -29,6 +29,7 @@ import {
 	Result,
 	Schema,
 	Stream,
+	Tracer,
 } from "effect";
 
 import {
@@ -386,6 +387,10 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 				}
 			});
 
+			const dropLoadSpan = Effect.updateContext<never, never>(
+				Context.omit(Tracer.ParentSpan),
+			);
+
 			yield* Effect.forkScoped(
 				Stream.merge(Stream.fromQueue(outbound), channel.status).pipe(
 					Stream.runForEach((next) =>
@@ -395,6 +400,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 							Match.exhaustive,
 						),
 					),
+					dropLoadSpan,
 				),
 			);
 
@@ -470,7 +476,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 						Match.tag("pong", () => Effect.void),
 						Match.exhaustive,
 					),
-				),
+				).pipe(dropLoadSpan),
 			);
 
 			return {

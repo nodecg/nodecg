@@ -23,5 +23,9 @@ export const telemetryManifest = defineNamespace("telemetry", {
 			},
 			permission: { write: { everyone: "allow" } },
 		},
+		hasExport: {
+			schema: { request: Schema.String, response: Schema.Boolean },
+			permission: { write: { everyone: "allow" } },
+		},
 	},
 });

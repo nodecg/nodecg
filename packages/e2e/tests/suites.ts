@@ -5,6 +5,7 @@ import { pathToFileURL } from "node:url";
 export interface SuiteConfig {
 	readonly runtime?: ReadonlyArray<"node" | "browser">;
 	readonly superadmins?: ReadonlyArray<string>;
+	readonly collector?: boolean;
 }
 
 export interface Suite {
@@ -37,6 +38,7 @@ export const scanSuites = async (): Promise<ReadonlyArray<Suite>> => {
 				config: {
 					runtime: ["browser"],
 					superadmins: [],
+					collector: false,
 					...module.default,
 				},
 			};

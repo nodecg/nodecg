@@ -62,6 +62,7 @@ import { RoleRepositoryService } from "../../services/repository/role/role-repos
 import { ServiceAccountRepositoryService } from "../../services/repository/service-account/service-account-repository.ts";
 import { UserRepositoryService } from "../../services/repository/user/user-repository.ts";
 import { TransactionService } from "../../services/transaction/transaction.ts";
+import { BrowserTelemetry } from "../browser-telemetry.ts";
 import { RootApi } from "../root-api.ts";
 import { UrlPath } from "../url-path.ts";
 import {
@@ -627,6 +628,16 @@ const RolesGroupLive = HttpApiBuilder.group(RootApi, "Roles", (handlers) =>
 		),
 );
 
+const TelemetryGroupLive = HttpApiBuilder.group(
+	RootApi,
+	"Telemetry",
+	(handlers) =>
+		Effect.gen(function* () {
+			const status = yield* BrowserTelemetry;
+			return handlers.handle("status", () => Effect.succeed(status));
+		}),
+).pipe(Layer.provide(BrowserTelemetry.layer));
+
 export const InternalGroupsLive = Layer.mergeAll(
 	HttpApiBuilder.group(RootApi, "Field", (handlers) =>
 		handlers
@@ -652,4 +663,5 @@ export const InternalGroupsLive = Layer.mergeAll(
 	ServiceAccountsGroupLive,
 	UsersGroupLive,
 	RolesGroupLive,
+	TelemetryGroupLive,
 );
