@@ -61,7 +61,7 @@ export const makeAuthClient = Effect.fn("makeAuthClient")(function* (
 			params: { id: UserId.make(assignment.userId) },
 			payload: {
 				namespace: assignment.role.namespace,
-				name: RoleName(assignment.role.name),
+				name: RoleName.make(assignment.role.name),
 			},
 		}).pipe(Effect.mapError(requestFailed));
 	});
@@ -73,7 +73,7 @@ export const makeAuthClient = Effect.fn("makeAuthClient")(function* (
 			params: { id: UserId.make(assignment.userId) },
 			payload: {
 				namespace: assignment.role.namespace,
-				name: RoleName(assignment.role.name),
+				name: RoleName.make(assignment.role.name),
 			},
 		}).pipe(Effect.mapError(requestFailed));
 	});

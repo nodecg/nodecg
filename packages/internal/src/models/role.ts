@@ -1,15 +1,13 @@
-import { Brand, Schema } from "effect";
+import { Schema } from "effect";
 
 import { PrincipalNameSchema } from "./principal.ts";
 
-export const RoleNameSchema = Schema.String.pipe(Schema.brand("Role"));
-export type RoleName = typeof RoleNameSchema.Type;
-// TODO: remove and use schema.make()
-export const RoleName = Brand.nominal<RoleName>();
+export const RoleName = Schema.String.pipe(Schema.brand("Role"));
+export type RoleName = typeof RoleName.Type;
 
 export const Role = Schema.Struct({
 	namespace: Schema.String,
-	name: RoleNameSchema,
+	name: RoleName,
 });
 export type Role = typeof Role.Type;
 

@@ -1,9 +1,4 @@
-import {
-	Authentication,
-	Role,
-	RoleNameSchema,
-	UserId,
-} from "@nodecg-next/internal";
+import { Authentication, Role, RoleName, UserId } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
 import { Effect, HashSet, Layer } from "effect";
 import { SecureRandom } from "effect/crypto";
@@ -16,7 +11,7 @@ import { buildClient, findUser, login, loginAdmin, services } from "./setup.ts";
 
 const producer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("producer"),
+	name: RoleName.make("producer"),
 });
 
 const test = testLayer(

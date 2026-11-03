@@ -321,12 +321,12 @@ const writeRule = (
 		return;
 	}
 	if (rule.allow) {
-		access.roles = new Set(rule.allow.map(RoleName));
+		access.roles = new Set(rule.allow.map((name) => RoleName.make(name)));
 		// an allow lifts a denial it names
 		access.rolesDenied = access.rolesDenied.difference(access.roles);
 	}
 	if (rule.deny) {
-		const denied = new Set(rule.deny.map(RoleName));
+		const denied = new Set(rule.deny.map((name) => RoleName.make(name)));
 		access.roles = access.roles.difference(denied);
 		access.rolesDenied = access.rolesDenied.union(denied);
 	}
@@ -407,7 +407,7 @@ const validatePermission = (
 		}
 		for (const kind of ["allow", "deny"] as const) {
 			for (const token of rule[kind] ?? []) {
-				if (!roles.has(RoleName(token))) {
+				if (!roles.has(RoleName.make(token))) {
 					throw new Error(
 						`Unknown role "${token}" in ${label} ${operation}.${kind}`,
 					);
@@ -553,21 +553,21 @@ const declareRoles = (
 				`Role "${key}" cannot be declared: it is granted to a user, never declared by a namespace`,
 			);
 		}
-		const roleName = RoleName(key);
+		const roleName = RoleName.make(key);
 		const existing = roles.get(roleName);
 		const linkedRoles = arg.linkedRoles?.map(({ namespace, name }) => {
 			if (
 				!Object.values(children).some(
 					(child) =>
 						child.namespace === namespace &&
-						child[manifestRolesKey].roles.has(RoleName(name)),
+						child[manifestRolesKey].roles.has(RoleName.make(name)),
 				)
 			) {
 				throw new Error(
 					`Role "${key}" cannot link to "${name}" of "${namespace}": no child declares it`,
 				);
 			}
-			return Role.make({ namespace, name: RoleName(name) });
+			return Role.make({ namespace, name: RoleName.make(name) });
 		});
 		roles.set(roleName, {
 			name: roleName,

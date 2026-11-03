@@ -1,5 +1,5 @@
 import { defineNamespace } from "@nodecg-next/core";
-import { Authentication, Role, RoleNameSchema } from "@nodecg-next/internal";
+import { Authentication, Role, RoleName } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
 import { Effect, HashSet, Layer, Logger, Redacted, Schema } from "effect";
 import { HttpBody } from "effect/http";
@@ -102,11 +102,11 @@ const routeUrl = (name: string) => `http://x/namespaces/show/custom/${name}`;
 
 const operatorRole = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("operator"),
+	name: RoleName.make("operator"),
 });
 const viewerRole = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("viewer"),
+	name: RoleName.make("viewer"),
 });
 
 const admin = Authentication.make({ issuer: "dev", subject: "admin" });

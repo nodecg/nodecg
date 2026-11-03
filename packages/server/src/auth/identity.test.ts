@@ -2,7 +2,7 @@ import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import {
 	Authentication,
 	Role,
-	RoleNameSchema,
+	RoleName,
 	ServiceAccountId,
 	User,
 	UserId,
@@ -35,11 +35,11 @@ const aliceSecondAuthentication = Authentication.make({
 const root = Authentication.make({ issuer: "dev", subject: "root" });
 const viewer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("viewer"),
+	name: RoleName.make("viewer"),
 });
 const uploader = Role.make({
 	namespace: "show-assets",
-	name: RoleNameSchema.make("uploader"),
+	name: RoleName.make("uploader"),
 });
 
 const aliceUser = {

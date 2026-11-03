@@ -1,4 +1,4 @@
-import { Authentication, RoleNameSchema } from "@nodecg-next/internal";
+import { Authentication, RoleName } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
 import { Effect, Layer } from "effect";
 import { SecureRandom } from "effect/crypto";
@@ -16,10 +16,7 @@ import {
 const namespaces = NamespaceRegistryService.layer([
 	{
 		namespace: "show",
-		declaredRoles: new Set([
-			RoleNameSchema.make("viewer"),
-			RoleNameSchema.make("judge"),
-		]),
+		declaredRoles: new Set([RoleName.make("viewer"), RoleName.make("judge")]),
 		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
 	},
 ]);

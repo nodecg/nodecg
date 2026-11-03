@@ -311,7 +311,7 @@ describe("rpc ctx runs as the server identity", () => {
 				subject: "subject",
 			}),
 			displayName: "Operator",
-			roles: [{ namespace: "guarded", name: RoleName("operator") }],
+			roles: [{ namespace: "guarded", name: RoleName.make("operator") }],
 			globalRoles: [],
 		}),
 	);

@@ -3,7 +3,7 @@ import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
 import {
 	Role,
-	RoleNameSchema,
+	RoleName,
 	ServiceAccountId,
 	UserId,
 } from "@nodecg-next/internal";
@@ -55,15 +55,15 @@ const test = testLayer(
 
 const viewer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("viewer"),
+	name: RoleName.make("viewer"),
 });
 const judge = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("judge"),
+	name: RoleName.make("judge"),
 });
 const producer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("producer"),
+	name: RoleName.make("producer"),
 });
 const ghost = ServiceAccountId.make("00000000-0000-4000-8000-0000000000ff");
 
@@ -485,7 +485,7 @@ describe("grantRoles", () => {
 				Array.makeBy(10_923, (index) =>
 					Role.make({
 						namespace: "show",
-						name: RoleNameSchema.make(`role-${index}`),
+						name: RoleName.make(`role-${index}`),
 					}),
 				),
 			);

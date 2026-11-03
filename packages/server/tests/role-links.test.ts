@@ -3,7 +3,7 @@ import {
 	Authentication,
 	manifestRolesKey,
 	Role,
-	RoleNameSchema,
+	RoleName,
 } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
 import { Effect, HashSet, Layer } from "effect";
@@ -26,7 +26,7 @@ const show = defineNamespace("show", {
 
 const operator = Role.make({
 	namespace: show.roles.operator.namespace,
-	name: RoleNameSchema.make(show.roles.operator.name),
+	name: RoleName.make(show.roles.operator.name),
 });
 
 const namespaces = NamespaceRegistryService.layer(

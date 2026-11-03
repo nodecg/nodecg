@@ -1,7 +1,7 @@
 import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
-import { Role, RoleNameSchema, UserId } from "@nodecg-next/internal";
+import { Role, RoleName, UserId } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
 import { Array, Effect, HashSet, Layer } from "effect";
 import { Reactivity } from "effect/reactivity";
@@ -37,15 +37,15 @@ const test = testLayer(
 
 const viewer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("viewer"),
+	name: RoleName.make("viewer"),
 });
 const producer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("producer"),
+	name: RoleName.make("producer"),
 });
 const otherViewer = Role.make({
 	namespace: "other",
-	name: RoleNameSchema.make("viewer"),
+	name: RoleName.make("viewer"),
 });
 
 const createUser = Effect.fn(function* (subject: string) {
@@ -144,7 +144,7 @@ describe("grantRoles", () => {
 				Array.makeBy(10_923, (index) =>
 					Role.make({
 						namespace: "show",
-						name: RoleNameSchema.make(`role-${index}`),
+						name: RoleName.make(`role-${index}`),
 					}),
 				),
 			);

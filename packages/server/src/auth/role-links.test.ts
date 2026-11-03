@@ -1,5 +1,5 @@
 import { defineNamespace } from "@nodecg-next/core";
-import { Role, RoleNameSchema } from "@nodecg-next/internal";
+import { Role, RoleName } from "@nodecg-next/internal";
 import { Equal, HashMap, HashSet, Option } from "effect";
 import { assert, describe, test } from "vitest";
 
@@ -7,23 +7,23 @@ import { expandRoleLinks, normalizeRoleLinks } from "./role-links.ts";
 
 const operator = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("operator"),
+	name: RoleName.make("operator"),
 });
 const uploader = Role.make({
 	namespace: "show-assets",
-	name: RoleNameSchema.make("uploader"),
+	name: RoleName.make("uploader"),
 });
 const archiver = Role.make({
 	namespace: "show-archive",
-	name: RoleNameSchema.make("archiver"),
+	name: RoleName.make("archiver"),
 });
 const player = Role.make({
 	namespace: "show-media",
-	name: RoleNameSchema.make("player"),
+	name: RoleName.make("player"),
 });
 const viewer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("viewer"),
+	name: RoleName.make("viewer"),
 });
 
 describe("normalizeRoleLinks", () => {

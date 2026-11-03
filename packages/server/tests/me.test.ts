@@ -1,21 +1,26 @@
-import { Authentication, Role, RoleNameSchema } from "@nodecg-next/internal";
+import { Authentication, Role, RoleName } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
 import { Effect, HashSet, Layer } from "effect";
 import { describe, expect } from "vitest";
 
 import { NamespaceRegistryService } from "../src/namespace-registry.ts";
 import { UserRepositoryService } from "../src/services/repository/user/user-repository.ts";
-import { buildClient, findUser, login, services } from "./setup.ts";
+import { buildClient, findUser, login, loginAdmin, services } from "./setup.ts";
 
 const producer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("producer"),
+	name: RoleName.make("producer"),
 });
 
 const namespaces = NamespaceRegistryService.layer([
 	{
 		namespace: "show",
-		declaredRoles: new Set([producer.name, RoleNameSchema.make("viewer")]),
+		declaredRoles: new Set([producer.name, RoleName.make("viewer")]),
+		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
+	},
+	{
+		namespace: "other",
+		declaredRoles: new Set([producer.name]),
 		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
 	},
 ]);
@@ -36,7 +41,7 @@ describe("me", () => {
 			expect(res.status).toBe(200);
 			expect(yield* res.json).toStrictEqual({
 				identity: { _tag: "anonymous" },
-				namespaces: { show: { roles: [] } },
+				namespaces: { show: { roles: [] }, other: { roles: [] } },
 			});
 		}),
 	);
@@ -61,7 +66,48 @@ describe("me", () => {
 					roles: [{ namespace: "show", name: "producer" }],
 					globalRoles: [],
 				},
-				namespaces: { show: { roles: ["producer"] } },
+				namespaces: { show: { roles: ["producer"] }, other: { roles: [] } },
+			});
+		}),
+	);
+
+	test(
+		"does not report a held role its namespace does not declare",
+		Effect.gen(function* () {
+			const client = yield* buildClient;
+			const users = yield* UserRepositoryService;
+			const asOperator = yield* login(client, operator);
+			const { id: operatorId } = yield* findUser(operator);
+			yield* users.grantRoles(
+				operatorId,
+				HashSet.make(
+					Role.make({
+						namespace: "show",
+						name: RoleName.make("unrelated"),
+					}),
+				),
+			);
+
+			const res = yield* asOperator.get(meUrl);
+			expect(res.status).toBe(200);
+			expect(yield* res.json).toStrictEqual({
+				identity: expect.anything(),
+				namespaces: { show: { roles: [] }, other: { roles: [] } },
+			});
+		}),
+	);
+
+	test(
+		"reports no declared role for an admin",
+		Effect.gen(function* () {
+			const client = yield* buildClient;
+			const asAdmin = yield* loginAdmin(client, operator);
+
+			const res = yield* asAdmin.get(meUrl);
+			expect(res.status).toBe(200);
+			expect(yield* res.json).toStrictEqual({
+				identity: expect.anything(),
+				namespaces: { show: { roles: [] }, other: { roles: [] } },
 			});
 		}),
 	);

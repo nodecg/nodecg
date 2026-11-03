@@ -68,7 +68,6 @@ export {
 	isUndeclarableRole,
 	Role,
 	RoleName,
-	RoleNameSchema,
 	type UndeclarableRoleName,
 } from "./models/role.ts";
 export { ServiceAccount, ServiceAccountId } from "./models/service-account.ts";

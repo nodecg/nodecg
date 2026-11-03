@@ -75,7 +75,7 @@ const scorer = Layer.succeed(
 		id: UserId.make("scorer"),
 		authentication: Authentication.make({ issuer: "test", subject: "subject" }),
 		displayName: "Scorer",
-		roles: [{ namespace: "ns", name: RoleName("scorer") }],
+		roles: [{ namespace: "ns", name: RoleName.make("scorer") }],
 		globalRoles: [],
 	}),
 );

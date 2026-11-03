@@ -5,7 +5,7 @@ import {
 	Authentication,
 	AuthenticationId,
 	Role,
-	RoleNameSchema,
+	RoleName,
 	UserSessionId,
 } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
@@ -124,11 +124,11 @@ describe("resolve", () => {
 	const bob = Authentication.make({ issuer: "dev", subject: "bob" });
 	const viewer = Role.make({
 		namespace: "show",
-		name: RoleNameSchema.make("viewer"),
+		name: RoleName.make("viewer"),
 	});
 	const producer = Role.make({
 		namespace: "show",
-		name: RoleNameSchema.make("producer"),
+		name: RoleName.make("producer"),
 	});
 
 	test(

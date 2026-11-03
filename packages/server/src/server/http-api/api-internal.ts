@@ -1,9 +1,11 @@
 import { timingSafeEqual } from "node:crypto";
 
+import { getRolesForNamespace } from "@nodecg-next/core";
 import {
 	CurrentIdentity,
 	CurrentSessionUser,
 	CurrentUser,
+	type MePayload,
 	UserDocumentEntry,
 	ServiceAccountDocumentEntry,
 	RoleAssignmentsDocument,
@@ -53,7 +55,6 @@ import {
 } from "../../auth/session.ts";
 import { grantGlobalRole, revokeGlobalRole } from "../../auth/users.ts";
 import { ConfiguredSuperadmins } from "../../configured-superadmins.ts";
-import { listPermissions } from "../../list-permissions.ts";
 import { NamespaceRegistryService } from "../../namespace-registry.ts";
 import { config } from "../../server-config.ts";
 import { AuthenticationRepositoryService } from "../../services/repository/authentication/authentication-repository.ts";
@@ -191,7 +192,18 @@ const AuthenticationGroupLive = HttpApiBuilder.group(
 				.handle("me", () =>
 					Effect.gen(function* () {
 						const identity = yield* CurrentIdentity;
-						return { identity, namespaces: yield* listPermissions(identity) };
+						const { declaredRoles } = yield* NamespaceRegistryService;
+						const namespaces: Record<string, MePayload["namespaces"][string]> =
+							{};
+						for (const [namespace, declared] of declaredRoles) {
+							namespaces[namespace] = {
+								roles: Array.intersection(
+									getRolesForNamespace(identity, namespace),
+									declared,
+								),
+							};
+						}
+						return { identity, namespaces };
 					}).pipe(provideIdentity),
 				)
 				.handle("providers", () =>

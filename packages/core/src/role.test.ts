@@ -72,13 +72,19 @@ const manifest = defineNamespace("match", {
 describe("canRead / canWrite", () => {
 	test("check the caller's roles against the field's read/write set", () => {
 		expect(
-			manifest.replicant.score.permission.canRead(user(RoleName("viewer"))),
+			manifest.replicant.score.permission.canRead(
+				user(RoleName.make("viewer")),
+			),
 		).toBe(true);
 		expect(
-			manifest.replicant.score.permission.canWrite(user(RoleName("viewer"))),
+			manifest.replicant.score.permission.canWrite(
+				user(RoleName.make("viewer")),
+			),
 		).toBe(false);
 		expect(
-			manifest.replicant.score.permission.canWrite(user(RoleName("judge"))),
+			manifest.replicant.score.permission.canWrite(
+				user(RoleName.make("judge")),
+			),
 		).toBe(true);
 	});
 
@@ -96,16 +102,18 @@ describe("canRead / canWrite", () => {
 			id: UserId.make("3"),
 			authentication,
 			displayName: "judge",
-			roles: [{ namespace: "other", name: RoleName("judge") }],
+			roles: [{ namespace: "other", name: RoleName.make("judge") }],
 			globalRoles: [],
 		});
 		expect(manifest.replicant.score.permission.canRead(foreign)).toBe(false);
 		expect(manifest.replicant.score.permission.canWrite(foreign)).toBe(false);
 		expect(
-			manifest.replicant.score.permission.canRead(user(RoleName("judge"))),
+			manifest.replicant.score.permission.canRead(user(RoleName.make("judge"))),
 		).toBe(true);
 		expect(
-			manifest.replicant.score.permission.canWrite(user(RoleName("judge"))),
+			manifest.replicant.score.permission.canWrite(
+				user(RoleName.make("judge")),
+			),
 		).toBe(true);
 	});
 
@@ -123,24 +131,24 @@ describe("canRead / canWrite", () => {
 	test("a service account's assigned roles are enforced like a user's", () => {
 		expect(
 			manifest.replicant.score.permission.canRead(
-				serviceAccount(RoleName("viewer")),
+				serviceAccount(RoleName.make("viewer")),
 			),
 		).toBe(true);
 		expect(
 			manifest.replicant.score.permission.canWrite(
-				serviceAccount(RoleName("viewer")),
+				serviceAccount(RoleName.make("viewer")),
 			),
 		).toBe(false);
 		expect(
 			manifest.replicant.score.permission.canWrite(
-				serviceAccount(RoleName("judge")),
+				serviceAccount(RoleName.make("judge")),
 			),
 		).toBe(true);
 	});
 
 	test("computed fields are never writable, not even for an admin", () => {
 		expect(
-			manifest.computed.total.permission.canRead(user(RoleName("viewer"))),
+			manifest.computed.total.permission.canRead(user(RoleName.make("viewer"))),
 		).toBe(true);
 		expect(
 			manifest.computed.total.permission.canWrite(adminTier("superadmin")),
@@ -159,7 +167,9 @@ describe("canRead / canWrite", () => {
 			manifest.replicant.config.permission.canWrite(adminTier("admin")),
 		).toBe(true);
 		expect(
-			manifest.replicant.config.permission.canWrite(user(RoleName("judge"))),
+			manifest.replicant.config.permission.canWrite(
+				user(RoleName.make("judge")),
+			),
 		).toBe(false);
 	});
 
@@ -175,7 +185,7 @@ describe("canRead / canWrite", () => {
 		});
 
 		expect(
-			members.replicant.lounge.permission.canRead(user(RoleName("judge"))),
+			members.replicant.lounge.permission.canRead(user(RoleName.make("judge"))),
 		).toBe(true);
 		expect(members.replicant.lounge.permission.canRead(anonymous)).toBe(false);
 
@@ -183,7 +193,9 @@ describe("canRead / canWrite", () => {
 			roles: { auditor: { permission: [] } },
 		});
 		expect(
-			extended.replicant.lounge.permission.canRead(user(RoleName("auditor"))),
+			extended.replicant.lounge.permission.canRead(
+				user(RoleName.make("auditor")),
+			),
 		).toBe(true);
 	});
 });
@@ -199,7 +211,7 @@ describe("principals as capability bases", () => {
 	test("an everyone base admits every caller without a field rule", () => {
 		expect(based.computed.total.permission.canRead(anonymous)).toBe(true);
 		expect(
-			based.computed.total.permission.canRead(user(RoleName("judge"))),
+			based.computed.total.permission.canRead(user(RoleName.make("judge"))),
 		).toBe(true);
 	});
 
@@ -252,10 +264,12 @@ describe("deny beats a wildcard grant", () => {
 
 	test("an explicit deny excludes a caller the wildcard would have admitted", () => {
 		expect(
-			wildcard.replicant.open.permission.canRead(user(RoleName("viewer"))),
+			wildcard.replicant.open.permission.canRead(user(RoleName.make("viewer"))),
 		).toBe(true);
 		expect(
-			wildcard.replicant.hidden.permission.canRead(user(RoleName("viewer"))),
+			wildcard.replicant.hidden.permission.canRead(
+				user(RoleName.make("viewer")),
+			),
 		).toBe(false);
 		expect(wildcard.replicant.hidden.permission.canRead(anonymous)).toBe(true);
 	});
@@ -273,7 +287,7 @@ describe("deny beats a wildcard grant", () => {
 
 		expect(sealed.replicant.audit.permission.canRead(anonymous)).toBe(false);
 		expect(
-			sealed.replicant.audit.permission.canRead(user(RoleName("viewer"))),
+			sealed.replicant.audit.permission.canRead(user(RoleName.make("viewer"))),
 		).toBe(false);
 		expect(sealed.replicant.audit.permission.canRead(adminTier("admin"))).toBe(
 			true,
@@ -289,7 +303,7 @@ describe("isAdminTier", () => {
 	});
 
 	test("fails for a named role, anonymous, and server", () => {
-		expect(isAdminTier(user(RoleName("judge")))).toBe(false);
+		expect(isAdminTier(user(RoleName.make("judge")))).toBe(false);
 		expect(isAdminTier(anonymous)).toBe(false);
 		expect(isAdminTier(server)).toBe(false);
 	});
@@ -297,16 +311,18 @@ describe("isAdminTier", () => {
 
 describe("getRolesForNamespace", () => {
 	test("projects the roles a user and a service account hold in the namespace", () => {
-		expect(getRolesForNamespace(user(RoleName("judge")), "match")).toEqual([
-			RoleName("judge"),
-		]);
+		expect(getRolesForNamespace(user(RoleName.make("judge")), "match")).toEqual(
+			[RoleName.make("judge")],
+		);
 		expect(
-			getRolesForNamespace(serviceAccount(RoleName("viewer")), "match"),
-		).toEqual([RoleName("viewer")]);
+			getRolesForNamespace(serviceAccount(RoleName.make("viewer")), "match"),
+		).toEqual([RoleName.make("viewer")]);
 	});
 
 	test("is empty for a namespace the holder has no role in", () => {
-		expect(getRolesForNamespace(user(RoleName("judge")), "other")).toEqual([]);
+		expect(getRolesForNamespace(user(RoleName.make("judge")), "other")).toEqual(
+			[],
+		);
 	});
 
 	test("is empty for anonymous and server", () => {

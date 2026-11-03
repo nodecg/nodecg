@@ -110,7 +110,7 @@ describe("make", () => {
 			const db = yield* DrizzleSqliteDatabaseService.make(":memory:");
 			const alice = AccountId.make("1");
 			const bob = AccountId.make("2");
-			const viewer = RoleName("viewer");
+			const viewer = RoleName.make("viewer");
 			yield* db.insert(accounts).values([
 				{ id: alice, displayName: "Alice", createdAt: 0 },
 				{ id: bob, displayName: "Bob", createdAt: 0 },

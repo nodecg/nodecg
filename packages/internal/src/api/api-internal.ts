@@ -19,7 +19,7 @@ import {
 	GlobalRoleName,
 	isUndeclarableRole,
 	Role,
-	RoleNameSchema,
+	RoleName,
 } from "../models/role.ts";
 import { ServiceAccountId } from "../models/service-account.ts";
 import { UserId } from "../models/user.ts";
@@ -41,7 +41,7 @@ export class SuperadminRevokeRefused extends Schema.TaggedError<SuperadminRevoke
 ) {}
 
 const NamespacePermissionsSchema = Schema.Struct({
-	roles: Schema.Array(RoleNameSchema),
+	roles: Schema.Array(RoleName),
 });
 export const MePayload = Schema.Struct({
 	identity: Identity,
@@ -116,7 +116,7 @@ const AuthenticationGroup = HttpApiGroup.make("Authentication")
 		),
 	);
 
-const DeclarableRoleName = RoleNameSchema.check(
+const DeclarableRoleName = RoleName.check(
 	Schema.makeFilter((name) =>
 		isUndeclarableRole(name) ? `role "${name}" cannot be assigned` : undefined,
 	),

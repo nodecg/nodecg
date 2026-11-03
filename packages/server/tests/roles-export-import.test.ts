@@ -2,7 +2,7 @@ import {
 	Authentication,
 	Role,
 	RoleAssignmentsDocument,
-	RoleNameSchema,
+	RoleName,
 	ServiceAccountDocumentEntry,
 	ServiceAccountId,
 	UserDocumentEntry,
@@ -26,15 +26,15 @@ import {
 
 const producer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("producer"),
+	name: RoleName.make("producer"),
 });
 const viewer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("viewer"),
+	name: RoleName.make("viewer"),
 });
 const judge = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("judge"),
+	name: RoleName.make("judge"),
 });
 
 const test = testLayer(

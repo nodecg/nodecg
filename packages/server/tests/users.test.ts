@@ -1,4 +1,4 @@
-import { Authentication, Role, RoleNameSchema } from "@nodecg-next/internal";
+import { Authentication, Role, RoleName } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
 import { ConfigProvider, Effect, HashMap, HashSet, Layer } from "effect";
 import { describe, expect } from "vitest";
@@ -41,7 +41,7 @@ const admin = Authentication.make({ issuer: "dev", subject: "admin" });
 
 const viewer = Role.make({
 	namespace: "show",
-	name: RoleNameSchema.make("viewer"),
+	name: RoleName.make("viewer"),
 });
 
 describe("list", () => {

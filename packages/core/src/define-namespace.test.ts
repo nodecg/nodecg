@@ -944,7 +944,8 @@ describe("defineNamespace", () => {
 			});
 
 			expect(
-				show[manifestRolesKey].roles.get(RoleName("operator"))?.linkedRoles,
+				show[manifestRolesKey].roles.get(RoleName.make("operator"))
+					?.linkedRoles,
 			).toStrictEqual([{ namespace: "show-assets", name: "uploader" }]);
 		});
 
@@ -1655,10 +1656,10 @@ describe("extendNamespace", () => {
 			});
 
 			const { roles } = extended[manifestRolesKey];
-			expect(roles.get(RoleName("operator"))?.linkedRoles).toStrictEqual([
+			expect(roles.get(RoleName.make("operator"))?.linkedRoles).toStrictEqual([
 				{ namespace: "show-assets", name: "uploader" },
 			]);
-			expect(roles.get(RoleName("director"))?.linkedRoles).toStrictEqual([
+			expect(roles.get(RoleName.make("director"))?.linkedRoles).toStrictEqual([
 				{ namespace: "show-assets", name: "uploader" },
 				{ namespace: "show-media", name: "player" },
 			]);
@@ -1670,7 +1671,8 @@ describe("extendNamespace", () => {
 			});
 
 			expect(
-				extended[manifestRolesKey].roles.get(RoleName("operator"))?.linkedRoles,
+				extended[manifestRolesKey].roles.get(RoleName.make("operator"))
+					?.linkedRoles,
 			).toStrictEqual([{ namespace: "show-assets", name: "uploader" }]);
 		});
 
@@ -1683,7 +1685,8 @@ describe("extendNamespace", () => {
 			});
 
 			expect(
-				extended[manifestRolesKey].roles.get(RoleName("operator"))?.linkedRoles,
+				extended[manifestRolesKey].roles.get(RoleName.make("operator"))
+					?.linkedRoles,
 			).toStrictEqual([{ namespace: "show-media", name: "player" }]);
 		});
 
