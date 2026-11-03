@@ -239,8 +239,18 @@ export const websocketRoute = HttpRouter.use((router) =>
 				if (typeof data !== "string") {
 					return;
 				}
-				const message = yield* decodeClientMessage(data);
-				yield* Match.value(message).pipe(
+				const message = yield* decodeClientMessage(data).pipe(
+					Effect.asSome,
+					Effect.catchTag("SchemaError", (error) =>
+						Effect.logError("Failed to decode incoming message:", error).pipe(
+							Effect.as(Option.none()),
+						),
+					),
+				);
+				if (Option.isNone(message)) {
+					return;
+				}
+				yield* Match.value(message.value).pipe(
 					Match.tag("ping", () =>
 						Effect.gen(function* () {
 							yield* Effect.logDebug("Received ping");
