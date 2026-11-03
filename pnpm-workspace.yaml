@@ -3,9 +3,9 @@ packages:
   - examples/*
 
 catalog:
-  "@effect/platform-node": ~4.1.1
-  "@effect/sql-sqlite-node": ~4.1.1
-  "@effect/vitest": ~4.1.1
+  "@effect/platform-node": 4.1.2
+  "@effect/sql-sqlite-node": 4.1.2
+  "@effect/vitest": 4.1.2
   "@preact/signals-core": ^1.14.4
   "@standard-schema/spec": ^1.1.0
   "@types/node": "^24.13.3"
@@ -14,7 +14,7 @@ catalog:
   "@vitejs/plugin-react": ^6.0.3
   "@vitest/browser-playwright": ^5.0.0
   "@vitest/browser": ^5.0.0
-  "effect": ~4.1.1
+  "effect": 4.1.2
   "oauth2-mock-server": ^9.1.0
   "playwright": ^1.61.1
   "react-dom": ^19.2.7
@@ -31,11 +31,12 @@ allowBuilds:
 
 minimumReleaseAge: 4320
 minimumReleaseAgeExclude:
-  - "@effect/platform-node-shared@4.1.1"
-  - "@effect/platform-node@4.1.1"
-  - "@effect/sql-sqlite-node@4.1.1"
-  - "@effect/vitest@4.1.1"
-  - "effect@4.1.1"
+  - "@effect/platform-node-shared@4.1.2"
+  - "@effect/platform-node@4.1.2"
+  - "@effect/sql-sqlite-node@4.1.2"
+  - "@effect/vitest@4.1.2"
+  - "effect@4.1.2"
   - "hono@4.13.16"
+  - "ws@8.22.1"
 
 verifyDepsBeforeRun: warn

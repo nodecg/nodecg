@@ -7,14 +7,14 @@ settings:
 catalogs:
   default:
     '@effect/platform-node':
-      specifier: ~4.1.1
-      version: 4.1.1
+      specifier: 4.1.2
+      version: 4.1.2
     '@effect/sql-sqlite-node':
-      specifier: ~4.1.1
-      version: 4.1.1
+      specifier: 4.1.2
+      version: 4.1.2
     '@effect/vitest':
-      specifier: ~4.1.1
-      version: 4.1.1
+      specifier: 4.1.2
+      version: 4.1.2
     '@preact/signals-core':
       specifier: ^1.14.4
       version: 1.14.4
@@ -40,8 +40,8 @@ catalogs:
       specifier: ^5.0.0
       version: 5.0.0
     effect:
-      specifier: ~4.1.1
-      version: 4.1.1
+      specifier: 4.1.2
+      version: 4.1.2
     oauth2-mock-server:
       specifier: ^9.1.0
       version: 9.1.0
@@ -124,7 +124,7 @@ importers:
         version: link:../../packages/server
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
       react:
         specifier: 'catalog:'
         version: 19.2.7
@@ -170,7 +170,7 @@ importers:
         version: link:../plugin-time
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
       react:
         specifier: 'catalog:'
         version: 19.2.7
@@ -204,7 +204,7 @@ importers:
         version: link:../../packages/server
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -220,7 +220,7 @@ importers:
         version: link:../../packages/server
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -273,7 +273,7 @@ importers:
         version: link:../internal
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
     devDependencies:
       vitest:
         specifier: 'catalog:'
@@ -292,14 +292,14 @@ importers:
         version: 1.14.4
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
       type-fest:
         specifier: 'catalog:'
         version: 5.8.0
     devDependencies:
       '@effect/vitest':
         specifier: 'catalog:'
-        version: 4.1.1(effect@4.1.1)(vitest@5.0.0)
+        version: 4.1.2(effect@4.1.2)(vitest@5.0.0)
       '@nodecg-next/test-utils':
         specifier: workspace:*
         version: link:../test-utils
@@ -332,7 +332,7 @@ importers:
         version: 0.3.0
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
       type-fest:
         specifier: 'catalog:'
         version: 5.8.0
@@ -342,7 +342,7 @@ importers:
     devDependencies:
       '@effect/vitest':
         specifier: 'catalog:'
-        version: 4.1.1(effect@4.1.1)(vitest@5.0.0)
+        version: 4.1.2(effect@4.1.2)(vitest@5.0.0)
       '@vitest/browser':
         specifier: 'catalog:'
         version: 5.0.0(vite@8.2.2(@types/node@24.13.3)(jiti@2.7.0)(yaml@2.9.0))(vitest@5.0.0)
@@ -363,7 +363,7 @@ importers:
     devDependencies:
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 4.1.1(effect@4.1.1)(redis@6.2.1)
+        version: 4.1.2(effect@4.1.2)(redis@6.2.1)
       '@nodecg-next/browser':
         specifier: workspace:*
         version: link:../browser
@@ -390,7 +390,7 @@ importers:
         version: 5.0.0(playwright@1.61.1)(vite@8.2.2(@types/node@24.13.3)(jiti@2.7.0)(yaml@2.9.0))(vitest@5.0.0)
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
       express:
         specifier: ^5.3.0
         version: 5.3.0
@@ -423,7 +423,7 @@ importers:
         version: 1.1.0
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
       fast-json-stable-stringify:
         specifier: ^2.1.0
         version: 2.1.0
@@ -442,7 +442,7 @@ importers:
     devDependencies:
       '@effect/vitest':
         specifier: 'catalog:'
-        version: 4.1.1(effect@4.1.1)(vitest@5.0.0)
+        version: 4.1.2(effect@4.1.2)(vitest@5.0.0)
       '@types/murmurhash3js-revisited':
         specifier: ^3.0.3
         version: 3.0.3
@@ -463,10 +463,10 @@ importers:
     dependencies:
       '@effect/platform-node':
         specifier: 'catalog:'
-        version: 4.1.1(effect@4.1.1)(redis@6.2.1)
+        version: 4.1.2(effect@4.1.2)(redis@6.2.1)
       '@effect/sql-sqlite-node':
         specifier: 'catalog:'
-        version: 4.1.1(effect@4.1.1)
+        version: 4.1.2(effect@4.1.2)
       '@nodecg-next/core':
         specifier: workspace:*
         version: link:../core
@@ -478,10 +478,10 @@ importers:
         version: 1.14.4
       drizzle-orm:
         specifier: 1.0.0-rc.5
-        version: 1.0.0-rc.5(@effect/sql-sqlite-node@4.1.1(effect@4.1.1))(effect@4.1.1)(typebox@1.3.35)(zod@4.6.5)
+        version: 1.0.0-rc.5(@effect/sql-sqlite-node@4.1.2(effect@4.1.2))(effect@4.1.2)(typebox@1.3.35)(zod@4.6.5)
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
       openid-client:
         specifier: ^6.8.4
         version: 6.8.4
@@ -491,7 +491,7 @@ importers:
     devDependencies:
       '@effect/vitest':
         specifier: 'catalog:'
-        version: 4.1.1(effect@4.1.1)(vitest@5.0.0)
+        version: 4.1.2(effect@4.1.2)(vitest@5.0.0)
       '@nodecg-next/test-utils':
         specifier: workspace:*
         version: link:../test-utils
@@ -500,7 +500,7 @@ importers:
         version: 24.13.3
       drizzle-kit:
         specifier: 1.0.0-rc.5
-        version: 1.0.0-rc.5(drizzle-orm@1.0.0-rc.5(@effect/sql-sqlite-node@4.1.1(effect@4.1.1))(effect@4.1.1)(typebox@1.3.35)(zod@4.6.5))
+        version: 1.0.0-rc.5(drizzle-orm@1.0.0-rc.5(@effect/sql-sqlite-node@4.1.2(effect@4.1.2))(effect@4.1.2)(typebox@1.3.35)(zod@4.6.5))
       oauth2-mock-server:
         specifier: 'catalog:'
         version: 9.1.0
@@ -518,10 +518,10 @@ importers:
     dependencies:
       '@effect/vitest':
         specifier: 'catalog:'
-        version: 4.1.1(effect@4.1.1)(vitest@5.0.0)
+        version: 4.1.2(effect@4.1.2)(vitest@5.0.0)
       effect:
         specifier: 'catalog:'
-        version: 4.1.1
+        version: 4.1.2
     devDependencies:
       vitest:
         specifier: 'catalog:'
@@ -612,23 +612,23 @@ packages:
   '@dmsnell/diff-match-patch@1.1.0':
     resolution: {integrity: sha512-yejLPmM5pjsGvxS9gXablUSbInW7H976c/FJ4iQxWIm7/38xBySRemTPDe34lhg1gVLbJntX0+sH0jYfU+PN9A==}
 
-  '@effect/platform-node-shared@4.1.1':
-    resolution: {integrity: sha512-29zdEDs3i5W+t92+mWTFNSfzSHsTpZMcFZ9k4lkkz4tETlC1m4lRwjdjieJtvQ/bKHMnYrCtZwizsBFSf3L5Yg==}
+  '@effect/platform-node-shared@4.1.2':
+    resolution: {integrity: sha512-wSwl9A/G1hcVvF8nLI+YfB3EyOIDvWS6+lsTZBkmgDnPBL7m8YWZF+1HD+mdEsb52SUGfukip46Q3gRwSdk3QA==}
     engines: {node: '>=22.19.0'}
     peerDependencies:
-      effect: ^4.1.1
+      effect: ^4.1.2
 
-  '@effect/platform-node@4.1.1':
-    resolution: {integrity: sha512-Oy3eP27XeipUgejftptHy0zf2W75HU8/yPKwBqdz8uYxAvWdf4c48OFYs6KJX/+uIEKdMjnF6mXYgbauWgIcVA==}
+  '@effect/platform-node@4.1.2':
+    resolution: {integrity: sha512-ye0UjxORdd5Qu3paZ1LljgGOALWHt7muP9VTpjUSCNfcesiB/Hm7wPJIvZeu4gnwpTe5BtEnO1VHngWqjJp8mA==}
     engines: {node: '>=22.19.0'}
     peerDependencies:
-      effect: ^4.1.1
+      effect: ^4.1.2
       redis: '>=5.1.0 <7.0.0'
 
-  '@effect/sql-sqlite-node@4.1.1':
-    resolution: {integrity: sha512-vg4ZuqrVN2no19hQnueU0APEbzpSeJ58TMMcqZUek9k2LtfVVhmSOsAgPnkNS37NmQnfXoAHkMY1ZjZBt48D8A==}
+  '@effect/sql-sqlite-node@4.1.2':
+    resolution: {integrity: sha512-fTmI8Ol1Lf8rGITtdIW285nuT9G46ETOPZ48CxlZ7vkfWDYgipYnH0dILxPGcZ6f/BMLeybmLRKKBcRWStShfQ==}
     peerDependencies:
-      effect: ^4.1.1
+      effect: ^4.1.2
 
   '@effect/tsgo-darwin-arm64@0.56.0':
     resolution: {integrity: sha512-08yYRU3OOw/jKzy582EF741xKvLJ2HK6GO+L2zuSR97b61ES7fER2fxg1xp4mv8u2Fc3bBRvk7026GzdKEGFgw==}
@@ -669,10 +669,10 @@ packages:
     resolution: {integrity: sha512-/S5G8RJjtaVjE/RhwFNTvWQwFAQyDGc+3Ig4Oynvlo3gJu8le4MUgM/DBjoiwkwBsQ+BhufGDCBpwojplerGlw==}
     hasBin: true
 
-  '@effect/vitest@4.1.1':
-    resolution: {integrity: sha512-VkE9EUXE4G7mXMmV3X3Iu+6k3pZswWjOf7PB2qiaHMoFAZAPtHp+eUZo9oJM4Ip5z+ghQ9K0IDAQM2iG6+w5MA==}
+  '@effect/vitest@4.1.2':
+    resolution: {integrity: sha512-JJPwAHkJHxvM/woW9mMW/khjasAHcmwWdOMAgMy16rfqsxcVhFDnrRsvN9VI2+kMv8zDCCyBE2q1n5hzZlfE0w==}
     peerDependencies:
-      effect: ^4.1.1
+      effect: ^4.1.2
       vitest: '>=5.0.0 <6.0.0'
 
   '@hey-api/spec-types@0.2.0':
@@ -1690,8 +1690,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  effect@4.1.1:
-    resolution: {integrity: sha512-XYu65BrcmNqu5i7PPvP4dqL+R5ma37zIsfuSPjcn78mog+6e5PkilNg7Xo+pBpjXJYlWEIpH4j91tMrfW05CMw==}
+  effect@4.1.2:
+    resolution: {integrity: sha512-d3Oah1WyKxFLFh19yWheS5IXIVaITzxZ71JkE1rkUozq/6EcJSU5nPk5bF2QrSygZ3SQoiNQB8TsxFriyMeMaQ==}
 
   empathic@2.1.0:
     resolution: {integrity: sha512-AnfC1ATldl49/cvZdLPDjBfrRNwbDO05aibiOtzQu3qtlbJtomNLhF30HEtn/7iBz50dlMECqATo3fG0LrdEgw==}
@@ -2330,8 +2330,8 @@ packages:
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
-  undici@8.12.2:
-    resolution: {integrity: sha512-XtuDWVdqTLr3NAxm2ly9/hU6kUsJOgGh1RASzMBbsw6aWCOaQzHdW+QQDfdERjfJ2V5vL5pRPa4RetO9UfivDg==}
+  undici@8.12.3:
+    resolution: {integrity: sha512-+fdndUTwBP86cVjihTp21hZHo7d6oj1c/47XPA3lL8mM0XHs+C4EkcjmgRsFnFk2f/UONGDy9ItBItmXsLOQHw==}
     engines: {node: '>=22.19.0'}
 
   unpipe@1.0.0:
@@ -2450,8 +2450,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.22.0:
-    resolution: {integrity: sha512-Ydggc987+RO0AnWtZ/7Wq9FtNvcrL1b/RO0ud9mWjUPgDrsAAwQSF51sm2hm1XofbU/4jkpGEsLFsZZxU+1DOg==}
+  ws@8.22.1:
+    resolution: {integrity: sha512-oyL6OPYme/CmiFvNuGzeoxCJ4nOrZE2O1FwM9MWM1AsGri6nLXB2pg+lNA8aLeXMSav0J6eIVS1j6vUPzUtK9g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -2617,28 +2617,28 @@ snapshots:
 
   '@dmsnell/diff-match-patch@1.1.0': {}
 
-  '@effect/platform-node-shared@4.1.1(effect@4.1.1)':
+  '@effect/platform-node-shared@4.1.2(effect@4.1.2)':
     dependencies:
       '@types/ws': 8.18.2
-      effect: 4.1.1
-      ws: 8.22.0
+      effect: 4.1.2
+      ws: 8.22.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@effect/platform-node@4.1.1(effect@4.1.1)(redis@6.2.1)':
+  '@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.2.1)':
     dependencies:
-      '@effect/platform-node-shared': 4.1.1(effect@4.1.1)
-      effect: 4.1.1
+      '@effect/platform-node-shared': 4.1.2(effect@4.1.2)
+      effect: 4.1.2
       redis: 6.2.1
-      undici: 8.12.2
+      undici: 8.12.3
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@effect/sql-sqlite-node@4.1.1(effect@4.1.1)':
+  '@effect/sql-sqlite-node@4.1.2(effect@4.1.2)':
     dependencies:
-      effect: 4.1.1
+      effect: 4.1.2
 
   '@effect/tsgo-darwin-arm64@0.56.0':
     optional: true
@@ -2671,9 +2671,9 @@ snapshots:
       '@effect/tsgo-win32-arm64': 0.56.0
       '@effect/tsgo-win32-x64': 0.56.0
 
-  '@effect/vitest@4.1.1(effect@4.1.1)(vitest@5.0.0)':
+  '@effect/vitest@4.1.2(effect@4.1.2)(vitest@5.0.0)':
     dependencies:
-      effect: 4.1.1
+      effect: 4.1.2
       vitest: 5.0.0(@types/node@24.13.3)(@vitest/browser-playwright@5.0.0)(@vitest/ui@5.0.0)(vite@8.2.2(@types/node@24.13.3)(jiti@2.7.0)(yaml@2.9.0))
 
   '@hey-api/spec-types@0.2.0':
@@ -3217,14 +3217,14 @@ snapshots:
 
   detect-libc@2.1.2: {}
 
-  drizzle-kit@1.0.0-rc.5(drizzle-orm@1.0.0-rc.5(@effect/sql-sqlite-node@4.1.1(effect@4.1.1))(effect@4.1.1)(typebox@1.3.35)(zod@4.6.5)):
+  drizzle-kit@1.0.0-rc.5(drizzle-orm@1.0.0-rc.5(@effect/sql-sqlite-node@4.1.2(effect@4.1.2))(effect@4.1.2)(typebox@1.3.35)(zod@4.6.5)):
     optionalDependencies:
-      drizzle-orm: 1.0.0-rc.5(@effect/sql-sqlite-node@4.1.1(effect@4.1.1))(effect@4.1.1)(typebox@1.3.35)(zod@4.6.5)
+      drizzle-orm: 1.0.0-rc.5(@effect/sql-sqlite-node@4.1.2(effect@4.1.2))(effect@4.1.2)(typebox@1.3.35)(zod@4.6.5)
 
-  drizzle-orm@1.0.0-rc.5(@effect/sql-sqlite-node@4.1.1(effect@4.1.1))(effect@4.1.1)(typebox@1.3.35)(zod@4.6.5):
+  drizzle-orm@1.0.0-rc.5(@effect/sql-sqlite-node@4.1.2(effect@4.1.2))(effect@4.1.2)(typebox@1.3.35)(zod@4.6.5):
     optionalDependencies:
-      '@effect/sql-sqlite-node': 4.1.1(effect@4.1.1)
-      effect: 4.1.1
+      '@effect/sql-sqlite-node': 4.1.2(effect@4.1.2)
+      effect: 4.1.2
       typebox: 1.3.35
       zod: 4.6.5
 
@@ -3238,7 +3238,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  effect@4.1.1: {}
+  effect@4.1.2: {}
 
   empathic@2.1.0: {}
 
@@ -3871,7 +3871,7 @@ snapshots:
 
   undici-types@7.18.2: {}
 
-  undici@8.12.2: {}
+  undici@8.12.3: {}
 
   unpipe@1.0.0: {}
 
@@ -3924,7 +3924,7 @@ snapshots:
 
   ws@8.21.3: {}
 
-  ws@8.22.0: {}
+  ws@8.22.1: {}
 
   yaml@2.9.0: {}
 
