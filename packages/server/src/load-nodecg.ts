@@ -5,7 +5,7 @@ import * as NodeRuntime from "@effect/platform-node/NodeRuntime";
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import type {
 	EmptyNamespaceFields,
-	WidestChildManifests,
+	WidestNamespaceManifests,
 	WidestNamespaceFields,
 } from "@nodecg-next/core";
 import { manifestChildrenKey, manifestRolesKey } from "@nodecg-next/internal";
@@ -257,7 +257,7 @@ export const loadNodeCGEffect = Effect.fn(
 			ImplementedNamespace<EmptyNamespaceFields>
 		>();
 		const walkChildren = (
-			children: ImplementedChildren<WidestChildManifests> | undefined,
+			children: ImplementedChildren<WidestNamespaceManifests> | undefined,
 		) => {
 			for (const child of Object.values(children ?? {})) {
 				if (!namespaces.has(child)) {

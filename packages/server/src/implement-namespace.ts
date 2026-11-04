@@ -1,6 +1,6 @@
 import type {
 	CustomRouteManifest,
-	WidestChildManifests,
+	WidestNamespaceManifests,
 	WidestCustomRoutes,
 	EmptyNamespaceFields,
 	WidestNamespaceFields,
@@ -242,7 +242,7 @@ export type RequiredOptions<S extends WidestNamespaceFields> = ([
 				readonly implementRpc: ImplementRpc<S>;
 			});
 
-export type ImplementedChildren<Children extends WidestChildManifests> = {
+export type ImplementedChildren<Children extends WidestNamespaceManifests> = {
 	readonly [K in keyof Children]: ImplementedNamespace<
 		Children[K] extends NamespaceManifest<string, infer S, string> ? S : never
 	>;
@@ -251,7 +251,7 @@ export type ImplementedChildren<Children extends WidestChildManifests> = {
 export interface ImplementedNamespace<
 	in out S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes = WidestCustomRoutes,
-	out Children extends WidestChildManifests = WidestChildManifests,
+	out Children extends WidestNamespaceManifests = WidestNamespaceManifests,
 > {
 	readonly manifest: NamespaceManifest<
 		string,
@@ -277,7 +277,7 @@ export interface WidenedImplementedNamespace {
 					ctx: never,
 				) => Promisable<void | (() => Promisable<void>)>;
 				readonly frontend?: FrontendConfig;
-				readonly children?: ImplementedChildren<WidestChildManifests>;
+				readonly children?: ImplementedChildren<WidestNamespaceManifests>;
 		  })
 		| undefined;
 }
@@ -285,7 +285,7 @@ export interface WidenedImplementedNamespace {
 export function implementNamespace<
 	S extends WidestNamespaceFields = EmptyNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes = {},
-	Children extends WidestChildManifests = {},
+	Children extends WidestNamespaceManifests = {},
 >(
 	manifest: NamespaceManifest<string, S, string, CustomRoutes, Children>,
 	...rest: [
@@ -329,7 +329,7 @@ type RequiredIfAnyKey<Name extends string, Keys, Value> = [Keys] extends [never]
 type ExtensionSupplement<
 	S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes,
-	Children extends WidestChildManifests,
+	Children extends WidestNamespaceManifests,
 	BaseReplicantKeys extends keyof S["replicant"] & string,
 	BaseComputedKeys extends keyof S["computed"] & string,
 	BaseRpcKeys extends keyof S["rpc"] & string,
@@ -386,7 +386,7 @@ const combineOnLoad = <S extends WidestNamespaceFields>(
 export function implementExtendedNamespace<
 	S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes,
-	Children extends WidestChildManifests,
+	Children extends WidestNamespaceManifests,
 	const Base extends ImplementedNamespace<any>,
 >(
 	manifest: NamespaceManifest<string, S, string, CustomRoutes, Children>,

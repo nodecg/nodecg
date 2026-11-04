@@ -1,3 +1,4 @@
+import { customRoutePath } from "@nodecg-next/internal";
 import { Effect, Match } from "effect";
 import { HttpRouter, HttpServerResponse } from "effect/http";
 
@@ -30,7 +31,7 @@ export const customRoutes = HttpRouter.use((router) =>
 				Array.from(routes, (route) =>
 					HttpRouter.prefixRoute(
 						HttpRouter.route(route.method, "/*", handleRequest(route)),
-						`/namespaces/${namespace}/custom/${route.name}`,
+						customRoutePath(namespace, route.name),
 					),
 				),
 			),

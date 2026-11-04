@@ -1,12 +1,14 @@
 import type {
+	CustomRouteManifest,
 	NamespaceManifest,
 	FieldManifest,
 	RpcFieldManifest,
 	EmptyNamespaceFields,
+	WidestCustomRoutes,
 	WidestNamespaceFields,
 	WidestRpcField,
 } from "@nodecg-next/core";
-import type { Updater } from "@nodecg-next/internal";
+import { customRoutePath, type Updater } from "@nodecg-next/internal";
 import { diffSignedPatch } from "@nodecg-next/internal/occ";
 import {
 	mapEffectValues,
@@ -36,7 +38,7 @@ import {
 	Scope,
 	Stream,
 } from "effect";
-import { FetchHttpClient } from "effect/http";
+import { FetchHttpClient, Url } from "effect/http";
 import type { Promisable } from "type-fest";
 
 import { type FieldSource, fieldSource } from "./derive.ts";
@@ -373,6 +375,36 @@ export type RpcField<Request, Response> = ApplyLambdaToObject<
 	}
 >;
 
+const implementCustomRoute = Effect.fn("implementCustomRoute")(function* (
+	base: Option.Option<URL>,
+	namespace: string,
+	name: string,
+) {
+	const urlPath = yield* Path.Path;
+	const routePath = customRoutePath(namespace, name);
+	const routeUrl = Option.match(base, {
+		onNone: () => routePath,
+		onSome: (url) =>
+			Url.setPathname(url, urlPath.join(url.pathname, routePath)).href,
+	});
+
+	return { url: routeUrl };
+});
+
+export type CustomRoute = Effect.Success<
+	ReturnType<typeof implementCustomRoute>
+>;
+
+interface CustomRouteManifestLambda extends HKT.TypeLambda {
+	readonly type: {
+		readonly [M in keyof this["Target"]]: CustomRouteManifest;
+	};
+}
+
+interface CustomRouteLambda extends HKT.TypeLambda {
+	readonly type: CustomRoute;
+}
+
 interface FieldManifestLambda extends HKT.TypeLambda {
 	readonly type: FieldManifest<this["Target"]>;
 }
@@ -425,12 +457,19 @@ interface RpcFieldPromiseLambda extends HKT.TypeLambda {
 	>;
 }
 
-const buildNamespace = <S extends WidestNamespaceFields>(
-	manifest: NamespaceManifest<string, S, string>,
+const buildNamespace = <
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
+>(
+	manifest: NamespaceManifest<string, S, string, CustomRoutes>,
+	baseUrl: string | undefined,
 ) =>
-	Layer.build(FieldCellsService.layer).pipe(
+	Layer.build(Layer.merge(FieldCellsService.layer, Path.layer)).pipe(
 		Effect.flatMap((context) =>
 			Effect.gen(function* () {
+				const base = baseUrl
+					? Option.some(yield* Effect.fromResult(Url.fromString(baseUrl)))
+					: Option.none();
 				const fields = yield* mapEffectValues<
 					FieldManifestLambda,
 					ReplicantFieldEffectLambda
@@ -455,32 +494,59 @@ const buildNamespace = <S extends WidestNamespaceFields>(
 				>()((codec, name) => implementRpc(manifest.namespace, name, codec))(
 					manifest.rpc,
 				);
-				return { fields, computedFields, topicFields, rpcFields };
+				const customRoutes = yield* mapEffectValues<
+					CustomRouteManifestLambda,
+					CustomRouteLambda
+				>()((_, name) => implementCustomRoute(base, manifest.namespace, name))(
+					manifest.customRoute,
+				);
+				return {
+					fields,
+					computedFields,
+					topicFields,
+					rpcFields,
+					customRoutes,
+				};
 			}).pipe(Effect.provide(context)),
 		),
 	);
 
 export const loadNamespaceEffect = Effect.fn("loadNamespaceEffect")(function* <
 	S extends WidestNamespaceFields = EmptyNamespaceFields,
->(manifest: NamespaceManifest<string, S, string>) {
-	return yield* buildNamespace(manifest).pipe(
-		Effect.map(({ fields, computedFields, topicFields, rpcFields }) => ({
-			namespace: manifest.namespace,
-			replicant: fields,
-			computed: computedFields,
-			topic: topicFields,
-			rpc: rpcFields,
-		})),
+	CustomRoutes extends WidestCustomRoutes = {},
+>(
+	manifest: NamespaceManifest<string, S, string, CustomRoutes>,
+	options?: { readonly baseUrl?: string },
+) {
+	return yield* buildNamespace(manifest, options?.baseUrl).pipe(
+		Effect.map(
+			({ fields, computedFields, topicFields, rpcFields, customRoutes }) => ({
+				namespace: manifest.namespace,
+				replicant: fields,
+				computed: computedFields,
+				topic: topicFields,
+				rpc: rpcFields,
+				customRoute: customRoutes,
+			}),
+		),
 	);
 });
 
 export interface BuiltNamespace<
 	S extends WidestNamespaceFields = WidestNamespaceFields,
-> extends Effect.Success<ReturnType<typeof loadNamespaceEffect<S>>> {}
+	CustomRoutes extends WidestCustomRoutes = WidestCustomRoutes,
+> extends Effect.Success<
+	ReturnType<typeof loadNamespaceEffect<S, CustomRoutes>>
+> {}
 
-export const adaptNamespace = <S extends WidestNamespaceFields, R, E>(
+export const adaptNamespace = <
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
+	R,
+	E,
+>(
 	runtime: ManagedRuntime.ManagedRuntime<R, E>,
-	built: BuiltNamespace<S>,
+	built: BuiltNamespace<S, CustomRoutes>,
 ) => {
 	const subscribeEffectToPromise =
 		<Decoded, SubscribeError>(
@@ -578,11 +644,12 @@ export const adaptNamespace = <S extends WidestNamespaceFields, R, E>(
 		}),
 	)(built.rpc);
 
-	return { replicant, computed, topic, rpc };
+	return { replicant, computed, topic, rpc, customRoute: built.customRoute };
 };
 
 export interface LoadedNamespace<
 	S extends WidestNamespaceFields = WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes = WidestCustomRoutes,
 > {
 	readonly replicant: {
 		readonly [K in keyof S["replicant"] & string]: ReplicantField<
@@ -603,6 +670,9 @@ export interface LoadedNamespace<
 			S["rpc"][K]["response"]
 		>;
 	};
+	readonly customRoute: {
+		readonly [R in keyof CustomRoutes & string]: CustomRoute;
+	};
 	readonly dispose: () => void;
 }
 
@@ -611,8 +681,9 @@ export interface LoadedNamespace<
  */
 export async function loadNamespace<
 	S extends WidestNamespaceFields = EmptyNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes = {},
 >(
-	manifest: NamespaceManifest<string, S, string>,
+	manifest: NamespaceManifest<string, S, string, CustomRoutes>,
 	options?: {
 		baseUrl?: string;
 		fieldTransport?:
@@ -622,7 +693,7 @@ export async function loadNamespace<
 			| (() => MessageChannel)
 			| Effect.Effect<MessageChannel, never, never>;
 	},
-): Promise<LoadedNamespace<S>> {
+): Promise<LoadedNamespace<S, CustomRoutes>> {
 	const baseUrl = options?.baseUrl;
 	const fieldTransport = options?.fieldTransport;
 	const messageChannel = options?.messageChannel;
@@ -648,18 +719,22 @@ export async function loadNamespace<
 	);
 
 	const built = await runtime.runPromise(
-		loadNamespaceEffect(manifest).pipe(
+		loadNamespaceEffect(manifest, { baseUrl }).pipe(
 			Scope.provide(runtime.scope),
 			Effect.onError(() => runtime.disposeEffect),
 		),
 	);
-	const { replicant, computed, topic, rpc } = adaptNamespace(runtime, built);
+	const { replicant, computed, topic, rpc, customRoute } = adaptNamespace(
+		runtime,
+		built,
+	);
 
 	return {
 		replicant,
 		computed,
 		topic,
 		rpc,
+		customRoute,
 		dispose: runtime.dispose,
 	};
 }

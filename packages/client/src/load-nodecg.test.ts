@@ -74,6 +74,27 @@ describe("loadNodeCGEffect", () => {
 	);
 
 	test(
+		"gives each namespace its own custom routes",
+		Effect.gen(function* () {
+			const routeManifest = defineNamespace("routes", {
+				replicant: { count: { schema: Schema.FiniteFromString } },
+				customRoute: { upload: { post: {} } },
+			});
+			transport.getReplicant.mockReturnValue(Effect.succeed("7"));
+			const { namespaces } = yield* loadNodeCGEffect({
+				namespaces: { main: show, routes: routeManifest },
+			});
+
+			expect(namespaces.routes.customRoute.upload.url).toBe(
+				"/namespaces/routes/custom/upload",
+			);
+			expect(yield* namespaces.routes.replicant.count.get()).toBe(7);
+			// @ts-expect-error show declares no routes
+			expect(namespaces.main.customRoute.upload).toBeUndefined();
+		}),
+	);
+
+	test(
 		"fails when two keys name the same namespace",
 		Effect.gen(function* () {
 			const error = yield* loadNodeCGEffect({

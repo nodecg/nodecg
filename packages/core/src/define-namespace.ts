@@ -117,7 +117,7 @@ export type EmptyNamespaceFields = {
 	readonly rpc: {};
 };
 
-export type WidestChildManifests = Record<
+export type WidestNamespaceManifests = Record<
 	string,
 	NamespaceManifest<string, EmptyNamespaceFields, string>
 >;
@@ -127,7 +127,7 @@ export interface NamespaceManifest<
 	S extends WidestNamespaceFields,
 	RoleNames extends string,
 	CustomRoutes extends WidestCustomRoutes = WidestCustomRoutes,
-	Children extends WidestChildManifests = WidestChildManifests,
+	Children extends WidestNamespaceManifests = WidestNamespaceManifests,
 > {
 	readonly namespace: Namespace;
 	readonly roles: Readonly<
@@ -510,7 +510,7 @@ const declareRoles = (
 		  >
 		| undefined,
 	overrides: PrincipalsArg | undefined,
-	children: WidestChildManifests,
+	children: WidestNamespaceManifests,
 ): {
 	registry: RoleRegistry;
 	declared: DeclaredTokens;
@@ -585,7 +585,7 @@ const declareRoles = (
 };
 
 // Infer roles of child manifest type
-type ChildRole<Children extends WidestChildManifests> = {
+type ChildRole<Children extends WidestNamespaceManifests> = {
 	[K in keyof Children]: Children[K]["roles"][keyof Children[K]["roles"]];
 }[keyof Children];
 
@@ -603,7 +603,7 @@ export function defineNamespace<
 		CustomRouteOption<WriteOnlyPermissionArg<DeclaredRoleName>>
 	> = {},
 	const DeclaredRoleName extends string = never,
-	Children extends WidestChildManifests = {},
+	Children extends WidestNamespaceManifests = {},
 >(
 	namespace: FileSafeName<Namespace>,
 	defineOption: {
@@ -806,7 +806,7 @@ export function extendNamespace<
 	PRpc extends WidestRpcFields,
 	PRoleNames extends string,
 	PCustomRoutes extends WidestCustomRoutes,
-	PChildren extends WidestChildManifests,
+	PChildren extends WidestNamespaceManifests,
 	const EReplicant extends Record<
 		string,
 		ExtendReplicantFieldOption<PermissionArg<string>>
@@ -825,7 +825,7 @@ export function extendNamespace<
 	> = {},
 	const ERoleName extends string = never,
 	const ECustomRoute extends WidestCustomRoutes = {},
-	EChildren extends WidestChildManifests = {},
+	EChildren extends WidestNamespaceManifests = {},
 >(
 	manifest: NamespaceManifest<
 		PNamespace,

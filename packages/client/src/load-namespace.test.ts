@@ -1124,6 +1124,57 @@ describe("rpc", () => {
 	);
 });
 
+describe("customRoute", () => {
+	const routeManifest = defineNamespace("root", {
+		customRoute: { upload: { post: {} } },
+	});
+
+	test(
+		"url points at the route",
+		Effect.gen(function* () {
+			const loaded = yield* loadNamespaceEffect(routeManifest);
+
+			expect(loaded.customRoute.upload.url).toBe(
+				"/namespaces/root/custom/upload",
+			);
+		}),
+	);
+
+	test(
+		"url appends to a base URL with a path",
+		Effect.gen(function* () {
+			const loaded = yield* loadNamespaceEffect(routeManifest, {
+				baseUrl: "https://example.com/foo/",
+			});
+
+			expect(loaded.customRoute.upload.url).toBe(
+				"https://example.com/foo/namespaces/root/custom/upload",
+			);
+		}),
+	);
+
+	test(
+		"fails to load with an invalid base URL",
+		Effect.gen(function* () {
+			const error = yield* loadNamespaceEffect(routeManifest, {
+				baseUrl: "not a url",
+			}).pipe(Effect.flip);
+
+			expect(error.message).toBe('Invalid URL: "not a url"');
+		}),
+	);
+
+	test(
+		"types refuse a route the manifest does not declare",
+		Effect.gen(function* () {
+			const loaded = yield* loadNamespaceEffect(routeManifest);
+
+			// @ts-expect-error missing is not a declared route
+			expect(loaded.customRoute.missing).toBeUndefined();
+		}),
+	);
+});
+
 describe("loadNamespace (Promise wrapper)", () => {
 	it("forwards to the injected transport", async () => {
 		const { stub: transportStub } = createTransportStub();

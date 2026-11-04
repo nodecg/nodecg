@@ -12,6 +12,7 @@ export {
 	TooManyRequests,
 } from "./api/api-internal.ts";
 export { PublicApi } from "./api/api-v0.ts";
+export { customRoutePath } from "./custom-route-path.ts";
 export {
 	UserAuthenticationMiddleware,
 	ServiceAccountAuthenticationMiddleware,

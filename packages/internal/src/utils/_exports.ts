@@ -9,6 +9,7 @@ export {
 export { type WidestFieldSchema } from "./field-schema.ts";
 export { findInheritedKey, isInheritedKey } from "./inherited-key.ts";
 export {
+	type ApplyLambdaToObjectValues,
 	mapValues,
 	mapEffectValues,
 	mapNestedValues,

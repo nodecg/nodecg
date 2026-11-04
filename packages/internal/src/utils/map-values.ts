@@ -5,7 +5,7 @@ import type { WidestFieldSchema } from "./field-schema.ts";
 const unsafeObjectKeys = <T extends object>(obj: T) =>
 	Object.keys(obj) as (keyof T & string)[];
 
-type ApplyLambdaToObjectValues<
+export type ApplyLambdaToObjectValues<
 	F extends HKT.TypeLambda,
 	Target extends Record<string, unknown>,
 	Out1 = never,

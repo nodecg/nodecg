@@ -1,9 +1,9 @@
 import type {
-	EmptyNamespaceFields,
 	NamespaceManifest,
-	WidestNamespaceFields,
+	WidestNamespaceManifests,
 } from "@nodecg-next/core";
 import {
+	type ApplyLambdaToObjectValues,
 	findCaseClash,
 	mapEffectValues,
 	mapValues,
@@ -48,48 +48,55 @@ class ReportedError extends Schema.TaggedError<ReportedError>()(
 	override readonly message = String(this.cause);
 }
 
-export type LoadNodeCGOptions<
-	Shapes extends Record<string, WidestNamespaceFields>,
-> = {
-	readonly baseUrl?: string;
-	readonly namespaces: {
-		readonly [K in keyof Shapes & string]: NamespaceManifest<
-			string,
-			Shapes[K],
-			string
-		>;
-	};
-};
+type InferManifestFields<Manifest> =
+	Manifest extends NamespaceManifest<string, infer S, string, any> ? S : never;
 
-type NamespaceHandle<S extends WidestNamespaceFields> = Omit<
-	LoadedNamespace<S>,
-	"dispose"
->;
+type InferManifestCustomRoutes<Manifest> =
+	Manifest extends NamespaceManifest<string, any, string, infer CustomRoutes>
+		? CustomRoutes
+		: never;
 
 interface ManifestLambda extends HKT.TypeLambda {
-	readonly Target: EmptyNamespaceFields;
-	readonly type: NamespaceManifest<string, this["Target"], string>;
+	readonly type: NamespaceManifest<
+		string,
+		InferManifestFields<this["Target"]>,
+		string,
+		InferManifestCustomRoutes<this["Target"]>
+	>;
 }
 
 interface BuiltNamespaceLambda extends HKT.TypeLambda {
-	readonly Target: EmptyNamespaceFields;
-	readonly type: BuiltNamespace<this["Target"]>;
+	readonly type: BuiltNamespace<
+		InferManifestFields<this["Target"]>,
+		InferManifestCustomRoutes<this["Target"]>
+	>;
 }
 
 interface NamespaceHandleLambda extends HKT.TypeLambda {
-	readonly Target: EmptyNamespaceFields;
-	readonly type: NamespaceHandle<this["Target"]>;
+	readonly type: Omit<
+		LoadedNamespace<
+			InferManifestFields<this["Target"]>,
+			InferManifestCustomRoutes<this["Target"]>
+		>,
+		"dispose"
+	>;
 }
 
+export type LoadNodeCGOptions<Manifests extends WidestNamespaceManifests> = {
+	readonly baseUrl?: string;
+	readonly namespaces: Manifests &
+		ApplyLambdaToObjectValues<ManifestLambda, Manifests>;
+};
+
 const loadNamespaces = Effect.fnUntraced(function* <
-	Shapes extends Record<string, WidestNamespaceFields>,
->(options: LoadNodeCGOptions<Shapes>) {
-	const widened: Readonly<
-		Record<string, NamespaceManifest<string, EmptyNamespaceFields, string>>
-	> = options.namespaces;
+	Manifests extends WidestNamespaceManifests,
+>(options: LoadNodeCGOptions<Manifests>) {
+	// Widen the type to allow inference of mapEffectValues
+	const manifests: ApplyLambdaToObjectValues<ManifestLambda, Manifests> =
+		options.namespaces;
 
 	const loaded = new Set<string>();
-	for (const { namespace } of Object.values(widened)) {
+	for (const { namespace } of Object.values(manifests)) {
 		if (loaded.has(namespace)) {
 			return yield* DuplicateNamespace.make({ namespace, clash: namespace });
 		}
@@ -106,14 +113,16 @@ const loadNamespaces = Effect.fnUntraced(function* <
 	const namespaces = yield* mapEffectValues<
 		ManifestLambda,
 		BuiltNamespaceLambda
-	>()((manifest) => loadNamespaceEffect(manifest))<Shapes>(options.namespaces);
+	>()((manifest) =>
+		loadNamespaceEffect(manifest, { baseUrl: options.baseUrl }),
+	)(manifests);
 	const auth = yield* makeAuthClient(options.baseUrl);
 	return { namespaces, auth };
 });
 
 export const loadNodeCGEffect = Effect.fnUntraced(function* <
-	Shapes extends Record<string, WidestNamespaceFields>,
->(options: LoadNodeCGOptions<Shapes>) {
+	Manifests extends WidestNamespaceManifests,
+>(options: LoadNodeCGOptions<Manifests>) {
 	const telemetry = yield* Layer.build(otlpTelemetry(options.baseUrl));
 	return yield* loadNamespaces(options).pipe(
 		Effect.withSpan("loadNodeCG"),
@@ -121,12 +130,11 @@ export const loadNodeCGEffect = Effect.fnUntraced(function* <
 	);
 });
 
-export interface LoadedNodeCG<
-	Shapes extends Record<string, WidestNamespaceFields>,
-> {
-	readonly namespaces: {
-		readonly [K in keyof Shapes & string]: NamespaceHandle<Shapes[K]>;
-	};
+export interface LoadedNodeCG<Manifests extends WidestNamespaceManifests> {
+	readonly namespaces: ApplyLambdaToObjectValues<
+		NamespaceHandleLambda,
+		Manifests
+	>;
 	readonly auth: ReturnType<typeof adaptAuthClient>;
 	readonly reportError: (error: unknown) => void;
 	readonly dispose: () => void;
@@ -135,9 +143,9 @@ export interface LoadedNodeCG<
 /**
  * Client-side entrypoint loading every namespace of the record over one connection
  */
-export async function loadNodeCG<
-	Shapes extends Record<string, WidestNamespaceFields>,
->(options: LoadNodeCGOptions<Shapes>): Promise<LoadedNodeCG<Shapes>> {
+export async function loadNodeCG<Manifests extends WidestNamespaceManifests>(
+	options: LoadNodeCGOptions<Manifests>,
+): Promise<LoadedNodeCG<Manifests>> {
 	const runtime = ManagedRuntime.make(
 		Layer.mergeAll(
 			httpFieldTransport(options.baseUrl),

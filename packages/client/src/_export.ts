@@ -19,6 +19,7 @@ export {
 	type ComputedField,
 	type TopicField,
 	type RpcField,
+	type CustomRoute,
 } from "./load-namespace.ts";
 export {
 	DuplicateNamespace,
