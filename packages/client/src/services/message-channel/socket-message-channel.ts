@@ -123,9 +123,15 @@ export const SocketMessageChannel = Layer.effect(
 						),
 					),
 				);
+
 				yield* write(data).pipe(
-					Effect.satisfiesErrorType<Socket.SocketError>(),
-					Effect.orDie,
+					Effect.catchTag("SocketError", (error) =>
+						Effect.logWarning(
+							"Message channel could not send a message:",
+							error,
+						),
+					),
+					Effect.satisfiesErrorType<never>(),
 				);
 			}),
 			receive: Effect.fn("WebsocketMessageChannel.receive")(function* () {

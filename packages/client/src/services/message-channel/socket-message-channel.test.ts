@@ -2,6 +2,7 @@ import { it } from "@effect/vitest";
 import {
 	type FieldIdentifier,
 	ReplicantSnapshotMessage,
+	ServerMessage,
 	SubscribeMessage,
 } from "@nodecg-next/internal";
 import {
@@ -11,6 +12,7 @@ import {
 	Fiber,
 	Layer,
 	Option,
+	Schema,
 	Stream,
 } from "effect";
 import { Socket } from "effect/socket";
@@ -77,7 +79,14 @@ const countField: FieldIdentifier = {
 	name: "count",
 };
 
-const countSnapshot = JSON.stringify(
+const encodeServerMessage = Schema.encodeSync(
+	Schema.fromJsonString(ServerMessage),
+);
+const decodeWrittenJson = Schema.decodeUnknownEffect(
+	Schema.fromJsonString(Schema.Json),
+);
+
+const countSnapshot = encodeServerMessage(
 	ReplicantSnapshotMessage.make({ field: countField, value: 42, revision: 3 }),
 );
 
@@ -91,12 +100,54 @@ describe("send", () => {
 				yield* channel.send(SubscribeMessage.make({ field: countField }));
 			}).pipe(Effect.provide(makeChannelLayer(socket)));
 
-			expect(write).toHaveBeenCalledExactlyOnceWith(
-				JSON.stringify({
+			const written = yield* Effect.forEach(write.mock.calls, ([data]) =>
+				decodeWrittenJson(data),
+			);
+			expect(written).toEqual([
+				{
 					_tag: "subscribe",
 					field: { type: "replicant", namespace: "root", name: "count" },
-				}),
+				},
+			]);
+		}),
+	);
+
+	it.effect("drops a message the socket fails to write and keeps sending", () =>
+		Effect.gen(function* () {
+			const { socket, write } = makeFakeSocket();
+			write.mockReturnValueOnce(
+				Effect.fail(
+					Socket.SocketError.make({
+						reason: Socket.SocketWriteError.make({
+							cause: new Error("simulated"),
+						}),
+					}),
+				),
 			);
+
+			yield* Effect.gen(function* () {
+				const channel = yield* MessageChannelService;
+				yield* channel.send(SubscribeMessage.make({ field: countField }));
+				yield* channel.send(
+					SubscribeMessage.make({
+						field: { type: "replicant", namespace: "root", name: "total" },
+					}),
+				);
+			}).pipe(Effect.provide(makeChannelLayer(socket)));
+
+			const written = yield* Effect.forEach(write.mock.calls, ([data]) =>
+				decodeWrittenJson(data),
+			);
+			expect(written).toEqual([
+				{
+					_tag: "subscribe",
+					field: { type: "replicant", namespace: "root", name: "count" },
+				},
+				{
+					_tag: "subscribe",
+					field: { type: "replicant", namespace: "root", name: "total" },
+				},
+			]);
 		}),
 	);
 });
