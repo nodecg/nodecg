@@ -46,8 +46,9 @@ jobs:
           cache: pnpm
       - run: pnpm install
       - run: pnpm run build
-      - run: bash scripts/add-internal-changeset.bash
       - uses: changesets/action@v2
+        with:
+          version-script: bash scripts/version-packages.bash
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
