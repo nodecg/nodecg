@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v6
       - id: pending
         run: |
-          if ls .changeset/*.md; then
+          if ls .changeset/*.md || { [ -f .changeset/pre.json ] && jq -e '.mode == "exit"' .changeset/pre.json; }; then
             echo "pending=true" >> "$GITHUB_OUTPUT"
           else
             echo "pending=false" >> "$GITHUB_OUTPUT"
@@ -67,7 +67,12 @@ jobs:
           cache: pnpm
       - run: pnpm install
       - run: pnpm run build
-      - run: pnpm stage publish -r --provenance --report-summary
+      - run: |
+          tag=latest
+          if [ -f .changeset/pre.json ]; then
+            tag="$(jq -r .tag .changeset/pre.json)"
+          fi
+          pnpm stage publish -r --tag "$tag" --provenance --report-summary
       - env:
           GH_TOKEN: ${{ github.token }}
         run: bash scripts/create-github-release.bash
