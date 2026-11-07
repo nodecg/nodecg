@@ -1,16 +1,13 @@
-import { loadNodeCG } from "@nodecg-next/server";
+import { loadNamespace } from "@nodecg-next/server";
 
 import { fixture } from "../../src/server/namespaces.ts";
 import { reportReady } from "../../src/server/report-ready.ts";
 
-const nodecg = await loadNodeCG({
-	namespaces: { fixture },
-	onReady: reportReady,
-});
+const loaded = await loadNamespace(fixture, { onReady: reportReady });
 
-const { mirrorSource, mirror } = nodecg.namespaces.fixture.replicant;
+const { mirrorSource, mirror } = loaded.replicant;
 await mirrorSource.subscribe(async (value) => {
 	await mirror.set(value);
 });
 
-nodecg.start();
+loaded.start();

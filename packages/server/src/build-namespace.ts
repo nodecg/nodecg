@@ -1,10 +1,18 @@
-import type { WidestNamespaceFields } from "@nodecg-next/core";
+import type {
+	InferNamespace,
+	WidestCustomRoutes,
+	WidestNamespaceFields,
+} from "@nodecg-next/core";
 import { CurrentIdentity, ServerIdentity } from "@nodecg-next/internal";
-import { mapValues } from "@nodecg-next/internal/utils";
+import {
+	type ApplyLambdaToObjectValues,
+	mapValues,
+} from "@nodecg-next/internal/utils";
 import {
 	Context,
 	Effect,
 	Exit,
+	type HKT,
 	Option,
 	Result,
 	Schema,
@@ -18,6 +26,8 @@ import {
 	type BuiltNamespace,
 	buildFields,
 	BuiltNamespaceRegistry,
+	makeCrossComputeView,
+	makeCrossNamespaceHandle,
 } from "./build-fields.ts";
 import { fieldInternal } from "./field-builders/field-internal-key.ts";
 import type {
@@ -31,10 +41,12 @@ import type {
 	TopicFieldLambda,
 } from "./field-lambdas.ts";
 import type {
+	CrossComputeView,
+	CrossNamespaceHandle,
 	ImplementedNamespace,
 	LoadedNamespace,
 } from "./implement-namespace.ts";
-import { ReplicantStoreService } from "./replicant-store.ts";
+import type { ReplicantStoreService } from "./replicant-store.ts";
 import type { TopicBrokerService } from "./services/topic-broker/topic-broker.ts";
 
 const serverIdentity = ServerIdentity.make({});
@@ -48,9 +60,43 @@ export class MissingReplicantSeed extends Schema.TaggedError<MissingReplicantSee
 	override readonly message = `Missing seed value for replicant "${this.name}" in "${this.namespace}"`;
 }
 
+export interface NamespaceHandles<S extends WidestNamespaceFields> {
+	readonly compute: CrossComputeView<
+		S["replicant"],
+		S["computed"],
+		S["children"]
+	>;
+	readonly rpc: CrossNamespaceHandle<S>;
+	readonly loaded: LoadedNamespace<S>;
+}
+
+export interface NamespaceHandlesLambda extends HKT.TypeLambda {
+	readonly type: NamespaceHandles<InferNamespace<this["Target"]>["fields"]>;
+}
+
+interface CrossComputeViewLambda extends HKT.TypeLambda {
+	readonly type: CrossComputeView<
+		InferNamespace<this["Target"]>["fields"]["replicant"],
+		InferNamespace<this["Target"]>["fields"]["computed"],
+		InferNamespace<this["Target"]>["fields"]["children"]
+	>;
+}
+
+interface CrossNamespaceHandleLambda extends HKT.TypeLambda {
+	readonly type: CrossNamespaceHandle<InferNamespace<this["Target"]>["fields"]>;
+}
+
+interface LoadedNamespaceLambda extends HKT.TypeLambda {
+	readonly type: LoadedNamespace<InferNamespace<this["Target"]>["fields"]>;
+}
+
 export const buildNamespace = Effect.fn("buildNamespace")(function* <
 	S extends WidestNamespaceFields,
->(implemented: ImplementedNamespace<S>) {
+	CustomRoutes extends WidestCustomRoutes,
+>(
+	implemented: ImplementedNamespace<S, CustomRoutes>,
+	children: ApplyLambdaToObjectValues<NamespaceHandlesLambda, S["children"]>,
+) {
 	const { manifest, impl } = implemented;
 	const seedReplicant = impl?.seedReplicant;
 
@@ -63,20 +109,37 @@ export const buildNamespace = Effect.fn("buildNamespace")(function* <
 		}
 	}
 
-	const built = yield* buildFields(manifest, impl);
-	const registry = yield* BuiltNamespaceRegistry;
-	yield* registry.register(implemented, built);
+	const compute = mapValues<NamespaceHandlesLambda, CrossComputeViewLambda>(
+		(child) => child.compute,
+	)(children);
+	const rpc = mapValues<NamespaceHandlesLambda, CrossNamespaceHandleLambda>(
+		(child) => child.rpc,
+	)(children);
+	const loaded = mapValues<NamespaceHandlesLambda, LoadedNamespaceLambda>(
+		(child) => child.loaded,
+	)(children);
 
-	return built;
-});
-
-export const adaptNamespace = Effect.fn("adaptNamespace")(function* <
-	S extends WidestNamespaceFields,
->(built: BuiltNamespace<S>) {
-	const contextForField = yield* Effect.context<
+	const fields = yield* buildFields(manifest, impl, { compute, rpc });
+	const fieldContext = yield* Effect.context<
 		TopicBrokerService | ReplicantStoreService
 	>().pipe(Effect.map(Context.omit(Tracer.ParentSpan)));
-	const runPromise = Effect.runPromiseWith(contextForField);
+	const handles: NamespaceHandles<S> = {
+		compute: makeCrossComputeView(fields, compute),
+		rpc: makeCrossNamespaceHandle(fieldContext, fields, rpc),
+		loaded: yield* adaptNamespace(fields, loaded),
+	};
+	const registry = yield* BuiltNamespaceRegistry;
+	yield* registry.register(implemented, handles);
+	return { fields, handles };
+});
+
+const adaptNamespace = Effect.fn("adaptNamespace")(function* <
+	S extends WidestNamespaceFields,
+>(built: BuiltNamespace<S>, children: LoadedNamespace<S>["children"]) {
+	const fieldContext = yield* Effect.context<
+		TopicBrokerService | ReplicantStoreService
+	>().pipe(Effect.map(Context.omit(Tracer.ParentSpan)));
+	const runPromise = Effect.runPromiseWith(fieldContext);
 
 	const subscribeAdapter =
 		<Decoded, E>(
@@ -154,6 +217,7 @@ export const adaptNamespace = Effect.fn("adaptNamespace")(function* <
 		rpc: mapValues<RpcFieldEffectLambda, RpcFieldLambda>(
 			(field) => (request) => runPromise(field.call(request).pipe(asServer)),
 		)(built.rpc),
+		children,
 	};
 	return loaded;
 });

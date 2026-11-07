@@ -287,6 +287,23 @@ describe("mapEffectValues", () => {
 		}),
 	);
 
+	it.effect("maps nothing when the input is undefined", () =>
+		Effect.gen(function* () {
+			const keys: string[] = [];
+			const input: Record<string, number> | undefined = undefined;
+
+			const result = yield* mapEffectValues<IdentityLambda, ArrayLambda>()(
+				(value, key) => {
+					keys.push(key);
+					return Effect.succeed([value]);
+				},
+			)(input);
+
+			expect(result).toEqual({});
+			expect(keys).toEqual([]);
+		}),
+	);
+
 	it.effect("reduces a non-identity In lambda on the input side", () =>
 		Effect.gen(function* () {
 			const result = yield* mapEffectValues<BoxLambda, IdentityLambda>()(

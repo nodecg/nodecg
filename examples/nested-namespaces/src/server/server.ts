@@ -1,4 +1,4 @@
-import { implementNamespace, loadNodeCG } from "@nodecg-next/server";
+import { implementNamespace, loadNamespace } from "@nodecg-next/server";
 import { tickerNamespace } from "@nodecg/example-plugin-ticker/server";
 import { timeNamespace } from "@nodecg/example-plugin-time/server";
 
@@ -9,10 +9,9 @@ const showNamespace = implementNamespace(showManifest, {
 	children: { ticker: tickerNamespace, time: timeNamespace },
 	implementComputed: {
 		visibleMessages: (ctx) => {
-			const now = ctx.use(timeNamespace).replicant.time.get();
-			return ctx
-				.use(tickerNamespace)
-				.replicant.messages.get()
+			const now = ctx.children.time.replicant.time.get();
+			return ctx.children.ticker.replicant.messages
+				.get()
 				.filter(({ postedAt }) => now - postedAt < 10_000)
 				.map(({ text }) => text);
 		},
@@ -23,8 +22,6 @@ const showNamespace = implementNamespace(showManifest, {
 	},
 });
 
-const nodecg = await loadNodeCG({
-	namespaces: { show: showNamespace },
-});
+const loaded = await loadNamespace(showNamespace);
 
-nodecg.start();
+loaded.start();

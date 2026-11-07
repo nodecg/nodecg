@@ -4,7 +4,7 @@ import { ConfigProvider, Effect, Layer, Option, Schema, Tracer } from "effect";
 import { expect } from "vitest";
 
 import { implementNamespace } from "../src/implement-namespace.ts";
-import { loadNodeCGEffect } from "../src/load-nodecg.ts";
+import { loadNamespaceEffect } from "../src/load-namespace.ts";
 import { AuthenticationRepositoryService } from "../src/services/repository/authentication/authentication-repository.ts";
 import { LoginAttemptRepositoryService } from "../src/services/repository/login-attempt/login-attempt-repository.ts";
 import { InMemoryReplicantRepository } from "../src/services/repository/replicant/in-memory-replicant-repository.ts";
@@ -64,11 +64,11 @@ test(
 			},
 		});
 
-		const { namespaces } = yield* loadNodeCGEffect({
-			namespaces: { counter },
-		}).pipe(Effect.provideService(Tracer.Tracer, tracer));
-		yield* Effect.promise(() => namespaces.counter.replicant.count.set(5));
-		yield* Effect.promise(() => namespaces.counter.rpc.bump(2));
+		const handle = yield* loadNamespaceEffect(counter).pipe(
+			Effect.provideService(Tracer.Tracer, tracer),
+		);
+		yield* Effect.promise(() => handle.replicant.count.set(5));
+		yield* Effect.promise(() => handle.rpc.bump(2));
 
 		const names = new Map(spans.map(({ spanId, name }) => [spanId, name]));
 		const parents = Object.fromEntries(
@@ -85,7 +85,7 @@ test(
 			buildNamespace: "prepareNamespace",
 			buildFields: "buildNamespace",
 			buildReplicant: "buildFields",
-			adaptNamespace: "prepareNamespace",
+			adaptNamespace: "buildNamespace",
 			onLoad: undefined,
 			set: undefined,
 			call: undefined,

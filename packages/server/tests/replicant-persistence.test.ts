@@ -35,7 +35,7 @@ const show = implementNamespace(
 const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
-		const fields = yield* buildNamespace(show);
+		const { fields } = yield* buildNamespace(show, {});
 		return yield* NamespaceRegistryService.make([
 			{
 				namespace: "show",

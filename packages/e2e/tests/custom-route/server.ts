@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 
-import { implementNamespace, loadNodeCG } from "@nodecg-next/server";
+import { implementNamespace, loadNamespace } from "@nodecg-next/server";
 import express from "express";
 import { Hono } from "hono";
 import { fetchNodeHandler } from "srvx/node";
@@ -58,9 +58,6 @@ const customRoute = implementNamespace(customRouteManifest, {
 	},
 });
 
-const nodecg = await loadNodeCG({
-	namespaces: { customRoute },
-	onReady: reportReady,
-});
+const loaded = await loadNamespace(customRoute, { onReady: reportReady });
 
-nodecg.start();
+loaded.start();

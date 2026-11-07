@@ -1,5 +1,6 @@
 import type {
 	CustomRouteManifest,
+	InferNamespace,
 	WidestNamespaceManifests,
 	WidestCustomRoutes,
 	EmptyNamespaceFields,
@@ -24,6 +25,7 @@ export type SeedReplicant<out Replicant extends Record<string, unknown>> = {
 export type CrossComputeView<
 	out Replicant extends Record<string, unknown>,
 	out Computed extends Record<string, unknown>,
+	out Children extends WidestNamespaceManifests,
 > = {
 	readonly replicant: {
 		readonly [K in keyof Replicant & string]: {
@@ -34,36 +36,36 @@ export type CrossComputeView<
 		readonly [K in keyof Computed & string]: {
 			readonly get: () => Computed[K];
 		};
+	};
+	readonly children: {
+		readonly [K in keyof Children & string]: CrossComputeView<
+			InferNamespace<Children[K]>["fields"]["replicant"],
+			InferNamespace<Children[K]>["fields"]["computed"],
+			InferNamespace<Children[K]>["fields"]["children"]
+		>;
 	};
 };
 
-export type ComputeContextUse = <S extends WidestNamespaceFields>(
-	implemented: ImplementedNamespace<S>,
-) => CrossComputeView<S["replicant"], S["computed"]>;
-
 export type ComputeContext<
-	out Replicant extends Record<string, unknown>,
-	out Computed extends Record<string, unknown>,
-> = {
-	readonly replicant: {
-		readonly [K in keyof Replicant & string]: {
-			readonly get: () => Replicant[K];
-		};
-	};
-	readonly computed: {
-		readonly [K in keyof Computed & string]: {
-			readonly get: () => Computed[K];
-		};
-	};
-	readonly use: ComputeContextUse;
+	Replicant extends Record<string, unknown>,
+	Computed extends Record<string, unknown>,
+	Children extends WidestNamespaceManifests,
+> = CrossComputeView<Replicant, Computed, Children> & {
+	readonly use: <
+		S extends WidestNamespaceFields,
+		CustomRoutes extends WidestCustomRoutes,
+	>(
+		implemented: ImplementedNamespace<S, CustomRoutes>,
+	) => CrossComputeView<S["replicant"], S["computed"], S["children"]>;
 };
 
 export type ImplementComputed<
 	in Replicant extends Record<string, unknown>,
 	in out Computed extends Record<string, unknown>,
+	in Children extends WidestNamespaceManifests,
 > = {
 	readonly [K in keyof Computed & string]: (
-		ctx: ComputeContext<Replicant, Omit<Computed, K>>,
+		ctx: ComputeContext<Replicant, Omit<Computed, K>, Children>,
 	) => Computed[K];
 };
 
@@ -97,9 +99,7 @@ export type RpcField<in Request, out Response> = (
 	request: Request,
 ) => Promise<Response>;
 
-export interface LoadedNamespace<
-	S extends WidestNamespaceFields = WidestNamespaceFields,
-> {
+export interface LoadedNamespace<S extends WidestNamespaceFields> {
 	readonly replicant: {
 		readonly [K in keyof S["replicant"] & string]: ReplicantField<
 			S["replicant"][K]
@@ -117,6 +117,11 @@ export interface LoadedNamespace<
 		readonly [K in keyof S["rpc"] & string]: RpcField<
 			S["rpc"][K]["request"],
 			S["rpc"][K]["response"]
+		>;
+	};
+	readonly children: {
+		readonly [K in keyof S["children"] & string]: LoadedNamespace<
+			InferNamespace<S["children"][K]>["fields"]
 		>;
 	};
 }
@@ -168,14 +173,23 @@ export type CrossNamespaceHandle<S extends WidestNamespaceFields> =
 				S["rpc"][K]["response"]
 			>;
 		};
+		readonly children: {
+			readonly [K in keyof S["children"] & string]: CrossNamespaceHandle<
+				InferNamespace<S["children"][K]>["fields"]
+			>;
+		};
 	};
 
-export type UseCrossNamespace = <S extends WidestNamespaceFields>(
-	implemented: ImplementedNamespace<S>,
+export type UseCrossNamespace = <
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
+>(
+	implemented: ImplementedNamespace<S, CustomRoutes>,
 ) => CrossNamespaceHandle<S>;
 
 export type RpcContext<S extends WidestNamespaceFields> =
 	RpcFieldAccessors<S> & {
+		readonly children: CrossNamespaceHandle<S>["children"];
 		readonly use: UseCrossNamespace;
 	};
 
@@ -218,7 +232,11 @@ type UnchangedCustomRoutes<
 
 export type NamespaceOptions<in out S extends WidestNamespaceFields> = {
 	readonly seedReplicant?: SeedReplicant<S["replicant"]>;
-	readonly implementComputed?: ImplementComputed<S["replicant"], S["computed"]>;
+	readonly implementComputed?: ImplementComputed<
+		S["replicant"],
+		S["computed"],
+		S["children"]
+	>;
 	readonly implementRpc?: ImplementRpc<S>;
 	readonly onLoad?: OnLoad<S>;
 };
@@ -233,7 +251,8 @@ export type RequiredOptions<S extends WidestNamespaceFields> = ([
 		: {
 				readonly implementComputed: ImplementComputed<
 					S["replicant"],
-					S["computed"]
+					S["computed"],
+					S["children"]
 				>;
 			}) &
 	([keyof S["rpc"]] extends [never]
@@ -243,27 +262,21 @@ export type RequiredOptions<S extends WidestNamespaceFields> = ([
 			});
 
 export type ImplementedChildren<Children extends WidestNamespaceManifests> = {
-	readonly [K in keyof Children]: ImplementedNamespace<
-		Children[K] extends NamespaceManifest<string, infer S, string> ? S : never
+	readonly [K in keyof Children & string]: ImplementedNamespace<
+		InferNamespace<Children[K]>["fields"],
+		InferNamespace<Children[K]>["customRoutes"]
 	>;
 };
 
 export interface ImplementedNamespace<
 	in out S extends WidestNamespaceFields,
-	CustomRoutes extends WidestCustomRoutes = WidestCustomRoutes,
-	out Children extends WidestNamespaceManifests = WidestNamespaceManifests,
+	CustomRoutes extends WidestCustomRoutes,
 > {
-	readonly manifest: NamespaceManifest<
-		string,
-		S,
-		string,
-		CustomRoutes,
-		Children
-	>;
+	readonly manifest: NamespaceManifest<string, S, string, CustomRoutes>;
 	readonly impl:
 		| (NamespaceOptions<S> & {
 				readonly frontend?: FrontendConfig;
-				readonly children?: ImplementedChildren<Children>;
+				readonly children?: ImplementedChildren<S["children"]>;
 				readonly implementCustomRoute?: ImplementCustomRoute<S, CustomRoutes>;
 		  })
 		| undefined;
@@ -272,28 +285,25 @@ export interface ImplementedNamespace<
 export interface WidenedImplementedNamespace {
 	readonly manifest: NamespaceManifest<string, EmptyNamespaceFields, string>;
 	readonly impl:
-		| (Omit<NamespaceOptions<EmptyNamespaceFields>, "onLoad"> & {
-				readonly onLoad?: (
-					ctx: never,
-				) => Promisable<void | (() => Promisable<void>)>;
-				readonly frontend?: FrontendConfig;
-				readonly children?: ImplementedChildren<WidestNamespaceManifests>;
-		  })
+		| {
+				readonly children?: Readonly<
+					Record<string, WidenedImplementedNamespace>
+				>;
+		  }
 		| undefined;
 }
 
 export function implementNamespace<
 	S extends WidestNamespaceFields = EmptyNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes = {},
-	Children extends WidestNamespaceManifests = {},
 >(
-	manifest: NamespaceManifest<string, S, string, CustomRoutes, Children>,
+	manifest: NamespaceManifest<string, S, string, CustomRoutes>,
 	...rest: [
 		| keyof S["replicant"]
 		| keyof S["computed"]
 		| keyof S["rpc"]
 		| keyof CustomRoutes
-		| keyof Children,
+		| keyof S["children"],
 	] extends [never]
 		? [
 				options?: {
@@ -305,8 +315,8 @@ export function implementNamespace<
 				impl: RequiredOptions<S> &
 					RequiredIfAnyKey<
 						"children",
-						keyof Children,
-						ImplementedChildren<Children>
+						keyof S["children"],
+						ImplementedChildren<S["children"]>
 					> &
 					RequiredIfAnyKey<
 						"implementCustomRoute",
@@ -317,7 +327,7 @@ export function implementNamespace<
 						readonly onLoad?: OnLoad<S>;
 					},
 			]
-): ImplementedNamespace<S, CustomRoutes, Children> {
+): ImplementedNamespace<S, CustomRoutes> {
 	const [impl] = rest;
 	return { manifest, impl };
 }
@@ -329,12 +339,11 @@ type RequiredIfAnyKey<Name extends string, Keys, Value> = [Keys] extends [never]
 type ExtensionSupplement<
 	S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes,
-	Children extends WidestNamespaceManifests,
 	BaseReplicantKeys extends keyof S["replicant"] & string,
 	BaseComputedKeys extends keyof S["computed"] & string,
 	BaseRpcKeys extends keyof S["rpc"] & string,
 	BaseCustomRouteKeys extends keyof CustomRoutes,
-	BaseChildKeys extends keyof Children & string,
+	BaseChildKeys extends keyof S["children"] & string,
 > = RequiredIfAnyKey<
 	"seedReplicant",
 	keyof Omit<S["replicant"], BaseReplicantKeys>,
@@ -344,7 +353,7 @@ type ExtensionSupplement<
 		"implementComputed",
 		keyof Omit<S["computed"], BaseComputedKeys>,
 		SetOptional<
-			ImplementComputed<S["replicant"], S["computed"]>,
+			ImplementComputed<S["replicant"], S["computed"], S["children"]>,
 			BaseComputedKeys
 		>
 	> &
@@ -360,8 +369,8 @@ type ExtensionSupplement<
 	> &
 	RequiredIfAnyKey<
 		"children",
-		keyof Omit<Children, BaseChildKeys>,
-		SetOptional<ImplementedChildren<Children>, BaseChildKeys>
+		keyof Omit<S["children"], BaseChildKeys>,
+		SetOptional<ImplementedChildren<S["children"]>, BaseChildKeys>
 	> & {
 		readonly onLoad?: OnLoad<S>;
 		readonly frontend?: FrontendConfig;
@@ -386,24 +395,22 @@ const combineOnLoad = <S extends WidestNamespaceFields>(
 export function implementExtendedNamespace<
 	S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes,
-	Children extends WidestNamespaceManifests,
-	const Base extends ImplementedNamespace<any>,
+	const Base extends ImplementedNamespace<any, WidestCustomRoutes>,
 >(
-	manifest: NamespaceManifest<string, S, string, CustomRoutes, Children>,
+	manifest: NamespaceManifest<string, S, string, CustomRoutes>,
 	implemented: Base,
 	additional: ExtensionSupplement<
 		S,
 		CustomRoutes,
-		Children,
 		keyof Base["manifest"]["replicant"] & keyof S["replicant"] & string,
 		keyof Base["manifest"]["computed"] & keyof S["computed"] & string,
 		keyof Base["manifest"]["rpc"] & keyof S["rpc"] & string,
 		UnchangedCustomRoutes<CustomRoutes, Base["manifest"]["customRoute"]>,
 		keyof NonNullable<NonNullable<Base["impl"]>["children"]> &
-			keyof Children &
+			keyof S["children"] &
 			string
 	>,
-): ImplementedNamespace<S, CustomRoutes, Children> {
+): ImplementedNamespace<S, CustomRoutes> {
 	const baseFrontend = implemented.impl?.frontend;
 	const frontend =
 		baseFrontend && additional.frontend
@@ -421,7 +428,7 @@ export function implementExtendedNamespace<
 				additional.seedReplicant,
 			),
 			implementComputed: mergeRecords<
-				ImplementComputed<S["replicant"], S["computed"]>
+				ImplementComputed<S["replicant"], S["computed"], S["children"]>
 			>(implemented.impl?.implementComputed, additional.implementComputed),
 			implementRpc: mergeRecords<ImplementRpc<S>>(
 				implemented.impl?.implementRpc,
@@ -433,7 +440,7 @@ export function implementExtendedNamespace<
 			),
 			onLoad: combineOnLoad(implemented.impl?.onLoad, additional.onLoad),
 			frontend,
-			children: mergeRecords<ImplementedChildren<Children>>(
+			children: mergeRecords<ImplementedChildren<S["children"]>>(
 				implemented.impl?.children,
 				additional.children,
 			),

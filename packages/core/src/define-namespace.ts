@@ -107,6 +107,7 @@ export type WidestNamespaceFields = {
 	readonly computed: Record<string, unknown>;
 	readonly topic: Record<string, unknown>;
 	readonly rpc: WidestRpcFields;
+	readonly children: WidestNamespaceManifests;
 };
 
 export type EmptyNamespaceFields = {
@@ -114,6 +115,7 @@ export type EmptyNamespaceFields = {
 	readonly computed: {};
 	readonly topic: {};
 	readonly rpc: {};
+	readonly children: {};
 };
 
 export type WidestNamespaceManifests = Record<
@@ -126,7 +128,6 @@ export interface NamespaceManifest<
 	S extends WidestNamespaceFields,
 	RoleNames extends string,
 	CustomRoutes extends WidestCustomRoutes = WidestCustomRoutes,
-	Children extends WidestNamespaceManifests = WidestNamespaceManifests,
 > {
 	readonly namespace: Namespace;
 	readonly roles: Readonly<
@@ -151,10 +152,20 @@ export interface NamespaceManifest<
 		>;
 	};
 	readonly customRoute: NestedValues<CustomRoutes, CustomRouteManifest>;
-	readonly children: Children;
+	readonly children: S["children"];
 
 	readonly [manifestRolesKey]: RoleRegistry;
 }
+
+export type InferNamespace<Manifest> =
+	Manifest extends NamespaceManifest<
+		string,
+		infer Fields,
+		string,
+		infer CustomRoutes
+	>
+		? { readonly fields: Fields; readonly customRoutes: CustomRoutes }
+		: never;
 
 type FieldDecoded<S> = S extends Schema.Top
 	? S["Type"]
@@ -631,10 +642,10 @@ export function defineNamespace<
 		computed: { [K in keyof Computed]: FieldDecoded<Computed[K]> };
 		topic: { [K in keyof Topic]: FieldDecoded<Topic[K]> };
 		rpc: AddedRpcDecoded<Rpc>;
+		children: Children;
 	},
 	DeclaredRoleName,
-	CustomRoute,
-	Children
+	CustomRoute
 > {
 	if (!isFileSafeName(namespace)) {
 		throw new Error(
@@ -833,10 +844,10 @@ export function extendNamespace<
 			computed: PComputed;
 			topic: PTopic;
 			rpc: PRpc;
+			children: PChildren;
 		},
 		PRoleNames,
-		PCustomRoutes,
-		PChildren
+		PCustomRoutes
 	>,
 	extendOptionOrFn:
 		| {
@@ -865,10 +876,10 @@ export function extendNamespace<
 						computed: PComputed;
 						topic: PTopic;
 						rpc: PRpc;
+						children: PChildren;
 					},
 					PRoleNames,
-					PCustomRoutes,
-					PChildren
+					PCustomRoutes
 				>,
 		  ) => {
 				readonly roles?: Record<
@@ -895,23 +906,23 @@ export function extendNamespace<
 		computed: Override<PComputed, AddedDecoded<EComputed>>;
 		topic: Override<PTopic, AddedDecoded<ETopic>>;
 		rpc: Override<PRpc, AddedRpcDecoded<ERpc>>;
+		children: Override<PChildren, EChildren>;
 	},
 	PRoleNames | ERoleName,
-	MergedNestedKeys<PCustomRoutes, ECustomRoute>,
-	Override<PChildren, EChildren>
+	MergedNestedKeys<PCustomRoutes, ECustomRoute>
 > {
 	type Extended = {
 		replicant: Override<PReplicant, AddedDecoded<EReplicant>>;
 		computed: Override<PComputed, AddedDecoded<EComputed>>;
 		topic: Override<PTopic, AddedDecoded<ETopic>>;
 		rpc: Override<PRpc, AddedRpcDecoded<ERpc>>;
+		children: Override<PChildren, EChildren>;
 	};
 	type ExtendedManifest = NamespaceManifest<
 		PNamespace,
 		Extended,
 		PRoleNames | ERoleName,
-		MergedNestedKeys<PCustomRoutes, ECustomRoute>,
-		Override<PChildren, EChildren>
+		MergedNestedKeys<PCustomRoutes, ECustomRoute>
 	>;
 
 	const extendOption =

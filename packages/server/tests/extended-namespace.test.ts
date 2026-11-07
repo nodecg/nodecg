@@ -58,9 +58,9 @@ const namespace = implementExtendedNamespace(
 const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
-		const built = yield* buildNamespace(namespace);
+		const { fields } = yield* buildNamespace(namespace, {});
 		return yield* NamespaceRegistryService.make([
-			{ namespace: built.namespace, declaredRoles: new Set(), fields: built },
+			{ namespace: fields.namespace, declaredRoles: new Set(), fields },
 		]);
 	}),
 ).pipe(Layer.provide(services));

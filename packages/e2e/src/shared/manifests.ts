@@ -116,4 +116,5 @@ export const crossManifest = defineNamespace("e2e-cross", {
 			permission: everyoneWrite,
 		},
 	},
+	children: { extended: extendedManifest },
 });

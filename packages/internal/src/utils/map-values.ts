@@ -25,15 +25,16 @@ export const mapValues =
 	<Target extends Record<string, unknown>, In = unknown>(
 		obj: ApplyLambdaToObjectValues<F, Target, never, never, In> | undefined,
 	): ApplyLambdaToObjectValues<G, Target, never, never, In> => {
-		const result: any = {};
+		const result: Partial<
+			ApplyLambdaToObjectValues<G, Target, never, never, In>
+		> = {};
 		// TODO: handle undefined before this function is called
-		if (typeof obj === "undefined") {
-			return result;
+		if (typeof obj !== "undefined") {
+			for (const key of unsafeObjectKeys(obj)) {
+				result[key] = transform(obj[key], key);
+			}
 		}
-		for (const key of unsafeObjectKeys(obj)) {
-			result[key] = transform(obj[key], key);
-		}
-		return result;
+		return result as ApplyLambdaToObjectValues<G, Target, never, never, In>;
 	};
 
 export const mapEffectValues =
@@ -45,18 +46,22 @@ export const mapEffectValues =
 		) => Effect.Effect<HKT.Kind<G, In, never, never, Target>, E, R>,
 	) =>
 	<Target extends Record<string, unknown>, In = unknown>(
-		obj: ApplyLambdaToObjectValues<F, Target, never, never, In>,
+		obj: ApplyLambdaToObjectValues<F, Target, never, never, In> | undefined,
 	): Effect.Effect<
 		ApplyLambdaToObjectValues<G, Target, never, never, In>,
 		E,
 		R
 	> =>
 		Effect.gen(function* () {
-			const result: any = {};
-			for (const key of unsafeObjectKeys(obj)) {
-				result[key] = yield* transform(obj[key], key);
+			const result: Partial<
+				ApplyLambdaToObjectValues<G, Target, never, never, In>
+			> = {};
+			if (typeof obj !== "undefined") {
+				for (const key of unsafeObjectKeys(obj)) {
+					result[key] = yield* transform(obj[key], key);
+				}
 			}
-			return result as ApplyLambdaToObjectValues<G, Target>;
+			return result as ApplyLambdaToObjectValues<G, Target, never, never, In>;
 		});
 
 export const zipEffectValues =

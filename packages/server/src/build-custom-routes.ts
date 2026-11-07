@@ -1,6 +1,7 @@
 import type {
 	CustomRouteManifest,
 	CustomRouteMethod,
+	WidestCustomRoutes,
 	WidestNamespaceFields,
 } from "@nodecg-next/core";
 import type { Identity } from "@nodecg-next/internal";
@@ -53,7 +54,11 @@ export class MissingCustomRouteHandler extends Schema.TaggedError<MissingCustomR
 
 export const buildCustomRoutes = Effect.fn("buildCustomRoutes")(function* <
 	S extends WidestNamespaceFields,
->({ manifest, impl }: ImplementedNamespace<S>, ctx: OnLoadContext<S>) {
+	CustomRoutes extends WidestCustomRoutes,
+>(
+	{ manifest, impl }: ImplementedNamespace<S, CustomRoutes>,
+	ctx: OnLoadContext<S>,
+) {
 	const routerMethods = new Map<CustomRouteMethod, HttpMethod.HttpMethod | "*">(
 		[
 			["*", "*"],

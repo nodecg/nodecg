@@ -11,10 +11,7 @@ import { testLayer } from "@nodecg-next/test-utils";
 import { Effect, Layer, Schema, Stream } from "effect";
 import { assert, describe, expect, expectTypeOf, vi } from "vitest";
 
-import {
-	BuiltNamespaceRegistry,
-	LoadedNamespacesService,
-} from "./build-fields.ts";
+import { BuiltNamespaceRegistry } from "./build-fields.ts";
 import { buildNamespace } from "./build-namespace.ts";
 import {
 	type ComputeContext,
@@ -56,27 +53,28 @@ describe("computed source snapshot", () => {
 				firstGameId: (ctx) => ctx.replicant.games.get()[0]?.id ?? null,
 			},
 		}),
+		{},
 	);
 
 	test(
 		"get computes from the decoded snapshot of the namespace's replicants",
 		Effect.gen(function* () {
-			const built = yield* load;
+			const { fields } = yield* load;
 
-			expect(yield* built.computed.firstGameId.get()).toBe(null);
+			expect(yield* fields.computed.firstGameId.get()).toBe(null);
 
-			yield* built.replicant.games.set([{ id: "a" }, { id: "b" }]);
-			expect(yield* built.computed.firstGameId.get()).toBe("a");
+			yield* fields.replicant.games.set([{ id: "a" }, { id: "b" }]);
+			expect(yield* fields.computed.firstGameId.get()).toBe("a");
 		}),
 	);
 
 	test(
 		"subscribe recomputes when an own replicant changes",
 		Effect.gen(function* () {
-			const built = yield* load;
+			const { fields } = yield* load;
 
 			const received: (string | null)[] = [];
-			yield* built.computed.firstGameId.subscribe().pipe(
+			yield* fields.computed.firstGameId.subscribe().pipe(
 				Effect.flatMap((stream) =>
 					Stream.runForEach(stream, (value) =>
 						Effect.sync(() => received.push(value)),
@@ -88,7 +86,7 @@ describe("computed source snapshot", () => {
 			yield* Effect.promise(() =>
 				vi.waitFor(() => expect(received).toEqual([null])),
 			);
-			yield* built.replicant.games.set([{ id: "a" }]);
+			yield* fields.replicant.games.set([{ id: "a" }]);
 			yield* Effect.promise(() =>
 				vi.waitFor(() => expect(received).toEqual([null, "a"])),
 			);
@@ -110,10 +108,11 @@ describe("compute fn contract", () => {
 			let received:
 				| ComputeContext<
 						{ readonly games: readonly { readonly id: string }[] },
+						{},
 						{}
 				  >
 				| undefined;
-			const built = yield* buildNamespace(
+			const { fields } = yield* buildNamespace(
 				implementNamespace(manifest, {
 					seedReplicant: { games: () => [{ id: "a" }] },
 					implementComputed: {
@@ -122,6 +121,7 @@ describe("compute fn contract", () => {
 							expectTypeOf(ctx).toExtend<
 								ComputeContext<
 									{ readonly games: readonly { readonly id: string }[] },
+									{},
 									{}
 								>
 							>();
@@ -132,8 +132,9 @@ describe("compute fn contract", () => {
 						},
 					},
 				}),
+				{},
 			);
-			yield* built.computed.firstGameId.get();
+			yield* fields.computed.firstGameId.get();
 
 			assert(received);
 			expect(received.replicant.games.get()).toEqual([{ id: "a" }]);
@@ -144,7 +145,7 @@ describe("compute fn contract", () => {
 	test(
 		"surfaces a throwing compute fn as ComputedComputeError",
 		Effect.gen(function* () {
-			const built = yield* buildNamespace(
+			const { fields } = yield* buildNamespace(
 				implementNamespace(manifest, {
 					seedReplicant: { games: () => [] },
 					implementComputed: {
@@ -153,8 +154,9 @@ describe("compute fn contract", () => {
 						},
 					},
 				}),
+				{},
 			);
-			const error = yield* built.computed.firstGameId.get().pipe(Effect.flip);
+			const error = yield* fields.computed.firstGameId.get().pipe(Effect.flip);
 			expect(error._tag).toBe("ComputedComputeError");
 			expect(error.message).toContain("boom");
 		}),
@@ -178,27 +180,28 @@ describe("computed-on-computed via ctx.computed", () => {
 				winning: (ctx) => ctx.computed.delta.get() > 0,
 			},
 		}),
+		{},
 	);
 
 	test(
 		"a computed reads another computed of its own namespace",
 		Effect.gen(function* () {
-			const built = yield* load;
+			const { fields } = yield* load;
 
-			expect(yield* built.computed.winning.get()).toBe(false);
+			expect(yield* fields.computed.winning.get()).toBe(false);
 
-			yield* built.replicant.score.set(15);
-			expect(yield* built.computed.winning.get()).toBe(true);
+			yield* fields.replicant.score.set(15);
+			expect(yield* fields.computed.winning.get()).toBe(true);
 		}),
 	);
 
 	test(
 		"subscribe recomputes through the chain and dedupes unchanged values",
 		Effect.gen(function* () {
-			const built = yield* load;
+			const { fields } = yield* load;
 
 			const received: boolean[] = [];
-			yield* built.computed.winning.subscribe().pipe(
+			yield* fields.computed.winning.subscribe().pipe(
 				Effect.flatMap((stream) =>
 					Stream.runForEach(stream, (value) =>
 						Effect.sync(() => received.push(value)),
@@ -210,13 +213,13 @@ describe("computed-on-computed via ctx.computed", () => {
 			yield* Effect.promise(() =>
 				vi.waitFor(() => expect(received).toEqual([false])),
 			);
-			yield* built.replicant.score.set(15);
+			yield* fields.replicant.score.set(15);
 			yield* Effect.promise(() =>
 				vi.waitFor(() => expect(received).toEqual([false, true])),
 			);
 			// delta changes but winning stays true → no frame
-			yield* built.replicant.score.set(16);
-			yield* built.replicant.score.set(5);
+			yield* fields.replicant.score.set(16);
+			yield* fields.replicant.score.set(5);
 			yield* Effect.promise(() =>
 				vi.waitFor(() => expect(received).toEqual([false, true, false])),
 			);
@@ -232,16 +235,17 @@ describe("computed-on-computed via ctx.computed", () => {
 					b: { schema: Schema.Finite },
 				},
 			});
-			const built = yield* buildNamespace(
+			const { fields } = yield* buildNamespace(
 				implementNamespace(cyclic, {
 					implementComputed: {
 						a: (ctx) => ctx.computed.b.get() + 1,
 						b: (ctx) => ctx.computed.a.get() + 1,
 					},
 				}),
+				{},
 			);
 
-			const error = yield* built.computed.a.get().pipe(Effect.flip);
+			const error = yield* fields.computed.a.get().pipe(Effect.flip);
 
 			expect(error._tag).toBe("ComputedComputeError");
 			expect(error.message).toContain("Cycle detected");
@@ -267,6 +271,7 @@ describe("rpc ctx", () => {
 		computed: { doubled: number };
 		topic: { cheer: string };
 		rpc: {};
+		children: {};
 	}>;
 
 	const load = (
@@ -278,6 +283,7 @@ describe("rpc ctx", () => {
 				implementComputed: { doubled: (ctx) => ctx.replicant.count.get() * 2 },
 				implementRpc: { bump },
 			}),
+			{},
 		);
 
 	test(
@@ -285,16 +291,16 @@ describe("rpc ctx", () => {
 		Effect.gen(function* () {
 			const broker = yield* TopicBrokerService;
 			const publish = vi.spyOn(broker, "publish");
-			const built = yield* load(async (request, ctx) => {
+			const { fields } = yield* load(async (request, ctx) => {
 				await ctx.replicant.count.set(ctx.replicant.count.get() + request);
 				await ctx.replicant.count.update((count) => count + 1);
 				await ctx.topic.cheer.publish("bumped");
 				return ctx.computed.doubled.get();
 			});
 
-			const result = yield* built.rpc.bump.call(5);
+			const result = yield* fields.rpc.bump.call(5);
 
-			expect(yield* built.replicant.count.get()).toBe(6);
+			expect(yield* fields.replicant.count.get()).toBe(6);
 			expect(publish).toHaveBeenCalledWith("ns", "cheer", "bumped");
 			expect(result).toBe(12);
 		}),
@@ -342,30 +348,33 @@ describe("rpc ctx runs as the server identity", () => {
 				readHidden: (_, ctx) => ctx.replicant.hidden.get(),
 			},
 		}),
+		{},
 	);
 
 	test(
 		"writes a private replicant through ctx even when the calling role could not",
 		Effect.gen(function* () {
-			const built = yield* load;
+			const { fields } = yield* load;
 
-			yield* built.rpc.writeHidden.call(7).pipe(Effect.provide(operator));
+			yield* fields.rpc.writeHidden.call(7).pipe(Effect.provide(operator));
 
-			expect(yield* built.replicant.hidden.get()).toBe(7);
+			expect(yield* fields.replicant.hidden.get()).toBe(7);
 		}),
 	);
 
 	test(
 		"reads a private replicant through ctx for a role-holding caller",
 		Effect.gen(function* () {
-			const built = yield* load;
+			const { fields } = yield* load;
 
 			expect(
-				yield* built.rpc.readHidden.call(null).pipe(Effect.provide(operator)),
+				yield* fields.rpc.readHidden.call(null).pipe(Effect.provide(operator)),
 			).toBe(3);
 		}),
 	);
 });
+
+const everyoneWrite = { write: { everyone: "allow" } } as const;
 
 const settings = implementNamespace(
 	defineNamespace("settings", {
@@ -374,44 +383,122 @@ const settings = implementNamespace(
 	{ seedReplicant: { multiplier: () => 3 } },
 );
 
-describe("cross-namespace computed via ctx.use", () => {
-	const scoreboard = implementNamespace(
-		defineNamespace("scoreboard", {
-			replicant: { total: { schema: Schema.FiniteFromString } },
-			computed: { weighted: { schema: Schema.FiniteFromString } },
-		}),
-		{
-			seedReplicant: { total: () => 10 },
-			implementComputed: {
-				weighted: (ctx) =>
-					ctx.replicant.total.get() *
-					ctx.use(settings).replicant.multiplier.get(),
+const scoreboard = implementNamespace(
+	defineNamespace("scoreboard", {
+		replicant: { total: { schema: Schema.FiniteFromString } },
+		computed: { weighted: { schema: Schema.FiniteFromString } },
+		rpc: {
+			award: {
+				schema: { request: Schema.Finite, response: Schema.Finite },
+				permission: everyoneWrite,
+			},
+			reset: {
+				schema: { request: Schema.Null, response: Schema.Null },
+				permission: everyoneWrite,
 			},
 		},
-	);
+		children: { settings: settings.manifest },
+	}),
+	{
+		seedReplicant: { total: () => 10 },
+		implementComputed: {
+			weighted: (ctx) => {
+				// @ts-expect-error scoreboard declares no child named clock
+				void ctx.children.clock;
+				return (
+					ctx.replicant.total.get() *
+					ctx.children.settings.replicant.multiplier.get()
+				);
+			},
+		},
+		implementRpc: {
+			award: async (points, ctx) => {
+				const multiplier = ctx.children.settings.replicant.multiplier.get();
+				await ctx.replicant.total.update(
+					(total) => total + points * multiplier,
+				);
+				return ctx.replicant.total.get();
+			},
+			reset: async (_, ctx) => {
+				await ctx.children.settings.replicant.multiplier.set(1);
+				return null;
+			},
+		},
+		children: { settings },
+	},
+);
 
-	const loadBoth = Effect.gen(function* () {
-		const settingsBuilt = yield* buildNamespace(settings);
-		const scoreboardBuilt = yield* buildNamespace(scoreboard);
-		return { settingsBuilt, scoreboardBuilt };
+const league = implementNamespace(
+	defineNamespace("league", {
+		computed: {
+			multiplier: { schema: Schema.FiniteFromString },
+			usedMultiplier: { schema: Schema.FiniteFromString },
+		},
+		rpc: {
+			relayAward: {
+				schema: { request: Schema.Finite, response: Schema.Finite },
+				permission: everyoneWrite,
+			},
+			readMultiplier: {
+				schema: { request: Schema.Null, response: Schema.Finite },
+				permission: everyoneWrite,
+			},
+			readUsedMultiplier: {
+				schema: { request: Schema.Null, response: Schema.Finite },
+				permission: everyoneWrite,
+			},
+		},
+		children: { scoreboard: scoreboard.manifest },
+	}),
+	{
+		implementComputed: {
+			multiplier: (ctx) =>
+				ctx.children.scoreboard.children.settings.replicant.multiplier.get(),
+			usedMultiplier: (ctx) => ctx.use(settings).replicant.multiplier.get(),
+		},
+		implementRpc: {
+			relayAward: (points, ctx) => ctx.children.scoreboard.rpc.award(points),
+			readMultiplier: (_, ctx) =>
+				ctx.children.scoreboard.children.settings.replicant.multiplier.get(),
+			readUsedMultiplier: (_, ctx) =>
+				ctx.use(settings).replicant.multiplier.get(),
+		},
+		children: { scoreboard },
+	},
+);
+
+const loadTree = Effect.gen(function* () {
+	const settingsBuilt = yield* buildNamespace(settings, {});
+	const scoreboardBuilt = yield* buildNamespace(scoreboard, {
+		settings: settingsBuilt.handles,
 	});
+	const leagueBuilt = yield* buildNamespace(league, {
+		scoreboard: scoreboardBuilt.handles,
+	});
+	return {
+		settings: settingsBuilt.fields,
+		scoreboard: scoreboardBuilt.fields,
+		league: leagueBuilt.fields,
+	};
+});
 
+describe("ctx.children in a compute fn", () => {
 	test(
-		"a computed reads a replicant in another namespace",
+		"a computed reads a replicant of its child",
 		Effect.gen(function* () {
-			const { scoreboardBuilt } = yield* loadBoth;
+			const tree = yield* loadTree;
 
-			expect(yield* scoreboardBuilt.computed.weighted.get()).toBe(30);
+			expect(yield* tree.scoreboard.computed.weighted.get()).toBe(30);
 		}),
 	);
 
 	test(
-		"recomputes when a source in another namespace changes",
+		"recomputes when a source in its child changes",
 		Effect.gen(function* () {
-			const { settingsBuilt, scoreboardBuilt } = yield* loadBoth;
+			const tree = yield* loadTree;
 
 			const received: number[] = [];
-			yield* scoreboardBuilt.computed.weighted.subscribe().pipe(
+			yield* tree.scoreboard.computed.weighted.subscribe().pipe(
 				Effect.flatMap((stream) =>
 					Stream.runForEach(stream, (value) =>
 						Effect.sync(() => received.push(value)),
@@ -423,7 +510,7 @@ describe("cross-namespace computed via ctx.use", () => {
 			yield* Effect.promise(() =>
 				vi.waitFor(() => expect(received).toEqual([30])),
 			);
-			yield* settingsBuilt.replicant.multiplier.set(5);
+			yield* tree.settings.replicant.multiplier.set(5);
 			yield* Effect.promise(() =>
 				vi.waitFor(() => expect(received).toEqual([30, 50])),
 			);
@@ -431,118 +518,97 @@ describe("cross-namespace computed via ctx.use", () => {
 	);
 
 	test(
-		"an unloaded target surfaces as ComputedComputeError",
+		"a computed reads a replicant of its grandchild",
 		Effect.gen(function* () {
-			const built = yield* buildNamespace(scoreboard);
+			const tree = yield* loadTree;
 
-			const error = yield* built.computed.weighted.get().pipe(Effect.flip);
-
-			expect(error._tag).toBe("ComputedComputeError");
-		}),
-	);
-
-	test(
-		"a target outside the loaded set fails NamespaceNotLoaded at the use call",
-		Effect.gen(function* () {
-			const { scoreboardBuilt } = yield* loadBoth.pipe(
-				Effect.provideService(LoadedNamespacesService, new Set(["scoreboard"])),
-			);
-
-			const error = yield* scoreboardBuilt.computed.weighted
-				.get()
-				.pipe(Effect.flip);
-
-			expect(error._tag).toBe("ComputedComputeError");
-			expect(error.message).toContain('"settings" was not loaded');
+			expect(yield* tree.league.computed.multiplier.get()).toBe(3);
 		}),
 	);
 });
 
-describe("cross-namespace rpc via ctx.use", () => {
-	const scoreboard = implementNamespace(
-		defineNamespace("scoreboard", {
-			replicant: { total: { schema: Schema.FiniteFromString } },
-			rpc: {
-				award: {
-					schema: { request: Schema.Finite, response: Schema.Finite },
-					permission: { write: { everyone: "allow" } },
-				},
-				reset: {
-					schema: { request: Schema.Null, response: Schema.Null },
-					permission: { write: { everyone: "allow" } },
-				},
-			},
-		}),
-		{
-			seedReplicant: { total: () => 0 },
-			implementRpc: {
-				award: async (points, ctx) => {
-					const multiplier = ctx.use(settings).replicant.multiplier.get();
-					await ctx.replicant.total.update(
-						(total) => total + points * multiplier,
-					);
-					return ctx.replicant.total.get();
-				},
-				reset: async (_, ctx) => {
-					await ctx.use(settings).replicant.multiplier.set(1);
-					return null;
-				},
-			},
-		},
-	);
-
-	const loadBoth = Effect.gen(function* () {
-		const settingsBuilt = yield* buildNamespace(settings);
-		const built = yield* buildNamespace(scoreboard);
-		return { built, settingsBuilt };
-	});
-
+describe("ctx.children in an rpc handler", () => {
 	test(
-		"a handler reads another namespace's replicant through ctx.use",
+		"a handler reads its child's replicant",
 		Effect.gen(function* () {
-			const { built } = yield* loadBoth;
+			const tree = yield* loadTree;
 
-			expect(yield* built.rpc.award.call(5)).toBe(15);
-			expect(yield* built.replicant.total.get()).toBe(15);
+			expect(yield* tree.scoreboard.rpc.award.call(5)).toBe(25);
+			expect(yield* tree.scoreboard.replicant.total.get()).toBe(25);
 		}),
 	);
 
 	test(
-		"a handler writes another namespace's replicant through ctx.use",
+		"a handler writes its child's replicant",
 		Effect.gen(function* () {
-			const { built, settingsBuilt } = yield* loadBoth;
+			const tree = yield* loadTree;
 
-			yield* built.rpc.reset.call(null);
+			yield* tree.scoreboard.rpc.reset.call(null);
 
-			expect(yield* settingsBuilt.replicant.multiplier.get()).toBe(1);
+			expect(yield* tree.settings.replicant.multiplier.get()).toBe(1);
 		}),
 	);
 
 	test(
-		"a handler calls another namespace's rpc through ctx.use",
+		"a handler calls its child's rpc",
 		Effect.gen(function* () {
-			const { built } = yield* loadBoth;
-			const relay = implementNamespace(
-				defineNamespace("relay", {
-					rpc: {
-						relayAward: {
-							schema: { request: Schema.Finite, response: Schema.Finite },
-							permission: { write: { everyone: "allow" } },
-						},
-					},
+			const tree = yield* loadTree;
+
+			const result = yield* tree.league.rpc.relayAward.call(2);
+
+			expect(result).toBe(16);
+			expect(yield* tree.scoreboard.replicant.total.get()).toBe(16);
+		}),
+	);
+
+	test(
+		"a handler reads its grandchild's replicant",
+		Effect.gen(function* () {
+			const tree = yield* loadTree;
+
+			expect(yield* tree.league.rpc.readMultiplier.call(null)).toBe(3);
+		}),
+	);
+});
+
+describe("ctx.use", () => {
+	test(
+		"a computed reads a namespace outside its children",
+		Effect.gen(function* () {
+			const tree = yield* loadTree;
+
+			expect(yield* tree.league.computed.usedMultiplier.get()).toBe(3);
+		}),
+	);
+
+	test(
+		"a handler reads a namespace outside its children",
+		Effect.gen(function* () {
+			const tree = yield* loadTree;
+
+			expect(yield* tree.league.rpc.readUsedMultiplier.call(null)).toBe(3);
+		}),
+	);
+
+	test(
+		"an unloaded target surfaces as ComputedComputeError",
+		Effect.gen(function* () {
+			const lonely = implementNamespace(
+				defineNamespace("lonely", {
+					computed: { multiplier: { schema: Schema.FiniteFromString } },
 				}),
 				{
-					implementRpc: {
-						relayAward: (points, ctx) => ctx.use(scoreboard).rpc.award(points),
+					implementComputed: {
+						multiplier: (ctx) => ctx.use(settings).replicant.multiplier.get(),
 					},
 				},
 			);
-			const relayBuilt = yield* buildNamespace(relay);
+			const { fields } = yield* buildNamespace(lonely, {});
 
-			const result = yield* relayBuilt.rpc.relayAward.call(2);
+			const error = yield* fields.computed.multiplier.get().pipe(Effect.flip);
 
-			expect(result).toBe(6);
-			expect(yield* built.replicant.total.get()).toBe(6);
+			expect(error._tag).toBe("ComputedComputeError");
+			expect(error.message).toContain('Namespace "settings" was not loaded');
 		}),
 	);
 });

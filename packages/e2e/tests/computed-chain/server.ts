@@ -1,11 +1,13 @@
-import { loadNodeCG } from "@nodecg-next/server";
+import { implementNamespace, loadNamespace } from "@nodecg-next/server";
 
-import { chain, cross, extended } from "../../src/server/namespaces.ts";
+import { chain, cross } from "../../src/server/namespaces.ts";
 import { reportReady } from "../../src/server/report-ready.ts";
+import { computedChainManifest } from "./manifest.ts";
 
-const nodecg = await loadNodeCG({
-	namespaces: { chain, cross, extended },
-	onReady: reportReady,
+const computedChain = implementNamespace(computedChainManifest, {
+	children: { chain, cross },
 });
 
-nodecg.start();
+const loaded = await loadNamespace(computedChain, { onReady: reportReady });
+
+loaded.start();

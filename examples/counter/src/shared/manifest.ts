@@ -1,12 +1,12 @@
-import { extendNamespace } from "@nodecg-next/core";
+import { defineNamespace, extendNamespace } from "@nodecg-next/core";
 import { Schema } from "effect";
 
-import { counterManifest } from "./library/manifest.ts";
+import { counterManifest, settingsManifest } from "./library/manifest.ts";
 
 export const extendedCounterManifest = extendNamespace(counterManifest, {
 	replicant: {
 		step: {
-			schema: Schema.Number,
+			schema: Schema.Finite,
 			permission: { read: { everyone: "allow" } },
 		},
 	},
@@ -20,4 +20,8 @@ export const extendedCounterManifest = extendNamespace(counterManifest, {
 			permission: { read: { everyone: "allow" } },
 		},
 	},
+});
+
+export const rootManifest = defineNamespace("counter-example", {
+	children: { counter: extendedCounterManifest, settings: settingsManifest },
 });

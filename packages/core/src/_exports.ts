@@ -5,6 +5,7 @@ export {
 	type CustomRouteManifest,
 	type WidestCustomRoutes,
 	type FieldManifest,
+	type InferNamespace,
 	type ReplicantFieldManifest,
 	type WidestNamespaceManifests,
 	type RpcFieldManifest,

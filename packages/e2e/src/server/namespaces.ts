@@ -95,4 +95,5 @@ export const cross = implementNamespace(crossManifest, {
 			return ctx.use(extended).replicant.score.get();
 		},
 	},
+	children: { extended },
 });

@@ -1,4 +1,4 @@
-import { implementNamespace, loadNodeCG } from "@nodecg-next/server";
+import { implementNamespace, loadNamespace } from "@nodecg-next/server";
 
 import { devProvider } from "../../src/server/fake-auth-provider.ts";
 import { reportReady } from "../../src/server/report-ready.ts";
@@ -12,10 +12,9 @@ const nest = implementNamespace(nestManifest, {
 	},
 });
 
-const nodecg = await loadNodeCG({
-	namespaces: { nest },
+const loaded = await loadNamespace(nest, {
 	authProviders: [devProvider],
 	onReady: reportReady,
 });
 
-nodecg.start();
+loaded.start();

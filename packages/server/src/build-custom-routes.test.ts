@@ -18,7 +18,7 @@ import {
 	MissingCustomRouteHandler,
 } from "./build-custom-routes.ts";
 import { BuiltNamespaceRegistry } from "./build-fields.ts";
-import { adaptNamespace, buildNamespace } from "./build-namespace.ts";
+import { buildNamespace } from "./build-namespace.ts";
 import {
 	implementNamespace,
 	type UseCrossNamespace,
@@ -79,10 +79,9 @@ const buildRoutes = Effect.fn(function* (
 			webhook: { "*": stubHandler },
 		},
 	});
-	const built = yield* buildNamespace(implemented);
-	const handle = yield* adaptNamespace(built);
+	const { handles } = yield* buildNamespace(implemented, {});
 	return Array.from(
-		yield* buildCustomRoutes(implemented, { ...handle, use: stubUse }),
+		yield* buildCustomRoutes(implemented, { ...handles.loaded, use: stubUse }),
 	);
 });
 
@@ -112,11 +111,10 @@ describe("buildCustomRoutes", () => {
 					webhook: { "*": stubHandler },
 				},
 			});
-			const built = yield* buildNamespace(implemented);
-			const handle = yield* adaptNamespace(built);
+			const { handles } = yield* buildNamespace(implemented, {});
 
 			const error = yield* buildCustomRoutes(implemented, {
-				...handle,
+				...handles.loaded,
 				use: stubUse,
 			}).pipe(Effect.flip);
 

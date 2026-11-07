@@ -2,7 +2,7 @@ import { defineNamespace } from "@nodecg-next/core";
 import {
 	type AuthProvider,
 	implementNamespace,
-	loadNodeCG,
+	loadNamespace,
 	makeOAuth2Provider,
 	makeOidcProvider,
 } from "@nodecg-next/server";
@@ -94,9 +94,6 @@ const showcase = implementNamespace(defineNamespace("social-login", {}), {
 	},
 });
 
-const nodecg = await loadNodeCG({
-	namespaces: { showcase },
-	authProviders: providers,
-});
+const loaded = await loadNamespace(showcase, { authProviders: providers });
 
-nodecg.start();
+loaded.start();

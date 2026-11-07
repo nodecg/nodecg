@@ -2,7 +2,7 @@ import { defineNamespace, extendNamespace } from "@nodecg-next/core";
 import { CurrentIdentity, ServerIdentity } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
 import { Effect, Layer, Schema } from "effect";
-import { describe, expect, test } from "vitest";
+import { describe, expect, expectTypeOf, test } from "vitest";
 
 import { BuiltNamespaceRegistry } from "./build-fields.ts";
 import { buildNamespace } from "./build-namespace.ts";
@@ -142,6 +142,35 @@ describe("implementNamespace", () => {
 			},
 		});
 	});
+
+	test("types a custom route handler's children from the manifest", () => {
+		const settings = implementNamespace(
+			defineNamespace("settings", {
+				replicant: { label: { schema: Schema.String } },
+			}),
+			{ seedReplicant: { label: () => "live" } },
+		);
+		const show = defineNamespace("show", {
+			customRoute: { label: { get: {} } },
+			children: { settings: settings.manifest },
+		});
+
+		implementNamespace(show, {
+			children: { settings },
+			implementCustomRoute: {
+				label: {
+					get: (_, ctx) => {
+						expectTypeOf(
+							ctx.children.settings.replicant.label.get(),
+						).toEqualTypeOf<string>();
+						// @ts-expect-error show declares no child named clock
+						void ctx.children.clock;
+						return new Response();
+					},
+				},
+			},
+		});
+	});
 });
 
 describe("implementExtendedNamespace", () => {
@@ -231,11 +260,11 @@ describe("implementExtendedNamespace", () => {
 				},
 			);
 
-			const built = yield* buildNamespace(implemented);
+			const { fields } = yield* buildNamespace(implemented, {});
 
-			expect(yield* built.replicant.score.get()).toBe(10);
-			expect(yield* built.replicant.round.get()).toBe(3);
-			expect(yield* built.computed.total.get()).toBe(13);
+			expect(yield* fields.replicant.score.get()).toBe(10);
+			expect(yield* fields.replicant.round.get()).toBe(3);
+			expect(yield* fields.computed.total.get()).toBe(13);
 		}),
 	);
 
@@ -251,10 +280,10 @@ describe("implementExtendedNamespace", () => {
 				baseImplemented,
 				{ seedReplicant: { round: () => 3, score: () => 99 } },
 			);
-			const built = yield* buildNamespace(implemented);
+			const { fields } = yield* buildNamespace(implemented, {});
 
-			expect(yield* built.replicant.score.get()).toBe(99);
-			expect(yield* built.replicant.label.get()).toBe("m1");
+			expect(yield* fields.replicant.score.get()).toBe(99);
+			expect(yield* fields.replicant.label.get()).toBe("m1");
 		}),
 	);
 
@@ -374,7 +403,7 @@ describe("implementExtendedNamespace", () => {
 					seedReplicant: {},
 				},
 			);
-			const failure = yield* buildNamespace(implemented).pipe(Effect.flip);
+			const failure = yield* buildNamespace(implemented, {}).pipe(Effect.flip);
 			expect(failure.message).toMatch(
 				/Missing seed value for replicant "round"/,
 			);

@@ -1,12 +1,11 @@
 import { defineNamespace } from "@nodecg-next/core";
 import { manifestRolesKey } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
-import { Effect, Layer, Schema } from "effect";
+import { Effect, Schema } from "effect";
 import { HttpBody } from "effect/http";
 import { describe, expect, onTestFinished, vi } from "vitest";
 
-import { BuiltNamespaceRegistry } from "../src/build-fields.ts";
-import { adaptNamespace, buildNamespace } from "../src/build-namespace.ts";
+import { buildNamespace } from "../src/build-namespace.ts";
 import { implementNamespace } from "../src/implement-namespace.ts";
 import { NamespaceRegistryService } from "../src/namespace-registry.ts";
 import { buildClient, services } from "./setup.ts";
@@ -29,30 +28,28 @@ const show = implementNamespace(
 	},
 );
 
-const namespaces = Layer.effect(
-	NamespaceRegistryService,
-	Effect.gen(function* () {
-		const fields = yield* buildNamespace(show);
-		return yield* NamespaceRegistryService.make([
-			{
-				namespace: "show",
-				declaredRoles: new Set(show.manifest[manifestRolesKey].roles.keys()),
-				fields,
-			},
-		]);
-	}),
-).pipe(Layer.provide(services));
+const loadShow = Effect.gen(function* () {
+	const { fields, handles } = yield* buildNamespace(show, {});
+	const registry = yield* NamespaceRegistryService.make([
+		{
+			namespace: "show",
+			declaredRoles: new Set(show.manifest[manifestRolesKey].roles.keys()),
+			fields,
+		},
+	]);
+	const client = yield* buildClient.pipe(
+		Effect.provideService(NamespaceRegistryService, registry),
+	);
+	return { client, handle: handles.loaded };
+});
 
-const test = testLayer(Layer.mergeAll(services, namespaces));
+const test = testLayer(services);
 
 describe("subscribe", () => {
 	test(
 		"a replicant subscriber gets the old value",
 		Effect.gen(function* () {
-			const client = yield* buildClient;
-			const registry = yield* BuiltNamespaceRegistry;
-			const built = yield* Effect.fromResult(registry.lookup(show));
-			const handle = yield* adaptNamespace(built);
+			const { client, handle } = yield* loadShow;
 			const received: Array<[number, number | undefined]> = [];
 			const cancel = yield* Effect.promise(() =>
 				handle.replicant.score.subscribe((value, oldValue) => {
@@ -93,10 +90,7 @@ describe("subscribe", () => {
 	test(
 		"a computed subscriber gets the old value",
 		Effect.gen(function* () {
-			const client = yield* buildClient;
-			const registry = yield* BuiltNamespaceRegistry;
-			const built = yield* Effect.fromResult(registry.lookup(show));
-			const handle = yield* adaptNamespace(built);
+			const { client, handle } = yield* loadShow;
 			const received: Array<[number, number | undefined]> = [];
 			const cancel = yield* Effect.promise(() =>
 				handle.computed.doubled.subscribe((value, oldValue) => {

@@ -1,13 +1,13 @@
 export {
-	loadNodeCGEffect,
-	loadNodeCG,
+	DuplicateNamespace,
+	loadNamespaceEffect,
+	loadNamespace,
 	OnLoadError,
 	ShutdownMessageError,
-	type LoadedNamespaces,
-	type LoadedNodeCG,
-	type LoadNodeCGOptions,
+	type LoadedRoot,
+	type LoadNamespaceOptions,
 	type StorageOption,
-} from "./load-nodecg.ts";
+} from "./load-namespace.ts";
 export { NamespaceNotLoaded } from "./build-fields.ts";
 export {
 	type AuthProvider,

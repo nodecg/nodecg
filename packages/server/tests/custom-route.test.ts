@@ -6,7 +6,7 @@ import { HttpBody } from "effect/http";
 import { describe, expect } from "vitest";
 
 import { buildCustomRoutes } from "../src/build-custom-routes.ts";
-import { adaptNamespace, buildNamespace } from "../src/build-namespace.ts";
+import { buildNamespace } from "../src/build-namespace.ts";
 import {
 	implementNamespace,
 	type UseCrossNamespace,
@@ -80,17 +80,19 @@ const namespace = implementNamespace(manifest, {
 const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
-		const built = yield* buildNamespace(namespace);
-		const handle = yield* adaptNamespace(built);
+		const { fields, handles } = yield* buildNamespace(namespace, {});
 		const use: UseCrossNamespace = () => {
 			throw new Error("unused");
 		};
 		return yield* NamespaceRegistryService.make([
 			{
-				namespace: built.namespace,
+				namespace: fields.namespace,
 				declaredRoles: new Set(),
-				customRoute: yield* buildCustomRoutes(namespace, { ...handle, use }),
-				fields: built,
+				customRoute: yield* buildCustomRoutes(namespace, {
+					...handles.loaded,
+					use,
+				}),
+				fields,
 			},
 		]);
 	}),

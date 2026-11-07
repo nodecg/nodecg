@@ -8,7 +8,7 @@ import {
 	implementNamespace,
 	InMemoryTopicBroker,
 	JsonFileReplicantRepository,
-	loadNodeCGEffect,
+	loadNamespaceEffect,
 	OperatingSystemService,
 } from "@nodecg-next/server";
 import {
@@ -83,11 +83,10 @@ const telemetry = implementNamespace(telemetryManifest, {
 });
 
 Effect.gen(function* () {
-	const nodecg = yield* loadNodeCGEffect({
-		namespaces: { telemetry },
+	const loaded = yield* loadNamespaceEffect(telemetry, {
 		onReady: reportReady,
 	});
-	return yield* nodecg.start;
+	return yield* loaded.start;
 }).pipe(
 	Effect.scoped,
 	Effect.provide(

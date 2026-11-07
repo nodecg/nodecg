@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 import { defineNamespace, extendNamespace } from "@nodecg-next/core";
 import { testLayer } from "@nodecg-next/test-utils";
-import { Cause, ConfigProvider, Effect, Layer, Result, Schema } from "effect";
+import { ConfigProvider, Effect, Layer, Schema } from "effect";
 import {
 	assert,
 	beforeEach,
@@ -20,10 +20,11 @@ import {
 	implementNamespace,
 } from "./implement-namespace.ts";
 import {
-	loadNodeCG,
-	loadNodeCGEffect,
+	DuplicateNamespace,
+	loadNamespace,
+	loadNamespaceEffect,
 	UnimplementedChild,
-} from "./load-nodecg.ts";
+} from "./load-namespace.ts";
 import { AuthenticationRepositoryService } from "./services/repository/authentication/authentication-repository.ts";
 import { LoginAttemptRepositoryService } from "./services/repository/login-attempt/login-attempt-repository.ts";
 import { InMemoryReplicantRepository } from "./services/repository/replicant/in-memory-replicant-repository.ts";
@@ -81,15 +82,12 @@ const settings = implementNamespace(
 	{ seedReplicant: { multiplier: () => 3 } },
 );
 
-describe("namespaces", () => {
+describe("handle", () => {
 	testInMemory(
-		"returns a concretely-typed plain handle per loaded namespace",
+		"returns a concretely-typed plain handle of the root",
 		Effect.gen(function* () {
-			const { namespaces } = yield* loadNodeCGEffect({
-				namespaces: { counter },
-			});
+			const handle = yield* loadNamespaceEffect(counter);
 
-			const handle = namespaces.counter;
 			expect(handle.replicant.count.get()).toBe(1);
 			yield* Effect.promise(() => handle.replicant.count.set(5));
 			expect(handle.replicant.count.get()).toBe(5);
@@ -98,15 +96,19 @@ describe("namespaces", () => {
 	);
 
 	testInMemory(
-		"a namespace that was not aggregated does not exist on the return",
+		"reaches a child through children",
 		Effect.gen(function* () {
-			const { namespaces } = yield* loadNodeCGEffect({
-				namespaces: { counter },
-			});
+			const show = implementNamespace(
+				defineNamespace("show", { children: { counter: counter.manifest } }),
+				{ children: { counter } },
+			);
 
-			// @ts-expect-error settings was not passed to loadNodeCG
-			void namespaces.settings;
-			expect("settings" in namespaces).toBe(false);
+			const handle = yield* loadNamespaceEffect(show);
+
+			expect(handle.children.counter.replicant.count.get()).toBe(1);
+			expect(
+				yield* Effect.promise(() => handle.children.counter.rpc.bump(2)),
+			).toBe(3);
 		}),
 	);
 });
@@ -129,9 +131,7 @@ describe("computed validation", () => {
 				},
 			});
 
-			const error = yield* loadNodeCGEffect({
-				namespaces: { broken: implemented },
-			}).pipe(Effect.flip);
+			const error = yield* loadNamespaceEffect(implemented).pipe(Effect.flip);
 
 			expect(error._tag).toBe("ComputedComputeError");
 		}),
@@ -147,11 +147,35 @@ describe("computed validation", () => {
 				},
 			});
 
-			const error = yield* loadNodeCGEffect({
-				namespaces: { broken: implemented },
-			}).pipe(Effect.flip);
+			const error = yield* loadNamespaceEffect(implemented).pipe(Effect.flip);
 
 			expect(error._tag).toBe("FieldEncodeError");
+		}),
+	);
+
+	testInMemory(
+		"validates a computed that reads its child",
+		Effect.gen(function* () {
+			const scoreboard = implementNamespace(
+				defineNamespace("scoreboard", {
+					replicant: { total: { schema: Schema.FiniteFromString } },
+					computed: { weighted: { schema: Schema.FiniteFromString } },
+					children: { settings: settings.manifest },
+				}),
+				{
+					seedReplicant: { total: () => 10 },
+					implementComputed: {
+						weighted: (ctx) =>
+							ctx.replicant.total.get() *
+							ctx.children.settings.replicant.multiplier.get(),
+					},
+					children: { settings },
+				},
+			);
+
+			const handle = yield* loadNamespaceEffect(scoreboard);
+
+			expect(handle.computed.weighted.get()).toBe(30);
 		}),
 	);
 
@@ -172,12 +196,19 @@ describe("computed validation", () => {
 					},
 				},
 			);
+			const show = implementNamespace(
+				defineNamespace("show", {
+					children: {
+						scoreboard: scoreboard.manifest,
+						settings: settings.manifest,
+					},
+				}),
+				{ children: { scoreboard, settings } },
+			);
 
-			const { namespaces } = yield* loadNodeCGEffect({
-				namespaces: { scoreboard, settings },
-			});
+			const handle = yield* loadNamespaceEffect(show);
 
-			expect(namespaces.scoreboard.computed.weighted.get()).toBe(30);
+			expect(handle.children.scoreboard.computed.weighted.get()).toBe(30);
 		}),
 	);
 
@@ -199,9 +230,7 @@ describe("computed validation", () => {
 				},
 			);
 
-			const error = yield* loadNodeCGEffect({
-				namespaces: { cyclic },
-			}).pipe(Effect.flip);
+			const error = yield* loadNamespaceEffect(cyclic).pipe(Effect.flip);
 
 			expect(error._tag).toBe("ComputedComputeError");
 			expect(error.message).toContain("Cycle detected");
@@ -210,6 +239,31 @@ describe("computed validation", () => {
 });
 
 describe("onLoad", () => {
+	testInMemory(
+		"runs with the handles of its children",
+		Effect.gen(function* () {
+			const stats = implementNamespace(
+				defineNamespace("stats", {
+					replicant: { viewers: { schema: Schema.FiniteFromString } },
+					children: { settings: settings.manifest },
+				}),
+				{
+					seedReplicant: { viewers: () => 0 },
+					children: { settings },
+					onLoad: async (ctx) => {
+						await ctx.replicant.viewers.set(
+							ctx.children.settings.replicant.multiplier.get() * 100,
+						);
+					},
+				},
+			);
+
+			const handle = yield* loadNamespaceEffect(stats);
+
+			expect(handle.replicant.viewers.get()).toBe(300);
+		}),
+	);
+
 	testInMemory(
 		"runs with the plain handle after every namespace is built",
 		Effect.gen(function* () {
@@ -226,12 +280,44 @@ describe("onLoad", () => {
 					},
 				},
 			);
+			const show = implementNamespace(
+				defineNamespace("show", {
+					children: { stats: stats.manifest, settings: settings.manifest },
+				}),
+				{ children: { stats, settings } },
+			);
 
-			const { namespaces } = yield* loadNodeCGEffect({
-				namespaces: { stats, settings },
-			});
+			const handle = yield* loadNamespaceEffect(show);
 
-			expect(namespaces.stats.replicant.viewers.get()).toBe(300);
+			expect(handle.children.stats.replicant.viewers.get()).toBe(300);
+		}),
+	);
+
+	testInMemory(
+		"subscribes to a child's replicant through children",
+		Effect.gen(function* () {
+			const received: number[] = [];
+			const stats = implementNamespace(
+				defineNamespace("stats", {
+					children: { settings: settings.manifest },
+				}),
+				{
+					children: { settings },
+					onLoad: (ctx) =>
+						ctx.children.settings.replicant.multiplier.subscribe((value) => {
+							received.push(value);
+						}),
+				},
+			);
+
+			const handle = yield* loadNamespaceEffect(stats);
+			yield* Effect.promise(() =>
+				handle.children.settings.replicant.multiplier.set(5),
+			);
+
+			yield* Effect.promise(() =>
+				vi.waitFor(() => expect(received).toEqual([3, 5])),
+			);
 		}),
 	);
 
@@ -249,7 +335,7 @@ describe("onLoad", () => {
 				},
 			);
 
-			yield* Effect.scoped(loadNodeCGEffect({ namespaces: { stats } }));
+			yield* Effect.scoped(loadNamespaceEffect(stats));
 
 			expect(cleanup).toHaveBeenCalledTimes(1);
 		}),
@@ -291,7 +377,7 @@ describe("onLoad", () => {
 
 			yield* Effect.scoped(
 				Effect.gen(function* () {
-					yield* loadNodeCGEffect({ namespaces: { composed: extended } });
+					yield* loadNamespaceEffect(extended);
 					expect(calls).toEqual(["base:setup", "extension:setup"]);
 				}),
 			);
@@ -320,46 +406,11 @@ describe("onLoad", () => {
 				},
 			);
 
-			const error = yield* loadNodeCGEffect({ namespaces: { stats } }).pipe(
-				Effect.flip,
-			);
+			const error = yield* loadNamespaceEffect(stats).pipe(Effect.flip);
 
 			expect(error._tag).toBe("OnLoadError");
 			expect(error.message).toContain('"stats"');
 			expect(error.message).toContain("no connection");
-		}),
-	);
-});
-
-describe("duplicate namespaces", () => {
-	testInMemory(
-		"dies when the same namespace is listed under two keys",
-		Effect.gen(function* () {
-			const cause = yield* loadNodeCGEffect({
-				namespaces: { first: counter, second: counter },
-			}).pipe(Effect.sandbox, Effect.flip);
-
-			const defect = Cause.findDefect(cause);
-			assert(Result.isSuccess(defect));
-			assert(defect.success instanceof Error);
-			expect(defect.success.message).toContain('"counter" was loaded twice');
-		}),
-	);
-
-	testInMemory(
-		"dies when two namespace names differ only in case",
-		Effect.gen(function* () {
-			const upper = implementNamespace(defineNamespace("Counter", {}), {});
-			const cause = yield* loadNodeCGEffect({
-				namespaces: { first: counter, second: upper },
-			}).pipe(Effect.sandbox, Effect.flip);
-
-			const defect = Cause.findDefect(cause);
-			assert(Result.isSuccess(defect));
-			assert(defect.success instanceof Error);
-			expect(defect.success.message).toBe(
-				'Namespace "Counter" differs from "counter" only in case',
-			);
 		}),
 	);
 });
@@ -389,20 +440,20 @@ describe("children", () => {
 					children: { sponsors },
 					onLoad: async (ctx) => {
 						await ctx.replicant.files.set(
-							ctx.use(assets).replicant.files.get(),
+							ctx.children.sponsors.children.assets.replicant.files.get(),
 						);
 					},
 				},
 			);
 
-			const { namespaces } = yield* loadNodeCGEffect({ namespaces: { show } });
+			const handle = yield* loadNamespaceEffect(show);
 
-			expect(namespaces.show.replicant.files.get()).toBe(4);
+			expect(handle.replicant.files.get()).toBe(4);
 		}),
 	);
 
 	testInMemory(
-		"loads a child reached from two parents and the entry script once",
+		"loads a child reached from two parents once",
 		Effect.gen(function* () {
 			const onLoad = vi.fn();
 			const assets = implementNamespace(assetsManifest, {
@@ -417,18 +468,27 @@ describe("children", () => {
 				defineNamespace("stage", { children: { assets: assetsManifest } }),
 				{ children: { assets } },
 			);
+			const venue = implementNamespace(
+				defineNamespace("venue", {
+					children: { show: show.manifest, stage: stage.manifest },
+				}),
+				{ children: { show, stage } },
+			);
 
-			const { namespaces } = yield* loadNodeCGEffect({
-				namespaces: { show, stage, assets },
-			});
+			const handle = yield* loadNamespaceEffect(venue);
+			yield* Effect.promise(() =>
+				handle.children.stage.children.assets.replicant.files.set(9),
+			);
 
 			expect(onLoad).toHaveBeenCalledTimes(1);
-			expect(namespaces.assets.replicant.files.get()).toBe(4);
+			expect(handle.children.show.children.assets.replicant.files.get()).toBe(
+				9,
+			);
 		}),
 	);
 
 	testInMemory(
-		"dies when two child objects share a name",
+		"fails when two child objects share a name",
 		Effect.gen(function* () {
 			const show = implementNamespace(
 				defineNamespace("show", { children: { assets: assetsManifest } }),
@@ -450,15 +510,41 @@ describe("children", () => {
 					},
 				},
 			);
+			const venue = implementNamespace(
+				defineNamespace("venue", {
+					children: { show: show.manifest, stage: stage.manifest },
+				}),
+				{ children: { show, stage } },
+			);
 
-			const cause = yield* loadNodeCGEffect({
-				namespaces: { show, stage },
-			}).pipe(Effect.sandbox, Effect.flip);
+			const error = yield* loadNamespaceEffect(venue).pipe(Effect.flip);
 
-			const defect = Cause.findDefect(cause);
-			assert(Result.isSuccess(defect));
-			assert(defect.success instanceof Error);
-			expect(defect.success.message).toContain('"assets" was loaded twice');
+			expect(error).toStrictEqual(
+				DuplicateNamespace.make({ namespace: "assets", clash: "assets" }),
+			);
+			expect(error.message).toBe('Namespace "assets" was loaded twice');
+		}),
+	);
+
+	testInMemory(
+		"fails when two namespace names differ only in case",
+		Effect.gen(function* () {
+			const upper = implementNamespace(defineNamespace("Counter", {}), {});
+			const venue = implementNamespace(
+				defineNamespace("venue", {
+					children: { first: counter.manifest, second: upper.manifest },
+				}),
+				{ children: { first: counter, second: upper } },
+			);
+
+			const error = yield* loadNamespaceEffect(venue).pipe(Effect.flip);
+
+			expect(error).toStrictEqual(
+				DuplicateNamespace.make({ namespace: "Counter", clash: "counter" }),
+			);
+			expect(error.message).toBe(
+				'Namespace "Counter" differs from "counter" only in case',
+			);
 		}),
 	);
 
@@ -479,9 +565,7 @@ describe("children", () => {
 				},
 			);
 
-			const error = yield* loadNodeCGEffect({
-				namespaces: { show },
-			}).pipe(Effect.flip);
+			const error = yield* loadNamespaceEffect(show).pipe(Effect.flip);
 
 			expect(error).toStrictEqual(
 				UnimplementedChild.make({ namespace: "show", child: "assets" }),
@@ -490,7 +574,7 @@ describe("children", () => {
 	);
 });
 
-describe("loadNodeCG", () => {
+describe("loadNamespace", () => {
 	beforeEach(() => {
 		const dataDir = mkdtempSync(join(tmpdir(), "nodecg-load-"));
 		vi.stubEnv("NODECG_DATA_DIR", dataDir);
@@ -505,7 +589,7 @@ describe("loadNodeCG", () => {
 		};
 	});
 
-	test("seeds through the injected plain storage and serves the handles", async () => {
+	test("seeds through the injected plain storage", async () => {
 		const storage = {
 			read: vi.fn<ReplicantRepository["read"]>(
 				(namespace, name) => new ReplicantNotFound({ namespace, name }),
@@ -513,10 +597,10 @@ describe("loadNodeCG", () => {
 			write: vi.fn<ReplicantRepository["write"]>(() => Effect.void),
 		} satisfies ReplicantRepository;
 
-		const nodecg = await loadNodeCG({ namespaces: { settings }, storage });
+		const handle = await loadNamespace(settings, { storage });
 
 		expect(storage.write).toHaveBeenCalledWith("settings", "multiplier", "3");
-		expect(nodecg.namespaces.settings.replicant.multiplier.get()).toBe(3);
+		expect(handle.replicant.multiplier.get()).toBe(3);
 	});
 
 	test("exports a failed load before rejecting", async () => {
@@ -530,8 +614,14 @@ describe("loadNodeCG", () => {
 		vi.stubEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://collector:4318");
 		const first = implementNamespace(defineNamespace("twin", {}), {});
 		const second = implementNamespace(defineNamespace("twin", {}), {});
+		const venue = implementNamespace(
+			defineNamespace("venue", {
+				children: { first: first.manifest, second: second.manifest },
+			}),
+			{ children: { first, second } },
+		);
 
-		await expect(loadNodeCG({ namespaces: { first, second } })).rejects.toThrow(
+		await expect(loadNamespace(venue)).rejects.toThrow(
 			'Namespace "twin" was loaded twice',
 		);
 
@@ -552,8 +642,8 @@ describe("loadNodeCG", () => {
 			write: vi.fn<ReplicantRepository["write"]>(() => Effect.void),
 		} satisfies ReplicantRepository;
 
-		const nodecg = await loadNodeCG({ namespaces: { settings }, storage });
-		await nodecg.namespaces.settings.replicant.multiplier.set(9);
+		const handle = await loadNamespace(settings, { storage });
+		await handle.replicant.multiplier.set(9);
 
 		await vi.waitFor(() =>
 			expect(storage.write).toHaveBeenCalledWith("settings", "multiplier", "9"),

@@ -1,11 +1,12 @@
 import {
 	implementExtendedNamespace,
-	loadNodeCG,
+	implementNamespace,
+	loadNamespace,
 	makeOidcProvider,
 } from "@nodecg-next/server";
 import { OAuth2Server } from "oauth2-mock-server";
 
-import { extendedCounterManifest } from "../shared/manifest.ts";
+import { extendedCounterManifest, rootManifest } from "../shared/manifest.ts";
 import { counter, settings } from "./library/server.ts";
 
 const extendedCounter = implementExtendedNamespace(
@@ -43,13 +44,16 @@ const localProvider = await makeOidcProvider({
 
 process.env["NODECG_SUPERADMINS"] = "local:johndoe";
 
-const nodecg = await loadNodeCG({
-	namespaces: { counter: extendedCounter, settings },
+const implementedRoot = implementNamespace(rootManifest, {
+	children: { counter: extendedCounter, settings },
+});
+
+const loaded = await loadNamespace(implementedRoot, {
 	authProviders: [localProvider],
 });
 
-await nodecg.namespaces.counter.computed.parity.subscribe((parity) => {
+await loaded.children.counter.computed.parity.subscribe((parity) => {
 	console.log(`[server] count is now ${parity}`);
 });
 
-nodecg.start();
+loaded.start();

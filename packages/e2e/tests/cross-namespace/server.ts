@@ -1,11 +1,8 @@
-import { loadNodeCG } from "@nodecg-next/server";
+import { loadNamespace } from "@nodecg-next/server";
 
-import { cross, extended } from "../../src/server/namespaces.ts";
+import { cross } from "../../src/server/namespaces.ts";
 import { reportReady } from "../../src/server/report-ready.ts";
 
-const nodecg = await loadNodeCG({
-	namespaces: { cross, extended },
-	onReady: reportReady,
-});
+const loaded = await loadNamespace(cross, { onReady: reportReady });
 
-nodecg.start();
+loaded.start();

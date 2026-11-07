@@ -1,4 +1,5 @@
 import type {
+	WidestCustomRoutes,
 	WidestNamespaceFields,
 	NamespaceManifest,
 } from "@nodecg-next/core";
@@ -9,8 +10,9 @@ import {
 	toError,
 	zipEffectValues,
 } from "@nodecg-next/internal/utils";
-import { Context, Effect, Layer, Option, Result, Schema, Tracer } from "effect";
+import { Context, Effect, Layer, Result, Schema, Tracer } from "effect";
 
+import type { NamespaceHandles } from "./build-namespace.ts";
 import {
 	buildComputed,
 	type ComputedFieldEffect,
@@ -44,14 +46,17 @@ import type {
 } from "./field-lambdas.ts";
 import type {
 	ComputeContext,
+	CrossComputeView,
+	CrossNamespaceHandle,
 	ImplementedNamespace,
 	NamespaceOptions,
 	RpcContext,
+	UseCrossNamespace,
 	WidenedImplementedNamespace,
 } from "./implement-namespace.ts";
 import {
 	ComputedComputeError,
-	ReplicantStoreService,
+	type ReplicantStoreService,
 } from "./replicant-store.ts";
 import type { TopicBrokerService } from "./services/topic-broker/topic-broker.ts";
 
@@ -63,30 +68,31 @@ export class NamespaceNotLoaded extends Schema.TaggedError<NamespaceNotLoaded>()
 	"NamespaceNotLoaded",
 	{ namespace: Schema.String },
 ) {
-	override readonly message = `Namespace "${this.namespace}" was not loaded — pass it to loadNodeCG's namespaces`;
+	override readonly message = `Namespace "${this.namespace}" was not loaded`;
 }
 
-export class LoadedNamespacesService extends Context.Service<
-	LoadedNamespacesService,
-	ReadonlySet<string>
->()("LoadedNamespaces") {}
-
-// ctx.use lookup keyed by ImplementedNamespace. Returns typed whole namespace
+// Key each namespace's handles by its ImplementedNamespace
 export class BuiltNamespaceRegistry extends Context.Service<BuiltNamespaceRegistry>()(
 	"BuiltNamespaceRegistry",
 	{
 		make: Effect.sync(() => {
 			const map = new WeakMap<WidenedImplementedNamespace, unknown>();
 			return {
-				register: <S extends WidestNamespaceFields>(
-					implemented: ImplementedNamespace<S>,
-					built: BuiltNamespace<S>,
+				register: <
+					S extends WidestNamespaceFields,
+					CustomRoutes extends WidestCustomRoutes,
+				>(
+					implemented: ImplementedNamespace<S, CustomRoutes>,
+					handles: NamespaceHandles<S>,
 				) =>
 					Effect.sync(() => {
-						map.set(implemented, built);
+						map.set(implemented, handles);
 					}),
-				lookup: <S extends WidestNamespaceFields>(
-					implemented: ImplementedNamespace<S>,
+				lookup: <
+					S extends WidestNamespaceFields,
+					CustomRoutes extends WidestCustomRoutes,
+				>(
+					implemented: ImplementedNamespace<S, CustomRoutes>,
 				) => {
 					const found = map.get(implemented);
 					if (typeof found === "undefined") {
@@ -97,7 +103,7 @@ export class BuiltNamespaceRegistry extends Context.Service<BuiltNamespaceRegist
 						);
 					}
 					// Relevant map value is set right above
-					return Result.succeed(found as BuiltNamespace<S>);
+					return Result.succeed(found as NamespaceHandles<S>);
 				},
 			};
 		}),
@@ -106,28 +112,23 @@ export class BuiltNamespaceRegistry extends Context.Service<BuiltNamespaceRegist
 	static readonly layer = Layer.effect(this, this.make);
 }
 
-type FieldOps =
-	| TopicBrokerService
-	| ReplicantStoreService
-	| BuiltNamespaceRegistry;
+type FieldOps = TopicBrokerService | ReplicantStoreService;
 
 type FieldOpsContext = Context.Context<FieldOps>;
 
-const lookupLoaded = <S extends WidestNamespaceFields>(
-	registry: BuiltNamespaceRegistry["Service"],
-	loaded: Option.Option<ReadonlySet<string>>,
-	implemented: ImplementedNamespace<S>,
-) => {
-	const namespace = implemented.manifest.namespace;
-	if (Option.isSome(loaded) && !loaded.value.has(namespace)) {
-		return Result.fail(NamespaceNotLoaded.make({ namespace }));
-	}
-	return registry.lookup(implemented);
-};
+export const makeUseCrossNamespace =
+	(registry: BuiltNamespaceRegistry["Service"]): UseCrossNamespace =>
+	(implemented) =>
+		Result.getOrThrow(registry.lookup(implemented)).rpc;
 
-const makeCrossComputeView = <S extends WidestNamespaceFields>(
+export const makeCrossComputeView = <S extends WidestNamespaceFields>(
 	fields: BuiltNamespace<S>,
-) => ({
+	children: CrossComputeView<
+		S["replicant"],
+		S["computed"],
+		S["children"]
+	>["children"],
+): CrossComputeView<S["replicant"], S["computed"], S["children"]> => ({
 	replicant: mapValues<ReplicantFieldEffectLambda, CrossFieldReadLambda>(
 		(field) => ({
 			get: () =>
@@ -140,6 +141,7 @@ const makeCrossComputeView = <S extends WidestNamespaceFields>(
 				Result.getOrThrow(field[fieldInternal].getResult(serverIdentity)),
 		}),
 	)(fields.computed),
+	children,
 });
 
 // TODO: use Effect's R instead of Context
@@ -189,34 +191,39 @@ const fieldAccessors =
 
 export const makeCrossNamespaceHandle = <S extends WidestNamespaceFields>(
 	context: FieldOpsContext,
-	registry: BuiltNamespaceRegistry["Service"],
-	loaded: Option.Option<ReadonlySet<string>>,
-	implemented: ImplementedNamespace<S>,
-) => {
-	const fields = Result.getOrThrow(lookupLoaded(registry, loaded, implemented));
-	return {
-		...fieldAccessors(context)(fields),
-		rpc: mapValues<RpcFieldEffectLambda, RpcFieldLambda>(
-			(field) => (request) =>
-				Effect.runPromiseWith(context)(field.call(request).pipe(asServer)),
-		)(fields.rpc),
-	};
-};
+	fields: BuiltNamespace<S>,
+	children: CrossNamespaceHandle<S>["children"],
+): CrossNamespaceHandle<S> => ({
+	...fieldAccessors(context)(fields),
+	rpc: mapValues<RpcFieldEffectLambda, RpcFieldLambda>(
+		(field) => (request) =>
+			Effect.runPromiseWith(context)(field.call(request).pipe(asServer)),
+	)(fields.rpc),
+	children,
+});
 
 export const buildFields = Effect.fn("buildFields")(function* <
 	S extends WidestNamespaceFields,
 >(
 	manifest: NamespaceManifest<string, S, string>,
-	options?: NamespaceOptions<S>,
+	options: NamespaceOptions<S> | undefined,
+	children: {
+		readonly compute: CrossComputeView<
+			S["replicant"],
+			S["computed"],
+			S["children"]
+		>["children"];
+		readonly rpc: RpcContext<S>["children"];
+	},
 ) {
 	const seedReplicantFns = options?.seedReplicant;
 	const computeFns = options?.implementComputed;
 	const rpcHandlers = options?.implementRpc;
 
-	const contextForField = yield* Effect.context<FieldOps>().pipe(
+	const fieldContext = yield* Effect.context<FieldOps>().pipe(
 		Effect.map(Context.omit(Tracer.ParentSpan)),
 	);
-	const loaded = yield* Effect.serviceOption(LoadedNamespacesService);
+	const registry = yield* BuiltNamespaceRegistry;
 
 	const replicant = yield* zipEffectValues<
 		ReplicantFieldManifestLambda,
@@ -228,7 +235,11 @@ export const buildFields = Effect.fn("buildFields")(function* <
 		buildReplicant(manifest.namespace, name, codec, seed()),
 	);
 
-	type OwnComputeContext = ComputeContext<S["replicant"], S["computed"]>;
+	type OwnComputeContext = ComputeContext<
+		S["replicant"],
+		S["computed"],
+		S["children"]
+	>;
 
 	let ownComputedAccessors: OwnComputeContext["computed"] | undefined;
 	const computeContext: OwnComputeContext = {
@@ -246,16 +257,9 @@ export const buildFields = Effect.fn("buildFields")(function* <
 			}
 			return ownComputedAccessors;
 		},
+		children: children.compute,
 		use: (implemented) =>
-			makeCrossComputeView(
-				Result.getOrThrow(
-					lookupLoaded(
-						Context.get(contextForField, BuiltNamespaceRegistry),
-						loaded,
-						implemented,
-					),
-				),
-			),
+			Result.getOrThrow(registry.lookup(implemented)).compute,
 	};
 
 	const computed = yield* zipEffectValues<
@@ -294,14 +298,9 @@ export const buildFields = Effect.fn("buildFields")(function* <
 	);
 
 	const rpcContext: RpcContext<S> = {
-		...fieldAccessors(contextForField)({ replicant, computed, topic }),
-		use: (implemented) =>
-			makeCrossNamespaceHandle(
-				contextForField,
-				Context.get(contextForField, BuiltNamespaceRegistry),
-				loaded,
-				implemented,
-			),
+		...fieldAccessors(fieldContext)({ replicant, computed, topic }),
+		children: children.rpc,
+		use: makeUseCrossNamespace(registry),
 	};
 
 	const rpc = yield* zipEffectValues<

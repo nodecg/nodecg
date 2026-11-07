@@ -96,7 +96,7 @@ const match = implementNamespace(match, {
   },
 });
 
-loadNodeCG({ namespaces: { match } });
+loadNamespace(match);
 
 // Client-side
 const match = loadNamespace(match);
@@ -120,14 +120,14 @@ match.replicant.label.subscribe((label) => {
 
   ```ts
   // Server-side
-  import { implementNamespace, loadNodeCG } from "@nodecg/server";
+  import { implementNamespace, loadNamespace } from "@nodecg/server";
 
   const match = implementNamespace(manifest, {
     seedReplicant: { counter: () => 0, games: () => [] },
   });
-  const nodecg = await loadNodeCG({ namespaces: { match } });
+  const loaded = await loadNamespace(match);
 
-  console.log(nodecg.namespaces.match.replicant.counter.get());
+  console.log(loaded.replicant.counter.get());
 
   // Client-side
   import { loadNamespace } from "@nodecg/client";
@@ -217,7 +217,7 @@ match.replicant.label.subscribe((label) => {
       summary: (ctx) => `first: ${ctx.computed.firstGameId.get()}`,
     },
   });
-  loadNodeCG({ namespaces: { match } });
+  loadNamespace(match);
 
   // Client: read-only
   const ns = await loadNamespace(manifest);
@@ -273,7 +273,7 @@ match.replicant.label.subscribe((label) => {
     },
   });
 
-  loadNodeCG({ namespaces: { extended } });
+  loadNamespace(extended);
   ```
 
 - ✅ A namespace can run server-side logic when it loads, and can read other loaded namespaces inside
@@ -286,7 +286,11 @@ match.replicant.label.subscribe((label) => {
     },
   });
 
-  loadNodeCG({ namespaces: { overlay, commercial } });
+  const show = implementNamespace(showManifest, {
+    children: { overlay, commercial },
+  });
+
+  loadNamespace(show);
   ```
 
 - ✅ Replicant in client-side is synchronized on reconnect
@@ -358,7 +362,7 @@ match.replicant.label.subscribe((label) => {
       },
     },
   });
-  loadNodeCG({ namespaces: { dice } });
+  loadNamespace(dice);
 
   // Client: call and await the reply
   const ns = await loadNamespace(manifest);
