@@ -14,6 +14,7 @@ import {
 	Scope,
 	Stream,
 } from "effect";
+import { TestClock, TestConsole } from "effect/testing";
 import { afterEach, assert, describe, expect, vi } from "vitest";
 
 import {
@@ -617,28 +618,7 @@ describe("subscribeReplicant", () => {
 
 describe("persistence", () => {
 	testStubbed(
-		"persists each written value, in write order",
-		Effect.gen(function* () {
-			const scope = yield* Scope.make();
-			const store = yield* storeIn(scope);
-			yield* store.initializeReplicant("ns", "a", Effect.succeed, 0, true);
-			repository.write.mockClear();
-
-			yield* store.commit("ns", "a", () => Effect.succeed(1));
-			yield* store.commit("ns", "a", () => Effect.succeed(2));
-			yield* store.commit("ns", "a", () => Effect.succeed(3));
-
-			yield* waitFor(() => expect(repository.write).toHaveBeenCalledTimes(3));
-			expect(repository.write.mock.calls).toEqual([
-				["ns", "a", 1],
-				["ns", "a", 2],
-				["ns", "a", 3],
-			]);
-		}),
-	);
-
-	testStubbed(
-		"closing the scope persists every queued write, in write order",
+		"persists only the latest value committed during a write",
 		Effect.gen(function* () {
 			const scope = yield* Scope.make();
 			const store = yield* storeIn(scope);
@@ -650,9 +630,66 @@ describe("persistence", () => {
 			);
 
 			yield* store.commit("ns", "a", () => Effect.succeed(1));
+			yield* waitFor(() => expect(repository.write).toHaveBeenCalledTimes(1));
 			yield* store.commit("ns", "a", () => Effect.succeed(2));
 			yield* store.commit("ns", "a", () => Effect.succeed(3));
+			yield* store.commit("ns", "a", () => Effect.succeed(4));
+			yield* Deferred.succeed(gate, undefined);
+
+			yield* waitFor(() => expect(repository.write).toHaveBeenCalledTimes(2));
+			expect(repository.write.mock.calls).toEqual([
+				["ns", "a", 1],
+				["ns", "a", 4],
+			]);
+		}),
+	);
+
+	testStubbed(
+		"a flooding replicant does not hold back another replicant",
+		Effect.gen(function* () {
+			const scope = yield* Scope.make();
+			const store = yield* storeIn(scope);
+			yield* store.initializeReplicant("ns", "a", Effect.succeed, 0, true);
+			yield* store.initializeReplicant("ns", "b", Effect.succeed, 0, true);
+			repository.write.mockClear();
+			const gate = yield* Deferred.make<void>();
+			repository.write.mockImplementation((_namespace, name, value) =>
+				name === "a" && value === 1 ? Deferred.await(gate) : Effect.void,
+			);
+
+			yield* store.commit("ns", "a", () => Effect.succeed(1));
 			yield* waitFor(() => expect(repository.write).toHaveBeenCalledTimes(1));
+			yield* store.commit("ns", "a", () => Effect.succeed(2));
+			yield* store.commit("ns", "b", () => Effect.succeed(1));
+			yield* store.commit("ns", "a", () => Effect.succeed(3));
+			yield* store.commit("ns", "a", () => Effect.succeed(4));
+			yield* store.commit("ns", "a", () => Effect.succeed(5));
+			yield* Deferred.succeed(gate, undefined);
+
+			yield* waitFor(() => expect(repository.write).toHaveBeenCalledTimes(3));
+			expect(repository.write.mock.calls).toEqual([
+				["ns", "a", 1],
+				["ns", "a", 5],
+				["ns", "b", 1],
+			]);
+		}),
+	);
+
+	testStubbed(
+		"closing the scope persists a pending value",
+		Effect.gen(function* () {
+			const scope = yield* Scope.make();
+			const store = yield* storeIn(scope);
+			yield* store.initializeReplicant("ns", "a", Effect.succeed, 0, true);
+			repository.write.mockClear();
+			const gate = yield* Deferred.make<void>();
+			repository.write.mockImplementation((_namespace, _name, value) =>
+				value === 1 ? Deferred.await(gate) : Effect.void,
+			);
+
+			yield* store.commit("ns", "a", () => Effect.succeed(1));
+			yield* waitFor(() => expect(repository.write).toHaveBeenCalledTimes(1));
+			yield* store.commit("ns", "a", () => Effect.succeed(2));
 			yield* Scope.addFinalizer(scope, Deferred.succeed(gate, undefined));
 
 			expect(repository.write.mock.calls).toEqual([["ns", "a", 1]]);
@@ -661,7 +698,6 @@ describe("persistence", () => {
 			expect(repository.write.mock.calls).toEqual([
 				["ns", "a", 1],
 				["ns", "a", 2],
-				["ns", "a", 3],
 			]);
 		}),
 	);
@@ -722,6 +758,89 @@ describe("persistence", () => {
 
 			yield* waitFor(() => expect(repository.write).toHaveBeenCalledTimes(1));
 			expect(readA().value).toBe(1);
+		}),
+	);
+
+	testStubbed(
+		"retries a failed write five times",
+		Effect.gen(function* () {
+			const scope = yield* Scope.make();
+			const store = yield* storeIn(scope);
+			yield* store.initializeReplicant("ns", "a", Effect.succeed, 0, true);
+			repository.write.mockClear();
+			repository.write.mockReturnValue(
+				BackendError.make({ cause: new Error("disk full") }),
+			);
+
+			yield* store.commit("ns", "a", () => Effect.succeed(1));
+			for (const calls of [1, 2, 3, 4, 5]) {
+				yield* waitFor(() =>
+					expect(repository.write).toHaveBeenCalledTimes(calls),
+				);
+				yield* TestClock.adjust("1 second");
+			}
+
+			const context = yield* Effect.context();
+			yield* waitFor(() =>
+				expect(Effect.runSyncWith(context)(TestConsole.logLines)).toContain(
+					'Stopped retrying replicant "ns/a" after 5 retries',
+				),
+			);
+			expect(repository.write.mock.calls).toEqual([
+				["ns", "a", 1],
+				["ns", "a", 1],
+				["ns", "a", 1],
+				["ns", "a", 1],
+				["ns", "a", 1],
+				["ns", "a", 1],
+			]);
+		}),
+	);
+
+	testStubbed(
+		"a failing replicant does not hold back another replicant",
+		Effect.gen(function* () {
+			const scope = yield* Scope.make();
+			const store = yield* storeIn(scope);
+			yield* store.initializeReplicant("ns", "a", Effect.succeed, 0, true);
+			yield* store.initializeReplicant("ns", "b", Effect.succeed, 0, true);
+			repository.write.mockClear();
+			repository.write.mockImplementation((_namespace, name) =>
+				name === "a"
+					? BackendError.make({ cause: new Error("disk full") })
+					: Effect.void,
+			);
+
+			yield* store.commit("ns", "a", () => Effect.succeed(1));
+			yield* store.commit("ns", "b", () => Effect.succeed(1));
+
+			yield* waitFor(() => expect(repository.write).toHaveBeenCalledTimes(2));
+			expect(repository.write.mock.calls).toEqual([
+				["ns", "a", 1],
+				["ns", "b", 1],
+			]);
+		}),
+	);
+
+	testStubbed(
+		"closing the scope persists a replicant waiting for its retry",
+		Effect.gen(function* () {
+			const scope = yield* Scope.make();
+			const store = yield* storeIn(scope);
+			yield* store.initializeReplicant("ns", "a", Effect.succeed, 0, true);
+			repository.write.mockClear();
+			repository.write.mockReturnValueOnce(
+				BackendError.make({ cause: new Error("disk full") }),
+			);
+
+			yield* store.commit("ns", "a", () => Effect.succeed(1));
+			yield* waitFor(() => expect(repository.write).toHaveBeenCalledTimes(1));
+
+			yield* Scope.close(scope, Exit.void);
+			expect(repository.write.mock.calls).toEqual([
+				["ns", "a", 1],
+				["ns", "a", 1],
+			]);
 		}),
 	);
 });

@@ -30,6 +30,7 @@ import {
 	Option,
 	PubSub,
 	Queue,
+	Ref,
 	Result,
 	Schema,
 	Stream,
@@ -154,8 +155,10 @@ const sameValue = (current: LeafValue, value: Schema.Json) => {
 };
 
 interface ReplicantNode {
+	readonly key: FieldKey;
 	readonly signal: Signal<LeafValue>;
 	readonly persistent: boolean;
+	readonly queued: Ref.Ref<boolean>;
 }
 
 type ComputeFailure = ComputedComputeError | FieldEncodeError;
@@ -189,11 +192,7 @@ export class ReplicantStoreService extends Context.Service<ReplicantStoreService
 			);
 
 			const pendingWrites = yield* Queue.unbounded<
-				{
-					readonly namespace: string;
-					readonly name: string;
-					readonly value: Schema.Json;
-				},
+				{ readonly node: ReplicantNode; readonly retries: number },
 				Cause.Done
 			>();
 
@@ -241,8 +240,9 @@ export class ReplicantStoreService extends Context.Service<ReplicantStoreService
 						),
 				});
 				const replicant = signal(makeLeafValue(initial, 0));
+				const queued = yield* Ref.make(false);
 				yield* SynchronizedRef.update(replicants, (map) =>
-					HashMap.set(map, key, { signal: replicant, persistent }),
+					HashMap.set(map, key, { key, signal: replicant, persistent, queued }),
 				);
 				if (persistent && Option.isNone(persistedValue)) {
 					yield* repository
@@ -269,26 +269,75 @@ export class ReplicantStoreService extends Context.Service<ReplicantStoreService
 				return existing.value;
 			});
 
-			const persist = (namespace: string, name: string, value: Schema.Json) =>
+			const scope = yield* Effect.scope;
+
+			const enqueue = Effect.fn(function* (node: ReplicantNode) {
+				if (!(yield* Ref.getAndSet(node.queued, true))) {
+					yield* Queue.offer(pendingWrites, { node, retries: 0 });
+				}
+			});
+
+			const retry = Effect.fn(function* (node: ReplicantNode, retries: number) {
+				if (retries >= 5) {
+					return yield* Effect.logError(
+						`Stopped retrying replicant "${node.key.namespace}/${node.key.name}" after ${retries} retries`,
+					);
+				}
+				if (!(yield* Ref.getAndSet(node.queued, true))) {
+					// Keep writing other replicants during the wait
+					yield* Effect.forkIn(
+						Effect.delay(
+							Queue.offer(pendingWrites, { node, retries: retries + 1 }),
+							"1 second",
+						),
+						scope,
+					);
+				}
+			});
+
+			const persist = (node: ReplicantNode) =>
 				repository
-					.write(namespace, name, value)
+					.write(node.key.namespace, node.key.name, node.signal.peek().value)
 					.pipe(
-						Effect.catchTag("BackendError", (error) =>
+						Effect.tapError((error) =>
 							Effect.logError(
-								`Persisting replicant "${namespace}/${name}" failed`,
+								`Persisting replicant "${node.key.namespace}/${node.key.name}" failed`,
 								error,
 							),
 						),
 					);
 
 			const consumer = yield* Effect.forkScoped(
-				Stream.runForEach(Stream.fromQueue(pendingWrites), (write) =>
-					persist(write.namespace, write.name, write.value),
+				Stream.runForEach(
+					Stream.fromQueue(pendingWrites),
+					({ node, retries }) =>
+						Effect.gen(function* () {
+							// Allow queuing the replicant during the write
+							yield* Ref.set(node.queued, false);
+							yield* persist(node).pipe(
+								Effect.catchTag("BackendError", () => retry(node, retries)),
+							);
+						}),
 				),
 			);
 
 			yield* Effect.addFinalizer(() =>
-				Queue.end(pendingWrites).pipe(Effect.andThen(Fiber.join(consumer))),
+				Effect.gen(function* () {
+					yield* Queue.end(pendingWrites);
+					yield* Fiber.join(consumer);
+					const waiting = yield* Effect.filter(
+						HashMap.values(yield* SynchronizedRef.get(replicants)),
+						(node) => Ref.get(node.queued),
+					);
+					yield* Effect.forEach(
+						waiting,
+						(node) =>
+							persist(node).pipe(
+								Effect.catchTag("BackendError", () => Effect.void),
+							),
+						{ discard: true },
+					);
+				}),
 			);
 
 			const finishCommit = (
@@ -315,11 +364,7 @@ export class ReplicantStoreService extends Context.Service<ReplicantStoreService
 							Effect.orDie,
 						);
 						if (node.persistent) {
-							yield* Queue.offer(pendingWrites, {
-								namespace,
-								name,
-								value: frame.value,
-							});
+							yield* enqueue(node);
 						}
 						yield* PubSub.publish(changes, { namespace, name, frame });
 						return [
