@@ -1,7 +1,8 @@
 import { Authentication, sessionCookieName } from "@nodecg-next/internal";
 import { testLayer } from "@nodecg-next/test-utils";
-import { ConfigProvider, Effect, Layer } from "effect";
+import { ConfigProvider, Effect, Layer, Option } from "effect";
 import { SecureRandom } from "effect/crypto";
+import { Cookies } from "effect/http";
 import { TestClock } from "effect/testing";
 import { describe, expect } from "vitest";
 
@@ -23,7 +24,7 @@ const operator = Authentication.make({ issuer: "dev", subject: "operator" });
 
 describe("renewal", () => {
 	test(
-		"no cookie within the renew interval",
+		"no session cookie within the renew interval",
 		Effect.gen(function* () {
 			const client = yield* buildClient;
 
@@ -32,7 +33,9 @@ describe("renewal", () => {
 
 			const res = yield* asOperator.get(meUrl);
 			expect(res.status).toBe(200);
-			expect(res.headers["set-cookie"]).toBeUndefined();
+			expect(res.cookies.pipe(Cookies.get(sessionCookieName))).toEqual(
+				Option.none(),
+			);
 		}),
 	);
 
@@ -46,14 +49,23 @@ describe("renewal", () => {
 
 			const res = yield* asOperator.get(meUrl);
 			expect(res.status).toBe(200);
-			expect(res.headers["set-cookie"]).toMatch(
-				/^nodecg\.sid=[^;]+; Max-Age=604800; Path=\/; HttpOnly; SameSite=Lax$/,
+			expect(
+				res.cookies.pipe(
+					Cookies.get(sessionCookieName),
+					Option.map(Cookies.serializeCookie),
+				),
+			).toEqual(
+				Option.some(
+					expect.stringMatching(
+						/^nodecg\.sid=[^;]+; Max-Age=604800; Path=\/; HttpOnly; SameSite=Lax$/,
+					),
+				),
 			);
 		}),
 	);
 
 	test(
-		"no cookie for an unknown session",
+		"no session cookie for an unknown session",
 		Effect.gen(function* () {
 			const client = yield* buildClient;
 			const random = yield* SecureRandom.SecureRandom;
@@ -63,7 +75,9 @@ describe("renewal", () => {
 				headers: { cookie: `${sessionCookieName}=${token}` },
 			});
 			expect(res.status).toBe(200);
-			expect(res.headers["set-cookie"]).toBeUndefined();
+			expect(res.cookies.pipe(Cookies.get(sessionCookieName))).toEqual(
+				Option.none(),
+			);
 		}),
 	);
 });
@@ -78,8 +92,13 @@ describe("logout", () => {
 
 			const logoutRes = yield* asOperator.post(logoutUrl);
 			expect(logoutRes.status).toBe(204);
-			expect(logoutRes.headers["set-cookie"]).toBe(
-				"nodecg.sid=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax",
+			expect(
+				logoutRes.cookies.pipe(
+					Cookies.get(sessionCookieName),
+					Option.map(Cookies.serializeCookie),
+				),
+			).toEqual(
+				Option.some("nodecg.sid=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax"),
 			);
 
 			const meRes = yield* asOperator.get(meUrl);

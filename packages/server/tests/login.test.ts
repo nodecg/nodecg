@@ -88,8 +88,17 @@ describe("login", () => {
 
 			const res = yield* client.get(loginUrl);
 			expect(res.status).toBe(302);
-			expect(res.headers["set-cookie"]).toMatch(
-				/^nodecg\.login_attempt=[^;]+; Max-Age=300; Path=\/; HttpOnly; SameSite=Lax$/,
+			expect(
+				res.cookies.pipe(
+					Cookies.get("nodecg.login_attempt"),
+					Option.map(Cookies.serializeCookie),
+				),
+			).toEqual(
+				Option.some(
+					expect.stringMatching(
+						/^nodecg\.login_attempt=[^;]+; Max-Age=300; Path=\/; HttpOnly; SameSite=Lax$/,
+					),
+				),
 			);
 		}).pipe(
 			Effect.provide(
@@ -222,8 +231,15 @@ describe("callback", () => {
 				headers: { cookie: `nodecg.login_attempt=${attempt}` },
 			});
 			expect(res.status).toBe(400);
-			expect(res.headers["set-cookie"]).toBe(
-				"nodecg.login_attempt=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax",
+			expect(
+				res.cookies.pipe(
+					Cookies.get("nodecg.login_attempt"),
+					Option.map(Cookies.serializeCookie),
+				),
+			).toEqual(
+				Option.some(
+					"nodecg.login_attempt=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax",
+				),
 			);
 		}),
 	);

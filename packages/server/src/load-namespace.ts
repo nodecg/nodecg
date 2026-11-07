@@ -61,7 +61,7 @@ import {
 	disableTelemetryRouteTracing,
 	OtlpEnvironment,
 } from "./server/browser-telemetry.ts";
-import { makeNodeHttpServer } from "./server/node-http-server.ts";
+import { makeNodeHttpServer, reportReady } from "./server/node-http-server.ts";
 import { routes } from "./server/routes.ts";
 import { OperatingSystemService } from "./services/operating-system/operating-system.ts";
 import { DrizzleSqliteRepositories } from "./services/repository/drizzle-sqlite-repositories.ts";
@@ -80,7 +80,7 @@ export type StorageOption =
 export type LoadNamespaceOptions = {
 	readonly storage?: StorageOption;
 	readonly authProviders?: ReadonlyArray<AuthProvider>;
-	readonly onReady?: (address?: string) => void;
+	readonly onReady?: (address: string) => void;
 };
 
 export class OnLoadError extends Schema.TaggedError<OnLoadError>()(
@@ -327,10 +327,13 @@ export const loadNamespaceEffect = Effect.fn(
 				discard: true,
 			});
 
-			const httpServer = yield* makeNodeHttpServer({
-				onReady: options?.onReady,
-			});
-			const ServerLive = HttpRouter.serve(routes).pipe(
+			const httpServer = yield* makeNodeHttpServer();
+			const serve = HttpRouter.serve(routes);
+			const ServerLive = (
+				typeof options?.onReady === "undefined"
+					? serve
+					: reportReady(serve, options.onReady)
+			).pipe(
 				Layer.provide(NamespaceRegistryService.layer(registered)),
 				Layer.provide(Layer.succeed(RoleLinks, roleLinks)),
 				Layer.provide(Layer.succeed(ReplicantStoreService, store)),
