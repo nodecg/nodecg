@@ -8,7 +8,7 @@ import type {
 	WidestNamespaceManifests,
 	WidestNamespaceFields,
 } from "@nodecg-next/core";
-import { manifestChildrenKey, manifestRolesKey } from "@nodecg-next/internal";
+import { manifestRolesKey } from "@nodecg-next/internal";
 import {
 	findCaseClash,
 	mapEffectValues,
@@ -131,9 +131,7 @@ const checkChildren = Effect.fn(function* ({
 	manifest,
 	impl,
 }: WidenedImplementedNamespace) {
-	for (const [child, declared] of Object.entries(
-		manifest[manifestChildrenKey],
-	)) {
+	for (const [child, declared] of Object.entries(manifest.children)) {
 		if (impl?.children?.[child]?.manifest !== declared) {
 			return yield* UnimplementedChild.make({
 				namespace: manifest.namespace,

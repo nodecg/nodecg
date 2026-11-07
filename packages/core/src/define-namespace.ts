@@ -1,7 +1,6 @@
 import {
 	DeclarablePrincipalNameSchema,
 	isUndeclarableRole,
-	manifestChildrenKey,
 	manifestRolesKey,
 	PRINCIPAL,
 	Role,
@@ -152,9 +151,9 @@ export interface NamespaceManifest<
 		>;
 	};
 	readonly customRoute: NestedValues<CustomRoutes, CustomRouteManifest>;
+	readonly children: Children;
 
 	readonly [manifestRolesKey]: RoleRegistry;
-	readonly [manifestChildrenKey]: Children;
 }
 
 type FieldDecoded<S> = S extends Schema.Top
@@ -754,8 +753,8 @@ export function defineNamespace<
 		topic,
 		rpc,
 		customRoute,
+		children,
 		[manifestRolesKey]: registry,
-		[manifestChildrenKey]: children,
 	};
 }
 
@@ -932,7 +931,7 @@ export function extendNamespace<
 	);
 
 	const children = mergeRecords<Override<PChildren, EChildren>>(
-		manifest[manifestChildrenKey],
+		manifest.children,
 		extendOption.children,
 	);
 
@@ -1154,7 +1153,7 @@ export function extendNamespace<
 		topic,
 		rpc,
 		customRoute,
+		children,
 		[manifestRolesKey]: registry,
-		[manifestChildrenKey]: children,
 	};
 }

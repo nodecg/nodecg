@@ -51,7 +51,7 @@ export {
 	Identity,
 	ServerIdentity,
 } from "./models/identity.ts";
-export { manifestChildrenKey, manifestRolesKey } from "./manifest-keys.ts";
+export { manifestRolesKey } from "./manifest-keys.ts";
 export { LoginAttempt } from "./models/login-attempt.ts";
 export {
 	DeclarablePrincipalNameSchema,

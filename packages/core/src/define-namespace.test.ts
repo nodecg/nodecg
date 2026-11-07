@@ -1,8 +1,4 @@
-import {
-	manifestChildrenKey,
-	manifestRolesKey,
-	RoleName,
-} from "@nodecg-next/internal";
+import { manifestRolesKey, RoleName } from "@nodecg-next/internal";
 import { Result, Schema } from "effect";
 import { assert, describe, expect, expectTypeOf, test } from "vitest";
 import { z } from "zod";
@@ -918,7 +914,7 @@ describe("defineNamespace", () => {
 		const assets = defineNamespace("show-assets", {});
 		const show = defineNamespace("show", { children: { assets } });
 
-		expect(show[manifestChildrenKey]).toStrictEqual({ assets });
+		expect(show.children).toStrictEqual({ assets });
 	});
 
 	describe("role links", () => {
@@ -1600,7 +1596,7 @@ describe("extendNamespace", () => {
 		test("adds children beside the precedent's", () => {
 			const extended = extendNamespace(show, { children: { media } });
 
-			expect(extended[manifestChildrenKey]).toStrictEqual({ assets, media });
+			expect(extended.children).toStrictEqual({ assets, media });
 		});
 
 		test("rejects re-declaring a child", () => {
