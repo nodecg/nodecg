@@ -4,7 +4,8 @@ import { StrictMode, useState } from "react";
 import { showManifest } from "../shared/manifest.ts";
 import { render } from "./store.tsx";
 
-const ticker = await loadNamespace(showManifest.children.ticker);
+const root = await loadNamespace(showManifest);
+const ticker = root.children.ticker;
 
 function Dashboard() {
 	const [message, setMessage] = useState("");

@@ -29,20 +29,18 @@ describe("anonymous access", () => {
 	});
 
 	test("a read of a restricted field is denied (HTTP 403)", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		await expect(ns.replicant.secret.get()).rejects.toThrow(
 			/Permission denied/,
 		);
 	});
 
 	test("a subscribe to a restricted field is rejected (WS forbidden)", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		await expect(ns.replicant.secret.subscribe(() => {})).rejects.toThrow(
 			/Permission denied/,
 		);
@@ -55,28 +53,25 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 	});
 
 	test("reads the server-seeded value", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		expect(await ns.replicant.count.get()).toBe(0);
 		expect(await ns.replicant.label.get()).toBe("hello");
 	});
 
 	test("set round-trips through the server", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		await ns.replicant.count.set(42);
 		expect(await ns.replicant.count.get()).toBe(42);
 	});
 
 	test("a subscriber gets the old value", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		await ns.replicant.count.set(5);
 		const received: Array<[number, number | undefined]> = [];
 		const cancel = await ns.replicant.count.subscribe((value, oldValue) => {
@@ -94,10 +89,9 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 	});
 
 	test("a subscriber receives its own update exactly once", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		await ns.replicant.count.set(20);
 		const received: number[] = [];
 		const cancel = await ns.replicant.count.subscribe((value) => {
@@ -114,10 +108,11 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 	});
 
 	test("concurrent writes to disjoint fields both land", async () => {
-		const writer = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const writerRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(writer.dispose);
+		onTestFinished(writerRoot.dispose);
+		const writer = writerRoot.children.fixture;
 		await writer.replicant.scoreboard.set({ home: 0, away: 0 });
 		// Subscribing holds the field hot, so both updaters read the same base and
 		// their patches genuinely race.
@@ -133,10 +128,11 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 			}),
 		]);
 
-		const reader = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const readerRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(reader.dispose);
+		onTestFinished(readerRoot.dispose);
+		const reader = readerRoot.children.fixture;
 		expect(await reader.replicant.scoreboard.get()).toEqual({
 			home: 1,
 			away: 2,
@@ -144,10 +140,11 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 	});
 
 	test("concurrent same-field increments converge through retry", async () => {
-		const writer = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const writerRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(writer.dispose);
+		onTestFinished(writerRoot.dispose);
+		const writer = writerRoot.children.fixture;
 		await writer.replicant.count.set(0);
 		// Subscribing holds the field hot, so all three updaters read the same
 		// base and the losers genuinely conflict before re-running.
@@ -160,18 +157,20 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 			writer.replicant.count.update((c) => c + 1),
 		]);
 
-		const reader = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const readerRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(reader.dispose);
+		onTestFinished(readerRoot.dispose);
+		const reader = readerRoot.children.fixture;
 		expect(await reader.replicant.count.get()).toBe(3);
 	});
 
 	test("{ retry: false } surfaces a same-field conflict instead of resending", async () => {
-		const writer = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const writerRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(writer.dispose);
+		onTestFinished(writerRoot.dispose);
+		const writer = writerRoot.children.fixture;
 		await writer.replicant.scoreboard.set({ home: 0, away: 0 });
 		const cancel = await writer.replicant.scoreboard.subscribe(() => {});
 		onTestFinished(() => cancel());
@@ -199,10 +198,11 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 			/conflicted with a concurrent update/,
 		);
 
-		const reader = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const readerRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(reader.dispose);
+		onTestFinished(readerRoot.dispose);
+		const reader = readerRoot.children.fixture;
 		expect(await reader.replicant.scoreboard.get()).toEqual({
 			home: first.status === "fulfilled" ? 1 : 2,
 			away: 0,
@@ -210,10 +210,11 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 	});
 
 	test("concurrent key adds both land", async () => {
-		const writer = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const writerRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(writer.dispose);
+		onTestFinished(writerRoot.dispose);
+		const writer = writerRoot.children.fixture;
 		await writer.replicant.tallies.set({});
 		const cancel = await writer.replicant.tallies.subscribe(() => {});
 		onTestFinished(() => cancel());
@@ -227,10 +228,11 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 			}),
 		]);
 
-		const reader = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const readerRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(reader.dispose);
+		onTestFinished(readerRoot.dispose);
+		const reader = readerRoot.children.fixture;
 		expect(await reader.replicant.tallies.get()).toEqual({
 			first: 1,
 			second: 2,
@@ -238,10 +240,11 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 	});
 
 	test("concurrent array appends both land", async () => {
-		const writer = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const writerRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(writer.dispose);
+		onTestFinished(writerRoot.dispose);
+		const writer = writerRoot.children.fixture;
 		await writer.replicant.roster.set([]);
 		const cancel = await writer.replicant.roster.subscribe(() => {});
 		onTestFinished(() => cancel());
@@ -255,10 +258,11 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 			}),
 		]);
 
-		const reader = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const readerRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(reader.dispose);
+		onTestFinished(readerRoot.dispose);
+		const reader = readerRoot.children.fixture;
 		const roster = await reader.replicant.roster.get();
 		expect([...roster].sort((a, b) => a.id.localeCompare(b.id))).toEqual([
 			{ id: "alice", score: 1 },
@@ -267,10 +271,9 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 	});
 
 	test("subscribe receives an array reorder with an element edit", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		const seed = [
 			{ id: "alice", score: 1 },
 			{ id: "bob", score: 2 },
@@ -303,19 +306,17 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 	});
 
 	test("reads a server-computed value over HTTP", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		await ns.replicant.count.set(10);
 		expect(await ns.computed.doubledCount.get()).toBe(20);
 	});
 
 	test("subscribe to a computed value receives recomputed updates", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		await ns.replicant.count.set(3);
 		const received: number[] = [];
 		const cancel = await ns.computed.doubledCount.subscribe((value) => {
@@ -328,10 +329,9 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 	});
 
 	test("a branching computed dedupes source changes it doesn't depend on", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		await ns.replicant.count.set(0);
 		await ns.replicant.label.set("first");
 		const received: string[] = [];
@@ -399,10 +399,9 @@ describe("spa frontend serving", () => {
 describe("role-gated field access (HTTP)", () => {
 	test("anonymous is denied the role-gated and the member-gated field", async () => {
 		await logout();
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		await expect(ns.replicant.producerOnly.get()).rejects.toThrow(
 			/Permission denied/,
 		);
@@ -413,20 +412,18 @@ describe("role-gated field access (HTTP)", () => {
 
 	test("an explicit producer reads the producer-only and member fields", async () => {
 		await login("prod");
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		expect(await ns.replicant.producerOnly.get()).toBe("producers-only");
 		expect(await ns.replicant.membersOnly.get()).toBe("members-only");
 	});
 
 	test("a viewer reads the member field via the umbrella but not the producer-only field", async () => {
 		await login("view");
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		expect(await ns.replicant.membersOnly.get()).toBe("members-only");
 		await expect(ns.replicant.producerOnly.get()).rejects.toThrow(
 			/Permission denied/,
@@ -476,10 +473,9 @@ describe("role-gated field access (HTTP)", () => {
 describe("WS handshake honors the session cookie", () => {
 	test("a logged-in producer subscribes to a producer-only field", async () => {
 		await login("prod");
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		const received: string[] = [];
 		const cancel = await ns.replicant.producerOnly.subscribe((value) => {
 			received.push(value);
@@ -495,16 +491,16 @@ describe("messaging (topic + rpc)", () => {
 	});
 
 	test("a topic publish fans out to a separate subscriber", async () => {
-		const subscriber = await loadNamespace(
-			replicantSyncManifest.children.fixture,
-			{ baseUrl: base },
-		);
-		onTestFinished(subscriber.dispose);
-		const publisher = await loadNamespace(
-			replicantSyncManifest.children.fixture,
-			{ baseUrl: base },
-		);
-		onTestFinished(publisher.dispose);
+		const subscriberRoot = await loadNamespace(replicantSyncManifest, {
+			baseUrl: base,
+		});
+		onTestFinished(subscriberRoot.dispose);
+		const subscriber = subscriberRoot.children.fixture;
+		const publisherRoot = await loadNamespace(replicantSyncManifest, {
+			baseUrl: base,
+		});
+		onTestFinished(publisherRoot.dispose);
+		const publisher = publisherRoot.children.fixture;
 		const received: string[] = [];
 		const cancel = await subscriber.topic.chat.subscribe((value) => {
 			received.push(value);
@@ -520,15 +516,14 @@ describe("messaging (topic + rpc)", () => {
 	});
 
 	test("a second subscriber on the same client joins live without replaying the last event", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
+		const publisherRoot = await loadNamespace(replicantSyncManifest, {
 			baseUrl: base,
 		});
-		onTestFinished(ns.dispose);
-		const publisher = await loadNamespace(
-			replicantSyncManifest.children.fixture,
-			{ baseUrl: base },
-		);
-		onTestFinished(publisher.dispose);
+		onTestFinished(publisherRoot.dispose);
+		const publisher = publisherRoot.children.fixture;
 		const first: string[] = [];
 		const cancelFirst = await ns.topic.chat.subscribe((value) => {
 			first.push(value);
@@ -563,18 +558,16 @@ describe("messaging (topic + rpc)", () => {
 	});
 
 	test("an rpc call runs the server handler and returns its response", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		expect(await ns.rpc.echo.call("ping")).toBe("PING");
 	});
 
 	test("an rpc handler mutates a replicant that a subscriber observes", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.fixture, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const ns = root.children.fixture;
 		const received: number[] = [];
 		const cancel = await ns.replicant.count.subscribe((value) => {
 			received.push(value);
