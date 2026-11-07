@@ -4,16 +4,18 @@ on:
   pull_request:
     branches:
       - main
+      - next
   push:
     branches:
       - main
+      - next
 
 permissions:
   contents: read
 
 jobs:
   status:
-    if: github.head_ref != 'changeset-release/main' && !contains(github.event.head_commit.message, 'Version Packages')
+    if: ${{ !startsWith(github.head_ref, 'changeset-release/') && !contains(github.event.head_commit.message, 'Version Packages') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6

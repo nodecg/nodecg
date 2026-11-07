@@ -2,7 +2,7 @@
 	"$schema": "../node_modules/.pnpm/@changesets+config@4.0.0/node_modules/@changesets/config/schema.json",
 	"changelog": [
 		"./changelog.ts",
-		{ "repo": "Hoishin/nodecg-next", "template": "- {summary} {ref}" }
+		{ "template": "- {summary} {ref}" }
 	],
 	"linked": [
 		[
