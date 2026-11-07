@@ -1,9 +1,6 @@
 {
 	"$schema": "../node_modules/.pnpm/@changesets+config@4.0.0/node_modules/@changesets/config/schema.json",
-	"changelog": [
-		"./changelog.ts",
-		{ "template": "- {summary} {ref}" }
-	],
+	"changelog": ["./changelog.ts", { "template": "- {summary} {ref}" }],
 	"linked": [
 		[
 			"@nodecg-next/core",
