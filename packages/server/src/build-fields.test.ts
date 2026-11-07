@@ -11,7 +11,6 @@ import { testLayer } from "@nodecg-next/test-utils";
 import { Effect, Layer, Schema, Stream } from "effect";
 import { assert, describe, expect, expectTypeOf, vi } from "vitest";
 
-import { BuiltNamespaceRegistry } from "./build-fields.ts";
 import { buildNamespace } from "./build-namespace.ts";
 import {
 	type ComputeContext,
@@ -33,7 +32,6 @@ const test = testLayer(
 		ReplicantStoreService.layer.pipe(
 			Layer.provide(InMemoryReplicantRepository),
 		),
-		BuiltNamespaceRegistry.layer,
 		identity,
 	),
 );
@@ -138,7 +136,6 @@ describe("compute fn contract", () => {
 
 			assert(received);
 			expect(received.replicant.games.get()).toEqual([{ id: "a" }]);
-			expect(received.use).toBeTypeOf("function");
 		}),
 	);
 
@@ -430,20 +427,13 @@ const scoreboard = implementNamespace(
 
 const league = implementNamespace(
 	defineNamespace("league", {
-		computed: {
-			multiplier: { schema: Schema.FiniteFromString },
-			usedMultiplier: { schema: Schema.FiniteFromString },
-		},
+		computed: { multiplier: { schema: Schema.FiniteFromString } },
 		rpc: {
 			relayAward: {
 				schema: { request: Schema.Finite, response: Schema.Finite },
 				permission: everyoneWrite,
 			},
 			readMultiplier: {
-				schema: { request: Schema.Null, response: Schema.Finite },
-				permission: everyoneWrite,
-			},
-			readUsedMultiplier: {
 				schema: { request: Schema.Null, response: Schema.Finite },
 				permission: everyoneWrite,
 			},
@@ -454,14 +444,11 @@ const league = implementNamespace(
 		implementComputed: {
 			multiplier: (ctx) =>
 				ctx.children.scoreboard.children.settings.replicant.multiplier.get(),
-			usedMultiplier: (ctx) => ctx.use(settings).replicant.multiplier.get(),
 		},
 		implementRpc: {
 			relayAward: (points, ctx) => ctx.children.scoreboard.rpc.award(points),
 			readMultiplier: (_, ctx) =>
 				ctx.children.scoreboard.children.settings.replicant.multiplier.get(),
-			readUsedMultiplier: (_, ctx) =>
-				ctx.use(settings).replicant.multiplier.get(),
 		},
 		children: { scoreboard },
 	},
@@ -567,48 +554,6 @@ describe("ctx.children in an rpc handler", () => {
 			const tree = yield* loadTree;
 
 			expect(yield* tree.league.rpc.readMultiplier.call(null)).toBe(3);
-		}),
-	);
-});
-
-describe("ctx.use", () => {
-	test(
-		"a computed reads a namespace outside its children",
-		Effect.gen(function* () {
-			const tree = yield* loadTree;
-
-			expect(yield* tree.league.computed.usedMultiplier.get()).toBe(3);
-		}),
-	);
-
-	test(
-		"a handler reads a namespace outside its children",
-		Effect.gen(function* () {
-			const tree = yield* loadTree;
-
-			expect(yield* tree.league.rpc.readUsedMultiplier.call(null)).toBe(3);
-		}),
-	);
-
-	test(
-		"an unloaded target surfaces as ComputedComputeError",
-		Effect.gen(function* () {
-			const lonely = implementNamespace(
-				defineNamespace("lonely", {
-					computed: { multiplier: { schema: Schema.FiniteFromString } },
-				}),
-				{
-					implementComputed: {
-						multiplier: (ctx) => ctx.use(settings).replicant.multiplier.get(),
-					},
-				},
-			);
-			const { fields } = yield* buildNamespace(lonely, {});
-
-			const error = yield* fields.computed.multiplier.get().pipe(Effect.flip);
-
-			expect(error._tag).toBe("ComputedComputeError");
-			expect(error.message).toContain('Namespace "settings" was not loaded');
 		}),
 	);
 });

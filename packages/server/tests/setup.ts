@@ -26,7 +26,6 @@ import {
 } from "../src/auth/auth-provider.ts";
 import { RoleLinks } from "../src/auth/role-links.ts";
 import { createSession } from "../src/auth/session.ts";
-import { BuiltNamespaceRegistry } from "../src/build-fields.ts";
 import { NamespaceRegistryService } from "../src/namespace-registry.ts";
 import { ReplicantStoreService } from "../src/replicant-store.ts";
 import { routes } from "../src/server/routes.ts";
@@ -63,7 +62,6 @@ export const services = Layer.mergeAll(
 			),
 		),
 	),
-	BuiltNamespaceRegistry.layer,
 	HttpPlatform.layer.pipe(Layer.provideMerge(Etag.layerWeak)),
 	NamespaceRegistryService.layer([]),
 	Layer.succeed(AuthProviderRegistry, HashMap.empty<string, AuthProvider>()),

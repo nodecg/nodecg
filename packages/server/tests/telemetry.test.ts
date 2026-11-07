@@ -85,7 +85,6 @@ test(
 			buildNamespace: "prepareNamespace",
 			buildFields: "buildNamespace",
 			buildReplicant: "buildFields",
-			adaptNamespace: "buildNamespace",
 			onLoad: undefined,
 			set: undefined,
 			call: undefined,

@@ -28,7 +28,6 @@ import {
 	ManagedRuntime,
 	Option,
 	References,
-	Result,
 	Schema,
 	Scope,
 	Stream,
@@ -43,10 +42,6 @@ import {
 import { normalizeRoleLinks, RoleLinks } from "./auth/role-links.ts";
 import { buildCustomRoutes } from "./build-custom-routes.ts";
 import {
-	BuiltNamespaceRegistry,
-	makeUseCrossNamespace,
-} from "./build-fields.ts";
-import {
 	buildNamespace,
 	type NamespaceHandles,
 	type NamespaceHandlesLambda,
@@ -55,7 +50,6 @@ import { fieldInternal } from "./field-builders/field-internal-key.ts";
 import type {
 	ImplementedNamespace,
 	LoadedNamespace,
-	OnLoadContext,
 	WidenedImplementedNamespace,
 } from "./implement-namespace.ts";
 import {
@@ -165,19 +159,14 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 	implemented: ImplementedNamespace<S, CustomRoutes>,
 	children: ApplyLambdaToObjectValues<NamespaceHandlesLambda, S["children"]>,
 ) {
-	const registry = yield* BuiltNamespaceRegistry;
 	const { fields, handles } = yield* buildNamespace(implemented, children);
-	const ctx: OnLoadContext<S> = {
-		...handles.loaded,
-		use: makeUseCrossNamespace(registry),
-	};
 	const onLoad = implemented.impl?.onLoad;
 	const runOnLoad =
 		typeof onLoad === "undefined"
 			? Effect.void
 			: Effect.gen(function* () {
 					const cleanup = yield* Effect.tryPromise({
-						try: async () => onLoad(ctx),
+						try: async () => onLoad(handles.loaded),
 						catch: (error) =>
 							OnLoadError.make({
 								namespace: implemented.manifest.namespace,
@@ -207,7 +196,7 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 		namespace: fields.namespace,
 		declaredRoles: new Set(implemented.manifest[manifestRolesKey].roles.keys()),
 		frontend: implemented.impl?.frontend,
-		customRoute: yield* buildCustomRoutes(implemented, ctx),
+		customRoute: yield* buildCustomRoutes(implemented, handles.loaded),
 		fields,
 	};
 	return { handles, prepared: { registered, runOnLoad } };
@@ -277,13 +266,11 @@ export const loadNamespaceEffect = Effect.fn(
 			});
 		}
 
-		const internalServices = yield* Layer.build(
-			Layer.merge(ReplicantStoreService.layer, BuiltNamespaceRegistry.layer),
-		);
+		const internalServices = yield* Layer.build(ReplicantStoreService.layer);
 
 		return yield* Effect.gen(function* () {
 			const store = yield* ReplicantStoreService;
-			const registry = yield* BuiltNamespaceRegistry;
+			const builtHandles = new WeakMap<WidenedImplementedNamespace, unknown>();
 
 			const loadTree = <
 				TreeS extends WidestNamespaceFields,
@@ -297,9 +284,12 @@ export const loadNamespaceEffect = Effect.fn(
 			> =>
 				Effect.gen(function* () {
 					// Reuse when namespace is referenced by multiple parents
-					const existing = registry.lookup(implemented);
-					if (Result.isSuccess(existing)) {
-						return { handles: existing.success, prepared: [] };
+					const existing = builtHandles.get(implemented);
+					if (typeof existing !== "undefined") {
+						return {
+							handles: existing as NamespaceHandles<TreeS>,
+							prepared: [],
+						};
 					}
 					const children = yield* mapEffectValues<
 						ImplementedNamespaceLambda,
@@ -311,6 +301,7 @@ export const loadNamespaceEffect = Effect.fn(
 							(child) => child.handles,
 						)(children),
 					);
+					builtHandles.set(implemented, handles);
 					return {
 						handles,
 						prepared: [

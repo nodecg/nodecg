@@ -33,10 +33,10 @@ export interface DecodedLambda extends HKT.TypeLambda {
 	readonly type: this["Target"];
 }
 
-export type CrossFieldRead<Decoded> = { readonly get: () => Decoded };
+export type FieldRead<Decoded> = { readonly get: () => Decoded };
 
-export interface CrossFieldReadLambda extends HKT.TypeLambda {
-	readonly type: CrossFieldRead<this["Target"]>;
+export interface FieldReadLambda extends HKT.TypeLambda {
+	readonly type: FieldRead<this["Target"]>;
 }
 
 export interface ComputeFnLambda extends HKT.TypeLambda {

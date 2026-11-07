@@ -6,8 +6,8 @@ import { crossManifest, extendedManifest } from "../../src/shared/manifests.ts";
 
 const base = suiteBase("cross-namespace");
 
-describe("cross-namespace rpc via ctx.use", () => {
-	test("an rpc writes another namespace's replicant", async () => {
+describe("cross-namespace rpc via ctx.children", () => {
+	test("an rpc writes its child's replicant", async () => {
 		const {
 			namespaces: { cross, extended },
 			dispose,
@@ -25,8 +25,8 @@ describe("cross-namespace rpc via ctx.use", () => {
 	});
 });
 
-describe("cross-namespace computed via ctx.use", () => {
-	test("recomputes when the source in the other namespace changes", async () => {
+describe("cross-namespace computed via ctx.children", () => {
+	test("recomputes when the source in its child changes", async () => {
 		const {
 			namespaces: { cross, extended },
 			dispose,

@@ -276,18 +276,19 @@ match.replicant.label.subscribe((label) => {
   loadNamespace(extended);
   ```
 
-- ✅ A namespace can run server-side logic when it loads, and can read other loaded namespaces inside
+- ✅ A namespace can run server-side logic when it loads, and can read its children inside
 
   ```ts
   const overlay = implementNamespace(overlayManifest, {
+    children: { commercial },
     onLoad: async (ctx) => {
-      const { isRunning } = ctx.use(commercial).replicant;
+      const { isRunning } = ctx.children.commercial.replicant;
       await ctx.topic.status.publish(isRunning.get() ? "On break" : "Live");
     },
   });
 
   const show = implementNamespace(showManifest, {
-    children: { overlay, commercial },
+    children: { overlay },
   });
 
   loadNamespace(show);

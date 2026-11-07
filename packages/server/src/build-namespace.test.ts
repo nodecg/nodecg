@@ -5,7 +5,6 @@ import { Effect, Layer, Schema } from "effect";
 import { describe, expect, onTestFinished, vi } from "vitest";
 import { z } from "zod";
 
-import { BuiltNamespaceRegistry } from "./build-fields.ts";
 import { buildNamespace } from "./build-namespace.ts";
 import { fieldInternal } from "./field-builders/field-internal-key.ts";
 import { implementNamespace } from "./implement-namespace.ts";
@@ -27,7 +26,6 @@ const test = testLayer(
 		ReplicantStoreService.layer.pipe(
 			Layer.provide(InMemoryReplicantRepository),
 		),
-		BuiltNamespaceRegistry.layer,
 		identity,
 	),
 );

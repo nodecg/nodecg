@@ -7,10 +7,7 @@ import { describe, expect } from "vitest";
 
 import { buildCustomRoutes } from "../src/build-custom-routes.ts";
 import { buildNamespace } from "../src/build-namespace.ts";
-import {
-	implementNamespace,
-	type UseCrossNamespace,
-} from "../src/implement-namespace.ts";
+import { implementNamespace } from "../src/implement-namespace.ts";
 import { NamespaceRegistryService } from "../src/namespace-registry.ts";
 import { BackendError } from "../src/services/repository/repository-errors.ts";
 import { SessionRepositoryService } from "../src/services/repository/session/session-repository.ts";
@@ -81,17 +78,11 @@ const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
 		const { fields, handles } = yield* buildNamespace(namespace, {});
-		const use: UseCrossNamespace = () => {
-			throw new Error("unused");
-		};
 		return yield* NamespaceRegistryService.make([
 			{
 				namespace: fields.namespace,
 				declaredRoles: new Set(),
-				customRoute: yield* buildCustomRoutes(namespace, {
-					...handles.loaded,
-					use,
-				}),
+				customRoute: yield* buildCustomRoutes(namespace, handles.loaded),
 				fields,
 			},
 		]);

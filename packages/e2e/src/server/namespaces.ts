@@ -87,12 +87,14 @@ export const cross = implementNamespace(crossManifest, {
 	seedReplicant: { factor: () => 2 },
 	implementComputed: {
 		scaledScore: (ctx) =>
-			ctx.replicant.factor.get() * ctx.use(extended).replicant.score.get(),
+			ctx.replicant.factor.get() * ctx.children.extended.replicant.score.get(),
 	},
 	implementRpc: {
 		addScore: async (points, ctx) => {
-			await ctx.use(extended).replicant.score.update((score) => score + points);
-			return ctx.use(extended).replicant.score.get();
+			await ctx.children.extended.replicant.score.update(
+				(score) => score + points,
+			);
+			return ctx.children.extended.replicant.score.get();
 		},
 	},
 	children: { extended },

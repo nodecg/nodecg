@@ -180,39 +180,6 @@ describe("computed validation", () => {
 	);
 
 	testInMemory(
-		"validates a cross-namespace computed listed before its source",
-		Effect.gen(function* () {
-			const scoreboard = implementNamespace(
-				defineNamespace("scoreboard", {
-					replicant: { total: { schema: Schema.FiniteFromString } },
-					computed: { weighted: { schema: Schema.FiniteFromString } },
-				}),
-				{
-					seedReplicant: { total: () => 10 },
-					implementComputed: {
-						weighted: (ctx) =>
-							ctx.replicant.total.get() *
-							ctx.use(settings).replicant.multiplier.get(),
-					},
-				},
-			);
-			const show = implementNamespace(
-				defineNamespace("show", {
-					children: {
-						scoreboard: scoreboard.manifest,
-						settings: settings.manifest,
-					},
-				}),
-				{ children: { scoreboard, settings } },
-			);
-
-			const handle = yield* loadNamespaceEffect(show);
-
-			expect(handle.children.scoreboard.computed.weighted.get()).toBe(30);
-		}),
-	);
-
-	testInMemory(
 		"fails the load when computed fields form a cycle",
 		Effect.gen(function* () {
 			const cyclic = implementNamespace(
@@ -261,35 +228,6 @@ describe("onLoad", () => {
 			const handle = yield* loadNamespaceEffect(stats);
 
 			expect(handle.replicant.viewers.get()).toBe(300);
-		}),
-	);
-
-	testInMemory(
-		"runs with the plain handle after every namespace is built",
-		Effect.gen(function* () {
-			const stats = implementNamespace(
-				defineNamespace("stats", {
-					replicant: { viewers: { schema: Schema.FiniteFromString } },
-				}),
-				{
-					seedReplicant: { viewers: () => 0 },
-					onLoad: async (ctx) => {
-						await ctx.replicant.viewers.set(
-							ctx.use(settings).replicant.multiplier.get() * 100,
-						);
-					},
-				},
-			);
-			const show = implementNamespace(
-				defineNamespace("show", {
-					children: { stats: stats.manifest, settings: settings.manifest },
-				}),
-				{ children: { stats, settings } },
-			);
-
-			const handle = yield* loadNamespaceEffect(show);
-
-			expect(handle.children.stats.replicant.viewers.get()).toBe(300);
 		}),
 	);
 

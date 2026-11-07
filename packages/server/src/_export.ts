@@ -8,7 +8,6 @@ export {
 	type LoadNamespaceOptions,
 	type StorageOption,
 } from "./load-namespace.ts";
-export { NamespaceNotLoaded } from "./build-fields.ts";
 export {
 	type AuthProvider,
 	ProviderStateMismatch,

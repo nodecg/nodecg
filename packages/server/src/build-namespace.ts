@@ -9,7 +9,6 @@ import {
 	mapValues,
 } from "@nodecg-next/internal/utils";
 import {
-	Context,
 	Effect,
 	Exit,
 	type HKT,
@@ -18,15 +17,13 @@ import {
 	Schema,
 	Scope,
 	Stream,
-	Tracer,
 } from "effect";
 import type { Promisable } from "type-fest";
 
 import {
 	type BuiltNamespace,
 	buildFields,
-	BuiltNamespaceRegistry,
-	makeCrossComputeView,
+	type FieldServices,
 	makeCrossNamespaceHandle,
 } from "./build-fields.ts";
 import { fieldInternal } from "./field-builders/field-internal-key.ts";
@@ -41,7 +38,7 @@ import type {
 	TopicFieldLambda,
 } from "./field-lambdas.ts";
 import type {
-	CrossComputeView,
+	ComputeContext,
 	CrossNamespaceHandle,
 	ImplementedNamespace,
 	LoadedNamespace,
@@ -61,7 +58,7 @@ export class MissingReplicantSeed extends Schema.TaggedError<MissingReplicantSee
 }
 
 export interface NamespaceHandles<S extends WidestNamespaceFields> {
-	readonly compute: CrossComputeView<
+	readonly compute: ComputeContext<
 		S["replicant"],
 		S["computed"],
 		S["children"]
@@ -74,8 +71,8 @@ export interface NamespaceHandlesLambda extends HKT.TypeLambda {
 	readonly type: NamespaceHandles<InferNamespace<this["Target"]>["fields"]>;
 }
 
-interface CrossComputeViewLambda extends HKT.TypeLambda {
-	readonly type: CrossComputeView<
+interface ComputeContextLambda extends HKT.TypeLambda {
+	readonly type: ComputeContext<
 		InferNamespace<this["Target"]>["fields"]["replicant"],
 		InferNamespace<this["Target"]>["fields"]["computed"],
 		InferNamespace<this["Target"]>["fields"]["children"]
@@ -102,14 +99,14 @@ export const buildNamespace = Effect.fn("buildNamespace")(function* <
 
 	for (const name of Object.keys(manifest.replicant)) {
 		if (typeof seedReplicant?.[name] === "undefined") {
-			return yield* new MissingReplicantSeed({
+			return yield* MissingReplicantSeed.make({
 				namespace: manifest.namespace,
 				name,
 			});
 		}
 	}
 
-	const compute = mapValues<NamespaceHandlesLambda, CrossComputeViewLambda>(
+	const compute = mapValues<NamespaceHandlesLambda, ComputeContextLambda>(
 		(child) => child.compute,
 	)(children);
 	const rpc = mapValues<NamespaceHandlesLambda, CrossNamespaceHandleLambda>(
@@ -119,27 +116,25 @@ export const buildNamespace = Effect.fn("buildNamespace")(function* <
 		(child) => child.loaded,
 	)(children);
 
-	const fields = yield* buildFields(manifest, impl, { compute, rpc });
-	const fieldContext = yield* Effect.context<
-		TopicBrokerService | ReplicantStoreService
-	>().pipe(Effect.map(Context.omit(Tracer.ParentSpan)));
+	const { fields, computeContext, fieldServices } = yield* buildFields(
+		manifest,
+		impl,
+		{ compute, rpc },
+	);
 	const handles: NamespaceHandles<S> = {
-		compute: makeCrossComputeView(fields, compute),
-		rpc: makeCrossNamespaceHandle(fieldContext, fields, rpc),
-		loaded: yield* adaptNamespace(fields, loaded),
+		compute: computeContext,
+		rpc: makeCrossNamespaceHandle(fieldServices, fields, rpc),
+		loaded: adaptNamespace(fieldServices, fields, loaded),
 	};
-	const registry = yield* BuiltNamespaceRegistry;
-	yield* registry.register(implemented, handles);
 	return { fields, handles };
 });
 
-const adaptNamespace = Effect.fn("adaptNamespace")(function* <
-	S extends WidestNamespaceFields,
->(built: BuiltNamespace<S>, children: LoadedNamespace<S>["children"]) {
-	const fieldContext = yield* Effect.context<
-		TopicBrokerService | ReplicantStoreService
-	>().pipe(Effect.map(Context.omit(Tracer.ParentSpan)));
-	const runPromise = Effect.runPromiseWith(fieldContext);
+const adaptNamespace = <S extends WidestNamespaceFields>(
+	services: FieldServices,
+	built: BuiltNamespace<S>,
+	children: LoadedNamespace<S>["children"],
+) => {
+	const runPromise = Effect.runPromiseWith(services);
 
 	const subscribeAdapter =
 		<Decoded, E>(
@@ -220,4 +215,4 @@ const adaptNamespace = Effect.fn("adaptNamespace")(function* <
 		children,
 	};
 	return loaded;
-});
+};

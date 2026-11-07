@@ -22,7 +22,7 @@ export type SeedReplicant<out Replicant extends Record<string, unknown>> = {
 	readonly [K in keyof Replicant & string]: () => Replicant[K];
 };
 
-export type CrossComputeView<
+export type ComputeContext<
 	out Replicant extends Record<string, unknown>,
 	out Computed extends Record<string, unknown>,
 	out Children extends WidestNamespaceManifests,
@@ -38,25 +38,12 @@ export type CrossComputeView<
 		};
 	};
 	readonly children: {
-		readonly [K in keyof Children & string]: CrossComputeView<
+		readonly [K in keyof Children & string]: ComputeContext<
 			InferNamespace<Children[K]>["fields"]["replicant"],
 			InferNamespace<Children[K]>["fields"]["computed"],
 			InferNamespace<Children[K]>["fields"]["children"]
 		>;
 	};
-};
-
-export type ComputeContext<
-	Replicant extends Record<string, unknown>,
-	Computed extends Record<string, unknown>,
-	Children extends WidestNamespaceManifests,
-> = CrossComputeView<Replicant, Computed, Children> & {
-	readonly use: <
-		S extends WidestNamespaceFields,
-		CustomRoutes extends WidestCustomRoutes,
-	>(
-		implemented: ImplementedNamespace<S, CustomRoutes>,
-	) => CrossComputeView<S["replicant"], S["computed"], S["children"]>;
 };
 
 export type ImplementComputed<
@@ -126,10 +113,7 @@ export interface LoadedNamespace<S extends WidestNamespaceFields> {
 	};
 }
 
-export type OnLoadContext<S extends WidestNamespaceFields> =
-	LoadedNamespace<S> & {
-		readonly use: UseCrossNamespace;
-	};
+export type OnLoadContext<S extends WidestNamespaceFields> = LoadedNamespace<S>;
 
 export type OnLoad<S extends WidestNamespaceFields> = (
 	ctx: OnLoadContext<S>,
@@ -180,17 +164,9 @@ export type CrossNamespaceHandle<S extends WidestNamespaceFields> =
 		};
 	};
 
-export type UseCrossNamespace = <
-	S extends WidestNamespaceFields,
-	CustomRoutes extends WidestCustomRoutes,
->(
-	implemented: ImplementedNamespace<S, CustomRoutes>,
-) => CrossNamespaceHandle<S>;
-
 export type RpcContext<S extends WidestNamespaceFields> =
 	RpcFieldAccessors<S> & {
 		readonly children: CrossNamespaceHandle<S>["children"];
-		readonly use: UseCrossNamespace;
 	};
 
 export type ImplementRpc<S extends WidestNamespaceFields> = {

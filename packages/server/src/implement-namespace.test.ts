@@ -4,7 +4,6 @@ import { testLayer } from "@nodecg-next/test-utils";
 import { Effect, Layer, Schema } from "effect";
 import { describe, expect, expectTypeOf, test } from "vitest";
 
-import { BuiltNamespaceRegistry } from "./build-fields.ts";
 import { buildNamespace } from "./build-namespace.ts";
 import {
 	implementExtendedNamespace,
@@ -22,7 +21,6 @@ const testInMemory = testLayer(
 		ReplicantStoreService.layer.pipe(
 			Layer.provide(InMemoryReplicantRepository),
 		),
-		BuiltNamespaceRegistry.layer,
 	),
 );
 
