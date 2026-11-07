@@ -19,14 +19,17 @@ const assets = defineNamespace("show-assets", {
 });
 const show = defineNamespace("show", {
 	roles: {
-		operator: { permission: [], linkedRoles: [assets.roles.uploader] },
+		operator: {
+			permission: [],
+			linkRoles: (children) => [children.assets.roles.uploader],
+		},
 	},
 	children: { assets },
 });
 
 const operator = Role.make({
-	namespace: show.roles.operator.namespace,
-	name: RoleName.make(show.roles.operator.name),
+	namespace: show.namespace,
+	name: RoleName.make("operator"),
 });
 
 const namespaces = NamespaceRegistryService.layer(

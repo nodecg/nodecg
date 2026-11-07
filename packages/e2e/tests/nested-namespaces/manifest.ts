@@ -21,7 +21,7 @@ export const nestManifest = defineNamespace("e2e-nest", {
 	roles: {
 		operator: {
 			permission: [],
-			linkedRoles: [nestAssetsManifest.roles.uploader],
+			linkRoles: (children) => [children.assets.roles.uploader],
 		},
 		viewer: { permission: [] },
 	},

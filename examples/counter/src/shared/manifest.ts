@@ -7,7 +7,7 @@ export const rootManifest = defineNamespace("counter-example", {
 	roles: {
 		operator: {
 			permission: ["replicant-write"],
-			linkedRoles: [counterManifest.roles.operator],
+			linkRoles: (children) => [children.counter.roles.operator],
 		},
 	},
 	replicant: {

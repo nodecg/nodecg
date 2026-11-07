@@ -32,14 +32,13 @@ import {
 	rpcPermission,
 	topicPermission,
 	type Access,
-	type NamespaceRole,
+	RoleReference,
 	type PermissionArg,
 	type PrincipalManifest,
 	type PrincipalsArg,
 	type PermissionRuleArg,
 	type ReadOnlyPermissionArg,
 	type ResolvedPermission,
-	type RoleArg,
 	type RoleCapability,
 	type RoleManifest,
 	type WriteOnlyPermissionArg,
@@ -121,9 +120,7 @@ export interface NamespaceManifest<
 	CustomRoutes extends WidestCustomRoutes = WidestCustomRoutes,
 > {
 	readonly namespace: Namespace;
-	readonly roles: Readonly<
-		Record<RoleNames, NamespaceRole<Namespace, RoleNames>>
-	>;
+	readonly roles: ReadonlySet<RoleNames>;
 
 	readonly replicant: {
 		[K in keyof S["replicant"] & string]: ReplicantFieldManifest<
@@ -146,6 +143,25 @@ export interface NamespaceManifest<
 	readonly children: S["children"];
 
 	readonly [manifestRolesKey]: RoleRegistry;
+}
+
+type ChildRoleTree<Children extends WidestNamespaceManifests> = {
+	readonly [K in keyof Children]: {
+		readonly roles: {
+			readonly [Name in Children[K]["roles"] extends ReadonlySet<
+				infer RoleNames extends string
+			>
+				? RoleNames
+				: never]: RoleReference;
+		};
+		readonly children: ChildRoleTree<Children[K]["children"]>;
+	};
+};
+
+export interface RoleArg<Children extends WidestNamespaceManifests> {
+	readonly description?: string;
+	readonly permission: ReadonlyArray<RoleCapability>;
+	linkRoles?(children: ChildRoleTree<Children>): ReadonlyArray<RoleReference>;
 }
 
 export type InferNamespace<Manifest> =
@@ -445,11 +461,30 @@ const validateCustomRouteMethods = (
 const isDeclarablePrincipalName = Schema.is(DeclarablePrincipalNameSchema);
 const isUndeniablePrincipalName = Schema.is(UndeniablePrincipalNameSchema);
 
+const buildRoleTree = (
+	children: WidestNamespaceManifests,
+): ChildRoleTree<WidestNamespaceManifests> =>
+	Record.map(children, (child) => ({
+		roles: Record.fromIterableWith(child.roles, (name) => [
+			name,
+			RoleReference.make({ namespace: child.namespace, name }),
+		]),
+		children: buildRoleTree(child.children),
+	}));
+
+const declaresRole = (
+	children: WidestNamespaceManifests,
+	role: RoleReference,
+): boolean =>
+	Object.values(children).some(
+		(child) =>
+			(child.namespace === role.namespace && child.roles.has(role.name)) ||
+			declaresRole(child.children, role),
+	);
+
 const declareRoles = (
 	named:
-		| Readonly<
-				Record<string, RoleArg<NamespaceRole<string, string>> | undefined>
-		  >
+		| Readonly<Record<string, RoleArg<WidestNamespaceManifests> | undefined>>
 		| undefined,
 	overrides: PrincipalsArg | undefined,
 	children: WidestNamespaceManifests,
@@ -475,6 +510,7 @@ const declareRoles = (
 	}
 
 	// Resolve roles
+	const roleTree = buildRoleTree(children);
 	for (const [key, arg] of Object.entries(named ?? {})) {
 		if (typeof arg === "undefined") {
 			continue;
@@ -490,19 +526,16 @@ const declareRoles = (
 			);
 		}
 		const roleName = RoleName.make(key);
-		const linkedRoles = arg.linkedRoles?.map(({ namespace, name }) => {
-			if (
-				!Object.values(children).some(
-					(child) =>
-						child.namespace === namespace &&
-						child[manifestRolesKey].roles.has(RoleName.make(name)),
-				)
-			) {
+		const linkedRoles = arg.linkRoles?.(roleTree).map((role) => {
+			if (!declaresRole(children, role)) {
 				throw new Error(
-					`Role "${key}" cannot link to "${name}" of "${namespace}": no child declares it`,
+					`Role "${key}" links to unknown role "${role.name}" of "${role.namespace}"`,
 				);
 			}
-			return Role.make({ namespace, name: RoleName.make(name) });
+			return Role.make({
+				namespace: role.namespace,
+				name: RoleName.make(role.name),
+			});
 		});
 		roles.set(roleName, {
 			name: roleName,
@@ -514,11 +547,6 @@ const declareRoles = (
 
 	return { roles, principals };
 };
-
-// Infer roles of child manifest type
-type ChildRole<Children extends WidestNamespaceManifests> = {
-	[K in keyof Children]: Children[K]["roles"][keyof Children[K]["roles"]];
-}[keyof Children];
 
 export function defineNamespace<
 	const Namespace extends string,
@@ -538,7 +566,7 @@ export function defineNamespace<
 >(
 	namespace: FileSafeName<Namespace>,
 	defineOption: {
-		roles?: Record<DeclaredRoleName, RoleArg<ChildRole<NoInfer<Children>>>> & {
+		roles?: Record<DeclaredRoleName, RoleArg<NoInfer<Children>>> & {
 			[K in UndeclarableRoleName]?: never;
 		};
 		principals?: PrincipalsArg;
@@ -686,10 +714,11 @@ export function defineNamespace<
 
 	return {
 		namespace,
-		roles: Record.map(
-			// roles is undefined only when DeclaredRoleName is never
-			defineOption.roles ?? ({} as Record<DeclaredRoleName, unknown>),
-			(_, name) => ({ namespace, name }),
+		roles: new Set(
+			Record.keys(
+				// roles is undefined only when DeclaredRoleName is never
+				defineOption.roles ?? ({} as Record<DeclaredRoleName, unknown>),
+			),
 		),
 		replicant,
 		computed,

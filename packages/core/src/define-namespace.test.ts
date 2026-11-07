@@ -3,13 +3,9 @@ import { Result, Schema } from "effect";
 import { assert, describe, expect, expectTypeOf, test } from "vitest";
 import { z } from "zod";
 
-import {
-	defineNamespace,
-	type EmptyNamespaceFields,
-	type NamespaceManifest,
-} from "./define-namespace.ts";
+import { defineNamespace } from "./define-namespace.ts";
 import { FieldDecodeError, FieldEncodeError } from "./field-codec.ts";
-import type { NamespaceRole } from "./role.ts";
+import { RoleReference } from "./role.ts";
 
 const decodeJsonText = Schema.decodeSync(Schema.fromJsonString(Schema.Json));
 
@@ -945,19 +941,18 @@ describe("defineNamespace", () => {
 			roles: { uploader: { permission: ["rpc-call"] } },
 		});
 
-		test("exposes each declared role as a reference", () => {
-			expect(assets.roles).toStrictEqual({
-				uploader: { namespace: "show-assets", name: "uploader" },
-			});
-			expectTypeOf(assets.roles.uploader).toEqualTypeOf<
-				NamespaceRole<"show-assets", "uploader">
-			>();
+		test("exposes the declared role names", () => {
+			expect(assets.roles).toStrictEqual(new Set(["uploader"]));
+			expectTypeOf(assets.roles).toEqualTypeOf<ReadonlySet<"uploader">>();
 		});
 
 		test("links a role to the child roles it lists", () => {
 			const show = defineNamespace("show", {
 				roles: {
-					operator: { permission: [], linkedRoles: [assets.roles.uploader] },
+					operator: {
+						permission: [],
+						linkRoles: (children) => [children.assets.roles.uploader],
+					},
 				},
 				children: { assets },
 			});
@@ -968,40 +963,81 @@ describe("defineNamespace", () => {
 			).toStrictEqual([{ namespace: "show-assets", name: "uploader" }]);
 		});
 
-		test("rejects a role of a namespace that is not a child", () => {
+		test("links a role to a grandchild role", () => {
+			const archive = defineNamespace("show-archive", {
+				roles: { archiver: { permission: ["rpc-call"] } },
+			});
 			const media = defineNamespace("show-media", {
-				roles: { player: { permission: ["rpc-call"] } },
+				children: { archive },
+			});
+			const show = defineNamespace("show", {
+				roles: {
+					operator: {
+						permission: [],
+						linkRoles: (children) => [
+							children.media.children.archive.roles.archiver,
+						],
+					},
+				},
+				children: { media },
 			});
 
+			expect(
+				show[manifestRolesKey].roles.get(RoleName.make("operator"))
+					?.linkedRoles,
+			).toStrictEqual([{ namespace: "show-archive", name: "archiver" }]);
+		});
+
+		test("refuses a role reference built by hand", () => {
+			defineNamespace("show", {
+				roles: {
+					operator: {
+						permission: [],
+						// @ts-expect-error a plain object lacks the brand
+						linkRoles: () => [{ namespace: "show-assets", name: "uploader" }],
+					},
+				},
+				children: { assets },
+			});
+		});
+
+		test("rejects a role of a namespace that is not a descendant", () => {
 			expect(() =>
 				defineNamespace("show", {
 					roles: {
 						operator: {
 							permission: [],
-							// @ts-expect-error "show-media" is not a declared child
-							linkedRoles: [media.roles.player],
+							linkRoles: () => [
+								RoleReference.make({ namespace: "show-media", name: "player" }),
+							],
 						},
 					},
 					children: { assets },
 				}),
-			).toThrow(/Role "operator" cannot link to "player" of "show-media"/);
+			).toThrow(
+				'Role "operator" links to unknown role "player" of "show-media"',
+			);
 		});
 
-		test("rejects a role the child does not declare", () => {
-			const widened: NamespaceManifest<string, EmptyNamespaceFields, string> =
-				assets;
-
+		test("rejects a role the descendant does not declare", () => {
 			expect(() =>
 				defineNamespace("show", {
 					roles: {
 						operator: {
 							permission: [],
-							linkedRoles: [{ namespace: "show-assets", name: "server" }],
+							linkRoles: () => [
+								RoleReference.make({
+									namespace: "show-assets",
+									name: "server",
+								}),
+							],
 						},
 					},
-					children: { assets: widened },
+					children: { assets },
 				}),
-			).toThrow(/Role "operator" cannot link to "server" of "show-assets"/);
+			).toThrow(
+				'Role "operator" links to unknown role "server" of "show-assets"',
+			);
 		});
 	});
 });

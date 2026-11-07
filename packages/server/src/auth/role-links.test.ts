@@ -33,13 +33,19 @@ describe("normalizeRoleLinks", () => {
 		});
 		const assets = defineNamespace("show-assets", {
 			roles: {
-				uploader: { permission: [], linkedRoles: [archive.roles.archiver] },
+				uploader: {
+					permission: [],
+					linkRoles: (children) => [children.archive.roles.archiver],
+				},
 			},
 			children: { archive },
 		});
 		const show = defineNamespace("show", {
 			roles: {
-				operator: { permission: [], linkedRoles: [assets.roles.uploader] },
+				operator: {
+					permission: [],
+					linkRoles: (children) => [children.assets.roles.uploader],
+				},
 			},
 			children: { assets },
 		});
@@ -71,7 +77,10 @@ describe("normalizeRoleLinks", () => {
 			roles: {
 				operator: {
 					permission: [],
-					linkedRoles: [assets.roles.uploader, media.roles.player],
+					linkRoles: (children) => [
+						children.assets.roles.uploader,
+						children.media.roles.player,
+					],
 				},
 			},
 			children: { assets, media },

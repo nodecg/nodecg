@@ -7,7 +7,7 @@ import {
 	type Role,
 	type RoleName,
 } from "@nodecg/internal";
-import { Match } from "effect";
+import { Match, Schema } from "effect";
 
 export const ROLE_CAPABILITY = [
 	"replicant-read",
@@ -27,16 +27,11 @@ export interface PrincipalArg {
 	readonly permission: ReadonlyArray<RoleCapability>;
 }
 
-export interface NamespaceRole<Namespace extends string, Name extends string> {
-	readonly namespace: Namespace;
-	readonly name: Name;
-}
-
-export interface RoleArg<Child extends NamespaceRole<string, string>> {
-	readonly description?: string;
-	readonly permission: ReadonlyArray<RoleCapability>;
-	readonly linkedRoles?: ReadonlyArray<Child>;
-}
+export const RoleReference = Schema.Struct({
+	namespace: Schema.String,
+	name: Schema.String,
+}).pipe(Schema.brand("RoleReference"));
+export type RoleReference = typeof RoleReference.Type;
 
 export type PrincipalsArg = {
 	readonly [K in DeclarablePrincipalName]?: PrincipalArg;
