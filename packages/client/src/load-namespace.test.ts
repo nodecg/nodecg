@@ -20,6 +20,7 @@ import {
 	Scope,
 	Stream,
 } from "effect";
+import { FetchHttpClient } from "effect/http";
 import {
 	afterEach,
 	assert,
@@ -31,7 +32,11 @@ import {
 } from "vitest";
 
 import { derive } from "./derive.ts";
-import { loadNamespace, loadNamespaceEffect } from "./load-namespace.ts";
+import {
+	DuplicateNamespace,
+	loadNamespace,
+	loadNamespaceEffect,
+} from "./load-namespace.ts";
 import { createTransportStub } from "./services/field-transport/field-transport.stub.ts";
 import {
 	FieldNotFound,
@@ -49,9 +54,10 @@ afterEach(() => {
 });
 
 const test = testLayer(
-	Layer.merge(
+	Layer.mergeAll(
 		Layer.succeed(FieldTransportService, transport),
 		Layer.succeed(MessageChannelService, channel),
+		FetchHttpClient.layer,
 	),
 );
 
@@ -1175,7 +1181,102 @@ describe("customRoute", () => {
 	);
 });
 
+describe("children", () => {
+	const first = defineNamespace("first", {
+		replicant: { count: { schema: Schema.FiniteFromString } },
+	});
+	const second = defineNamespace("second", {
+		replicant: { count: { schema: Schema.FiniteFromString } },
+	});
+
+	test(
+		"loads each namespace of the tree under its key",
+		Effect.gen(function* () {
+			transport.getReplicant.mockImplementation((namespace) =>
+				Effect.succeed(namespace === "first" ? "4" : "9"),
+			);
+			const middle = defineNamespace("middle", { children: { second } });
+			const root = defineNamespace("root", { children: { first, middle } });
+
+			const loaded = yield* loadNamespaceEffect(root);
+
+			const firstCount = yield* loaded.children.first.replicant.count.get();
+			const secondCount =
+				yield* loaded.children.middle.children.second.replicant.count.get();
+			expect(firstCount).toBe(4);
+			expect(secondCount).toBe(9);
+			// @ts-expect-error middle declares no child named first
+			expect(loaded.children.middle.children.first).toBeUndefined();
+		}),
+	);
+
+	test(
+		"builds a child reached from two parents once",
+		Effect.gen(function* () {
+			const middle = defineNamespace("middle", { children: { first } });
+			const root = defineNamespace("root", { children: { middle, first } });
+
+			const loaded = yield* loadNamespaceEffect(root);
+
+			expect(loaded.children.middle.children.first).toBe(loaded.children.first);
+		}),
+	);
+
+	test(
+		"fails when two children name the same namespace",
+		Effect.gen(function* () {
+			const lookalike = defineNamespace("first", {});
+			const root = defineNamespace("root", {
+				children: { first, again: lookalike },
+			});
+
+			const error = yield* loadNamespaceEffect(root).pipe(Effect.flip);
+
+			expect(error).toStrictEqual(
+				DuplicateNamespace.make({ namespace: "first" }),
+			);
+			expect(error.message).toBe('Namespace "first" was loaded twice');
+			expect(channel.receive).not.toHaveBeenCalled();
+		}),
+	);
+});
+
 describe("loadNamespace (Promise wrapper)", () => {
+	it("reaches a child through the handle", async () => {
+		const { stub: transportStub } = createTransportStub();
+		const { stub: channelStub } = createMessageChannelStub();
+		transportStub.getReplicant.mockReturnValue(Effect.succeed(42));
+		const child = defineNamespace("child", {
+			replicant: { count: { schema: Schema.Finite } },
+		});
+		const root = defineNamespace("root", { children: { child } });
+
+		const loaded = await loadNamespace(root, {
+			fieldTransport: () => transportStub,
+			messageChannel: () => channelStub,
+		});
+		onTestFinished(() => loaded.dispose());
+
+		expect(await loaded.children.child.replicant.count.get()).toBe(42);
+		expect(transportStub.getReplicant).toHaveBeenCalledWith("child", "count");
+	});
+
+	it("gives a child reached from two parents one handle", async () => {
+		const { stub: transportStub } = createTransportStub();
+		const { stub: channelStub } = createMessageChannelStub();
+		const child = defineNamespace("child", {});
+		const middle = defineNamespace("middle", { children: { child } });
+		const root = defineNamespace("root", { children: { middle, child } });
+
+		const loaded = await loadNamespace(root, {
+			fieldTransport: () => transportStub,
+			messageChannel: () => channelStub,
+		});
+		onTestFinished(() => loaded.dispose());
+
+		expect(loaded.children.middle.children.child).toBe(loaded.children.child);
+	});
+
 	it("forwards to the injected transport", async () => {
 		const { stub: transportStub } = createTransportStub();
 		const { stub: channelStub } = createMessageChannelStub();

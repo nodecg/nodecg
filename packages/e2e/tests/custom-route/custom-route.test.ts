@@ -1,4 +1,4 @@
-import { loadNamespace, loadNodeCG } from "@nodecg-next/client";
+import { loadNamespace } from "@nodecg-next/client";
 import { describe, expect, onTestFinished, test, vi } from "vitest";
 
 import { suiteBase } from "../../src/client/suite-base.ts";
@@ -29,25 +29,17 @@ describe("custom routes", () => {
 	});
 
 	test("an upload reaches the handler through the route URL", async () => {
-		const { namespaces, dispose } = await loadNodeCG({
-			baseUrl: base,
-			namespaces: { routes: customRouteManifest },
-		});
-		onTestFinished(dispose);
+		const ns = await loadNamespace(customRouteManifest, { baseUrl: base });
+		onTestFinished(ns.dispose);
 
-		const response = await fetch(
-			`${namespaces.routes.customRoute.upload.url}/logos/a.png`,
-			{
-				method: "POST",
-				body: new Blob([new Uint8Array(300_000)]),
-			},
-		);
+		const response = await fetch(`${ns.customRoute.upload.url}/logos/a.png`, {
+			method: "POST",
+			body: new Blob([new Uint8Array(300_000)]),
+		});
 
 		expect(response.status).toBe(200);
 		await vi.waitFor(async () => {
-			expect(await namespaces.routes.replicant.uploadedBytes.get()).toBe(
-				300_000,
-			);
+			expect(await ns.replicant.uploadedBytes.get()).toBe(300_000);
 		});
 	});
 

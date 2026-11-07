@@ -1,12 +1,10 @@
-import { loadNodeCG } from "@nodecg-next/client";
-import { tickerManifest } from "@nodecg/example-plugin-ticker";
+import { loadNamespace } from "@nodecg-next/client";
 import { StrictMode, useState } from "react";
 
+import { showManifest } from "../shared/manifest.ts";
 import { render } from "./store.tsx";
 
-const {
-	namespaces: { ticker },
-} = await loadNodeCG({ namespaces: { ticker: tickerManifest } });
+const ticker = await loadNamespace(showManifest.children.ticker);
 
 function Dashboard() {
 	const [message, setMessage] = useState("");

@@ -1,8 +1,9 @@
-import { loadAuthClient, loadNodeCG } from "@nodecg-next/client";
+import { loadAuthClient, loadNamespace } from "@nodecg-next/client";
 import { assert, describe, expect, onTestFinished, test } from "vitest";
 
 import { makeAuthHelpers } from "../../src/client/auth.ts";
 import { suiteBase } from "../../src/client/suite-base.ts";
+import { fixtureManifest } from "../../src/shared/manifests.ts";
 
 const base = suiteBase("auth");
 const {
@@ -91,18 +92,18 @@ describe("loadAuthClient", () => {
 	});
 });
 
-describe("loadNodeCG", () => {
+describe("loadNamespace", () => {
 	test("passes me through to the live server", async () => {
 		await login("alice");
 		onTestFinished(async () => {
 			await logout();
 		});
-		const nodecg = await loadNodeCG({ baseUrl: base, namespaces: {} });
+		const root = await loadNamespace(fixtureManifest, { baseUrl: base });
 		onTestFinished(() => {
-			nodecg.dispose();
+			root.dispose();
 		});
 
-		const payload = await nodecg.auth.me();
+		const payload = await root.auth.me();
 		expect(payload.identity).toMatchObject({
 			_tag: "user",
 			authentication: { issuer: "dev", subject: "alice" },

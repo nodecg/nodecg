@@ -1,4 +1,4 @@
-import { loadNodeCG } from "@nodecg-next/client";
+import { loadNamespace } from "@nodecg-next/client";
 import { describe, expect, onTestFinished, test } from "vitest";
 import { commands } from "vitest/browser";
 
@@ -9,25 +9,16 @@ const base = suiteBase("replicant-persistence");
 
 describe("replicant persistence", () => {
 	test("restores only persisted replicants after a restart", async () => {
-		const nodecg = await loadNodeCG({
-			baseUrl: base,
-			namespaces: { persistence: persistenceManifest },
-		});
-		await nodecg.namespaces.persistence.replicant.live.set(7);
-		await nodecg.namespaces.persistence.replicant.score.set(7);
-		nodecg.dispose();
+		const before = await loadNamespace(persistenceManifest, { baseUrl: base });
+		await before.replicant.live.set(7);
+		await before.replicant.score.set(7);
+		before.dispose();
 
 		await commands.restartServer("replicant-persistence");
 
-		const {
-			namespaces: { persistence },
-			dispose,
-		} = await loadNodeCG({
-			baseUrl: base,
-			namespaces: { persistence: persistenceManifest },
-		});
-		onTestFinished(dispose);
-		expect(await persistence.replicant.live.get()).toBe(0);
-		expect(await persistence.replicant.score.get()).toBe(7);
+		const after = await loadNamespace(persistenceManifest, { baseUrl: base });
+		onTestFinished(after.dispose);
+		expect(await after.replicant.live.get()).toBe(0);
+		expect(await after.replicant.score.get()).toBe(7);
 	});
 });

@@ -1,13 +1,16 @@
-import type { LoadedNodeCG } from "@nodecg-next/client";
+import type { LoadedRoot } from "@nodecg-next/client";
 
 export const reportPageErrors = (
-	nodecg: LoadedNodeCG<Record<never, never>>,
+	root: LoadedRoot<
+		{ replicant: {}; computed: {}; topic: {}; rpc: {}; children: {} },
+		{}
+	>,
 ) => {
 	const onError = (event: ErrorEvent) => {
-		nodecg.reportError(event.error ?? event.message);
+		root.reportError(event.error ?? event.message);
 	};
 	const onRejection = (event: PromiseRejectionEvent) => {
-		nodecg.reportError(event.reason);
+		root.reportError(event.reason);
 	};
 	window.addEventListener("error", onError);
 	window.addEventListener("unhandledrejection", onRejection);

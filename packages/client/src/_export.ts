@@ -12,22 +12,17 @@ export {
 	type Get,
 } from "./derive.ts";
 export {
+	DuplicateNamespace,
 	loadNamespace,
 	loadNamespaceEffect,
 	type LoadedNamespace,
+	type LoadedRoot,
 	type ReplicantField,
 	type ComputedField,
 	type TopicField,
 	type RpcField,
 	type CustomRoute,
 } from "./load-namespace.ts";
-export {
-	DuplicateNamespace,
-	loadNodeCG,
-	loadNodeCGEffect,
-	type LoadedNodeCG,
-	type LoadNodeCGOptions,
-} from "./load-nodecg.ts";
 export { otlpTelemetry } from "./otlp-telemetry.ts";
 export { type FieldFailure, type TerminalFieldFailure } from "./field-cells.ts";
 export {

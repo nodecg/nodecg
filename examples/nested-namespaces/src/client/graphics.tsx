@@ -1,12 +1,10 @@
-import { loadNodeCG } from "@nodecg-next/client";
+import { loadNamespace } from "@nodecg-next/client";
 import { StrictMode } from "react";
 
 import { showManifest } from "../shared/manifest.ts";
 import { render, useReplicant } from "./store.tsx";
 
-const {
-	namespaces: { show },
-} = await loadNodeCG({ namespaces: { show: showManifest } });
+const show = await loadNamespace(showManifest);
 
 function Graphics() {
 	const title = useReplicant(show.replicant.title);

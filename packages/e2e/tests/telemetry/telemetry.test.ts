@@ -1,5 +1,5 @@
 import { reportPageErrors } from "@nodecg-next/browser";
-import { loadNodeCG } from "@nodecg-next/client";
+import { loadNamespace } from "@nodecg-next/client";
 import { describe, expect, onTestFinished, test, vi } from "vitest";
 
 import { suiteBase } from "../../src/client/suite-base.ts";
@@ -8,17 +8,14 @@ import { telemetryManifest } from "./manifest.ts";
 const base = suiteBase("telemetry");
 
 const load = async () => {
-	const nodecg = await loadNodeCG({
-		baseUrl: base,
-		namespaces: { telemetry: telemetryManifest },
-	});
-	onTestFinished(nodecg.dispose);
-	return nodecg;
+	const telemetry = await loadNamespace(telemetryManifest, { baseUrl: base });
+	onTestFinished(telemetry.dispose);
+	return telemetry;
 };
 
 describe("telemetry", () => {
 	test("runs a request in its own trace", async () => {
-		const { telemetry } = (await load()).namespaces;
+		const telemetry = await load();
 
 		await fetch(`${base}/api/internal/me?marker=root`);
 
@@ -32,7 +29,7 @@ describe("telemetry", () => {
 	});
 
 	test("runs a later persistence write in its own trace", async () => {
-		const { telemetry } = (await load()).namespaces;
+		const telemetry = await load();
 
 		await telemetry.replicant.score.set(1);
 
@@ -46,7 +43,7 @@ describe("telemetry", () => {
 	});
 
 	test("redacts query values on request spans", async () => {
-		const { telemetry } = (await load()).namespaces;
+		const telemetry = await load();
 
 		await fetch(`${base}/api/internal/me?code=query-secret&=unnamed-secret`);
 
@@ -60,7 +57,7 @@ describe("telemetry", () => {
 
 	test("does not report a closed client as an error", async () => {
 		const closing = await load();
-		const { telemetry } = (await load()).namespaces;
+		const telemetry = await load();
 
 		closing.dispose();
 
@@ -75,7 +72,7 @@ describe("telemetry", () => {
 	});
 
 	test("leaves telemetry posts out of the server's traces", async () => {
-		const { telemetry } = (await load()).namespaces;
+		const telemetry = await load();
 
 		const first = await load();
 		first.reportError(new Error("first post"));
@@ -98,7 +95,7 @@ describe("telemetry", () => {
 	});
 
 	test("exports an uncaught page error", async () => {
-		const { telemetry } = (await load()).namespaces;
+		const telemetry = await load();
 		const page = await load();
 		onTestFinished(reportPageErrors(page));
 

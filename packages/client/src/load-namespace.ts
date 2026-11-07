@@ -1,9 +1,9 @@
 import type {
 	CustomRouteManifest,
+	InferNamespace,
 	NamespaceManifest,
 	FieldManifest,
 	RpcFieldManifest,
-	EmptyNamespaceFields,
 	WidestCustomRoutes,
 	WidestNamespaceFields,
 	WidestRpcField,
@@ -11,6 +11,7 @@ import type {
 import { customRoutePath, type Updater } from "@nodecg-next/internal";
 import { diffSignedPatch } from "@nodecg-next/internal/occ";
 import {
+	type ApplyLambdaToObjectValues,
 	mapEffectValues,
 	mapValues,
 	toError,
@@ -23,6 +24,7 @@ import { effect } from "@preact/signals-core";
 import {
 	Array,
 	Cause,
+	Context,
 	Deferred,
 	Effect,
 	Exit,
@@ -34,13 +36,15 @@ import {
 	Path,
 	Queue,
 	Ref,
-	type Schema,
+	Schema,
 	Scope,
 	Stream,
+	Tracer,
 } from "effect";
 import { FetchHttpClient, Url } from "effect/http";
 import type { Promisable } from "type-fest";
 
+import { adaptAuthClient, makeAuthClient } from "./auth-client.ts";
 import { type FieldSource, fieldSource } from "./derive.ts";
 import {
 	type ComputedCell,
@@ -51,6 +55,7 @@ import {
 	type TopicCell,
 } from "./field-cells.ts";
 import { Loadable } from "./loadable.ts";
+import { otlpTelemetry } from "./otlp-telemetry.ts";
 import {
 	FieldSetError,
 	FieldTransportService,
@@ -212,7 +217,7 @@ const implementReplicant = Effect.fn("implementReplicant")(function* <Decoded>(
 				return result;
 			},
 			catch: (error) =>
-				new FieldSetError({ namespace, name, cause: toError(error) }),
+				FieldSetError.make({ namespace, name, cause: toError(error) }),
 		});
 		const encoded = yield* Effect.fromResult(manifest.encode(next));
 		const patch = yield* Effect.fromResult(diffSignedPatch(base, encoded)).pipe(
@@ -457,7 +462,21 @@ interface RpcFieldPromiseLambda extends HKT.TypeLambda {
 	>;
 }
 
-const buildNamespace = <
+export class DuplicateNamespace extends Schema.TaggedError<DuplicateNamespace>()(
+	"DuplicateNamespace",
+	{ namespace: Schema.String },
+) {
+	override readonly message = `Namespace "${this.namespace}" was loaded twice`;
+}
+
+class ReportedError extends Schema.TaggedError<ReportedError>()(
+	"ReportedError",
+	{ cause: Schema.Defect() },
+) {
+	override readonly message = String(this.cause);
+}
+
+const buildFields = <
 	S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes,
 >(
@@ -470,84 +489,223 @@ const buildNamespace = <
 				const base = baseUrl
 					? Option.some(yield* Effect.fromResult(Url.fromString(baseUrl)))
 					: Option.none();
-				const fields = yield* mapEffectValues<
+				const replicant = yield* mapEffectValues<
 					FieldManifestLambda,
 					ReplicantFieldEffectLambda
 				>()((codec, name) =>
 					implementReplicant(manifest.namespace, name, codec),
 				)(manifest.replicant);
-				const computedFields = yield* mapEffectValues<
+				const computed = yield* mapEffectValues<
 					FieldManifestLambda,
 					ComputedFieldEffectLambda
 				>()((codec, name) =>
 					implementComputed(manifest.namespace, name, codec),
 				)(manifest.computed);
-				const topicFields = yield* mapEffectValues<
+				const topic = yield* mapEffectValues<
 					FieldManifestLambda,
 					TopicFieldEffectLambda
 				>()((codec, name) => implementTopic(manifest.namespace, name, codec))(
 					manifest.topic,
 				);
-				const rpcFields = yield* mapEffectValues<
+				const rpc = yield* mapEffectValues<
 					RpcFieldManifestLambda,
 					RpcFieldEffectLambda
 				>()((codec, name) => implementRpc(manifest.namespace, name, codec))(
 					manifest.rpc,
 				);
-				const customRoutes = yield* mapEffectValues<
+				const customRoute = yield* mapEffectValues<
 					CustomRouteManifestLambda,
 					CustomRouteLambda
 				>()((_, name) => implementCustomRoute(base, manifest.namespace, name))(
 					manifest.customRoute,
 				);
 				return {
-					fields,
-					computedFields,
-					topicFields,
-					rpcFields,
-					customRoutes,
+					namespace: manifest.namespace,
+					replicant,
+					computed,
+					topic,
+					rpc,
+					customRoute,
 				};
 			}).pipe(Effect.provide(context)),
 		),
 	);
 
-export const loadNamespaceEffect = Effect.fn("loadNamespaceEffect")(function* <
-	S extends WidestNamespaceFields = EmptyNamespaceFields,
-	CustomRoutes extends WidestCustomRoutes = {},
->(
-	manifest: NamespaceManifest<string, S, string, CustomRoutes>,
-	options?: { readonly baseUrl?: string },
-) {
-	return yield* buildNamespace(manifest, options?.baseUrl).pipe(
-		Effect.map(
-			({ fields, computedFields, topicFields, rpcFields, customRoutes }) => ({
-				namespace: manifest.namespace,
-				replicant: fields,
-				computed: computedFields,
-				topic: topicFields,
-				rpc: rpcFields,
-				customRoute: customRoutes,
-			}),
-		),
-	);
-});
-
-export interface BuiltNamespace<
-	S extends WidestNamespaceFields = WidestNamespaceFields,
-	CustomRoutes extends WidestCustomRoutes = WidestCustomRoutes,
-> extends Effect.Success<
-	ReturnType<typeof loadNamespaceEffect<S, CustomRoutes>>
-> {}
-
-export const adaptNamespace = <
+type TreeManifest<
 	S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes,
-	R,
-	E,
+> = NamespaceManifest<string, S, string, CustomRoutes> & {
+	readonly children: ApplyLambdaToObjectValues<
+		TreeManifestLambda,
+		S["children"]
+	>;
+};
+
+interface TreeManifestLambda extends HKT.TypeLambda {
+	readonly type: TreeManifest<
+		InferNamespace<this["Target"]>["fields"],
+		InferNamespace<this["Target"]>["customRoutes"]
+	>;
+}
+
+interface WidenedManifest {
+	readonly namespace: string;
+	readonly children: Readonly<Record<string, WidenedManifest>>;
+}
+
+type BuiltFields<
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
+> = Effect.Success<ReturnType<typeof buildFields<S, CustomRoutes>>>;
+
+type BuiltNamespace<
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
+> = BuiltFields<S, CustomRoutes> & {
+	readonly children: ApplyLambdaToObjectValues<
+		BuiltNamespaceLambda,
+		S["children"]
+	>;
+};
+
+interface NamespaceHandles<
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
+> {
+	readonly built: BuiltNamespace<S, CustomRoutes>;
+	readonly loaded: LoadedNamespace<S, CustomRoutes>;
+}
+
+interface NamespaceHandlesLambda extends HKT.TypeLambda {
+	readonly type: NamespaceHandles<
+		InferNamespace<this["Target"]>["fields"],
+		InferNamespace<this["Target"]>["customRoutes"]
+	>;
+}
+
+interface BuiltNamespaceLambda extends HKT.TypeLambda {
+	readonly type: BuiltNamespace<
+		InferNamespace<this["Target"]>["fields"],
+		InferNamespace<this["Target"]>["customRoutes"]
+	>;
+}
+
+interface LoadedNamespaceLambda extends HKT.TypeLambda {
+	readonly type: LoadedNamespace<
+		InferNamespace<this["Target"]>["fields"],
+		InferNamespace<this["Target"]>["customRoutes"]
+	>;
+}
+
+const loadTree = Effect.fn("loadNamespace")(function* <
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
+>(manifest: TreeManifest<S, CustomRoutes>, baseUrl: string | undefined) {
+	const manifests = new Set<WidenedManifest>();
+	const walk = (node: WidenedManifest) => {
+		if (manifests.has(node)) {
+			return;
+		}
+		manifests.add(node);
+		for (const child of Object.values(node.children)) {
+			walk(child);
+		}
+	};
+	walk(manifest);
+
+	const names = new Set<string>();
+	for (const { namespace } of manifests) {
+		if (names.has(namespace)) {
+			return yield* DuplicateNamespace.make({ namespace });
+		}
+		names.add(namespace);
+	}
+
+	const services = yield* Effect.context<never>().pipe(
+		Effect.map(Context.omit(Tracer.ParentSpan)),
+	);
+	const builtHandles = new WeakMap<WidenedManifest, unknown>();
+	const build = <
+		TreeS extends WidestNamespaceFields,
+		TreeCustomRoutes extends WidestCustomRoutes,
+	>(
+		node: TreeManifest<TreeS, TreeCustomRoutes>,
+	): Effect.Effect<
+		NamespaceHandles<TreeS, TreeCustomRoutes>,
+		Effect.Error<ReturnType<typeof buildFields>>,
+		Effect.Services<ReturnType<typeof buildFields>>
+	> =>
+		Effect.gen(function* () {
+			// Reuse when namespace is referenced by multiple parents
+			const existing = builtHandles.get(node);
+			if (typeof existing !== "undefined") {
+				return existing as NamespaceHandles<TreeS, TreeCustomRoutes>;
+			}
+			const children = yield* mapEffectValues<
+				TreeManifestLambda,
+				NamespaceHandlesLambda
+			>()((child) => build(child))<TreeS["children"]>(node.children);
+			const fields = yield* buildFields(node, baseUrl);
+			const handles: NamespaceHandles<TreeS, TreeCustomRoutes> = {
+				built: {
+					...fields,
+					children: mapValues<NamespaceHandlesLambda, BuiltNamespaceLambda>(
+						(child) => child.built,
+					)(children),
+				},
+				loaded: adaptNamespace(
+					services,
+					fields,
+					mapValues<NamespaceHandlesLambda, LoadedNamespaceLambda>(
+						(child) => child.loaded,
+					)(children),
+				),
+			};
+			builtHandles.set(node, handles);
+			return handles;
+		});
+
+	const root = yield* build(manifest);
+	const auth = yield* makeAuthClient(baseUrl);
+	return { root, auth };
+});
+
+export const loadNamespaceEffect = Effect.fnUntraced(function* <
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
 >(
-	runtime: ManagedRuntime.ManagedRuntime<R, E>,
-	built: BuiltNamespace<S, CustomRoutes>,
+	manifest: TreeManifest<S, CustomRoutes>,
+	options?: { readonly baseUrl?: string },
+) {
+	const telemetry = yield* Layer.build(otlpTelemetry(options?.baseUrl));
+	const {
+		root: { built },
+		auth,
+	} = yield* loadTree(manifest, options?.baseUrl).pipe(
+		Effect.provide(telemetry),
+	);
+	return {
+		namespace: built.namespace,
+		replicant: built.replicant,
+		computed: built.computed,
+		topic: built.topic,
+		rpc: built.rpc,
+		customRoute: built.customRoute,
+		children: built.children,
+		auth,
+	};
+});
+
+const adaptNamespace = <
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
+>(
+	services: Context.Context<never>,
+	fields: BuiltFields<S, CustomRoutes>,
+	children: LoadedNamespace<S, CustomRoutes>["children"],
 ) => {
+	const runPromise = Effect.runPromiseWith(services);
+
 	const subscribeEffectToPromise =
 		<Decoded, SubscribeError>(
 			subscribe: () => Effect.Effect<
@@ -562,7 +720,7 @@ export const adaptNamespace = <
 			callback: (value: Decoded) => Promisable<void>,
 			onError?: (error: TerminalFieldFailure) => void,
 		) =>
-			runtime.runPromise(
+			runPromise(
 				Effect.gen(function* () {
 					const scope = yield* Scope.make();
 					const stream = yield* subscribe().pipe(
@@ -575,7 +733,7 @@ export const adaptNamespace = <
 							Effect.tryPromise(async () => callback(value)).pipe(
 								Effect.catchTag("UnknownError", (error) =>
 									Effect.logError(
-										`Subscription handler for "${built.namespace}/${name}" threw`,
+										`Subscription handler for "${fields.namespace}/${name}" threw`,
 										error,
 									),
 								),
@@ -591,7 +749,7 @@ export const adaptNamespace = <
 					if (awaitSeed) {
 						yield* Deferred.await(seeded);
 					}
-					return () => runtime.runPromise(Scope.close(scope, Exit.void));
+					return () => runPromise(Scope.close(scope, Exit.void));
 				}),
 			);
 
@@ -599,9 +757,9 @@ export const adaptNamespace = <
 		ReplicantFieldEffectLambda,
 		ReplicantFieldPromiseLambda
 	>((field, name) => ({
-		get: () => runtime.runPromise(field.get()),
-		set: (value) => runtime.runPromise(field.set(value)),
-		update: (fn, options) => runtime.runPromise(field.update(fn, options)),
+		get: () => runPromise(field.get()),
+		set: (value) => runPromise(field.set(value)),
+		update: (fn, options) => runPromise(field.update(fn, options)),
 		subscribe: (callback, onError) =>
 			subscribeEffectToPromise(
 				() => field.subscribe().pipe(Effect.map(Stream.zipWithPrevious)),
@@ -612,13 +770,13 @@ export const adaptNamespace = <
 				onError,
 			),
 		[fieldSource]: field[fieldSource],
-	}))(built.replicant);
+	}))(fields.replicant);
 
 	const computed = mapValues<
 		ComputedFieldEffectLambda,
 		ComputedFieldPromiseLambda
 	>((field, name) => ({
-		get: () => runtime.runPromise(field.get()),
+		get: () => runPromise(field.get()),
 		subscribe: (callback, onError) =>
 			subscribeEffectToPromise(
 				() => field.subscribe().pipe(Effect.map(Stream.zipWithPrevious)),
@@ -629,22 +787,29 @@ export const adaptNamespace = <
 				onError,
 			),
 		[fieldSource]: field[fieldSource],
-	}))(built.computed);
+	}))(fields.computed);
 
 	const topic = mapValues<TopicFieldEffectLambda, TopicFieldPromiseLambda>(
 		(field, name) => ({
-			publish: (value) => runtime.runPromise(field.publish(value)),
+			publish: (value) => runPromise(field.publish(value)),
 			subscribe: subscribeEffectToPromise(field.subscribe, name, false),
 		}),
-	)(built.topic);
+	)(fields.topic);
 
 	const rpc = mapValues<RpcFieldEffectLambda, RpcFieldPromiseLambda>(
 		(field) => ({
-			call: (request) => runtime.runPromise(field.call(request)),
+			call: (request) => runPromise(field.call(request)),
 		}),
-	)(built.rpc);
+	)(fields.rpc);
 
-	return { replicant, computed, topic, rpc, customRoute: built.customRoute };
+	return {
+		replicant,
+		computed,
+		topic,
+		rpc,
+		customRoute: fields.customRoute,
+		children,
+	};
 };
 
 export interface LoadedNamespace<
@@ -673,17 +838,31 @@ export interface LoadedNamespace<
 	readonly customRoute: {
 		readonly [R in keyof CustomRoutes & string]: CustomRoute;
 	};
-	readonly dispose: () => void;
+	readonly children: {
+		readonly [K in keyof S["children"] & string]: LoadedNamespace<
+			InferNamespace<S["children"][K]>["fields"],
+			InferNamespace<S["children"][K]>["customRoutes"]
+		>;
+	};
 }
 
+export type LoadedRoot<
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
+> = LoadedNamespace<S, CustomRoutes> & {
+	readonly auth: ReturnType<typeof adaptAuthClient>;
+	readonly reportError: (error: unknown) => void;
+	readonly dispose: () => void;
+};
+
 /**
- * Client-side entrypoint of namespace manifests returned from defineNamespace
+ * Client-side entrypoint loading a namespace and its children over one connection
  */
 export async function loadNamespace<
-	S extends WidestNamespaceFields = EmptyNamespaceFields,
-	CustomRoutes extends WidestCustomRoutes = {},
+	S extends WidestNamespaceFields,
+	CustomRoutes extends WidestCustomRoutes,
 >(
-	manifest: NamespaceManifest<string, S, string, CustomRoutes>,
+	manifest: TreeManifest<S, CustomRoutes>,
 	options?: {
 		baseUrl?: string;
 		fieldTransport?:
@@ -693,7 +872,7 @@ export async function loadNamespace<
 			| (() => MessageChannel)
 			| Effect.Effect<MessageChannel, never, never>;
 	},
-): Promise<LoadedNamespace<S, CustomRoutes>> {
+): Promise<LoadedRoot<S, CustomRoutes>> {
 	const baseUrl = options?.baseUrl;
 	const fieldTransport = options?.fieldTransport;
 	const messageChannel = options?.messageChannel;
@@ -715,19 +894,18 @@ export async function loadNamespace<
 			transportLayer,
 			messageChannelLayer,
 			FetchHttpClient.layer,
+			otlpTelemetry(baseUrl),
 		).pipe(Layer.provide(Path.layer)),
 	);
 
-	const built = await runtime.runPromise(
-		loadNamespaceEffect(manifest, { baseUrl }).pipe(
+	const { root, auth } = await runtime.runPromise(
+		loadTree(manifest, baseUrl).pipe(
 			Scope.provide(runtime.scope),
 			Effect.onError(() => runtime.disposeEffect),
 		),
 	);
-	const { replicant, computed, topic, rpc, customRoute } = adaptNamespace(
-		runtime,
-		built,
-	);
+	const { replicant, computed, topic, rpc, customRoute, children } =
+		root.loaded;
 
 	return {
 		replicant,
@@ -735,6 +913,16 @@ export async function loadNamespace<
 		topic,
 		rpc,
 		customRoute,
+		children,
+		auth: adaptAuthClient(runtime, Effect.succeed(auth)),
+		reportError: (error) => {
+			runtime.runFork(
+				ReportedError.make({ cause: error }).pipe(
+					Effect.withSpan("reportError"),
+					Effect.exit,
+				),
+			);
+		},
 		dispose: runtime.dispose,
 	};
 }
