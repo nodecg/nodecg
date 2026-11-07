@@ -1,32 +1,13 @@
 {
-	"compilerOptions": {
-		"target": "ES2022",
-		"lib": ["ES2022"],
-		"module": "node20",
-		"allowImportingTsExtensions": true,
-		"rewriteRelativeImportExtensions": true,
-
-		"strict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"noImplicitReturns": true,
-		"noFallthroughCasesInSwitch": true,
-		"noUncheckedIndexedAccess": true,
-		"noImplicitOverride": true,
-		"noPropertyAccessFromIndexSignature": true,
-
-		"forceConsistentCasingInFileNames": true,
-		"verbatimModuleSyntax": true,
-		"isolatedModules": true,
-		"noUncheckedSideEffectImports": true,
-
-		"skipLibCheck": true,
-
-		"noEmit": true,
-		"declaration": true,
-		"declarationMap": true,
-		"incremental": false,
-
-		"plugins": [{ "name": "@effect/language-service" }]
-	}
+	"include": [],
+	"references": [
+		{ "path": "./packages/browser" },
+		{ "path": "./packages/client" },
+		{ "path": "./packages/core" },
+		{ "path": "./packages/e2e" },
+		{ "path": "./packages/internal" },
+		{ "path": "./packages/server" },
+		{ "path": "./packages/test-utils" },
+		{ "path": "./examples" }
+	]
 }

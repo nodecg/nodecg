@@ -1,0 +1,37 @@
+{
+	"name": "@nodecg-next/client",
+	"version": "3.0.0-alpha",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Hoishin/nodecg-next.git",
+		"directory": "packages/client"
+	},
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"exports": {
+		".": "./src/_export.ts"
+	},
+	"publishConfig": {
+		"exports": {
+			".": "./dist/_export.js"
+		}
+	},
+	"dependencies": {
+		"@nodecg-next/core": "workspace:*",
+		"@nodecg-next/internal": "workspace:*",
+		"@preact/signals-core": "catalog:",
+		"effect": "catalog:",
+		"type-fest": "catalog:"
+	},
+	"devDependencies": {
+		"@effect/vitest": "catalog:",
+		"@nodecg-next/test-utils": "workspace:*",
+		"@vitest/browser": "catalog:",
+		"@vitest/browser-playwright": "catalog:",
+		"playwright": "catalog:",
+		"vitest": "catalog:"
+	}
+}

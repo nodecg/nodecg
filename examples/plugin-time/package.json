@@ -1,0 +1,17 @@
+{
+	"name": "@nodecg/example-plugin-time",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/manifest.ts",
+		"./server": "./src/server.ts"
+	},
+	"dependencies": {
+		"@nodecg-next/core": "workspace:*",
+		"@nodecg-next/server": "workspace:*",
+		"effect": "catalog:"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:"
+	}
+}

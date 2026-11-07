@@ -1,0 +1,9 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"printWidth": 80,
+	"sortImports": true,
+	"sortPackageJson": {
+		"sortScripts": true
+	},
+	"ignorePatterns": []
+}

@@ -1,6 +1,0 @@
-{
-	"bundles": {
-		"disabled": ["test-disabled-bundle"],
-		"paths": ["custom-bundles"]
-	}
-}

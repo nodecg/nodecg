@@ -1,0 +1,27 @@
+{
+	"name": "@nodecg/example-counter",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "vite build",
+		"dev": "node src/server/dev.ts",
+		"start": "node src/server/server.ts"
+	},
+	"dependencies": {
+		"@nodecg-next/browser": "workspace:*",
+		"@nodecg-next/client": "workspace:*",
+		"@nodecg-next/core": "workspace:*",
+		"@nodecg-next/server": "workspace:*",
+		"effect": "catalog:",
+		"react": "catalog:",
+		"react-dom": "catalog:"
+	},
+	"devDependencies": {
+		"@types/node": "catalog:",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"@vitejs/plugin-react": "catalog:",
+		"oauth2-mock-server": "catalog:",
+		"vite": "catalog:"
+	}
+}

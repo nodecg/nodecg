@@ -1,0 +1,169 @@
+{
+	"compilerOptions": {
+		"module": "nodenext",
+		"allowImportingTsExtensions": true,
+		"target": "esnext",
+		"lib": ["ESNext"],
+		"types": [],
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": false,
+		"noImplicitReturns": true,
+		"noImplicitOverride": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"noUncheckedSideEffectImports": true,
+		"moduleDetection": "force",
+		"skipLibCheck": true,
+		"noEmit": true,
+
+		"noErrorTruncation": true,
+		"plugins": [
+			{
+				"name": "@effect/language-service",
+				"diagnosticSeverity": {
+					// Bugs
+					"duplicatePackage": "error",
+					"effectFnIife": "error",
+					"effectGenUsesAdapter": "error",
+					"effectInFailure": "error",
+					"effectInVoidSuccess": "error",
+					"genericEffectServices": "error",
+					"lazyPromiseInEffectSync": "error",
+					"multipleEffectProvide": "error",
+					"outdatedApi": "error",
+					"promiseInEffectSuccess": "error",
+
+					// Untyped errors
+					"anyUnknownInErrorContext": "error",
+					"extendsNativeError": "error",
+					"globalErrorInEffectCatch": "error",
+					"globalErrorInEffectFailure": "error",
+					"unknownInEffectCatch": "error",
+					"unsafeEffectTypeAssertion": "error",
+
+					// Misuse
+					"abortControllerInEffect": "error",
+					"catchUnfailableEffect": "error",
+					"instanceOfSchema": "error",
+					"preferTypedSchemaDecoder": "error",
+					"preferUnsafeConstructor": "error",
+					"returnEffectInGen": "error",
+					"schemaNumber": "error",
+					"schemaStructWithTag": "error",
+					"schemaSyncInEffect": "error",
+					"tryCatchInEffectGen": "error",
+					"unnecessaryFailYieldableError": "error",
+
+					// Globals
+					"cryptoRandomUUID": "error",
+					"cryptoRandomUUIDInEffect": "error",
+					"globalConsole": "error",
+					"globalConsoleInEffect": "error",
+					"globalDateInEffect": "error",
+					"globalFetchInEffect": "error",
+					"globalRandom": "error",
+					"globalRandomInEffect": "error",
+					"globalTimersInEffect": "error",
+					"nodeBuiltinImport": "error",
+					"processEnv": "error",
+					"processEnvInEffect": "error",
+
+					// Conventions
+					"effectDoNotation": "error",
+					"nestedEffectGenYield": "error",
+					"serviceNotAsClass": "error",
+
+					// Catch shorthand
+					"catchAllToMapError": "error",
+					"catchChainToFirstSuccessOf": "error",
+					"catchConditionalRefailToCatchIf": "error",
+					"catchDieToOrDie": "error",
+					"catchTagToCatchReason": "error",
+					"catchToIgnore": "error",
+					"catchToOrElseSucceed": "error",
+					"multipleCatchTag": "error",
+
+					// Shorthand
+					"effectMapFlatten": "error",
+					"effectMapVoid": "error",
+					"effectSucceedWithVoid": "error",
+					"flatMapConditionalToFilterOrFail": "error",
+					"flatMapToMap": "error",
+					"mapSomeToAsSome": "error",
+					"optionMatchToFromOption": "error",
+					"preferSucceedSomeOrNone": "error",
+					"syncToSucceed": "error",
+
+					// Warnings
+					"globalDate": "warning",
+					"globalFetch": "warning",
+					"globalTimers": "warning",
+					"preferSchemaTypeProperty": "warning",
+					"runEffectInsideEffect": "warning",
+					"strictEffectProvide": "warning",
+
+					// Tidy-ups
+					"acquireReleaseDisposable": "message",
+					"allOfMapToForEach": "message",
+					"effectFnOpportunity": "message",
+					"leakingRequirements": "message",
+					"newPromise": "message",
+					"raceFirstWithSleepToTimeout": "message",
+					"redundantMapError": "message",
+					"redundantOrDie": "message",
+					"redundantSchemaTagIdentifier": "message",
+					"unnecessaryArrowBlock": "message",
+					"unnecessaryEffectGen": "message",
+					"unnecessaryPipe": "message",
+					"unnecessaryPipeChain": "message",
+					"unnecessaryTypeofType": "message",
+
+					// Hints
+					"lazyEffect": "suggestion",
+					"missedPipeableOpportunity": "suggestion",
+					"newSchemaClass": "suggestion",
+					"preferSchemaOverJson": "suggestion",
+
+					// Off
+					"unstableApiUsage": "off"
+				},
+				"overrides": [
+					{
+						"include": ["**/*.test.ts", "**/packages/e2e/**/*.ts"],
+						"options": {
+							"diagnosticSeverity": {
+								"globalFetch": "off",
+								"nodeBuiltinImport": "off",
+								"strictEffectProvide": "off"
+							}
+						}
+					},
+					{
+						"include": ["**/examples/**/*.ts", "**/examples/**/*.tsx"],
+						"options": {
+							"diagnosticSeverity": {
+								"globalConsole": "off",
+								"globalConsoleInEffect": "off",
+								"globalDate": "off",
+								"globalDateInEffect": "off",
+								"globalFetch": "off",
+								"globalFetchInEffect": "off",
+								"globalRandom": "off",
+								"globalRandomInEffect": "off",
+								"globalTimers": "off",
+								"globalTimersInEffect": "off",
+								"processEnv": "off",
+								"processEnvInEffect": "off"
+							}
+						}
+					}
+				]
+			}
+		]
+	}
+}

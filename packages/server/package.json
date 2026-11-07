@@ -1,0 +1,59 @@
+{
+	"name": "@nodecg-next/server",
+	"version": "3.0.0-alpha",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Hoishin/nodecg-next.git",
+		"directory": "packages/server"
+	},
+	"files": [
+		"dist",
+		"migrations",
+		"!migrations/**/snapshot.json"
+	],
+	"type": "module",
+	"exports": {
+		".": "./src/_export.ts"
+	},
+	"publishConfig": {
+		"exports": {
+			".": "./dist/_export.js"
+		}
+	},
+	"scripts": {
+		"drizzle-generate": "drizzle-kit generate --dialect sqlite --schema src/services/database/drizzle-sqlite/tables.ts --out migrations/drizzle-sqlite && drizzle-kit generate --dialect postgresql --schema src/services/database/drizzle-pg/tables.ts --out migrations/drizzle-pg"
+	},
+	"dependencies": {
+		"@effect/platform-node": "catalog:",
+		"@effect/sql-sqlite-node": "catalog:",
+		"@nodecg-next/core": "workspace:*",
+		"@nodecg-next/internal": "workspace:*",
+		"@preact/signals-core": "catalog:",
+		"drizzle-orm": "1.0.0-rc.5",
+		"effect": "catalog:",
+		"openid-client": "^6.8.4",
+		"type-fest": "catalog:"
+	},
+	"devDependencies": {
+		"@effect/vitest": "catalog:",
+		"@nodecg-next/test-utils": "workspace:*",
+		"@types/node": "catalog:",
+		"drizzle-kit": "1.0.0-rc.5",
+		"oauth2-mock-server": "catalog:",
+		"vite": "catalog:",
+		"vitest": "catalog:",
+		"zod": "catalog:"
+	},
+	"peerDependencies": {
+		"vite": "catalog:"
+	},
+	"peerDependenciesMeta": {
+		"vite": {
+			"optional": true
+		}
+	},
+	"engines": {
+		"node": "^22.19.0 || ^24.11.0 || ^26.13.0"
+	}
+}

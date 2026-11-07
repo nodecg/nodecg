@@ -8,9 +8,9 @@ indent_style = tab
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[{package.json,*.yml,*.yaml,*.md}]
-indent_style = space
+[*.{md,yml,yaml,}]
 indent_size = 2
+indent_style = space
 
 [*.md]
 trim_trailing_whitespace = false

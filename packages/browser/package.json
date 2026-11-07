@@ -1,0 +1,30 @@
+{
+	"name": "@nodecg-next/browser",
+	"version": "3.0.0-alpha",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Hoishin/nodecg-next.git",
+		"directory": "packages/browser"
+	},
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"exports": {
+		".": "./src/_export.ts"
+	},
+	"publishConfig": {
+		"exports": {
+			".": "./dist/_export.js"
+		}
+	},
+	"dependencies": {
+		"@nodecg-next/client": "workspace:*",
+		"@nodecg-next/internal": "workspace:*",
+		"effect": "catalog:"
+	},
+	"devDependencies": {
+		"vitest": "catalog:"
+	}
+}

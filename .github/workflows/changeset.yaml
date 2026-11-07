@@ -1,0 +1,30 @@
+name: Changeset
+
+on:
+  pull_request:
+    branches:
+      - main
+      - next
+  push:
+    branches:
+      - main
+      - next
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    if: ${{ !startsWith(github.head_ref, 'changeset-release/') && !contains(github.event.head_commit.message, 'Version Packages') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - run: corepack enable pnpm
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm exec changeset status --since="${{ github.event.pull_request.base.sha || github.event.before }}"
