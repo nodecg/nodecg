@@ -1,6 +1,6 @@
 {
 	"name": "@nodecg/server",
-	"version": "3.0.0-alpha",
+	"version": "3.0.0-alpha.0",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
