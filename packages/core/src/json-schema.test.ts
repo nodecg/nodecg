@@ -26,6 +26,15 @@ describe("jsonSchema", () => {
 		expectTypeOf<Score["note"]>().toEqualTypeOf<string | null | undefined>();
 	});
 
+	test("types an open schema as JSON", () => {
+		const anything = jsonSchema({});
+		const objectSchema = jsonSchema({ type: "object" });
+
+		expectTypeOf<typeof anything.Type>().toEqualTypeOf<Schema.Json>();
+		expectTypeOf(new Date()).not.toExtend<typeof objectSchema.Type>();
+		expectTypeOf({ a: [1, "b", null] }).toExtend<typeof objectSchema.Type>();
+	});
+
 	it.effect("accepts a value the schema allows", () =>
 		Effect.gen(function* () {
 			const value = yield* Schema.decodeEffect(score)({

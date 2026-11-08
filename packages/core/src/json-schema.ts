@@ -43,8 +43,19 @@ type ImportableDocument<T> = {
 				: T[K];
 };
 
+// Static<{}> is unknown, and Static<{ "type": "object"}> is generic object
+type AsJson<V> = unknown extends V
+	? Schema.Json
+	: V extends Schema.Json
+		? V
+		: V & Schema.Json;
+
+export interface JsonSchemaCodec<
+	TValue extends Schema.Json,
+> extends Schema.Codec<TValue, TValue> {}
+
 export const jsonSchema = <
-	TValue extends Static<T>,
+	TValue extends AsJson<Static<T>>,
 	const T extends JSONSchemaDraft2020_12.Document,
 >(
 	schema: T & ImportableDocument<T>,
@@ -52,4 +63,4 @@ export const jsonSchema = <
 	SchemaRepresentation.fromJsonSchemaDocument(
 		JsonSchema.fromSchemaDraft2020_12(decodeRecord(schema)),
 		{ patterns: "apply" },
-	) as Schema.Codec<TValue, TValue>;
+	) as JsonSchemaCodec<TValue>;

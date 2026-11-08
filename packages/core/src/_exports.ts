@@ -20,7 +20,7 @@ export {
 	FieldEncodeError,
 	type FieldCodec,
 } from "./field-codec.ts";
-export { jsonSchema } from "./json-schema.ts";
+export { jsonSchema, type JsonSchemaCodec } from "./json-schema.ts";
 export {
 	getRolesForNamespace,
 	isAdminTier,
