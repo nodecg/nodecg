@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 
-import { implementNamespace, loadNamespace } from "@nodecg-next/server";
+import { implementNamespace, loadNamespace } from "@nodecg/server";
 import express from "express";
 import { Hono } from "hono";
 import { fetchNodeHandler } from "srvx/node";

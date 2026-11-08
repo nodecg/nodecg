@@ -1,4 +1,4 @@
-import { loadNamespace } from "@nodecg-next/client";
+import { loadNamespace } from "@nodecg/client";
 import { describe, expect, onTestFinished, test, vi } from "vitest";
 
 import { suiteBase } from "../../src/client/suite-base.ts";

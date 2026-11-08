@@ -1,5 +1,5 @@
 import * as NodeHttpServer from "@effect/platform-node/NodeHttpServer";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
 import { Effect, FileSystem, Layer, Path } from "effect";
 import {
 	FetchHttpClient,

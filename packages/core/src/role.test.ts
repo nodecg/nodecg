@@ -8,7 +8,7 @@ import {
 	ServerIdentity,
 	ServiceAccountId,
 	UserId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { Schema } from "effect";
 import { describe, expect, test } from "vitest";
 

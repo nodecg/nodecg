@@ -1,4 +1,4 @@
-import { baseUrlCookieName } from "@nodecg-next/internal";
+import { baseUrlCookieName } from "@nodecg/internal";
 import { Effect, Layer } from "effect";
 import {
 	Cookies,

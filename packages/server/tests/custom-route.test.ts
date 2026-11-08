@@ -1,6 +1,6 @@
-import { defineNamespace } from "@nodecg-next/core";
-import { Authentication, Role, RoleName } from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { defineNamespace } from "@nodecg/core";
+import { Authentication, Role, RoleName } from "@nodecg/internal";
 import { Effect, HashSet, Layer, Logger, Redacted, Schema } from "effect";
 import { HttpBody } from "effect/http";
 import { describe, expect } from "vitest";

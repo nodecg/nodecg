@@ -1,5 +1,5 @@
 {
-	"name": "@nodecg/example-counter",
+	"name": "@nodecg-private/example-counter",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -8,10 +8,10 @@
 		"start": "node src/server/server.ts"
 	},
 	"dependencies": {
-		"@nodecg-next/browser": "workspace:*",
-		"@nodecg-next/client": "workspace:*",
-		"@nodecg-next/core": "workspace:*",
-		"@nodecg-next/server": "workspace:*",
+		"@nodecg/browser": "workspace:*",
+		"@nodecg/client": "workspace:*",
+		"@nodecg/core": "workspace:*",
+		"@nodecg/server": "workspace:*",
 		"effect": "catalog:",
 		"react": "catalog:",
 		"react-dom": "catalog:"

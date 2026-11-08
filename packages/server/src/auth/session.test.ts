@@ -1,12 +1,12 @@
 import { createHash } from "node:crypto";
 
 import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
+import { testLayer } from "@nodecg-private/test-utils";
 import {
 	type Authentication,
 	AuthenticationId,
 	UserId,
-} from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+} from "@nodecg/internal";
 import { ConfigProvider, DateTime, Effect, Layer } from "effect";
 import { TestClock } from "effect/testing";
 import { afterEach, describe, expect, vi } from "vitest";

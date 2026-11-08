@@ -1,8 +1,4 @@
-import type {
-	Authentication,
-	GlobalRoleName,
-	Role,
-} from "@nodecg-next/internal";
+import type { Authentication, GlobalRoleName, Role } from "@nodecg/internal";
 import { Context, type Effect } from "effect";
 
 import type { BackendError } from "../repository-errors.ts";

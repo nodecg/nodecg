@@ -1,4 +1,4 @@
-import type { FieldEncodeError } from "@nodecg-next/core";
+import type { FieldEncodeError } from "@nodecg/core";
 import {
 	ClientMessage,
 	type ComputedFieldIdentifier,
@@ -12,7 +12,7 @@ import {
 	ServerMessage,
 	SubscribeRejectedMessage,
 	type TopicFieldIdentifier,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import {
 	Context,
 	Data,

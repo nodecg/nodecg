@@ -3,7 +3,7 @@ import {
 	type GlobalRoleName,
 	type Role,
 	UserId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { Context, type Effect, type HashSet, Schema } from "effect";
 
 import type { BackendError } from "../repository-errors.ts";

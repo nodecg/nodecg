@@ -5,7 +5,7 @@ import type {
 	Role,
 	UserId,
 	UserSessionId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { Context, type Effect, type Option } from "effect";
 import type { DateTime } from "effect";
 

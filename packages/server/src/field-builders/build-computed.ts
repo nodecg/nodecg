@@ -1,6 +1,6 @@
-import type { FieldManifest } from "@nodecg-next/core";
-import { CurrentIdentity, type Identity } from "@nodecg-next/internal";
-import { cloneJson } from "@nodecg-next/internal/utils";
+import type { FieldManifest } from "@nodecg/core";
+import { CurrentIdentity, type Identity } from "@nodecg/internal";
+import { cloneJson } from "@nodecg/internal/utils";
 import { Effect, Result, Stream } from "effect";
 
 import {

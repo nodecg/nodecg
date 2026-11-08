@@ -1,10 +1,10 @@
 {
-	"name": "@nodecg-next/internal",
+	"name": "@nodecg/internal",
 	"version": "0.0.6",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Hoishin/nodecg-next.git",
+		"url": "git+https://github.com/nodecg/nodecg.git",
 		"directory": "packages/internal"
 	},
 	"files": [

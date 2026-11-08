@@ -1,6 +1,6 @@
-import { FieldDecodeError } from "@nodecg-next/core";
-import { computeFingerprint, computeTestHash } from "@nodecg-next/internal/occ";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { FieldDecodeError } from "@nodecg/core";
+import { computeFingerprint, computeTestHash } from "@nodecg/internal/occ";
 import {
 	Cause,
 	Context,

@@ -1,9 +1,6 @@
-import { defineNamespace } from "@nodecg-next/core";
-import {
-	Authentication,
-	CreateApiKeyResultSchema,
-} from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { defineNamespace } from "@nodecg/core";
+import { Authentication, CreateApiKeyResultSchema } from "@nodecg/internal";
 import { Effect, Layer, Redacted, Schema } from "effect";
 import { HttpClientResponse } from "effect/http";
 import { describe, expect } from "vitest";

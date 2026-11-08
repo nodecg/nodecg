@@ -1,4 +1,4 @@
-import { implementNamespace, loadNamespace } from "@nodecg-next/server";
+import { implementNamespace, loadNamespace } from "@nodecg/server";
 
 import { reportReady } from "../../src/server/report-ready.ts";
 import { persistenceManifest } from "./manifest.ts";

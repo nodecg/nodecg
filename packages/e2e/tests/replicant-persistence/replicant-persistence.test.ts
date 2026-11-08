@@ -1,4 +1,4 @@
-import { loadNamespace } from "@nodecg-next/client";
+import { loadNamespace } from "@nodecg/client";
 import { describe, expect, onTestFinished, test } from "vitest";
 import { commands } from "vitest/browser";
 

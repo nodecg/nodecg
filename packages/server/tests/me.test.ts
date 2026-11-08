@@ -1,5 +1,5 @@
-import { Authentication, Role, RoleName } from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { Authentication, Role, RoleName } from "@nodecg/internal";
 import { Effect, HashSet, Layer } from "effect";
 import { describe, expect } from "vitest";
 

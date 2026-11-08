@@ -1,4 +1,4 @@
-import { defineNamespace, extendNamespace } from "@nodecg-next/core";
+import { defineNamespace, extendNamespace } from "@nodecg/core";
 import { Schema } from "effect";
 
 import { counterManifest, settingsManifest } from "./library/manifest.ts";

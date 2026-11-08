@@ -1,4 +1,4 @@
-import { manifestRolesKey, RoleName } from "@nodecg-next/internal";
+import { manifestRolesKey, RoleName } from "@nodecg/internal";
 import { Result, Schema } from "effect";
 import { assert, describe, expect, expectTypeOf, test } from "vitest";
 import { z } from "zod";

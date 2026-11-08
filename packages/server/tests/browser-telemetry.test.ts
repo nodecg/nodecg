@@ -1,5 +1,5 @@
-import { Authentication } from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { Authentication } from "@nodecg/internal";
 import { ConfigProvider, Effect, Layer } from "effect";
 import { FetchHttpClient, HttpBody } from "effect/http";
 import { assert, describe, expect, vi } from "vitest";

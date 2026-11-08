@@ -1,13 +1,13 @@
 import { it } from "@effect/vitest";
-import { defineNamespace } from "@nodecg-next/core";
+import { testLayer } from "@nodecg-private/test-utils";
+import { defineNamespace } from "@nodecg/core";
 import {
 	FieldValueMessage,
 	ReplicantSnapshotMessage,
 	type ServerMessage,
 	SubscribeRejectedMessage,
-} from "@nodecg-next/internal";
-import { computeTestHash, RevisionConflict } from "@nodecg-next/internal/occ";
-import { testLayer } from "@nodecg-next/test-utils";
+} from "@nodecg/internal";
+import { computeTestHash, RevisionConflict } from "@nodecg/internal/occ";
 import {
 	Effect,
 	Exit,

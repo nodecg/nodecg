@@ -1,4 +1,4 @@
-import { cloneJson, findInheritedKey } from "@nodecg-next/internal/utils";
+import { cloneJson, findInheritedKey } from "@nodecg/internal/utils";
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { getDotPath } from "@standard-schema/utils";
 import { Option, Result, Schema } from "effect";

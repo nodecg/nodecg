@@ -1,4 +1,4 @@
-import { PingMessage } from "@nodecg-next/internal";
+import { PingMessage } from "@nodecg/internal";
 import {
 	Duration,
 	Effect,

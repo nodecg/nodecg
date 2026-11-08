@@ -2,8 +2,8 @@ import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
 import { it } from "@effect/vitest";
-import { type ResolvedPermission, FieldDecodeError } from "@nodecg-next/core";
-import { RoleName } from "@nodecg-next/internal";
+import { type ResolvedPermission, FieldDecodeError } from "@nodecg/core";
+import { RoleName } from "@nodecg/internal";
 import { ConfigProvider, Effect, HashMap, Layer, Stream } from "effect";
 import {
 	FetchHttpClient,

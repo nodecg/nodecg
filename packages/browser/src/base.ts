@@ -1,4 +1,4 @@
-import { baseUrlCookieName } from "@nodecg-next/internal";
+import { baseUrlCookieName } from "@nodecg/internal";
 import { Cookies } from "effect/http";
 
 const cookieBase = (): string | undefined =>

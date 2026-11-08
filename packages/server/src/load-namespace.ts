@@ -7,15 +7,15 @@ import type {
 	InferNamespace,
 	WidestCustomRoutes,
 	WidestNamespaceFields,
-} from "@nodecg-next/core";
-import { manifestRolesKey } from "@nodecg-next/internal";
+} from "@nodecg/core";
+import { manifestRolesKey } from "@nodecg/internal";
 import {
 	type ApplyLambdaToObjectValues,
 	findCaseClash,
 	mapEffectValues,
 	mapValues,
 	toError,
-} from "@nodecg-next/internal/utils";
+} from "@nodecg/internal/utils";
 import {
 	ConfigProvider,
 	Effect,

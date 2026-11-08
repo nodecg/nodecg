@@ -1,5 +1,5 @@
 {
-	"name": "@nodecg-next/example-nested-namespaces",
+	"name": "@nodecg-private/example-nested-namespaces",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -8,11 +8,11 @@
 		"start": "node src/server/server.ts"
 	},
 	"dependencies": {
-		"@nodecg-next/client": "workspace:*",
-		"@nodecg-next/core": "workspace:*",
-		"@nodecg-next/server": "workspace:*",
-		"@nodecg/example-plugin-ticker": "workspace:*",
-		"@nodecg/example-plugin-time": "workspace:*",
+		"@nodecg-private/example-plugin-ticker": "workspace:*",
+		"@nodecg-private/example-plugin-time": "workspace:*",
+		"@nodecg/client": "workspace:*",
+		"@nodecg/core": "workspace:*",
+		"@nodecg/server": "workspace:*",
 		"effect": "catalog:",
 		"react": "catalog:",
 		"react-dom": "catalog:"

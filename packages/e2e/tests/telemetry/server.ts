@@ -10,7 +10,7 @@ import {
 	JsonFileReplicantRepository,
 	loadNamespaceEffect,
 	OperatingSystemService,
-} from "@nodecg-next/server";
+} from "@nodecg/server";
 import {
 	Config,
 	ConfigProvider,

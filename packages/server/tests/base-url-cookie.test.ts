@@ -1,5 +1,5 @@
-import { baseUrlCookieName, sessionCookieName } from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { baseUrlCookieName, sessionCookieName } from "@nodecg/internal";
 import { ConfigProvider, Effect, Layer, Option } from "effect";
 import { Cookies } from "effect/http";
 import { describe, expect } from "vitest";

@@ -1,14 +1,11 @@
-import type {
-	WidestNamespaceFields,
-	NamespaceManifest,
-} from "@nodecg-next/core";
-import { CurrentIdentity, ServerIdentity } from "@nodecg-next/internal";
+import type { WidestNamespaceFields, NamespaceManifest } from "@nodecg/core";
+import { CurrentIdentity, ServerIdentity } from "@nodecg/internal";
 import {
 	mapValues,
 	mapEffectValues,
 	toError,
 	zipEffectValues,
-} from "@nodecg-next/internal/utils";
+} from "@nodecg/internal/utils";
 import { Context, Effect, Result, Tracer } from "effect";
 
 import {

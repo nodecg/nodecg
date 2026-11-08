@@ -2,7 +2,7 @@ import { realpathSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
 import { ConfigProvider, Effect, FileSystem, Layer } from "effect";
 import { FetchHttpClient, HttpClient } from "effect/http";
 import { describe, expect } from "vitest";

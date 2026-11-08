@@ -1,5 +1,5 @@
-import { UserId } from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { UserId } from "@nodecg/internal";
 import { Effect, Layer } from "effect";
 import { afterEach, describe, expect, vi } from "vitest";
 

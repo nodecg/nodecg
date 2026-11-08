@@ -1,4 +1,4 @@
-import type { LoginAttempt } from "@nodecg-next/internal";
+import type { LoginAttempt } from "@nodecg/internal";
 import { and, eq, gt, lte } from "drizzle-orm";
 import { Array, Effect, Layer, Option } from "effect";
 

@@ -1,8 +1,4 @@
-import {
-	defineNamespace,
-	extendNamespace,
-	jsonSchema,
-} from "@nodecg-next/core";
+import { defineNamespace, extendNamespace, jsonSchema } from "@nodecg/core";
 import { Schema } from "effect";
 import { z } from "zod";
 

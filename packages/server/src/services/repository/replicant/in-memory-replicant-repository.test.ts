@@ -1,4 +1,4 @@
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
 import { Effect } from "effect";
 import { describe, expect } from "vitest";
 

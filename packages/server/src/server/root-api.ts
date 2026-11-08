@@ -1,4 +1,4 @@
-import { InternalApi, PublicApi } from "@nodecg-next/internal";
+import { InternalApi, PublicApi } from "@nodecg/internal";
 import { HttpApi } from "effect/http-api";
 
 export const RootApi = HttpApi.make("NodeCG")

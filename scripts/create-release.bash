@@ -1,6 +1,6 @@
 set -euo pipefail
 
-version="$(jq -r 'first(.publishedPackages[] | select(.name != "@nodecg-next/internal") | .version) // empty' pnpm-publish-summary.json)"
+version="$(jq -r 'first(.publishedPackages[] | select(.name != "@nodecg/internal") | .version) // empty' pnpm-publish-summary.json)"
 
 [ -n "$version" ] || exit 0
 

@@ -4,7 +4,7 @@ import {
 	type Authentication,
 	CreateApiKeyResultSchema,
 	sessionCookieName,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { Array, ConfigProvider, Effect, HashMap, Layer, Option } from "effect";
 import {
 	Etag,

@@ -1,13 +1,13 @@
 {
-	"name": "@nodecg-next/e2e",
+	"name": "@nodecg-private/e2e",
 	"private": true,
 	"type": "module",
 	"devDependencies": {
 		"@effect/platform-node": "catalog:",
-		"@nodecg-next/browser": "workspace:*",
-		"@nodecg-next/client": "workspace:*",
-		"@nodecg-next/core": "workspace:*",
-		"@nodecg-next/server": "workspace:*",
+		"@nodecg/browser": "workspace:*",
+		"@nodecg/client": "workspace:*",
+		"@nodecg/core": "workspace:*",
+		"@nodecg/server": "workspace:*",
 		"@types/express": "^5.0.6",
 		"@types/node": "catalog:",
 		"@vitest/browser": "catalog:",

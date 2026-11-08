@@ -1,6 +1,6 @@
-import { InternalApi } from "@nodecg-next/internal";
-import type { Patch } from "@nodecg-next/internal/occ";
-import { toError } from "@nodecg-next/internal/utils";
+import { InternalApi } from "@nodecg/internal";
+import type { Patch } from "@nodecg/internal/occ";
+import { toError } from "@nodecg/internal/utils";
 import { Effect, Layer, Match, type Schema } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";

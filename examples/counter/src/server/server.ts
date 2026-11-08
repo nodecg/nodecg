@@ -3,7 +3,7 @@ import {
 	implementNamespace,
 	loadNamespace,
 	makeOidcProvider,
-} from "@nodecg-next/server";
+} from "@nodecg/server";
 import { OAuth2Server } from "oauth2-mock-server";
 
 import { extendedCounterManifest, rootManifest } from "../shared/manifest.ts";

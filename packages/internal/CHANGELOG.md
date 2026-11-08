@@ -1,36 +1,36 @@
-# @nodecg-next/internal
+# @nodecg/internal
 
-## 0.0.6
-
-### Patch Changes
-
-- Internal updates
-
-## 0.0.5
+## 0.0.6 (@nodecg-next/internal)
 
 ### Patch Changes
 
 - Internal updates
 
-## 0.0.4
+## 0.0.5 (@nodecg-next/internal)
 
 ### Patch Changes
 
 - Internal updates
 
-## 0.0.3
+## 0.0.4 (@nodecg-next/internal)
 
 ### Patch Changes
 
 - Internal updates
 
-## 0.0.2
+## 0.0.3 (@nodecg-next/internal)
 
 ### Patch Changes
 
 - Internal updates
 
-## 0.0.1
+## 0.0.2 (@nodecg-next/internal)
+
+### Patch Changes
+
+- Internal updates
+
+## 0.0.1 (@nodecg-next/internal)
 
 ### Patch Changes
 

@@ -1,14 +1,14 @@
 import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
+import { testLayer } from "@nodecg-private/test-utils";
 import {
 	Authentication,
 	AuthenticationId,
 	Role,
 	RoleName,
 	UserSessionId,
-} from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+} from "@nodecg/internal";
 import { DateTime, Effect, HashSet, Layer, Option, Schema } from "effect";
 import { Reactivity } from "effect/reactivity";
 import { TestClock } from "effect/testing";

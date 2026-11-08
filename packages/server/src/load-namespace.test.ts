@@ -2,8 +2,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { defineNamespace, extendNamespace } from "@nodecg-next/core";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { defineNamespace, extendNamespace } from "@nodecg/core";
 import { ConfigProvider, Effect, Layer, Schema } from "effect";
 import {
 	assert,

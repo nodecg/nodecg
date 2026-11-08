@@ -1,4 +1,4 @@
-import type { LoginAttempt } from "@nodecg-next/internal";
+import type { LoginAttempt } from "@nodecg/internal";
 import { Clock, Duration, Effect, Schema } from "effect";
 import { SecureRandom } from "effect/crypto";
 import { Base64Url } from "effect/encoding";

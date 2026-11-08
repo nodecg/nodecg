@@ -1,5 +1,5 @@
-import { Authentication, sessionCookieName } from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { Authentication, sessionCookieName } from "@nodecg/internal";
 import { ConfigProvider, Effect, Layer, Option } from "effect";
 import { SecureRandom } from "effect/crypto";
 import { Cookies } from "effect/http";

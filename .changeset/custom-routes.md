@@ -1,7 +1,7 @@
 ---
-"@nodecg-next/client": patch
-"@nodecg-next/core": patch
-"@nodecg-next/server": patch
+"@nodecg/client": patch
+"@nodecg/core": patch
+"@nodecg/server": patch
 ---
 
 add custom HTTP routes

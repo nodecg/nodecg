@@ -1,4 +1,4 @@
-import { loadAuthClient, type RoleAssignment } from "@nodecg-next/client";
+import { loadAuthClient, type RoleAssignment } from "@nodecg/client";
 import { Url, UrlParams } from "effect/http";
 import { commands } from "vitest/browser";
 

@@ -6,7 +6,7 @@ import {
 	type Principal,
 	type Role,
 	type RoleName,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { Match } from "effect";
 
 export const ROLE_CAPABILITY = [

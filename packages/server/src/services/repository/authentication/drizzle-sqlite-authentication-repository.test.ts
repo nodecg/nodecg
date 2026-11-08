@@ -1,7 +1,7 @@
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
-import { type Authentication, UserId } from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { type Authentication, UserId } from "@nodecg/internal";
 import { eq, sql } from "drizzle-orm";
 import { Effect, Layer, Schema } from "effect";
 import { SecureRandom } from "effect/crypto";

@@ -1,3 +1,4 @@
+import { testLayer } from "@nodecg-private/test-utils";
 import {
 	Authentication,
 	Role,
@@ -6,8 +7,7 @@ import {
 	ServiceAccountDocumentEntry,
 	ServiceAccountId,
 	UserDocumentEntry,
-} from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+} from "@nodecg/internal";
 import { Effect, HashSet, Layer } from "effect";
 import { SecureRandom } from "effect/crypto";
 import { HttpBody } from "effect/http";

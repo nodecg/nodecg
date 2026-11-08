@@ -1,4 +1,5 @@
 import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
+import { testLayer } from "@nodecg-private/test-utils";
 import {
 	Authentication,
 	Role,
@@ -6,8 +7,7 @@ import {
 	ServiceAccountId,
 	User,
 	UserId,
-} from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+} from "@nodecg/internal";
 import { Effect, HashMap, HashSet, Layer, Option } from "effect";
 import { afterEach, assert, describe, expect, vi } from "vitest";
 

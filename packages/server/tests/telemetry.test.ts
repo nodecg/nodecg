@@ -1,5 +1,5 @@
-import { defineNamespace } from "@nodecg-next/core";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { defineNamespace } from "@nodecg/core";
 import { ConfigProvider, Effect, Layer, Option, Schema, Tracer } from "effect";
 import { expect } from "vitest";
 

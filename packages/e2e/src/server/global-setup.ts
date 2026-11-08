@@ -1,7 +1,7 @@
 import { type ChildProcess, fork } from "node:child_process";
 
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import { OperatingSystemService } from "@nodecg-next/server";
+import { OperatingSystemService } from "@nodecg/server";
 import {
 	Cause,
 	Duration,

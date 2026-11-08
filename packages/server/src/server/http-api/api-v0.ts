@@ -1,4 +1,4 @@
-import { CurrentIdentity, CurrentServiceAccount } from "@nodecg-next/internal";
+import { CurrentIdentity, CurrentServiceAccount } from "@nodecg/internal";
 import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/http-api";
 

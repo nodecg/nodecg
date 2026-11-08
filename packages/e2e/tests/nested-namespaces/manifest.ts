@@ -1,4 +1,4 @@
-import { defineNamespace } from "@nodecg-next/core";
+import { defineNamespace } from "@nodecg/core";
 import { Schema } from "effect";
 
 export const nestAssetsManifest = defineNamespace("e2e-nest-assets", {

@@ -1,11 +1,7 @@
-import type { ReplicantFieldManifest } from "@nodecg-next/core";
-import {
-	CurrentIdentity,
-	type Identity,
-	type Updater,
-} from "@nodecg-next/internal";
-import type { Patch } from "@nodecg-next/internal/occ";
-import { cloneJson, toError } from "@nodecg-next/internal/utils";
+import type { ReplicantFieldManifest } from "@nodecg/core";
+import { CurrentIdentity, type Identity, type Updater } from "@nodecg/internal";
+import type { Patch } from "@nodecg/internal/occ";
+import { cloneJson, toError } from "@nodecg/internal/utils";
 import { Effect, Result, Schema, Stream } from "effect";
 import type { WritableDeep } from "type-fest";
 

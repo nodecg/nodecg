@@ -1,6 +1,6 @@
-# @nodecg-next/server
+# @nodecg/server
 
-## 0.1.5
+## 0.1.5 (@nodecg-next/server)
 
 ### Patch Changes
 
@@ -9,14 +9,14 @@
 - Allow linking roles to child namespaces' roles ([`65dafb4`](https://github.com/Hoishin/nodecg-next/commit/65dafb4b55f10428c84d47eb9dfe810ab74d8615))
 - WebSocket answers ping with pong ([`7c47ce8`](https://github.com/Hoishin/nodecg-next/commit/7c47ce8bf531659ca5cd4667302b04123267ff2c))
 
-## 0.1.4
+## 0.1.4 (@nodecg-next/server)
 
 ### Patch Changes
 
 - effect packages in dependencies are now specified with `^` ([`c7752bd`](https://github.com/Hoishin/nodecg-next/commit/c7752bd75608bb4a32d5feb3aa00a4039072452f))
 - replicant, computed and derive subscribers receive the old value as a second argument ([`b8aaab9`](https://github.com/Hoishin/nodecg-next/commit/b8aaab9c26b60b7ddd6132be31f6a3909650b35a))
 
-## 0.1.3
+## 0.1.3 (@nodecg-next/server)
 
 ### Patch Changes
 
@@ -25,13 +25,13 @@
 - replicants declared with `persistent: false` are not written to storage ([`04e8e3d`](https://github.com/Hoishin/nodecg-next/commit/04e8e3d827e9450d35a79e9deb0131addf73d01d))
 - the server shuts down on the IPC message `"shutdown"` ([`b5ee674`](https://github.com/Hoishin/nodecg-next/commit/b5ee674c253393088dde8b718f6bd79780ee4b55))
 
-## 0.1.2
+## 0.1.2 (@nodecg-next/server)
 
 ### Patch Changes
 
 - field schemas can now be written with Standard Schema (zod, valibot, etc) or JSON Schema (`jsonSchema()`) in addition to Effect Schema ([`d0c1d5c`](https://github.com/Hoishin/nodecg-next/commit/d0c1d5ca5d635a78fc92190a7f086b996f29fdc8))
 
-## 0.1.1
+## 0.1.1 (@nodecg-next/server)
 
 ### Patch Changes
 
@@ -56,7 +56,7 @@
 - Serve frontend dirs with Effect's `HttpStaticServer` instead of sirv ([`a12a133`](https://github.com/Hoishin/nodecg-next/commit/a12a133b73086f23b73de9cefc32f89037175f4f))
 - Accept RFC-compatible Bearer header on `/ws/v0` ([`5ef848e`](https://github.com/Hoishin/nodecg-next/commit/5ef848e41d7c13706ed4c64d2bb3c3ef043bd79c))
 
-## 0.1.0
+## 0.1.0 (@nodecg-next/server)
 
 ### Minor Changes
 

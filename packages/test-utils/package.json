@@ -1,5 +1,5 @@
 {
-	"name": "@nodecg-next/test-utils",
+	"name": "@nodecg-private/test-utils",
 	"version": "0.0.0",
 	"private": true,
 	"license": "MIT",

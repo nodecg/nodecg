@@ -1,11 +1,11 @@
-import { defineNamespace } from "@nodecg-next/core";
+import { defineNamespace } from "@nodecg/core";
 import {
 	type AuthProvider,
 	implementNamespace,
 	loadNamespace,
 	makeOAuth2Provider,
 	makeOidcProvider,
-} from "@nodecg-next/server";
+} from "@nodecg/server";
 
 const credentials = (prefix: string) => {
 	const clientId = process.env[`${prefix}_CLIENT_ID`];

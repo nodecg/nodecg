@@ -22,7 +22,7 @@ export {
 	ServiceAccountId,
 	UserId,
 	UserSessionId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 export {
 	BackendError,
 	KeyTaken,

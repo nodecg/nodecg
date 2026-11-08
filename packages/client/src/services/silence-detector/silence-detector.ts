@@ -1,4 +1,4 @@
-import type { ServerMessage } from "@nodecg-next/internal";
+import type { ServerMessage } from "@nodecg/internal";
 import { Context, Duration, Effect, Schema } from "effect";
 
 export class ConnectionIdle extends Schema.TaggedError<ConnectionIdle>()(

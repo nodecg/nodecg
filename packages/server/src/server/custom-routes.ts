@@ -1,4 +1,4 @@
-import { customRoutePath } from "@nodecg-next/internal";
+import { customRoutePath } from "@nodecg/internal";
 import { Effect, Match } from "effect";
 import { HttpRouter, HttpServerResponse } from "effect/http";
 

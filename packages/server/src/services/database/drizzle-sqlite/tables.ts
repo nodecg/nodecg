@@ -6,7 +6,7 @@ import type {
 	ServiceAccountId,
 	UserId,
 	UserSessionId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import {
 	integer,
 	primaryKey,

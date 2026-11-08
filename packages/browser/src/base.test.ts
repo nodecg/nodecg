@@ -1,4 +1,4 @@
-import { baseUrlCookieName } from "@nodecg-next/internal";
+import { baseUrlCookieName } from "@nodecg/internal";
 import { afterEach, describe, expect, test } from "vitest";
 
 import { nodecgBase } from "./base.ts";

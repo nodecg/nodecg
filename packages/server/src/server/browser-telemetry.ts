@@ -1,4 +1,4 @@
-import { InternalApi, TelemetrySignal } from "@nodecg-next/internal";
+import { InternalApi, TelemetrySignal } from "@nodecg/internal";
 import {
 	Config,
 	ConfigProvider,

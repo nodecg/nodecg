@@ -1,13 +1,8 @@
 import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
-import {
-	Role,
-	RoleName,
-	ServiceAccountId,
-	UserId,
-} from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { Role, RoleName, ServiceAccountId, UserId } from "@nodecg/internal";
 import { eq } from "drizzle-orm";
 import { Array, Effect, HashSet, Layer, Option, Schema } from "effect";
 import { Reactivity } from "effect/reactivity";

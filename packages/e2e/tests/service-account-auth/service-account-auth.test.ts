@@ -1,4 +1,4 @@
-import { type ClientMessage, ServerMessage } from "@nodecg-next/client";
+import { type ClientMessage, ServerMessage } from "@nodecg/client";
 import { Option, Schema } from "effect";
 import { describe, expect, onTestFinished, test, vi } from "vitest";
 

@@ -1,4 +1,4 @@
-import type { ClientMessage, ServerMessage } from "@nodecg-next/internal";
+import type { ClientMessage, ServerMessage } from "@nodecg/internal";
 import { Context, type Effect, Schema, type Scope, type Stream } from "effect";
 
 export class MessageEncodeError extends Schema.TaggedError<MessageEncodeError>()(

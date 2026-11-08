@@ -1,6 +1,6 @@
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
 import { ConfigProvider, Effect, FileSystem, Layer, Path } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { assert, describe, expect, vi } from "vitest";

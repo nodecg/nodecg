@@ -1,5 +1,5 @@
 ---
-"@nodecg-next/server": patch
+"@nodecg/server": patch
 ---
 
 support OpenTelemetry traces and logs

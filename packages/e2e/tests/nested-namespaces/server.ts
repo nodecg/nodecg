@@ -1,4 +1,4 @@
-import { implementNamespace, loadNamespace } from "@nodecg-next/server";
+import { implementNamespace, loadNamespace } from "@nodecg/server";
 
 import { devProvider } from "../../src/server/fake-auth-provider.ts";
 import { reportReady } from "../../src/server/report-ready.ts";

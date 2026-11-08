@@ -3,8 +3,8 @@ import type {
 	CustomRouteMethod,
 	WidestCustomRoutes,
 	WidestNamespaceFields,
-} from "@nodecg-next/core";
-import type { Identity } from "@nodecg-next/internal";
+} from "@nodecg/core";
+import type { Identity } from "@nodecg/internal";
 import { Effect, HashSet, Schema, String } from "effect";
 import { HttpEffect, HttpMethod } from "effect/http";
 

@@ -1,4 +1,4 @@
-import type { ComputedField, ReplicantField } from "@nodecg-next/client";
+import type { ComputedField, ReplicantField } from "@nodecg/client";
 import { type ReactNode, useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 

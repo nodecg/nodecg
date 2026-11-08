@@ -1,4 +1,4 @@
-import { Authentication } from "@nodecg-next/internal";
+import { Authentication } from "@nodecg/internal";
 import { Effect } from "effect";
 import { Digest } from "effect/crypto";
 import { Base64Url } from "effect/encoding";

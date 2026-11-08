@@ -1,4 +1,4 @@
-import { loadNamespace } from "@nodecg-next/client";
+import { loadNamespace } from "@nodecg/client";
 import { StrictMode, useState } from "react";
 
 import { showManifest } from "../shared/manifest.ts";

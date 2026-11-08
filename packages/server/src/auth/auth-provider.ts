@@ -1,4 +1,4 @@
-import type { LoginAttempt, Authentication } from "@nodecg-next/internal";
+import type { LoginAttempt, Authentication } from "@nodecg/internal";
 import {
 	Context,
 	type Effect,

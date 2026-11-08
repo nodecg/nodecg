@@ -3,8 +3,8 @@ import {
 	type AuthClient,
 	type Identity,
 	type MePayload,
-} from "@nodecg-next/client";
-import { AnonymousIdentitySchema } from "@nodecg-next/internal";
+} from "@nodecg/client";
+import { AnonymousIdentitySchema } from "@nodecg/internal";
 
 import { nodecgBase } from "./base.ts";
 

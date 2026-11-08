@@ -4,7 +4,7 @@ import {
 	ReplicantSnapshotMessage,
 	ServerMessage,
 	SubscribeMessage,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import {
 	Deferred,
 	Duration,

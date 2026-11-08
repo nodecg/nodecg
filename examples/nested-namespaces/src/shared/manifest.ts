@@ -1,6 +1,6 @@
-import { defineNamespace } from "@nodecg-next/core";
-import { tickerManifest } from "@nodecg/example-plugin-ticker";
-import { timeManifest } from "@nodecg/example-plugin-time";
+import { tickerManifest } from "@nodecg-private/example-plugin-ticker";
+import { timeManifest } from "@nodecg-private/example-plugin-time";
+import { defineNamespace } from "@nodecg/core";
 import { Schema } from "effect";
 
 export const showManifest = defineNamespace("show", {

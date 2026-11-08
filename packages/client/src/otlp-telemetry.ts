@@ -1,4 +1,4 @@
-import { InternalApi, type TelemetrySignal } from "@nodecg-next/internal";
+import { InternalApi, type TelemetrySignal } from "@nodecg/internal";
 import { Effect, Layer, Option, Path, Record } from "effect";
 import { SecureRandom } from "effect/crypto";
 import { FetchHttpClient, HttpClient, Url } from "effect/http";

@@ -1,4 +1,4 @@
-import type { FieldManifest } from "@nodecg-next/core";
+import type { FieldManifest } from "@nodecg/core";
 import { Effect, type Schema, Stream } from "effect";
 
 import { TopicBrokerService } from "../services/topic-broker/topic-broker.ts";

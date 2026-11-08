@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 
-import { getRolesForNamespace } from "@nodecg-next/core";
+import { getRolesForNamespace } from "@nodecg/core";
 import {
 	CurrentIdentity,
 	CurrentSessionUser,
@@ -12,8 +12,8 @@ import {
 	sessionCookieName,
 	SuperadminRevokeRefused,
 	TooManyRequests,
-} from "@nodecg-next/internal";
-import { MalformedUrl, parseRelativeUrl } from "@nodecg-next/internal/utils";
+} from "@nodecg/internal";
+import { MalformedUrl, parseRelativeUrl } from "@nodecg/internal/utils";
 import {
 	Array,
 	Clock,

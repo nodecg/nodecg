@@ -1,4 +1,4 @@
-import type { AuthenticationId, UserSessionId } from "@nodecg-next/internal";
+import type { AuthenticationId, UserSessionId } from "@nodecg/internal";
 import { and, eq, gt, lt } from "drizzle-orm";
 import { DateTime, Effect, Layer, Option } from "effect";
 

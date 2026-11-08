@@ -3,7 +3,7 @@ import {
 	type AuthenticationId,
 	sessionCookieSecurity,
 	UserSessionId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { DateTime, type Duration, Effect, Schema } from "effect";
 import { Digest, SecureRandom } from "effect/crypto";
 import { Base64Url } from "effect/encoding";

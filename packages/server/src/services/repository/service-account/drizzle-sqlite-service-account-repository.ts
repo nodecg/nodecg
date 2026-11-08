@@ -3,7 +3,7 @@ import {
 	type Role,
 	ServiceAccountId,
 	type UserId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { and, eq, inArray } from "drizzle-orm";
 import { Array, DateTime, Effect, type HashSet, Layer, Option } from "effect";
 import { SecureRandom } from "effect/crypto";

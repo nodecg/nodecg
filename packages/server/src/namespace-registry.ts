@@ -1,4 +1,4 @@
-import type { RoleName } from "@nodecg-next/internal";
+import type { RoleName } from "@nodecg/internal";
 import { Context, Effect, HashSet, Layer } from "effect";
 
 import type { CustomRoute } from "./build-custom-routes.ts";

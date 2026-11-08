@@ -1,5 +1,5 @@
-import { RpcCallError } from "@nodecg-next/internal";
-import type { Patch } from "@nodecg-next/internal/occ";
+import { RpcCallError } from "@nodecg/internal";
+import type { Patch } from "@nodecg/internal/occ";
 import { Effect, Match, type Schema } from "effect";
 import { HttpApiError } from "effect/http-api";
 

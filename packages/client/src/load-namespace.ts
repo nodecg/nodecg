@@ -7,9 +7,9 @@ import type {
 	WidestCustomRoutes,
 	WidestNamespaceFields,
 	WidestRpcField,
-} from "@nodecg-next/core";
-import { customRoutePath, type Updater } from "@nodecg-next/internal";
-import { diffSignedPatch } from "@nodecg-next/internal/occ";
+} from "@nodecg/core";
+import { customRoutePath, type Updater } from "@nodecg/internal";
+import { diffSignedPatch } from "@nodecg/internal/occ";
 import {
 	type ApplyLambdaToObjectValues,
 	mapEffectValues,
@@ -19,7 +19,7 @@ import {
 	type StreamToSubscribeTopicLambda,
 	type StreamToSubscribeLambda,
 	type ApplyLambdaToObject,
-} from "@nodecg-next/internal/utils";
+} from "@nodecg/internal/utils";
 import { effect } from "@preact/signals-core";
 import {
 	Array,

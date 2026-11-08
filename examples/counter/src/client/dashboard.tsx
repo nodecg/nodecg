@@ -1,4 +1,4 @@
-import { derive } from "@nodecg-next/client";
+import { derive } from "@nodecg/client";
 import { StrictMode, Suspense, useState } from "react";
 
 import { Login } from "./login.tsx";

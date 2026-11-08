@@ -1,7 +1,7 @@
-import { defineNamespace } from "@nodecg-next/core";
-import { Authentication } from "@nodecg-next/internal";
-import { computeTestHash } from "@nodecg-next/internal/occ";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { defineNamespace } from "@nodecg/core";
+import { Authentication } from "@nodecg/internal";
+import { computeTestHash } from "@nodecg/internal/occ";
 import { Effect, Layer, Schema } from "effect";
 import { HttpBody } from "effect/http";
 import { describe, expect } from "vitest";

@@ -1,4 +1,4 @@
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
 import { Effect, Layer } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { afterEach, describe, expect, test, vi } from "vitest";

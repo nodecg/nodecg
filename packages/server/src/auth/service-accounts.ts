@@ -1,4 +1,4 @@
-import type { UserId } from "@nodecg-next/internal";
+import type { UserId } from "@nodecg/internal";
 import { Effect, Redacted } from "effect";
 import { Digest, SecureRandom } from "effect/crypto";
 import { Base64Url } from "effect/encoding";

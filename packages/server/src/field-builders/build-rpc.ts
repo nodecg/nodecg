@@ -1,5 +1,5 @@
-import type { RpcFieldManifest } from "@nodecg-next/core";
-import { toError } from "@nodecg-next/internal/utils";
+import type { RpcFieldManifest } from "@nodecg/core";
+import { toError } from "@nodecg/internal/utils";
 import { Effect, Schema } from "effect";
 import type { Promisable } from "type-fest";
 

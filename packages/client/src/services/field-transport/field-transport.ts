@@ -1,4 +1,4 @@
-import type { Patch, RevisionConflict } from "@nodecg-next/internal/occ";
+import type { Patch, RevisionConflict } from "@nodecg/internal/occ";
 import { Context, Data, type Effect, Schema } from "effect";
 
 export class FieldNotFound extends Schema.TaggedError<FieldNotFound>()(

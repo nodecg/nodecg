@@ -1,8 +1,5 @@
-import type {
-	EmptyNamespaceFields,
-	NamespaceManifest,
-} from "@nodecg-next/core";
-import { manifestRolesKey, Role } from "@nodecg-next/internal";
+import type { EmptyNamespaceFields, NamespaceManifest } from "@nodecg/core";
+import { manifestRolesKey, Role } from "@nodecg/internal";
 import { Context, HashMap, HashSet, Option } from "effect";
 
 export class RoleLinks extends Context.Service<

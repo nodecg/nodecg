@@ -1,7 +1,7 @@
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
-import type { LoginAttempt } from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import type { LoginAttempt } from "@nodecg/internal";
 import { sql } from "drizzle-orm";
 import { Effect, Layer, Option, Schema } from "effect";
 import { Reactivity } from "effect/reactivity";

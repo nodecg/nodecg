@@ -1,4 +1,4 @@
-import { implementNamespace, loadNamespace } from "@nodecg-next/server";
+import { implementNamespace, loadNamespace } from "@nodecg/server";
 
 import { chain, cross } from "../../src/server/namespaces.ts";
 import { reportReady } from "../../src/server/report-ready.ts";

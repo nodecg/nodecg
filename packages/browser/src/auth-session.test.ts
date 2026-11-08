@@ -1,5 +1,5 @@
-import type { AuthClient, MePayload } from "@nodecg-next/client";
-import { AnonymousIdentitySchema, User, UserId } from "@nodecg-next/internal";
+import type { AuthClient, MePayload } from "@nodecg/client";
+import { AnonymousIdentitySchema, User, UserId } from "@nodecg/internal";
 import { describe, expect, test, vi } from "vitest";
 
 import { authSession } from "./auth-session.ts";

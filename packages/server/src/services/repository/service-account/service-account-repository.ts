@@ -3,7 +3,7 @@ import {
 	type Role,
 	ServiceAccountId,
 	type UserId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import {
 	Context,
 	type Effect,

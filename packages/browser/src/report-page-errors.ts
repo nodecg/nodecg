@@ -1,4 +1,4 @@
-import type { LoadedRoot } from "@nodecg-next/client";
+import type { LoadedRoot } from "@nodecg/client";
 
 export const reportPageErrors = (
 	root: LoadedRoot<

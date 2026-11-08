@@ -2,12 +2,12 @@ import type {
 	InferNamespace,
 	WidestCustomRoutes,
 	WidestNamespaceFields,
-} from "@nodecg-next/core";
-import { CurrentIdentity, ServerIdentity } from "@nodecg-next/internal";
+} from "@nodecg/core";
+import { CurrentIdentity, ServerIdentity } from "@nodecg/internal";
 import {
 	type ApplyLambdaToObjectValues,
 	mapValues,
-} from "@nodecg-next/internal/utils";
+} from "@nodecg/internal/utils";
 import {
 	Effect,
 	Exit,

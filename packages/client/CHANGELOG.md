@@ -1,19 +1,19 @@
-# @nodecg-next/client
+# @nodecg/client
 
-## 0.1.5
+## 0.1.5 (@nodecg-next/client)
 
 ### Patch Changes
 
 - the client reconnects a WebSocket that went silent ([`7c47ce8`](https://github.com/Hoishin/nodecg-next/commit/7c47ce8bf531659ca5cd4667302b04123267ff2c))
 
-## 0.1.4
+## 0.1.4 (@nodecg-next/client)
 
 ### Patch Changes
 
 - effect packages in dependencies are now specified with `^` ([`c7752bd`](https://github.com/Hoishin/nodecg-next/commit/c7752bd75608bb4a32d5feb3aa00a4039072452f))
 - replicant, computed and derive subscribers receive the old value as a second argument ([`b8aaab9`](https://github.com/Hoishin/nodecg-next/commit/b8aaab9c26b60b7ddd6132be31f6a3909650b35a))
 
-## 0.1.3
+## 0.1.3 (@nodecg-next/client)
 
 ### Patch Changes
 
@@ -22,13 +22,13 @@
 - popup login is removed ([`39c449c`](https://github.com/Hoishin/nodecg-next/commit/39c449c1341230a0fbef90d6a0cc29e3e13b3763))
 - Field value is refused when an object key is a name every object inherits (`toString`, `constructor`, `__proto__`, etc) ([`76d2eba`](https://github.com/Hoishin/nodecg-next/commit/76d2ebafc04a88308f31b7038f11e47e2ff0a00c))
 
-## 0.1.2
+## 0.1.2 (@nodecg-next/client)
 
 ### Patch Changes
 
 - field schemas can now be written with Standard Schema (zod, valibot, etc) or JSON Schema (`jsonSchema()`) in addition to Effect Schema ([`d0c1d5c`](https://github.com/Hoishin/nodecg-next/commit/d0c1d5ca5d635a78fc92190a7f086b996f29fdc8))
 
-## 0.1.1
+## 0.1.1 (@nodecg-next/client)
 
 ### Patch Changes
 
@@ -38,7 +38,7 @@
 - Scope role grants to their namespace ([`94420f7`](https://github.com/Hoishin/nodecg-next/commit/94420f79dee7614f85f99f61f16b15f3863a5352))
 - Rename identity types to user and service account ([`8b2e5eb`](https://github.com/Hoishin/nodecg-next/commit/8b2e5eba2475b9d15c0f54288dd8a328368eec93))
 
-## 0.1.0
+## 0.1.0 (@nodecg-next/client)
 
 ### Minor Changes
 

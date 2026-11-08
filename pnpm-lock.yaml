@@ -110,16 +110,16 @@ importers:
 
   examples/counter:
     dependencies:
-      '@nodecg-next/browser':
+      '@nodecg/browser':
         specifier: workspace:*
         version: link:../../packages/browser
-      '@nodecg-next/client':
+      '@nodecg/client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@nodecg-next/core':
+      '@nodecg/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@nodecg-next/server':
+      '@nodecg/server':
         specifier: workspace:*
         version: link:../../packages/server
       effect:
@@ -153,21 +153,21 @@ importers:
 
   examples/nested-namespaces:
     dependencies:
-      '@nodecg-next/client':
-        specifier: workspace:*
-        version: link:../../packages/client
-      '@nodecg-next/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@nodecg-next/server':
-        specifier: workspace:*
-        version: link:../../packages/server
-      '@nodecg/example-plugin-ticker':
+      '@nodecg-private/example-plugin-ticker':
         specifier: workspace:*
         version: link:../plugin-ticker
-      '@nodecg/example-plugin-time':
+      '@nodecg-private/example-plugin-time':
         specifier: workspace:*
         version: link:../plugin-time
+      '@nodecg/client':
+        specifier: workspace:*
+        version: link:../../packages/client
+      '@nodecg/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@nodecg/server':
+        specifier: workspace:*
+        version: link:../../packages/server
       effect:
         specifier: 'catalog:'
         version: 4.1.2
@@ -196,10 +196,10 @@ importers:
 
   examples/plugin-ticker:
     dependencies:
-      '@nodecg-next/core':
+      '@nodecg/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@nodecg-next/server':
+      '@nodecg/server':
         specifier: workspace:*
         version: link:../../packages/server
       effect:
@@ -212,10 +212,10 @@ importers:
 
   examples/plugin-time:
     dependencies:
-      '@nodecg-next/core':
+      '@nodecg/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@nodecg-next/server':
+      '@nodecg/server':
         specifier: workspace:*
         version: link:../../packages/server
       effect:
@@ -228,16 +228,16 @@ importers:
 
   examples/social-login:
     dependencies:
-      '@nodecg-next/browser':
+      '@nodecg/browser':
         specifier: workspace:*
         version: link:../../packages/browser
-      '@nodecg-next/client':
+      '@nodecg/client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@nodecg-next/core':
+      '@nodecg/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@nodecg-next/server':
+      '@nodecg/server':
         specifier: workspace:*
         version: link:../../packages/server
       react:
@@ -265,10 +265,10 @@ importers:
 
   packages/browser:
     dependencies:
-      '@nodecg-next/client':
+      '@nodecg/client':
         specifier: workspace:*
         version: link:../client
-      '@nodecg-next/internal':
+      '@nodecg/internal':
         specifier: workspace:*
         version: link:../internal
       effect:
@@ -281,10 +281,10 @@ importers:
 
   packages/client:
     dependencies:
-      '@nodecg-next/core':
+      '@nodecg/core':
         specifier: workspace:*
         version: link:../core
-      '@nodecg-next/internal':
+      '@nodecg/internal':
         specifier: workspace:*
         version: link:../internal
       '@preact/signals-core':
@@ -300,7 +300,7 @@ importers:
       '@effect/vitest':
         specifier: 'catalog:'
         version: 4.1.2(effect@4.1.2)(vitest@5.0.0)
-      '@nodecg-next/test-utils':
+      '@nodecg-private/test-utils':
         specifier: workspace:*
         version: link:../test-utils
       '@vitest/browser':
@@ -321,7 +321,7 @@ importers:
       '@hey-api/spec-types':
         specifier: ^0.2.0
         version: 0.2.0
-      '@nodecg-next/internal':
+      '@nodecg/internal':
         specifier: workspace:*
         version: link:../internal
       '@standard-schema/spec':
@@ -364,16 +364,16 @@ importers:
       '@effect/platform-node':
         specifier: 'catalog:'
         version: 4.1.2(effect@4.1.2)(redis@6.2.1)
-      '@nodecg-next/browser':
+      '@nodecg/browser':
         specifier: workspace:*
         version: link:../browser
-      '@nodecg-next/client':
+      '@nodecg/client':
         specifier: workspace:*
         version: link:../client
-      '@nodecg-next/core':
+      '@nodecg/core':
         specifier: workspace:*
         version: link:../core
-      '@nodecg-next/server':
+      '@nodecg/server':
         specifier: workspace:*
         version: link:../server
       '@types/express':
@@ -467,10 +467,10 @@ importers:
       '@effect/sql-sqlite-node':
         specifier: 'catalog:'
         version: 4.1.2(effect@4.1.2)
-      '@nodecg-next/core':
+      '@nodecg/core':
         specifier: workspace:*
         version: link:../core
-      '@nodecg-next/internal':
+      '@nodecg/internal':
         specifier: workspace:*
         version: link:../internal
       '@preact/signals-core':
@@ -492,7 +492,7 @@ importers:
       '@effect/vitest':
         specifier: 'catalog:'
         version: 4.1.2(effect@4.1.2)(vitest@5.0.0)
-      '@nodecg-next/test-utils':
+      '@nodecg-private/test-utils':
         specifier: workspace:*
         version: link:../test-utils
       '@types/node':

@@ -2,7 +2,7 @@ import {
 	type Authentication,
 	AuthenticationId,
 	UserId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { and, eq, sql } from "drizzle-orm";
 import { Array, DateTime, Effect, Layer, Option } from "effect";
 import { SecureRandom } from "effect/crypto";

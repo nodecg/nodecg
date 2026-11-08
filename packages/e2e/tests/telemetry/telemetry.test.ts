@@ -1,5 +1,5 @@
-import { reportPageErrors } from "@nodecg-next/browser";
-import { loadNamespace } from "@nodecg-next/client";
+import { reportPageErrors } from "@nodecg/browser";
+import { loadNamespace } from "@nodecg/client";
 import { describe, expect, onTestFinished, test, vi } from "vitest";
 
 import { suiteBase } from "../../src/client/suite-base.ts";

@@ -1,4 +1,4 @@
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
 import { Cause, ConfigProvider, Effect, Exit, HashMap, Layer } from "effect";
 import { assert, describe, expect } from "vitest";
 

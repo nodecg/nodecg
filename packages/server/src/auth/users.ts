@@ -1,8 +1,4 @@
-import {
-	Authentication,
-	type GlobalRoleName,
-	UserId,
-} from "@nodecg-next/internal";
+import { Authentication, type GlobalRoleName, UserId } from "@nodecg/internal";
 import { Array, Effect, Match, Option, Schema } from "effect";
 
 import { ConfiguredSuperadmins } from "../configured-superadmins.ts";

@@ -46,4 +46,4 @@ export {
 	type MePayload,
 	type Role,
 	type Updater,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";

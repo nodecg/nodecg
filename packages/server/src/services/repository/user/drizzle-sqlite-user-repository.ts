@@ -1,4 +1,4 @@
-import type { GlobalRoleName, Role, UserId } from "@nodecg-next/internal";
+import type { GlobalRoleName, Role, UserId } from "@nodecg/internal";
 import { and, eq, inArray } from "drizzle-orm";
 import { Array, Effect, type HashSet, Layer, Option } from "effect";
 

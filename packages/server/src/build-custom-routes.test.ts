@@ -1,4 +1,5 @@
-import { defineNamespace } from "@nodecg-next/core";
+import { testLayer } from "@nodecg-private/test-utils";
+import { defineNamespace } from "@nodecg/core";
 import {
 	AnonymousIdentitySchema,
 	CurrentIdentity,
@@ -7,8 +8,7 @@ import {
 	ServerIdentity,
 	ServiceAccount,
 	ServiceAccountId,
-} from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+} from "@nodecg/internal";
 import { Effect, Layer } from "effect";
 import { HttpServerRequest } from "effect/http";
 import { assert, describe, expect, vi } from "vitest";

@@ -1,10 +1,10 @@
 {
-	"name": "@nodecg-next/server",
+	"name": "@nodecg/server",
 	"version": "3.0.0-alpha",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Hoishin/nodecg-next.git",
+		"url": "git+https://github.com/nodecg/nodecg.git",
 		"directory": "packages/server"
 	},
 	"files": [
@@ -27,8 +27,8 @@
 	"dependencies": {
 		"@effect/platform-node": "catalog:",
 		"@effect/sql-sqlite-node": "catalog:",
-		"@nodecg-next/core": "workspace:*",
-		"@nodecg-next/internal": "workspace:*",
+		"@nodecg/core": "workspace:*",
+		"@nodecg/internal": "workspace:*",
 		"@preact/signals-core": "catalog:",
 		"drizzle-orm": "1.0.0-rc.5",
 		"effect": "catalog:",
@@ -37,7 +37,7 @@
 	},
 	"devDependencies": {
 		"@effect/vitest": "catalog:",
-		"@nodecg-next/test-utils": "workspace:*",
+		"@nodecg-private/test-utils": "workspace:*",
 		"@types/node": "catalog:",
 		"drizzle-kit": "1.0.0-rc.5",
 		"oauth2-mock-server": "catalog:",

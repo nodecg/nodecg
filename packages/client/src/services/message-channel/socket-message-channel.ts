@@ -1,4 +1,4 @@
-import { ClientMessage, ServerMessage } from "@nodecg-next/internal";
+import { ClientMessage, ServerMessage } from "@nodecg/internal";
 import {
 	Duration,
 	Effect,

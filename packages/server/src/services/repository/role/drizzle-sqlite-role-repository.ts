@@ -1,4 +1,4 @@
-import type { GlobalRoleName } from "@nodecg-next/internal";
+import type { GlobalRoleName } from "@nodecg/internal";
 import { eq } from "drizzle-orm";
 import { Effect, Layer } from "effect";
 

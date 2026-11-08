@@ -4,7 +4,7 @@ import {
 	type CurrentSessionUser,
 	ServiceAccount,
 	sessionCookieSecurity,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { Array, Effect, Option, Redacted } from "effect";
 import { HttpApiBuilder, HttpApiSecurity } from "effect/http-api";
 

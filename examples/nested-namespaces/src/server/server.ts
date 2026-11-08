@@ -1,6 +1,6 @@
-import { implementNamespace, loadNamespace } from "@nodecg-next/server";
-import { tickerNamespace } from "@nodecg/example-plugin-ticker/server";
-import { timeNamespace } from "@nodecg/example-plugin-time/server";
+import { tickerNamespace } from "@nodecg-private/example-plugin-ticker/server";
+import { timeNamespace } from "@nodecg-private/example-plugin-time/server";
+import { implementNamespace, loadNamespace } from "@nodecg/server";
 
 import { showManifest } from "../shared/manifest.ts";
 

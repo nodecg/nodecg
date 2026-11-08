@@ -1,5 +1,5 @@
-import { authSession } from "@nodecg-next/browser";
-import { loginUrl } from "@nodecg-next/client";
+import { authSession } from "@nodecg/browser";
+import { loginUrl } from "@nodecg/client";
 import { Suspense, use, useSyncExternalStore } from "react";
 
 const session = authSession();

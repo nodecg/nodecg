@@ -9,7 +9,7 @@ import {
 	type DeclarablePrincipalName,
 	type Principal,
 	type UndeclarableRoleName,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import {
 	type AddedRpcSchemas,
 	type AddedSchemas,
@@ -27,7 +27,7 @@ import {
 	mergeRecords,
 	type NestedValues,
 	type UnsafeNameKeys,
-} from "@nodecg-next/internal/utils";
+} from "@nodecg/internal/utils";
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { type HKT, Option, Record, Schema, String } from "effect";
 import { HttpMethod } from "effect/http";

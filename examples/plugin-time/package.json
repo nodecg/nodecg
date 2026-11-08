@@ -1,5 +1,5 @@
 {
-	"name": "@nodecg/example-plugin-time",
+	"name": "@nodecg-private/example-plugin-time",
 	"private": true,
 	"type": "module",
 	"exports": {
@@ -7,8 +7,8 @@
 		"./server": "./src/server.ts"
 	},
 	"dependencies": {
-		"@nodecg-next/core": "workspace:*",
-		"@nodecg-next/server": "workspace:*",
+		"@nodecg/core": "workspace:*",
+		"@nodecg/server": "workspace:*",
 		"effect": "catalog:"
 	},
 	"devDependencies": {

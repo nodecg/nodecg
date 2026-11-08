@@ -1,4 +1,4 @@
-import { implementNamespace } from "@nodecg-next/server";
+import { implementNamespace } from "@nodecg/server";
 
 import { timeManifest } from "./manifest.ts";
 

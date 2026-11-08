@@ -1,4 +1,4 @@
-import { isAdminTier, isSuperadmin } from "@nodecg-next/core";
+import { isAdminTier, isSuperadmin } from "@nodecg/core";
 import {
 	AdminTierMiddleware,
 	CurrentServiceAccount,
@@ -7,7 +7,7 @@ import {
 	UserAuthenticationMiddleware,
 	ServiceAccountAuthenticationMiddleware,
 	SuperadminMiddleware,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { Effect, Layer, Option, Redacted } from "effect";
 import type { Digest } from "effect/crypto";
 import { HttpApiError } from "effect/http-api";

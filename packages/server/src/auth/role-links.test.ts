@@ -1,5 +1,5 @@
-import { defineNamespace } from "@nodecg-next/core";
-import { Role, RoleName } from "@nodecg-next/internal";
+import { defineNamespace } from "@nodecg/core";
+import { Role, RoleName } from "@nodecg/internal";
 import { Equal, HashMap, HashSet, Option } from "effect";
 import { assert, describe, test } from "vitest";
 

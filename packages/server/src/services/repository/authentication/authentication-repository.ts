@@ -2,7 +2,7 @@ import type {
 	Authentication,
 	AuthenticationId,
 	UserId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { Context, type Effect } from "effect";
 
 import type { BackendError } from "../repository-errors.ts";

@@ -1,4 +1,4 @@
-import { loadAuthClient, loadNamespace } from "@nodecg-next/client";
+import { loadAuthClient, loadNamespace } from "@nodecg/client";
 import { assert, describe, expect, onTestFinished, test } from "vitest";
 
 import { makeAuthHelpers } from "../../src/client/auth.ts";

@@ -1,5 +1,5 @@
-import { Authentication, UserId } from "@nodecg-next/internal";
-import { testLayer } from "@nodecg-next/test-utils";
+import { testLayer } from "@nodecg-private/test-utils";
+import { Authentication, UserId } from "@nodecg/internal";
 import { ConfigProvider, Effect, HashMap, Layer } from "effect";
 import { SecureRandom } from "effect/crypto";
 import { HttpBody } from "effect/http";

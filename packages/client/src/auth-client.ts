@@ -4,7 +4,7 @@ import {
 	RoleName,
 	type LoginProvider,
 	UserId,
-} from "@nodecg-next/internal";
+} from "@nodecg/internal";
 import { Context, Effect, Layer, ManagedRuntime, Schema } from "effect";
 import { FetchHttpClient, Url, UrlParams } from "effect/http";
 import { HttpApiClient } from "effect/http-api";

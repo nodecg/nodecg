@@ -6,9 +6,9 @@ import type {
 	EmptyNamespaceFields,
 	WidestNamespaceFields,
 	NamespaceManifest,
-} from "@nodecg-next/core";
-import type { Identity, Updater } from "@nodecg-next/internal";
-import { mergeRecords, type NestedValues } from "@nodecg-next/internal/utils";
+} from "@nodecg/core";
+import type { Identity, Updater } from "@nodecg/internal";
+import { mergeRecords, type NestedValues } from "@nodecg/internal/utils";
 import type { Schema } from "effect";
 import type { Promisable, SetOptional } from "type-fest";
 

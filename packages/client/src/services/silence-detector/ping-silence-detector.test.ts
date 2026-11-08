@@ -1,5 +1,5 @@
 import { it } from "@effect/vitest";
-import { PongMessage, ReplicantSnapshotMessage } from "@nodecg-next/internal";
+import { PongMessage, ReplicantSnapshotMessage } from "@nodecg/internal";
 import { Clock, Duration, Effect, Fiber, Layer, Schema } from "effect";
 import { Socket } from "effect/socket";
 import { TestClock } from "effect/testing";

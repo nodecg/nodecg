@@ -3,10 +3,10 @@
 	"changelog": ["./changelog.ts", { "template": "- {summary} {ref}" }],
 	"linked": [
 		[
-			"@nodecg-next/core",
-			"@nodecg-next/server",
-			"@nodecg-next/client",
-			"@nodecg-next/browser"
+			"@nodecg/core",
+			"@nodecg/server",
+			"@nodecg/client",
+			"@nodecg/browser"
 		]
 	]
 }
