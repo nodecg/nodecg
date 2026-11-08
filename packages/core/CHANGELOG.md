@@ -1,5 +1,12 @@
 # @nodecg/core
 
+## 3.0.0-alpha.1
+
+### Patch Changes
+
+- export `jsonSchema` return type as its own type ([#935](https://github.com/nodecg/nodecg/pull/935))
+- reject rpc schemas that do not encode to JSON ([`25a46bf`](https://github.com/nodecg/nodecg/commit/25a46bf6e75946b96ad6009e14fea9ba2b52082b))
+
 ## 3.0.0-alpha.0
 
 ### Patch Changes

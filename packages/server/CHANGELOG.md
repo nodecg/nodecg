@@ -1,5 +1,9 @@
 # @nodecg/server
 
+## 3.0.0-alpha.1
+
+No changes in this release.
+
 ## 3.0.0-alpha.0
 
 ### Patch Changes
