@@ -1,0 +1,114 @@
+{
+	"version": "8",
+	"dialect": "postgres",
+	"id": "3330ff72-a78b-433c-a0d7-e89333b28feb",
+	"prevIds": ["00000000-0000-0000-0000-000000000000"],
+	"ddl": [
+		{
+			"isRlsEnabled": false,
+			"name": "login_attempts",
+			"entityType": "tables",
+			"schema": "public"
+		},
+		{
+			"type": "text",
+			"typeSchema": null,
+			"notNull": true,
+			"dimensions": 0,
+			"default": null,
+			"generated": null,
+			"identity": null,
+			"name": "key",
+			"entityType": "columns",
+			"schema": "public",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"typeSchema": null,
+			"notNull": true,
+			"dimensions": 0,
+			"default": null,
+			"generated": null,
+			"identity": null,
+			"name": "provider",
+			"entityType": "columns",
+			"schema": "public",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"typeSchema": null,
+			"notNull": true,
+			"dimensions": 0,
+			"default": null,
+			"generated": null,
+			"identity": null,
+			"name": "state",
+			"entityType": "columns",
+			"schema": "public",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"typeSchema": null,
+			"notNull": false,
+			"dimensions": 0,
+			"default": null,
+			"generated": null,
+			"identity": null,
+			"name": "code_verifier",
+			"entityType": "columns",
+			"schema": "public",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"typeSchema": null,
+			"notNull": false,
+			"dimensions": 0,
+			"default": null,
+			"generated": null,
+			"identity": null,
+			"name": "nonce",
+			"entityType": "columns",
+			"schema": "public",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"typeSchema": null,
+			"notNull": false,
+			"dimensions": 0,
+			"default": null,
+			"generated": null,
+			"identity": null,
+			"name": "return_to",
+			"entityType": "columns",
+			"schema": "public",
+			"table": "login_attempts"
+		},
+		{
+			"type": "bigint",
+			"typeSchema": null,
+			"notNull": true,
+			"dimensions": 0,
+			"default": null,
+			"generated": null,
+			"identity": null,
+			"name": "expires_at",
+			"entityType": "columns",
+			"schema": "public",
+			"table": "login_attempts"
+		},
+		{
+			"columns": ["key"],
+			"nameExplicit": false,
+			"name": "login_attempts_pkey",
+			"schema": "public",
+			"table": "login_attempts",
+			"entityType": "pks"
+		}
+	],
+	"renames": []
+}

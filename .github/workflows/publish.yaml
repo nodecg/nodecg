@@ -1,0 +1,79 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+      - next
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  mode:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      pending: ${{ steps.pending.outputs.pending }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: pending
+        run: |
+          if ls .changeset/*.md || { [ -f .changeset/pre.json ] && jq -e '.mode == "exit"' .changeset/pre.json; }; then
+            echo "pending=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pending=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  version-pr:
+    needs: mode
+    if: needs.mode.outputs.pending == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - run: corepack enable pnpm
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm run build
+      - uses: changesets/action@v2
+        with:
+          version-script: bash scripts/version-packages.bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  publish:
+    needs: mode
+    if: needs.mode.outputs.pending == 'false'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - run: corepack enable pnpm
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm run build
+      - run: |
+          tag=latest
+          if [ -f .changeset/pre.json ]; then
+            tag="$(jq -r .tag .changeset/pre.json)"
+          fi
+          pnpm publish -r --tag "$tag" --provenance --report-summary --publish-branch "$GITHUB_REF_NAME"
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/create-release.bash

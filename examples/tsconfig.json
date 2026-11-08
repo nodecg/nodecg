@@ -1,0 +1,10 @@
+{
+	"include": [],
+	"references": [
+		{ "path": "./counter" },
+		{ "path": "./nested-namespaces" },
+		{ "path": "./plugin-ticker" },
+		{ "path": "./plugin-time" },
+		{ "path": "./social-login" }
+	]
+}

@@ -1,8 +1,5 @@
-# Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
 
-# Explicitly declare text files you want to always be normalized and converted
-# to native line endings on checkout.
 *.css text eol=lf
 *.html text eol=lf
 *.js text eol=lf
@@ -13,11 +10,8 @@
 *.md text eol=lf
 *.yml text eol=lf
 
-# Denote all files that are truly binary and should not be modified.
 *.jpg binary
 *.mp4 binary
 *.png binary
 *.webm binary
 *.woff binary
-
-workspaces/nodecg/test/fixtures/nodecg-core/bundles/test-bundle/git/* text eol=lf

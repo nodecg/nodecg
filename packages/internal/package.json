@@ -1,0 +1,44 @@
+{
+	"name": "@nodecg/internal",
+	"version": "0.0.6",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nodecg/nodecg.git",
+		"directory": "packages/internal"
+	},
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"exports": {
+		".": "./src/_exports.ts",
+		"./occ": "./src/occ/_exports.ts",
+		"./utils": "./src/utils/_exports.ts"
+	},
+	"publishConfig": {
+		"exports": {
+			".": "./dist/index.js",
+			"./occ": "./dist/occ.js",
+			"./utils": "./dist/utils.js"
+		}
+	},
+	"dependencies": {
+		"@preact/signals-core": "catalog:",
+		"@standard-schema/spec": "catalog:",
+		"effect": "catalog:",
+		"fast-json-stable-stringify": "^2.1.0",
+		"jsondiffpatch": "^0.7.6",
+		"klona": "^2.0.6",
+		"murmurhash3js-revisited": "^3.0.0",
+		"type-fest": "catalog:"
+	},
+	"devDependencies": {
+		"@effect/vitest": "catalog:",
+		"@types/murmurhash3js-revisited": "^3.0.3",
+		"@vitest/browser": "catalog:",
+		"@vitest/browser-playwright": "catalog:",
+		"playwright": "catalog:",
+		"vitest": "catalog:"
+	}
+}

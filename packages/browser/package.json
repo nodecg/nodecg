@@ -1,0 +1,30 @@
+{
+	"name": "@nodecg/browser",
+	"version": "3.0.0-alpha",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nodecg/nodecg.git",
+		"directory": "packages/browser"
+	},
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"exports": {
+		".": "./src/_export.ts"
+	},
+	"publishConfig": {
+		"exports": {
+			".": "./dist/_export.js"
+		}
+	},
+	"dependencies": {
+		"@nodecg/client": "workspace:*",
+		"@nodecg/internal": "workspace:*",
+		"effect": "catalog:"
+	},
+	"devDependencies": {
+		"vitest": "catalog:"
+	}
+}

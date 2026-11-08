@@ -1,0 +1,301 @@
+{
+	"version": "7",
+	"dialect": "sqlite",
+	"id": "94b62abe-c69d-4189-ab92-fb0b801ed422",
+	"prevIds": ["7889785e-9bd6-45d5-9788-592239edcdc3"],
+	"ddl": [
+		{
+			"name": "accounts",
+			"entityType": "tables"
+		},
+		{
+			"name": "authentications",
+			"entityType": "tables"
+		},
+		{
+			"name": "login_attempts",
+			"entityType": "tables"
+		},
+		{
+			"name": "sessions",
+			"entityType": "tables"
+		},
+		{
+			"name": "users",
+			"entityType": "tables"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "id",
+			"entityType": "columns",
+			"table": "accounts"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "display_name",
+			"entityType": "columns",
+			"table": "accounts"
+		},
+		{
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "created_at",
+			"entityType": "columns",
+			"table": "accounts"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "id",
+			"entityType": "columns",
+			"table": "authentications"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "user_id",
+			"entityType": "columns",
+			"table": "authentications"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "issuer",
+			"entityType": "columns",
+			"table": "authentications"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "subject",
+			"entityType": "columns",
+			"table": "authentications"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "key",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "provider",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "state",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "code_verifier",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "nonce",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "return_to",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "expires_at",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "id",
+			"entityType": "columns",
+			"table": "sessions"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "authentication_id",
+			"entityType": "columns",
+			"table": "sessions"
+		},
+		{
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "expires_at",
+			"entityType": "columns",
+			"table": "sessions"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "id",
+			"entityType": "columns",
+			"table": "users"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "account_id",
+			"entityType": "columns",
+			"table": "users"
+		},
+		{
+			"columns": ["user_id"],
+			"tableTo": "users",
+			"columnsTo": ["id"],
+			"onUpdate": "NO ACTION",
+			"onDelete": "CASCADE",
+			"nameExplicit": false,
+			"name": "fk_authentications_user_id_users_id_fk",
+			"entityType": "fks",
+			"table": "authentications"
+		},
+		{
+			"columns": ["authentication_id"],
+			"tableTo": "authentications",
+			"columnsTo": ["id"],
+			"onUpdate": "NO ACTION",
+			"onDelete": "CASCADE",
+			"nameExplicit": false,
+			"name": "fk_sessions_authentication_id_authentications_id_fk",
+			"entityType": "fks",
+			"table": "sessions"
+		},
+		{
+			"columns": ["account_id"],
+			"tableTo": "accounts",
+			"columnsTo": ["id"],
+			"onUpdate": "NO ACTION",
+			"onDelete": "CASCADE",
+			"nameExplicit": false,
+			"name": "fk_users_account_id_accounts_id_fk",
+			"entityType": "fks",
+			"table": "users"
+		},
+		{
+			"columns": ["id"],
+			"nameExplicit": false,
+			"name": "accounts_pk",
+			"table": "accounts",
+			"entityType": "pks"
+		},
+		{
+			"columns": ["id"],
+			"nameExplicit": false,
+			"name": "authentications_pk",
+			"table": "authentications",
+			"entityType": "pks"
+		},
+		{
+			"columns": ["key"],
+			"nameExplicit": false,
+			"name": "login_attempts_pk",
+			"table": "login_attempts",
+			"entityType": "pks"
+		},
+		{
+			"columns": ["id"],
+			"nameExplicit": false,
+			"name": "sessions_pk",
+			"table": "sessions",
+			"entityType": "pks"
+		},
+		{
+			"columns": ["id"],
+			"nameExplicit": false,
+			"name": "users_pk",
+			"table": "users",
+			"entityType": "pks"
+		},
+		{
+			"columns": ["issuer", "subject"],
+			"nameExplicit": false,
+			"name": "authentications_issuer_subject_unique",
+			"entityType": "uniques",
+			"table": "authentications"
+		},
+		{
+			"columns": ["account_id"],
+			"nameExplicit": false,
+			"name": "users_account_id_unique",
+			"entityType": "uniques",
+			"table": "users"
+		}
+	],
+	"renames": []
+}

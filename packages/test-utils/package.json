@@ -1,0 +1,17 @@
+{
+	"name": "@nodecg-private/test-utils",
+	"version": "0.0.0",
+	"private": true,
+	"license": "MIT",
+	"type": "module",
+	"exports": {
+		".": "./src/_exports.ts"
+	},
+	"dependencies": {
+		"@effect/vitest": "catalog:",
+		"effect": "catalog:"
+	},
+	"devDependencies": {
+		"vitest": "catalog:"
+	}
+}

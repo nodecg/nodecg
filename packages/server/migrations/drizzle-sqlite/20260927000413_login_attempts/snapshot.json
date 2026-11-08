@@ -1,0 +1,90 @@
+{
+	"version": "7",
+	"dialect": "sqlite",
+	"id": "7889785e-9bd6-45d5-9788-592239edcdc3",
+	"prevIds": ["00000000-0000-0000-0000-000000000000"],
+	"ddl": [
+		{
+			"name": "login_attempts",
+			"entityType": "tables"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "key",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "provider",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "state",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "code_verifier",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "nonce",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "return_to",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"name": "expires_at",
+			"entityType": "columns",
+			"table": "login_attempts"
+		},
+		{
+			"columns": ["key"],
+			"nameExplicit": false,
+			"name": "login_attempts_pk",
+			"table": "login_attempts",
+			"entityType": "pks"
+		}
+	],
+	"renames": []
+}

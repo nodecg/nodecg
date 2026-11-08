@@ -1,0 +1,2 @@
+ALTER TABLE "service_accounts" DROP CONSTRAINT "service_accounts_created_by_accounts_id_fkey";--> statement-breakpoint
+ALTER TABLE "service_accounts" ADD CONSTRAINT "service_accounts_created_by_users_id_fkey" FOREIGN KEY ("created_by") REFERENCES "users"("id") ON DELETE SET NULL;

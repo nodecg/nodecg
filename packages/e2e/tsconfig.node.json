@@ -1,0 +1,7 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": ["node"]
+	},
+	"exclude": ["./node_modules", "./src/client", "./tests/**/*.test.ts"]
+}

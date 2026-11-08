@@ -1,0 +1,17 @@
+set -euo pipefail
+
+version="$(jq -r .version packages/internal/package.json)"
+published="$(npm view "@nodecg/internal@$version" dist.shasum 2>/dev/null || true)"
+
+pnpm --filter @nodecg/internal pack --pack-destination "$RUNNER_TEMP/internal" >/dev/null
+
+local_shasum="$(sha1sum "$RUNNER_TEMP"/internal/*.tgz | cut -d' ' -f1)"
+
+if [ "$local_shasum" != "$published" ]; then
+	printf -- '---\n"@nodecg/internal": patch\n---\n\nInternal updates\n' > .changeset/internal-auto.md
+fi
+
+pnpm exec changeset version
+
+# Keep prerelease changesets out of the hand-written 3.0.0 changelog
+rm -rf .changeset/pre

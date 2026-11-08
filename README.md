@@ -7,6 +7,8 @@
 [![Coverage Status](https://codecov.io/gh/nodecg/nodecg/branch/main/graph/badge.svg)](https://codecov.io/gh/nodecg/nodecg)
 [![Docker Build Status](https://ghcr-badge.egpl.dev/nodecg/nodecg/latest_tag)](https://ghcr.io/nodecg/nodecg)
 
+This branch is an experimental new version of NodeCG in active development. See [README-next.md](README-next.md).
+
 NodeCG is a broadcast graphics framework and application. It enables you to write complex, dynamic broadcast graphics using the web platform. NodeCG has no graphics or drawing primitives of its own. Instead, NodeCG provides a structure for your code and an API to facilitate moving data between the dashboard, the server, and your graphics. It makes few assumptions about how to best code a graphic, and gives you freedom to use whatever libraries, frameworks, tools, and methodologies you want. As such, NodeCG graphics can be rendered in any environment that can render HTML, including:
 
 - [OBS Studio](https://obsproject.com/)
@@ -24,30 +26,7 @@ Full docs and API reference are available at https://nodecg.dev
 
 ## Development
 
-To contribute to NodeCG development:
-
-```bash
-# Clone the repository
-git clone https://github.com/nodecg/nodecg.git
-cd nodecg
-
-# Install dependencies
-npm install
-
-# Run auto-rebuild + type-check on file changes
-npm run dev
-
-# Build all workspace packages
-npm run build
-
-# Run tests
-npx vitest run
-
-# Start NodeCG
-npm start
-```
-
-For more details on contributing to NodeCG core, see [the contributor guide on the official docs site](https://nodecg.dev/docs/working-on-nodecg-core)
+See [Development in README-next.md](README-next.md#development).
 
 ## Goals
 
@@ -78,7 +57,7 @@ NodeCG's roots are in small broadcasts with no budget. More recently, NodeCG has
 ## Maintainers
 
 - [Matt "Bluee" McNamara](https://mattmcn.com/)
-- [Keiichiro "Hoishin" Amemiya](https://twitter.com/hoishinxii)
+- [Hoishin](https://github.com/hoishin)
 
 ## Designers
 

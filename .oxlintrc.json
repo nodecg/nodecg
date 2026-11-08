@@ -1,0 +1,42 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["typescript", "unicorn", "oxc"],
+	"categories": {
+		"correctness": "error",
+		"nursery": "error"
+	},
+	"rules": {
+		"no-undef": "off",
+		"max-lines-per-function": "off",
+		"no-restricted-imports": [
+			"error",
+			{
+				"paths": [
+					{
+						"name": "@effect/platform-node",
+						"message": "Import the module path, e.g. @effect/platform-node/NodeRuntime"
+					}
+				]
+			}
+		],
+		"no-restricted-properties": [
+			"error",
+			{
+				"object": "Effect",
+				"property": "catch",
+				"message": "Name each error with Effect.catchTag."
+			},
+			{
+				"object": "Effect",
+				"property": "catchCause",
+				"message": "Name each error with Effect.catchTag."
+			}
+		]
+	},
+	"env": {
+		"builtin": true
+	},
+	"options": {
+		"typeAware": true
+	}
+}

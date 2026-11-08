@@ -1,52 +1,25 @@
 {
-  "name": "nodecg-monorepo",
-  "private": true,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nodecg/nodecg.git"
-  },
-  "license": "MIT",
-  "type": "module",
-  "workspaces": [
-    "workspaces/internal-util",
-    "workspaces/database-adapter-types",
-    "workspaces/database-adapter-sqlite-legacy",
-    "workspaces/cli",
-    "workspaces/nodecg"
-  ],
-  "scripts": {
-    "start": "node index.js",
-    "dev": "run-p watch typecheck-watch",
-    "watch": "tsdown --watch --no-clean",
-    "typecheck-watch": "npm run typecheck -- --watch --preserveWatchOutput",
-    "build": "tsdown",
-    "typecheck": "tsc -b tsconfig.typecheck.json",
-    "test": "vitest",
-    "typetest": "npm -w nodecg run typetest",
-    "lint": "eslint && prettier --check .",
-    "fix": "eslint --fix && prettier --write ."
-  },
-  "prettier": {},
-  "devDependencies": {
-    "@effect/cli": "^0.72.1",
-    "@effect/language-service": "^0.55.5",
-    "@effect/platform": "^0.93.0",
-    "@effect/platform-node": "^0.100.0",
-    "@eslint/js": "^9.39.0",
-    "@vitest/coverage-v8": "^4.0.12",
-    "effect": "^3.19.3",
-    "eslint": "^9.39.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "jiti": "^2.6.1",
-    "npm-run-all2": "^7.0.2",
-    "prettier": "^3.4.2",
-    "tsdown": "^0.16.6",
-    "tsx": "^4.19.2",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.2",
-    "vitest": "^4.0.12"
-  },
-  "packageManager": "npm@11.6.2+sha512.ee22b335fcbc95662cdf3ab8a053daf045d9cf9c6df6040d28965abb707512b2c16fa6c5eec049d34c74f78f390cebd14f697919eadb97756564d4f9eccc4954",
-  "nodecgRoot": true
+	"private": true,
+	"license": "MIT",
+	"type": "module",
+	"scripts": {
+		"build": "tsdown",
+		"effect-check": "effect-tsgo diagnostics --project tsconfig.json",
+		"type-check": "tsc -b --noEmit"
+	},
+	"devDependencies": {
+		"@changesets/changelog-github": "^1.0.0",
+		"@changesets/cli": "^3.0.1",
+		"@effect/tsgo": "^0.56.0",
+		"@vitest/browser": "catalog:",
+		"@vitest/browser-playwright": "catalog:",
+		"oxfmt": "^0.58.0",
+		"oxlint": "^1.73.0",
+		"oxlint-tsgolint": "^0.24.0",
+		"playwright": "catalog:",
+		"tsdown": "^0.23.1",
+		"typescript": "~7.0.2",
+		"vitest": "catalog:"
+	},
+	"packageManager": "pnpm@11.13.0+sha512.88d94724d8f2e6c186744a5584c6e59ecac869ec7ba15e9cb4cd628e8dc7066820b2481d8ee3b51ea8da323a7378068aa58c556a3720d32b7c20a051d088363a"
 }
