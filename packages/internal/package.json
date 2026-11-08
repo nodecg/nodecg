@@ -25,7 +25,6 @@
 	},
 	"dependencies": {
 		"@preact/signals-core": "catalog:",
-		"@standard-schema/spec": "catalog:",
 		"effect": "catalog:",
 		"fast-json-stable-stringify": "^2.1.0",
 		"jsondiffpatch": "^0.7.6",

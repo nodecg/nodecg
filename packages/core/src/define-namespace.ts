@@ -11,16 +11,11 @@ import {
 	type UndeclarableRoleName,
 } from "@nodecg/internal";
 import {
-	type AddedRpcSchemas,
-	type AddedSchemas,
 	type CaseClashingKeys,
-	type WidestFieldSchema,
 	type FileSafeName,
 	findCaseClash,
 	isFileSafeName,
 	mapNestedValues,
-	mapRpcValues,
-	mapSchemaValues,
 	mapValues,
 	type MergedNestedKeys,
 	mergeNestedValues,
@@ -33,6 +28,14 @@ import { type HKT, Option, Record, Schema, String } from "effect";
 import { HttpMethod } from "effect/http";
 
 import { makeCodec, type FieldCodec } from "./field-codec.ts";
+import {
+	type AddedRpcSchemas,
+	type AddedSchemas,
+	mapRpcValues,
+	mapSchemaValues,
+	type RpcSchemaPair,
+	type WidestFieldSchema,
+} from "./map-schema-values.ts";
 import {
 	computedPermission,
 	customRoutePermission,
@@ -265,11 +268,6 @@ interface ReplicantFieldManifestFromOptionLambda extends HKT.TypeLambda {
 interface ReplicantFieldManifestLambda extends HKT.TypeLambda {
 	readonly type: ReplicantFieldManifest<this["Target"]>;
 }
-
-type RpcSchemaPair = {
-	readonly request: WidestFieldSchema;
-	readonly response: WidestFieldSchema;
-};
 
 interface RpcFieldOption<P extends WriteOnlyPermissionArg<string>> {
 	readonly schema: RpcSchemaPair;
@@ -808,11 +806,15 @@ type RedeclaredKeys<T, Existing> = {
 		: never]: "Already declared by the precedent";
 };
 
-type AddedDecoded<In> = {
+type AddedDecoded<
+	In extends Readonly<Record<string, { readonly schema?: WidestFieldSchema }>>,
+> = {
 	readonly [K in keyof AddedSchemas<In>]: FieldDecoded<AddedSchemas<In>[K]>;
 };
 
-type AddedRpcDecoded<In> = {
+type AddedRpcDecoded<
+	In extends Readonly<Record<string, { readonly schema?: RpcSchemaPair }>>,
+> = {
 	readonly [K in keyof AddedRpcSchemas<In>]: {
 		readonly request: FieldDecoded<AddedRpcSchemas<In>[K]["request"]>;
 		readonly response: FieldDecoded<AddedRpcSchemas<In>[K]["response"]>;

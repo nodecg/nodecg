@@ -6,7 +6,6 @@ export {
 	isFileSafeName,
 	type UnsafeNameKeys,
 } from "./file-safe-name.ts";
-export { type WidestFieldSchema } from "./field-schema.ts";
 export { findInheritedKey, isInheritedKey } from "./inherited-key.ts";
 export {
 	type ApplyLambdaToObjectValues,
@@ -18,10 +17,6 @@ export {
 	mergeRecords,
 	type NestedValues,
 	zipEffectValues,
-	type AddedSchemas,
-	mapSchemaValues,
-	type AddedRpcSchemas,
-	mapRpcValues,
 } from "./map-values.ts";
 export {
 	type EffectToPromiseLambda,

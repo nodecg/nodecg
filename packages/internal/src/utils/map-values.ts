@@ -1,7 +1,5 @@
 import { Effect, HashSet, type HKT } from "effect";
 
-import type { WidestFieldSchema } from "./field-schema.ts";
-
 const unsafeObjectKeys = <T extends object>(obj: T) =>
 	Object.keys(obj) as (keyof T & string)[];
 
@@ -93,93 +91,6 @@ export const zipEffectValues =
 			}
 			return result as ApplyLambdaToObjectValues<G, Target, never, never, In>;
 		});
-
-type SchemaKeys<In> = {
-	[K in keyof In]: In[K] extends { readonly schema: {} } ? K : never;
-}[keyof In] &
-	string;
-
-export type AddedSchemas<In> = {
-	readonly [K in SchemaKeys<In>]: In[K] extends {
-		readonly schema: infer S extends WidestFieldSchema;
-	}
-		? S
-		: never;
-};
-
-export const mapSchemaValues =
-	<
-		FieldOption extends { readonly schema?: WidestFieldSchema },
-		G extends HKT.TypeLambda,
-	>() =>
-	<In extends Record<string, FieldOption>>(
-		obj: In | undefined,
-		transform: (
-			value: FieldOption & { readonly schema: WidestFieldSchema },
-			key: string,
-		) => HKT.Kind<G, unknown, never, never, WidestFieldSchema>,
-	): ApplyLambdaToObjectValues<G, AddedSchemas<In>> => {
-		const result: any = {};
-		if (typeof obj !== "undefined") {
-			for (const key of Object.keys(obj)) {
-				const value = obj[key];
-				if (typeof value === "undefined") {
-					continue;
-				}
-				const schema = value.schema;
-				if (typeof schema === "undefined") {
-					continue;
-				}
-				result[key] = transform({ ...value, schema }, key);
-			}
-		}
-		return result as ApplyLambdaToObjectValues<G, AddedSchemas<In>>;
-	};
-
-type RpcSchemaSlot = {
-	readonly request: WidestFieldSchema;
-	readonly response: WidestFieldSchema;
-};
-
-export type AddedRpcSchemas<In> = {
-	readonly [K in SchemaKeys<In>]: In[K] extends {
-		readonly schema: {
-			readonly request: infer Req extends WidestFieldSchema;
-			readonly response: infer Res extends WidestFieldSchema;
-		};
-	}
-		? { readonly request: Req; readonly response: Res }
-		: never;
-};
-
-export const mapRpcValues =
-	<
-		FieldOption extends { readonly schema?: RpcSchemaSlot },
-		G extends HKT.TypeLambda,
-	>() =>
-	<In extends Record<string, FieldOption>>(
-		obj: In | undefined,
-		transform: (
-			value: FieldOption & { readonly schema: RpcSchemaSlot },
-			key: string,
-		) => HKT.Kind<G, unknown, never, never, RpcSchemaSlot>,
-	): ApplyLambdaToObjectValues<G, AddedRpcSchemas<In>> => {
-		const result: any = {};
-		if (typeof obj !== "undefined") {
-			for (const key of Object.keys(obj)) {
-				const value = obj[key];
-				if (typeof value === "undefined") {
-					continue;
-				}
-				const schema = value.schema;
-				if (typeof schema === "undefined") {
-					continue;
-				}
-				result[key] = transform({ ...value, schema }, key);
-			}
-		}
-		return result as ApplyLambdaToObjectValues<G, AddedRpcSchemas<In>>;
-	};
 
 export type NestedValues<In, Output> = {
 	readonly [K in keyof In & string]: {
