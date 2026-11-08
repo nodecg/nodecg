@@ -73,7 +73,7 @@ jobs:
           if [ -f .changeset/pre.json ]; then
             tag="$(jq -r .tag .changeset/pre.json)"
           fi
-          pnpm stage publish -r --tag "$tag" --provenance --report-summary
+          pnpm publish -r --tag "$tag" --provenance --report-summary --publish-branch "$GITHUB_REF_NAME"
       - env:
           GH_TOKEN: ${{ github.token }}
-        run: bash scripts/create-github-release.bash
+        run: bash scripts/create-release.bash
