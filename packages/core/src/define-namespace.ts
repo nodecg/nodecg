@@ -276,6 +276,17 @@ interface RpcFieldOption<P extends WriteOnlyPermissionArg<string>> {
 	readonly permission?: P;
 }
 
+type JsonEncodableRpc<
+	Rpc extends Record<string, { readonly schema: RpcSchemaPair }>,
+> = {
+	readonly [K in keyof Rpc]: {
+		readonly schema: {
+			readonly request: JsonEncodable<Rpc[K]["schema"]["request"]>;
+			readonly response: JsonEncodable<Rpc[K]["schema"]["response"]>;
+		};
+	};
+};
+
 interface RpcFieldManifestFromSchemaLambda extends HKT.TypeLambda {
 	readonly Target: RpcSchemaPair;
 	readonly type: RpcFieldManifest<
@@ -629,7 +640,7 @@ export function defineNamespace<
 			CaseClashingKeys<Replicant>;
 		computed?: FieldOptions<Computed, ReadOnlyPermissionArg<DeclaredRoleName>>;
 		topic?: FieldOptions<Topic, PermissionArg<DeclaredRoleName>>;
-		rpc?: Rpc;
+		rpc?: Rpc & JsonEncodableRpc<Rpc>;
 		customRoute?: CustomRoute &
 			UnsafeNameKeys<CustomRoute> &
 			CaseClashingKeys<CustomRoute>;

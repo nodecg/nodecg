@@ -757,6 +757,34 @@ describe("defineNamespace", () => {
 					replicant: { tally: { schema: z.custom<Tally>() } },
 				});
 			});
+
+			test("rpc request", () => {
+				defineNamespace("match", {
+					rpc: {
+						start: {
+							schema: {
+								// @ts-expect-error DurationFromNanos encodes to bigint
+								request: Schema.Struct({ startTime: Schema.DurationFromNanos }),
+								response: Schema.Null,
+							},
+						},
+					},
+				});
+			});
+
+			test("rpc response", () => {
+				defineNamespace("match", {
+					rpc: {
+						start: {
+							schema: {
+								request: Schema.Null,
+								// @ts-expect-error Schema.Date has Encoded=Date, not Schema.Json
+								response: Schema.Date,
+							},
+						},
+					},
+				});
+			});
 		});
 
 		test("accepts a schema whose value is an interface", () => {
