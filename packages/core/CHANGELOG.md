@@ -1,5 +1,13 @@
 # @nodecg/core
 
+## 3.0.0-alpha.0
+
+### Patch Changes
+
+- add custom HTTP routes ([#933](https://github.com/nodecg/nodecg/pull/933))
+- rename packages from @nodecg-next to @nodecg ([#933](https://github.com/nodecg/nodecg/pull/933))
+- update effect to 4.1 ([#933](https://github.com/nodecg/nodecg/pull/933))
+
 ## 0.1.5 (@nodecg-next/core)
 
 ### Patch Changes

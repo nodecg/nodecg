@@ -1,5 +1,14 @@
 # @nodecg/browser
 
+## 3.0.0-alpha.0
+
+### Patch Changes
+
+- report browser telemetry through the server ([#933](https://github.com/nodecg/nodecg/pull/933))
+- load a namespace and its children with one loadNamespace ([#933](https://github.com/nodecg/nodecg/pull/933))
+- rename packages from @nodecg-next to @nodecg ([#933](https://github.com/nodecg/nodecg/pull/933))
+- update effect to 4.1 ([#933](https://github.com/nodecg/nodecg/pull/933))
+
 ## 0.1.5 (@nodecg-next/browser)
 
 No changes in this release.

@@ -1,5 +1,21 @@
 # @nodecg/server
 
+## 3.0.0-alpha.0
+
+### Patch Changes
+
+- fix the missing base url cookie on login and logout ([#933](https://github.com/nodecg/nodecg/pull/933))
+- report browser telemetry through the server ([#933](https://github.com/nodecg/nodecg/pull/933))
+- add custom HTTP routes ([#933](https://github.com/nodecg/nodecg/pull/933))
+- update supported Node.js version to 22.19 and LTS 24 and 26 ([#933](https://github.com/nodecg/nodecg/pull/933))
+- pass the full server URL to onReady ([#933](https://github.com/nodecg/nodecg/pull/933))
+- support OpenTelemetry traces and logs ([#933](https://github.com/nodecg/nodecg/pull/933))
+- rename packages from @nodecg-next to @nodecg ([#933](https://github.com/nodecg/nodecg/pull/933))
+- persist only the latest value of a replicant committed while its write is pending ([#933](https://github.com/nodecg/nodecg/pull/933))
+- load one namespace at root entrypoint ([#933](https://github.com/nodecg/nodecg/pull/933))
+- remove ctx.use and provide `.children` instead ([#933](https://github.com/nodecg/nodecg/pull/933))
+- update effect to 4.1 ([#933](https://github.com/nodecg/nodecg/pull/933))
+
 ## 0.1.5 (@nodecg-next/server)
 
 ### Patch Changes
