@@ -8,8 +8,8 @@
 		"type-check": "tsc -b --noEmit"
 	},
 	"devDependencies": {
-		"@changesets/changelog-github": "^1.0.0",
 		"@changesets/cli": "^3.0.1",
+		"@changesets/types": "^7.0.0",
 		"@effect/tsgo": "^0.56.0",
 		"@vitest/browser": "catalog:",
 		"@vitest/browser-playwright": "catalog:",
