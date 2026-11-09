@@ -111,7 +111,11 @@ export interface LoadedNamespace<S extends WidestNamespaceFields> {
 	};
 }
 
-export type OnLoadContext<S extends WidestNamespaceFields> = LoadedNamespace<S>;
+export type OnLoadContext<S extends WidestNamespaceFields> =
+	LoadedNamespace<S> & {
+		readonly dataDir: string;
+		readonly namespacePath: ReadonlyArray<string>;
+	};
 
 export type OnLoad<S extends WidestNamespaceFields> = (
 	ctx: OnLoadContext<S>,

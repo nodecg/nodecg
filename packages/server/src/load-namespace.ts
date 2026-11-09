@@ -46,10 +46,12 @@ import {
 	type NamespaceHandles,
 	type NamespaceHandlesLambda,
 } from "./build-namespace.ts";
+import { resolveDataDir } from "./data-dir.ts";
 import { fieldInternal } from "./field-builders/field-internal-key.ts";
 import type {
 	ImplementedNamespace,
 	LoadedNamespace,
+	OnLoadContext,
 	WidenedImplementedNamespace,
 } from "./implement-namespace.ts";
 import {
@@ -158,15 +160,21 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 >(
 	implemented: ImplementedNamespace<S, CustomRoutes>,
 	children: ApplyLambdaToObjectValues<NamespaceHandlesLambda, S["children"]>,
+	dataDir: string,
 ) {
 	const { fields, handles } = yield* buildNamespace(implemented, children);
+	const ctx: OnLoadContext<S> = {
+		...handles.loaded,
+		dataDir,
+		namespacePath: [implemented.manifest.namespace],
+	};
 	const onLoad = implemented.impl?.onLoad;
 	const runOnLoad =
 		typeof onLoad === "undefined"
 			? Effect.void
 			: Effect.gen(function* () {
 					const cleanup = yield* Effect.tryPromise({
-						try: async () => onLoad(handles.loaded),
+						try: async () => onLoad(ctx),
 						catch: (error) =>
 							OnLoadError.make({
 								namespace: implemented.manifest.namespace,
@@ -196,7 +204,7 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 		namespace: fields.namespace,
 		declaredRoles: new Set(implemented.manifest[manifestRolesKey].roles.keys()),
 		frontend: implemented.impl?.frontend,
-		customRoute: yield* buildCustomRoutes(implemented, handles.loaded),
+		customRoute: yield* buildCustomRoutes(implemented, ctx),
 		fields,
 	};
 	return { handles, prepared: { registered, runOnLoad } };
@@ -267,6 +275,7 @@ export const loadNamespaceEffect = Effect.fn(
 		}
 
 		const internalServices = yield* Layer.build(ReplicantStoreService.layer);
+		const dataDir = yield* resolveDataDir();
 
 		return yield* Effect.gen(function* () {
 			const store = yield* ReplicantStoreService;
@@ -300,6 +309,7 @@ export const loadNamespaceEffect = Effect.fn(
 						mapValues<PreparedTreeLambda, NamespaceHandlesLambda>(
 							(child) => child.handles,
 						)(children),
+						dataDir,
 					);
 					builtHandles.set(implemented, handles);
 					return {
@@ -438,12 +448,12 @@ export const loadNamespace = <
 			),
 			Layer.provide(
 				Layer.mergeAll(
-					NodeServices.layer,
 					NodeCrypto.layerSecureRandom,
 					OperatingSystemService.layer,
 					Reactivity.layer,
 				),
 			),
+			Layer.provideMerge(NodeServices.layer),
 		),
 	);
 	return runtime

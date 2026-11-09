@@ -2,6 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import { testLayer } from "@nodecg-private/test-utils";
 import { defineNamespace } from "@nodecg/core";
 import { ConfigProvider, Effect, Layer, Schema } from "effect";
@@ -48,6 +49,7 @@ const testInMemory = testLayer(
 		Layer.mock(UserRepositoryService)({}),
 		Layer.mock(TransactionService)({}),
 		ConfigProvider.layer(ConfigProvider.fromEnvRecord({})),
+		NodeServices.layer,
 	),
 );
 
@@ -225,6 +227,33 @@ describe("onLoad", () => {
 			const handle = yield* loadNamespaceEffect(stats);
 
 			expect(handle.replicant.viewers.get()).toBe(300);
+		}),
+	);
+
+	testInMemory(
+		"receives the data folder and the namespace path",
+		Effect.gen(function* () {
+			const dataDir = join(tmpdir(), "nodecg-data");
+			const onLoad = vi.fn();
+			const child = implementNamespace(defineNamespace("child", {}), {
+				onLoad,
+			});
+			const parent = implementNamespace(
+				defineNamespace("parent", { children: { child: child.manifest } }),
+				{ children: { child } },
+			);
+
+			yield* loadNamespaceEffect(parent).pipe(
+				Effect.provide(
+					ConfigProvider.layer(
+						ConfigProvider.fromEnvRecord({ DATA_DIR: dataDir }),
+					),
+				),
+			);
+
+			expect(onLoad).toHaveBeenCalledWith(
+				expect.objectContaining({ dataDir, namespacePath: ["child"] }),
+			);
 		}),
 	);
 

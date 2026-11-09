@@ -72,7 +72,13 @@ const buildRoutes = Effect.fn(function* (
 		},
 	});
 	const { handles } = yield* buildNamespace(implemented, {});
-	return Array.from(yield* buildCustomRoutes(implemented, handles.loaded));
+	return Array.from(
+		yield* buildCustomRoutes(implemented, {
+			...handles.loaded,
+			dataDir: "data",
+			namespacePath: ["ns"],
+		}),
+	);
 });
 
 describe("buildCustomRoutes", () => {
@@ -103,9 +109,11 @@ describe("buildCustomRoutes", () => {
 			});
 			const { handles } = yield* buildNamespace(implemented, {});
 
-			const error = yield* buildCustomRoutes(implemented, handles.loaded).pipe(
-				Effect.flip,
-			);
+			const error = yield* buildCustomRoutes(implemented, {
+				...handles.loaded,
+				dataDir: "data",
+				namespacePath: ["ns"],
+			}).pipe(Effect.flip);
 
 			expect(error).toStrictEqual(
 				MissingCustomRouteHandler.make({

@@ -82,7 +82,11 @@ const namespaces = Layer.effect(
 			{
 				namespace: fields.namespace,
 				declaredRoles: new Set(),
-				customRoute: yield* buildCustomRoutes(namespace, handles.loaded),
+				customRoute: yield* buildCustomRoutes(namespace, {
+					...handles.loaded,
+					dataDir: "data",
+					namespacePath: ["show"],
+				}),
 				fields,
 			},
 		]);

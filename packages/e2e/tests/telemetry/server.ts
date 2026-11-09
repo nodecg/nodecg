@@ -103,12 +103,12 @@ Effect.gen(function* () {
 			),
 			Layer.provide(
 				Layer.mergeAll(
-					NodeServices.layer,
 					NodeCrypto.layerSecureRandom,
 					OperatingSystemService.layer,
 					Reactivity.layer,
 				),
 			),
+			Layer.provideMerge(NodeServices.layer),
 		),
 	),
 	NodeRuntime.runMain,

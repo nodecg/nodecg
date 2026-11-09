@@ -1,3 +1,4 @@
+import * as NodeServices from "@effect/platform-node/NodeServices";
 import { testLayer } from "@nodecg-private/test-utils";
 import { defineNamespace } from "@nodecg/core";
 import { ConfigProvider, Effect, Layer, Option, Schema, Tracer } from "effect";
@@ -27,6 +28,7 @@ const test = testLayer(
 		Layer.mock(UserRepositoryService)({}),
 		Layer.mock(TransactionService)({}),
 		ConfigProvider.layer(ConfigProvider.fromEnvRecord({})),
+		NodeServices.layer,
 	),
 );
 
