@@ -12,9 +12,6 @@ export {
 	mapValues,
 	mapEffectValues,
 	mapNestedValues,
-	type MergedNestedKeys,
-	mergeNestedValues,
-	mergeRecords,
 	type NestedValues,
 	zipEffectValues,
 } from "./map-values.ts";

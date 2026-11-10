@@ -6,7 +6,6 @@ import {
 	Role,
 	RoleName,
 	UndeniablePrincipalNameSchema,
-	type DeclarablePrincipalName,
 	type Principal,
 	type UndeclarableRoleName,
 } from "@nodecg/internal";
@@ -17,25 +16,15 @@ import {
 	isFileSafeName,
 	mapNestedValues,
 	mapValues,
-	type MergedNestedKeys,
-	mergeNestedValues,
-	mergeRecords,
 	type NestedValues,
 	type UnsafeNameKeys,
 } from "@nodecg/internal/utils";
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { type HKT, Option, Record, Schema, String } from "effect";
 import { HttpMethod } from "effect/http";
+import type { Writable } from "type-fest";
 
 import { makeCodec, type FieldCodec } from "./field-codec.ts";
-import {
-	type AddedRpcSchemas,
-	type AddedSchemas,
-	mapRpcValues,
-	mapSchemaValues,
-	type RpcSchemaPair,
-	type WidestFieldSchema,
-} from "./map-schema-values.ts";
 import {
 	computedPermission,
 	customRoutePermission,
@@ -43,7 +32,6 @@ import {
 	rpcPermission,
 	topicPermission,
 	type Access,
-	type Grant,
 	type NamespaceRole,
 	type PermissionArg,
 	type PrincipalManifest,
@@ -204,6 +192,15 @@ type JsonEncodable<S> =
 				: "Every part of the schema's value must be JSON"
 			: never;
 
+type WidestFieldSchema =
+	| Schema.Codec<any, any>
+	| StandardSchemaV1<unknown, unknown>;
+
+type RpcSchemaPair = {
+	readonly request: WidestFieldSchema;
+	readonly response: WidestFieldSchema;
+};
+
 interface FieldOption<
 	S extends WidestFieldSchema,
 	P extends PermissionArg<string> | ReadOnlyPermissionArg<string>,
@@ -233,8 +230,8 @@ type ReplicantFieldOptions<
 	[K in keyof Schemas & string]: ReplicantFieldOption<Schemas[K], P>;
 };
 
-type FieldOptionSchema<Option> =
-	Option extends FieldOption<
+type FieldOptionSchema<FieldArg> =
+	FieldArg extends FieldOption<
 		infer S extends WidestFieldSchema,
 		PermissionArg<string> | ReadOnlyPermissionArg<string>
 	>
@@ -252,9 +249,6 @@ interface FieldOptionLambda<
 interface FieldManifestFromOptionLambda extends HKT.TypeLambda {
 	readonly type: FieldManifest<FieldDecoded<FieldOptionSchema<this["Target"]>>>;
 }
-interface FieldManifestLambda extends HKT.TypeLambda {
-	readonly type: FieldManifest<this["Target"]>;
-}
 interface ReplicantFieldOptionLambda<P extends PermissionArg<string>>
 	extends HKT.TypeLambda {
 	readonly Target: ReplicantFieldOption<WidestFieldSchema, P>;
@@ -264,9 +258,6 @@ interface ReplicantFieldManifestFromOptionLambda extends HKT.TypeLambda {
 	readonly type: ReplicantFieldManifest<
 		FieldDecoded<FieldOptionSchema<this["Target"]>>
 	>;
-}
-interface ReplicantFieldManifestLambda extends HKT.TypeLambda {
-	readonly type: ReplicantFieldManifest<this["Target"]>;
 }
 
 interface RpcFieldOption<P extends WriteOnlyPermissionArg<string>> {
@@ -285,18 +276,21 @@ type JsonEncodableRpc<
 	};
 };
 
-interface RpcFieldManifestFromSchemaLambda extends HKT.TypeLambda {
-	readonly Target: RpcSchemaPair;
-	readonly type: RpcFieldManifest<
-		FieldDecoded<this["Target"]["request"]>,
-		FieldDecoded<this["Target"]["response"]>
-	>;
+type RpcOptionSchema<RpcArg> = RpcArg extends {
+	readonly schema: infer S extends RpcSchemaPair;
 }
-interface RpcFieldManifestLambda extends HKT.TypeLambda {
-	readonly Target: WidestRpcField;
+	? S
+	: never;
+
+interface RpcFieldOptionLambda<P extends WriteOnlyPermissionArg<string>>
+	extends HKT.TypeLambda {
+	readonly Target: RpcFieldOption<P>;
+	readonly type: this["Target"];
+}
+interface RpcFieldManifestFromOptionLambda extends HKT.TypeLambda {
 	readonly type: RpcFieldManifest<
-		this["Target"]["request"],
-		this["Target"]["response"]
+		FieldDecoded<RpcOptionSchema<this["Target"]>["request"]>,
+		FieldDecoded<RpcOptionSchema<this["Target"]>["response"]>
 	>;
 }
 
@@ -309,94 +303,35 @@ interface RoleRegistry {
 	readonly principals: Map<Principal, PrincipalManifest>;
 }
 
-interface DeclaredTokens {
-	readonly roles: ReadonlySet<RoleName>;
-	readonly principals: ReadonlySet<DeclarablePrincipalName>;
-}
-
-type AccessBuilder = {
-	[K in DeclarablePrincipalName]?: Grant;
-} & {
-	roles: Set<RoleName>;
-	rolesDenied: Set<RoleName>;
-};
-
-const initializeAccess = (): AccessBuilder => ({
-	roles: new Set(),
-	rolesDenied: new Set(),
-});
-
-const updateAccess = (access: Access): AccessBuilder => ({
-	...access,
-	roles: new Set(access.roles),
-	rolesDenied: new Set(access.rolesDenied),
-});
-
-const writeRule = (
-	access: AccessBuilder,
-	rule: PermissionRuleArg<string> | undefined,
-): void => {
-	if (typeof rule === "undefined") {
-		return;
-	}
-	if (rule.allow) {
-		access.roles = new Set(rule.allow.map((name) => RoleName.make(name)));
-		// an allow lifts a denial it names
-		access.rolesDenied = access.rolesDenied.difference(access.roles);
-	}
-	if (rule.deny) {
-		const denied = new Set(rule.deny.map((name) => RoleName.make(name)));
-		access.roles = access.roles.difference(denied);
-		access.rolesDenied = access.rolesDenied.union(denied);
-	}
-	for (const principal of DeclarablePrincipalNameSchema.literals) {
-		const grant = rule[principal];
-		if (typeof grant !== "undefined") {
-			access[principal] = grant;
-		}
-	}
-};
-
-/**
- * A fresh field (no precedent) replays every registry row onto a seed;
- * an inherited field replays only the tokens this layer re-declared.
- */
 const resolveAccess = (
 	registry: RoleRegistry,
-	declared: DeclaredTokens,
 	capability: RoleCapability,
-	precedent: Access | undefined,
 	rule: PermissionRuleArg<string> | undefined,
 ): Access => {
-	const access = precedent ? updateAccess(precedent) : initializeAccess();
-	const roles = precedent ? declared.roles : registry.roles.keys();
-	for (const role of roles) {
-		if (access.rolesDenied.has(role)) {
-			// a field-level deny stands
-			continue;
-		}
-		if (registry.roles.get(role)?.capabilities.has(capability)) {
-			access.roles.add(role);
-		} else {
-			access.roles.delete(role);
-		}
-	}
-	const principals = precedent
-		? declared.principals
-		: DeclarablePrincipalNameSchema.literals;
-	for (const name of principals) {
-		if (access[name] === "deny") {
-			continue;
-		}
-		if (
+	const rolesDenied = new Set(
+		(rule?.deny ?? []).map((name) => RoleName.make(name)),
+	);
+	const roles = rule?.allow
+		? new Set(rule.allow.map((name) => RoleName.make(name)))
+		: new Set(
+				Array.from(registry.roles.values())
+					.filter((role) => role.capabilities.has(capability))
+					.map((role) => role.name),
+			);
+	const access: Writable<Access> = {
+		roles: roles.difference(rolesDenied),
+		rolesDenied,
+	};
+	for (const name of DeclarablePrincipalNameSchema.literals) {
+		const grant = rule?.[name];
+		if (typeof grant !== "undefined") {
+			access[name] = grant;
+		} else if (
 			registry.principals.get(PRINCIPAL[name])?.capabilities.has(capability)
 		) {
 			access[name] = "allow";
-		} else {
-			access[name] = undefined;
 		}
 	}
-	writeRule(access, rule);
 	return access;
 };
 
@@ -446,25 +381,35 @@ const validatePermissionTokens = (
 	}
 };
 
-const validateReplicantNames = (
+class UnsafeName extends Schema.TaggedError<UnsafeName>()("UnsafeName", {
+	namespace: Schema.String,
+	key: Schema.String,
+}) {
+	override readonly message = `"${this.key}" in "${this.namespace}" must use only A-Z, a-z, 0-9, "_" and "-", and not be a Windows device name`;
+}
+
+class NameCaseClash extends Schema.TaggedError<NameCaseClash>()(
+	"NameCaseClash",
+	{ namespace: Schema.String, key: Schema.String, clash: Schema.String },
+) {
+	override readonly message = `"${this.key}" in "${this.namespace}" differs from "${this.clash}" only in case`;
+}
+
+const findInvalidName = (
 	namespace: string,
-	replicant: Readonly<Record<string, unknown>> | undefined,
-	existing: ReadonlyArray<string>,
-): void => {
-	const names = Object.keys(replicant ?? {});
-	for (const name of names) {
-		if (!isFileSafeName(name)) {
-			throw new Error(
-				`Replicant "${name}" in "${namespace}" must use only A-Z, a-z, 0-9, "_" and "-", and not be a Windows device name`,
-			);
-		}
-	}
-	const clash = findCaseClash(names, existing);
-	if (Option.isSome(clash)) {
-		throw new Error(
-			`Replicant "${clash.value.name}" in "${namespace}" differs from "${clash.value.clash}" only in case`,
-		);
-	}
+	record: Readonly<Record<string, unknown>> | undefined,
+) => {
+	const keys = Object.keys(record ?? {});
+	return Option.fromNullishOr(keys.find((key) => !isFileSafeName(key))).pipe(
+		Option.map((key) => UnsafeName.make({ namespace, key })),
+		Option.orElse(() =>
+			findCaseClash(keys).pipe(
+				Option.map(({ name, clash }) =>
+					NameCaseClash.make({ namespace, key: name, clash }),
+				),
+			),
+		),
+	);
 };
 
 const isCustomRouteMethod = Schema.is(
@@ -475,27 +420,6 @@ const isCustomRouteMethod = Schema.is(
 			.map((method) => String.toLowerCase(method)),
 	]),
 );
-
-const validateCustomRouteNames = (
-	namespace: string,
-	customRoute: Readonly<Record<string, unknown>> | undefined,
-	existing: ReadonlyArray<string>,
-): void => {
-	const names = Object.keys(customRoute ?? {});
-	for (const name of names) {
-		if (!isFileSafeName(name)) {
-			throw new Error(
-				`Custom route "${name}" in "${namespace}" must use only A-Z, a-z, 0-9, "_" and "-", and not be a Windows device name`,
-			);
-		}
-	}
-	const clash = findCaseClash(names, existing);
-	if (Option.isSome(clash)) {
-		throw new Error(
-			`Custom route "${clash.value.name}" in "${namespace}" differs from "${clash.value.clash}" only in case`,
-		);
-	}
-};
 
 const validateCustomRouteMethods = (
 	namespace: string,
@@ -522,7 +446,6 @@ const isDeclarablePrincipalName = Schema.is(DeclarablePrincipalNameSchema);
 const isUndeniablePrincipalName = Schema.is(UndeniablePrincipalNameSchema);
 
 const declareRoles = (
-	precedent: RoleRegistry,
 	named:
 		| Readonly<
 				Record<string, RoleArg<NamespaceRole<string, string>> | undefined>
@@ -530,14 +453,9 @@ const declareRoles = (
 		| undefined,
 	overrides: PrincipalsArg | undefined,
 	children: WidestNamespaceManifests,
-): {
-	registry: RoleRegistry;
-	declared: DeclaredTokens;
-} => {
-	const roles = new Map(precedent.roles);
-	const principals = new Map(precedent.principals);
-	const declaredRoles = new Set<RoleName>();
-	const declaredPrincipals = new Set<DeclarablePrincipalName>();
+): RoleRegistry => {
+	const roles = new Map<RoleName, RoleManifest>();
+	const principals = new Map<Principal, PrincipalManifest>();
 
 	// Resolve principals
 	for (const [key, arg] of Object.entries(overrides ?? {})) {
@@ -554,7 +472,6 @@ const declareRoles = (
 			name: PRINCIPAL[key],
 			capabilities: new Set(arg.permission),
 		});
-		declaredPrincipals.add(key);
 	}
 
 	// Resolve roles
@@ -573,7 +490,6 @@ const declareRoles = (
 			);
 		}
 		const roleName = RoleName.make(key);
-		const existing = roles.get(roleName);
 		const linkedRoles = arg.linkedRoles?.map(({ namespace, name }) => {
 			if (
 				!Object.values(children).some(
@@ -590,17 +506,13 @@ const declareRoles = (
 		});
 		roles.set(roleName, {
 			name: roleName,
-			description: arg.description ?? existing?.description,
+			description: arg.description,
 			capabilities: new Set(arg.permission),
-			linkedRoles: linkedRoles ?? existing?.linkedRoles ?? [],
+			linkedRoles: linkedRoles ?? [],
 		});
-		declaredRoles.add(roleName);
 	}
 
-	return {
-		registry: { roles, principals },
-		declared: { roles: declaredRoles, principals: declaredPrincipals },
-	};
+	return { roles, principals };
 };
 
 // Infer roles of child manifest type
@@ -650,7 +562,12 @@ export function defineNamespace<
 		replicant: { [K in keyof Replicant]: FieldDecoded<Replicant[K]> };
 		computed: { [K in keyof Computed]: FieldDecoded<Computed[K]> };
 		topic: { [K in keyof Topic]: FieldDecoded<Topic[K]> };
-		rpc: AddedRpcDecoded<Rpc>;
+		rpc: {
+			[K in keyof Rpc]: {
+				readonly request: FieldDecoded<Rpc[K]["schema"]["request"]>;
+				readonly response: FieldDecoded<Rpc[K]["schema"]["response"]>;
+			};
+		};
 		children: Children;
 	},
 	DeclaredRoleName,
@@ -662,14 +579,21 @@ export function defineNamespace<
 		);
 	}
 
-	// Check names are file path and URL safe
-	validateReplicantNames(namespace, defineOption.replicant, []);
-	validateCustomRouteNames(namespace, defineOption.customRoute, []);
+	const invalidReplicant = findInvalidName(namespace, defineOption.replicant);
+	if (Option.isSome(invalidReplicant)) {
+		throw invalidReplicant.value;
+	}
+	const invalidCustomRoute = findInvalidName(
+		namespace,
+		defineOption.customRoute,
+	);
+	if (Option.isSome(invalidCustomRoute)) {
+		throw invalidCustomRoute.value;
+	}
 
 	const children = defineOption.children ?? ({} as Children);
 
-	const { registry, declared } = declareRoles(
-		{ roles: new Map(), principals: new Map() },
+	const registry = declareRoles(
 		defineOption.roles,
 		defineOption.principals,
 		children,
@@ -687,19 +611,14 @@ export function defineNamespace<
 		registry.roles,
 	);
 
-	const resolve = (
-		capability: RoleCapability,
-		rule: PermissionRuleArg<DeclaredRoleName> | undefined,
-	) => resolveAccess(registry, declared, capability, undefined, rule);
-
 	const replicant = mapValues<
 		ReplicantFieldOptionLambda<PermissionArg<DeclaredRoleName>>,
 		ReplicantFieldManifestFromOptionLambda
 	>((option, name) => ({
 		...implementCodec(name, option.schema),
 		permission: replicantPermission(
-			resolve("replicant-read", option.permission?.read),
-			resolve("replicant-write", option.permission?.write),
+			resolveAccess(registry, "replicant-read", option.permission?.read),
+			resolveAccess(registry, "replicant-write", option.permission?.write),
 			namespace,
 			namedRoles,
 		),
@@ -714,7 +633,7 @@ export function defineNamespace<
 	>((option, name) => ({
 		...implementCodec(name, option.schema),
 		permission: computedPermission(
-			resolve("computed-read", option.permission?.read),
+			resolveAccess(registry, "computed-read", option.permission?.read),
 			namespace,
 			namedRoles,
 		),
@@ -728,26 +647,26 @@ export function defineNamespace<
 	>((option, name) => ({
 		...implementCodec(name, option.schema),
 		permission: topicPermission(
-			resolve("topic-subscribe", option.permission?.read),
-			resolve("topic-publish", option.permission?.write),
+			resolveAccess(registry, "topic-subscribe", option.permission?.read),
+			resolveAccess(registry, "topic-publish", option.permission?.write),
 			namespace,
 			namedRoles,
 		),
 	}))<FieldOptions<Topic, PermissionArg<DeclaredRoleName>>>(defineOption.topic);
 
-	const rpc = mapRpcValues<
-		RpcFieldOption<WriteOnlyPermissionArg<DeclaredRoleName>>,
-		RpcFieldManifestFromSchemaLambda
-	>()(defineOption.rpc, (option, name) => ({
+	const rpc = mapValues<
+		RpcFieldOptionLambda<WriteOnlyPermissionArg<DeclaredRoleName>>,
+		RpcFieldManifestFromOptionLambda
+	>((option, name) => ({
 		name,
 		request: makeCodec(name, option.schema.request),
 		response: makeCodec(name, option.schema.response),
 		permission: rpcPermission(
-			resolve("rpc-call", option.permission?.write),
+			resolveAccess(registry, "rpc-call", option.permission?.write),
 			namespace,
 			namedRoles,
 		),
-	}));
+	}))<Rpc>(defineOption.rpc);
 
 	const declaredRoutes: CustomRoute | undefined = defineOption.customRoute;
 	const customRoute = mapNestedValues<
@@ -755,7 +674,11 @@ export function defineNamespace<
 	>()(declaredRoutes, (option, name) => ({
 		name,
 		permission: customRoutePermission(
-			resolve("custom-route-request", option?.permission?.write),
+			resolveAccess(
+				registry,
+				"custom-route-request",
+				option?.permission?.write,
+			),
 			namespace,
 			namedRoles,
 		),
@@ -768,410 +691,6 @@ export function defineNamespace<
 			defineOption.roles ?? ({} as Record<DeclaredRoleName, unknown>),
 			(_, name) => ({ namespace, name }),
 		),
-		replicant,
-		computed,
-		topic,
-		rpc,
-		customRoute,
-		children,
-		[manifestRolesKey]: registry,
-	};
-}
-
-/** extend **/
-
-interface ExtendFieldOption<
-	P extends PermissionArg<string> | ReadOnlyPermissionArg<string>,
-> {
-	readonly schema?: WidestFieldSchema;
-	readonly permission?: P;
-}
-
-interface ExtendReplicantFieldOption<
-	P extends PermissionArg<string>,
-> extends ExtendFieldOption<P> {
-	readonly persistent?: boolean;
-}
-
-interface ExtendRpcFieldOption<P extends WriteOnlyPermissionArg<string>> {
-	readonly schema?: RpcSchemaPair;
-	readonly permission?: P;
-}
-
-type Override<Precedent, Added> = Omit<Precedent, keyof Added> & Added;
-
-type RedeclaredKeys<T, Existing> = {
-	[K in keyof T as K extends Existing
-		? K
-		: never]: "Already declared by the precedent";
-};
-
-type AddedDecoded<
-	In extends Readonly<Record<string, { readonly schema?: WidestFieldSchema }>>,
-> = {
-	readonly [K in keyof AddedSchemas<In>]: FieldDecoded<AddedSchemas<In>[K]>;
-};
-
-type AddedRpcDecoded<
-	In extends Readonly<Record<string, { readonly schema?: RpcSchemaPair }>>,
-> = {
-	readonly [K in keyof AddedRpcSchemas<In>]: {
-		readonly request: FieldDecoded<AddedRpcSchemas<In>[K]["request"]>;
-		readonly response: FieldDecoded<AddedRpcSchemas<In>[K]["response"]>;
-	};
-};
-
-export function extendNamespace<
-	const PNamespace extends string,
-	PReplicant extends Record<string, unknown>,
-	PComputed extends Record<string, unknown>,
-	PTopic extends Record<string, unknown>,
-	PRpc extends WidestRpcFields,
-	PRoleNames extends string,
-	PCustomRoutes extends WidestCustomRoutes,
-	PChildren extends WidestNamespaceManifests,
-	const EReplicant extends Record<
-		string,
-		ExtendReplicantFieldOption<PermissionArg<string>>
-	> = {},
-	const EComputed extends Record<
-		string,
-		ExtendFieldOption<ReadOnlyPermissionArg<string>>
-	> = {},
-	const ETopic extends Record<
-		string,
-		ExtendFieldOption<PermissionArg<string>>
-	> = {},
-	const ERpc extends Record<
-		string,
-		ExtendRpcFieldOption<WriteOnlyPermissionArg<string>>
-	> = {},
-	const ERoleName extends string = never,
-	const ECustomRoute extends WidestCustomRoutes = {},
-	EChildren extends WidestNamespaceManifests = {},
->(
-	manifest: NamespaceManifest<
-		PNamespace,
-		{
-			replicant: PReplicant;
-			computed: PComputed;
-			topic: PTopic;
-			rpc: PRpc;
-			children: PChildren;
-		},
-		PRoleNames,
-		PCustomRoutes
-	>,
-	extendOptionOrFn:
-		| {
-				readonly roles?: Record<
-					ERoleName,
-					RoleArg<ChildRole<NoInfer<PChildren & EChildren>>>
-				>;
-				readonly principals?: PrincipalsArg;
-				readonly replicant?: EReplicant &
-					UnsafeNameKeys<EReplicant> &
-					CaseClashingKeys<EReplicant, keyof PReplicant & string>;
-				readonly computed?: EComputed;
-				readonly topic?: ETopic;
-				readonly rpc?: ERpc;
-				readonly customRoute?: ECustomRoute &
-					UnsafeNameKeys<ECustomRoute> &
-					CaseClashingKeys<ECustomRoute, keyof PCustomRoutes & string>;
-				readonly children?: EChildren &
-					RedeclaredKeys<EChildren, keyof PChildren>;
-		  }
-		| ((
-				precedent: NamespaceManifest<
-					PNamespace,
-					{
-						replicant: PReplicant;
-						computed: PComputed;
-						topic: PTopic;
-						rpc: PRpc;
-						children: PChildren;
-					},
-					PRoleNames,
-					PCustomRoutes
-				>,
-		  ) => {
-				readonly roles?: Record<
-					ERoleName,
-					RoleArg<ChildRole<NoInfer<PChildren & EChildren>>>
-				>;
-				readonly principals?: PrincipalsArg;
-				readonly replicant?: EReplicant &
-					UnsafeNameKeys<EReplicant> &
-					CaseClashingKeys<EReplicant, keyof PReplicant & string>;
-				readonly computed?: EComputed;
-				readonly topic?: ETopic;
-				readonly rpc?: ERpc;
-				readonly customRoute?: ECustomRoute &
-					UnsafeNameKeys<ECustomRoute> &
-					CaseClashingKeys<ECustomRoute, keyof PCustomRoutes & string>;
-				readonly children?: EChildren &
-					RedeclaredKeys<EChildren, keyof PChildren>;
-		  }),
-): NamespaceManifest<
-	PNamespace,
-	{
-		replicant: Override<PReplicant, AddedDecoded<EReplicant>>;
-		computed: Override<PComputed, AddedDecoded<EComputed>>;
-		topic: Override<PTopic, AddedDecoded<ETopic>>;
-		rpc: Override<PRpc, AddedRpcDecoded<ERpc>>;
-		children: Override<PChildren, EChildren>;
-	},
-	PRoleNames | ERoleName,
-	MergedNestedKeys<PCustomRoutes, ECustomRoute>
-> {
-	type Extended = {
-		replicant: Override<PReplicant, AddedDecoded<EReplicant>>;
-		computed: Override<PComputed, AddedDecoded<EComputed>>;
-		topic: Override<PTopic, AddedDecoded<ETopic>>;
-		rpc: Override<PRpc, AddedRpcDecoded<ERpc>>;
-		children: Override<PChildren, EChildren>;
-	};
-	type ExtendedManifest = NamespaceManifest<
-		PNamespace,
-		Extended,
-		PRoleNames | ERoleName,
-		MergedNestedKeys<PCustomRoutes, ECustomRoute>
-	>;
-
-	const extendOption =
-		typeof extendOptionOrFn === "function"
-			? extendOptionOrFn(manifest)
-			: extendOptionOrFn;
-
-	validateReplicantNames(
-		manifest.namespace,
-		extendOption.replicant,
-		Object.keys(manifest.replicant),
-	);
-	validateCustomRouteNames(
-		manifest.namespace,
-		extendOption.customRoute,
-		Object.keys(manifest.customRoute),
-	);
-
-	const children = mergeRecords<Override<PChildren, EChildren>>(
-		manifest.children,
-		extendOption.children,
-	);
-
-	const { registry, declared } = declareRoles(
-		manifest[manifestRolesKey],
-		extendOption.roles,
-		extendOption.principals,
-		children,
-	);
-
-	const namedRoles = new Set(registry.roles.keys());
-
-	validatePermissionTokens("replicant", extendOption.replicant, registry.roles);
-	validatePermissionTokens("computed", extendOption.computed, registry.roles);
-	validatePermissionTokens("topic", extendOption.topic, registry.roles);
-	validatePermissionTokens("rpc", extendOption.rpc, registry.roles);
-	validateCustomRouteMethods(
-		manifest.namespace,
-		extendOption.customRoute,
-		registry.roles,
-	);
-
-	const resolve = (
-		capability: RoleCapability,
-		rule: PermissionRuleArg<string> | undefined,
-	) => resolveAccess(registry, declared, capability, undefined, rule);
-
-	const remap = (
-		capability: RoleCapability,
-		precedent: Access,
-		rule: PermissionRuleArg<string> | undefined,
-	) => resolveAccess(registry, declared, capability, precedent, rule);
-
-	const replicantRemap = mapValues<
-		ReplicantFieldManifestLambda,
-		ReplicantFieldManifestLambda
-	>((field, name) => {
-		const override = extendOption.replicant?.[name];
-		return {
-			name: field.name,
-			decode: field.decode,
-			encode: field.encode,
-			mutableDecode: field.mutableDecode,
-			permission: replicantPermission(
-				remap(
-					"replicant-read",
-					field.permission.read,
-					override?.permission?.read,
-				),
-				remap(
-					"replicant-write",
-					field.permission.write,
-					override?.permission?.write,
-				),
-				manifest.namespace,
-				namedRoles,
-			),
-			persistent: override?.persistent ?? field.persistent,
-		};
-	})(manifest.replicant);
-
-	const replicantAdded = mapSchemaValues<
-		ExtendReplicantFieldOption<PermissionArg<string>>,
-		ReplicantFieldManifestLambda
-	>()(extendOption.replicant, (option, name) => ({
-		...implementCodec(name, option.schema),
-		permission: replicantPermission(
-			resolve("replicant-read", option.permission?.read),
-			resolve("replicant-write", option.permission?.write),
-			manifest.namespace,
-			namedRoles,
-		),
-		persistent: option.persistent ?? true,
-	}));
-	const replicant = mergeRecords<ExtendedManifest["replicant"]>(
-		replicantRemap,
-		replicantAdded,
-	);
-
-	const computedRemap = mapValues<FieldManifestLambda, FieldManifestLambda>(
-		(field, name) => {
-			const override = extendOption.computed?.[name];
-			return {
-				name: field.name,
-				decode: field.decode,
-				encode: field.encode,
-				mutableDecode: field.mutableDecode,
-				permission: computedPermission(
-					remap(
-						"computed-read",
-						field.permission.read,
-						override?.permission?.read,
-					),
-					manifest.namespace,
-					namedRoles,
-				),
-			};
-		},
-	)(manifest.computed);
-	const computedAdded = mapSchemaValues<
-		ExtendFieldOption<ReadOnlyPermissionArg<string>>,
-		FieldManifestLambda
-	>()(extendOption.computed, (option, name) => ({
-		...implementCodec(name, option.schema),
-		permission: computedPermission(
-			resolve("computed-read", option.permission?.read),
-			manifest.namespace,
-			namedRoles,
-		),
-	}));
-	const computed = mergeRecords<ExtendedManifest["computed"]>(
-		computedRemap,
-		computedAdded,
-	);
-
-	const topicRemap = mapValues<FieldManifestLambda, FieldManifestLambda>(
-		(field, name) => {
-			const override = extendOption.topic?.[name];
-			return {
-				name: field.name,
-				encode: field.encode,
-				decode: field.decode,
-				mutableDecode: field.mutableDecode,
-				permission: topicPermission(
-					remap(
-						"topic-subscribe",
-						field.permission.read,
-						override?.permission?.read,
-					),
-					remap(
-						"topic-publish",
-						field.permission.write,
-						override?.permission?.write,
-					),
-					manifest.namespace,
-					namedRoles,
-				),
-			};
-		},
-	)(manifest.topic);
-	const topicAdded = mapSchemaValues<
-		ExtendFieldOption<PermissionArg<string>>,
-		FieldManifestLambda
-	>()(extendOption.topic, (option, name) => ({
-		...implementCodec(name, option.schema),
-		permission: topicPermission(
-			resolve("topic-subscribe", option.permission?.read),
-			resolve("topic-publish", option.permission?.write),
-			manifest.namespace,
-			namedRoles,
-		),
-	}));
-	const topic = mergeRecords<ExtendedManifest["topic"]>(topicRemap, topicAdded);
-
-	const rpcRemap = mapValues<RpcFieldManifestLambda, RpcFieldManifestLambda>(
-		(field, name) => {
-			const override = extendOption.rpc?.[name];
-			return {
-				name: field.name,
-				request: field.request,
-				response: field.response,
-				permission: rpcPermission(
-					remap(
-						"rpc-call",
-						field.permission.write,
-						override?.permission?.write,
-					),
-					manifest.namespace,
-					namedRoles,
-				),
-			};
-		},
-	)(manifest.rpc);
-	const rpcAdded = mapRpcValues<
-		ExtendRpcFieldOption<WriteOnlyPermissionArg<string>>,
-		RpcFieldManifestFromSchemaLambda
-	>()(extendOption.rpc, (option, name) => ({
-		name,
-		request: makeCodec(name, option.schema.request),
-		response: makeCodec(name, option.schema.response),
-		permission: rpcPermission(
-			resolve("rpc-call", option.permission?.write),
-			manifest.namespace,
-			namedRoles,
-		),
-	}));
-	const rpc = mergeRecords<ExtendedManifest["rpc"]>(rpcRemap, rpcAdded);
-
-	const addedRoutes: ECustomRoute | undefined = extendOption.customRoute;
-	const customRoute = mergeNestedValues<
-		CustomRouteMethodOption<WriteOnlyPermissionArg<string>>
-	>()(manifest.customRoute, addedRoutes, (route, option, name) => ({
-		name,
-		permission: customRoutePermission(
-			typeof route === "undefined"
-				? resolve("custom-route-request", option?.permission?.write)
-				: remap(
-						"custom-route-request",
-						route.permission.write,
-						option?.permission?.write,
-					),
-			manifest.namespace,
-			namedRoles,
-		),
-	}));
-
-	return {
-		namespace: manifest.namespace,
-		roles: {
-			...manifest.roles,
-			...Record.map(
-				// roles is undefined only when ERoleName is never
-				extendOption.roles ?? ({} as Record<ERoleName, unknown>),
-				(_, name) => ({ namespace: manifest.namespace, name }),
-			),
-		},
 		replicant,
 		computed,
 		topic,

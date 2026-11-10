@@ -1,10 +1,10 @@
 import { StrictMode, Suspense } from "react";
 
-import { counter, mount, useField, useTopic } from "./store.tsx";
+import { counter, mount, root, useField, useTopic } from "./store.tsx";
 
 function Graphics() {
 	const count = useField(counter.replicant.count);
-	const parity = useField(counter.computed.parity);
+	const parity = useField(root.computed.parity);
 	const cheers = useTopic(counter.topic.cheer);
 	const latestCheer = cheers.at(-1);
 	return (

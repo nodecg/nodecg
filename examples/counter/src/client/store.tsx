@@ -13,9 +13,10 @@ import {
 } from "react";
 import ReactDOM from "react-dom/client";
 
-import { extendedCounterManifest } from "../shared/manifest.ts";
+import { rootManifest } from "../shared/manifest.ts";
 
-export const counter = await loadNamespace(extendedCounterManifest);
+export const root = await loadNamespace(rootManifest);
+export const { counter } = root.children;
 
 type Snapshot<T> = { readonly value: T };
 

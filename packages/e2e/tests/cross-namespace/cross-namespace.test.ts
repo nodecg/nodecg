@@ -10,13 +10,13 @@ describe("cross-namespace rpc via ctx.children", () => {
 	test("an rpc writes its child's replicant", async () => {
 		const cross = await loadNamespace(crossManifest, { baseUrl: base });
 		onTestFinished(cross.dispose);
-		const { extended } = cross.children;
-		const before = await extended.replicant.score.get();
+		const { library } = cross.children;
+		const before = await library.replicant.score.get();
 
 		const returned = await cross.rpc.addScore.call(5);
 
 		expect(returned).toBe(before + 5);
-		expect(await extended.replicant.score.get()).toBe(before + 5);
+		expect(await library.replicant.score.get()).toBe(before + 5);
 	});
 });
 
@@ -24,8 +24,8 @@ describe("cross-namespace computed via ctx.children", () => {
 	test("recomputes when the source in its child changes", async () => {
 		const cross = await loadNamespace(crossManifest, { baseUrl: base });
 		onTestFinished(cross.dispose);
-		const { extended } = cross.children;
-		const score = await extended.replicant.score.get();
+		const { library } = cross.children;
+		const score = await library.replicant.score.get();
 
 		expect(await cross.computed.scaledScore.get()).toBe(score * 2);
 

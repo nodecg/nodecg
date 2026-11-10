@@ -1,4 +1,4 @@
-import { Effect, HashSet, type HKT } from "effect";
+import { Effect, type HKT } from "effect";
 
 const unsafeObjectKeys = <T extends object>(obj: T) =>
 	Object.keys(obj) as (keyof T & string)[];
@@ -118,63 +118,3 @@ export const mapNestedValues =
 				return [outerKey, Object.fromEntries(innerEntries)] as const;
 			}),
 		) as NestedValues<In, Output>;
-
-export type MergedNestedKeys<Base, Extra> = {
-	readonly [K in (keyof Base | keyof Extra) & string]: {
-		readonly [L in
-			| (K extends keyof Base ? keyof Base[K] : never)
-			| (K extends keyof Extra ? keyof Extra[K] : never)]: never;
-	};
-};
-
-const unionKeys = (left: object, right: object) =>
-	HashSet.union(
-		HashSet.fromIterable(Object.keys(left)),
-		HashSet.fromIterable(Object.keys(right)),
-	);
-
-export const mergeNestedValues =
-	<ExtraValue>() =>
-	<
-		BaseValue,
-		Base extends Readonly<Record<string, Readonly<Record<string, unknown>>>>,
-		Extra extends Readonly<
-			Record<string, Readonly<Record<string, ExtraValue | undefined>>>
-		>,
-		Output,
-	>(
-		base: NestedValues<Base, BaseValue>,
-		extra: Extra | undefined,
-		transform: (
-			baseValue: BaseValue | undefined,
-			extraValue: ExtraValue | undefined,
-			outerKey: string,
-		) => Output,
-	) =>
-		Object.fromEntries(
-			Array.from(unionKeys(base, extra ?? {}), (outerKey) => {
-				const baseRecord: Readonly<
-					Record<string, Readonly<Record<string, BaseValue | undefined>>>
-				> = base;
-				const baseInner = baseRecord[outerKey] ?? {};
-				const extraInner: Readonly<Record<string, ExtraValue | undefined>> =
-					extra?.[outerKey] ?? {};
-				const inner = Array.from(
-					unionKeys(baseInner, extraInner),
-					(innerKey) =>
-						[
-							innerKey,
-							transform(baseInner[innerKey], extraInner[innerKey], outerKey),
-						] as const,
-				);
-				return [outerKey, Object.fromEntries(inner)] as const;
-			}),
-		) as NestedValues<MergedNestedKeys<Base, Extra>, Output>;
-
-// TODO: nowhere near type safe. Result can do anything.
-export function mergeRecords<Result>(
-	base: Readonly<Record<string, unknown>> | undefined,
-	extra: Readonly<Record<string, unknown>> | undefined,
-): Result {
-	return { ...base, ...extra } as Result;
-}

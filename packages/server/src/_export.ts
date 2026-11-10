@@ -88,7 +88,6 @@ export {
 } from "./auth/oauth2-provider.ts";
 export {
 	implementNamespace,
-	implementExtendedNamespace,
 	type CrossNamespaceHandle,
 	type CustomRouteContext,
 	type FrontendConfig,

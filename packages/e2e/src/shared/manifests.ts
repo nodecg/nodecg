@@ -1,4 +1,4 @@
-import { defineNamespace, extendNamespace, jsonSchema } from "@nodecg/core";
+import { defineNamespace, jsonSchema } from "@nodecg/core";
 import { Schema } from "effect";
 import { z } from "zod";
 
@@ -68,21 +68,12 @@ export const fixtureManifest = defineNamespace("e2e", {
 	},
 });
 
-export const baseManifest = defineNamespace("e2e-extend", {
+export const libraryManifest = defineNamespace("e2e-library", {
 	roles: {
 		producer: { permission: ["replicant-write"] },
 	},
 	replicant: {
 		score: { schema: Schema.Finite, permission: everyoneRead },
-	},
-});
-
-export const extendedManifest = extendNamespace(baseManifest, {
-	replicant: {
-		bonus: { schema: Schema.Finite, permission: everyoneRead },
-	},
-	computed: {
-		total: { schema: Schema.Finite, permission: everyoneRead },
 	},
 });
 
@@ -112,5 +103,5 @@ export const crossManifest = defineNamespace("e2e-cross", {
 			permission: everyoneWrite,
 		},
 	},
-	children: { extended: extendedManifest },
+	children: { library: libraryManifest },
 });

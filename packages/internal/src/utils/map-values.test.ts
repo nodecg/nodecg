@@ -6,9 +6,6 @@ import {
 	mapEffectValues,
 	mapNestedValues,
 	mapValues,
-	mergeNestedValues,
-	mergeRecords,
-	type NestedValues,
 	zipEffectValues,
 } from "./map-values.ts";
 
@@ -583,88 +580,5 @@ describe("mapNestedValues", () => {
 		const result = mapNestedValues<number>()(undefined, (value) => value);
 
 		expect(result).toStrictEqual({});
-	});
-});
-
-describe("mergeNestedValues", () => {
-	test("passes each side of every inner key to the transform", () => {
-		const base: NestedValues<{ a: { x: unknown; y: unknown } }, number> = {
-			a: { x: 1, y: 2 },
-		};
-
-		const result = mergeNestedValues<boolean>()(
-			base,
-			{ a: { y: true }, b: { z: false } },
-			(baseValue, extra, outerKey) => `${outerKey}:${baseValue}/${extra}`,
-		);
-
-		expectTypeOf(result).toEqualTypeOf<{
-			readonly a: { readonly x: string; readonly y: string };
-			readonly b: { readonly z: string };
-		}>();
-		expect(result).toStrictEqual({
-			a: { x: "a:1/undefined", y: "a:2/true" },
-			b: { z: "b:undefined/false" },
-		});
-	});
-
-	test("transforms every base value when extra is undefined", () => {
-		const base: NestedValues<{ a: { x: unknown } }, number> = { a: { x: 1 } };
-
-		const result = mergeNestedValues<never>()(
-			base,
-			undefined,
-			(value) => (value ?? 0) + 1,
-		);
-
-		expect(result).toStrictEqual({ a: { x: 2 } });
-	});
-});
-
-describe("mergeRecords", () => {
-	test("shallow-merges base and extra into the declared result type", () => {
-		const result = mergeRecords<{ readonly a: number; readonly b: string }>(
-			{ a: 1 },
-			{ b: "two" },
-		);
-		expectTypeOf(result).toEqualTypeOf<{
-			readonly a: number;
-			readonly b: string;
-		}>();
-		expect(result).toEqual({ a: 1, b: "two" });
-	});
-
-	test("lets extra override base on colliding keys", () => {
-		const result = mergeRecords<Record<string, number>>(
-			{ a: 1, b: 2 },
-			{ b: 3 },
-		);
-		expect(result).toEqual({ a: 1, b: 3 });
-	});
-
-	test("replaces colliding values wholesale rather than deep-merging", () => {
-		const result = mergeRecords<{ readonly a: { readonly y: number } }>(
-			{ a: { x: 1 } },
-			{ a: { y: 2 } },
-		);
-		expect(result).toEqual({ a: { y: 2 } });
-	});
-
-	test("treats an undefined base as empty", () => {
-		expect(mergeRecords<Record<string, number>>(undefined, { a: 1 })).toEqual({
-			a: 1,
-		});
-	});
-
-	test("treats an undefined extra as empty", () => {
-		expect(mergeRecords<Record<string, number>>({ a: 1 }, undefined)).toEqual({
-			a: 1,
-		});
-	});
-
-	test("returns an empty object when both are undefined", () => {
-		expect(mergeRecords<Record<string, never>>(undefined, undefined)).toEqual(
-			{},
-		);
 	});
 });

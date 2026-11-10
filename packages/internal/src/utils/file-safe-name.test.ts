@@ -35,23 +35,13 @@ describe("isFileSafeName", () => {
 
 describe("findCaseClash", () => {
 	test("finds nothing when every name differs by more than case", () => {
-		expect(findCaseClash(["home", "away"], ["score"])).toEqual(Option.none());
+		expect(findCaseClash(["home", "away"])).toEqual(Option.none());
 	});
 
 	test("finds a name that differs from an earlier one only in case", () => {
-		expect(findCaseClash(["home", "away", "Home"], [])).toEqual(
+		expect(findCaseClash(["home", "away", "Home"])).toEqual(
 			Option.some({ name: "Home", clash: "home" }),
 		);
-	});
-
-	test("finds a name that differs from an existing one only in case", () => {
-		expect(findCaseClash(["Score"], ["score"])).toEqual(
-			Option.some({ name: "Score", clash: "score" }),
-		);
-	});
-
-	test("allows a name that repeats an existing one exactly", () => {
-		expect(findCaseClash(["score"], ["score"])).toEqual(Option.none());
 	});
 });
 
@@ -85,17 +75,5 @@ describe("CaseClashingKeys", () => {
 		expectTypeOf<
 			keyof CaseClashingKeys<{ home: 1; Home: 2; away: 3 }>
 		>().toEqualTypeOf<"home" | "Home">();
-	});
-
-	test("picks a key that differs from an existing name only in case", () => {
-		expectTypeOf<
-			keyof CaseClashingKeys<{ Score: 1 }, "score">
-		>().toEqualTypeOf<"Score">();
-	});
-
-	test("allows a key that repeats an existing name exactly", () => {
-		expectTypeOf<
-			keyof CaseClashingKeys<{ score: 1 }, "score">
-		>().toEqualTypeOf<never>();
 	});
 });

@@ -252,30 +252,6 @@ match.replicant.label.subscribe((label) => {
   });
   ```
 
-- ✅ Namespaces can be extended: add fields and roles or override permissions
-
-  ```ts
-  // Library
-  const base = implementNamespace(baseManifest, {
-    seedReplicant: { score: () => 0 },
-  });
-
-  // Application
-  const extendedManifest = extendNamespace(baseManifest, {
-    replicant: { round: { schema } },
-    computed: { total: { schema } }, // may read original + newly-added replicants
-  });
-
-  const extended = implementExtendedNamespace(extendedManifest, base, {
-    seedReplicant: { round: () => 0 },
-    implementComputed: {
-      total: (ctx) => ctx.replicant.score.get() + ctx.replicant.round.get(),
-    },
-  });
-
-  loadNamespace(extended);
-  ```
-
 - ✅ A namespace can run server-side logic when it loads, and can read its children inside
 
   ```ts

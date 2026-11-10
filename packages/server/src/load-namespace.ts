@@ -258,7 +258,7 @@ export const loadNamespaceEffect = Effect.fn(
 			}
 			names.add(manifest.namespace);
 		}
-		const clash = findCaseClash(names, []);
+		const clash = findCaseClash(names);
 		if (Option.isSome(clash)) {
 			return yield* DuplicateNamespace.make({
 				namespace: clash.value.name,

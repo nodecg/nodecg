@@ -12,7 +12,7 @@ import {
 import { Schema } from "effect";
 import { describe, expect, test } from "vitest";
 
-import { defineNamespace, extendNamespace } from "./define-namespace.ts";
+import { defineNamespace } from "./define-namespace.ts";
 import { getRolesForNamespace, isAdminTier } from "./role.ts";
 
 const authentication = Authentication.make({
@@ -173,7 +173,7 @@ describe("canRead / canWrite", () => {
 		).toBe(false);
 	});
 
-	test("a member grant admits any declared role, including one added by a later extend", () => {
+	test("a member grant admits any declared role", () => {
 		const members = defineNamespace("match", {
 			roles: { judge: { permission: [] } },
 			replicant: {
@@ -188,15 +188,6 @@ describe("canRead / canWrite", () => {
 			members.replicant.lounge.permission.canRead(user(RoleName.make("judge"))),
 		).toBe(true);
 		expect(members.replicant.lounge.permission.canRead(anonymous)).toBe(false);
-
-		const extended = extendNamespace(members, {
-			roles: { auditor: { permission: [] } },
-		});
-		expect(
-			extended.replicant.lounge.permission.canRead(
-				user(RoleName.make("auditor")),
-			),
-		).toBe(true);
 	});
 });
 

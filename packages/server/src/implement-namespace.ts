@@ -1,5 +1,4 @@
 import type {
-	CustomRouteManifest,
 	InferNamespace,
 	WidestNamespaceManifests,
 	WidestCustomRoutes,
@@ -8,9 +7,8 @@ import type {
 	NamespaceManifest,
 } from "@nodecg/core";
 import type { Identity, Updater } from "@nodecg/internal";
-import { mergeRecords, type NestedValues } from "@nodecg/internal/utils";
 import type { Schema } from "effect";
-import type { Promisable, SetOptional } from "type-fest";
+import type { Promisable } from "type-fest";
 
 export type FrontendConfig = {
 	readonly dir: ReadonlyArray<string | URL>;
@@ -195,17 +193,6 @@ export type ImplementCustomRoute<
 	};
 };
 
-type UnchangedCustomRoutes<
-	CustomRoutes extends WidestCustomRoutes,
-	BaseRoutes extends NestedValues<WidestCustomRoutes, CustomRouteManifest>,
-> = {
-	[R in keyof CustomRoutes & keyof BaseRoutes]: [
-		keyof CustomRoutes[R],
-	] extends [keyof BaseRoutes[R]]
-		? R
-		: never;
-}[keyof CustomRoutes & keyof BaseRoutes];
-
 export type NamespaceOptions<in out S extends WidestNamespaceFields> = {
 	readonly seedReplicant?: SeedReplicant<S["replicant"]>;
 	readonly implementComputed?: ImplementComputed<
@@ -311,115 +298,3 @@ export function implementNamespace<
 type RequiredIfAnyKey<Name extends string, Keys, Value> = [Keys] extends [never]
 	? { readonly [P in Name]?: Value }
 	: { readonly [P in Name]: Value };
-
-type ExtensionSupplement<
-	S extends WidestNamespaceFields,
-	CustomRoutes extends WidestCustomRoutes,
-	BaseReplicantKeys extends keyof S["replicant"] & string,
-	BaseComputedKeys extends keyof S["computed"] & string,
-	BaseRpcKeys extends keyof S["rpc"] & string,
-	BaseCustomRouteKeys extends keyof CustomRoutes,
-	BaseChildKeys extends keyof S["children"] & string,
-> = RequiredIfAnyKey<
-	"seedReplicant",
-	keyof Omit<S["replicant"], BaseReplicantKeys>,
-	SetOptional<SeedReplicant<S["replicant"]>, BaseReplicantKeys>
-> &
-	RequiredIfAnyKey<
-		"implementComputed",
-		keyof Omit<S["computed"], BaseComputedKeys>,
-		SetOptional<
-			ImplementComputed<S["replicant"], S["computed"], S["children"]>,
-			BaseComputedKeys
-		>
-	> &
-	RequiredIfAnyKey<
-		"implementRpc",
-		keyof Omit<S["rpc"], BaseRpcKeys>,
-		SetOptional<ImplementRpc<S>, BaseRpcKeys>
-	> &
-	RequiredIfAnyKey<
-		"implementCustomRoute",
-		Exclude<keyof CustomRoutes, BaseCustomRouteKeys>,
-		SetOptional<ImplementCustomRoute<S, CustomRoutes>, BaseCustomRouteKeys>
-	> &
-	RequiredIfAnyKey<
-		"children",
-		keyof Omit<S["children"], BaseChildKeys>,
-		SetOptional<ImplementedChildren<S["children"]>, BaseChildKeys>
-	> & {
-		readonly onLoad?: OnLoad<S>;
-		readonly frontend?: FrontendConfig;
-	};
-
-const combineOnLoad = <S extends WidestNamespaceFields>(
-	base: OnLoad<S> | undefined,
-	extension: OnLoad<S> | undefined,
-): OnLoad<S> | undefined => {
-	if (typeof base === "undefined") return extension;
-	if (typeof extension === "undefined") return base;
-	return async (ctx) => {
-		const cleanupBase = await base(ctx);
-		const cleanupExtension = await extension(ctx);
-		return async () => {
-			if (typeof cleanupExtension === "function") await cleanupExtension();
-			if (typeof cleanupBase === "function") await cleanupBase();
-		};
-	};
-};
-
-export function implementExtendedNamespace<
-	S extends WidestNamespaceFields,
-	CustomRoutes extends WidestCustomRoutes,
-	const Base extends ImplementedNamespace<any, WidestCustomRoutes>,
->(
-	manifest: NamespaceManifest<string, S, string, CustomRoutes>,
-	implemented: Base,
-	additional: ExtensionSupplement<
-		S,
-		CustomRoutes,
-		keyof Base["manifest"]["replicant"] & keyof S["replicant"] & string,
-		keyof Base["manifest"]["computed"] & keyof S["computed"] & string,
-		keyof Base["manifest"]["rpc"] & keyof S["rpc"] & string,
-		UnchangedCustomRoutes<CustomRoutes, Base["manifest"]["customRoute"]>,
-		keyof NonNullable<NonNullable<Base["impl"]>["children"]> &
-			keyof S["children"] &
-			string
-	>,
-): ImplementedNamespace<S, CustomRoutes> {
-	const baseFrontend = implemented.impl?.frontend;
-	const frontend =
-		baseFrontend && additional.frontend
-			? {
-					...baseFrontend,
-					...additional.frontend,
-					dir: [...new Set([...baseFrontend.dir, ...additional.frontend.dir])],
-				}
-			: (additional.frontend ?? baseFrontend);
-	return {
-		manifest,
-		impl: {
-			seedReplicant: mergeRecords<SeedReplicant<S["replicant"]>>(
-				implemented.impl?.seedReplicant,
-				additional.seedReplicant,
-			),
-			implementComputed: mergeRecords<
-				ImplementComputed<S["replicant"], S["computed"], S["children"]>
-			>(implemented.impl?.implementComputed, additional.implementComputed),
-			implementRpc: mergeRecords<ImplementRpc<S>>(
-				implemented.impl?.implementRpc,
-				additional.implementRpc,
-			),
-			implementCustomRoute: mergeRecords<ImplementCustomRoute<S, CustomRoutes>>(
-				implemented.impl?.implementCustomRoute,
-				additional.implementCustomRoute,
-			),
-			onLoad: combineOnLoad(implemented.impl?.onLoad, additional.onLoad),
-			frontend,
-			children: mergeRecords<ImplementedChildren<S["children"]>>(
-				implemented.impl?.children,
-				additional.children,
-			),
-		},
-	};
-}

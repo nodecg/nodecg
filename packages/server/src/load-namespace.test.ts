@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { testLayer } from "@nodecg-private/test-utils";
-import { defineNamespace, extendNamespace } from "@nodecg/core";
+import { defineNamespace } from "@nodecg/core";
 import { ConfigProvider, Effect, Layer, Schema } from "effect";
 import {
 	assert,
@@ -15,10 +15,7 @@ import {
 	vi,
 } from "vitest";
 
-import {
-	implementExtendedNamespace,
-	implementNamespace,
-} from "./implement-namespace.ts";
+import { implementNamespace } from "./implement-namespace.ts";
 import {
 	DuplicateNamespace,
 	loadNamespace,
@@ -280,34 +277,25 @@ describe("onLoad", () => {
 	);
 
 	testInMemory(
-		"runs both the base and the extension onLoad, cleaning up in reverse",
+		"cleans up onLoad in reverse load order",
 		Effect.gen(function* () {
 			const calls: string[] = [];
-			const baseNs = implementNamespace(
-				defineNamespace("composed", {
-					replicant: { a: { schema: Schema.FiniteFromString } },
-				}),
-				{
-					seedReplicant: { a: () => 0 },
-					onLoad: () => {
-						calls.push("base:setup");
-						return () => {
-							calls.push("base:cleanup");
-						};
-					},
+			const child = implementNamespace(defineNamespace("child", {}), {
+				onLoad: () => {
+					calls.push("child:setup");
+					return () => {
+						calls.push("child:cleanup");
+					};
 				},
-			);
-			const extended = implementExtendedNamespace(
-				extendNamespace(baseNs.manifest, {
-					replicant: { b: { schema: Schema.FiniteFromString } },
-				}),
-				baseNs,
+			});
+			const parent = implementNamespace(
+				defineNamespace("parent", { children: { child: child.manifest } }),
 				{
-					seedReplicant: { b: () => 0 },
+					children: { child },
 					onLoad: () => {
-						calls.push("extension:setup");
+						calls.push("parent:setup");
 						return () => {
-							calls.push("extension:cleanup");
+							calls.push("parent:cleanup");
 						};
 					},
 				},
@@ -315,16 +303,16 @@ describe("onLoad", () => {
 
 			yield* Effect.scoped(
 				Effect.gen(function* () {
-					yield* loadNamespaceEffect(extended);
-					expect(calls).toEqual(["base:setup", "extension:setup"]);
+					yield* loadNamespaceEffect(parent);
+					expect(calls).toEqual(["child:setup", "parent:setup"]);
 				}),
 			);
 
 			expect(calls).toEqual([
-				"base:setup",
-				"extension:setup",
-				"extension:cleanup",
-				"base:cleanup",
+				"child:setup",
+				"parent:setup",
+				"parent:cleanup",
+				"child:cleanup",
 			]);
 		}),
 	);

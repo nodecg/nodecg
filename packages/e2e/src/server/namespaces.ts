@@ -1,11 +1,10 @@
-import { implementExtendedNamespace, implementNamespace } from "@nodecg/server";
+import { implementNamespace } from "@nodecg/server";
 
 import {
-	baseManifest,
 	chainManifest,
 	crossManifest,
-	extendedManifest,
 	fixtureManifest,
+	libraryManifest,
 } from "../shared/manifests.ts";
 
 export const fixture = implementNamespace(fixtureManifest, {
@@ -40,27 +39,13 @@ export const fixture = implementNamespace(fixtureManifest, {
 	},
 });
 
-const baseImplemented = implementNamespace(baseManifest, {
+export const library = implementNamespace(libraryManifest, {
 	seedReplicant: { score: () => 0 },
 	frontend: {
 		dir: [import.meta.resolve("../../assets/frontend-spa")],
 		spa: true,
 	},
 });
-
-export const extended = implementExtendedNamespace(
-	extendedManifest,
-	baseImplemented,
-	{
-		seedReplicant: { bonus: () => 0 },
-		implementComputed: {
-			total: (ctx) => ctx.replicant.score.get() + ctx.replicant.bonus.get(),
-		},
-		frontend: {
-			dir: [import.meta.resolve("../../assets/frontend-widget")],
-		},
-	},
-);
 
 export const chain = implementNamespace(chainManifest, {
 	seedReplicant: { points: () => 0, target: () => 0, denominator: () => 1 },
@@ -84,15 +69,15 @@ export const cross = implementNamespace(crossManifest, {
 	seedReplicant: { factor: () => 2 },
 	implementComputed: {
 		scaledScore: (ctx) =>
-			ctx.replicant.factor.get() * ctx.children.extended.replicant.score.get(),
+			ctx.replicant.factor.get() * ctx.children.library.replicant.score.get(),
 	},
 	implementRpc: {
 		addScore: async (points, ctx) => {
-			await ctx.children.extended.replicant.score.update(
+			await ctx.children.library.replicant.score.update(
 				(score) => score + points,
 			);
-			return ctx.children.extended.replicant.score.get();
+			return ctx.children.library.replicant.score.get();
 		},
 	},
-	children: { extended },
+	children: { library },
 });

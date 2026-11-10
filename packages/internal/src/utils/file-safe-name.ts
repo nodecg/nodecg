@@ -45,9 +45,9 @@ export type UnsafeNameKeys<T> = {
 
 type CaseClashRule = "Differs from another name only in case";
 
-export type CaseClashingKeys<T, Existing extends string = never> = {
+export type CaseClashingKeys<T> = {
 	[K in keyof T as K extends string
-		? Lowercase<K> extends Lowercase<Exclude<(keyof T & string) | Existing, K>>
+		? Lowercase<K> extends Lowercase<Exclude<keyof T & string, K>>
 			? K
 			: never
 		: never]: CaseClashRule;
@@ -57,14 +57,8 @@ export const isFileSafeName = (name: string) =>
 	/^[A-Za-z0-9_-]+$/.test(name) &&
 	!/^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(name);
 
-export const findCaseClash = (
-	names: Iterable<string>,
-	existing: Iterable<string>,
-) => {
+export const findCaseClash = (names: Iterable<string>) => {
 	const byLowercase = new Map<string, string>();
-	for (const name of existing) {
-		byLowercase.set(name.toLowerCase(), name);
-	}
 	for (const name of names) {
 		const clash = byLowercase.get(name.toLowerCase());
 		if (typeof clash !== "undefined" && clash !== name) {

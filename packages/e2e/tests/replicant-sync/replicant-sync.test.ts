@@ -15,17 +15,9 @@ beforeAll(async () => {
 	const prodUserId = await createUser("prod");
 	const viewUserId = await createUser("view");
 	await grantAsAdmin(prodUserId, { namespace: "e2e", name: "producer" });
-	await grantAsAdmin(prodUserId, {
-		namespace: "e2e-extend",
-		name: "producer",
-	});
 	await grantAsAdmin(viewUserId, { namespace: "e2e", name: "viewer" });
 	return async () => {
 		await revokeAsAdmin(prodUserId, { namespace: "e2e", name: "producer" });
-		await revokeAsAdmin(prodUserId, {
-			namespace: "e2e-extend",
-			name: "producer",
-		});
 		await revokeAsAdmin(viewUserId, { namespace: "e2e", name: "viewer" });
 		await logout();
 	};
@@ -380,24 +372,16 @@ describe("namespace frontend serving", () => {
 	});
 });
 
-describe("extended namespace frontend serving (spa)", () => {
-	test("serves the index from the base dir", async () => {
-		const response = await fetch(`${base}/frontend/namespaces/e2e-extend/`);
+describe("spa frontend serving", () => {
+	test("serves the index", async () => {
+		const response = await fetch(`${base}/frontend/namespaces/e2e-library/`);
 		expect(response.ok).toBe(true);
 		expect(await response.text()).toContain("spa shell");
 	});
 
-	test("serves a file from the extension's appended dir", async () => {
+	test("falls back to the index for a client-side route", async () => {
 		const response = await fetch(
-			`${base}/frontend/namespaces/e2e-extend/widget.js`,
-		);
-		expect(response.ok).toBe(true);
-		expect(await response.text()).toContain("extension widget loaded");
-	});
-
-	test("falls back to the base index for a client-side route", async () => {
-		const response = await fetch(
-			`${base}/frontend/namespaces/e2e-extend/some/route`,
+			`${base}/frontend/namespaces/e2e-library/some/route`,
 			{ headers: { accept: "text/html" } },
 		);
 		expect(response.ok).toBe(true);
@@ -406,44 +390,9 @@ describe("extended namespace frontend serving (spa)", () => {
 
 	test("404s for a missing file despite the fallback", async () => {
 		const response = await fetch(
-			`${base}/frontend/namespaces/e2e-extend/missing.js`,
+			`${base}/frontend/namespaces/e2e-library/missing.js`,
 		);
 		expect(response.status).toBe(404);
-	});
-});
-
-describe("extended namespace sync (as producer)", () => {
-	beforeAll(async () => {
-		await login("prod");
-	});
-
-	test("reads original + added replicant and a computed over both", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.extended, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
-		await ns.replicant.score.set(4);
-		await ns.replicant.bonus.set(3);
-		expect(await ns.replicant.score.get()).toBe(4);
-		expect(await ns.replicant.bonus.get()).toBe(3);
-		expect(await ns.computed.total.get()).toBe(7);
-	});
-
-	test("the extend-added computed recomputes when the original replicant changes", async () => {
-		const ns = await loadNamespace(replicantSyncManifest.children.extended, {
-			baseUrl: base,
-		});
-		onTestFinished(ns.dispose);
-		await ns.replicant.score.set(1);
-		await ns.replicant.bonus.set(0);
-		const received: number[] = [];
-		const cancel = await ns.computed.total.subscribe((value) => {
-			received.push(value);
-		});
-		onTestFinished(() => cancel());
-		await vi.waitFor(() => expect(received.at(-1)).toBe(1));
-		await ns.replicant.score.set(10);
-		await vi.waitFor(() => expect(received.at(-1)).toBe(10));
 	});
 });
 
@@ -484,6 +433,25 @@ describe("role-gated field access (HTTP)", () => {
 		);
 	});
 
+	test("a producer of the library writes its score", async () => {
+		const libraryUserId = await createUser("library");
+		await grantAsAdmin(libraryUserId, {
+			namespace: "e2e-library",
+			name: "producer",
+		});
+		onTestFinished(async () => {
+			await revokeAsAdmin(libraryUserId, {
+				namespace: "e2e-library",
+				name: "producer",
+			});
+		});
+		await login("library");
+		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		await root.children.library.replicant.score.set(7);
+		expect(await root.children.library.replicant.score.get()).toBe(7);
+	});
+
 	test("a role granted in one namespace does not reach another declaring the same role", async () => {
 		const singleUserId = await createUser("single");
 		await grantAsAdmin(singleUserId, { namespace: "e2e", name: "producer" });
@@ -499,7 +467,7 @@ describe("role-gated field access (HTTP)", () => {
 		expect(await root.children.fixture.replicant.producerOnly.get()).toBe(
 			"producers-only",
 		);
-		await expect(root.children.extended.replicant.score.set(1)).rejects.toThrow(
+		await expect(root.children.library.replicant.score.set(1)).rejects.toThrow(
 			/Permission denied/,
 		);
 	});
