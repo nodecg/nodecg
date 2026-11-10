@@ -3,7 +3,11 @@ import type {
 	WidestCustomRoutes,
 	WidestNamespaceFields,
 } from "@nodecg/core";
-import { CurrentIdentity, ServerIdentity } from "@nodecg/internal";
+import {
+	CurrentIdentity,
+	NamespacePath,
+	ServerIdentity,
+} from "@nodecg/internal";
 import {
 	type ApplyLambdaToObjectValues,
 	mapValues,
@@ -52,9 +56,9 @@ const asServer = Effect.provideService(CurrentIdentity, serverIdentity);
 
 export class MissingReplicantSeed extends Schema.TaggedError<MissingReplicantSeed>()(
 	"MissingReplicantSeed",
-	{ namespace: Schema.String, name: Schema.String },
+	{ namespace: NamespacePath, name: Schema.String },
 ) {
-	override readonly message = `Missing seed value for replicant "${this.name}" in "${this.namespace}"`;
+	override readonly message = `Missing seed value for replicant "${this.name}" in "${this.namespace.join("/")}"`;
 }
 
 export interface NamespaceHandles<S extends WidestNamespaceFields> {
@@ -91,6 +95,7 @@ export const buildNamespace = Effect.fn("buildNamespace")(function* <
 	S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes,
 >(
+	namespace: NamespacePath,
 	implemented: ImplementedNamespace<S, CustomRoutes>,
 	children: ApplyLambdaToObjectValues<NamespaceHandlesLambda, S["children"]>,
 ) {
@@ -99,10 +104,7 @@ export const buildNamespace = Effect.fn("buildNamespace")(function* <
 
 	for (const name of Object.keys(manifest.replicant)) {
 		if (typeof seedReplicant?.[name] === "undefined") {
-			return yield* MissingReplicantSeed.make({
-				namespace: manifest.namespace,
-				name,
-			});
+			return yield* MissingReplicantSeed.make({ namespace, name });
 		}
 	}
 
@@ -117,6 +119,7 @@ export const buildNamespace = Effect.fn("buildNamespace")(function* <
 	)(children);
 
 	const { fields, computeContext, fieldServices } = yield* buildFields(
+		namespace,
 		manifest,
 		impl,
 		{ compute, rpc },

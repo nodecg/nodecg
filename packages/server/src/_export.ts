@@ -18,6 +18,7 @@ export {
 	GlobalRoleName,
 	type Identity,
 	type LoginAttempt,
+	NamespacePath,
 	Role,
 	ServiceAccountId,
 	UserId,

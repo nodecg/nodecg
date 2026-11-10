@@ -52,9 +52,9 @@ describe("read", () => {
 		"fails with ReplicantNotFound on a missing key",
 		Effect.gen(function* () {
 			const repository = yield* ReplicantRepositoryService;
-			const error = yield* repository.read("ns", "missing").pipe(Effect.flip);
+			const error = yield* repository.read(["ns"], "missing").pipe(Effect.flip);
 			assert(Schema.is(ReplicantNotFound)(error));
-			expect(error).toMatchObject({ namespace: "ns", name: "missing" });
+			expect(error).toMatchObject({ namespace: ["ns"], name: "missing" });
 		}),
 	);
 
@@ -65,13 +65,13 @@ describe("read", () => {
 			const fs = yield* FileSystem.FileSystem;
 			const path = yield* Path.Path;
 			const dir = yield* config.dataDir;
-			yield* repository.write("ns", "a", 1);
+			yield* repository.write(["ns"], "a", 1);
 			yield* fs.writeFileString(
 				path.join(dir, "replicants", "ns", "a.json"),
 				"{not json",
 			);
 
-			const error = yield* repository.read("ns", "a").pipe(Effect.flip);
+			const error = yield* repository.read(["ns"], "a").pipe(Effect.flip);
 			assert(Schema.is(DecodeError)(error));
 			expect(error).toMatchObject({ issue: "Expected a valid JSON string" });
 		}),
@@ -91,7 +91,7 @@ describe("write", () => {
 			});
 			yield* fs.writeFileString(path.join(dir, "replicants", "ns"), "");
 
-			const error = yield* repository.write("ns", "a", 1).pipe(Effect.flip);
+			const error = yield* repository.write(["ns"], "a", 1).pipe(Effect.flip);
 			assert(Schema.is(BackendError)(error));
 			expect(error.message).toContain(path.join(dir, "replicants", "ns"));
 		}),
@@ -101,10 +101,10 @@ describe("write", () => {
 		"stores new values that read returns",
 		Effect.gen(function* () {
 			const repository = yield* ReplicantRepositoryService;
-			yield* repository.write("ns", "a", 1);
-			yield* repository.write("ns", "b", { list: ["two"] });
-			expect(yield* repository.read("ns", "a")).toBe(1);
-			expect(yield* repository.read("ns", "b")).toEqual({ list: ["two"] });
+			yield* repository.write(["ns"], "a", 1);
+			yield* repository.write(["ns"], "b", { list: ["two"] });
+			expect(yield* repository.read(["ns"], "a")).toBe(1);
+			expect(yield* repository.read(["ns"], "b")).toEqual({ list: ["two"] });
 		}),
 	);
 
@@ -112,9 +112,9 @@ describe("write", () => {
 		"overwrites an existing value",
 		Effect.gen(function* () {
 			const repository = yield* ReplicantRepositoryService;
-			yield* repository.write("ns", "a", 1);
-			yield* repository.write("ns", "a", 2);
-			expect(yield* repository.read("ns", "a")).toBe(2);
+			yield* repository.write(["ns"], "a", 1);
+			yield* repository.write(["ns"], "a", 2);
+			expect(yield* repository.read(["ns"], "a")).toBe(2);
 		}),
 	);
 
@@ -125,8 +125,8 @@ describe("write", () => {
 			const fs = yield* FileSystem.FileSystem;
 			const path = yield* Path.Path;
 			const dir = yield* config.dataDir;
-			yield* repository.write("ns", "a", 1);
-			yield* repository.write("ns", "a", 2);
+			yield* repository.write(["ns"], "a", 1);
+			yield* repository.write(["ns"], "a", 2);
 
 			expect(
 				yield* fs.readDirectory(path.join(dir, "replicants", "ns")),
@@ -138,17 +138,34 @@ describe("write", () => {
 	);
 
 	test(
+		"stores a nested namespace in a folder per key",
+		Effect.gen(function* () {
+			const repository = yield* ReplicantRepositoryService;
+			const fs = yield* FileSystem.FileSystem;
+			const path = yield* Path.Path;
+			const dir = yield* config.dataDir;
+			yield* repository.write(["ns", "child"], "a", 1);
+
+			expect(
+				yield* fs.readFileString(
+					path.join(dir, "replicants", "ns", "child", "a.json"),
+				),
+			).toBe("1");
+		}),
+	);
+
+	test(
 		"a value written by one instance is read by a fresh one",
 		Effect.gen(function* () {
 			const repository = yield* ReplicantRepositoryService;
-			yield* repository.write("ns", "a", { count: 3 });
+			yield* repository.write(["ns"], "a", { count: 3 });
 
 			const restarted = yield* Layer.build(
 				Layer.fresh(JsonFileReplicantRepository),
 			);
 			expect(
 				yield* Context.get(restarted, ReplicantRepositoryService).read(
-					"ns",
+					["ns"],
 					"a",
 				),
 			).toEqual({ count: 3 });
@@ -215,7 +232,7 @@ describe("write over a locked file", () => {
 					.mockReturnValueOnce(Effect.fail(renameError("EPERM")))
 					.mockReturnValueOnce(Effect.void);
 
-				const write = yield* Effect.forkChild(repository.write("ns", "a", 1));
+				const write = yield* Effect.forkChild(repository.write(["ns"], "a", 1));
 				yield* Deferred.await(attempted);
 				yield* TestClock.adjust("1 second");
 				yield* Fiber.join(write);
@@ -236,7 +253,7 @@ describe("write over a locked file", () => {
 				);
 
 				const write = yield* Effect.forkChild(
-					repository.write("ns", "a", 1).pipe(Effect.flip),
+					repository.write(["ns"], "a", 1).pipe(Effect.flip),
 				);
 				yield* Deferred.await(attempted);
 				yield* TestClock.adjust("59 seconds");
@@ -253,7 +270,7 @@ describe("write over a locked file", () => {
 				const repository = yield* ReplicantRepositoryService;
 				rename.mockReturnValue(Effect.fail(renameError("ENOSPC")));
 
-				const error = yield* repository.write("ns", "a", 1).pipe(Effect.flip);
+				const error = yield* repository.write(["ns"], "a", 1).pipe(Effect.flip);
 
 				assert(Schema.is(BackendError)(error));
 				expect(rename).toHaveBeenCalledTimes(1);
@@ -270,7 +287,7 @@ describe("write over a locked file", () => {
 				const repository = yield* ReplicantRepositoryService;
 				rename.mockReturnValue(Effect.fail(renameError("EPERM")));
 
-				const error = yield* repository.write("ns", "a", 1).pipe(Effect.flip);
+				const error = yield* repository.write(["ns"], "a", 1).pipe(Effect.flip);
 
 				assert(Schema.is(BackendError)(error));
 				expect(rename).toHaveBeenCalledTimes(1);

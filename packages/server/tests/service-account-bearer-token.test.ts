@@ -31,7 +31,11 @@ const namespace = implementNamespace(manifest, {
 const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
-		const { fields } = yield* buildNamespace(namespace, {});
+		const { fields } = yield* buildNamespace(
+			[namespace.manifest.namespace],
+			namespace,
+			{},
+		);
 		return yield* NamespaceRegistryService.make([
 			{ namespace: fields.namespace, declaredRoles: new Set(), fields },
 		]);

@@ -40,6 +40,7 @@ describe("seeding", () => {
 		"encodes the seed and seeds the store",
 		Effect.gen(function* () {
 			const { fields } = yield* buildNamespace(
+				[countManifest.namespace],
 				implementNamespace(countManifest, {
 					seedReplicant: { count: () => 42 },
 				}),
@@ -55,6 +56,7 @@ describe("seeding", () => {
 		"fails MissingReplicantSeed when a replicant has no seed",
 		Effect.gen(function* () {
 			const error = yield* buildNamespace(
+				[countManifest.namespace],
 				implementNamespace(countManifest, {
 					// @ts-expect-error a replicant with no seed is a type error; exercising the runtime guard
 					seedReplicant: {},
@@ -71,6 +73,7 @@ describe("seeding", () => {
 		"fails if encode rejects the seed value",
 		Effect.gen(function* () {
 			const error = yield* buildNamespace(
+				[countManifest.namespace],
 				implementNamespace(countManifest, {
 					seedReplicant: { count: () => "nope" as unknown as number },
 				}),
@@ -107,6 +110,7 @@ describe("loaded handle", () => {
 			const broker = yield* TopicBrokerService;
 			const publish = vi.spyOn(broker, "publish");
 			const { handles } = yield* buildNamespace(
+				[manifest.namespace],
 				implementNamespace(manifest, {
 					seedReplicant: { count: () => 1, title: () => "semi" },
 					implementComputed: {
@@ -132,7 +136,7 @@ describe("loaded handle", () => {
 			).toBe("9");
 			expect(handle.computed.doubled.get()).toBe(6);
 			yield* Effect.promise(() => handle.topic.cheer.publish("hi"));
-			expect(publish).toHaveBeenCalledWith("ns", "cheer", "hi");
+			expect(publish).toHaveBeenCalledWith(["ns"], "cheer", "hi");
 			expect(yield* Effect.promise(() => handle.rpc.echo(4))).toBe(40);
 
 			const received: number[] = [];
@@ -156,6 +160,7 @@ describe("loaded handle", () => {
 		"a subscription handler awaits a write to another replicant",
 		Effect.gen(function* () {
 			const { handles } = yield* buildNamespace(
+				[manifest.namespace],
 				implementNamespace(manifest, {
 					seedReplicant: { count: () => 1, title: () => "semi" },
 					implementComputed: {
@@ -188,6 +193,7 @@ describe("loaded handle", () => {
 		"a failing get throws the field's error",
 		Effect.gen(function* () {
 			const { handles } = yield* buildNamespace(
+				[manifest.namespace],
 				implementNamespace(manifest, {
 					seedReplicant: { count: () => 1, title: () => "semi" },
 					implementComputed: {
@@ -202,7 +208,7 @@ describe("loaded handle", () => {
 
 			expect(() => handles.loaded.computed.doubled.get()).toThrow(
 				ComputedComputeError.make({
-					namespace: "ns",
+					namespace: ["ns"],
 					name: "doubled",
 					cause: new Error("boom"),
 				}),
@@ -229,11 +235,15 @@ describe("loaded handle", () => {
 				defineNamespace("parent", { children: { child: child.manifest } }),
 				{ children: { child } },
 			);
-			const grandchildBuilt = yield* buildNamespace(grandchild, {});
-			const childBuilt = yield* buildNamespace(child, {
+			const grandchildBuilt = yield* buildNamespace(
+				["parent", "child", "grandchild"],
+				grandchild,
+				{},
+			);
+			const childBuilt = yield* buildNamespace(["parent", "child"], child, {
 				grandchild: grandchildBuilt.handles,
 			});
-			const { handles } = yield* buildNamespace(parent, {
+			const { handles } = yield* buildNamespace(["parent"], parent, {
 				child: childBuilt.handles,
 			});
 			const field =

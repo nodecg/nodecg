@@ -1,3 +1,4 @@
+import type { NamespacePath } from "@nodecg/internal";
 import {
 	Effect,
 	FileSystem,
@@ -36,12 +37,13 @@ export const JsonFileReplicantRepository = Layer.effect(
 		const root = path.join(yield* resolveDataDir(), "replicants");
 		yield* Effect.logInfo(`Storing replicants in ${root}`);
 
-		const directory = (namespace: string) => path.join(root, namespace);
-		const file = (namespace: string, name: string) =>
+		const directory = (namespace: NamespacePath) =>
+			path.join(root, ...namespace);
+		const file = (namespace: NamespacePath, name: string) =>
 			path.join(directory(namespace), `${name}.json`);
 
 		const read = Effect.fn("ReplicantRepository.read")(
-			function* (namespace: string, name: string) {
+			function* (namespace: NamespacePath, name: string) {
 				const text = yield* fs
 					.readFileString(file(namespace, name))
 					.pipe(
@@ -59,7 +61,7 @@ export const JsonFileReplicantRepository = Layer.effect(
 		);
 
 		const write = Effect.fn("ReplicantRepository.write")(
-			function* (namespace: string, name: string, value: Schema.Json) {
+			function* (namespace: NamespacePath, name: string, value: Schema.Json) {
 				const target = file(namespace, name);
 				const temporary = `${target}.tmp`;
 				const bytes = new TextEncoder().encode(yield* encodeJson(value));

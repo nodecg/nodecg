@@ -1,21 +1,25 @@
 import type { ResolvedPermission } from "@nodecg/core";
-import { CurrentIdentity, type Identity } from "@nodecg/internal";
+import {
+	CurrentIdentity,
+	type Identity,
+	NamespacePath,
+} from "@nodecg/internal";
 import { Effect, Match, Result, Schema } from "effect";
 
 export class FieldPermissionDenied extends Schema.TaggedError<FieldPermissionDenied>()(
 	"FieldPermissionDenied",
 	{
-		namespace: Schema.String,
+		namespace: NamespacePath,
 		name: Schema.String,
 		operation: Schema.Literals(["read", "write"]),
 	},
 ) {
-	override readonly message = `Permission denied to ${this.operation} "${this.name}" in "${this.namespace}"`;
+	override readonly message = `Permission denied to ${this.operation} "${this.name}" in "${this.namespace.join("/")}"`;
 }
 
 export const checkPermission = (
 	permission: ResolvedPermission,
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	operation: "read" | "write",
 	identity: Identity,
@@ -35,7 +39,7 @@ export const checkPermission = (
 
 export const requirePermission = (
 	permission: ResolvedPermission,
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	operation: "read" | "write",
 ) =>

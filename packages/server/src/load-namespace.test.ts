@@ -252,7 +252,10 @@ describe("onLoad", () => {
 			);
 
 			expect(onLoad).toHaveBeenCalledWith(
-				expect.objectContaining({ dataDir, namespacePath: ["child"] }),
+				expect.objectContaining({
+					dataDir,
+					namespacePath: ["parent", "child"],
+				}),
 			);
 		}),
 	);
@@ -546,16 +549,43 @@ describe("loadNamespace", () => {
 
 	test("seeds through the injected plain storage", async () => {
 		const storage = {
-			read: vi.fn<ReplicantRepository["read"]>(
-				(namespace, name) => new ReplicantNotFound({ namespace, name }),
+			read: vi.fn<ReplicantRepository["read"]>((namespace, name) =>
+				ReplicantNotFound.make({ namespace, name }),
 			),
 			write: vi.fn<ReplicantRepository["write"]>(() => Effect.void),
 		} satisfies ReplicantRepository;
 
 		const handle = await loadNamespace(settings, { storage });
 
-		expect(storage.write).toHaveBeenCalledWith("settings", "multiplier", "3");
+		expect(storage.write).toHaveBeenCalledWith(["settings"], "multiplier", "3");
 		expect(handle.replicant.multiplier.get()).toBe(3);
+	});
+
+	test("seeds a child under its parent's path and its key", async () => {
+		const storage = {
+			read: vi.fn<ReplicantRepository["read"]>((namespace, name) =>
+				ReplicantNotFound.make({ namespace, name }),
+			),
+			write: vi.fn<ReplicantRepository["write"]>(() => Effect.void),
+		} satisfies ReplicantRepository;
+		const child = implementNamespace(
+			defineNamespace("child", {
+				replicant: { value: { schema: Schema.Finite } },
+			}),
+			{ seedReplicant: { value: () => 1 } },
+		);
+		const parent = implementNamespace(
+			defineNamespace("parent", { children: { first: child.manifest } }),
+			{ children: { first: child } },
+		);
+
+		await loadNamespace(parent, { storage });
+
+		expect(storage.write).toHaveBeenCalledExactlyOnceWith(
+			["parent", "first"],
+			"value",
+			1,
+		);
 	});
 
 	test("exports a failed load before rejecting", async () => {
@@ -591,8 +621,8 @@ describe("loadNamespace", () => {
 
 	test("persists a write made after loading returns", async () => {
 		const storage = {
-			read: vi.fn<ReplicantRepository["read"]>(
-				(namespace, name) => new ReplicantNotFound({ namespace, name }),
+			read: vi.fn<ReplicantRepository["read"]>((namespace, name) =>
+				ReplicantNotFound.make({ namespace, name }),
 			),
 			write: vi.fn<ReplicantRepository["write"]>(() => Effect.void),
 		} satisfies ReplicantRepository;
@@ -601,7 +631,11 @@ describe("loadNamespace", () => {
 		await handle.replicant.multiplier.set(9);
 
 		await vi.waitFor(() =>
-			expect(storage.write).toHaveBeenCalledWith("settings", "multiplier", "9"),
+			expect(storage.write).toHaveBeenCalledWith(
+				["settings"],
+				"multiplier",
+				"9",
+			),
 		);
 	});
 });

@@ -1,12 +1,13 @@
+import { NamespacePath } from "@nodecg/internal";
 import { Context, type Effect, Schema } from "effect";
 
 import type { BackendError } from "../repository-errors.ts";
 
 export class ReplicantNotFound extends Schema.TaggedError<ReplicantNotFound>()(
 	"ReplicantNotFound",
-	{ namespace: Schema.String, name: Schema.String },
+	{ namespace: NamespacePath, name: Schema.String },
 ) {
-	override readonly message = `Replicant "${this.name}" in "${this.namespace}" does not exist`;
+	override readonly message = `Replicant "${this.name}" in "${this.namespace.join("/")}" does not exist`;
 }
 
 export class DecodeError extends Schema.TaggedError<DecodeError>()(
@@ -18,7 +19,7 @@ export class DecodeError extends Schema.TaggedError<DecodeError>()(
 
 export interface ReplicantRepository {
 	read: (
-		namespace: string,
+		namespace: NamespacePath,
 		name: string,
 	) => Effect.Effect<
 		Schema.Json,
@@ -26,7 +27,7 @@ export interface ReplicantRepository {
 	>;
 
 	write: (
-		namespace: string,
+		namespace: NamespacePath,
 		name: string,
 		value: Schema.Json,
 	) => Effect.Effect<void, BackendError>;

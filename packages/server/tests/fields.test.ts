@@ -31,17 +31,32 @@ const manifest = defineNamespace("show", {
 			permission: { read: { everyone: "allow" } },
 		},
 	},
+	rpc: {
+		explode: {
+			schema: { request: Schema.Finite, response: Schema.Finite },
+			permission: { write: { everyone: "allow" } },
+		},
+	},
 });
 
 const namespace = implementNamespace(manifest, {
 	seedReplicant: { count: () => 42, tags: () => ["a"], locked: () => 0 },
 	implementComputed: { doubled: (ctx) => ctx.replicant.count.get() * 2 },
+	implementRpc: {
+		explode: () => {
+			throw new Error("boom");
+		},
+	},
 });
 
 const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
-		const { fields } = yield* buildNamespace(namespace, {});
+		const { fields } = yield* buildNamespace(
+			[manifest.namespace],
+			namespace,
+			{},
+		);
 		return yield* NamespaceRegistryService.make([
 			{ namespace: fields.namespace, declaredRoles: new Set(), fields },
 		]);
@@ -54,6 +69,7 @@ const countUrl = "http://x/api/internal/namespaces/show/replicant/count";
 const tagsUrl = "http://x/api/internal/namespaces/show/replicant/tags";
 const lockedUrl = "http://x/api/internal/namespaces/show/replicant/locked";
 const doubledUrl = "http://x/api/internal/namespaces/show/computed/doubled";
+const explodeUrl = "http://x/api/internal/namespaces/show/rpc/explode";
 
 const admin = Authentication.make({ issuer: "dev", subject: "admin" });
 
@@ -219,6 +235,20 @@ describe("permission enforcement", () => {
 			const res = yield* asAdmin.get(lockedUrl);
 			expect(res.status).toBe(200);
 			expect(yield* res.json).toBe(0);
+		}),
+	);
+});
+
+describe("rpc", () => {
+	test(
+		"500 when the handler fails",
+		Effect.gen(function* () {
+			const client = yield* buildClient;
+
+			const res = yield* client.post(explodeUrl, {
+				body: yield* HttpBody.json(1),
+			});
+			expect(res.status).toBe(500);
 		}),
 	);
 });

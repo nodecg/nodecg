@@ -45,6 +45,7 @@ describe("computed source snapshot", () => {
 	});
 
 	const load = buildNamespace(
+		[manifest.namespace],
 		implementNamespace(manifest, {
 			seedReplicant: { games: () => [] },
 			implementComputed: {
@@ -111,6 +112,7 @@ describe("compute fn contract", () => {
 				  >
 				| undefined;
 			const { fields } = yield* buildNamespace(
+				[manifest.namespace],
 				implementNamespace(manifest, {
 					seedReplicant: { games: () => [{ id: "a" }] },
 					implementComputed: {
@@ -143,6 +145,7 @@ describe("compute fn contract", () => {
 		"surfaces a throwing compute fn as ComputedComputeError",
 		Effect.gen(function* () {
 			const { fields } = yield* buildNamespace(
+				[manifest.namespace],
 				implementNamespace(manifest, {
 					seedReplicant: { games: () => [] },
 					implementComputed: {
@@ -170,6 +173,7 @@ describe("computed-on-computed via ctx.computed", () => {
 	});
 
 	const load = buildNamespace(
+		[manifest.namespace],
 		implementNamespace(manifest, {
 			seedReplicant: { score: () => 8 },
 			implementComputed: {
@@ -233,6 +237,7 @@ describe("computed-on-computed via ctx.computed", () => {
 				},
 			});
 			const { fields } = yield* buildNamespace(
+				[cyclic.namespace],
 				implementNamespace(cyclic, {
 					implementComputed: {
 						a: (ctx) => ctx.computed.b.get() + 1,
@@ -275,6 +280,7 @@ describe("rpc ctx", () => {
 		bump: (request: number, ctx: Ctx) => Promise<number> | number,
 	) =>
 		buildNamespace(
+			[manifest.namespace],
 			implementNamespace(manifest, {
 				seedReplicant: { count: () => 0 },
 				implementComputed: { doubled: (ctx) => ctx.replicant.count.get() * 2 },
@@ -298,7 +304,7 @@ describe("rpc ctx", () => {
 			const result = yield* fields.rpc.bump.call(5);
 
 			expect(yield* fields.replicant.count.get()).toBe(6);
-			expect(publish).toHaveBeenCalledWith("ns", "cheer", "bumped");
+			expect(publish).toHaveBeenCalledWith(["ns"], "cheer", "bumped");
 			expect(result).toBe(12);
 		}),
 	);
@@ -335,6 +341,7 @@ describe("rpc ctx runs as the server identity", () => {
 	});
 
 	const load = buildNamespace(
+		[manifest.namespace],
 		implementNamespace(manifest, {
 			seedReplicant: { hidden: () => 3 },
 			implementRpc: {
@@ -455,11 +462,20 @@ const league = implementNamespace(
 );
 
 const loadTree = Effect.gen(function* () {
-	const settingsBuilt = yield* buildNamespace(settings, {});
-	const scoreboardBuilt = yield* buildNamespace(scoreboard, {
-		settings: settingsBuilt.handles,
-	});
-	const leagueBuilt = yield* buildNamespace(league, {
+	const root = league.manifest.namespace;
+	const settingsBuilt = yield* buildNamespace(
+		[root, "scoreboard", "settings"],
+		settings,
+		{},
+	);
+	const scoreboardBuilt = yield* buildNamespace(
+		[root, "scoreboard"],
+		scoreboard,
+		{
+			settings: settingsBuilt.handles,
+		},
+	);
+	const leagueBuilt = yield* buildNamespace([root], league, {
 		scoreboard: scoreboardBuilt.handles,
 	});
 	return {

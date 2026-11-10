@@ -1,4 +1,5 @@
-import { Effect, Layer, type Schema } from "effect";
+import type { NamespacePath } from "@nodecg/internal";
+import { Effect, Layer, MutableHashMap, Option, type Schema } from "effect";
 
 import {
 	ReplicantNotFound,
@@ -8,33 +9,28 @@ import {
 export const InMemoryReplicantRepository = Layer.sync(
 	ReplicantRepositoryService,
 	() => {
-		const map = new Map<string, Map<string, Schema.Json>>();
+		const values = MutableHashMap.empty<
+			{ readonly namespace: NamespacePath; readonly name: string },
+			Schema.Json
+		>();
 
-		const read = (
-			namespace: string,
-			name: string,
-		): Effect.Effect<Schema.Json, ReplicantNotFound> => {
-			const value = map.get(namespace)?.get(name);
-			// JavaScript `undefined` is not a valid JSON value, thus means value not defined
-			if (typeof value === "undefined") {
-				return new ReplicantNotFound({ namespace, name });
+		const read = Effect.fn(function* (namespace: NamespacePath, name: string) {
+			const value = MutableHashMap.get(values, { namespace, name });
+			if (Option.isNone(value)) {
+				return yield* ReplicantNotFound.make({ namespace, name });
 			}
-			return Effect.succeed(value);
-		};
+			return value.value;
+		});
 
-		const write = (namespace: string, name: string, value: Schema.Json) =>
+		const write = (
+			namespace: NamespacePath,
+			name: string,
+			value: Schema.Json,
+		) =>
 			Effect.sync(() => {
-				const ns = map.get(namespace);
-				if (ns) {
-					ns.set(name, value);
-				} else {
-					map.set(namespace, new Map([[name, value]]));
-				}
+				MutableHashMap.set(values, { namespace, name }, value);
 			});
 
-		return {
-			read,
-			write,
-		};
+		return { read, write };
 	},
 );

@@ -1,5 +1,10 @@
 import type { ReplicantFieldManifest } from "@nodecg/core";
-import { CurrentIdentity, type Identity, type Updater } from "@nodecg/internal";
+import {
+	CurrentIdentity,
+	type Identity,
+	NamespacePath,
+	type Updater,
+} from "@nodecg/internal";
 import type { Patch } from "@nodecg/internal/occ";
 import { cloneJson, toError } from "@nodecg/internal/utils";
 import { Effect, Result, Schema, Stream } from "effect";
@@ -17,16 +22,16 @@ import { checkPermission, requirePermission } from "./permission.ts";
 export class ReplicantUpdateFnError extends Schema.TaggedError<ReplicantUpdateFnError>()(
 	"ReplicantUpdateFnError",
 	{
-		namespace: Schema.String,
+		namespace: NamespacePath,
 		name: Schema.String,
 		cause: Schema.instanceOf(Error),
 	},
 ) {
-	override readonly message = `Update function for replicant "${this.name}" in "${this.namespace}" failed: ${this.cause.message}`;
+	override readonly message = `Update function for replicant "${this.name}" in "${this.namespace.join("/")}" failed: ${this.cause.message}`;
 }
 
 export const buildReplicant = Effect.fn("buildReplicant")(function* <Decoded>(
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	manifest: ReplicantFieldManifest<Decoded>,
 	initialValue: Decoded,
@@ -56,7 +61,7 @@ export const buildReplicant = Effect.fn("buildReplicant")(function* <Decoded>(
 			Effect.catchTag("CommitContended", () =>
 				Effect.die(
 					new Error(
-						`Committing "${namespace}/${name}" lost 100 compare-and-swap attempts, is an updater writing its own field?`,
+						`Committing "${namespace.join("/")}/${name}" lost 100 compare-and-swap attempts, is an updater writing its own field?`,
 					),
 				),
 			),

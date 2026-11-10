@@ -45,7 +45,7 @@ describe("callEncoded", () => {
 				(request: number, _ctx: typeof context) => request * 2,
 			);
 			const field = yield* buildRpc(
-				"ns",
+				["ns"],
 				"echo",
 				manifest.rpc.echo,
 				handler,
@@ -65,7 +65,7 @@ describe("callEncoded", () => {
 		"awaits an async handler",
 		Effect.gen(function* () {
 			const field = yield* buildRpc(
-				"ns",
+				["ns"],
 				"echo",
 				manifest.rpc.echo,
 				async (request: number) => {
@@ -88,7 +88,7 @@ describe("callEncoded", () => {
 		Effect.gen(function* () {
 			const handler = vi.fn((request: number) => request);
 			const field = yield* buildRpc(
-				"ns",
+				["ns"],
 				"echo",
 				manifest.rpc.echo,
 				handler,
@@ -108,7 +108,7 @@ describe("callEncoded", () => {
 		"surfaces a throwing handler as RpcHandlerError",
 		Effect.gen(function* () {
 			const field = yield* buildRpc(
-				"ns",
+				["ns"],
 				"echo",
 				manifest.rpc.echo,
 				() => {
@@ -130,7 +130,7 @@ describe("callEncoded", () => {
 		"fails FieldEncodeError when the response fails its schema",
 		Effect.gen(function* () {
 			const field = yield* buildRpc(
-				"ns",
+				["ns"],
 				"echo",
 				manifest.rpc.echo,
 				() => "nope" as unknown as number,
@@ -154,7 +154,7 @@ describe("call", () => {
 				(request: number, _ctx: typeof context) => request * 2,
 			);
 			const field = yield* buildRpc(
-				"ns",
+				["ns"],
 				"echo",
 				manifest.rpc.echo,
 				handler,
@@ -172,7 +172,7 @@ describe("call", () => {
 		"surfaces a throwing handler as RpcHandlerError",
 		Effect.gen(function* () {
 			const field = yield* buildRpc(
-				"ns",
+				["ns"],
 				"echo",
 				manifest.rpc.echo,
 				() => {
@@ -193,7 +193,7 @@ test(
 	Effect.gen(function* () {
 		const handler = vi.fn((request: string) => request);
 		const field = yield* buildRpc(
-			"ns",
+			["ns"],
 			"locked",
 			manifest.rpc.locked,
 			handler,

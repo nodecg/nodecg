@@ -12,7 +12,7 @@ describe("read", () => {
 		"fails with ReplicantNotFound on a missing key",
 		Effect.gen(function* () {
 			const repository = yield* ReplicantRepositoryService;
-			const error = yield* repository.read("ns", "missing").pipe(Effect.flip);
+			const error = yield* repository.read(["ns"], "missing").pipe(Effect.flip);
 			expect(error._tag).toBe("ReplicantNotFound");
 		}),
 	);
@@ -23,10 +23,10 @@ describe("write", () => {
 		"stores new values that read returns",
 		Effect.gen(function* () {
 			const repository = yield* ReplicantRepositoryService;
-			yield* repository.write("ns", "a", 1);
-			yield* repository.write("ns", "b", "two");
-			expect(yield* repository.read("ns", "a")).toBe(1);
-			expect(yield* repository.read("ns", "b")).toBe("two");
+			yield* repository.write(["ns"], "a", 1);
+			yield* repository.write(["ns"], "b", "two");
+			expect(yield* repository.read(["ns"], "a")).toBe(1);
+			expect(yield* repository.read(["ns"], "b")).toBe("two");
 		}),
 	);
 
@@ -34,9 +34,9 @@ describe("write", () => {
 		"overwrites an existing value",
 		Effect.gen(function* () {
 			const repository = yield* ReplicantRepositoryService;
-			yield* repository.write("ns", "a", 1);
-			yield* repository.write("ns", "a", 2);
-			expect(yield* repository.read("ns", "a")).toBe(2);
+			yield* repository.write(["ns"], "a", 1);
+			yield* repository.write(["ns"], "a", 2);
+			expect(yield* repository.read(["ns"], "a")).toBe(2);
 		}),
 	);
 });

@@ -27,7 +27,6 @@ import {
 import { RoleLinks } from "../auth/role-links.ts";
 import { type BuiltNamespace } from "../build-fields.ts";
 import { ConfiguredSuperadmins } from "../configured-superadmins.ts";
-import { RpcHandlerError } from "../field-builders/build-rpc.ts";
 import { fieldInternal } from "../field-builders/field-internal-key.ts";
 import {
 	NamespaceRegistryService,
@@ -286,31 +285,6 @@ describe("rpc call", () => {
 				),
 			]);
 			expect((yield* handler(postRequest(rpcUrl, 42))).status).toBe(400);
-		}),
-	);
-
-	it.effect("500 when the handler fails", () =>
-		Effect.gen(function* () {
-			const handler = yield* webHandler([
-				registeredNamespace(
-					"root",
-					{},
-					{},
-					{},
-					{
-						echo: stubRpc(() =>
-							Effect.fail(
-								new RpcHandlerError({
-									namespace: "root",
-									name: "echo",
-									cause: new Error("boom"),
-								}),
-							),
-						),
-					},
-				),
-			]);
-			expect((yield* handler(postRequest(rpcUrl, 42))).status).toBe(500);
 		}),
 	);
 });

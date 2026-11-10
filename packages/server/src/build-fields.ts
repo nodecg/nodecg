@@ -1,5 +1,9 @@
 import type { WidestNamespaceFields, NamespaceManifest } from "@nodecg/core";
-import { CurrentIdentity, ServerIdentity } from "@nodecg/internal";
+import {
+	CurrentIdentity,
+	type NamespacePath,
+	ServerIdentity,
+} from "@nodecg/internal";
 import {
 	mapValues,
 	mapEffectValues,
@@ -120,6 +124,7 @@ export const makeCrossNamespaceHandle = <S extends WidestNamespaceFields>(
 export const buildFields = Effect.fn("buildFields")(function* <
 	S extends WidestNamespaceFields,
 >(
+	namespace: NamespacePath,
 	manifest: NamespaceManifest<string, S, string>,
 	options: NamespaceOptions<S> | undefined,
 	children: {
@@ -146,7 +151,7 @@ export const buildFields = Effect.fn("buildFields")(function* <
 		unknown,
 		S["replicant"]
 	>()(manifest.replicant, seedReplicantFns, (codec, seed, name) =>
-		buildReplicant(manifest.namespace, name, codec, seed()),
+		buildReplicant(namespace, name, codec, seed()),
 	);
 
 	type OwnComputeContext = ComputeContext<
@@ -181,12 +186,12 @@ export const buildFields = Effect.fn("buildFields")(function* <
 		OwnComputeContext,
 		S["computed"]
 	>()(manifest.computed, computeFns, (codec, compute, name) =>
-		buildComputed(manifest.namespace, name, codec, () =>
+		buildComputed(namespace, name, codec, () =>
 			Result.try({
 				try: () => compute(computeContext),
 				catch: (error) =>
 					ComputedComputeError.make({
-						namespace: manifest.namespace,
+						namespace,
 						name,
 						cause: toError(error),
 					}),
@@ -204,9 +209,7 @@ export const buildFields = Effect.fn("buildFields")(function* <
 	const topic = yield* mapEffectValues<
 		FieldManifestLambda,
 		TopicFieldEffectLambda
-	>()((codec, name) => buildTopic(manifest.namespace, name, codec))(
-		manifest.topic,
-	);
+	>()((codec, name) => buildTopic(namespace, name, codec))(manifest.topic);
 
 	const rpcContext: RpcContext<S> = {
 		...fieldAccessors(fieldServices)({ replicant, computed, topic }),
@@ -220,7 +223,7 @@ export const buildFields = Effect.fn("buildFields")(function* <
 		RpcContext<S>,
 		S["rpc"]
 	>()(manifest.rpc, rpcHandlers, (codec, handler, name) =>
-		buildRpc(manifest.namespace, name, codec, handler, rpcContext),
+		buildRpc(namespace, name, codec, handler, rpcContext),
 	);
 
 	return {

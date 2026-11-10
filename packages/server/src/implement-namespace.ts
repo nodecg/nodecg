@@ -6,7 +6,7 @@ import type {
 	WidestNamespaceFields,
 	NamespaceManifest,
 } from "@nodecg/core";
-import type { Identity, Updater } from "@nodecg/internal";
+import type { Identity, NamespacePath, Updater } from "@nodecg/internal";
 import type { Schema } from "effect";
 import type { Promisable } from "type-fest";
 
@@ -114,7 +114,7 @@ export interface LoadedNamespace<S extends WidestNamespaceFields> {
 export type OnLoadContext<S extends WidestNamespaceFields> =
 	LoadedNamespace<S> & {
 		readonly dataDir: string;
-		readonly namespacePath: ReadonlyArray<string>;
+		readonly namespacePath: NamespacePath;
 	};
 
 export type OnLoad<S extends WidestNamespaceFields> = (

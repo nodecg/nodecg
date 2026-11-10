@@ -71,7 +71,7 @@ const buildRoutes = Effect.fn(function* (
 			webhook: { "*": stubHandler },
 		},
 	});
-	const { handles } = yield* buildNamespace(implemented, {});
+	const { handles } = yield* buildNamespace(["ns"], implemented, {});
 	return Array.from(
 		yield* buildCustomRoutes(implemented, {
 			...handles.loaded,
@@ -107,7 +107,7 @@ describe("buildCustomRoutes", () => {
 					webhook: { "*": stubHandler },
 				},
 			});
-			const { handles } = yield* buildNamespace(implemented, {});
+			const { handles } = yield* buildNamespace(["ns"], implemented, {});
 
 			const error = yield* buildCustomRoutes(implemented, {
 				...handles.loaded,
@@ -117,7 +117,7 @@ describe("buildCustomRoutes", () => {
 
 			expect(error).toStrictEqual(
 				MissingCustomRouteHandler.make({
-					namespace: "ns",
+					namespace: ["ns"],
 					name: "asset",
 					method: "POST",
 				}),

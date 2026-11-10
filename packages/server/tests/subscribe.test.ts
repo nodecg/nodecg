@@ -29,7 +29,11 @@ const show = implementNamespace(
 );
 
 const loadShow = Effect.gen(function* () {
-	const { fields, handles } = yield* buildNamespace(show, {});
+	const { fields, handles } = yield* buildNamespace(
+		[show.manifest.namespace],
+		show,
+		{},
+	);
 	const registry = yield* NamespaceRegistryService.make([
 		{
 			namespace: "show",

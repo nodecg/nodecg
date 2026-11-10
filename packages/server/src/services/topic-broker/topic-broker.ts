@@ -1,3 +1,4 @@
+import type { NamespacePath } from "@nodecg/internal";
 import {
 	Context,
 	type Effect,
@@ -7,14 +8,14 @@ import {
 } from "effect";
 
 export interface TopicMessage {
-	readonly namespace: string;
+	readonly namespace: NamespacePath;
 	readonly name: string;
 	readonly value: Schema.Json;
 }
 
 export interface TopicBroker {
 	publish: (
-		namespace: string,
+		namespace: NamespacePath,
 		name: string,
 		value: Schema.Json,
 	) => Effect.Effect<void>;

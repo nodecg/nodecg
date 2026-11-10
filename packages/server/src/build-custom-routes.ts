@@ -4,7 +4,7 @@ import type {
 	WidestCustomRoutes,
 	WidestNamespaceFields,
 } from "@nodecg/core";
-import type { Identity } from "@nodecg/internal";
+import { type Identity, NamespacePath } from "@nodecg/internal";
 import { Effect, HashSet, Schema, String } from "effect";
 import { HttpEffect, HttpMethod } from "effect/http";
 
@@ -16,7 +16,6 @@ import type {
 } from "./implement-namespace.ts";
 
 const makeCustomRoute = <S extends WidestNamespaceFields>(
-	namespace: string,
 	route: CustomRouteManifest,
 	method: HttpMethod.HttpMethod | "*",
 	handler: CustomRouteHandler<S>,
@@ -24,16 +23,22 @@ const makeCustomRoute = <S extends WidestNamespaceFields>(
 ) => ({
 	name: route.name,
 	method,
-	handle: Effect.fn("CustomRoute.handle")(function* (caller: Identity) {
+	handle: Effect.fn(function* (caller: Identity) {
 		yield* Effect.fromResult(
-			checkPermission(route.permission, namespace, route.name, "write", caller),
+			checkPermission(
+				route.permission,
+				ctx.namespacePath,
+				route.name,
+				"write",
+				caller,
+			),
 		);
 		return yield* HttpEffect.fromWebHandler(async (request) =>
 			handler(request, { ...ctx, caller }),
 		).pipe(
 			Effect.tapError((error) =>
 				Effect.logError(
-					`Custom route "${namespace}/${route.name}" failed`,
+					`Custom route "${ctx.namespacePath.join("/")}/${route.name}" failed`,
 					error,
 				),
 			),
@@ -47,9 +52,9 @@ export type CustomRoute = ReturnType<
 
 export class MissingCustomRouteHandler extends Schema.TaggedError<MissingCustomRouteHandler>()(
 	"MissingCustomRouteHandler",
-	{ namespace: Schema.String, name: Schema.String, method: Schema.String },
+	{ namespace: NamespacePath, name: Schema.String, method: Schema.String },
 ) {
-	override readonly message = `Missing handler for custom route "${this.name}" ${this.method} in "${this.namespace}"`;
+	override readonly message = `Missing handler for custom route "${this.name}" ${this.method} in "${this.namespace.join("/")}"`;
 }
 
 export const buildCustomRoutes = Effect.fn("buildCustomRoutes")(function* <
@@ -77,14 +82,12 @@ export const buildCustomRoutes = Effect.fn("buildCustomRoutes")(function* <
 			const handler = impl?.implementCustomRoute?.[name]?.[key];
 			if (typeof handler === "undefined") {
 				return yield* MissingCustomRouteHandler.make({
-					namespace: manifest.namespace,
+					namespace: ctx.namespacePath,
 					name,
 					method,
 				});
 			}
-			routes.push(
-				makeCustomRoute(manifest.namespace, route, method, handler, ctx),
-			);
+			routes.push(makeCustomRoute(route, method, handler, ctx));
 		}
 	}
 	return HashSet.fromIterable(routes);

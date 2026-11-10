@@ -86,7 +86,7 @@ describe("buildReplicant", () => {
 		Effect.gen(function* () {
 			repository.read.mockReturnValue(Effect.succeed("42"));
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"live",
 				manifest.replicant.live,
 				0,
@@ -102,7 +102,7 @@ describe("buildReplicant", () => {
 		Effect.gen(function* () {
 			repository.read.mockReturnValue(Effect.succeed("not a number"));
 			const error = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				0,
@@ -110,7 +110,7 @@ describe("buildReplicant", () => {
 
 			expect(error).toMatchObject({
 				_tag: "ReplicantLoadError",
-				namespace: "ns",
+				namespace: ["ns"],
 				name: "count",
 				cause: {
 					_tag: "FieldDecodeError",
@@ -127,7 +127,7 @@ describe("get", () => {
 		"decodes the value held by the store",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				42,
@@ -139,10 +139,15 @@ describe("get", () => {
 	testStubbed(
 		"returns a value that shares nothing with the store",
 		Effect.gen(function* () {
-			const field = yield* buildReplicant("ns", "doc", manifest.replicant.doc, {
-				count: 1,
-				data: { tags: ["a"] },
-			});
+			const field = yield* buildReplicant(
+				["ns"],
+				"doc",
+				manifest.replicant.doc,
+				{
+					count: 1,
+					data: { tags: ["a"] },
+				},
+			);
 
 			const first = yield* field.get();
 			const second = yield* field.get();
@@ -156,12 +161,14 @@ describe("get", () => {
 		Effect.gen(function* () {
 			const store = yield* ReplicantStoreService;
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				0,
 			);
-			yield* store.commit("ns", "count", () => Effect.succeed("not a number"));
+			yield* store.commit(["ns"], "count", () =>
+				Effect.succeed("not a number"),
+			);
 			const error = yield* field.get().pipe(Effect.flip);
 			expect(error._tag).toBe("FieldDecodeError");
 		}),
@@ -173,7 +180,7 @@ describe("set", () => {
 		"encodes the value and writes it to the store",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				0,
@@ -187,10 +194,15 @@ describe("set", () => {
 	testStubbed(
 		"keeps no reference to the value it was given",
 		Effect.gen(function* () {
-			const field = yield* buildReplicant("ns", "doc", manifest.replicant.doc, {
-				count: 0,
-				data: null,
-			});
+			const field = yield* buildReplicant(
+				["ns"],
+				"doc",
+				manifest.replicant.doc,
+				{
+					count: 0,
+					data: null,
+				},
+			);
 			const tags = ["a"];
 
 			yield* field.set({ count: 1, data: { tags } });
@@ -204,7 +216,7 @@ describe("set", () => {
 		"fails when the value fails schema validation",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				0,
@@ -222,7 +234,7 @@ describe("set", () => {
 		"fails FieldPermissionDenied for a caller whose role the write denies",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"locked",
 				manifest.replicant.locked,
 				0,
@@ -242,7 +254,7 @@ describe("update", () => {
 		"reads the current value, applies the fn, and writes the result",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				10,
@@ -256,10 +268,15 @@ describe("update", () => {
 	testStubbed(
 		"keeps no reference to the value the fn returns",
 		Effect.gen(function* () {
-			const field = yield* buildReplicant("ns", "doc", manifest.replicant.doc, {
-				count: 0,
-				data: null,
-			});
+			const field = yield* buildReplicant(
+				["ns"],
+				"doc",
+				manifest.replicant.doc,
+				{
+					count: 0,
+					data: null,
+				},
+			);
 			const tags = ["a"];
 
 			yield* field.update(() => ({ count: 1, data: { tags } }));
@@ -273,7 +290,7 @@ describe("update", () => {
 		"surfaces a throwing update fn as ReplicantUpdateFnError without writing",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				10,
@@ -298,7 +315,7 @@ describe("update", () => {
 					box: { schema: Schema.Struct({ n: Schema.FiniteFromString }) },
 				},
 			});
-			const field = yield* buildReplicant("ns", "box", box.replicant.box, {
+			const field = yield* buildReplicant(["ns"], "box", box.replicant.box, {
 				n: 1,
 			});
 			yield* field.update((draft) => {
@@ -315,7 +332,7 @@ describe("update", () => {
 			const store = yield* ReplicantStoreService;
 			const context = yield* Effect.context<never>();
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				10,
@@ -325,7 +342,7 @@ describe("update", () => {
 				if (!raced) {
 					raced = true;
 					Effect.runForkWith(context)(
-						store.commit("ns", "count", () => Effect.succeed("100")),
+						store.commit(["ns"], "count", () => Effect.succeed("100")),
 					);
 				}
 				return v + 3;
@@ -342,7 +359,7 @@ describe("validate", () => {
 		"encodes a valid value and fails an invalid one",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				0,
@@ -361,9 +378,9 @@ describe("subscribe", () => {
 		"emits decoded values on set",
 		Effect.gen(function* () {
 			const repository = yield* ReplicantRepositoryService;
-			yield* repository.write("ns", "count", "0");
+			yield* repository.write(["ns"], "count", "0");
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				0,
@@ -380,10 +397,15 @@ describe("subscribe", () => {
 	testInMemory(
 		"emits values that share nothing with the store",
 		Effect.gen(function* () {
-			const field = yield* buildReplicant("ns", "doc", manifest.replicant.doc, {
-				count: 1,
-				data: { tags: ["a"] },
-			});
+			const field = yield* buildReplicant(
+				["ns"],
+				"doc",
+				manifest.replicant.doc,
+				{
+					count: 1,
+					data: { tags: ["a"] },
+				},
+			);
 
 			const first = yield* field
 				.subscribe()
@@ -401,16 +423,16 @@ describe("subscribe", () => {
 		"filters out updates to other fields",
 		Effect.gen(function* () {
 			const repository = yield* ReplicantRepositoryService;
-			yield* repository.write("ns", "count", "0");
-			yield* repository.write("ns", "other", "0");
+			yield* repository.write(["ns"], "count", "0");
+			yield* repository.write(["ns"], "other", "0");
 			const count = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				0,
 			);
 			const other = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"other",
 				manifest.replicant.other,
 				0,
@@ -429,9 +451,9 @@ describe("subscribe", () => {
 		"[fieldInternal].subscribeRevisioned streams this field's frames",
 		Effect.gen(function* () {
 			const repository = yield* ReplicantRepositoryService;
-			yield* repository.write("ns", "count", "0");
+			yield* repository.write(["ns"], "count", "0");
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				0,
@@ -454,7 +476,7 @@ describe("store write-through", () => {
 		"set, commitPatch, and update feed the store replicant",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"count",
 				manifest.replicant.count,
 				0,
@@ -480,7 +502,7 @@ describe("store write-through", () => {
 		"a failed write leaves the replicant untouched",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"locked",
 				manifest.replicant.locked,
 				0,
@@ -510,7 +532,7 @@ describe("encoded read/write enforce permission", () => {
 		"getRevisioned returns the raw stored value and revision for an allowed caller",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"open",
 				permissioned.replicant.open,
 				42,
@@ -527,7 +549,7 @@ describe("encoded read/write enforce permission", () => {
 		"getRevisioned fails FieldPermissionDenied for a denied caller",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"locked",
 				permissioned.replicant.locked,
 				0,
@@ -543,7 +565,7 @@ describe("encoded read/write enforce permission", () => {
 		"commitPatch validates and writes for an allowed caller",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"open",
 				permissioned.replicant.open,
 				0,
@@ -561,7 +583,7 @@ describe("encoded read/write enforce permission", () => {
 		"commitPatch fails FieldDecodeError and does not write for an invalid applied document",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"open",
 				permissioned.replicant.open,
 				0,
@@ -579,7 +601,7 @@ describe("encoded read/write enforce permission", () => {
 		"commitPatch fails FieldPermissionDenied and does not write for a denied caller",
 		Effect.gen(function* () {
 			const field = yield* buildReplicant(
-				"ns",
+				["ns"],
 				"locked",
 				permissioned.replicant.locked,
 				0,
@@ -609,7 +631,7 @@ describe("commitPatch", () => {
 	testStubbed(
 		"applies a field-level replace and validates the applied document",
 		Effect.gen(function* () {
-			const field = yield* buildReplicant("ns", "doc", nested.replicant.doc, {
+			const field = yield* buildReplicant(["ns"], "doc", nested.replicant.doc, {
 				a: 1,
 				b: 2,
 			});
@@ -625,7 +647,7 @@ describe("commitPatch", () => {
 	testStubbed(
 		"fails PatchNotApplicable when the patch fits no document",
 		Effect.gen(function* () {
-			const field = yield* buildReplicant("ns", "doc", nested.replicant.doc, {
+			const field = yield* buildReplicant(["ns"], "doc", nested.replicant.doc, {
 				a: 1,
 				b: 2,
 			});
@@ -643,7 +665,7 @@ describe("commitPatch", () => {
 	testStubbed(
 		"fails RevisionConflict when a precondition no longer holds",
 		Effect.gen(function* () {
-			const field = yield* buildReplicant("ns", "doc", nested.replicant.doc, {
+			const field = yield* buildReplicant(["ns"], "doc", nested.replicant.doc, {
 				a: 1,
 				b: 2,
 			});

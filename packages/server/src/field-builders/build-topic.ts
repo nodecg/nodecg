@@ -1,5 +1,6 @@
 import type { FieldManifest } from "@nodecg/core";
-import { Effect, type Schema, Stream } from "effect";
+import type { NamespacePath } from "@nodecg/internal";
+import { Effect, Equal, type Schema, Stream } from "effect";
 
 import { TopicBrokerService } from "../services/topic-broker/topic-broker.ts";
 import { fieldInternal } from "./field-internal-key.ts";
@@ -7,7 +8,7 @@ import { requirePermission } from "./permission.ts";
 
 export const buildTopic = Effect.fn("buildTopic")(
 	<Decoded>(
-		namespace: string,
+		namespace: NamespacePath,
 		name: string,
 		manifest: FieldManifest<Decoded>,
 	) =>
@@ -26,7 +27,8 @@ export const buildTopic = Effect.fn("buildTopic")(
 				return stream.pipe(
 					Stream.filter(
 						(message) =>
-							message.namespace === namespace && message.name === name,
+							Equal.equals(message.namespace, namespace) &&
+							message.name === name,
 					),
 					Stream.map((message) => message.value),
 				);

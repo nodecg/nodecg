@@ -1,5 +1,9 @@
 import type { FieldManifest } from "@nodecg/core";
-import { CurrentIdentity, type Identity } from "@nodecg/internal";
+import {
+	CurrentIdentity,
+	type Identity,
+	type NamespacePath,
+} from "@nodecg/internal";
 import { cloneJson } from "@nodecg/internal/utils";
 import { Effect, Result, Stream } from "effect";
 
@@ -12,7 +16,7 @@ import { migrationDie } from "./migration-die.ts";
 import { checkPermission, requirePermission } from "./permission.ts";
 
 export const buildComputed = Effect.fn("buildComputed")(function* <Decoded>(
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	manifest: FieldManifest<Decoded>,
 	computeValue: () => Result.Result<Decoded, ComputedComputeError>,

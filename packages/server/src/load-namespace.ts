@@ -8,7 +8,7 @@ import type {
 	WidestCustomRoutes,
 	WidestNamespaceFields,
 } from "@nodecg/core";
-import { manifestRolesKey } from "@nodecg/internal";
+import { manifestRolesKey, NamespacePath } from "@nodecg/internal";
 import {
 	type ApplyLambdaToObjectValues,
 	findCaseClash,
@@ -17,6 +17,7 @@ import {
 	toError,
 } from "@nodecg/internal/utils";
 import {
+	Array,
 	ConfigProvider,
 	Effect,
 	Exit,
@@ -87,9 +88,9 @@ export type LoadNamespaceOptions = {
 
 export class OnLoadError extends Schema.TaggedError<OnLoadError>()(
 	"OnLoadError",
-	{ namespace: Schema.String, cause: Schema.instanceOf(Error) },
+	{ namespace: NamespacePath, cause: Schema.instanceOf(Error) },
 ) {
-	override readonly message = `onLoad for namespace "${this.namespace}" failed: ${this.cause.message}`;
+	override readonly message = `onLoad for namespace "${this.namespace.join("/")}" failed: ${this.cause.message}`;
 }
 
 export class ShutdownMessageError extends Schema.TaggedError<ShutdownMessageError>()(
@@ -158,15 +159,20 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 	S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes,
 >(
+	namespace: NamespacePath,
 	implemented: ImplementedNamespace<S, CustomRoutes>,
 	children: ApplyLambdaToObjectValues<NamespaceHandlesLambda, S["children"]>,
 	dataDir: string,
 ) {
-	const { fields, handles } = yield* buildNamespace(implemented, children);
+	const { fields, handles } = yield* buildNamespace(
+		namespace,
+		implemented,
+		children,
+	);
 	const ctx: OnLoadContext<S> = {
 		...handles.loaded,
 		dataDir,
-		namespacePath: [implemented.manifest.namespace],
+		namespacePath: namespace,
 	};
 	const onLoad = implemented.impl?.onLoad;
 	const runOnLoad =
@@ -176,10 +182,7 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 					const cleanup = yield* Effect.tryPromise({
 						try: async () => onLoad(ctx),
 						catch: (error) =>
-							OnLoadError.make({
-								namespace: implemented.manifest.namespace,
-								cause: toError(error),
-							}),
+							OnLoadError.make({ namespace, cause: toError(error) }),
 					});
 					if (typeof cleanup === "function") {
 						yield* Effect.addFinalizer(() =>
@@ -253,7 +256,7 @@ export const loadNamespaceEffect = Effect.fn(
 		yield* Effect.forEach(namespaces, checkChildren, { discard: true });
 
 		const roleLinks = normalizeRoleLinks(
-			Array.from(namespaces, ({ manifest }) => manifest),
+			Array.map(Array.fromIterable(namespaces), ({ manifest }) => manifest),
 		);
 
 		const names = new Set<string>();
@@ -286,6 +289,7 @@ export const loadNamespaceEffect = Effect.fn(
 				TreeCustomRoutes extends WidestCustomRoutes,
 			>(
 				implemented: ImplementedNamespace<TreeS, TreeCustomRoutes>,
+				namespace: NamespacePath,
 			): Effect.Effect<
 				PreparedTree<TreeS>,
 				Effect.Error<ReturnType<typeof prepareNamespace>>,
@@ -303,8 +307,11 @@ export const loadNamespaceEffect = Effect.fn(
 					const children = yield* mapEffectValues<
 						ImplementedNamespaceLambda,
 						PreparedTreeLambda
-					>()((child) => loadTree(child))(implemented.impl?.children);
+					>()((child, key) => loadTree(child, Array.append(namespace, key)))(
+						implemented.impl?.children,
+					);
 					const { handles, prepared } = yield* prepareNamespace(
+						namespace,
 						implemented,
 						mapValues<PreparedTreeLambda, NamespaceHandlesLambda>(
 							(child) => child.handles,
@@ -324,7 +331,7 @@ export const loadNamespaceEffect = Effect.fn(
 			const {
 				handles: { loaded },
 				prepared,
-			} = yield* loadTree(root);
+			} = yield* loadTree(root, [root.manifest.namespace]);
 			const registered = prepared.map(({ registered }) => registered);
 
 			yield* Effect.forEach(

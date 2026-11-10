@@ -1,3 +1,4 @@
+import type { NamespacePath } from "@nodecg/internal";
 import { Effect, Layer } from "effect";
 
 import { DrizzleSqliteDatabaseService } from "../../database/drizzle-sqlite/drizzle-sqlite-database.ts";
@@ -13,7 +14,7 @@ export const DrizzleSqliteReplicantRepository = Layer.effect(
 		const _db = yield* DrizzleSqliteDatabaseService;
 
 		const read = Effect.fn("ReplicantRepository.read")(function* (
-			namespace: string,
+			namespace: NamespacePath,
 			name: string,
 		) {
 			// TODO

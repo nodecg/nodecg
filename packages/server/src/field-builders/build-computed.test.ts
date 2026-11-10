@@ -58,7 +58,7 @@ const doubleCount = (encoded: Schema.Json) => {
 	if (Number.isNaN(count)) {
 		return Result.fail(
 			ComputedComputeError.make({
-				namespace: "ns",
+				namespace: ["ns"],
 				name: "doubled",
 				cause: new Error(`not a number: ${JSON.stringify(encoded)}`),
 			}),
@@ -69,19 +69,19 @@ const doubleCount = (encoded: Schema.Json) => {
 
 const seedCount = (value: string) =>
 	Effect.flatMap(ReplicantStoreService, (store) =>
-		store.initializeReplicant("ns", "count", Effect.succeed, value, true),
+		store.initializeReplicant(["ns"], "count", Effect.succeed, value, true),
 	);
 
 const setCount = (value: string) =>
 	Effect.flatMap(ReplicantStoreService, (store) =>
-		store.commit("ns", "count", () => Effect.succeed(value)),
+		store.commit(["ns"], "count", () => Effect.succeed(value)),
 	);
 
 const buildDoubled = (value: string) =>
 	Effect.gen(function* () {
 		const readCount = yield* seedCount(value);
 		return yield* buildComputed(
-			"ns",
+			["ns"],
 			"doubled",
 			manifest.computed.doubled,
 			() => doubleCount(readCount().value),
@@ -126,7 +126,7 @@ describe("get", () => {
 		"returns a value that shares nothing with the store",
 		Effect.gen(function* () {
 			const field = yield* buildComputed(
-				"ns",
+				["ns"],
 				"doc",
 				manifest.computed.doc,
 				() => Result.succeed({ count: 1, data: { tags: ["a"] } }),
@@ -144,7 +144,7 @@ describe("get", () => {
 		Effect.gen(function* () {
 			const tags = ["a"];
 			const field = yield* buildComputed(
-				"ns",
+				["ns"],
 				"doc",
 				manifest.computed.doc,
 				() => Result.succeed({ count: 1, data: { tags } }),
@@ -165,7 +165,7 @@ describe("getEncoded", () => {
 		Effect.gen(function* () {
 			const readCount = yield* seedCount("3");
 			const field = yield* buildComputed(
-				"ns",
+				["ns"],
 				"open",
 				manifest.computed.open,
 				() => doubleCount(readCount().value),
@@ -193,7 +193,7 @@ describe("getEncoded", () => {
 		"fails FieldEncodeError when the computed value fails its schema",
 		Effect.gen(function* () {
 			const field = yield* buildComputed(
-				"ns",
+				["ns"],
 				"positive",
 				manifest.computed.positive,
 				() => Result.succeed(-1),
@@ -266,7 +266,7 @@ describe("subscribe", () => {
 		"emits values that share nothing with the store",
 		Effect.gen(function* () {
 			const field = yield* buildComputed(
-				"ns",
+				["ns"],
 				"doc",
 				manifest.computed.doc,
 				() => Result.succeed({ count: 1, data: { tags: ["a"] } }),

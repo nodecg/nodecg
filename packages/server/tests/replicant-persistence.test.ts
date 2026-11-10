@@ -35,7 +35,7 @@ const show = implementNamespace(
 const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
-		const { fields } = yield* buildNamespace(show, {});
+		const { fields } = yield* buildNamespace(["show"], show, {});
 		return yield* NamespaceRegistryService.make([
 			{
 				namespace: "show",
@@ -77,15 +77,15 @@ describe("replicant persistence", () => {
 				vi.waitFor(async () =>
 					expect(
 						await Effect.runPromiseWith(context)(
-							repository.read("show", "score"),
+							repository.read(["show"], "score"),
 						),
 					).toBe("7"),
 				),
 			);
 			expect(
-				yield* repository.read("show", "live").pipe(Effect.flip),
+				yield* repository.read(["show"], "live").pipe(Effect.flip),
 			).toStrictEqual(
-				ReplicantNotFound.make({ namespace: "show", name: "live" }),
+				ReplicantNotFound.make({ namespace: ["show"], name: "live" }),
 			);
 		}),
 	);
