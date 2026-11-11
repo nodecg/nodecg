@@ -1,5 +1,9 @@
 import { FieldDecodeError, type FieldEncodeError } from "@nodecg/core";
-import { NamespacePath } from "@nodecg/internal";
+import {
+	formatField,
+	formatNamespacePath,
+	NamespacePath,
+} from "@nodecg/internal";
 import {
 	applyPatch,
 	ChangeOp,
@@ -10,7 +14,7 @@ import {
 	RevisionConflict,
 	stableStringify,
 } from "@nodecg/internal/occ";
-import { setSignal, toError } from "@nodecg/internal/utils";
+import { setSignal } from "@nodecg/internal/utils";
 import {
 	computed,
 	effect,
@@ -38,6 +42,7 @@ import {
 	SynchronizedRef,
 } from "effect";
 
+import type { FieldPermissionDenied } from "./field-builders/permission.ts";
 import {
 	DecodeError,
 	ReplicantRepositoryService,
@@ -52,7 +57,7 @@ export class ReplicantLoadError extends Schema.TaggedError<ReplicantLoadError>()
 		cause: Schema.Union([DecodeError, BackendError, FieldDecodeError]),
 	},
 ) {
-	override readonly message = `Loading replicant "${this.name}" in "${this.namespace.join("/")}" failed: ${this.cause.message}`;
+	override readonly message = `Loading replicant ${formatField(this.namespace, this.name)} failed`;
 }
 
 export class ComputedComputeError extends Schema.TaggedError<ComputedComputeError>()(
@@ -60,10 +65,10 @@ export class ComputedComputeError extends Schema.TaggedError<ComputedComputeErro
 	{
 		namespace: NamespacePath,
 		name: Schema.String,
-		cause: Schema.instanceOf(Error),
+		cause: Schema.Defect(),
 	},
 ) {
-	override readonly message = `Computing computed field "${this.name}" in "${this.namespace.join("/")}" failed: ${this.cause.message}`;
+	override readonly message = `Computing computed field ${formatField(this.namespace, this.name)} failed`;
 }
 
 export class ReplicantAlreadyRegistered extends Schema.TaggedError<ReplicantAlreadyRegistered>()(
@@ -73,7 +78,7 @@ export class ReplicantAlreadyRegistered extends Schema.TaggedError<ReplicantAlre
 		name: Schema.String,
 	},
 ) {
-	override readonly message = `Replicant "${this.name}" in "${this.namespace.join("/")}" is already registered`;
+	override readonly message = `Replicant ${formatField(this.namespace, this.name)} is already registered`;
 }
 
 export class ComputedAlreadyRegistered extends Schema.TaggedError<ComputedAlreadyRegistered>()(
@@ -83,7 +88,7 @@ export class ComputedAlreadyRegistered extends Schema.TaggedError<ComputedAlread
 		name: Schema.String,
 	},
 ) {
-	override readonly message = `Computed "${this.name}" in "${this.namespace.join("/")}" is already registered`;
+	override readonly message = `Computed ${formatField(this.namespace, this.name)} is already registered`;
 }
 
 const fieldKey = (namespace: NamespacePath, name: string) => ({
@@ -99,7 +104,7 @@ export class UnknownReplicant extends Schema.TaggedError<UnknownReplicant>()(
 		name: Schema.String,
 	},
 ) {
-	override readonly message = `Replicant "${this.name}" in "${this.namespace.join("/")}" does not exist`;
+	override readonly message = `Replicant ${formatField(this.namespace, this.name)} does not exist`;
 }
 
 export class ComputedNotFound extends Schema.TaggedError<ComputedNotFound>()(
@@ -109,7 +114,17 @@ export class ComputedNotFound extends Schema.TaggedError<ComputedNotFound>()(
 		name: Schema.String,
 	},
 ) {
-	override readonly message = `Computed "${this.name}" in "${this.namespace.join("/")}" does not exist`;
+	override readonly message = `Computed ${formatField(this.namespace, this.name)} does not exist`;
+}
+
+export class ComputedCycle extends Schema.TaggedError<ComputedCycle>()(
+	"ComputedCycle",
+	{
+		namespace: NamespacePath,
+		name: Schema.String,
+	},
+) {
+	override readonly message = `Computed ${formatField(this.namespace, this.name)} reads itself through a cycle`;
 }
 
 export class CommitContended extends Schema.TaggedError<CommitContended>()(
@@ -119,7 +134,7 @@ export class CommitContended extends Schema.TaggedError<CommitContended>()(
 		name: Schema.String,
 	},
 ) {
-	override readonly message = `Committing "${this.name}" in "${this.namespace.join("/")}" lost a compare-and-swap to a concurrent write`;
+	override readonly message = `Committing ${formatField(this.namespace, this.name)} lost a compare-and-swap to a concurrent write`;
 }
 
 interface LeafValue {
@@ -165,7 +180,12 @@ interface ReplicantNode {
 	readonly queued: Ref.Ref<boolean>;
 }
 
-type ComputeFailure = ComputedComputeError | FieldEncodeError;
+export type ComputeFailure =
+	| ComputedComputeError
+	| ComputedCycle
+	| FieldEncodeError
+	| FieldDecodeError
+	| FieldPermissionDenied;
 
 export type ComputedResult = Result.Result<Schema.Json, ComputeFailure>;
 
@@ -176,8 +196,7 @@ const readComputedResult = (
 ) =>
 	Result.try({
 		try: () => result.value,
-		catch: (error) =>
-			ComputedComputeError.make({ namespace, name, cause: toError(error) }),
+		catch: () => ComputedCycle.make({ namespace, name }),
 	}).pipe(Result.flatMap((evaluation) => evaluation));
 
 /**
@@ -287,7 +306,7 @@ export class ReplicantStoreService extends Context.Service<ReplicantStoreService
 			const retry = Effect.fn(function* (node: ReplicantNode, retries: number) {
 				if (retries >= 5) {
 					return yield* Effect.logError(
-						`Stopped retrying replicant "${node.key.namespace.join("/")}/${node.key.name}" after ${retries} retries`,
+						`Stopped retrying replicant ${formatField(node.key.namespace, node.key.name)} after ${retries} retries`,
 					);
 				}
 				if (!(yield* Ref.getAndSet(node.queued, true))) {
@@ -308,7 +327,7 @@ export class ReplicantStoreService extends Context.Service<ReplicantStoreService
 					.pipe(
 						Effect.tapError((error) =>
 							Effect.logError(
-								`Persisting replicant "${node.key.namespace.join("/")}/${node.key.name}" failed`,
+								`Persisting replicant ${formatField(node.key.namespace, node.key.name)} failed`,
 								error,
 							),
 						),
@@ -367,7 +386,9 @@ export class ReplicantStoreService extends Context.Service<ReplicantStoreService
 								),
 							),
 						).pipe(
-							Effect.withSpan("setSignal", { attributes: { namespace, name } }),
+							Effect.withSpan("setSignal", {
+								attributes: { namespace: formatNamespacePath(namespace), name },
+							}),
 							Effect.orDie,
 						);
 						if (node.persistent) {
@@ -569,7 +590,7 @@ export class ReplicantStoreService extends Context.Service<ReplicantStoreService
 								onSuccess: () => Effect.void,
 								onFailure: (error) =>
 									Effect.logError(
-										`Failed to compute "${namespace.join("/")}/${name}"`,
+										`Failed to compute ${formatField(namespace, name)}`,
 										error,
 									),
 							}),

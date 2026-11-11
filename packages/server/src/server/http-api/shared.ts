@@ -57,9 +57,11 @@ export const getComputed = (namespace: string, name: string) =>
 		}
 		return yield* field.getEncoded().pipe(
 			Effect.catchTags({
-				FieldPermissionDenied: () => new HttpApiError.Forbidden(),
-				ComputedComputeError: () => new HttpApiError.InternalServerError(),
-				FieldEncodeError: () => new HttpApiError.InternalServerError(),
+				FieldPermissionDenied: () => HttpApiError.Forbidden.make(),
+				ComputedComputeError: () => HttpApiError.InternalServerError.make(),
+				ComputedCycle: () => HttpApiError.InternalServerError.make(),
+				FieldEncodeError: () => HttpApiError.InternalServerError.make(),
+				FieldDecodeError: () => HttpApiError.InternalServerError.make(),
 			}),
 		);
 	});

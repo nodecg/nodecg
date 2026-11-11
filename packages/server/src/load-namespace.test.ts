@@ -23,6 +23,7 @@ import {
 	loadNamespaceEffect,
 	UnimplementedChild,
 } from "./load-namespace.ts";
+import { ComputedCycle } from "./replicant-store.ts";
 import { AuthenticationRepositoryService } from "./services/repository/authentication/authentication-repository.ts";
 import { LoginAttemptRepositoryService } from "./services/repository/login-attempt/login-attempt-repository.ts";
 import { InMemoryReplicantRepository } from "./services/repository/replicant/in-memory-replicant-repository.ts";
@@ -198,8 +199,9 @@ describe("computed validation", () => {
 
 			const error = yield* loadNamespaceEffect(cyclic).pipe(Effect.flip);
 
-			expect(error._tag).toBe("ComputedComputeError");
-			expect(error.message).toContain("Cycle detected");
+			expect(error).toEqual(
+				ComputedCycle.make({ namespace: ["cyclic"], name: "a" }),
+			);
 		}),
 	);
 });
@@ -367,8 +369,23 @@ describe("onLoad", () => {
 			const error = yield* loadNamespaceEffect(stats).pipe(Effect.flip);
 
 			expect(error._tag).toBe("OnLoadError");
-			expect(error.message).toContain('"stats"');
-			expect(error.message).toContain("no connection");
+			expect(error.message).toBe('onLoad for namespace "stats" failed');
+			expect(error.cause).toEqual(new Error("no connection"));
+		}),
+	);
+
+	testInMemory(
+		"keeps a thrown value that is not an Error as the cause",
+		Effect.gen(function* () {
+			const stats = implementNamespace(defineNamespace("stats", {}), {
+				onLoad: async () => {
+					throw "no connection";
+				},
+			});
+
+			const error = yield* loadNamespaceEffect(stats).pipe(Effect.flip);
+
+			expect(error.cause).toBe("no connection");
 		}),
 	);
 });

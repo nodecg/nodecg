@@ -1,12 +1,13 @@
 import type { ReplicantFieldManifest } from "@nodecg/core";
 import {
 	CurrentIdentity,
+	formatField,
 	type Identity,
 	NamespacePath,
 	type Updater,
 } from "@nodecg/internal";
 import type { Patch } from "@nodecg/internal/occ";
-import { cloneJson, toError } from "@nodecg/internal/utils";
+import { cloneJson } from "@nodecg/internal/utils";
 import { Effect, Result, Schema, Stream } from "effect";
 import type { WritableDeep } from "type-fest";
 
@@ -24,10 +25,10 @@ export class ReplicantUpdateFnError extends Schema.TaggedError<ReplicantUpdateFn
 	{
 		namespace: NamespacePath,
 		name: Schema.String,
-		cause: Schema.instanceOf(Error),
+		cause: Schema.Defect(),
 	},
 ) {
-	override readonly message = `Update function for replicant "${this.name}" in "${this.namespace.join("/")}" failed: ${this.cause.message}`;
+	override readonly message = `Update function for replicant ${formatField(this.namespace, this.name)} failed`;
 }
 
 export const buildReplicant = Effect.fn("buildReplicant")(function* <Decoded>(
@@ -61,7 +62,7 @@ export const buildReplicant = Effect.fn("buildReplicant")(function* <Decoded>(
 			Effect.catchTag("CommitContended", () =>
 				Effect.die(
 					new Error(
-						`Committing "${namespace.join("/")}/${name}" lost 100 compare-and-swap attempts, is an updater writing its own field?`,
+						`Committing ${formatField(namespace, name)} lost 100 compare-and-swap attempts, is an updater writing its own field?`,
 					),
 				),
 			),
@@ -123,11 +124,7 @@ export const buildReplicant = Effect.fn("buildReplicant")(function* <Decoded>(
 						return result;
 					},
 					catch: (error) =>
-						ReplicantUpdateFnError.make({
-							namespace,
-							name,
-							cause: toError(error),
-						}),
+						ReplicantUpdateFnError.make({ namespace, name, cause: error }),
 				});
 				const encoded = yield* encode(next);
 				return cloneJson(encoded);

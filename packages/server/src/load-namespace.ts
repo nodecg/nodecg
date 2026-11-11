@@ -8,13 +8,16 @@ import type {
 	WidestCustomRoutes,
 	WidestNamespaceFields,
 } from "@nodecg/core";
-import { manifestRolesKey, NamespacePath } from "@nodecg/internal";
+import {
+	formatNamespacePath,
+	manifestRolesKey,
+	NamespacePath,
+} from "@nodecg/internal";
 import {
 	type ApplyLambdaToObjectValues,
 	findCaseClash,
 	mapEffectValues,
 	mapValues,
-	toError,
 } from "@nodecg/internal/utils";
 import {
 	Array,
@@ -88,9 +91,9 @@ export type LoadNamespaceOptions = {
 
 export class OnLoadError extends Schema.TaggedError<OnLoadError>()(
 	"OnLoadError",
-	{ namespace: NamespacePath, cause: Schema.instanceOf(Error) },
+	{ namespace: NamespacePath, cause: Schema.Defect() },
 ) {
-	override readonly message = `onLoad for namespace "${this.namespace.join("/")}" failed: ${this.cause.message}`;
+	override readonly message = `onLoad for namespace "${formatNamespacePath(this.namespace)}" failed`;
 }
 
 export class ShutdownMessageError extends Schema.TaggedError<ShutdownMessageError>()(
@@ -181,8 +184,7 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 			: Effect.gen(function* () {
 					const cleanup = yield* Effect.tryPromise({
 						try: async () => onLoad(ctx),
-						catch: (error) =>
-							OnLoadError.make({ namespace, cause: toError(error) }),
+						catch: (error) => OnLoadError.make({ namespace, cause: error }),
 					});
 					if (typeof cleanup === "function") {
 						yield* Effect.addFinalizer(() =>
@@ -191,7 +193,7 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 							}).pipe(
 								Effect.catchTag("UnknownError", (error) =>
 									Effect.logError(
-										`onLoad cleanup for namespace "${implemented.manifest.namespace}" threw`,
+										`onLoad cleanup for namespace "${formatNamespacePath(namespace)}" threw`,
 										error,
 									),
 								),
@@ -200,7 +202,7 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 					}
 				}).pipe(
 					Effect.withSpan("onLoad", {
-						attributes: { namespace: implemented.manifest.namespace },
+						attributes: { namespace: formatNamespacePath(namespace) },
 					}),
 				);
 	const registered: RegisteredNamespace = {

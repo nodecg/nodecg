@@ -4,7 +4,7 @@ import type {
 	WidestCustomRoutes,
 	WidestNamespaceFields,
 } from "@nodecg/core";
-import { type Identity, NamespacePath } from "@nodecg/internal";
+import { formatField, type Identity, NamespacePath } from "@nodecg/internal";
 import { Effect, HashSet, Schema, String } from "effect";
 import { HttpEffect, HttpMethod } from "effect/http";
 
@@ -38,7 +38,7 @@ const makeCustomRoute = <S extends WidestNamespaceFields>(
 		).pipe(
 			Effect.tapError((error) =>
 				Effect.logError(
-					`Custom route "${ctx.namespacePath.join("/")}/${route.name}" failed`,
+					`Custom route ${formatField(ctx.namespacePath, route.name)} failed`,
 					error,
 				),
 			),
@@ -54,7 +54,7 @@ export class MissingCustomRouteHandler extends Schema.TaggedError<MissingCustomR
 	"MissingCustomRouteHandler",
 	{ namespace: NamespacePath, name: Schema.String, method: Schema.String },
 ) {
-	override readonly message = `Missing handler for custom route "${this.name}" ${this.method} in "${this.namespace.join("/")}"`;
+	override readonly message = `Missing handler for ${this.method} custom route ${formatField(this.namespace, this.name)}`;
 }
 
 export const buildCustomRoutes = Effect.fn("buildCustomRoutes")(function* <

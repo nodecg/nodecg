@@ -14,7 +14,7 @@ export class FieldEncodeError extends Schema.TaggedError<FieldEncodeError>()(
 		cause: Schema.instanceOf(Error),
 	},
 ) {
-	override readonly message = `Failed to encode replicant "${this.fieldName}": ${this.cause.message}`;
+	override readonly message = `Failed to encode replicant "${this.fieldName}"`;
 }
 
 export class FieldDecodeError extends Schema.TaggedError<FieldDecodeError>()(
@@ -25,7 +25,7 @@ export class FieldDecodeError extends Schema.TaggedError<FieldDecodeError>()(
 		cause: Schema.instanceOf(Error),
 	},
 ) {
-	override readonly message = `Failed to decode replicant "${this.fieldName}": ${this.cause.message}`;
+	override readonly message = `Failed to decode replicant "${this.fieldName}"`;
 }
 
 class SchemaDefect extends Schema.TaggedError<SchemaDefect>()("SchemaDefect", {

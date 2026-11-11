@@ -301,9 +301,27 @@ describe("update", () => {
 				})
 				.pipe(Effect.flip);
 			expect(error._tag).toBe("ReplicantUpdateFnError");
-			expect(error.message).toContain("boom");
+			expect(error.cause).toEqual(new Error("boom"));
 			const { value } = yield* field[fieldInternal].getRevisioned();
 			expect(value).toBe("10");
+		}),
+	);
+
+	testStubbed(
+		"keeps a thrown value that is not an Error as the cause",
+		Effect.gen(function* () {
+			const field = yield* buildReplicant(
+				["ns"],
+				"count",
+				manifest.replicant.count,
+				10,
+			);
+			const error = yield* field
+				.update(() => {
+					throw "bad value";
+				})
+				.pipe(Effect.flip);
+			expect(error.cause).toBe("bad value");
 		}),
 	);
 

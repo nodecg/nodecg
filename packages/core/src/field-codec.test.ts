@@ -20,9 +20,7 @@ describe("makeCodec", () => {
 			const decoded = codec.decode("nope");
 
 			assert(Result.isFailure(decoded));
-			expect(decoded.failure.message).toMatchInlineSnapshot(
-				`"Failed to decode replicant "count": Expected a finite number"`,
-			);
+			expect(decoded.failure.cause.message).toBe("Expected a finite number");
 		});
 
 		test("fails to decode with an asynchronous schema", () => {
@@ -39,8 +37,8 @@ describe("makeCodec", () => {
 			const decoded = codec.decode("a");
 
 			assert(Result.isFailure(decoded));
-			expect(decoded.failure.message).toBe(
-				'Failed to decode replicant "label": The schema threw instead of returning issues',
+			expect(decoded.failure.cause.message).toBe(
+				"The schema threw instead of returning issues",
 			);
 		});
 
@@ -70,8 +68,8 @@ describe("makeCodec", () => {
 			const encoded = codec.encode(0);
 
 			assert(Result.isFailure(encoded));
-			expect(encoded.failure.message).toBe(
-				'Failed to encode replicant "round": Too small: expected number to be >=1',
+			expect(encoded.failure.cause.message).toBe(
+				"Too small: expected number to be >=1",
 			);
 		});
 
@@ -89,9 +87,7 @@ describe("makeCodec", () => {
 			const encoded = codec.encode({ left: 1n });
 
 			assert(Result.isFailure(encoded));
-			expect(encoded.failure.message).toBe(
-				'Failed to encode replicant "anything": Expected JSON value',
-			);
+			expect(encoded.failure.cause.message).toBe("Expected JSON value");
 		});
 
 		test("fails to decode a value the schema refuses", () => {
@@ -100,8 +96,8 @@ describe("makeCodec", () => {
 			const decoded = codec.decode({ left: "x" });
 
 			assert(Result.isFailure(decoded));
-			expect(decoded.failure.message).toBe(
-				'Failed to decode replicant "score": left: Invalid input: expected number, received string',
+			expect(decoded.failure.cause.message).toBe(
+				"left: Invalid input: expected number, received string",
 			);
 		});
 
@@ -112,8 +108,8 @@ describe("makeCodec", () => {
 			const decoded = codec.decode("a");
 
 			assert(Result.isFailure(decoded));
-			expect(decoded.failure.message).toBe(
-				'Failed to decode replicant "label": The schema validated asynchronously',
+			expect(decoded.failure.cause.message).toBe(
+				"The schema validated asynchronously",
 			);
 		});
 
@@ -124,8 +120,8 @@ describe("makeCodec", () => {
 			const encoded = codec.encode("a");
 
 			assert(Result.isFailure(encoded));
-			expect(encoded.failure.message).toBe(
-				'Failed to encode replicant "label": The schema validated asynchronously',
+			expect(encoded.failure.cause.message).toBe(
+				"The schema validated asynchronously",
 			);
 		});
 
@@ -145,12 +141,12 @@ describe("makeCodec", () => {
 			const decoded = codec.decode("a");
 
 			assert(Result.isFailure(encoded));
-			expect(encoded.failure.message).toBe(
-				'Failed to encode replicant "label": The schema threw instead of returning issues',
+			expect(encoded.failure.cause.message).toBe(
+				"The schema threw instead of returning issues",
 			);
 			assert(Result.isFailure(decoded));
-			expect(decoded.failure.message).toBe(
-				'Failed to decode replicant "label": The schema threw instead of returning issues',
+			expect(decoded.failure.cause.message).toBe(
+				"The schema threw instead of returning issues",
 			);
 		});
 

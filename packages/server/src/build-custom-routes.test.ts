@@ -123,7 +123,7 @@ describe("buildCustomRoutes", () => {
 				}),
 			);
 			expect(error.message).toBe(
-				'Missing handler for custom route "asset" POST in "ns"',
+				'Missing handler for POST custom route "asset" in "ns"',
 			);
 		}),
 	);

@@ -1,6 +1,7 @@
 import type { ResolvedPermission } from "@nodecg/core";
 import {
 	CurrentIdentity,
+	formatField,
 	type Identity,
 	NamespacePath,
 } from "@nodecg/internal";
@@ -14,7 +15,7 @@ export class FieldPermissionDenied extends Schema.TaggedError<FieldPermissionDen
 		operation: Schema.Literals(["read", "write"]),
 	},
 ) {
-	override readonly message = `Permission denied to ${this.operation} "${this.name}" in "${this.namespace.join("/")}"`;
+	override readonly message = `Permission denied to ${this.operation} ${formatField(this.namespace, this.name)}`;
 }
 
 export const checkPermission = (

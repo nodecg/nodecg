@@ -1,6 +1,5 @@
 import type { RpcFieldManifest } from "@nodecg/core";
-import { NamespacePath } from "@nodecg/internal";
-import { toError } from "@nodecg/internal/utils";
+import { formatField, NamespacePath } from "@nodecg/internal";
 import { Effect, Schema } from "effect";
 import type { Promisable } from "type-fest";
 
@@ -12,10 +11,10 @@ export class RpcHandlerError extends Schema.TaggedError<RpcHandlerError>()(
 	{
 		namespace: NamespacePath,
 		name: Schema.String,
-		cause: Schema.instanceOf(Error),
+		cause: Schema.Defect(),
 	},
 ) {
-	override readonly message = `RPC handler for "${this.name}" in "${this.namespace.join("/")}" failed: ${this.cause.message}`;
+	override readonly message = `RPC handler for ${formatField(this.namespace, this.name)} failed`;
 }
 
 export const buildRpc = Effect.fn("buildRpc")(
@@ -31,7 +30,7 @@ export const buildRpc = Effect.fn("buildRpc")(
 				Effect.tryPromise({
 					try: async () => handler(request, ctx),
 					catch: (error) =>
-						RpcHandlerError.make({ namespace, name, cause: toError(error) }),
+						RpcHandlerError.make({ namespace, name, cause: error }),
 				});
 
 			const call = Effect.fn("call")(function* (request: Request) {

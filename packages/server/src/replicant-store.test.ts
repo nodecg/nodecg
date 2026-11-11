@@ -19,6 +19,7 @@ import { afterEach, assert, describe, expect, vi } from "vitest";
 
 import {
 	ComputedComputeError,
+	ComputedCycle,
 	type ComputedResult,
 	ReplicantAlreadyRegistered,
 	ReplicantStoreService,
@@ -786,7 +787,7 @@ describe("persistence", () => {
 			const context = yield* Effect.context();
 			yield* waitFor(() =>
 				expect(Effect.runSyncWith(context)(TestConsole.logLines)).toContain(
-					'Stopped retrying replicant "ns/a" after 5 retries',
+					'Stopped retrying replicant "a" in "ns" after 5 retries',
 				),
 			);
 			expect(repository.write.mock.calls).toEqual([
@@ -1067,8 +1068,8 @@ describe("computed", () => {
 			);
 			const result = readC();
 			assert(Result.isFailure(result));
-			expect(result.failure.message).toBe(
-				'Computing computed field "c" in "ns" failed: Cycle detected',
+			expect(result.failure).toEqual(
+				ComputedCycle.make({ namespace: ["ns"], name: "c" }),
 			);
 		}),
 	);

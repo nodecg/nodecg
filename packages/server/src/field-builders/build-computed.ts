@@ -8,7 +8,7 @@ import { cloneJson } from "@nodecg/internal/utils";
 import { Effect, Result, Stream } from "effect";
 
 import {
-	type ComputedComputeError,
+	type ComputeFailure,
 	ReplicantStoreService,
 } from "../replicant-store.ts";
 import { fieldInternal } from "./field-internal-key.ts";
@@ -19,7 +19,7 @@ export const buildComputed = Effect.fn("buildComputed")(function* <Decoded>(
 	namespace: NamespacePath,
 	name: string,
 	manifest: FieldManifest<Decoded>,
-	computeValue: () => Result.Result<Decoded, ComputedComputeError>,
+	computeValue: () => Result.Result<Decoded, ComputeFailure>,
 ) {
 	const store = yield* ReplicantStoreService;
 	const read = yield* store.initializeComputed(namespace, name, () =>

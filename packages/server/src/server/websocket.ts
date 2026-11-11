@@ -1,4 +1,4 @@
-import type { FieldEncodeError } from "@nodecg/core";
+import type { FieldDecodeError, FieldEncodeError } from "@nodecg/core";
 import {
 	ClientMessage,
 	type ComputedFieldIdentifier,
@@ -44,6 +44,7 @@ import {
 } from "../namespace-registry.ts";
 import {
 	type ComputedComputeError,
+	type ComputedCycle,
 	type ComputedNotFound,
 	ReplicantStoreService,
 	type ReplicantFrame,
@@ -62,9 +63,11 @@ const encodeServerMessage = Schema.encodeEffect(
 type SubscribeFailure =
 	| FieldPermissionDenied
 	| ComputedComputeError
+	| ComputedCycle
 	| ReplicantNotFound
 	| UnknownReplicant
 	| FieldEncodeError
+	| FieldDecodeError
 	| ComputedNotFound
 	| Schema.SchemaError
 	| Socket.SocketError;
@@ -152,9 +155,11 @@ export const websocketRoute = HttpRouter.use((router) =>
 									SubscribeRejectedMessage.make({ field, reason: "forbidden" }),
 								),
 							ComputedComputeError: rejectUnavailable,
+							ComputedCycle: rejectUnavailable,
 							ReplicantNotFound: rejectUnavailable,
 							UnknownReplicant: rejectUnavailable,
 							FieldEncodeError: rejectUnavailable,
+							FieldDecodeError: rejectUnavailable,
 							ComputedNotFound: () =>
 								send(
 									SubscribeRejectedMessage.make({ field, reason: "not-found" }),

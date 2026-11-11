@@ -106,8 +106,9 @@ describe("get", () => {
 			const field = yield* buildDoubled("boom");
 			const error = yield* field.get().pipe(Effect.flip);
 			expect(error.message).toBe(
-				'Computing computed field "doubled" in "ns" failed: not a number: "boom"',
+				'Computing computed field "doubled" in "ns" failed',
 			);
+			expect(error.cause).toEqual(new Error('not a number: "boom"'));
 		}),
 	);
 

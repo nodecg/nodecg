@@ -137,7 +137,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 					error: FieldUnavailable.make({
 						namespace: field.namespace,
 						name: field.name,
-						detail: `published value did not decode: ${error.message}`,
+						detail: `published value did not decode: ${error.cause.message}`,
 					}),
 				});
 

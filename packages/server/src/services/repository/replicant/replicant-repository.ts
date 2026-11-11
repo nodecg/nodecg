@@ -1,4 +1,4 @@
-import { NamespacePath } from "@nodecg/internal";
+import { formatField, NamespacePath } from "@nodecg/internal";
 import { Context, type Effect, Schema } from "effect";
 
 import type { BackendError } from "../repository-errors.ts";
@@ -7,7 +7,7 @@ export class ReplicantNotFound extends Schema.TaggedError<ReplicantNotFound>()(
 	"ReplicantNotFound",
 	{ namespace: NamespacePath, name: Schema.String },
 ) {
-	override readonly message = `Replicant "${this.name}" in "${this.namespace.join("/")}" does not exist`;
+	override readonly message = `Replicant ${formatField(this.namespace, this.name)} does not exist`;
 }
 
 export class DecodeError extends Schema.TaggedError<DecodeError>()(

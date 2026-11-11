@@ -53,7 +53,11 @@ export {
 } from "./models/identity.ts";
 export { manifestRolesKey } from "./manifest-keys.ts";
 export { LoginAttempt } from "./models/login-attempt.ts";
-export { NamespacePath } from "./models/namespace-path.ts";
+export {
+	formatField,
+	formatNamespacePath,
+	NamespacePath,
+} from "./models/namespace-path.ts";
 export {
 	DeclarablePrincipalNameSchema,
 	Principal,

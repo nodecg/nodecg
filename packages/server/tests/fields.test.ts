@@ -251,4 +251,19 @@ describe("rpc", () => {
 			expect(res.status).toBe(500);
 		}),
 	);
+
+	test(
+		"leaves what the handler threw out of the response",
+		Effect.gen(function* () {
+			const client = yield* buildClient;
+
+			const res = yield* client.post(explodeUrl, {
+				body: yield* HttpBody.json(1),
+			});
+			expect(yield* res.json).toEqual({
+				_tag: "RpcCallError",
+				message: 'RPC handler for "explode" in "show" failed',
+			});
+		}),
+	);
 });

@@ -5,6 +5,7 @@ import type {
 } from "@nodecg/core";
 import {
 	CurrentIdentity,
+	formatField,
 	NamespacePath,
 	ServerIdentity,
 } from "@nodecg/internal";
@@ -58,7 +59,7 @@ export class MissingReplicantSeed extends Schema.TaggedError<MissingReplicantSee
 	"MissingReplicantSeed",
 	{ namespace: NamespacePath, name: Schema.String },
 ) {
-	override readonly message = `Missing seed value for replicant "${this.name}" in "${this.namespace.join("/")}"`;
+	override readonly message = `Missing seed value for replicant ${formatField(this.namespace, this.name)}`;
 }
 
 export interface NamespaceHandles<S extends WidestNamespaceFields> {
@@ -127,12 +128,13 @@ export const buildNamespace = Effect.fn("buildNamespace")(function* <
 	const handles: NamespaceHandles<S> = {
 		compute: computeContext,
 		rpc: makeCrossNamespaceHandle(fieldServices, fields, rpc),
-		loaded: adaptNamespace(fieldServices, fields, loaded),
+		loaded: adaptNamespace(namespace, fieldServices, fields, loaded),
 	};
 	return { fields, handles };
 });
 
 const adaptNamespace = <S extends WidestNamespaceFields>(
+	namespace: NamespacePath,
 	services: FieldServices,
 	built: BuiltNamespace<S>,
 	children: LoadedNamespace<S>["children"],
@@ -162,7 +164,7 @@ const adaptNamespace = <S extends WidestNamespaceFields>(
 							Effect.tryPromise(async () => handler(value)).pipe(
 								Effect.catchTag("UnknownError", (error) =>
 									Effect.logError(
-										`Subscription handler for "${built.namespace}/${name}" threw`,
+										`Subscription handler for ${formatField(namespace, name)} threw`,
 										error,
 									),
 								),

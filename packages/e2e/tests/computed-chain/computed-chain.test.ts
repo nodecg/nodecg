@@ -43,6 +43,21 @@ describe("chained computed over the wire", () => {
 		);
 	});
 
+	test("a failing computed's reject leaves out what it threw", async () => {
+		const root = await loadNamespace(computedChainManifest, { baseUrl: base });
+		onTestFinished(root.dispose);
+		const chain = root.children.chain;
+		await chain.replicant.denominator.set(0);
+		onTestFinished(() => chain.replicant.denominator.set(2));
+
+		await expect(
+			chain.computed.reciprocal.subscribe(() => {}),
+		).rejects.toHaveProperty(
+			"message",
+			'Field "reciprocal" in "e2e-chain" is currently unavailable: Computing computed field "reciprocal" in "e2e-computed-chain/chain" failed',
+		);
+	});
+
 	test("subscribing to a currently-failing computed rejects instead of hanging", async () => {
 		const root = await loadNamespace(computedChainManifest, { baseUrl: base });
 		onTestFinished(root.dispose);

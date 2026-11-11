@@ -7,10 +7,9 @@ import {
 import {
 	mapValues,
 	mapEffectValues,
-	toError,
 	zipEffectValues,
 } from "@nodecg/internal/utils";
-import { Context, Effect, Result, Tracer } from "effect";
+import { Context, Data, Effect, Result, Tracer } from "effect";
 
 import {
 	buildComputed,
@@ -51,11 +50,16 @@ import type {
 } from "./implement-namespace.ts";
 import {
 	ComputedComputeError,
+	type ComputeFailure,
 	type ReplicantStoreService,
 } from "./replicant-store.ts";
 import type { TopicBrokerService } from "./services/topic-broker/topic-broker.ts";
 
 const serverIdentity = ServerIdentity.make({});
+
+class FieldReadError extends Data.TaggedError("FieldReadError")<{
+	readonly failure: ComputeFailure;
+}> {}
 
 const asServer = Effect.provideService(CurrentIdentity, serverIdentity);
 
@@ -165,7 +169,11 @@ export const buildFields = Effect.fn("buildFields")(function* <
 		replicant: mapValues<ReplicantFieldEffectLambda, FieldReadLambda>(
 			(field) => ({
 				get: () =>
-					Result.getOrThrow(field[fieldInternal].getResult(serverIdentity)),
+					field[fieldInternal].getResult(serverIdentity).pipe(
+						Result.getOrElse((failure) => {
+							throw new FieldReadError({ failure });
+						}),
+					),
 			}),
 		)(replicant),
 		get computed() {
@@ -190,11 +198,9 @@ export const buildFields = Effect.fn("buildFields")(function* <
 			Result.try({
 				try: () => compute(computeContext),
 				catch: (error) =>
-					ComputedComputeError.make({
-						namespace,
-						name,
-						cause: toError(error),
-					}),
+					error instanceof FieldReadError
+						? error.failure
+						: ComputedComputeError.make({ namespace, name, cause: error }),
 			}),
 		),
 	);
@@ -202,7 +208,11 @@ export const buildFields = Effect.fn("buildFields")(function* <
 	ownComputedAccessors = mapValues<ComputedFieldEffectLambda, FieldReadLambda>(
 		(field) => ({
 			get: () =>
-				Result.getOrThrow(field[fieldInternal].getResult(serverIdentity)),
+				field[fieldInternal].getResult(serverIdentity).pipe(
+					Result.getOrElse((failure) => {
+						throw new FieldReadError({ failure });
+					}),
+				),
 		}),
 	)(computed);
 

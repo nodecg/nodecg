@@ -404,7 +404,8 @@ describe("FieldCellsService", () => {
 							_tag: "FieldUnavailable",
 							namespace: "match",
 							name: "scoreLeft",
-							detail: expect.stringContaining("published value did not decode"),
+							detail:
+								"published value did not decode: Expected a finite number",
 						}),
 					}),
 					ready(7, "7", 3),

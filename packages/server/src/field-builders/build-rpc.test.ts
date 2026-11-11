@@ -122,7 +122,7 @@ describe("callEncoded", () => {
 				.pipe(Effect.provide(anonymousIdentity), Effect.flip);
 
 			expect(error._tag).toBe("RpcHandlerError");
-			expect(error.message).toContain("boom");
+			expect(error.cause).toEqual(new Error("boom"));
 		}),
 	);
 

@@ -17,7 +17,11 @@ import {
 	implementNamespace,
 	type RpcContext,
 } from "./implement-namespace.ts";
-import { ReplicantStoreService } from "./replicant-store.ts";
+import {
+	ComputedComputeError,
+	ComputedCycle,
+	ReplicantStoreService,
+} from "./replicant-store.ts";
 import { InMemoryReplicantRepository } from "./services/repository/replicant/in-memory-replicant-repository.ts";
 import { InMemoryTopicBroker } from "./services/topic-broker/in-memory-topic-broker.ts";
 import { TopicBrokerService } from "./services/topic-broker/topic-broker.ts";
@@ -158,7 +162,7 @@ describe("compute fn contract", () => {
 			);
 			const error = yield* fields.computed.firstGameId.get().pipe(Effect.flip);
 			expect(error._tag).toBe("ComputedComputeError");
-			expect(error.message).toContain("boom");
+			expect(error.cause).toEqual(new Error("boom"));
 		}),
 	);
 });
@@ -228,7 +232,7 @@ describe("computed-on-computed via ctx.computed", () => {
 	);
 
 	test(
-		"a computed cycle fails as ComputedComputeError instead of looping",
+		"a computed cycle fails as ComputedCycle instead of looping",
 		Effect.gen(function* () {
 			const cyclic = defineNamespace("cyclic", {
 				computed: {
@@ -249,8 +253,43 @@ describe("computed-on-computed via ctx.computed", () => {
 
 			const error = yield* fields.computed.a.get().pipe(Effect.flip);
 
-			expect(error._tag).toBe("ComputedComputeError");
-			expect(error.message).toContain("Cycle detected");
+			expect(error).toEqual(
+				ComputedCycle.make({ namespace: ["cyclic"], name: "a" }),
+			);
+		}),
+	);
+
+	test(
+		"fails with the error of the computed it reads",
+		Effect.gen(function* () {
+			const chained = defineNamespace("chained", {
+				computed: {
+					outer: { schema: Schema.Finite },
+					inner: { schema: Schema.Finite },
+				},
+			});
+			const { fields } = yield* buildNamespace(
+				[chained.namespace],
+				implementNamespace(chained, {
+					implementComputed: {
+						outer: (ctx) => ctx.computed.inner.get() + 1,
+						inner: () => {
+							throw new Error("boom");
+						},
+					},
+				}),
+				{},
+			);
+
+			const error = yield* fields.computed.outer.get().pipe(Effect.flip);
+
+			expect(error).toEqual(
+				ComputedComputeError.make({
+					namespace: ["chained"],
+					name: "inner",
+					cause: new Error("boom"),
+				}),
+			);
 		}),
 	);
 });

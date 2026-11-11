@@ -70,8 +70,8 @@ describe("defineNamespace", () => {
 			});
 			assert(Result.isFailure(encoded));
 			expect(encoded.failure).toBeInstanceOf(FieldEncodeError);
-			expect(encoded.failure.message).toBe(
-				'Failed to encode replicant "scores": Object key "toString" is a name every object inherits',
+			expect(encoded.failure.cause.message).toBe(
+				'Object key "toString" is a name every object inherits',
 			);
 
 			const decoded = manifest.replicant.scores.decode(
@@ -79,8 +79,8 @@ describe("defineNamespace", () => {
 			);
 			assert(Result.isFailure(decoded));
 			expect(decoded.failure).toBeInstanceOf(FieldDecodeError);
-			expect(decoded.failure.message).toBe(
-				'Failed to decode replicant "scores": Object key "__proto__" is a name every object inherits',
+			expect(decoded.failure.cause.message).toBe(
+				'Object key "__proto__" is a name every object inherits',
 			);
 		});
 
