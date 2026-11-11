@@ -717,17 +717,19 @@ const adaptNamespace = <
 				subscribe().pipe(
 					Effect.flatMap(
 						Stream.runForEach((element) =>
-							Effect.tryPromise(async () =>
-								element.pipe(
-									Result.match({
-										onSuccess: callback,
-										onFailure: (error) => onError?.(error),
-									}),
-								),
-							).pipe(
+							element.pipe(
+								Result.match({
+									onSuccess: (value) =>
+										Effect.tryPromise(async () => callback(value)),
+									onFailure: (error) =>
+										Effect.logError(
+											`Subscription to "${name}" in "${fields.namespace}" failed`,
+											error,
+										).pipe(Effect.andThen(Effect.try(() => onError?.(error)))),
+								}),
 								Effect.catchTag("UnknownError", (error) =>
 									Effect.logError(
-										`Subscription handler for "${fields.namespace}/${name}" threw`,
+										`Subscription handler for "${name}" in "${fields.namespace}" threw`,
 										error,
 									),
 								),
