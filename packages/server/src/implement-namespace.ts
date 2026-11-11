@@ -56,11 +56,11 @@ export type ImplementComputed<
 
 export type Subscribe<out Decoded> = (
 	handler: (value: Decoded, oldValue: Decoded | undefined) => Promisable<void>,
-) => Promise<() => Promise<void>>;
+) => () => void;
 
 export type SubscribeTopic<out Decoded> = (
 	handler: (value: Decoded) => Promisable<void>,
-) => Promise<() => Promise<void>>;
+) => () => void;
 
 export type ReplicantField<in out Decoded> = {
 	readonly get: () => Decoded;

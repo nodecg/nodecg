@@ -15,19 +15,15 @@ import {
 	mapEffectValues,
 	mapValues,
 	toError,
-	type EffectToPromiseLambda,
-	type StreamToSubscribeTopicLambda,
-	type StreamToSubscribeLambda,
-	type ApplyLambdaToObject,
+	zipPreviousSuccess,
 } from "@nodecg/internal/utils";
 import { effect } from "@preact/signals-core";
 import {
 	Array,
-	Cause,
 	Context,
-	Deferred,
 	Effect,
-	Exit,
+	Fiber,
+	FiberSet,
 	type HKT,
 	Layer,
 	ManagedRuntime,
@@ -36,6 +32,7 @@ import {
 	Path,
 	Queue,
 	Ref,
+	Result,
 	Schema,
 	Scope,
 	Stream,
@@ -51,7 +48,6 @@ import {
 	FieldCellsService,
 	type FieldFailure,
 	type ReplicantCell,
-	type TerminalFieldFailure,
 	type TopicCell,
 } from "./field-cells.ts";
 import { Loadable } from "./loadable.ts";
@@ -74,76 +70,22 @@ export type RetryPolicy = boolean | number;
 const defaultResends = 9;
 
 const subscribeCell = Effect.fn(function* <Decoded>(
-	cell: ReplicantCell<Decoded> | ComputedCell<Decoded>,
+	cell: ReplicantCell<Decoded> | ComputedCell<Decoded> | TopicCell<Decoded>,
+	{ skipInitial }: { readonly skipInitial: boolean },
 ) {
-	const queue = yield* Queue.make<Decoded, TerminalFieldFailure>();
-	const ready = yield* Deferred.make<void, FieldFailure>();
-	yield* Effect.acquireRelease(
-		Effect.sync(() => {
-			let settled = false;
-			return effect(() => {
-				Match.value(cell.signal.value).pipe(
-					Match.tag("Ready", ({ value }) => {
-						settled = true;
-						Queue.offerUnsafe(queue, value.decoded);
-						Deferred.doneUnsafe(ready, Effect.void);
-					}),
-					Match.tag("Failure", ({ error }) => {
-						if (!settled) {
-							Deferred.doneUnsafe(ready, Effect.fail(error));
-							return;
-						}
-						Match.value(error).pipe(
-							Match.tag("FieldUnavailable", () => {}),
-							Match.tag(
-								"FieldNotFound",
-								"FieldPermissionDenied",
-								(terminal) => {
-									Queue.failCauseUnsafe(queue, Cause.fail(terminal));
-								},
-							),
-							Match.exhaustive,
-						);
-					}),
-					Match.tag("Cold", () => {}),
-					Match.tag("Pending", () => {}),
-					Match.exhaustive,
-				);
-			});
-		}),
-		(dispose) => Effect.sync(dispose),
-	);
-	yield* Deferred.await(ready);
-	return Stream.fromQueue(queue);
-});
-
-// Topic doesn't have to wait for first value
-const subscribeTopicCell = Effect.fn(function* <Decoded>(
-	cell: TopicCell<Decoded>,
-) {
-	const queue = yield* Queue.make<Decoded, TerminalFieldFailure>();
+	const queue = yield* Queue.make<Result.Result<Decoded, FieldFailure>>();
 	yield* Effect.acquireRelease(
 		Effect.sync(() => {
 			let initial = true;
 			return effect(() => {
 				Match.value(cell.signal.value).pipe(
 					Match.tag("Ready", ({ value }) => {
-						if (!initial) {
-							Queue.offerUnsafe(queue, value.decoded);
+						if (!(skipInitial && initial)) {
+							Queue.offerUnsafe(queue, Result.succeed(value.decoded));
 						}
 					}),
 					Match.tag("Failure", ({ error }) => {
-						Match.value(error).pipe(
-							Match.tag("FieldUnavailable", () => {}),
-							Match.tag(
-								"FieldNotFound",
-								"FieldPermissionDenied",
-								(terminal) => {
-									Queue.failCauseUnsafe(queue, Cause.fail(terminal));
-								},
-							),
-							Match.exhaustive,
-						);
+						Queue.offerUnsafe(queue, Result.fail(error));
 					}),
 					Match.tag("Cold", () => {}),
 					Match.tag("Pending", () => {}),
@@ -265,10 +207,54 @@ const implementReplicant = Effect.fn("implementReplicant")(function* <Decoded>(
 		);
 	});
 
-	const subscribe = () => subscribeCell(cell);
+	const subscribe = () => subscribeCell(cell, { skipInitial: false });
 
 	return { get, set, update, subscribe, [fieldSource]: cell.signal };
 });
+
+interface EffectToPromiseLambda extends HKT.TypeLambda {
+	type: this["Target"] extends (
+		...args: infer Args
+	) => Effect.Effect<infer A, any, any>
+		? (...args: Args) => Promise<A>
+		: this["Target"] extends Effect.Effect<infer A, any, any>
+			? Promise<A>
+			: never;
+}
+
+type ApplyLambdaToObject<T, M extends { [K in keyof T]: HKT.TypeLambda }> = {
+	[K in keyof T]: HKT.Kind<M[K], unknown, never, never, T[K]>;
+};
+
+type Subscribe<A, E> = (
+	callback: (value: A, oldValue: A | undefined) => Promisable<void>,
+	onError?: (error: E) => void,
+) => () => void;
+
+type SubscribeTopic<A, E> = (
+	callback: (value: A) => Promisable<void>,
+	onError?: (error: E) => void,
+) => () => void;
+
+interface StreamToSubscribeLambda extends HKT.TypeLambda {
+	type: this["Target"] extends () => Effect.Effect<
+		Stream.Stream<Result.Result<infer A, infer E>, never, any>,
+		any,
+		any
+	>
+		? Subscribe<A, E>
+		: never;
+}
+
+interface StreamToSubscribeTopicLambda extends HKT.TypeLambda {
+	type: this["Target"] extends () => Effect.Effect<
+		Stream.Stream<Result.Result<infer A, infer E>, never, any>,
+		any,
+		any
+	>
+		? SubscribeTopic<A, E>
+		: never;
+}
 
 type ReplicantFieldEffect<Decoded> = Effect.Success<
 	ReturnType<typeof implementReplicant<Decoded>>
@@ -307,7 +293,7 @@ const implementComputed = Effect.fn("implementComputed")(function* <Decoded>(
 		});
 	});
 
-	const subscribe = () => subscribeCell(cell);
+	const subscribe = () => subscribeCell(cell, { skipInitial: false });
 
 	return { get, subscribe, [fieldSource]: cell.signal };
 });
@@ -338,7 +324,7 @@ const implementTopic = Effect.fn("implementTopic")(function* <Decoded>(
 		yield* transport.publishTopic(namespace, name, encoded);
 	});
 
-	const subscribe = () => subscribeTopicCell(cell);
+	const subscribe = () => subscribeCell(cell, { skipInitial: true });
 
 	return { publish, subscribe };
 });
@@ -624,6 +610,11 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 	const services = yield* Effect.context<never>().pipe(
 		Effect.map(Context.omit(Tracer.ParentSpan)),
 	);
+	const runSubscription = yield* FiberSet.makeRuntime().pipe(
+		Effect.updateContext<Scope.Scope, Scope.Scope>(
+			Context.omit(Tracer.ParentSpan),
+		),
+	);
 	const builtHandles = new WeakMap<WidenedManifest, unknown>();
 	const build = <
 		TreeS extends WidestNamespaceFields,
@@ -655,6 +646,7 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 				},
 				loaded: adaptNamespace(
 					services,
+					runSubscription,
 					fields,
 					mapValues<NamespaceHandlesLambda, LoadedNamespaceLambda>(
 						(child) => child.loaded,
@@ -701,57 +693,54 @@ const adaptNamespace = <
 	CustomRoutes extends WidestCustomRoutes,
 >(
 	services: Context.Context<never>,
+	runSubscription: (subscription: Effect.Effect<void>) => Fiber.Fiber<void>,
 	fields: BuiltFields<S, CustomRoutes>,
 	children: LoadedNamespace<S, CustomRoutes>["children"],
 ) => {
 	const runPromise = Effect.runPromiseWith(services);
+	const runFork = Effect.runForkWith(services);
 
 	const subscribeEffectToPromise =
-		<Decoded, SubscribeError>(
+		<Decoded>(
 			subscribe: () => Effect.Effect<
-				Stream.Stream<Decoded, TerminalFieldFailure>,
-				SubscribeError,
+				Stream.Stream<Result.Result<Decoded, FieldFailure>>,
+				never,
 				Scope.Scope
 			>,
 			name: string,
-			awaitSeed: boolean,
 		) =>
-		async (
+		(
 			callback: (value: Decoded) => Promisable<void>,
-			onError?: (error: TerminalFieldFailure) => void,
-		) =>
-			runPromise(
-				Effect.gen(function* () {
-					const scope = yield* Scope.make();
-					const stream = yield* subscribe().pipe(
-						Scope.provide(scope),
-						Effect.onError(() => Scope.close(scope, Exit.void)),
-					);
-					const seeded = yield* Deferred.make<void>();
-					yield* stream.pipe(
-						Stream.runForEach((value) =>
-							Effect.tryPromise(async () => callback(value)).pipe(
+			onError?: (error: FieldFailure) => void,
+		) => {
+			const fiber = runSubscription(
+				subscribe().pipe(
+					Effect.flatMap(
+						Stream.runForEach((element) =>
+							Effect.tryPromise(async () =>
+								element.pipe(
+									Result.match({
+										onSuccess: callback,
+										onFailure: (error) => onError?.(error),
+									}),
+								),
+							).pipe(
 								Effect.catchTag("UnknownError", (error) =>
 									Effect.logError(
 										`Subscription handler for "${fields.namespace}/${name}" threw`,
 										error,
 									),
 								),
-								Effect.tap(() => Deferred.succeed(seeded, undefined)),
 							),
 						),
-						Effect.catchTag(
-							["FieldNotFound", "FieldPermissionDenied"],
-							(error) => Effect.sync(() => onError?.(error)),
-						),
-						Effect.forkIn(scope),
-					);
-					if (awaitSeed) {
-						yield* Deferred.await(seeded);
-					}
-					return () => runPromise(Scope.close(scope, Exit.void));
-				}),
+					),
+					Effect.scoped,
+				),
 			);
+			return () => {
+				runFork(Fiber.interrupt(fiber));
+			};
+		};
 
 	const replicant = mapValues<
 		ReplicantFieldEffectLambda,
@@ -762,9 +751,8 @@ const adaptNamespace = <
 		update: (fn, options) => runPromise(field.update(fn, options)),
 		subscribe: (callback, onError) =>
 			subscribeEffectToPromise(
-				() => field.subscribe().pipe(Effect.map(Stream.zipWithPrevious)),
+				() => field.subscribe().pipe(Effect.map(zipPreviousSuccess)),
 				name,
-				true,
 			)(
 				([oldValue, value]) => callback(value, Option.getOrUndefined(oldValue)),
 				onError,
@@ -779,9 +767,8 @@ const adaptNamespace = <
 		get: () => runPromise(field.get()),
 		subscribe: (callback, onError) =>
 			subscribeEffectToPromise(
-				() => field.subscribe().pipe(Effect.map(Stream.zipWithPrevious)),
+				() => field.subscribe().pipe(Effect.map(zipPreviousSuccess)),
 				name,
-				true,
 			)(
 				([oldValue, value]) => callback(value, Option.getOrUndefined(oldValue)),
 				onError,
@@ -792,7 +779,7 @@ const adaptNamespace = <
 	const topic = mapValues<TopicFieldEffectLambda, TopicFieldPromiseLambda>(
 		(field, name) => ({
 			publish: (value) => runPromise(field.publish(value)),
-			subscribe: subscribeEffectToPromise(field.subscribe, name, false),
+			subscribe: subscribeEffectToPromise(field.subscribe, name),
 		}),
 	)(fields.topic);
 

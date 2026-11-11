@@ -2,14 +2,7 @@ import { derive } from "@nodecg/client";
 import { StrictMode, Suspense, useState } from "react";
 
 import { Login } from "./login.tsx";
-import {
-	counter,
-	mount,
-	root,
-	useDerived,
-	useField,
-	useTopic,
-} from "./store.tsx";
+import { counter, mount, root, useField, useTopic } from "./store.tsx";
 
 const nextCount = derive(
 	(get) => get(counter.replicant.count) + get(root.replicant.step),
@@ -32,9 +25,9 @@ function Dashboard() {
 	const step = useField(root.replicant.step);
 	const parity = useField(root.computed.parity);
 	const announcement = useField(root.computed.announcement);
-	const next = useDerived(nextCount);
-	const icon = useDerived(parityIcon);
-	const bucket = useDerived(countBucket);
+	const next = useField(nextCount);
+	const icon = useField(parityIcon);
+	const bucket = useField(countBucket);
 	const cheers = useTopic(counter.topic.cheer);
 	const [message, setMessage] = useState("");
 	const [lastRoll, setLastRoll] = useState<number | undefined>(undefined);

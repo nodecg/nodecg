@@ -4,14 +4,13 @@ import ReactDOM from "react-dom/client";
 
 export function useReplicant<T>(field: ReplicantField<T> | ComputedField<T>) {
 	const [value, setValue] = useState<T>();
-	useEffect(() => {
-		const subscription = field.subscribe((next) => {
-			setValue(() => next);
-		});
-		return () => {
-			void subscription.then((cancel) => cancel());
-		};
-	}, [field]);
+	useEffect(
+		() =>
+			field.subscribe((next) => {
+				setValue(() => next);
+			}),
+		[field],
+	);
 	return value;
 }
 

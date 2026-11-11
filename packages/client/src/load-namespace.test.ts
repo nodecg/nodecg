@@ -16,6 +16,7 @@ import {
 	Option,
 	PubSub,
 	Queue,
+	Result,
 	Schema,
 	Scope,
 	Stream,
@@ -31,17 +32,20 @@ import {
 	vi,
 } from "vitest";
 
-import { derive } from "./derive.ts";
+import { derive, fieldSource } from "./derive.ts";
+import type { FieldFailure } from "./field-cells.ts";
 import {
 	DuplicateNamespace,
 	loadNamespace,
 	loadNamespaceEffect,
 } from "./load-namespace.ts";
+import { Cold, Pending } from "./loadable.ts";
 import { createTransportStub } from "./services/field-transport/field-transport.stub.ts";
 import {
 	FieldNotFound,
 	FieldPermissionDenied,
 	FieldTransportService,
+	FieldUnavailable,
 } from "./services/field-transport/field-transport.ts";
 import { createMessageChannelStub } from "./services/message-channel/message-channel.stub.ts";
 import { MessageChannelService } from "./services/message-channel/message-channel.ts";
@@ -382,9 +386,8 @@ describe("subscribe", () => {
 
 			yield* Queue.offer(queue, publishFrame(42));
 
-			const result = yield* Fiber.join(head);
-			assert(Option.isSome(result));
-			expect(result.value).toBe(42);
+			const first = yield* Fiber.join(head);
+			expect(first).toEqual(Option.some(Result.succeed(42)));
 		}),
 	);
 
@@ -421,35 +424,8 @@ describe("subscribe", () => {
 			);
 			yield* Queue.offer(queue, publishFrame(7));
 
-			const result = yield* Fiber.join(head);
-			assert(Option.isSome(result));
-			expect(result.value).toBe(7);
-		}),
-	);
-
-	test(
-		"resolves only after the first publish",
-		Effect.gen(function* () {
-			const queue = yield* Queue.unbounded<ServerMessage>();
-			channel.receive.mockReturnValue(Effect.succeed(Stream.fromQueue(queue)));
-			const manifest = defineNamespace("root", {
-				replicant: { count: { schema: Schema.Finite } },
-			});
-
-			const loaded = yield* loadNamespaceEffect(manifest);
-
-			const fiber = yield* loaded.replicant.count
-				.subscribe()
-				.pipe(Effect.asVoid, Effect.forkChild);
-			yield* Effect.promise(() =>
-				vi.waitFor(() => {
-					expect(channel.send).toHaveBeenCalledWith(subscribeFrame);
-				}),
-			);
-			expect(fiber.pollUnsafe()).toBeUndefined();
-
-			yield* Queue.offer(queue, publishFrame(0));
-			yield* Fiber.join(fiber);
+			const first = yield* Fiber.join(head);
+			expect(first).toEqual(Option.some(Result.succeed(7)));
 		}),
 	);
 
@@ -551,7 +527,7 @@ describe("subscribe", () => {
 
 			const loaded = yield* loadNamespaceEffect(manifest);
 
-			const received1: number[] = [];
+			const received1: Array<Result.Result<number, FieldFailure>> = [];
 			const scope1 = yield* Scope.make();
 			const sub1 = yield* loaded.replicant.count.subscribe().pipe(
 				Effect.flatMap((stream) =>
@@ -570,11 +546,11 @@ describe("subscribe", () => {
 			yield* PubSub.publish(pubsub, publishFrame(5));
 			yield* Effect.promise(() =>
 				vi.waitFor(() => {
-					expect(received1).toEqual([5]);
+					expect(received1).toEqual([Result.succeed(5)]);
 				}),
 			);
 
-			const received2: number[] = [];
+			const received2: Array<Result.Result<number, FieldFailure>> = [];
 			const scope2 = yield* Scope.make();
 			const sub2 = yield* loaded.replicant.count.subscribe().pipe(
 				Effect.flatMap((stream) =>
@@ -587,7 +563,7 @@ describe("subscribe", () => {
 			);
 			yield* Effect.promise(() =>
 				vi.waitFor(() => {
-					expect(received2).toEqual([5]);
+					expect(received2).toEqual([Result.succeed(5)]);
 				}),
 			);
 
@@ -605,7 +581,7 @@ describe("subscribe", () => {
 		});
 
 	test(
-		"rejects with FieldPermissionDenied on a forbidden frame",
+		"emits FieldPermissionDenied on a forbidden frame",
 		Effect.gen(function* () {
 			const queue = yield* Queue.unbounded<ServerMessage>();
 			channel.receive.mockReturnValue(Effect.succeed(Stream.fromQueue(queue)));
@@ -615,9 +591,9 @@ describe("subscribe", () => {
 
 			const loaded = yield* loadNamespaceEffect(manifest);
 
-			const fiber = yield* loaded.replicant.count
+			const head = yield* loaded.replicant.count
 				.subscribe()
-				.pipe(Effect.flip, Effect.forkChild);
+				.pipe(Effect.flatMap(Stream.runHead), Effect.forkChild);
 			yield* Effect.promise(() =>
 				vi.waitFor(() => {
 					expect(channel.send).toHaveBeenCalledWith(subscribeFrame);
@@ -625,13 +601,19 @@ describe("subscribe", () => {
 			);
 			yield* Queue.offer(queue, rejectedFrame("forbidden"));
 
-			const error = yield* Fiber.join(fiber);
-			expect(error._tag).toBe("FieldPermissionDenied");
+			const first = yield* Fiber.join(head);
+			expect(first).toEqual(
+				Option.some(
+					Result.fail(
+						new FieldPermissionDenied({ namespace: "root", name: "count" }),
+					),
+				),
+			);
 		}),
 	);
 
 	test(
-		"rejects with FieldNotFound on a not-found frame",
+		"emits FieldNotFound on a not-found frame",
 		Effect.gen(function* () {
 			const queue = yield* Queue.unbounded<ServerMessage>();
 			channel.receive.mockReturnValue(Effect.succeed(Stream.fromQueue(queue)));
@@ -641,9 +623,9 @@ describe("subscribe", () => {
 
 			const loaded = yield* loadNamespaceEffect(manifest);
 
-			const fiber = yield* loaded.replicant.count
+			const head = yield* loaded.replicant.count
 				.subscribe()
-				.pipe(Effect.flip, Effect.forkChild);
+				.pipe(Effect.flatMap(Stream.runHead), Effect.forkChild);
 			yield* Effect.promise(() =>
 				vi.waitFor(() => {
 					expect(channel.send).toHaveBeenCalledWith(subscribeFrame);
@@ -651,13 +633,17 @@ describe("subscribe", () => {
 			);
 			yield* Queue.offer(queue, rejectedFrame("not-found"));
 
-			const error = yield* Fiber.join(fiber);
-			expect(error._tag).toBe("FieldNotFound");
+			const first = yield* Fiber.join(head);
+			expect(first).toEqual(
+				Option.some(
+					Result.fail(new FieldNotFound({ namespace: "root", name: "count" })),
+				),
+			);
 		}),
 	);
 
 	test(
-		"ends the stream with the error when the subscribe is rejected after the first value",
+		"keeps the stream open after a rejection",
 		Effect.gen(function* () {
 			const queue = yield* Queue.unbounded<ServerMessage>();
 			channel.receive.mockReturnValue(Effect.succeed(Stream.fromQueue(queue)));
@@ -667,16 +653,15 @@ describe("subscribe", () => {
 
 			const loaded = yield* loadNamespaceEffect(manifest);
 
-			const received: number[] = [];
-			const consumer = yield* loaded.replicant.count.subscribe().pipe(
+			const received: Array<Result.Result<number, FieldFailure>> = [];
+			yield* loaded.replicant.count.subscribe().pipe(
 				Effect.flatMap(
-					Stream.runForEach((value) =>
+					Stream.runForEach((element) =>
 						Effect.sync(() => {
-							received.push(value);
+							received.push(element);
 						}),
 					),
 				),
-				Effect.flip,
 				Effect.forkScoped,
 			);
 			yield* Effect.promise(() =>
@@ -685,21 +670,25 @@ describe("subscribe", () => {
 				),
 			);
 			yield* Queue.offer(queue, publishFrame(1));
-			yield* Effect.promise(() =>
-				vi.waitFor(() => expect(received).toEqual([1])),
-			);
-
 			yield* Queue.offer(queue, rejectedFrame("forbidden"));
-			const error = yield* Fiber.join(consumer);
-			expect(error).toEqual(
-				new FieldPermissionDenied({ namespace: "root", name: "count" }),
+			yield* Queue.offer(queue, publishFrame(7, 2));
+
+			yield* Effect.promise(() =>
+				vi.waitFor(() =>
+					expect(received).toEqual([
+						Result.succeed(1),
+						Result.fail(
+							new FieldPermissionDenied({ namespace: "root", name: "count" }),
+						),
+						Result.succeed(7),
+					]),
+				),
 			);
-			expect(received).toEqual([1]);
 		}),
 	);
 
 	test(
-		"keeps the stream open when a publish does not decode after the first value, and delivers the next publish that does",
+		"emits a publish that does not decode as FieldUnavailable",
 		Effect.gen(function* () {
 			const queue = yield* Queue.unbounded<ServerMessage>();
 			channel.receive.mockReturnValue(Effect.succeed(Stream.fromQueue(queue)));
@@ -709,7 +698,7 @@ describe("subscribe", () => {
 
 			const loaded = yield* loadNamespaceEffect(manifest);
 
-			const received: number[] = [];
+			const received: Array<Result.Result<number, FieldFailure>> = [];
 			yield* loaded.replicant.count.subscribe().pipe(
 				Effect.flatMap(
 					Stream.runForEach((value) =>
@@ -726,10 +715,6 @@ describe("subscribe", () => {
 				),
 			);
 			yield* Queue.offer(queue, publishFrame(1));
-			yield* Effect.promise(() =>
-				vi.waitFor(() => expect(received).toEqual([1])),
-			);
-
 			yield* Queue.offer(
 				queue,
 				ReplicantSnapshotMessage.make({
@@ -739,14 +724,30 @@ describe("subscribe", () => {
 				}),
 			);
 			yield* Queue.offer(queue, publishFrame(7, 3));
+
 			yield* Effect.promise(() =>
-				vi.waitFor(() => expect(received).toEqual([1, 7])),
+				vi.waitFor(() =>
+					expect(received).toEqual([
+						Result.succeed(1),
+						Result.fail(
+							expect.objectContaining({
+								_tag: "FieldUnavailable",
+								namespace: "root",
+								name: "count",
+								detail: expect.stringContaining(
+									"published value did not decode",
+								),
+							}),
+						),
+						Result.succeed(7),
+					]),
+				),
 			);
 		}),
 	);
 
 	test(
-		"re-subscribing after a rejection sends a fresh subscribe and heals on the next publish",
+		"a fresh subscribe after a rejection delivers the next publish",
 		Effect.gen(function* () {
 			const queue = yield* Queue.unbounded<ServerMessage>();
 			channel.receive.mockReturnValue(Effect.succeed(Stream.fromQueue(queue)));
@@ -759,15 +760,18 @@ describe("subscribe", () => {
 			const scope1 = yield* Scope.make();
 			const fiber1 = yield* loaded.replicant.count
 				.subscribe()
-				.pipe(Effect.flip, Scope.provide(scope1), Effect.forkChild);
+				.pipe(
+					Effect.flatMap(Stream.runHead),
+					Scope.provide(scope1),
+					Effect.forkChild,
+				);
 			yield* Effect.promise(() =>
 				vi.waitFor(() => {
 					expect(channel.send).toHaveBeenCalledWith(subscribeFrame);
 				}),
 			);
 			yield* Queue.offer(queue, rejectedFrame("forbidden"));
-			const firstError = yield* Fiber.join(fiber1);
-			expect(firstError._tag).toBe("FieldPermissionDenied");
+			yield* Fiber.join(fiber1);
 			yield* Scope.close(scope1, Exit.void);
 
 			const scope2 = yield* Scope.make();
@@ -787,9 +791,8 @@ describe("subscribe", () => {
 				}),
 			);
 			yield* Queue.offer(queue, publishFrame(5));
-			const result = yield* Fiber.join(head);
-			assert(Option.isSome(result));
-			expect(result.value).toBe(5);
+			const first = yield* Fiber.join(head);
+			expect(first).toEqual(Option.some(Result.succeed(5)));
 			yield* Scope.close(scope2, Exit.void);
 		}),
 	);
@@ -857,9 +860,8 @@ describe("computed", () => {
 				}),
 			);
 
-			const result = yield* Fiber.join(head);
-			assert(Option.isSome(result));
-			expect(result.value).toBe("z");
+			const first = yield* Fiber.join(head);
+			expect(first).toEqual(Option.some(Result.succeed("z")));
 		}),
 	);
 });
@@ -931,9 +933,8 @@ describe("topic", () => {
 			);
 			yield* PubSub.publish(pubsub, publishFrame(42));
 
-			const result = yield* Fiber.join(head);
-			assert(Option.isSome(result));
-			expect(result.value).toBe(42);
+			const first = yield* Fiber.join(head);
+			expect(first).toEqual(Option.some(Result.succeed(42)));
 		}),
 	);
 
@@ -990,7 +991,7 @@ describe("topic", () => {
 			);
 			const loaded = yield* loadNamespaceEffect(topicManifest);
 
-			const seen1: number[] = [];
+			const seen1: Array<Result.Result<number, FieldFailure>> = [];
 			const stream1 = yield* loaded.topic.chat.subscribe();
 			yield* Stream.runForEach(stream1, (v) =>
 				Effect.sync(() => seen1.push(v)),
@@ -1004,11 +1005,11 @@ describe("topic", () => {
 			yield* PubSub.publish(pubsub, publishFrame(1));
 			yield* Effect.promise(() =>
 				vi.waitFor(() => {
-					expect(seen1).toEqual([1]);
+					expect(seen1).toEqual([Result.succeed(1)]);
 				}),
 			);
 
-			const seen2: number[] = [];
+			const seen2: Array<Result.Result<number, FieldFailure>> = [];
 			const stream2 = yield* loaded.topic.chat.subscribe();
 			yield* Stream.runForEach(stream2, (v) =>
 				Effect.sync(() => seen2.push(v)),
@@ -1017,30 +1018,29 @@ describe("topic", () => {
 			yield* PubSub.publish(pubsub, publishFrame(2));
 			yield* Effect.promise(() =>
 				vi.waitFor(() => {
-					expect(seen1).toEqual([1, 2]);
-					expect(seen2).toEqual([2]);
+					expect(seen1).toEqual([Result.succeed(1), Result.succeed(2)]);
+					expect(seen2).toEqual([Result.succeed(2)]);
 				}),
 			);
 		}),
 	);
 
 	test(
-		"ends the stream with the error when the server rejects the subscribe",
+		"keeps the stream open after a rejection",
 		Effect.gen(function* () {
 			const queue = yield* Queue.unbounded<ServerMessage>();
 			channel.receive.mockReturnValue(Effect.succeed(Stream.fromQueue(queue)));
 			const loaded = yield* loadNamespaceEffect(topicManifest);
 
-			const seen: number[] = [];
-			const consumer = yield* loaded.topic.chat.subscribe().pipe(
+			const seen: Array<Result.Result<number, FieldFailure>> = [];
+			yield* loaded.topic.chat.subscribe().pipe(
 				Effect.flatMap(
-					Stream.runForEach((value) =>
+					Stream.runForEach((element) =>
 						Effect.sync(() => {
-							seen.push(value);
+							seen.push(element);
 						}),
 					),
 				),
-				Effect.flip,
 				Effect.forkScoped,
 			);
 			yield* Effect.promise(() =>
@@ -1049,8 +1049,6 @@ describe("topic", () => {
 				),
 			);
 			yield* Queue.offer(queue, publishFrame(1));
-			yield* Effect.promise(() => vi.waitFor(() => expect(seen).toEqual([1])));
-
 			yield* Queue.offer(
 				queue,
 				SubscribeRejectedMessage.make({
@@ -1058,11 +1056,19 @@ describe("topic", () => {
 					reason: "forbidden",
 				}),
 			);
-			const error = yield* Fiber.join(consumer);
-			expect(error).toEqual(
-				new FieldPermissionDenied({ namespace: "root", name: "chat" }),
+			yield* Queue.offer(queue, publishFrame(2));
+
+			yield* Effect.promise(() =>
+				vi.waitFor(() =>
+					expect(seen).toEqual([
+						Result.succeed(1),
+						Result.fail(
+							new FieldPermissionDenied({ namespace: "root", name: "chat" }),
+						),
+						Result.succeed(2),
+					]),
+				),
 			);
-			expect(seen).toEqual([1]);
 		}),
 	);
 });
@@ -1344,22 +1350,15 @@ describe("loadNamespace (Promise wrapper)", () => {
 
 		const received: number[] = [];
 		const onError = vi.fn();
-		const subscribed = loaded.replicant.count.subscribe((value) => {
+		const cancel = loaded.replicant.count.subscribe((value) => {
 			received.push(value);
 		}, onError);
-		await vi.waitFor(() =>
-			expect(channelStub.send).toHaveBeenCalledWith({
-				_tag: "subscribe",
-				field,
-			}),
-		);
+		onTestFinished(() => cancel());
 		Queue.offerUnsafe(
 			queue,
 			ReplicantSnapshotMessage.make({ field, value: 1, revision: 1 }),
 		);
-		const cancel = await subscribed;
-		onTestFinished(() => cancel());
-		expect(received).toEqual([1]);
+		await vi.waitFor(() => expect(received).toEqual([1]));
 
 		Queue.offerUnsafe(
 			queue,
@@ -1371,6 +1370,72 @@ describe("loadNamespace (Promise wrapper)", () => {
 			),
 		);
 		expect(received).toEqual([1]);
+	});
+
+	it("keeps delivering after a first-load failure", async () => {
+		const { stub: channelStub } = createMessageChannelStub();
+		const queue = await Effect.runPromise(Queue.unbounded<ServerMessage>());
+		channelStub.receive.mockReturnValue(
+			Effect.succeed(Stream.fromQueue(queue)),
+		);
+		const manifest = defineNamespace("root", {
+			replicant: { count: { schema: Schema.Finite } },
+		});
+		const field = {
+			type: "replicant",
+			namespace: "root",
+			name: "count",
+		} as const;
+		const loaded = await loadNamespace(manifest, {
+			fieldTransport: () => createTransportStub().stub,
+			messageChannel: () => channelStub,
+		});
+
+		const received: number[] = [];
+		const onError = vi.fn();
+		const cancel = loaded.replicant.count.subscribe((value) => {
+			received.push(value);
+		}, onError);
+		onTestFinished(() => cancel());
+		Queue.offerUnsafe(
+			queue,
+			SubscribeRejectedMessage.make({
+				field,
+				reason: "unavailable",
+				message: "compute failed",
+			}),
+		);
+		Queue.offerUnsafe(
+			queue,
+			ReplicantSnapshotMessage.make({ field, value: 1, revision: 1 }),
+		);
+
+		await vi.waitFor(() => expect(received).toEqual([1]));
+		expect(onError).toHaveBeenCalledWith(
+			new FieldUnavailable({
+				namespace: "root",
+				name: "count",
+				detail: "compute failed",
+			}),
+		);
+	});
+
+	it("dispose ends open subscriptions", async () => {
+		const manifest = defineNamespace("root", {
+			replicant: { count: { schema: Schema.Finite } },
+		});
+		const loaded = await loadNamespace(manifest, {
+			fieldTransport: () => createTransportStub().stub,
+			messageChannel: () => createMessageChannelStub().stub,
+		});
+
+		loaded.replicant.count.subscribe(() => {});
+		expect(loaded.replicant.count[fieldSource].value).toEqual(Pending);
+		loaded.dispose();
+
+		await vi.waitFor(() =>
+			expect(loaded.replicant.count[fieldSource].value).toEqual(Cold),
+		);
 	});
 
 	it("a replicant subscriber gets the old value", async () => {
@@ -1393,15 +1458,14 @@ describe("loadNamespace (Promise wrapper)", () => {
 		});
 
 		const received: Array<[number, number | undefined]> = [];
-		const subscribed = loaded.replicant.count.subscribe((value, oldValue) => {
+		const cancel = loaded.replicant.count.subscribe((value, oldValue) => {
 			received.push([value, oldValue]);
 		});
+		onTestFinished(() => cancel());
 		Queue.offerUnsafe(
 			queue,
 			ReplicantSnapshotMessage.make({ field, value: "1", revision: 1 }),
 		);
-		const cancel = await subscribed;
-		onTestFinished(() => cancel());
 		Queue.offerUnsafe(
 			queue,
 			ReplicantSnapshotMessage.make({ field, value: "2", revision: 2 }),
@@ -1440,12 +1504,11 @@ describe("loadNamespace (Promise wrapper)", () => {
 		});
 
 		const received: Array<[number, number | undefined]> = [];
-		const subscribed = loaded.computed.doubled.subscribe((value, oldValue) => {
+		const cancel = loaded.computed.doubled.subscribe((value, oldValue) => {
 			received.push([value, oldValue]);
 		});
-		Queue.offerUnsafe(queue, FieldValueMessage.make({ field, value: "2" }));
-		const cancel = await subscribed;
 		onTestFinished(() => cancel());
+		Queue.offerUnsafe(queue, FieldValueMessage.make({ field, value: "2" }));
 		Queue.offerUnsafe(queue, FieldValueMessage.make({ field, value: "6" }));
 		Queue.offerUnsafe(queue, FieldValueMessage.make({ field, value: "10" }));
 
@@ -1456,23 +1519,6 @@ describe("loadNamespace (Promise wrapper)", () => {
 				[10, 6],
 			]),
 		);
-	});
-
-	it("topic subscribe resolves before any event is published", async () => {
-		const manifest = defineNamespace("root", {
-			topic: { chat: { schema: Schema.Finite } },
-		});
-		const loaded = await loadNamespace(manifest, {
-			fieldTransport: () => createTransportStub().stub,
-			messageChannel: () => createMessageChannelStub().stub,
-		});
-
-		const received: number[] = [];
-		const cancel = await loaded.topic.chat.subscribe((value) => {
-			received.push(value);
-		});
-		onTestFinished(() => cancel());
-		expect(received).toEqual([]);
 	});
 });
 

@@ -63,13 +63,11 @@ class FieldReadError extends Data.TaggedError("FieldReadError")<{
 
 const asServer = Effect.provideService(CurrentIdentity, serverIdentity);
 
-type FieldOps = TopicBrokerService | ReplicantStoreService;
-
-export type FieldServices = Context.Context<FieldOps>;
+export type FieldServices = TopicBrokerService | ReplicantStoreService;
 
 // TODO: use Effect's R instead of Context
 const fieldAccessors =
-	(services: FieldServices) =>
+	(services: Context.Context<FieldServices>) =>
 	<
 		Replicant extends Record<string, unknown>,
 		Computed extends Record<string, unknown>,
@@ -113,7 +111,7 @@ const fieldAccessors =
 	};
 
 export const makeCrossNamespaceHandle = <S extends WidestNamespaceFields>(
-	services: FieldServices,
+	services: Context.Context<FieldServices>,
 	fields: BuiltNamespace<S>,
 	children: CrossNamespaceHandle<S>["children"],
 ): CrossNamespaceHandle<S> => ({
@@ -144,7 +142,7 @@ export const buildFields = Effect.fn("buildFields")(function* <
 	const computeFns = options?.implementComputed;
 	const rpcHandlers = options?.implementRpc;
 
-	const fieldServices = yield* Effect.context<FieldOps>().pipe(
+	const fieldServices = yield* Effect.context<FieldServices>().pipe(
 		Effect.map(Context.omit(Tracer.ParentSpan)),
 	);
 

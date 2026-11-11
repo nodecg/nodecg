@@ -149,7 +149,7 @@ match.replicant.label.subscribe((label) => {
 - ✅ Replicant is reactive: subscribe to listen to changes
 
   ```ts
-  const unsubscribe = await ns.replicant.counter.subscribe((newValue) => {
+  const unsubscribe = ns.replicant.counter.subscribe((newValue) => {
     console.log("Counter updated:", newValue);
   });
 
@@ -221,7 +221,7 @@ match.replicant.label.subscribe((label) => {
 
   // Client: read-only
   const ns = await loadNamespace(manifest);
-  await ns.computed.firstGameId.subscribe((firstGameId) => {
+  ns.computed.firstGameId.subscribe((firstGameId) => {
     console.log("First game updated:", firstGameId);
   });
   ```
@@ -310,7 +310,7 @@ match.replicant.label.subscribe((label) => {
 
   const ns = await loadNamespace(manifest);
   await ns.topic.message.publish("Hello, world!");
-  const cancel = await ns.topic.message.subscribe((message) => {
+  const cancel = ns.topic.message.subscribe((message) => {
     console.log("Received:", message);
   });
   ```

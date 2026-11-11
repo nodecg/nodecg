@@ -3,7 +3,7 @@ import { defineNamespace } from "@nodecg/core";
 import { manifestRolesKey } from "@nodecg/internal";
 import { Effect, Schema } from "effect";
 import { HttpBody } from "effect/http";
-import { describe, expect, onTestFinished, vi } from "vitest";
+import { describe, expect, vi } from "vitest";
 
 import { buildNamespace } from "../src/build-namespace.ts";
 import { implementNamespace } from "../src/implement-namespace.ts";
@@ -55,12 +55,9 @@ describe("subscribe", () => {
 		Effect.gen(function* () {
 			const { client, handle } = yield* loadShow;
 			const received: Array<[number, number | undefined]> = [];
-			const cancel = yield* Effect.promise(() =>
-				handle.replicant.score.subscribe((value, oldValue) => {
-					received.push([value, oldValue]);
-				}),
-			);
-			onTestFinished(() => cancel());
+			handle.replicant.score.subscribe((value, oldValue) => {
+				received.push([value, oldValue]);
+			});
 			const firstBody = yield* HttpBody.json([
 				{ op: "replace", path: "", value: "7" },
 			]);
@@ -96,12 +93,9 @@ describe("subscribe", () => {
 		Effect.gen(function* () {
 			const { client, handle } = yield* loadShow;
 			const received: Array<[number, number | undefined]> = [];
-			const cancel = yield* Effect.promise(() =>
-				handle.computed.doubled.subscribe((value, oldValue) => {
-					received.push([value, oldValue]);
-				}),
-			);
-			onTestFinished(() => cancel());
+			handle.computed.doubled.subscribe((value, oldValue) => {
+				received.push([value, oldValue]);
+			});
 			const firstBody = yield* HttpBody.json([
 				{ op: "replace", path: "", value: "7" },
 			]);

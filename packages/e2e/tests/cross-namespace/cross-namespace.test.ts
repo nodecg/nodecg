@@ -30,7 +30,7 @@ describe("cross-namespace computed via ctx.children", () => {
 		expect(await cross.computed.scaledScore.get()).toBe(score * 2);
 
 		const received: number[] = [];
-		const cancel = await cross.computed.scaledScore.subscribe((value) => {
+		const cancel = cross.computed.scaledScore.subscribe((value) => {
 			received.push(value);
 		});
 		onTestFinished(() => cancel());

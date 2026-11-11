@@ -15,14 +15,7 @@ export {
 	type NestedValues,
 	zipEffectValues,
 } from "./map-values.ts";
-export {
-	type EffectToPromiseLambda,
-	type EffectToSyncLambda,
-	type StreamToSubscribeTopicLambda,
-	type StreamToSubscribeLambda,
-	type IdentityLambda,
-	type ApplyLambdaToObject,
-} from "./promisify.ts";
 export { MalformedUrl, parseRelativeUrl } from "./relative-url.ts";
 export { setSignal, SetSignalError } from "./set-signal.ts";
 export { toError } from "./to-error.ts";
+export { zipPreviousSuccess } from "./zip-previous-success.ts";

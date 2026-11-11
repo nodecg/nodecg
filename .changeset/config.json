@@ -3,5 +3,6 @@
 	"changelog": "./changelog.ts",
 	"linked": [
 		["@nodecg/core", "@nodecg/server", "@nodecg/client", "@nodecg/browser"]
-	]
+	],
+	"baseBranch": "next"
 }

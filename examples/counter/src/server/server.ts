@@ -45,7 +45,7 @@ const loaded = await loadNamespace(implementedRoot, {
 	authProviders: [localProvider],
 });
 
-await loaded.computed.parity.subscribe((parity) => {
+loaded.computed.parity.subscribe((parity) => {
 	console.log(`[server] count is now ${parity}`);
 });
 

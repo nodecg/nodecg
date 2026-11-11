@@ -1,8 +1,8 @@
 import { testLayer } from "@nodecg-private/test-utils";
 import { defineNamespace } from "@nodecg/core";
 import { CurrentIdentity, ServerIdentity } from "@nodecg/internal";
-import { Effect, Layer, Schema } from "effect";
-import { describe, expect, onTestFinished, vi } from "vitest";
+import { Effect, Exit, Layer, Schema, Scope } from "effect";
+import { describe, expect, vi } from "vitest";
 import { z } from "zod";
 
 import { buildNamespace } from "./build-namespace.ts";
@@ -140,12 +140,9 @@ describe("loaded handle", () => {
 			expect(yield* Effect.promise(() => handle.rpc.echo(4))).toBe(40);
 
 			const received: number[] = [];
-			const cancel = yield* Effect.promise(() =>
-				handle.replicant.count.subscribe((value) => {
-					received.push(value);
-				}),
-			);
-			onTestFinished(() => cancel());
+			handle.replicant.count.subscribe((value) => {
+				received.push(value);
+			});
 			yield* Effect.promise(() =>
 				vi.waitFor(() => expect(received).toEqual([3])),
 			);
@@ -173,13 +170,10 @@ describe("loaded handle", () => {
 			const handle = handles.loaded;
 
 			const titles: string[] = [];
-			const cancel = yield* Effect.promise(() =>
-				handle.replicant.count.subscribe(async (count) => {
-					await handle.replicant.title.set(`count ${count}`);
-					titles.push(handle.replicant.title.get());
-				}),
-			);
-			onTestFinished(() => cancel());
+			handle.replicant.count.subscribe(async (count) => {
+				await handle.replicant.title.set(`count ${count}`);
+				titles.push(handle.replicant.title.get());
+			});
 
 			yield* Effect.promise(() => handle.replicant.count.set(2));
 
@@ -217,6 +211,92 @@ describe("loaded handle", () => {
 	);
 
 	test(
+		"a failing subscribe throws the field's error",
+		Effect.gen(function* () {
+			const { handles } = yield* buildNamespace(
+				[manifest.namespace],
+				implementNamespace(manifest, {
+					seedReplicant: { count: () => 1, title: () => "semi" },
+					implementComputed: {
+						doubled: () => {
+							throw new Error("boom");
+						},
+					},
+					implementRpc: { echo: (request) => request * 10 },
+				}),
+				{},
+			);
+
+			expect(() => handles.loaded.computed.doubled.subscribe(() => {})).toThrow(
+				ComputedComputeError.make({
+					namespace: ["ns"],
+					name: "doubled",
+					cause: new Error("boom"),
+				}),
+			);
+		}),
+	);
+
+	test(
+		"a failing subscribe leaves nothing running",
+		Effect.gen(function* () {
+			const compute = vi.fn();
+			const { handles } = yield* buildNamespace(
+				[manifest.namespace],
+				implementNamespace(manifest, {
+					seedReplicant: { count: () => 1, title: () => "semi" },
+					implementComputed: {
+						doubled: (ctx) => {
+							compute();
+							ctx.replicant.count.get();
+							throw new Error("boom");
+						},
+					},
+					implementRpc: { echo: (request) => request * 10 },
+				}),
+				{},
+			);
+			const handle = handles.loaded;
+			expect(() => handle.computed.doubled.subscribe(() => {})).toThrow();
+			const calls = compute.mock.calls.length;
+
+			yield* Effect.promise(() => handle.replicant.count.set(2));
+
+			expect(compute).toHaveBeenCalledTimes(calls);
+		}),
+	);
+
+	test(
+		"ends subscriptions when the load's scope closes",
+		Effect.gen(function* () {
+			const compute = vi.fn();
+			const scope = yield* Scope.make();
+			const { handles } = yield* buildNamespace(
+				[manifest.namespace],
+				implementNamespace(manifest, {
+					seedReplicant: { count: () => 1, title: () => "semi" },
+					implementComputed: {
+						doubled: (ctx) => {
+							compute();
+							return ctx.replicant.count.get() * 2;
+						},
+					},
+					implementRpc: { echo: (request) => request * 10 },
+				}),
+				{},
+			).pipe(Scope.provide(scope));
+			const handle = handles.loaded;
+			handle.computed.doubled.subscribe(() => {});
+			yield* Scope.close(scope, Exit.void);
+			const calls = compute.mock.calls.length;
+
+			yield* Effect.promise(() => handle.replicant.count.set(2));
+
+			expect(compute).toHaveBeenCalledTimes(calls);
+		}),
+	);
+
+	test(
 		"subscribes to a grandchild's replicant through children",
 		Effect.gen(function* () {
 			const grandchild = implementNamespace(
@@ -250,12 +330,9 @@ describe("loaded handle", () => {
 				handles.loaded.children.child.children.grandchild.replicant.value;
 
 			const received: number[] = [];
-			const cancel = yield* Effect.promise(() =>
-				field.subscribe((value) => {
-					received.push(value);
-				}),
-			);
-			onTestFinished(() => cancel());
+			field.subscribe((value) => {
+				received.push(value);
+			});
 			yield* grandchildBuilt.fields.replicant.value.set(5);
 
 			yield* Effect.promise(() =>

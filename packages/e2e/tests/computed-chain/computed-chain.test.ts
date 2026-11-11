@@ -26,7 +26,7 @@ describe("chained computed over the wire", () => {
 		await chain.replicant.target.set(0);
 
 		const statuses: string[] = [];
-		const cancel = await chain.computed.status.subscribe((value) => {
+		const cancel = chain.computed.status.subscribe((value) => {
 			statuses.push(value);
 		});
 		onTestFinished(() => cancel());
@@ -43,35 +43,50 @@ describe("chained computed over the wire", () => {
 		);
 	});
 
-	test("a failing computed's reject leaves out what it threw", async () => {
+	test("a failing computed's error leaves out what it threw", async () => {
 		const root = await loadNamespace(computedChainManifest, { baseUrl: base });
 		onTestFinished(root.dispose);
 		const chain = root.children.chain;
 		await chain.replicant.denominator.set(0);
 		onTestFinished(() => chain.replicant.denominator.set(2));
 
-		await expect(
-			chain.computed.reciprocal.subscribe(() => {}),
-		).rejects.toHaveProperty(
-			"message",
-			'Field "reciprocal" in "e2e-chain" is currently unavailable: Computing computed field "reciprocal" in "e2e-computed-chain/chain" failed',
+		const onError = vi.fn();
+		const cancel = chain.computed.reciprocal.subscribe(() => {}, onError);
+		onTestFinished(() => cancel());
+
+		await vi.waitFor(() =>
+			expect(onError).toHaveBeenCalledWith(
+				expect.objectContaining({
+					message:
+						'Field "reciprocal" in "e2e-chain" is currently unavailable: Computing computed field "reciprocal" in "e2e-computed-chain/chain" failed',
+				}),
+			),
 		);
 	});
 
-	test("subscribing to a currently-failing computed rejects instead of hanging", async () => {
+	test("a currently-failing computed reaches onError", async () => {
 		const root = await loadNamespace(computedChainManifest, { baseUrl: base });
 		onTestFinished(root.dispose);
 		const chain = root.children.chain;
 		await chain.replicant.denominator.set(0); // makes reciprocal throw
 
-		await expect(chain.computed.reciprocal.subscribe(() => {})).rejects.toThrow(
-			/unavailable/i,
+		const onError = vi.fn();
+		const stop = chain.computed.reciprocal.subscribe(() => {}, onError);
+		await vi.waitFor(() =>
+			expect(onError).toHaveBeenCalledWith(
+				expect.objectContaining({
+					_tag: "FieldUnavailable",
+					namespace: "e2e-chain",
+					name: "reciprocal",
+				}),
+			),
 		);
+		stop();
 
-		// a fresh subscribe heals once the source is fixed
+		// a fresh subscribe delivers once the source is fixed
 		await chain.replicant.denominator.set(2);
 		const values: number[] = [];
-		const cancel = await chain.computed.reciprocal.subscribe((value) => {
+		const cancel = chain.computed.reciprocal.subscribe((value) => {
 			values.push(value);
 		});
 		onTestFinished(() => cancel());
@@ -86,7 +101,7 @@ describe("chained computed over the wire", () => {
 		await chain.replicant.target.set(1);
 
 		const leads: number[] = [];
-		const cancel = await chain.computed.lead.subscribe((value) => {
+		const cancel = chain.computed.lead.subscribe((value) => {
 			leads.push(value);
 		});
 		onTestFinished(() => cancel());

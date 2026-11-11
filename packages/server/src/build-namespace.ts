@@ -14,14 +14,19 @@ import {
 	mapValues,
 } from "@nodecg/internal/utils";
 import {
+	Cause,
+	Context,
 	Effect,
 	Exit,
+	Fiber,
+	FiberSet,
 	type HKT,
 	Option,
 	Result,
 	Schema,
 	Scope,
 	Stream,
+	Tracer,
 } from "effect";
 import type { Promisable } from "type-fest";
 
@@ -48,8 +53,6 @@ import type {
 	ImplementedNamespace,
 	LoadedNamespace,
 } from "./implement-namespace.ts";
-import type { ReplicantStoreService } from "./replicant-store.ts";
-import type { TopicBrokerService } from "./services/topic-broker/topic-broker.ts";
 
 const serverIdentity = ServerIdentity.make({});
 
@@ -125,42 +128,53 @@ export const buildNamespace = Effect.fn("buildNamespace")(function* <
 		impl,
 		{ compute, rpc },
 	);
+	const runSubscription = yield* FiberSet.makeRuntime<FieldServices>().pipe(
+		Effect.updateContext<
+			FieldServices | Scope.Scope,
+			FieldServices | Scope.Scope
+		>(Context.omit(Tracer.ParentSpan)),
+	);
 	const handles: NamespaceHandles<S> = {
 		compute: computeContext,
 		rpc: makeCrossNamespaceHandle(fieldServices, fields, rpc),
-		loaded: adaptNamespace(namespace, fieldServices, fields, loaded),
+		loaded: adaptNamespace(
+			namespace,
+			fieldServices,
+			runSubscription,
+			fields,
+			loaded,
+		),
 	};
 	return { fields, handles };
 });
 
 const adaptNamespace = <S extends WidestNamespaceFields>(
 	namespace: NamespacePath,
-	services: FieldServices,
+	services: Context.Context<FieldServices>,
+	runSubscription: <E>(
+		subscription: Effect.Effect<void, E, FieldServices>,
+	) => Fiber.Fiber<void, E>,
 	built: BuiltNamespace<S>,
 	children: LoadedNamespace<S>["children"],
 ) => {
 	const runPromise = Effect.runPromiseWith(services);
+	const runFork = Effect.runForkWith(services);
 
 	const subscribeAdapter =
 		<Decoded, E>(
 			subscribe: () => Effect.Effect<
-				Stream.Stream<
-					Decoded,
-					never,
-					TopicBrokerService | ReplicantStoreService
-				>,
+				Stream.Stream<Decoded, never, FieldServices>,
 				E,
-				TopicBrokerService | ReplicantStoreService | Scope.Scope
+				FieldServices | Scope.Scope
 			>,
 			name: string,
 		) =>
-		async (handler: (value: Decoded) => Promisable<void>) =>
-			runPromise(
-				Effect.gen(function* () {
-					const scope = yield* Scope.make();
-					const subscription = yield* subscribe().pipe(Scope.provide(scope));
-					yield* Effect.forkIn(
-						Stream.runForEach(subscription, (value) =>
+		(handler: (value: Decoded) => Promisable<void>) => {
+			let subscribing = true;
+			const fiber = runSubscription(
+				subscribe().pipe(
+					Effect.flatMap(
+						Stream.runForEach((value) =>
 							Effect.tryPromise(async () => handler(value)).pipe(
 								Effect.catchTag("UnknownError", (error) =>
 									Effect.logError(
@@ -169,14 +183,29 @@ const adaptNamespace = <S extends WidestNamespaceFields>(
 									),
 								),
 							),
-						).pipe(Effect.satisfiesErrorType<never>()),
-						scope,
-					);
-					return async () => {
-						await runPromise(Scope.close(scope, Exit.void));
-					};
-				}),
+						),
+					),
+					Effect.tapError((error) =>
+						subscribing
+							? Effect.void
+							: Effect.logError(
+									`Subscribe to ${formatField(namespace, name)} failed after it returned`,
+									error,
+								),
+					),
+					Effect.scoped,
+				),
 			);
+			subscribing = false;
+
+			const exit = fiber.pollUnsafe();
+			if (typeof exit !== "undefined" && Exit.isFailure(exit)) {
+				throw Cause.squash(exit.cause);
+			}
+			return () => {
+				runFork(Fiber.interrupt(fiber));
+			};
+		};
 
 	const loaded: LoadedNamespace<S> = {
 		replicant: mapValues<ReplicantFieldEffectLambda, ReplicantFieldLambda>(

@@ -1,4 +1,4 @@
-import { loadNamespace } from "@nodecg/client";
+import { FieldPermissionDenied, loadNamespace } from "@nodecg/client";
 import { beforeAll, describe, expect, onTestFinished, test, vi } from "vitest";
 
 import { makeAuthHelpers } from "../../src/client/auth.ts";
@@ -37,12 +37,17 @@ describe("anonymous access", () => {
 		);
 	});
 
-	test("a subscribe to a restricted field is rejected (WS forbidden)", async () => {
+	test("a subscribe to a restricted field reaches onError (WS forbidden)", async () => {
 		const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
 		onTestFinished(root.dispose);
 		const ns = root.children.fixture;
-		await expect(ns.replicant.secret.subscribe(() => {})).rejects.toThrow(
-			/Permission denied/,
+		const onError = vi.fn();
+		ns.replicant.secret.subscribe(() => {}, onError);
+
+		await vi.waitFor(() =>
+			expect(onError).toHaveBeenCalledWith(
+				new FieldPermissionDenied({ namespace: "e2e", name: "secret" }),
+			),
 		);
 	});
 });
@@ -74,7 +79,7 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 		const ns = root.children.fixture;
 		await ns.replicant.count.set(5);
 		const received: Array<[number, number | undefined]> = [];
-		const cancel = await ns.replicant.count.subscribe((value, oldValue) => {
+		const cancel = ns.replicant.count.subscribe((value, oldValue) => {
 			received.push([value, oldValue]);
 		});
 		onTestFinished(() => cancel());
@@ -94,7 +99,7 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 		const ns = root.children.fixture;
 		await ns.replicant.count.set(20);
 		const received: number[] = [];
-		const cancel = await ns.replicant.count.subscribe((value) => {
+		const cancel = ns.replicant.count.subscribe((value) => {
 			received.push(value);
 		});
 		onTestFinished(() => cancel());
@@ -114,10 +119,11 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 		onTestFinished(writerRoot.dispose);
 		const writer = writerRoot.children.fixture;
 		await writer.replicant.scoreboard.set({ home: 0, away: 0 });
-		// Subscribing holds the field hot, so both updaters read the same base and
-		// their patches genuinely race.
-		const cancel = await writer.replicant.scoreboard.subscribe(() => {});
+
+		const onValue = vi.fn();
+		const cancel = writer.replicant.scoreboard.subscribe(onValue);
 		onTestFinished(() => cancel());
+		await vi.waitFor(() => expect(onValue).toHaveBeenCalled());
 
 		await Promise.all([
 			writer.replicant.scoreboard.update((draft) => {
@@ -146,10 +152,11 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 		onTestFinished(writerRoot.dispose);
 		const writer = writerRoot.children.fixture;
 		await writer.replicant.count.set(0);
-		// Subscribing holds the field hot, so all three updaters read the same
-		// base and the losers genuinely conflict before re-running.
-		const cancel = await writer.replicant.count.subscribe(() => {});
+
+		const onValue = vi.fn();
+		const cancel = writer.replicant.count.subscribe(onValue);
 		onTestFinished(() => cancel());
+		await vi.waitFor(() => expect(onValue).toHaveBeenCalled());
 
 		await Promise.all([
 			writer.replicant.count.update((c) => c + 1),
@@ -172,8 +179,10 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 		onTestFinished(writerRoot.dispose);
 		const writer = writerRoot.children.fixture;
 		await writer.replicant.scoreboard.set({ home: 0, away: 0 });
-		const cancel = await writer.replicant.scoreboard.subscribe(() => {});
+		const onValue = vi.fn();
+		const cancel = writer.replicant.scoreboard.subscribe(onValue);
 		onTestFinished(() => cancel());
+		await vi.waitFor(() => expect(onValue).toHaveBeenCalled());
 
 		const [first, second] = await Promise.allSettled([
 			writer.replicant.scoreboard.update(
@@ -216,8 +225,10 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 		onTestFinished(writerRoot.dispose);
 		const writer = writerRoot.children.fixture;
 		await writer.replicant.tallies.set({});
-		const cancel = await writer.replicant.tallies.subscribe(() => {});
+		const onValue = vi.fn();
+		const cancel = writer.replicant.tallies.subscribe(onValue);
 		onTestFinished(() => cancel());
+		await vi.waitFor(() => expect(onValue).toHaveBeenCalled());
 
 		await Promise.all([
 			writer.replicant.tallies.update((draft) => {
@@ -246,8 +257,10 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 		onTestFinished(writerRoot.dispose);
 		const writer = writerRoot.children.fixture;
 		await writer.replicant.roster.set([]);
-		const cancel = await writer.replicant.roster.subscribe(() => {});
+		const onValue = vi.fn();
+		const cancel = writer.replicant.roster.subscribe(onValue);
 		onTestFinished(() => cancel());
+		await vi.waitFor(() => expect(onValue).toHaveBeenCalled());
 
 		await Promise.all([
 			writer.replicant.roster.update((draft) => {
@@ -281,7 +294,7 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 		];
 		await ns.replicant.roster.set(seed);
 		const received: { id: string; score: number }[][] = [];
-		const cancel = await ns.replicant.roster.subscribe((value) => {
+		const cancel = ns.replicant.roster.subscribe((value) => {
 			received.push([...value]);
 		});
 		onTestFinished(() => cancel());
@@ -319,7 +332,7 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 		const ns = root.children.fixture;
 		await ns.replicant.count.set(3);
 		const received: number[] = [];
-		const cancel = await ns.computed.doubledCount.subscribe((value) => {
+		const cancel = ns.computed.doubledCount.subscribe((value) => {
 			received.push(value);
 		});
 		onTestFinished(() => cancel());
@@ -335,7 +348,7 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 		await ns.replicant.count.set(0);
 		await ns.replicant.label.set("first");
 		const received: string[] = [];
-		const cancel = await ns.computed.summary.subscribe((value) => {
+		const cancel = ns.computed.summary.subscribe((value) => {
 			received.push(value);
 		});
 		onTestFinished(() => cancel());
@@ -477,7 +490,7 @@ describe("WS handshake honors the session cookie", () => {
 		onTestFinished(root.dispose);
 		const ns = root.children.fixture;
 		const received: string[] = [];
-		const cancel = await ns.replicant.producerOnly.subscribe((value) => {
+		const cancel = ns.replicant.producerOnly.subscribe((value) => {
 			received.push(value);
 		});
 		onTestFinished(() => cancel());
@@ -502,7 +515,7 @@ describe("messaging (topic + rpc)", () => {
 		onTestFinished(publisherRoot.dispose);
 		const publisher = publisherRoot.children.fixture;
 		const received: string[] = [];
-		const cancel = await subscriber.topic.chat.subscribe((value) => {
+		const cancel = subscriber.topic.chat.subscribe((value) => {
 			received.push(value);
 		});
 		onTestFinished(() => cancel());
@@ -525,7 +538,7 @@ describe("messaging (topic + rpc)", () => {
 		onTestFinished(publisherRoot.dispose);
 		const publisher = publisherRoot.children.fixture;
 		const first: string[] = [];
-		const cancelFirst = await ns.topic.chat.subscribe((value) => {
+		const cancelFirst = ns.topic.chat.subscribe((value) => {
 			first.push(value);
 		});
 		onTestFinished(() => cancelFirst());
@@ -540,7 +553,7 @@ describe("messaging (topic + rpc)", () => {
 		await vi.waitFor(() => expect(first).toContain("sync"));
 
 		const second: string[] = [];
-		const cancelSecond = await ns.topic.chat.subscribe((value) => {
+		const cancelSecond = ns.topic.chat.subscribe((value) => {
 			second.push(value);
 		});
 		onTestFinished(() => cancelSecond());
@@ -569,7 +582,7 @@ describe("messaging (topic + rpc)", () => {
 		onTestFinished(root.dispose);
 		const ns = root.children.fixture;
 		const received: number[] = [];
-		const cancel = await ns.replicant.count.subscribe((value) => {
+		const cancel = ns.replicant.count.subscribe((value) => {
 			received.push(value);
 		});
 		onTestFinished(() => cancel());
