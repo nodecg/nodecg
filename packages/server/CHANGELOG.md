@@ -1,5 +1,14 @@
 # @nodecg/server
 
+## 3.0.0-alpha.1
+
+### Patch Changes
+
+- Make field subscribe return synchronously ([14fea3e](https://github.com/nodecg/nodecg/commit/14fea3eb75d52006b345c008f1cc6334eaf30716))
+- Remove `extendNamespace` and `implementExtendedNamespace`. `children` offers equivalent functionality. ([a993819](https://github.com/nodecg/nodecg/commit/a9938198cce1cfbd7b22d95e2c5b893e19178322))
+- replicant storage uses namespace key paths ([8a76e51](https://github.com/nodecg/nodecg/commit/8a76e514cf6a396b4ed84f03a45a31e8bfe132a4))
+- add data folder and namespace path to context ([5061530](https://github.com/nodecg/nodecg/commit/506153073791401e99f85ff89e545493e93574ea))
+
 ## 3.0.0-alpha.0
 
 ### Patch Changes

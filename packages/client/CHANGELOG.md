@@ -1,5 +1,11 @@
 # @nodecg/client
 
+## 3.0.0-alpha.1
+
+### Patch Changes
+
+- Make field subscribe return synchronously ([14fea3e](https://github.com/nodecg/nodecg/commit/14fea3eb75d52006b345c008f1cc6334eaf30716))
+
 ## 3.0.0-alpha.0
 
 ### Patch Changes

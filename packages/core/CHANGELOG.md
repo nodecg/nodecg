@@ -1,5 +1,15 @@
 # @nodecg/core
 
+## 3.0.0-alpha.1
+
+### Patch Changes
+
+- validate child key in type checking and runtime ([fa8c20f](https://github.com/nodecg/nodecg/commit/fa8c20f1de41b05c337c09aa3f476ab393d4b739))
+- export `jsonSchema` return type as its own type ([34dd342](https://github.com/nodecg/nodecg/commit/34dd34292c67d28c093d28af5502a052612e559d))
+- Remove `extendNamespace` and `implementExtendedNamespace`. `children` offers equivalent functionality. ([a993819](https://github.com/nodecg/nodecg/commit/a9938198cce1cfbd7b22d95e2c5b893e19178322))
+- link roles through a callback over the child tree ([fd56c69](https://github.com/nodecg/nodecg/commit/fd56c69f3d3e7d59f95efe13876de8e19bdb5645))
+- reject rpc schemas that do not encode to JSON ([25a46bf](https://github.com/nodecg/nodecg/commit/25a46bf6e75946b96ad6009e14fea9ba2b52082b))
+
 ## 3.0.0-alpha.0
 
 ### Patch Changes
