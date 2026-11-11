@@ -332,6 +332,37 @@ describe("defineNamespace", () => {
 			).toThrow('"Webhook" in "show" differs from "webhook" only in case');
 		});
 
+		test("rejects a child key outside the allowed characters", () => {
+			const assets = defineNamespace("show-assets", {});
+
+			expect(() =>
+				defineNamespace("show", {
+					children: {
+						// @ts-expect-error a dot is not allowed
+						"..": assets,
+					},
+				}),
+			).toThrow(
+				'".." in "show" must use only A-Z, a-z, 0-9, "_" and "-", and not be a Windows device name',
+			);
+		});
+
+		test("rejects child keys that differ only in case", () => {
+			const assets = defineNamespace("show-assets", {});
+			const media = defineNamespace("show-media", {});
+
+			expect(() =>
+				defineNamespace("show", {
+					children: {
+						// @ts-expect-error differs from Media only in case
+						media,
+						// @ts-expect-error differs from media only in case
+						Media: assets,
+					},
+				}),
+			).toThrow('"Media" in "show" differs from "media" only in case');
+		});
+
 		test("rejects a custom route method that is not HTTP", () => {
 			expect(() =>
 				defineNamespace("show", {

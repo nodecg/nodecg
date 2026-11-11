@@ -582,7 +582,7 @@ export function defineNamespace<
 		customRoute?: CustomRoute &
 			UnsafeNameKeys<CustomRoute> &
 			CaseClashingKeys<CustomRoute>;
-		children?: Children;
+		children?: Children & UnsafeNameKeys<Children> & CaseClashingKeys<Children>;
 	},
 ): NamespaceManifest<
 	FileSafeName<Namespace>,
@@ -617,6 +617,10 @@ export function defineNamespace<
 	);
 	if (Option.isSome(invalidCustomRoute)) {
 		throw invalidCustomRoute.value;
+	}
+	const invalidChild = findInvalidName(namespace, defineOption.children);
+	if (Option.isSome(invalidChild)) {
+		throw invalidChild.value;
 	}
 
 	const children = defineOption.children ?? ({} as Children);
