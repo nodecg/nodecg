@@ -2,7 +2,7 @@ import * as NodeCrypto from "@effect/platform-node/NodeCrypto";
 import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
 import { it } from "@effect/vitest";
-import { type ResolvedPermission, FieldDecodeError } from "@nodecg/core";
+import { FieldDecodeError } from "@nodecg/core";
 import { RoleName } from "@nodecg/internal";
 import { ConfigProvider, Effect, HashMap, Layer, Stream } from "effect";
 import {
@@ -49,13 +49,6 @@ import { UrlPath } from "./url-path.ts";
 
 type ReplicantStub = BuiltNamespace["replicant"][string];
 
-const openPermission: ResolvedPermission = {
-	read: { roles: new Set(), rolesDenied: new Set() },
-	write: { roles: new Set(), rolesDenied: new Set() },
-	canRead: () => true,
-	canWrite: () => true,
-};
-
 type TopicInternal = BuiltNamespace["topic"][string][typeof fieldInternal];
 type RpcInternal = BuiltNamespace["rpc"][string][typeof fieldInternal];
 
@@ -71,7 +64,7 @@ function stubTopic(
 			subscribe: () => Effect.succeed(Stream.empty),
 			subscribeEncoded: () => Effect.succeed(Stream.empty),
 			publishEncoded,
-			permission: openPermission,
+			canRead: () => true,
 		},
 	};
 }
@@ -83,7 +76,6 @@ function stubRpc(
 		call: vi.fn(),
 		[fieldInternal]: {
 			callEncoded,
-			permission: openPermission,
 		},
 	};
 }

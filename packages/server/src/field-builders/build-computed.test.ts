@@ -3,6 +3,7 @@ import { defineNamespace } from "@nodecg/core";
 import {
 	AnonymousIdentitySchema,
 	CurrentIdentity,
+	manifestRolesKey,
 	ServerIdentity,
 } from "@nodecg/internal";
 import { Effect, Layer, Option, Result, Schema, Stream } from "effect";
@@ -84,6 +85,8 @@ const buildDoubled = (value: string) =>
 			["ns"],
 			"doubled",
 			manifest.computed.doubled,
+			manifest[manifestRolesKey],
+			"ns",
 			() => doubleCount(readCount().value),
 		);
 	});
@@ -130,6 +133,8 @@ describe("get", () => {
 				["ns"],
 				"doc",
 				manifest.computed.doc,
+				manifest[manifestRolesKey],
+				"ns",
 				() => Result.succeed({ count: 1, data: { tags: ["a"] } }),
 			);
 
@@ -148,6 +153,8 @@ describe("get", () => {
 				["ns"],
 				"doc",
 				manifest.computed.doc,
+				manifest[manifestRolesKey],
+				"ns",
 				() => Result.succeed({ count: 1, data: { tags } }),
 			);
 
@@ -169,6 +176,8 @@ describe("getEncoded", () => {
 				["ns"],
 				"open",
 				manifest.computed.open,
+				manifest[manifestRolesKey],
+				"ns",
 				() => doubleCount(readCount().value),
 			);
 			expect(
@@ -197,6 +206,8 @@ describe("getEncoded", () => {
 				["ns"],
 				"positive",
 				manifest.computed.positive,
+				manifest[manifestRolesKey],
+				"ns",
 				() => Result.succeed(-1),
 			);
 			const error = yield* field[fieldInternal]
@@ -270,6 +281,8 @@ describe("subscribe", () => {
 				["ns"],
 				"doc",
 				manifest.computed.doc,
+				manifest[manifestRolesKey],
+				"ns",
 				() => Result.succeed({ count: 1, data: { tags: ["a"] } }),
 			);
 

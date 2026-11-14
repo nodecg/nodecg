@@ -1,10 +1,20 @@
-import type { RpcFieldManifest } from "@nodecg/core";
-import { formatField, NamespacePath } from "@nodecg/internal";
+import {
+	canAccess,
+	resolveRpcAccess,
+	type RoleRegistry,
+	type RpcFieldManifest,
+} from "@nodecg/core";
+import {
+	CurrentIdentity,
+	formatField,
+	type Identity,
+	NamespacePath,
+} from "@nodecg/internal";
 import { Effect, Schema } from "effect";
 import type { Promisable } from "type-fest";
 
 import { fieldInternal } from "./field-internal-key.ts";
-import { requirePermission } from "./permission.ts";
+import { FieldPermissionDenied } from "./permission.ts";
 
 export class RpcHandlerError extends Schema.TaggedError<RpcHandlerError>()(
 	"RpcHandlerError",
@@ -22,10 +32,15 @@ export const buildRpc = Effect.fn("buildRpc")(
 		namespace: NamespacePath,
 		name: string,
 		manifest: RpcFieldManifest<Request, Response>,
+		registry: RoleRegistry,
+		roleNamespace: string,
 		handler: (request: Request, ctx: Ctx) => Promisable<Response>,
 		ctx: Ctx,
 	) =>
 		Effect.sync(() => {
+			const access = resolveRpcAccess(registry, manifest.permission);
+			const canWrite = (identity: Identity) =>
+				canAccess(access.write, identity, roleNamespace, registry);
 			const runHandler = (request: Request) =>
 				Effect.tryPromise({
 					try: async () => handler(request, ctx),
@@ -34,14 +49,28 @@ export const buildRpc = Effect.fn("buildRpc")(
 				});
 
 			const call = Effect.fn("call")(function* (request: Request) {
-				yield* requirePermission(manifest.permission, namespace, name, "write");
+				const identity = yield* CurrentIdentity;
+				if (!canWrite(identity)) {
+					return yield* FieldPermissionDenied.make({
+						namespace,
+						name,
+						operation: "write",
+					});
+				}
 				return yield* runHandler(request);
 			});
 
 			const callEncoded = Effect.fn("callEncoded")(function* (
 				payload: Schema.Json,
 			) {
-				yield* requirePermission(manifest.permission, namespace, name, "write");
+				const identity = yield* CurrentIdentity;
+				if (!canWrite(identity)) {
+					return yield* FieldPermissionDenied.make({
+						namespace,
+						name,
+						operation: "write",
+					});
+				}
 				const request = yield* Effect.fromResult(
 					manifest.request.decode(payload),
 				);
@@ -53,7 +82,6 @@ export const buildRpc = Effect.fn("buildRpc")(
 				call,
 				[fieldInternal]: {
 					callEncoded,
-					permission: manifest.permission,
 				},
 			};
 		}),

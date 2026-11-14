@@ -1,6 +1,7 @@
 import type { WidestNamespaceFields, NamespaceManifest } from "@nodecg/core";
 import {
 	CurrentIdentity,
+	manifestRolesKey,
 	type NamespacePath,
 	ServerIdentity,
 } from "@nodecg/internal";
@@ -27,9 +28,9 @@ import {
 import { fieldInternal } from "./field-builders/field-internal-key.ts";
 import type {
 	ComputedFieldEffectLambda,
+	ComputedFieldManifestLambda,
 	ComputeFnLambda,
 	FieldReadLambda,
-	FieldManifestLambda,
 	ReplicantFieldEffectLambda,
 	ReplicantFieldManifestLambda,
 	RpcComputedAccessorLambda,
@@ -41,6 +42,7 @@ import type {
 	RpcTopicAccessorLambda,
 	SeedFnLambda,
 	TopicFieldEffectLambda,
+	TopicFieldManifestLambda,
 } from "./field-lambdas.ts";
 import type {
 	ComputeContext,
@@ -141,6 +143,7 @@ export const buildFields = Effect.fn("buildFields")(function* <
 	const seedReplicantFns = options?.seedReplicant;
 	const computeFns = options?.implementComputed;
 	const rpcHandlers = options?.implementRpc;
+	const registry = manifest[manifestRolesKey];
 
 	const fieldServices = yield* Effect.context<FieldServices>().pipe(
 		Effect.map(Context.omit(Tracer.ParentSpan)),
@@ -153,7 +156,14 @@ export const buildFields = Effect.fn("buildFields")(function* <
 		unknown,
 		S["replicant"]
 	>()(manifest.replicant, seedReplicantFns, (codec, seed, name) =>
-		buildReplicant(namespace, name, codec, seed()),
+		buildReplicant(
+			namespace,
+			name,
+			codec,
+			registry,
+			manifest.namespace,
+			seed(),
+		),
 	);
 
 	type OwnComputeContext = ComputeContext<
@@ -186,13 +196,13 @@ export const buildFields = Effect.fn("buildFields")(function* <
 	};
 
 	const computed = yield* zipEffectValues<
-		FieldManifestLambda,
+		ComputedFieldManifestLambda,
 		ComputeFnLambda,
 		ComputedFieldEffectLambda,
 		OwnComputeContext,
 		S["computed"]
 	>()(manifest.computed, computeFns, (codec, compute, name) =>
-		buildComputed(namespace, name, codec, () =>
+		buildComputed(namespace, name, codec, registry, manifest.namespace, () =>
 			Result.try({
 				try: () => compute(computeContext),
 				catch: (error) =>
@@ -215,9 +225,11 @@ export const buildFields = Effect.fn("buildFields")(function* <
 	)(computed);
 
 	const topic = yield* mapEffectValues<
-		FieldManifestLambda,
+		TopicFieldManifestLambda,
 		TopicFieldEffectLambda
-	>()((codec, name) => buildTopic(namespace, name, codec))(manifest.topic);
+	>()((codec, name) =>
+		buildTopic(namespace, name, codec, registry, manifest.namespace),
+	)(manifest.topic);
 
 	const rpcContext: RpcContext<S> = {
 		...fieldAccessors(fieldServices)({ replicant, computed, topic }),
@@ -231,7 +243,15 @@ export const buildFields = Effect.fn("buildFields")(function* <
 		RpcContext<S>,
 		S["rpc"]
 	>()(manifest.rpc, rpcHandlers, (codec, handler, name) =>
-		buildRpc(namespace, name, codec, handler, rpcContext),
+		buildRpc(
+			namespace,
+			name,
+			codec,
+			registry,
+			manifest.namespace,
+			handler,
+			rpcContext,
+		),
 	);
 
 	return {

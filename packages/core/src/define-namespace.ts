@@ -22,42 +22,38 @@ import {
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { type HKT, Option, Record, Schema, String } from "effect";
 import { HttpMethod } from "effect/http";
-import type { Writable } from "type-fest";
 
 import { makeCodec, type FieldCodec } from "./field-codec.ts";
 import {
-	computedPermission,
-	customRoutePermission,
-	replicantPermission,
-	rpcPermission,
-	topicPermission,
-	type Access,
 	RoleReference,
 	type PermissionArg,
 	type PrincipalManifest,
 	type PrincipalsArg,
 	type PermissionRuleArg,
 	type ReadOnlyPermissionArg,
-	type ResolvedPermission,
 	type RoleCapability,
 	type RoleManifest,
+	type RoleRegistry,
 	type WriteOnlyPermissionArg,
 } from "./role.ts";
 
-export interface FieldManifest<D> extends FieldCodec<D> {
-	readonly name: string;
-	readonly permission: ResolvedPermission;
-}
-
-export interface ReplicantFieldManifest<D> extends FieldManifest<D> {
+export interface ReplicantFieldManifest<D> extends FieldCodec<D> {
+	readonly permission?: PermissionArg<string>;
 	readonly persistent: boolean;
 }
 
+export interface ComputedFieldManifest<D> extends FieldCodec<D> {
+	readonly permission?: ReadOnlyPermissionArg<string>;
+}
+
+export interface TopicFieldManifest<D> extends FieldCodec<D> {
+	readonly permission?: PermissionArg<string>;
+}
+
 export interface RpcFieldManifest<Request, Response> {
-	readonly name: string;
 	readonly request: FieldCodec<Request>;
 	readonly response: FieldCodec<Response>;
-	readonly permission: ResolvedPermission;
+	readonly permission?: WriteOnlyPermissionArg<string>;
 }
 
 type HttpMethodKey = Lowercase<Exclude<HttpMethod.HttpMethod, "TRACE">>;
@@ -66,7 +62,7 @@ export type CustomRouteMethod = HttpMethodKey | "*";
 
 export interface CustomRouteManifest {
 	readonly name: string;
-	readonly permission: ResolvedPermission;
+	readonly permission?: WriteOnlyPermissionArg<string>;
 }
 
 type CustomRouteMethodOption<P extends WriteOnlyPermissionArg<string>> = {
@@ -128,10 +124,12 @@ export interface NamespaceManifest<
 		>;
 	};
 	readonly computed: {
-		[K in keyof S["computed"] & string]: FieldManifest<S["computed"][K]>;
+		[K in keyof S["computed"] & string]: ComputedFieldManifest<
+			S["computed"][K]
+		>;
 	};
 	readonly topic: {
-		[K in keyof S["topic"] & string]: FieldManifest<S["topic"][K]>;
+		[K in keyof S["topic"] & string]: TopicFieldManifest<S["topic"][K]>;
 	};
 	readonly rpc: {
 		[K in keyof S["rpc"] & string]: RpcFieldManifest<
@@ -254,17 +252,7 @@ type FieldOptionSchema<FieldArg> =
 		? S
 		: never;
 
-// Target FieldOption since the mapValues calls below fail to type-check with a schema target.
-interface FieldOptionLambda<
-	P extends PermissionArg<string> | ReadOnlyPermissionArg<string>,
->
-	extends HKT.TypeLambda {
-	readonly Target: FieldOption<WidestFieldSchema, P>;
-	readonly type: this["Target"];
-}
-interface FieldManifestFromOptionLambda extends HKT.TypeLambda {
-	readonly type: FieldManifest<FieldDecoded<FieldOptionSchema<this["Target"]>>>;
-}
+// Target the field option, not its schema, since the mapValues calls below fail to type-check with a schema target.
 interface ReplicantFieldOptionLambda<P extends PermissionArg<string>>
 	extends HKT.TypeLambda {
 	readonly Target: ReplicantFieldOption<WidestFieldSchema, P>;
@@ -272,6 +260,23 @@ interface ReplicantFieldOptionLambda<P extends PermissionArg<string>>
 }
 interface ReplicantFieldManifestFromOptionLambda extends HKT.TypeLambda {
 	readonly type: ReplicantFieldManifest<
+		FieldDecoded<FieldOptionSchema<this["Target"]>>
+	>;
+}
+interface FieldOptionLambda<
+	P extends PermissionArg<string> | ReadOnlyPermissionArg<string>,
+>
+	extends HKT.TypeLambda {
+	readonly Target: FieldOption<WidestFieldSchema, P>;
+	readonly type: this["Target"];
+}
+interface ComputedFieldManifestFromOptionLambda extends HKT.TypeLambda {
+	readonly type: ComputedFieldManifest<
+		FieldDecoded<FieldOptionSchema<this["Target"]>>
+	>;
+}
+interface TopicFieldManifestFromOptionLambda extends HKT.TypeLambda {
+	readonly type: TopicFieldManifest<
 		FieldDecoded<FieldOptionSchema<this["Target"]>>
 	>;
 }
@@ -309,47 +314,6 @@ interface RpcFieldManifestFromOptionLambda extends HKT.TypeLambda {
 		FieldDecoded<RpcOptionSchema<this["Target"]>["response"]>
 	>;
 }
-
-function implementCodec(name: string, schema: WidestFieldSchema) {
-	return { name, ...makeCodec(name, schema) };
-}
-
-interface RoleRegistry {
-	readonly roles: Map<RoleName, RoleManifest>;
-	readonly principals: Map<Principal, PrincipalManifest>;
-}
-
-const resolveAccess = (
-	registry: RoleRegistry,
-	capability: RoleCapability,
-	rule: PermissionRuleArg<string> | undefined,
-): Access => {
-	const rolesDenied = new Set(
-		(rule?.deny ?? []).map((name) => RoleName.make(name)),
-	);
-	const roles = rule?.allow
-		? new Set(rule.allow.map((name) => RoleName.make(name)))
-		: new Set(
-				Array.from(registry.roles.values())
-					.filter((role) => role.capabilities.has(capability))
-					.map((role) => role.name),
-			);
-	const access: Writable<Access> = {
-		roles: roles.difference(rolesDenied),
-		rolesDenied,
-	};
-	for (const name of DeclarablePrincipalNameSchema.literals) {
-		const grant = rule?.[name];
-		if (typeof grant !== "undefined") {
-			access[name] = grant;
-		} else if (
-			registry.principals.get(PRINCIPAL[name])?.capabilities.has(capability)
-		) {
-			access[name] = "allow";
-		}
-	}
-	return access;
-};
 
 type FieldPermissionOptions = {
 	readonly permission?: {
@@ -631,8 +595,6 @@ export function defineNamespace<
 		children,
 	);
 
-	const namedRoles = new Set(registry.roles.keys());
-
 	validatePermissionTokens("replicant", defineOption.replicant, registry.roles);
 	validatePermissionTokens("computed", defineOption.computed, registry.roles);
 	validatePermissionTokens("topic", defineOption.topic, registry.roles);
@@ -647,13 +609,8 @@ export function defineNamespace<
 		ReplicantFieldOptionLambda<PermissionArg<DeclaredRoleName>>,
 		ReplicantFieldManifestFromOptionLambda
 	>((option, name) => ({
-		...implementCodec(name, option.schema),
-		permission: replicantPermission(
-			resolveAccess(registry, "replicant-read", option.permission?.read),
-			resolveAccess(registry, "replicant-write", option.permission?.write),
-			namespace,
-			namedRoles,
-		),
+		...makeCodec(name, option.schema),
+		permission: option.permission,
 		persistent: option.persistent ?? true,
 	}))<ReplicantFieldOptions<Replicant, PermissionArg<DeclaredRoleName>>>(
 		defineOption.replicant,
@@ -661,43 +618,29 @@ export function defineNamespace<
 
 	const computed = mapValues<
 		FieldOptionLambda<ReadOnlyPermissionArg<DeclaredRoleName>>,
-		FieldManifestFromOptionLambda
+		ComputedFieldManifestFromOptionLambda
 	>((option, name) => ({
-		...implementCodec(name, option.schema),
-		permission: computedPermission(
-			resolveAccess(registry, "computed-read", option.permission?.read),
-			namespace,
-			namedRoles,
-		),
+		...makeCodec(name, option.schema),
+		permission: option.permission,
 	}))<FieldOptions<Computed, ReadOnlyPermissionArg<DeclaredRoleName>>>(
 		defineOption.computed,
 	);
 
 	const topic = mapValues<
 		FieldOptionLambda<PermissionArg<DeclaredRoleName>>,
-		FieldManifestFromOptionLambda
+		TopicFieldManifestFromOptionLambda
 	>((option, name) => ({
-		...implementCodec(name, option.schema),
-		permission: topicPermission(
-			resolveAccess(registry, "topic-subscribe", option.permission?.read),
-			resolveAccess(registry, "topic-publish", option.permission?.write),
-			namespace,
-			namedRoles,
-		),
+		...makeCodec(name, option.schema),
+		permission: option.permission,
 	}))<FieldOptions<Topic, PermissionArg<DeclaredRoleName>>>(defineOption.topic);
 
 	const rpc = mapValues<
 		RpcFieldOptionLambda<WriteOnlyPermissionArg<DeclaredRoleName>>,
 		RpcFieldManifestFromOptionLambda
 	>((option, name) => ({
-		name,
 		request: makeCodec(name, option.schema.request),
 		response: makeCodec(name, option.schema.response),
-		permission: rpcPermission(
-			resolveAccess(registry, "rpc-call", option.permission?.write),
-			namespace,
-			namedRoles,
-		),
+		permission: option.permission,
 	}))<Rpc>(defineOption.rpc);
 
 	const declaredRoutes: CustomRoute | undefined = defineOption.customRoute;
@@ -705,15 +648,7 @@ export function defineNamespace<
 		CustomRouteMethodOption<WriteOnlyPermissionArg<DeclaredRoleName>>
 	>()(declaredRoutes, (option, name) => ({
 		name,
-		permission: customRoutePermission(
-			resolveAccess(
-				registry,
-				"custom-route-request",
-				option?.permission?.write,
-			),
-			namespace,
-			namedRoles,
-		),
+		permission: option?.permission,
 	}));
 
 	return {

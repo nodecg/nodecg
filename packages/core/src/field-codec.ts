@@ -121,20 +121,10 @@ const makeStandardCodec = <D>(
 	};
 };
 
-export interface FieldCodec<D> {
-	readonly encode: (
-		value: D | WritableDeep<D>,
-	) => Result.Result<Schema.Json, FieldEncodeError>;
-	readonly decode: (value: Schema.Json) => Result.Result<D, FieldDecodeError>;
-	readonly mutableDecode: (
-		value: Schema.Json,
-	) => Result.Result<WritableDeep<D>, FieldDecodeError>;
-}
-
 export function makeCodec<D>(
 	name: string,
 	schema: Schema.Codec<D, Schema.Json> | StandardSchemaV1<unknown, D>,
-): FieldCodec<D> {
+) {
 	const codec = Schema.isSchema(schema)
 		? makeEffectCodec(name, schema)
 		: makeStandardCodec(name, schema);
@@ -181,3 +171,5 @@ export function makeCodec<D>(
 			),
 	};
 }
+
+export interface FieldCodec<D> extends ReturnType<typeof makeCodec<D>> {}

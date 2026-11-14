@@ -9,15 +9,15 @@ import type { FrontendConfig } from "./implement-namespace.ts";
 // Exclude Decoded types
 export type ReplicantFieldInternal = Pick<
 	BuiltNamespace["replicant"][string][typeof fieldInternal],
-	"getRevisioned" | "commitPatch" | "subscribeRevisioned" | "permission"
+	"getRevisioned" | "commitPatch" | "subscribeRevisioned" | "canRead"
 >;
 export type ComputedFieldInternal = Pick<
 	BuiltNamespace["computed"][string][typeof fieldInternal],
-	"getEncoded" | "getEncodedNoAuth" | "subscribeEncoded" | "permission"
+	"getEncoded" | "getEncodedNoAuth" | "subscribeEncoded" | "canRead"
 >;
 export type TopicFieldInternal = Pick<
 	BuiltNamespace["topic"][string][typeof fieldInternal],
-	"publishEncoded" | "subscribeEncoded" | "permission"
+	"publishEncoded" | "subscribeEncoded" | "canRead"
 >;
 type RpcFieldInternal = BuiltNamespace["rpc"][string][typeof fieldInternal];
 

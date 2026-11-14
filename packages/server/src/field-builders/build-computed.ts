@@ -1,4 +1,9 @@
-import type { FieldManifest } from "@nodecg/core";
+import {
+	canAccess,
+	resolveComputedAccess,
+	type ComputedFieldManifest,
+	type RoleRegistry,
+} from "@nodecg/core";
 import {
 	CurrentIdentity,
 	type Identity,
@@ -13,15 +18,20 @@ import {
 } from "../replicant-store.ts";
 import { fieldInternal } from "./field-internal-key.ts";
 import { migrationDie } from "./migration-die.ts";
-import { checkPermission, requirePermission } from "./permission.ts";
+import { FieldPermissionDenied } from "./permission.ts";
 
 export const buildComputed = Effect.fn("buildComputed")(function* <Decoded>(
 	namespace: NamespacePath,
 	name: string,
-	manifest: FieldManifest<Decoded>,
+	manifest: ComputedFieldManifest<Decoded>,
+	registry: RoleRegistry,
+	roleNamespace: string,
 	computeValue: () => Result.Result<Decoded, ComputeFailure>,
 ) {
 	const store = yield* ReplicantStoreService;
+	const access = resolveComputedAccess(registry, manifest.permission);
+	const canRead = (identity: Identity) =>
+		canAccess(access.read, identity, roleNamespace, registry);
 	const read = yield* store.initializeComputed(namespace, name, () =>
 		computeValue().pipe(
 			Result.flatMap((value) => manifest.encode(value)),
@@ -30,14 +40,10 @@ export const buildComputed = Effect.fn("buildComputed")(function* <Decoded>(
 	);
 
 	const getResult = (identity: Identity) =>
-		checkPermission(
-			manifest.permission,
-			namespace,
-			name,
-			"read",
-			identity,
+		Result.liftPredicate(identity, canRead, () =>
+			FieldPermissionDenied.make({ namespace, name, operation: "read" }),
 		).pipe(
-			Result.flatMap(read),
+			Result.flatMap(() => read()),
 			Result.flatMap((encoded) => manifest.decode(cloneJson(encoded))),
 		);
 
@@ -51,7 +57,14 @@ export const buildComputed = Effect.fn("buildComputed")(function* <Decoded>(
 	});
 
 	const getEncoded = Effect.fn("getEncoded")(function* () {
-		yield* requirePermission(manifest.permission, namespace, name, "read");
+		const identity = yield* CurrentIdentity;
+		if (!canRead(identity)) {
+			return yield* FieldPermissionDenied.make({
+				namespace,
+				name,
+				operation: "read",
+			});
+		}
 		return yield* Effect.fromResult(read());
 	});
 
@@ -77,7 +90,7 @@ export const buildComputed = Effect.fn("buildComputed")(function* <Decoded>(
 			getEncodedNoAuth,
 			getEncoded,
 			subscribeEncoded,
-			permission: manifest.permission,
+			canRead,
 		},
 	};
 });

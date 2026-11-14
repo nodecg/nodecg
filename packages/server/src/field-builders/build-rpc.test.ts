@@ -3,6 +3,7 @@ import { defineNamespace } from "@nodecg/core";
 import {
 	AnonymousIdentitySchema,
 	CurrentIdentity,
+	manifestRolesKey,
 	ServerIdentity,
 } from "@nodecg/internal";
 import { Effect, Layer, Schema } from "effect";
@@ -48,6 +49,8 @@ describe("callEncoded", () => {
 				["ns"],
 				"echo",
 				manifest.rpc.echo,
+				manifest[manifestRolesKey],
+				"ns",
 				handler,
 				context,
 			);
@@ -68,6 +71,8 @@ describe("callEncoded", () => {
 				["ns"],
 				"echo",
 				manifest.rpc.echo,
+				manifest[manifestRolesKey],
+				"ns",
 				async (request: number) => {
 					await Promise.resolve();
 					return request + 1;
@@ -91,6 +96,8 @@ describe("callEncoded", () => {
 				["ns"],
 				"echo",
 				manifest.rpc.echo,
+				manifest[manifestRolesKey],
+				"ns",
 				handler,
 				context,
 			);
@@ -111,6 +118,8 @@ describe("callEncoded", () => {
 				["ns"],
 				"echo",
 				manifest.rpc.echo,
+				manifest[manifestRolesKey],
+				"ns",
 				() => {
 					throw new Error("boom");
 				},
@@ -133,6 +142,8 @@ describe("callEncoded", () => {
 				["ns"],
 				"echo",
 				manifest.rpc.echo,
+				manifest[manifestRolesKey],
+				"ns",
 				() => "nope" as unknown as number,
 				context,
 			);
@@ -157,6 +168,8 @@ describe("call", () => {
 				["ns"],
 				"echo",
 				manifest.rpc.echo,
+				manifest[manifestRolesKey],
+				"ns",
 				handler,
 				context,
 			);
@@ -175,6 +188,8 @@ describe("call", () => {
 				["ns"],
 				"echo",
 				manifest.rpc.echo,
+				manifest[manifestRolesKey],
+				"ns",
 				() => {
 					throw new Error("boom");
 				},
@@ -196,6 +211,8 @@ test(
 			["ns"],
 			"locked",
 			manifest.rpc.locked,
+			manifest[manifestRolesKey],
+			"ns",
 			handler,
 			context,
 		);

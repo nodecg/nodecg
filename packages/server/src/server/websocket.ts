@@ -200,7 +200,7 @@ export const websocketRoute = HttpRouter.use((router) =>
 					return Option.none();
 				}
 				const target = resolved.value;
-				if (!target.internal.permission.canRead(identity)) {
+				if (!target.internal.canRead(identity)) {
 					yield* send(
 						SubscribeRejectedMessage.make({ field, reason: "forbidden" }),
 					);

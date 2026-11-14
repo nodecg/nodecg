@@ -3,11 +3,13 @@ import {
 	DeclarablePrincipalNameSchema,
 	type DeclarablePrincipalName,
 	type Identity,
+	PRINCIPAL,
 	type Principal,
 	type Role,
-	type RoleName,
+	RoleName,
 } from "@nodecg/internal";
 import { Match, Schema } from "effect";
+import type { Writable } from "type-fest";
 
 export const ROLE_CAPABILITY = [
 	"replicant-read",
@@ -68,17 +70,15 @@ export interface PrincipalManifest {
 	readonly capabilities: ReadonlySet<RoleCapability>;
 }
 
+export interface RoleRegistry {
+	readonly roles: Map<RoleName, RoleManifest>;
+	readonly principals: Map<Principal, PrincipalManifest>;
+}
+
 export type Access = PrincipalGrants & {
 	readonly roles: ReadonlySet<RoleName>;
 	readonly rolesDenied: ReadonlySet<RoleName>;
 };
-
-export interface ResolvedPermission {
-	readonly read: Access;
-	readonly write: Access;
-	readonly canRead: (caller: Identity) => boolean;
-	readonly canWrite: (caller: Identity) => boolean;
-}
 
 export const getRolesForNamespace = (
 	caller: Identity,
@@ -116,11 +116,11 @@ export const isSuperadmin = (caller: Identity): boolean =>
 		Match.exhaustive,
 	);
 
-const can = (
+export const canAccess = (
 	access: Access,
 	caller: Identity,
 	namespace: string,
-	namedRoles: ReadonlySet<RoleName>,
+	registry: RoleRegistry,
 ): boolean => {
 	if (caller._tag === "server") {
 		return true;
@@ -130,7 +130,7 @@ const can = (
 	}
 	const roles = getRolesForNamespace(caller, namespace);
 
-	const isMember = roles.some((role) => namedRoles.has(role));
+	const isMember = roles.some((role) => registry.roles.has(role));
 	if (isMember && access.member === "deny") {
 		return false;
 	}
@@ -149,24 +149,37 @@ const can = (
 	);
 };
 
-const EMPTY_ACCESS: Access = {
-	roles: new Set(),
-	rolesDenied: new Set(),
+const resolveAccess = (
+	registry: RoleRegistry,
+	capability: RoleCapability,
+	rule: PermissionRuleArg<string> | undefined,
+): Access => {
+	const rolesDenied = new Set(
+		(rule?.deny ?? []).map((name) => RoleName.make(name)),
+	);
+	const roles = rule?.allow
+		? new Set(rule.allow.map((name) => RoleName.make(name)))
+		: new Set(
+				Array.from(registry.roles.values())
+					.filter((role) => role.capabilities.has(capability))
+					.map((role) => role.name),
+			);
+	const access: Writable<Access> = {
+		roles: roles.difference(rolesDenied),
+		rolesDenied,
+	};
+	for (const name of DeclarablePrincipalNameSchema.literals) {
+		const grant = rule?.[name];
+		if (typeof grant !== "undefined") {
+			access[name] = grant;
+		} else if (
+			registry.principals.get(PRINCIPAL[name])?.capabilities.has(capability)
+		) {
+			access[name] = "allow";
+		}
+	}
+	return access;
 };
-
-const buildPermission = (
-	read: Access,
-	write: Access,
-	namespace: string,
-	namedRoles: ReadonlySet<RoleName>,
-): ResolvedPermission => ({
-	read,
-	write,
-	canRead: (caller: Identity): boolean =>
-		can(read, caller, namespace, namedRoles),
-	canWrite: (caller: Identity): boolean =>
-		can(write, caller, namespace, namedRoles),
-});
 
 const canReadWhenCanWrite = (
 	read: Grant | undefined,
@@ -194,71 +207,52 @@ const foldSlots = (
 	return slots;
 };
 
-export const replicantPermission = (
-	read: Access,
-	write: Access,
-	namespace: string,
-	namedRoles: ReadonlySet<RoleName>,
-): ResolvedPermission => {
+export const resolveReplicantAccess = (
+	registry: RoleRegistry,
+	permission: PermissionArg<string> | undefined,
+) => {
+	const read = resolveAccess(registry, "replicant-read", permission?.read);
+	const write = resolveAccess(registry, "replicant-write", permission?.write);
 	const writeDenied = write.rolesDenied.union(read.rolesDenied);
-	return buildPermission(
-		{
+	return {
+		read: {
 			roles: read.roles.union(write.roles).difference(read.rolesDenied),
 			rolesDenied: read.rolesDenied,
 			...foldSlots(canReadWhenCanWrite, read, write),
 		},
-		{
+		write: {
 			roles: write.roles.difference(writeDenied),
 			rolesDenied: writeDenied,
 			...foldSlots(cantWriteWhenCantRead, read, write),
 		},
-		namespace,
-		namedRoles,
-	);
+	};
 };
 
-const absentOperation = () => false;
-
-export const computedPermission = (
-	read: Access,
-	namespace: string,
-	namedRoles: ReadonlySet<RoleName>,
-): ResolvedPermission => ({
-	read,
-	write: EMPTY_ACCESS,
-	canRead: (caller: Identity): boolean =>
-		can(read, caller, namespace, namedRoles),
-	canWrite: absentOperation,
+export const resolveComputedAccess = (
+	registry: RoleRegistry,
+	permission: ReadOnlyPermissionArg<string> | undefined,
+) => ({
+	read: resolveAccess(registry, "computed-read", permission?.read),
 });
 
-export const rpcPermission = (
-	call: Access,
-	namespace: string,
-	namedRoles: ReadonlySet<RoleName>,
-): ResolvedPermission => ({
-	read: EMPTY_ACCESS,
-	write: call,
-	canRead: absentOperation,
-	canWrite: (caller: Identity): boolean =>
-		can(call, caller, namespace, namedRoles),
+export const resolveTopicAccess = (
+	registry: RoleRegistry,
+	permission: PermissionArg<string> | undefined,
+) => ({
+	read: resolveAccess(registry, "topic-subscribe", permission?.read),
+	write: resolveAccess(registry, "topic-publish", permission?.write),
 });
 
-export const customRoutePermission = (
-	request: Access,
-	namespace: string,
-	namedRoles: ReadonlySet<RoleName>,
-): ResolvedPermission => ({
-	read: EMPTY_ACCESS,
-	write: request,
-	canRead: absentOperation,
-	canWrite: (caller: Identity): boolean =>
-		can(request, caller, namespace, namedRoles),
+export const resolveRpcAccess = (
+	registry: RoleRegistry,
+	permission: WriteOnlyPermissionArg<string> | undefined,
+) => ({
+	write: resolveAccess(registry, "rpc-call", permission?.write),
 });
 
-export const topicPermission = (
-	subscribe: Access,
-	publish: Access,
-	namespace: string,
-	namedRoles: ReadonlySet<RoleName>,
-): ResolvedPermission =>
-	buildPermission(subscribe, publish, namespace, namedRoles);
+export const resolveCustomRouteAccess = (
+	registry: RoleRegistry,
+	permission: WriteOnlyPermissionArg<string> | undefined,
+) => ({
+	write: resolveAccess(registry, "custom-route-request", permission?.write),
+});

@@ -1,14 +1,22 @@
-import type {
-	CustomRouteManifest,
-	CustomRouteMethod,
-	WidestCustomRoutes,
-	WidestNamespaceFields,
+import {
+	canAccess,
+	resolveCustomRouteAccess,
+	type CustomRouteManifest,
+	type CustomRouteMethod,
+	type RoleRegistry,
+	type WidestCustomRoutes,
+	type WidestNamespaceFields,
 } from "@nodecg/core";
-import { formatField, type Identity, NamespacePath } from "@nodecg/internal";
+import {
+	formatField,
+	type Identity,
+	manifestRolesKey,
+	NamespacePath,
+} from "@nodecg/internal";
 import { Effect, HashSet, Schema, String } from "effect";
 import { HttpEffect, HttpMethod } from "effect/http";
 
-import { checkPermission } from "./field-builders/permission.ts";
+import { FieldPermissionDenied } from "./field-builders/permission.ts";
 import type {
 	CustomRouteHandler,
 	ImplementedNamespace,
@@ -20,31 +28,34 @@ const makeCustomRoute = <S extends WidestNamespaceFields>(
 	method: HttpMethod.HttpMethod | "*",
 	handler: CustomRouteHandler<S>,
 	ctx: OnLoadContext<S>,
-) => ({
-	name: route.name,
-	method,
-	handle: Effect.fn(function* (caller: Identity) {
-		yield* Effect.fromResult(
-			checkPermission(
-				route.permission,
-				ctx.namespacePath,
-				route.name,
-				"write",
-				caller,
-			),
-		);
-		return yield* HttpEffect.fromWebHandler(async (request) =>
-			handler(request, { ...ctx, caller }),
-		).pipe(
-			Effect.tapError((error) =>
-				Effect.logError(
-					`Custom route ${formatField(ctx.namespacePath, route.name)} failed`,
-					error,
+	registry: RoleRegistry,
+	roleNamespace: string,
+) => {
+	const access = resolveCustomRouteAccess(registry, route.permission);
+	return {
+		name: route.name,
+		method,
+		handle: Effect.fn(function* (caller: Identity) {
+			if (!canAccess(access.write, caller, roleNamespace, registry)) {
+				return yield* FieldPermissionDenied.make({
+					namespace: ctx.namespacePath,
+					name: route.name,
+					operation: "write",
+				});
+			}
+			return yield* HttpEffect.fromWebHandler(async (request) =>
+				handler(request, { ...ctx, caller }),
+			).pipe(
+				Effect.tapError((error) =>
+					Effect.logError(
+						`Custom route ${formatField(ctx.namespacePath, route.name)} failed`,
+						error,
+					),
 				),
-			),
-		);
-	}),
-});
+			);
+		}),
+	};
+};
 
 export type CustomRoute = ReturnType<
 	typeof makeCustomRoute<WidestNamespaceFields>
@@ -87,7 +98,16 @@ export const buildCustomRoutes = Effect.fn("buildCustomRoutes")(function* <
 					method,
 				});
 			}
-			routes.push(makeCustomRoute(route, method, handler, ctx));
+			routes.push(
+				makeCustomRoute(
+					route,
+					method,
+					handler,
+					ctx,
+					manifest[manifestRolesKey],
+					manifest.namespace,
+				),
+			);
 		}
 	}
 	return HashSet.fromIterable(routes);

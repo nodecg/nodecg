@@ -6,6 +6,7 @@ import {
 	Authentication,
 	User,
 	UserId,
+	manifestRolesKey,
 	RoleName,
 	ServerIdentity,
 } from "@nodecg/internal";
@@ -89,6 +90,8 @@ describe("buildReplicant", () => {
 				["ns"],
 				"live",
 				manifest.replicant.live,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 
@@ -105,6 +108,8 @@ describe("buildReplicant", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			).pipe(Effect.flip);
 
@@ -130,6 +135,8 @@ describe("get", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				42,
 			);
 			expect(yield* field.get()).toBe(42);
@@ -143,6 +150,8 @@ describe("get", () => {
 				["ns"],
 				"doc",
 				manifest.replicant.doc,
+				manifest[manifestRolesKey],
+				"ns",
 				{
 					count: 1,
 					data: { tags: ["a"] },
@@ -164,6 +173,8 @@ describe("get", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 			yield* store.commit(["ns"], "count", () =>
@@ -183,6 +194,8 @@ describe("set", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 			yield* field.set(7);
@@ -198,6 +211,8 @@ describe("set", () => {
 				["ns"],
 				"doc",
 				manifest.replicant.doc,
+				manifest[manifestRolesKey],
+				"ns",
 				{
 					count: 0,
 					data: null,
@@ -219,6 +234,8 @@ describe("set", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 			const error = yield* field
@@ -237,6 +254,8 @@ describe("set", () => {
 				["ns"],
 				"locked",
 				manifest.replicant.locked,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 			const error = yield* field
@@ -257,6 +276,8 @@ describe("update", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				10,
 			);
 			yield* field.update((v) => v + 3);
@@ -272,6 +293,8 @@ describe("update", () => {
 				["ns"],
 				"doc",
 				manifest.replicant.doc,
+				manifest[manifestRolesKey],
+				"ns",
 				{
 					count: 0,
 					data: null,
@@ -293,6 +316,8 @@ describe("update", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				10,
 			);
 			const error = yield* field
@@ -314,6 +339,8 @@ describe("update", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				10,
 			);
 			const error = yield* field
@@ -333,9 +360,14 @@ describe("update", () => {
 					box: { schema: Schema.Struct({ n: Schema.FiniteFromString }) },
 				},
 			});
-			const field = yield* buildReplicant(["ns"], "box", box.replicant.box, {
-				n: 1,
-			});
+			const field = yield* buildReplicant(
+				["ns"],
+				"box",
+				box.replicant.box,
+				box[manifestRolesKey],
+				"ns",
+				{ n: 1 },
+			);
 			yield* field.update((draft) => {
 				draft.n = 5;
 			});
@@ -353,6 +385,8 @@ describe("update", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				10,
 			);
 			let raced = false;
@@ -380,6 +414,8 @@ describe("validate", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 			expect(yield* field.validate(7)).toBe("7");
@@ -401,6 +437,8 @@ describe("subscribe", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 
@@ -419,6 +457,8 @@ describe("subscribe", () => {
 				["ns"],
 				"doc",
 				manifest.replicant.doc,
+				manifest[manifestRolesKey],
+				"ns",
 				{
 					count: 1,
 					data: { tags: ["a"] },
@@ -447,12 +487,16 @@ describe("subscribe", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 			const other = yield* buildReplicant(
 				["ns"],
 				"other",
 				manifest.replicant.other,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 
@@ -474,6 +518,8 @@ describe("subscribe", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 
@@ -497,6 +543,8 @@ describe("store write-through", () => {
 				["ns"],
 				"count",
 				manifest.replicant.count,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 
@@ -523,6 +571,8 @@ describe("store write-through", () => {
 				["ns"],
 				"locked",
 				manifest.replicant.locked,
+				manifest[manifestRolesKey],
+				"ns",
 				0,
 			);
 			yield* field.set(1).pipe(Effect.provide(scorer), Effect.flip);
@@ -553,6 +603,8 @@ describe("encoded read/write enforce permission", () => {
 				["ns"],
 				"open",
 				permissioned.replicant.open,
+				permissioned[manifestRolesKey],
+				"ns",
 				42,
 			);
 			expect(
@@ -570,6 +622,8 @@ describe("encoded read/write enforce permission", () => {
 				["ns"],
 				"locked",
 				permissioned.replicant.locked,
+				permissioned[manifestRolesKey],
+				"ns",
 				0,
 			);
 			const error = yield* field[fieldInternal]
@@ -586,6 +640,8 @@ describe("encoded read/write enforce permission", () => {
 				["ns"],
 				"open",
 				permissioned.replicant.open,
+				permissioned[manifestRolesKey],
+				"ns",
 				0,
 			);
 			const committed = yield* field[fieldInternal]
@@ -604,6 +660,8 @@ describe("encoded read/write enforce permission", () => {
 				["ns"],
 				"open",
 				permissioned.replicant.open,
+				permissioned[manifestRolesKey],
+				"ns",
 				0,
 			);
 			const error = yield* field[fieldInternal]
@@ -622,6 +680,8 @@ describe("encoded read/write enforce permission", () => {
 				["ns"],
 				"locked",
 				permissioned.replicant.locked,
+				permissioned[manifestRolesKey],
+				"ns",
 				0,
 			);
 			const error = yield* field[fieldInternal]
@@ -649,10 +709,17 @@ describe("commitPatch", () => {
 	testStubbed(
 		"applies a field-level replace and validates the applied document",
 		Effect.gen(function* () {
-			const field = yield* buildReplicant(["ns"], "doc", nested.replicant.doc, {
-				a: 1,
-				b: 2,
-			});
+			const field = yield* buildReplicant(
+				["ns"],
+				"doc",
+				nested.replicant.doc,
+				nested[manifestRolesKey],
+				"ns",
+				{
+					a: 1,
+					b: 2,
+				},
+			);
 			const committed = yield* field[fieldInternal].commitPatch([
 				{ op: "replace", path: "/a", value: "5" },
 			]);
@@ -665,10 +732,17 @@ describe("commitPatch", () => {
 	testStubbed(
 		"fails PatchNotApplicable when the patch fits no document",
 		Effect.gen(function* () {
-			const field = yield* buildReplicant(["ns"], "doc", nested.replicant.doc, {
-				a: 1,
-				b: 2,
-			});
+			const field = yield* buildReplicant(
+				["ns"],
+				"doc",
+				nested.replicant.doc,
+				nested[manifestRolesKey],
+				"ns",
+				{
+					a: 1,
+					b: 2,
+				},
+			);
 			const error = yield* field[fieldInternal]
 				.commitPatch([{ op: "remove", path: "" }])
 				.pipe(Effect.flip);
@@ -683,10 +757,17 @@ describe("commitPatch", () => {
 	testStubbed(
 		"fails RevisionConflict when a precondition no longer holds",
 		Effect.gen(function* () {
-			const field = yield* buildReplicant(["ns"], "doc", nested.replicant.doc, {
-				a: 1,
-				b: 2,
-			});
+			const field = yield* buildReplicant(
+				["ns"],
+				"doc",
+				nested.replicant.doc,
+				nested[manifestRolesKey],
+				"ns",
+				{
+					a: 1,
+					b: 2,
+				},
+			);
 			const error = yield* field[fieldInternal]
 				.commitPatch([
 					{ op: "test-hash", path: "/a", hash: computeTestHash("9") },

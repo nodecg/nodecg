@@ -1,13 +1,14 @@
 export {
 	defineNamespace,
+	type ComputedFieldManifest,
 	type CustomRouteMethod,
 	type CustomRouteManifest,
 	type WidestCustomRoutes,
-	type FieldManifest,
 	type InferNamespace,
 	type ReplicantFieldManifest,
 	type WidestNamespaceManifests,
 	type RpcFieldManifest,
+	type TopicFieldManifest,
 	type NamespaceManifest,
 	type RoleArg,
 	type EmptyNamespaceFields,
@@ -22,13 +23,21 @@ export {
 } from "./field-codec.ts";
 export { jsonSchema, type JsonSchemaCodec } from "./json-schema.ts";
 export {
+	canAccess,
 	getRolesForNamespace,
 	isAdminTier,
 	isSuperadmin,
+	resolveComputedAccess,
+	resolveCustomRouteAccess,
+	resolveReplicantAccess,
+	resolveRpcAccess,
+	resolveTopicAccess,
 	type Access,
 	type Grant,
+	type PermissionArg,
+	type ReadOnlyPermissionArg,
 	type RoleReference,
 	type RoleCapability,
-	type ResolvedPermission,
+	type RoleRegistry,
 	type WriteOnlyPermissionArg,
 } from "./role.ts";

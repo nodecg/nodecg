@@ -2,7 +2,7 @@ import type {
 	CustomRouteManifest,
 	InferNamespace,
 	NamespaceManifest,
-	FieldManifest,
+	FieldCodec,
 	RpcFieldManifest,
 	WidestCustomRoutes,
 	WidestNamespaceFields,
@@ -103,7 +103,7 @@ const subscribeCell = Effect.fn(function* <Decoded>(
 const implementReplicant = Effect.fn("implementReplicant")(function* <Decoded>(
 	namespace: string,
 	name: string,
-	manifest: FieldManifest<Decoded>,
+	manifest: FieldCodec<Decoded>,
 ) {
 	const transport = yield* FieldTransportService;
 	const cells = yield* FieldCellsService;
@@ -273,7 +273,7 @@ export type ReplicantField<Decoded> = ApplyLambdaToObject<
 const implementComputed = Effect.fn("implementComputed")(function* <Decoded>(
 	namespace: string,
 	name: string,
-	manifest: FieldManifest<Decoded>,
+	manifest: FieldCodec<Decoded>,
 ) {
 	const transport = yield* FieldTransportService;
 	const cells = yield* FieldCellsService;
@@ -313,7 +313,7 @@ export type ComputedField<Decoded> = ApplyLambdaToObject<
 const implementTopic = Effect.fn("implementTopic")(function* <Decoded>(
 	namespace: string,
 	name: string,
-	manifest: FieldManifest<Decoded>,
+	manifest: FieldCodec<Decoded>,
 ) {
 	const transport = yield* FieldTransportService;
 	const cells = yield* FieldCellsService;
@@ -396,8 +396,8 @@ interface CustomRouteLambda extends HKT.TypeLambda {
 	readonly type: CustomRoute;
 }
 
-interface FieldManifestLambda extends HKT.TypeLambda {
-	readonly type: FieldManifest<this["Target"]>;
+interface FieldCodecLambda extends HKT.TypeLambda {
+	readonly type: FieldCodec<this["Target"]>;
 }
 
 interface ReplicantFieldEffectLambda extends HKT.TypeLambda {
@@ -476,19 +476,19 @@ const buildFields = <
 					? Option.some(yield* Effect.fromResult(Url.fromString(baseUrl)))
 					: Option.none();
 				const replicant = yield* mapEffectValues<
-					FieldManifestLambda,
+					FieldCodecLambda,
 					ReplicantFieldEffectLambda
 				>()((codec, name) =>
 					implementReplicant(manifest.namespace, name, codec),
 				)(manifest.replicant);
 				const computed = yield* mapEffectValues<
-					FieldManifestLambda,
+					FieldCodecLambda,
 					ComputedFieldEffectLambda
 				>()((codec, name) =>
 					implementComputed(manifest.namespace, name, codec),
 				)(manifest.computed);
 				const topic = yield* mapEffectValues<
-					FieldManifestLambda,
+					FieldCodecLambda,
 					TopicFieldEffectLambda
 				>()((codec, name) => implementTopic(manifest.namespace, name, codec))(
 					manifest.topic,

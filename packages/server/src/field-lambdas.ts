@@ -1,7 +1,8 @@
 import type {
-	FieldManifest,
+	ComputedFieldManifest,
 	ReplicantFieldManifest,
 	RpcFieldManifest,
+	TopicFieldManifest,
 	WidestRpcField,
 } from "@nodecg/core";
 import type { HKT } from "effect";
@@ -21,12 +22,24 @@ import type {
 	TopicField,
 } from "./implement-namespace.ts";
 
-export interface FieldManifestLambda extends HKT.TypeLambda {
-	readonly type: FieldManifest<this["Target"]>;
-}
-
 export interface ReplicantFieldManifestLambda extends HKT.TypeLambda {
 	readonly type: ReplicantFieldManifest<this["Target"]>;
+}
+
+export interface ComputedFieldManifestLambda extends HKT.TypeLambda {
+	readonly type: ComputedFieldManifest<this["Target"]>;
+}
+
+export interface TopicFieldManifestLambda extends HKT.TypeLambda {
+	readonly type: TopicFieldManifest<this["Target"]>;
+}
+
+export interface RpcFieldManifestLambda extends HKT.TypeLambda {
+	readonly Target: WidestRpcField;
+	readonly type: RpcFieldManifest<
+		this["Target"]["request"],
+		this["Target"]["response"]
+	>;
 }
 
 export interface DecodedLambda extends HKT.TypeLambda {
@@ -62,14 +75,6 @@ export interface TopicFieldEffectLambda extends HKT.TypeLambda {
 export interface RpcFieldEffectLambda extends HKT.TypeLambda {
 	readonly Target: WidestRpcField;
 	readonly type: RpcFieldEffect<
-		this["Target"]["request"],
-		this["Target"]["response"]
-	>;
-}
-
-export interface RpcFieldManifestLambda extends HKT.TypeLambda {
-	readonly Target: WidestRpcField;
-	readonly type: RpcFieldManifest<
 		this["Target"]["request"],
 		this["Target"]["response"]
 	>;

@@ -1,4 +1,9 @@
-import type { ReplicantFieldManifest } from "@nodecg/core";
+import {
+	canAccess,
+	resolveReplicantAccess,
+	type ReplicantFieldManifest,
+	type RoleRegistry,
+} from "@nodecg/core";
 import {
 	CurrentIdentity,
 	formatField,
@@ -18,7 +23,7 @@ import {
 } from "../replicant-store.ts";
 import { fieldInternal } from "./field-internal-key.ts";
 import { migrationDie } from "./migration-die.ts";
-import { checkPermission, requirePermission } from "./permission.ts";
+import { FieldPermissionDenied } from "./permission.ts";
 
 export class ReplicantUpdateFnError extends Schema.TaggedError<ReplicantUpdateFnError>()(
 	"ReplicantUpdateFnError",
@@ -35,9 +40,16 @@ export const buildReplicant = Effect.fn("buildReplicant")(function* <Decoded>(
 	namespace: NamespacePath,
 	name: string,
 	manifest: ReplicantFieldManifest<Decoded>,
+	registry: RoleRegistry,
+	roleNamespace: string,
 	initialValue: Decoded,
 ) {
 	const store = yield* ReplicantStoreService;
+	const access = resolveReplicantAccess(registry, manifest.permission);
+	const canRead = (identity: Identity) =>
+		canAccess(access.read, identity, roleNamespace, registry);
+	const canWrite = (identity: Identity) =>
+		canAccess(access.write, identity, roleNamespace, registry);
 	const decode = (value: Schema.Json) =>
 		Effect.fromResult(manifest.decode(value));
 	const encode = (value: Decoded | WritableDeep<Decoded>) =>
@@ -73,14 +85,10 @@ export const buildReplicant = Effect.fn("buildReplicant")(function* <Decoded>(
 	) => retryContention(store.commit(namespace, name, produce));
 
 	const getResult = (identity: Identity) =>
-		checkPermission(
-			manifest.permission,
-			namespace,
-			name,
-			"read",
-			identity,
+		Result.liftPredicate(identity, canRead, () =>
+			FieldPermissionDenied.make({ namespace, name, operation: "read" }),
 		).pipe(
-			Result.map(read),
+			Result.map(() => read()),
 			Result.flatMap(({ value }) => manifest.decode(cloneJson(value))),
 		);
 
@@ -90,26 +98,54 @@ export const buildReplicant = Effect.fn("buildReplicant")(function* <Decoded>(
 	});
 
 	const getRevisioned = Effect.fn("getRevisioned")(function* () {
-		yield* requirePermission(manifest.permission, namespace, name, "read");
+		const identity = yield* CurrentIdentity;
+		if (!canRead(identity)) {
+			return yield* FieldPermissionDenied.make({
+				namespace,
+				name,
+				operation: "read",
+			});
+		}
 		return read();
 	});
 
 	const set = Effect.fn("set")(function* (value: Decoded) {
-		yield* requirePermission(manifest.permission, namespace, name, "write");
+		const identity = yield* CurrentIdentity;
+		if (!canWrite(identity)) {
+			return yield* FieldPermissionDenied.make({
+				namespace,
+				name,
+				operation: "write",
+			});
+		}
 		const encoded = yield* encode(value);
 		yield* commit(() => Effect.succeed(cloneJson(encoded)));
 	});
 
 	// Wire write: applies the client's patch, the decode gate validates the applied document
 	const commitPatch = Effect.fn("commitPatch")(function* (patch: Patch) {
-		yield* requirePermission(manifest.permission, namespace, name, "write");
+		const identity = yield* CurrentIdentity;
+		if (!canWrite(identity)) {
+			return yield* FieldPermissionDenied.make({
+				namespace,
+				name,
+				operation: "write",
+			});
+		}
 		return yield* retryContention(
 			store.commitPatch(namespace, name, patch, decode),
 		);
 	});
 
 	const update = Effect.fn("update")(function* (updater: Updater<Decoded>) {
-		yield* requirePermission(manifest.permission, namespace, name, "write");
+		const identity = yield* CurrentIdentity;
+		if (!canWrite(identity)) {
+			return yield* FieldPermissionDenied.make({
+				namespace,
+				name,
+				operation: "write",
+			});
+		}
 		yield* commit((stored) =>
 			Effect.gen(function* () {
 				const current = yield* Effect.fromResult(
@@ -160,7 +196,7 @@ export const buildReplicant = Effect.fn("buildReplicant")(function* <Decoded>(
 			getRevisioned,
 			commitPatch,
 			subscribeRevisioned,
-			permission: manifest.permission,
+			canRead,
 		},
 	};
 });

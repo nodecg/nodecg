@@ -1,4 +1,4 @@
-import type { FieldDecodeError, FieldManifest } from "@nodecg/core";
+import type { FieldCodec, FieldDecodeError } from "@nodecg/core";
 import {
 	ClientMessage,
 	type ComputedFieldIdentifier,
@@ -180,7 +180,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 
 			const makeReplicantCell = Effect.fn("makeReplicantCell")(function* <
 				Decoded,
-			>(namespace: string, name: string, manifest: FieldManifest<Decoded>) {
+			>(namespace: string, name: string, manifest: FieldCodec<Decoded>) {
 				const field: ReplicantFieldIdentifier = {
 					type: "replicant",
 					namespace,
@@ -275,7 +275,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 			const makeComputedCell = <Decoded>(
 				namespace: string,
 				name: string,
-				manifest: FieldManifest<Decoded>,
+				manifest: FieldCodec<Decoded>,
 			): ComputedCell<Decoded> => {
 				const field: ComputedFieldIdentifier = {
 					type: "computed",
@@ -310,7 +310,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 			const makeTopicCell = <Decoded>(
 				namespace: string,
 				name: string,
-				manifest: FieldManifest<Decoded>,
+				manifest: FieldCodec<Decoded>,
 			): TopicCell<Decoded> => {
 				const field: TopicFieldIdentifier = { type: "topic", namespace, name };
 				const cell = makeCell<TopicValue<Decoded>>(field);

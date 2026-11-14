@@ -3,6 +3,7 @@ import { defineNamespace } from "@nodecg/core";
 import {
 	AnonymousIdentitySchema,
 	CurrentIdentity,
+	manifestRolesKey,
 	ServerIdentity,
 } from "@nodecg/internal";
 import { Effect, Layer, Schema, Stream } from "effect";
@@ -47,7 +48,13 @@ describe("publish", () => {
 	test(
 		"encodes the value and forwards it to the broker",
 		Effect.gen(function* () {
-			const field = yield* buildTopic(["ns"], "open", manifest.topic.open);
+			const field = yield* buildTopic(
+				["ns"],
+				"open",
+				manifest.topic.open,
+				manifest[manifestRolesKey],
+				"ns",
+			);
 			yield* field.publish(42);
 			expect(broker.publish).toHaveBeenCalledWith(["ns"], "open", "42");
 		}),
@@ -56,7 +63,13 @@ describe("publish", () => {
 	test(
 		"fails FieldPermissionDenied for a denied caller without publishing",
 		Effect.gen(function* () {
-			const field = yield* buildTopic(["ns"], "locked", manifest.topic.locked);
+			const field = yield* buildTopic(
+				["ns"],
+				"locked",
+				manifest.topic.locked,
+				manifest[manifestRolesKey],
+				"ns",
+			);
 			const error = yield* field
 				.publish(1)
 				.pipe(Effect.provide(anonymous), Effect.flip);
@@ -77,7 +90,13 @@ describe("subscribe", () => {
 					]),
 				),
 			);
-			const field = yield* buildTopic(["ns"], "open", manifest.topic.open);
+			const field = yield* buildTopic(
+				["ns"],
+				"open",
+				manifest.topic.open,
+				manifest[manifestRolesKey],
+				"ns",
+			);
 			const stream = yield* field.subscribe();
 			const events = yield* stream.pipe(Stream.runCollect);
 			expect(events).toEqual([7]);
@@ -96,7 +115,13 @@ describe("subscribe", () => {
 					]),
 				),
 			);
-			const field = yield* buildTopic(["ns"], "open", manifest.topic.open);
+			const field = yield* buildTopic(
+				["ns"],
+				"open",
+				manifest.topic.open,
+				manifest[manifestRolesKey],
+				"ns",
+			);
 			const stream = yield* field[fieldInternal].subscribeEncoded();
 			const events = yield* stream.pipe(Stream.runCollect);
 			expect(events).toEqual(["2"]);
@@ -108,7 +133,13 @@ describe("publishEncoded", () => {
 	test(
 		"forwards the value for an allowed caller",
 		Effect.gen(function* () {
-			const field = yield* buildTopic(["ns"], "open", manifest.topic.open);
+			const field = yield* buildTopic(
+				["ns"],
+				"open",
+				manifest.topic.open,
+				manifest[manifestRolesKey],
+				"ns",
+			);
 			yield* field[fieldInternal]
 				.publishEncoded("5")
 				.pipe(Effect.provide(anonymous));
@@ -119,7 +150,13 @@ describe("publishEncoded", () => {
 	test(
 		"fails FieldPermissionDenied and does not publish for a denied caller",
 		Effect.gen(function* () {
-			const field = yield* buildTopic(["ns"], "locked", manifest.topic.locked);
+			const field = yield* buildTopic(
+				["ns"],
+				"locked",
+				manifest.topic.locked,
+				manifest[manifestRolesKey],
+				"ns",
+			);
 			const error = yield* field[fieldInternal]
 				.publishEncoded("5")
 				.pipe(Effect.provide(anonymous), Effect.flip);
@@ -131,7 +168,13 @@ describe("publishEncoded", () => {
 	test(
 		"fails when the value fails schema validation",
 		Effect.gen(function* () {
-			const field = yield* buildTopic(["ns"], "open", manifest.topic.open);
+			const field = yield* buildTopic(
+				["ns"],
+				"open",
+				manifest.topic.open,
+				manifest[manifestRolesKey],
+				"ns",
+			);
 			const error = yield* field[fieldInternal]
 				.publishEncoded(42)
 				.pipe(Effect.provide(anonymous), Effect.flip);
