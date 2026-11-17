@@ -1,0 +1,1 @@
+ALTER TABLE "role_grants" ALTER COLUMN "namespace" SET DATA TYPE jsonb USING "namespace"::jsonb;

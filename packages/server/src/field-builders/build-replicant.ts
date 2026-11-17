@@ -41,15 +41,14 @@ export const buildReplicant = Effect.fn("buildReplicant")(function* <Decoded>(
 	name: string,
 	manifest: ReplicantFieldManifest<Decoded>,
 	registry: RoleRegistry,
-	roleNamespace: string,
 	initialValue: Decoded,
 ) {
 	const store = yield* ReplicantStoreService;
 	const access = resolveReplicantAccess(registry, manifest.permission);
 	const canRead = (identity: Identity) =>
-		canAccess(access.read, identity, roleNamespace, registry);
+		canAccess(access.read, identity, namespace, registry);
 	const canWrite = (identity: Identity) =>
-		canAccess(access.write, identity, roleNamespace, registry);
+		canAccess(access.write, identity, namespace, registry);
 	const decode = (value: Schema.Json) =>
 		Effect.fromResult(manifest.decode(value));
 	const encode = (value: Decoded | WritableDeep<Decoded>) =>

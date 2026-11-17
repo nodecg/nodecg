@@ -1,12 +1,13 @@
 import { Schema } from "effect";
 
+import { NamespacePath } from "./namespace-path.ts";
 import { PrincipalNameSchema } from "./principal.ts";
 
 export const RoleName = Schema.String.pipe(Schema.brand("Role"));
 export type RoleName = typeof RoleName.Type;
 
 export const Role = Schema.Struct({
-	namespace: Schema.String,
+	namespace: NamespacePath,
 	name: RoleName,
 });
 export type Role = typeof Role.Type;

@@ -29,14 +29,13 @@ const makeCustomRoute = <S extends WidestNamespaceFields>(
 	handler: CustomRouteHandler<S>,
 	ctx: OnLoadContext<S>,
 	registry: RoleRegistry,
-	roleNamespace: string,
 ) => {
 	const access = resolveCustomRouteAccess(registry, route.permission);
 	return {
 		name: route.name,
 		method,
 		handle: Effect.fn(function* (caller: Identity) {
-			if (!canAccess(access.write, caller, roleNamespace, registry)) {
+			if (!canAccess(access.write, caller, ctx.namespacePath, registry)) {
 				return yield* FieldPermissionDenied.make({
 					namespace: ctx.namespacePath,
 					name: route.name,
@@ -105,7 +104,6 @@ export const buildCustomRoutes = Effect.fn("buildCustomRoutes")(function* <
 					handler,
 					ctx,
 					manifest[manifestRolesKey],
-					manifest.namespace,
 				),
 			);
 		}

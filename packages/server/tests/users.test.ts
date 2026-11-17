@@ -40,7 +40,7 @@ const root = Authentication.make({ issuer: "dev", subject: "root" });
 const admin = Authentication.make({ issuer: "dev", subject: "admin" });
 
 const viewer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("viewer"),
 });
 

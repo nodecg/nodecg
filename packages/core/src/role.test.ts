@@ -6,6 +6,7 @@ import {
 	AnonymousIdentitySchema,
 	type Identity,
 	manifestRolesKey,
+	type NamespacePath,
 	RoleName,
 	ServerIdentity,
 	ServiceAccountId,
@@ -29,6 +30,8 @@ import {
 	type RoleRegistry,
 } from "./role.ts";
 
+const path: NamespacePath = ["root", "match"];
+
 const authentication = Authentication.make({
 	issuer: "test",
 	subject: "subject",
@@ -38,7 +41,7 @@ const user = (...names: RoleName[]) =>
 		id: UserId.make("1"),
 		authentication,
 		displayName: "user",
-		roles: names.map((name) => ({ namespace: "match", name })),
+		roles: names.map((name) => ({ namespace: path, name })),
 		globalRoles: [],
 	});
 const adminTier = (...globalRoles: AdminRoleName[]) =>
@@ -53,7 +56,7 @@ const serviceAccount = (...names: RoleName[]) =>
 	ServiceAccount.make({
 		id: ServiceAccountId.make("00000000-0000-4000-8000-000000000001"),
 		displayName: "Bot",
-		roles: names.map((name) => ({ namespace: "match", name })),
+		roles: names.map((name) => ({ namespace: path, name })),
 		globalRoles: [],
 	});
 const anonymous = AnonymousIdentitySchema.make({});
@@ -67,7 +70,7 @@ const canRead = (
 	canAccess(
 		resolveReplicantAccess(registry, permission).read,
 		caller,
-		"match",
+		path,
 		registry,
 	);
 const canWrite = (
@@ -78,7 +81,7 @@ const canWrite = (
 	canAccess(
 		resolveReplicantAccess(registry, permission).write,
 		caller,
-		"match",
+		path,
 		registry,
 	);
 const canReadComputed = (
@@ -89,7 +92,7 @@ const canReadComputed = (
 	canAccess(
 		resolveComputedAccess(registry, permission).read,
 		caller,
-		"match",
+		path,
 		registry,
 	);
 
@@ -118,6 +121,7 @@ const manifest = defineNamespace("match", {
 });
 const registry = manifest[manifestRolesKey];
 const score = manifest.replicant.score.permission;
+const open = manifest.replicant.open.permission;
 const config = manifest.replicant.config.permission;
 
 describe("canAccess", () => {
@@ -135,24 +139,22 @@ describe("canAccess", () => {
 	});
 
 	test("a role counts only in the namespace it is held in", () => {
-		const foreign = User.make({
-			id: UserId.make("3"),
-			authentication,
-			displayName: "judge",
-			roles: [{ namespace: "other", name: RoleName.make("judge") }],
-			globalRoles: [],
-		});
-		expect(canRead(registry, score, foreign)).toBe(false);
-		expect(canWrite(registry, score, foreign)).toBe(false);
-		expect(canRead(registry, score, user(RoleName.make("judge")))).toBe(true);
-		expect(canWrite(registry, score, user(RoleName.make("judge")))).toBe(true);
+		const holder = (namespace: NamespacePath) =>
+			User.make({
+				id: UserId.make("3"),
+				authentication,
+				displayName: "judge",
+				roles: [{ namespace, name: RoleName.make("judge") }],
+				globalRoles: [],
+			});
+		expect(canWrite(registry, score, holder(path))).toBe(true);
+		expect(canWrite(registry, score, holder(["root", "other"]))).toBe(false);
+		expect(canWrite(registry, score, holder(["match"]))).toBe(false);
 	});
 
 	test("an anonymous caller passes only where anonymous is allowed", () => {
 		expect(canRead(registry, score, anonymous)).toBe(false);
-		expect(
-			canRead(registry, manifest.replicant.open.permission, anonymous),
-		).toBe(true);
+		expect(canRead(registry, open, anonymous)).toBe(true);
 	});
 
 	test("a service account with no roles matches nothing", () => {
@@ -197,12 +199,11 @@ describe("canAccess", () => {
 				},
 			},
 		});
+		const registry = members[manifestRolesKey];
 		const lounge = members.replicant.lounge.permission;
 
-		expect(
-			canRead(members[manifestRolesKey], lounge, user(RoleName.make("judge"))),
-		).toBe(true);
-		expect(canRead(members[manifestRolesKey], lounge, anonymous)).toBe(false);
+		expect(canRead(registry, lounge, user(RoleName.make("judge")))).toBe(true);
+		expect(canRead(registry, lounge, anonymous)).toBe(false);
 	});
 
 	describe("principals as capability bases", () => {
@@ -246,14 +247,9 @@ describe("canAccess", () => {
 		const registry = wildcard[manifestRolesKey];
 
 		test("an explicit deny excludes a caller the wildcard would have admitted", () => {
+			const open = wildcard.replicant.open.permission;
 			const hidden = wildcard.replicant.hidden.permission;
-			expect(
-				canRead(
-					registry,
-					wildcard.replicant.open.permission,
-					user(RoleName.make("viewer")),
-				),
-			).toBe(true);
+			expect(canRead(registry, open, user(RoleName.make("viewer")))).toBe(true);
 			expect(canRead(registry, hidden, user(RoleName.make("viewer")))).toBe(
 				false,
 			);
@@ -748,22 +744,22 @@ describe("isAdminTier", () => {
 
 describe("getRolesForNamespace", () => {
 	test("projects the roles a user and a service account hold in the namespace", () => {
-		expect(getRolesForNamespace(user(RoleName.make("judge")), "match")).toEqual(
-			[RoleName.make("judge")],
-		);
+		expect(getRolesForNamespace(user(RoleName.make("judge")), path)).toEqual([
+			RoleName.make("judge"),
+		]);
 		expect(
-			getRolesForNamespace(serviceAccount(RoleName.make("viewer")), "match"),
+			getRolesForNamespace(serviceAccount(RoleName.make("viewer")), path),
 		).toEqual([RoleName.make("viewer")]);
 	});
 
 	test("is empty for a namespace the holder has no role in", () => {
-		expect(getRolesForNamespace(user(RoleName.make("judge")), "other")).toEqual(
-			[],
-		);
+		expect(
+			getRolesForNamespace(user(RoleName.make("judge")), ["root", "other"]),
+		).toEqual([]);
 	});
 
 	test("is empty for anonymous and server", () => {
-		expect(getRolesForNamespace(anonymous, "match")).toEqual([]);
-		expect(getRolesForNamespace(server, "match")).toEqual([]);
+		expect(getRolesForNamespace(anonymous, path)).toEqual([]);
+		expect(getRolesForNamespace(server, path)).toEqual([]);
 	});
 });

@@ -123,11 +123,11 @@ describe("resolve", () => {
 	const alice = Authentication.make({ issuer: "dev", subject: "alice" });
 	const bob = Authentication.make({ issuer: "dev", subject: "bob" });
 	const viewer = Role.make({
-		namespace: "show",
+		namespace: ["show"],
 		name: RoleName.make("viewer"),
 	});
 	const producer = Role.make({
-		namespace: "show",
+		namespace: ["show"],
 		name: RoleName.make("producer"),
 	});
 

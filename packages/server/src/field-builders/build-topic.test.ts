@@ -53,7 +53,6 @@ describe("publish", () => {
 				"open",
 				manifest.topic.open,
 				manifest[manifestRolesKey],
-				"ns",
 			);
 			yield* field.publish(42);
 			expect(broker.publish).toHaveBeenCalledWith(["ns"], "open", "42");
@@ -68,7 +67,6 @@ describe("publish", () => {
 				"locked",
 				manifest.topic.locked,
 				manifest[manifestRolesKey],
-				"ns",
 			);
 			const error = yield* field
 				.publish(1)
@@ -95,7 +93,6 @@ describe("subscribe", () => {
 				"open",
 				manifest.topic.open,
 				manifest[manifestRolesKey],
-				"ns",
 			);
 			const stream = yield* field.subscribe();
 			const events = yield* stream.pipe(Stream.runCollect);
@@ -120,7 +117,6 @@ describe("subscribe", () => {
 				"open",
 				manifest.topic.open,
 				manifest[manifestRolesKey],
-				"ns",
 			);
 			const stream = yield* field[fieldInternal].subscribeEncoded();
 			const events = yield* stream.pipe(Stream.runCollect);
@@ -138,7 +134,6 @@ describe("publishEncoded", () => {
 				"open",
 				manifest.topic.open,
 				manifest[manifestRolesKey],
-				"ns",
 			);
 			yield* field[fieldInternal]
 				.publishEncoded("5")
@@ -155,7 +150,6 @@ describe("publishEncoded", () => {
 				"locked",
 				manifest.topic.locked,
 				manifest[manifestRolesKey],
-				"ns",
 			);
 			const error = yield* field[fieldInternal]
 				.publishEncoded("5")
@@ -173,7 +167,6 @@ describe("publishEncoded", () => {
 				"open",
 				manifest.topic.open,
 				manifest[manifestRolesKey],
-				"ns",
 			);
 			const error = yield* field[fieldInternal]
 				.publishEncoded(42)

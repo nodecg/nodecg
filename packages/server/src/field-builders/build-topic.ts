@@ -21,14 +21,13 @@ export const buildTopic = Effect.fn("buildTopic")(
 		name: string,
 		manifest: TopicFieldManifest<Decoded>,
 		registry: RoleRegistry,
-		roleNamespace: string,
 	) =>
 		Effect.sync(() => {
 			const access = resolveTopicAccess(registry, manifest.permission);
 			const canRead = (identity: Identity) =>
-				canAccess(access.read, identity, roleNamespace, registry);
+				canAccess(access.read, identity, namespace, registry);
 			const canWrite = (identity: Identity) =>
-				canAccess(access.write, identity, roleNamespace, registry);
+				canAccess(access.write, identity, namespace, registry);
 			const publish = Effect.fn("publish")(function* (value: Decoded) {
 				const broker = yield* TopicBrokerService;
 				const identity = yield* CurrentIdentity;

@@ -81,6 +81,7 @@ const namespaces = Layer.effect(
 		return yield* NamespaceRegistryService.make([
 			{
 				namespace: fields.namespace,
+				path: [fields.namespace],
 				declaredRoles: new Set(),
 				customRoute: yield* buildCustomRoutes(namespace, {
 					...handles.loaded,
@@ -98,11 +99,11 @@ const test = testLayer(Layer.merge(services, namespaces));
 const routeUrl = (name: string) => `http://x/namespaces/show/custom/${name}`;
 
 const operatorRole = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("operator"),
 });
 const viewerRole = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("viewer"),
 });
 

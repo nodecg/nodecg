@@ -37,7 +37,12 @@ const namespaces = Layer.effect(
 			{},
 		);
 		return yield* NamespaceRegistryService.make([
-			{ namespace: fields.namespace, declaredRoles: new Set(), fields },
+			{
+				namespace: fields.namespace,
+				path: [fields.namespace],
+				declaredRoles: new Set(),
+				fields,
+			},
 		]);
 	}),
 ).pipe(Layer.provide(services));

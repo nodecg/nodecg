@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "tsdown",
-		"effect-check": "effect-tsgo diagnostics --project tsconfig.json",
+		"effect-check": "node scripts/effect-check.ts",
 		"type-check": "tsc -b --noEmit"
 	},
 	"devDependencies": {

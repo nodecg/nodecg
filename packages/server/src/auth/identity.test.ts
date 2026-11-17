@@ -34,11 +34,11 @@ const aliceSecondAuthentication = Authentication.make({
 });
 const root = Authentication.make({ issuer: "dev", subject: "root" });
 const viewer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("viewer"),
 });
 const uploader = Role.make({
-	namespace: "show-assets",
+	namespace: ["show", "assets"],
 	name: RoleName.make("uploader"),
 });
 

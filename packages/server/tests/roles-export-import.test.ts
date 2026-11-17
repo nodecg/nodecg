@@ -25,15 +25,15 @@ import {
 } from "./setup.ts";
 
 const producer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("producer"),
 });
 const viewer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("viewer"),
 });
 const judge = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("judge"),
 });
 
@@ -43,6 +43,7 @@ const test = testLayer(
 		NamespaceRegistryService.layer([
 			{
 				namespace: "show",
+				path: ["show"],
 				declaredRoles: new Set([producer.name, viewer.name, judge.name]),
 				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
 			},
@@ -593,7 +594,7 @@ describe("validation", () => {
 								_tag: "user",
 								authentication: operator,
 								displayName: "operator",
-								roles: [{ namespace: "show", name: "server" }],
+								roles: [{ namespace: ["show"], name: "server" }],
 								globalRoles: [],
 							},
 						],

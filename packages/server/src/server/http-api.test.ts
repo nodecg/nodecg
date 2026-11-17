@@ -90,6 +90,7 @@ function registeredNamespace(
 ): RegisteredNamespace {
 	return {
 		namespace,
+		path: [namespace],
 		declaredRoles,
 		fields: { replicant, computed, topic, rpc },
 	};

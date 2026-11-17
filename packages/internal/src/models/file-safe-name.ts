@@ -1,4 +1,4 @@
-import { Option } from "effect";
+import { Option, Schema } from "effect";
 
 type Characters<
 	S extends string,
@@ -32,7 +32,17 @@ type IsFileSafeName<S extends string> = S extends ""
 type FileSafeNameRule =
 	'Use only A-Z, a-z, 0-9, "_" and "-", and not a Windows device name';
 
-export type FileSafeName<S extends string> =
+export const FileSafeName = Schema.NonEmptyString.check(
+	Schema.isPattern(/^[A-Za-z0-9_-]+$/),
+	Schema.makeFilter((name) =>
+		/^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(name)
+			? `"${name}" is a Windows device name`
+			: undefined,
+	),
+);
+export type FileSafeName = typeof FileSafeName.Type;
+
+export type ValidateFileSafeName<S extends string> =
 	IsFileSafeName<S> extends true ? S : FileSafeNameRule;
 
 export type UnsafeNameKeys<T> = {
@@ -53,9 +63,11 @@ export type CaseClashingKeys<T> = {
 		: never]: CaseClashRule;
 };
 
-export const isFileSafeName = (name: string) =>
-	/^[A-Za-z0-9_-]+$/.test(name) &&
-	!/^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(name);
+const isFileSafeNameSchema = Schema.is(FileSafeName);
+
+// Return a plain boolean so a refused name keeps its type in the caller's error message.
+export const isFileSafeName = (name: string): boolean =>
+	isFileSafeNameSchema(name);
 
 export const findCaseClash = (names: Iterable<string>) => {
 	const byLowercase = new Map<string, string>();

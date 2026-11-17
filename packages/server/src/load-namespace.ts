@@ -9,13 +9,13 @@ import type {
 	WidestNamespaceFields,
 } from "@nodecg/core";
 import {
+	findCaseClash,
 	formatNamespacePath,
 	manifestRolesKey,
 	NamespacePath,
 } from "@nodecg/internal";
 import {
 	type ApplyLambdaToObjectValues,
-	findCaseClash,
 	mapEffectValues,
 	mapValues,
 } from "@nodecg/internal/utils";
@@ -43,7 +43,11 @@ import {
 	type AuthProvider,
 	AuthProviderRegistry,
 } from "./auth/auth-provider.ts";
-import { normalizeRoleLinks, RoleLinks } from "./auth/role-links.ts";
+import {
+	normalizeRoleLinks,
+	resolveRoleLinks,
+	RoleLinks,
+} from "./auth/role-links.ts";
 import { buildCustomRoutes } from "./build-custom-routes.ts";
 import {
 	buildNamespace,
@@ -205,14 +209,17 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 						attributes: { namespace: formatNamespacePath(namespace) },
 					}),
 				);
+	const { roles } = implemented.manifest[manifestRolesKey];
 	const registered: RegisteredNamespace = {
 		namespace: fields.namespace,
-		declaredRoles: new Set(implemented.manifest[manifestRolesKey].roles.keys()),
+		path: namespace,
+		declaredRoles: new Set(roles.keys()),
 		frontend: implemented.impl?.frontend,
 		customRoute: yield* buildCustomRoutes(implemented, ctx),
 		fields,
 	};
-	return { handles, prepared: { registered, runOnLoad } };
+	const roleLinks = resolveRoleLinks(namespace, roles);
+	return { handles, prepared: { registered, runOnLoad, roleLinks } };
 });
 
 type PreparedNamespace = Effect.Success<
@@ -256,10 +263,6 @@ export const loadNamespaceEffect = Effect.fn(
 		walk(root);
 
 		yield* Effect.forEach(namespaces, checkChildren, { discard: true });
-
-		const roleLinks = normalizeRoleLinks(
-			Array.map(Array.fromIterable(namespaces), ({ manifest }) => manifest),
-		);
 
 		const names = new Set<string>();
 		for (const { manifest } of namespaces) {
@@ -335,6 +338,9 @@ export const loadNamespaceEffect = Effect.fn(
 				prepared,
 			} = yield* loadTree(root, [root.manifest.namespace]);
 			const registered = prepared.map(({ registered }) => registered);
+			const roleLinks = normalizeRoleLinks(
+				prepared.map(({ roleLinks }) => roleLinks),
+			);
 
 			yield* Effect.forEach(
 				registered,

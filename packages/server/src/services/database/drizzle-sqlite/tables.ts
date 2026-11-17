@@ -2,6 +2,7 @@ import type {
 	ApiKeyId,
 	AuthenticationId,
 	GlobalRoleName,
+	NamespacePath,
 	RoleName,
 	ServiceAccountId,
 	UserId,
@@ -98,7 +99,9 @@ export const roleGrants = sqliteTable(
 			.$type<AccountId>()
 			.notNull()
 			.references(() => accounts.id, { onDelete: "cascade" }),
-		namespace: text("namespace").notNull(),
+		namespace: text("namespace", { mode: "json" })
+			.$type<NamespacePath>()
+			.notNull(),
 		roleName: text("role_name").$type<RoleName>().notNull(),
 	},
 	(table) => [

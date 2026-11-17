@@ -55,7 +55,7 @@ const anonymous = AnonymousIdentitySchema.make({});
 const viewer = ServiceAccount.make({
 	id: ServiceAccountId.make("00000000-0000-4000-8000-000000000001"),
 	displayName: "viewer",
-	roles: [Role.make({ namespace: "ns", name: RoleName.make("viewer") })],
+	roles: [Role.make({ namespace: ["ns"], name: RoleName.make("viewer") })],
 	globalRoles: [],
 });
 

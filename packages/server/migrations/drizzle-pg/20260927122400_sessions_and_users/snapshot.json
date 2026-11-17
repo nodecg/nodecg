@@ -1,383 +1,466 @@
 {
-	"version": "8",
+	"type": "diff",
+	"version": "9",
 	"dialect": "postgres",
 	"id": "a55d59c2-d48d-4b17-8027-d4cd6f694c8a",
 	"prevIds": ["3330ff72-a78b-433c-a0d7-e89333b28feb"],
-	"ddl": [
+	"footprints": [
 		{
-			"isRlsEnabled": false,
-			"name": "accounts",
-			"entityType": "tables",
-			"schema": "public"
+			"statementType": "create_table",
+			"statementTarget": ["table", "public", "accounts"],
+			"writes": [
+				"s|tbl|public.accounts",
+				"n|tbl|public.accounts",
+				"e|tbl|public.accounts",
+				"n|rel|public.accounts",
+				"n|type|public.accounts",
+				"n|rel|public.accounts_pkey"
+			],
+			"reads": ["n|sch|public"]
 		},
 		{
-			"isRlsEnabled": false,
-			"name": "authentications",
-			"entityType": "tables",
-			"schema": "public"
+			"statementType": "create_table",
+			"statementTarget": ["table", "public", "authentications"],
+			"writes": [
+				"s|tbl|public.authentications",
+				"n|tbl|public.authentications",
+				"e|tbl|public.authentications",
+				"n|rel|public.authentications",
+				"n|type|public.authentications",
+				"n|rel|public.authentications_pkey",
+				"n|rel|public.authentications_issuer_subject_unique"
+			],
+			"reads": ["n|sch|public"]
 		},
 		{
-			"isRlsEnabled": false,
-			"name": "login_attempts",
-			"entityType": "tables",
-			"schema": "public"
+			"statementType": "create_table",
+			"statementTarget": ["table", "public", "sessions"],
+			"writes": [
+				"s|tbl|public.sessions",
+				"n|tbl|public.sessions",
+				"e|tbl|public.sessions",
+				"n|rel|public.sessions",
+				"n|type|public.sessions",
+				"n|rel|public.sessions_pkey"
+			],
+			"reads": ["n|sch|public"]
 		},
 		{
-			"isRlsEnabled": false,
-			"name": "sessions",
-			"entityType": "tables",
-			"schema": "public"
+			"statementType": "create_table",
+			"statementTarget": ["table", "public", "users"],
+			"writes": [
+				"s|tbl|public.users",
+				"n|tbl|public.users",
+				"e|tbl|public.users",
+				"n|rel|public.users",
+				"n|type|public.users",
+				"n|rel|public.users_pkey",
+				"n|rel|public.users_account_id_key"
+			],
+			"reads": ["n|sch|public"]
 		},
 		{
-			"isRlsEnabled": false,
-			"name": "users",
-			"entityType": "tables",
-			"schema": "public"
+			"statementType": "create_fk",
+			"statementTarget": ["table", "public", "authentications"],
+			"writes": [
+				"s|fk|public.authentications.authentications_user_id_users_id_fkey",
+				"n|fk|public.authentications.authentications_user_id_users_id_fkey",
+				"e|fk|public.authentications.authentications_user_id_users_id_fkey",
+				"n|con|public.authentications.authentications_user_id_users_id_fkey"
+			],
+			"reads": [
+				"n|tbl|public.authentications",
+				"n|sch|public",
+				"n|tbl|public.users",
+				"n|sch|public",
+				"n|col|public.authentications.user_id",
+				"n|col|public.users.id",
+				"e|uniqueness|public.users.id"
+			]
 		},
 		{
-			"type": "uuid",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": "gen_random_uuid()",
-			"generated": null,
-			"identity": null,
-			"name": "id",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "accounts"
+			"statementType": "create_fk",
+			"statementTarget": ["table", "public", "sessions"],
+			"writes": [
+				"s|fk|public.sessions.sessions_authentication_id_authentications_id_fkey",
+				"n|fk|public.sessions.sessions_authentication_id_authentications_id_fkey",
+				"e|fk|public.sessions.sessions_authentication_id_authentications_id_fkey",
+				"n|con|public.sessions.sessions_authentication_id_authentications_id_fkey"
+			],
+			"reads": [
+				"n|tbl|public.sessions",
+				"n|sch|public",
+				"n|tbl|public.authentications",
+				"n|sch|public",
+				"n|col|public.sessions.authentication_id",
+				"n|col|public.authentications.id",
+				"e|uniqueness|public.authentications.id"
+			]
 		},
 		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "display_name",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "accounts"
-		},
-		{
-			"type": "bigint",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "created_at",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "accounts"
-		},
-		{
-			"type": "uuid",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": "gen_random_uuid()",
-			"generated": null,
-			"identity": null,
-			"name": "id",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "authentications"
-		},
-		{
-			"type": "uuid",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "user_id",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "authentications"
-		},
-		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "issuer",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "authentications"
-		},
-		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "subject",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "authentications"
-		},
-		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "key",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "provider",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "state",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": false,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "code_verifier",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": false,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "nonce",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": false,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "return_to",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
-			"type": "bigint",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "expires_at",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "id",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "sessions"
-		},
-		{
-			"type": "uuid",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "authentication_id",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "sessions"
-		},
-		{
-			"type": "bigint",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "expires_at",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "sessions"
-		},
-		{
-			"type": "uuid",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": "gen_random_uuid()",
-			"generated": null,
-			"identity": null,
-			"name": "id",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "users"
-		},
-		{
-			"type": "uuid",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
-			"name": "account_id",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "users"
-		},
-		{
-			"nameExplicit": false,
-			"columns": ["user_id"],
-			"schemaTo": "public",
-			"tableTo": "users",
-			"columnsTo": ["id"],
-			"onUpdate": "NO ACTION",
-			"onDelete": "CASCADE",
-			"name": "authentications_user_id_users_id_fkey",
-			"entityType": "fks",
-			"schema": "public",
-			"table": "authentications"
-		},
-		{
-			"nameExplicit": false,
-			"columns": ["authentication_id"],
-			"schemaTo": "public",
-			"tableTo": "authentications",
-			"columnsTo": ["id"],
-			"onUpdate": "NO ACTION",
-			"onDelete": "CASCADE",
-			"name": "sessions_authentication_id_authentications_id_fkey",
-			"entityType": "fks",
-			"schema": "public",
-			"table": "sessions"
-		},
-		{
-			"nameExplicit": false,
-			"columns": ["account_id"],
-			"schemaTo": "public",
-			"tableTo": "accounts",
-			"columnsTo": ["id"],
-			"onUpdate": "NO ACTION",
-			"onDelete": "CASCADE",
-			"name": "users_account_id_accounts_id_fkey",
-			"entityType": "fks",
-			"schema": "public",
-			"table": "users"
-		},
-		{
-			"columns": ["id"],
-			"nameExplicit": false,
-			"name": "accounts_pkey",
-			"schema": "public",
-			"table": "accounts",
-			"entityType": "pks"
-		},
-		{
-			"columns": ["id"],
-			"nameExplicit": false,
-			"name": "authentications_pkey",
-			"schema": "public",
-			"table": "authentications",
-			"entityType": "pks"
-		},
-		{
-			"columns": ["key"],
-			"nameExplicit": false,
-			"name": "login_attempts_pkey",
-			"schema": "public",
-			"table": "login_attempts",
-			"entityType": "pks"
-		},
-		{
-			"columns": ["id"],
-			"nameExplicit": false,
-			"name": "sessions_pkey",
-			"schema": "public",
-			"table": "sessions",
-			"entityType": "pks"
-		},
-		{
-			"columns": ["id"],
-			"nameExplicit": false,
-			"name": "users_pkey",
-			"schema": "public",
-			"table": "users",
-			"entityType": "pks"
-		},
-		{
-			"nameExplicit": false,
-			"columns": ["issuer", "subject"],
-			"nullsNotDistinct": false,
-			"name": "authentications_issuer_subject_unique",
-			"entityType": "uniques",
-			"schema": "public",
-			"table": "authentications"
-		},
-		{
-			"nameExplicit": false,
-			"columns": ["account_id"],
-			"nullsNotDistinct": false,
-			"name": "users_account_id_key",
-			"schema": "public",
-			"table": "users",
-			"entityType": "uniques"
+			"statementType": "create_fk",
+			"statementTarget": ["table", "public", "users"],
+			"writes": [
+				"s|fk|public.users.users_account_id_accounts_id_fkey",
+				"n|fk|public.users.users_account_id_accounts_id_fkey",
+				"e|fk|public.users.users_account_id_accounts_id_fkey",
+				"n|con|public.users.users_account_id_accounts_id_fkey"
+			],
+			"reads": [
+				"n|tbl|public.users",
+				"n|sch|public",
+				"n|tbl|public.accounts",
+				"n|sch|public",
+				"n|col|public.users.account_id",
+				"n|col|public.accounts.id",
+				"e|uniqueness|public.accounts.id"
+			]
 		}
 	],
-	"renames": []
+	"deltas": [
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"name": "accounts",
+				"isRlsEnabled": false,
+				"entityType": "tables"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"name": "authentications",
+				"isRlsEnabled": false,
+				"entityType": "tables"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"name": "sessions",
+				"isRlsEnabled": false,
+				"entityType": "tables"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"name": "users",
+				"isRlsEnabled": false,
+				"entityType": "tables"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "accounts",
+				"name": "id",
+				"type": "uuid",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": "gen_random_uuid()",
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "accounts",
+				"name": "display_name",
+				"type": "text",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": null,
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "accounts",
+				"name": "created_at",
+				"type": "bigint",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": null,
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "authentications",
+				"name": "id",
+				"type": "uuid",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": "gen_random_uuid()",
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "authentications",
+				"name": "user_id",
+				"type": "uuid",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": null,
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "authentications",
+				"name": "issuer",
+				"type": "text",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": null,
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "authentications",
+				"name": "subject",
+				"type": "text",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": null,
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "sessions",
+				"name": "id",
+				"type": "text",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": null,
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "sessions",
+				"name": "authentication_id",
+				"type": "uuid",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": null,
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "sessions",
+				"name": "expires_at",
+				"type": "bigint",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": null,
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "users",
+				"name": "id",
+				"type": "uuid",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": "gen_random_uuid()",
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "users",
+				"name": "account_id",
+				"type": "uuid",
+				"typeSchema": null,
+				"notNull": true,
+				"dimensions": 0,
+				"default": null,
+				"generated": null,
+				"identity": null,
+				"entityType": "columns"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "authentications",
+				"name": "authentications_user_id_users_id_fkey",
+				"nameExplicit": false,
+				"columns": ["user_id"],
+				"schemaTo": "public",
+				"tableTo": "users",
+				"columnsTo": ["id"],
+				"onUpdate": "NO ACTION",
+				"onDelete": "CASCADE",
+				"entityType": "fks"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "sessions",
+				"name": "sessions_authentication_id_authentications_id_fkey",
+				"nameExplicit": false,
+				"columns": ["authentication_id"],
+				"schemaTo": "public",
+				"tableTo": "authentications",
+				"columnsTo": ["id"],
+				"onUpdate": "NO ACTION",
+				"onDelete": "CASCADE",
+				"entityType": "fks"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "users",
+				"name": "users_account_id_accounts_id_fkey",
+				"nameExplicit": false,
+				"columns": ["account_id"],
+				"schemaTo": "public",
+				"tableTo": "accounts",
+				"columnsTo": ["id"],
+				"onUpdate": "NO ACTION",
+				"onDelete": "CASCADE",
+				"entityType": "fks"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "accounts",
+				"name": "accounts_pkey",
+				"columns": ["id"],
+				"nameExplicit": false,
+				"entityType": "pks"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "authentications",
+				"name": "authentications_pkey",
+				"columns": ["id"],
+				"nameExplicit": false,
+				"entityType": "pks"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "sessions",
+				"name": "sessions_pkey",
+				"columns": ["id"],
+				"nameExplicit": false,
+				"entityType": "pks"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "users",
+				"name": "users_pkey",
+				"columns": ["id"],
+				"nameExplicit": false,
+				"entityType": "pks"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "authentications",
+				"name": "authentications_issuer_subject_unique",
+				"nameExplicit": false,
+				"columns": ["issuer", "subject"],
+				"nullsNotDistinct": false,
+				"entityType": "uniques"
+			}
+		},
+		{
+			"op": "create",
+			"row": {
+				"schema": "public",
+				"table": "users",
+				"name": "users_account_id_key",
+				"nameExplicit": false,
+				"columns": ["account_id"],
+				"nullsNotDistinct": false,
+				"entityType": "uniques"
+			}
+		}
+	]
 }

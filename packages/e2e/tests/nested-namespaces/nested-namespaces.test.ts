@@ -22,7 +22,7 @@ describe("role links", () => {
 	test("the parent role lets its holder write the child", async () => {
 		const operatorUserId = await createUser("operator");
 		await grantAsAdmin(operatorUserId, {
-			namespace: "e2e-nest",
+			namespace: ["e2e-nest"],
 			name: "operator",
 		});
 		await login("operator");
@@ -39,7 +39,7 @@ describe("role links", () => {
 	test("a parent role without a link cannot write the child", async () => {
 		const viewerUserId = await createUser("viewer");
 		await grantAsAdmin(viewerUserId, {
-			namespace: "e2e-nest",
+			namespace: ["e2e-nest"],
 			name: "viewer",
 		});
 		await login("viewer");

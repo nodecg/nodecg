@@ -25,13 +25,12 @@ export const buildComputed = Effect.fn("buildComputed")(function* <Decoded>(
 	name: string,
 	manifest: ComputedFieldManifest<Decoded>,
 	registry: RoleRegistry,
-	roleNamespace: string,
 	computeValue: () => Result.Result<Decoded, ComputeFailure>,
 ) {
 	const store = yield* ReplicantStoreService;
 	const access = resolveComputedAccess(registry, manifest.permission);
 	const canRead = (identity: Identity) =>
-		canAccess(access.read, identity, roleNamespace, registry);
+		canAccess(access.read, identity, namespace, registry);
 	const read = yield* store.initializeComputed(namespace, name, () =>
 		computeValue().pipe(
 			Result.flatMap((value) => manifest.encode(value)),

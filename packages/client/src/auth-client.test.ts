@@ -39,9 +39,7 @@ const mePayload = {
 		roles: [],
 		globalRoles: [],
 	},
-	namespaces: {
-		fixture: { roles: ["producer"] },
-	},
+	namespaces: [{ namespace: ["fixture"], roles: ["producer"] }],
 };
 
 describe("loginUrl", () => {
@@ -128,7 +126,9 @@ describe("me", () => {
 			const payload = yield* client.me();
 
 			expect(payload.identity._tag).toBe("user");
-			expect(payload.namespaces["fixture"]?.roles).toEqual(["producer"]);
+			expect(payload.namespaces).toEqual([
+				{ namespace: ["fixture"], roles: ["producer"] },
+			]);
 			const request = getLastRequest();
 			expect(request.method).toBe("GET");
 			expect(request.url).toContain("/api/internal/me");

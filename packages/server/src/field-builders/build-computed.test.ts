@@ -86,7 +86,6 @@ const buildDoubled = (value: string) =>
 			"doubled",
 			manifest.computed.doubled,
 			manifest[manifestRolesKey],
-			"ns",
 			() => doubleCount(readCount().value),
 		);
 	});
@@ -134,7 +133,6 @@ describe("get", () => {
 				"doc",
 				manifest.computed.doc,
 				manifest[manifestRolesKey],
-				"ns",
 				() => Result.succeed({ count: 1, data: { tags: ["a"] } }),
 			);
 
@@ -154,7 +152,6 @@ describe("get", () => {
 				"doc",
 				manifest.computed.doc,
 				manifest[manifestRolesKey],
-				"ns",
 				() => Result.succeed({ count: 1, data: { tags } }),
 			);
 
@@ -177,7 +174,6 @@ describe("getEncoded", () => {
 				"open",
 				manifest.computed.open,
 				manifest[manifestRolesKey],
-				"ns",
 				() => doubleCount(readCount().value),
 			);
 			expect(
@@ -207,7 +203,6 @@ describe("getEncoded", () => {
 				"positive",
 				manifest.computed.positive,
 				manifest[manifestRolesKey],
-				"ns",
 				() => Result.succeed(-1),
 			);
 			const error = yield* field[fieldInternal]
@@ -282,7 +277,6 @@ describe("subscribe", () => {
 				"doc",
 				manifest.computed.doc,
 				manifest[manifestRolesKey],
-				"ns",
 				() => Result.succeed({ count: 1, data: { tags: ["a"] } }),
 			);
 

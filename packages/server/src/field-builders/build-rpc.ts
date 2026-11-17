@@ -33,14 +33,13 @@ export const buildRpc = Effect.fn("buildRpc")(
 		name: string,
 		manifest: RpcFieldManifest<Request, Response>,
 		registry: RoleRegistry,
-		roleNamespace: string,
 		handler: (request: Request, ctx: Ctx) => Promisable<Response>,
 		ctx: Ctx,
 	) =>
 		Effect.sync(() => {
 			const access = resolveRpcAccess(registry, manifest.permission);
 			const canWrite = (identity: Identity) =>
-				canAccess(access.write, identity, roleNamespace, registry);
+				canAccess(access.write, identity, namespace, registry);
 			const runHandler = (request: Request) =>
 				Effect.tryPromise({
 					try: async () => handler(request, ctx),

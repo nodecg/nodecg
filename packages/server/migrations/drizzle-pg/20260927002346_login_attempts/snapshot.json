@@ -1,29 +1,35 @@
 {
-	"version": "8",
+	"type": "base",
+	"version": "9",
 	"dialect": "postgres",
 	"id": "3330ff72-a78b-433c-a0d7-e89333b28feb",
 	"prevIds": ["00000000-0000-0000-0000-000000000000"],
+	"footprints": [
+		{
+			"statementType": "create_table",
+			"statementTarget": ["table", "public", "login_attempts"],
+			"writes": [
+				"s|tbl|public.login_attempts",
+				"n|tbl|public.login_attempts",
+				"e|tbl|public.login_attempts",
+				"n|rel|public.login_attempts",
+				"n|type|public.login_attempts",
+				"n|rel|public.login_attempts_pkey"
+			],
+			"reads": ["n|sch|public"]
+		}
+	],
 	"ddl": [
 		{
-			"isRlsEnabled": false,
+			"schema": "public",
 			"name": "login_attempts",
-			"entityType": "tables",
-			"schema": "public"
+			"isRlsEnabled": false,
+			"entityType": "tables"
 		},
 		{
-			"type": "text",
-			"typeSchema": null,
-			"notNull": true,
-			"dimensions": 0,
-			"default": null,
-			"generated": null,
-			"identity": null,
+			"schema": "public",
+			"table": "login_attempts",
 			"name": "key",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
 			"type": "text",
 			"typeSchema": null,
 			"notNull": true,
@@ -31,12 +37,12 @@
 			"default": null,
 			"generated": null,
 			"identity": null,
+			"entityType": "columns"
+		},
+		{
+			"schema": "public",
+			"table": "login_attempts",
 			"name": "provider",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
 			"type": "text",
 			"typeSchema": null,
 			"notNull": true,
@@ -44,25 +50,25 @@
 			"default": null,
 			"generated": null,
 			"identity": null,
+			"entityType": "columns"
+		},
+		{
+			"schema": "public",
+			"table": "login_attempts",
 			"name": "state",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
 			"type": "text",
 			"typeSchema": null,
-			"notNull": false,
+			"notNull": true,
 			"dimensions": 0,
 			"default": null,
 			"generated": null,
 			"identity": null,
+			"entityType": "columns"
+		},
+		{
+			"schema": "public",
+			"table": "login_attempts",
 			"name": "code_verifier",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
 			"type": "text",
 			"typeSchema": null,
 			"notNull": false,
@@ -70,12 +76,12 @@
 			"default": null,
 			"generated": null,
 			"identity": null,
+			"entityType": "columns"
+		},
+		{
+			"schema": "public",
+			"table": "login_attempts",
 			"name": "nonce",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
-		},
-		{
 			"type": "text",
 			"typeSchema": null,
 			"notNull": false,
@@ -83,12 +89,25 @@
 			"default": null,
 			"generated": null,
 			"identity": null,
-			"name": "return_to",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
+			"entityType": "columns"
 		},
 		{
+			"schema": "public",
+			"table": "login_attempts",
+			"name": "return_to",
+			"type": "text",
+			"typeSchema": null,
+			"notNull": false,
+			"dimensions": 0,
+			"default": null,
+			"generated": null,
+			"identity": null,
+			"entityType": "columns"
+		},
+		{
+			"schema": "public",
+			"table": "login_attempts",
+			"name": "expires_at",
 			"type": "bigint",
 			"typeSchema": null,
 			"notNull": true,
@@ -96,19 +115,15 @@
 			"default": null,
 			"generated": null,
 			"identity": null,
-			"name": "expires_at",
-			"entityType": "columns",
-			"schema": "public",
-			"table": "login_attempts"
+			"entityType": "columns"
 		},
 		{
-			"columns": ["key"],
-			"nameExplicit": false,
-			"name": "login_attempts_pkey",
 			"schema": "public",
 			"table": "login_attempts",
+			"name": "login_attempts_pkey",
+			"columns": ["key"],
+			"nameExplicit": false,
 			"entityType": "pks"
 		}
-	],
-	"renames": []
+	]
 }

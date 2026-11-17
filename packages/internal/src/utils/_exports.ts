@@ -1,11 +1,4 @@
 export { cloneJson } from "./clone.ts";
-export {
-	type CaseClashingKeys,
-	findCaseClash,
-	type FileSafeName,
-	isFileSafeName,
-	type UnsafeNameKeys,
-} from "./file-safe-name.ts";
 export { findInheritedKey, isInheritedKey } from "./inherited-key.ts";
 export {
 	type ApplyLambdaToObjectValues,

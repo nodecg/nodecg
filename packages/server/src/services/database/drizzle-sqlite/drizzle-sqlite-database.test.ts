@@ -116,8 +116,8 @@ describe("make", () => {
 				{ id: bob, displayName: "Bob", createdAt: 0 },
 			]);
 			yield* db.insert(roleGrants).values([
-				{ accountId: alice, namespace: "show", roleName: viewer },
-				{ accountId: bob, namespace: "show", roleName: viewer },
+				{ accountId: alice, namespace: ["show"], roleName: viewer },
+				{ accountId: bob, namespace: ["show"], roleName: viewer },
 			]);
 			yield* db.insert(globalRoleGrants).values([
 				{ accountId: alice, roleName: "admin" },
@@ -128,7 +128,7 @@ describe("make", () => {
 
 			const roleRows = yield* db.select().from(roleGrants);
 			expect(roleRows).toStrictEqual([
-				{ accountId: bob, namespace: "show", roleName: viewer },
+				{ accountId: bob, namespace: ["show"], roleName: viewer },
 			]);
 			const globalRoleRows = yield* db.select().from(globalRoleGrants);
 			expect(globalRoleRows).toStrictEqual([

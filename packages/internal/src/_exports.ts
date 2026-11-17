@@ -52,6 +52,14 @@ export {
 	ServerIdentity,
 } from "./models/identity.ts";
 export { manifestRolesKey } from "./manifest-keys.ts";
+export {
+	type CaseClashingKeys,
+	FileSafeName,
+	findCaseClash,
+	isFileSafeName,
+	type UnsafeNameKeys,
+	type ValidateFileSafeName,
+} from "./models/file-safe-name.ts";
 export { LoginAttempt } from "./models/login-attempt.ts";
 export {
 	formatField,

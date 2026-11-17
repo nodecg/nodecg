@@ -45,7 +45,7 @@ const grantServiceAccountRole = async (id: string, role: string) => {
 		{
 			method: "POST",
 			headers: { "content-type": "application/json" },
-			body: JSON.stringify({ namespace: "e2e", name: role }),
+			body: JSON.stringify({ namespace: ["e2e"], name: role }),
 		},
 	);
 	await logout();

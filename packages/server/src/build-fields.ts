@@ -156,14 +156,7 @@ export const buildFields = Effect.fn("buildFields")(function* <
 		unknown,
 		S["replicant"]
 	>()(manifest.replicant, seedReplicantFns, (codec, seed, name) =>
-		buildReplicant(
-			namespace,
-			name,
-			codec,
-			registry,
-			manifest.namespace,
-			seed(),
-		),
+		buildReplicant(namespace, name, codec, registry, seed()),
 	);
 
 	type OwnComputeContext = ComputeContext<
@@ -202,7 +195,7 @@ export const buildFields = Effect.fn("buildFields")(function* <
 		OwnComputeContext,
 		S["computed"]
 	>()(manifest.computed, computeFns, (codec, compute, name) =>
-		buildComputed(namespace, name, codec, registry, manifest.namespace, () =>
+		buildComputed(namespace, name, codec, registry, () =>
 			Result.try({
 				try: () => compute(computeContext),
 				catch: (error) =>
@@ -227,9 +220,9 @@ export const buildFields = Effect.fn("buildFields")(function* <
 	const topic = yield* mapEffectValues<
 		TopicFieldManifestLambda,
 		TopicFieldEffectLambda
-	>()((codec, name) =>
-		buildTopic(namespace, name, codec, registry, manifest.namespace),
-	)(manifest.topic);
+	>()((codec, name) => buildTopic(namespace, name, codec, registry))(
+		manifest.topic,
+	);
 
 	const rpcContext: RpcContext<S> = {
 		...fieldAccessors(fieldServices)({ replicant, computed, topic }),
@@ -243,15 +236,7 @@ export const buildFields = Effect.fn("buildFields")(function* <
 		RpcContext<S>,
 		S["rpc"]
 	>()(manifest.rpc, rpcHandlers, (codec, handler, name) =>
-		buildRpc(
-			namespace,
-			name,
-			codec,
-			registry,
-			manifest.namespace,
-			handler,
-			rpcContext,
-		),
+		buildRpc(namespace, name, codec, registry, handler, rpcContext),
 	);
 
 	return {

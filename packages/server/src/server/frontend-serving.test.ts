@@ -47,6 +47,7 @@ const serve = Effect.fn(function* (frontend: FrontendConfig) {
 			NamespaceRegistryService.layer([
 				{
 					namespace: "ns",
+					path: ["ns"],
 					declaredRoles: new Set(),
 					frontend,
 					fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },

@@ -39,11 +39,11 @@ const test = testLayer(
 );
 
 const viewer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("viewer"),
 });
 const producer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("producer"),
 });
 

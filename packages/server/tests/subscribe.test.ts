@@ -37,6 +37,7 @@ const loadShow = Effect.gen(function* () {
 	const registry = yield* NamespaceRegistryService.make([
 		{
 			namespace: "show",
+			path: ["show"],
 			declaredRoles: new Set(show.manifest[manifestRolesKey].roles.keys()),
 			fields,
 		},

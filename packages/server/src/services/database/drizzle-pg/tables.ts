@@ -2,6 +2,7 @@ import type {
 	ApiKeyId,
 	AuthenticationId,
 	GlobalRoleName,
+	NamespacePath,
 	RoleName,
 	ServiceAccountId,
 	UserId,
@@ -9,6 +10,7 @@ import type {
 } from "@nodecg/internal";
 import {
 	bigint,
+	jsonb,
 	pgTable,
 	primaryKey,
 	text,
@@ -99,7 +101,7 @@ export const roleGrants = pgTable(
 			.$type<AccountId>()
 			.notNull()
 			.references(() => accounts.id, { onDelete: "cascade" }),
-		namespace: text("namespace").notNull(),
+		namespace: jsonb("namespace").$type<NamespacePath>().notNull(),
 		roleName: text("role_name").$type<RoleName>().notNull(),
 	},
 	(table) => [

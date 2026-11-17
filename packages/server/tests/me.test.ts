@@ -8,18 +8,20 @@ import { UserRepositoryService } from "../src/services/repository/user/user-repo
 import { buildClient, findUser, login, loginAdmin, services } from "./setup.ts";
 
 const producer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("producer"),
 });
 
 const namespaces = NamespaceRegistryService.layer([
 	{
 		namespace: "show",
+		path: ["show"],
 		declaredRoles: new Set([producer.name, RoleName.make("viewer")]),
 		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
 	},
 	{
 		namespace: "other",
+		path: ["other"],
 		declaredRoles: new Set([producer.name]),
 		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
 	},
@@ -41,7 +43,10 @@ describe("me", () => {
 			expect(res.status).toBe(200);
 			expect(yield* res.json).toStrictEqual({
 				identity: { _tag: "anonymous" },
-				namespaces: { show: { roles: [] }, other: { roles: [] } },
+				namespaces: [
+					{ namespace: ["other"], roles: [] },
+					{ namespace: ["show"], roles: [] },
+				],
 			});
 		}),
 	);
@@ -63,10 +68,13 @@ describe("me", () => {
 					id: expect.any(String),
 					authentication: { issuer: "dev", subject: "operator" },
 					displayName: "operator",
-					roles: [{ namespace: "show", name: "producer" }],
+					roles: [{ namespace: ["show"], name: "producer" }],
 					globalRoles: [],
 				},
-				namespaces: { show: { roles: ["producer"] }, other: { roles: [] } },
+				namespaces: [
+					{ namespace: ["other"], roles: [] },
+					{ namespace: ["show"], roles: ["producer"] },
+				],
 			});
 		}),
 	);
@@ -82,7 +90,7 @@ describe("me", () => {
 				operatorId,
 				HashSet.make(
 					Role.make({
-						namespace: "show",
+						namespace: ["show"],
 						name: RoleName.make("unrelated"),
 					}),
 				),
@@ -92,7 +100,10 @@ describe("me", () => {
 			expect(res.status).toBe(200);
 			expect(yield* res.json).toStrictEqual({
 				identity: expect.anything(),
-				namespaces: { show: { roles: [] }, other: { roles: [] } },
+				namespaces: [
+					{ namespace: ["other"], roles: [] },
+					{ namespace: ["show"], roles: [] },
+				],
 			});
 		}),
 	);
@@ -107,7 +118,10 @@ describe("me", () => {
 			expect(res.status).toBe(200);
 			expect(yield* res.json).toStrictEqual({
 				identity: expect.anything(),
-				namespaces: { show: { roles: [] }, other: { roles: [] } },
+				namespaces: [
+					{ namespace: ["other"], roles: [] },
+					{ namespace: ["show"], roles: [] },
+				],
 			});
 		}),
 	);

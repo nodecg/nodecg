@@ -44,25 +44,29 @@ describe("browser login", () => {
 describe("role reporting", () => {
 	test("anonymous holds no declared role", async () => {
 		await logout();
-		expect((await me()).namespaces["e2e"]?.roles).toEqual([]);
+		expect((await me()).namespaces).toEqual([
+			{ namespace: ["e2e"], roles: [] },
+		]);
 	});
 
 	test("a held declared role reports for its namespace, capabilities or not", async () => {
 		const permsviewerUserId = await createUser("permsviewer");
 		await grantAsAdmin(permsviewerUserId, {
-			namespace: "e2e",
+			namespace: ["e2e"],
 			name: "viewer",
 		});
 		await login("permsviewer");
 		onTestFinished(async () => {
 			await revokeAsAdmin(permsviewerUserId, {
-				namespace: "e2e",
+				namespace: ["e2e"],
 				name: "viewer",
 			});
 			await logout();
 		});
 
-		expect((await me()).namespaces["e2e"]?.roles).toEqual(["viewer"]);
+		expect((await me()).namespaces).toEqual([
+			{ namespace: ["e2e"], roles: ["viewer"] },
+		]);
 	});
 });
 
@@ -85,7 +89,7 @@ describe("loadAuthClient", () => {
 		await login("alice");
 		const payload = await client.me();
 		assert(payload.identity._tag === "user");
-		expect(payload.namespaces["e2e"]?.roles).toEqual([]);
+		expect(payload.namespaces).toEqual([{ namespace: ["e2e"], roles: [] }]);
 
 		await client.logout();
 		expect((await me()).identity).toEqual({ _tag: "anonymous" });
@@ -120,16 +124,16 @@ describe("runtime role assignment", () => {
 		expect(before.roles).toEqual([]);
 
 		await grantAsAdmin(operatorUserId, {
-			namespace: "e2e",
+			namespace: ["e2e"],
 			name: "producer",
 		});
 		await login("operator");
 		const granted = (await me()).identity;
 		assert(granted._tag === "user");
-		expect(granted.roles).toEqual([{ namespace: "e2e", name: "producer" }]);
+		expect(granted.roles).toEqual([{ namespace: ["e2e"], name: "producer" }]);
 
 		await revokeAsAdmin(operatorUserId, {
-			namespace: "e2e",
+			namespace: ["e2e"],
 			name: "producer",
 		});
 		await login("operator");
@@ -147,10 +151,10 @@ describe("runtime role assignment", () => {
 			await logout();
 		});
 		await expect(
-			grantRole(operatorUserId, { namespace: "e2e", name: "server" }),
+			grantRole(operatorUserId, { namespace: ["e2e"], name: "server" }),
 		).rejects.toThrow("Authentication request failed");
 		await expect(
-			grantRole(operatorUserId, { namespace: "e2e", name: "superadmin" }),
+			grantRole(operatorUserId, { namespace: ["e2e"], name: "superadmin" }),
 		).rejects.toThrow("Authentication request failed");
 	});
 
@@ -161,7 +165,7 @@ describe("runtime role assignment", () => {
 		});
 		await expect(
 			grantRole("unknown-user", {
-				namespace: "e2e",
+				namespace: ["e2e"],
 				name: "viewer",
 			}),
 		).rejects.toMatchObject({
@@ -177,7 +181,7 @@ describe("runtime role assignment", () => {
 		});
 		await expect(
 			grantRole("unknown-user", {
-				namespace: "e2e",
+				namespace: ["e2e"],
 				name: "producer",
 			}),
 		).rejects.toMatchObject({
@@ -190,7 +194,7 @@ describe("runtime role assignment", () => {
 		await logout();
 		await expect(
 			grantRole("unknown-user", {
-				namespace: "e2e",
+				namespace: ["e2e"],
 				name: "producer",
 			}),
 		).rejects.toMatchObject({

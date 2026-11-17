@@ -30,6 +30,7 @@ import {
 	Ref,
 	Result,
 	Semaphore,
+	String,
 } from "effect";
 import { Digest } from "effect/crypto";
 import { HttpServerRequest, HttpServerResponse, Url } from "effect/http";
@@ -193,16 +194,20 @@ const AuthenticationGroupLive = HttpApiBuilder.group(
 					Effect.gen(function* () {
 						const identity = yield* CurrentIdentity;
 						const { declaredRoles } = yield* NamespaceRegistryService;
-						const namespaces: Record<string, MePayload["namespaces"][string]> =
-							{};
-						for (const [namespace, declared] of declaredRoles) {
-							namespaces[namespace] = {
+						const namespaces: MePayload["namespaces"] = declaredRoles.pipe(
+							Array.fromIterable,
+							Array.map(([namespace, declared]) => ({
+								namespace,
 								roles: Array.intersection(
 									getRolesForNamespace(identity, namespace),
 									declared,
 								),
-							};
-						}
+							})),
+							Array.sortWith(
+								({ namespace }) => namespace,
+								Array.makeOrder(String.Order),
+							),
+						);
 						return { identity, namespaces };
 					}).pipe(provideIdentity),
 				)
@@ -427,7 +432,12 @@ const UsersGroupLive = HttpApiBuilder.group(RootApi, "Users", (handlers) =>
 		.handle("grantRole", ({ params: { id }, payload: role }) =>
 			Effect.gen(function* () {
 				const { declaredRoles } = yield* NamespaceRegistryService;
-				if (!declaredRoles.get(role.namespace)?.has(role.name)) {
+				if (
+					!declaredRoles.pipe(
+						HashMap.get(role.namespace),
+						Option.exists((declared) => declared.has(role.name)),
+					)
+				) {
 					return yield* HttpApiError.UnprocessableEntity.make();
 				}
 				const users = yield* UserRepositoryService;
@@ -516,7 +526,12 @@ const ServiceAccountsGroupLive = HttpApiBuilder.group(
 			.handle("grantRole", ({ params: { id }, payload: role }) =>
 				Effect.gen(function* () {
 					const { declaredRoles } = yield* NamespaceRegistryService;
-					if (!declaredRoles.get(role.namespace)?.has(role.name)) {
+					if (
+						!declaredRoles.pipe(
+							HashMap.get(role.namespace),
+							Option.exists((declared) => declared.has(role.name)),
+						)
+					) {
 						return yield* HttpApiError.UnprocessableEntity.make();
 					}
 					const serviceAccounts = yield* ServiceAccountRepositoryService;

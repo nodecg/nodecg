@@ -1,0 +1,32 @@
+{
+	"type": "diff",
+	"version": "9",
+	"dialect": "postgres",
+	"id": "988bdbd8-d2f6-453c-ae04-dc7751af9040",
+	"prevIds": ["0b26a9b4-0b1a-4bb3-8b26-ce4f69475fe2"],
+	"footprints": [
+		{
+			"statementType": "alter_column",
+			"statementTarget": ["column", "public", "role_grants", "namespace"],
+			"writes": [
+				"s|colprop|public.role_grants.namespace.type",
+				"s|colprop|public.role_grants.namespace.default"
+			],
+			"reads": [
+				"n|tbl|public.role_grants",
+				"n|sch|public",
+				"n|col|public.role_grants.namespace"
+			],
+			"sqlHash": "24801c2e06f2b6df"
+		}
+	],
+	"deltas": [
+		{
+			"op": "alter",
+			"key": "columns\u0000[\"public\",\"role_grants\",\"namespace\"]",
+			"set": {
+				"type": "jsonb"
+			}
+		}
+	]
+}

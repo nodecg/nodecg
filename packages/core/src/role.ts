@@ -2,13 +2,14 @@ import {
 	ADMIN_TIER,
 	DeclarablePrincipalNameSchema,
 	type DeclarablePrincipalName,
+	FileSafeName,
 	type Identity,
+	type NamespacePath,
 	PRINCIPAL,
 	type Principal,
-	type Role,
 	RoleName,
 } from "@nodecg/internal";
-import { Match, Schema } from "effect";
+import { Equal, Match, Schema } from "effect";
 import type { Writable } from "type-fest";
 
 export const ROLE_CAPABILITY = [
@@ -30,7 +31,7 @@ export interface PrincipalArg {
 }
 
 export const RoleReference = Schema.Struct({
-	namespace: Schema.String,
+	children: Schema.NonEmptyArray(FileSafeName),
 	name: Schema.String,
 }).pipe(Schema.brand("RoleReference"));
 export type RoleReference = typeof RoleReference.Type;
@@ -62,7 +63,7 @@ export interface RoleManifest {
 	readonly name: RoleName;
 	readonly description?: string;
 	readonly capabilities: ReadonlySet<RoleCapability>;
-	readonly linkedRoles: ReadonlyArray<Role>;
+	readonly linkedRoles: ReadonlyArray<RoleReference>;
 }
 
 export interface PrincipalManifest {
@@ -82,13 +83,13 @@ export type Access = PrincipalGrants & {
 
 export const getRolesForNamespace = (
 	caller: Identity,
-	namespace: string,
+	namespace: NamespacePath,
 ): ReadonlyArray<RoleName> =>
 	Match.value(caller).pipe(
 		Match.withReturnType<ReadonlyArray<RoleName>>(),
 		Match.tag("user", "serviceAccount", (holder) =>
 			holder.roles
-				.filter((role) => role.namespace === namespace)
+				.filter((role) => Equal.equals(role.namespace, namespace))
 				.map((role) => role.name),
 		),
 		Match.tag("anonymous", () => []),
@@ -119,7 +120,7 @@ export const isSuperadmin = (caller: Identity): boolean =>
 export const canAccess = (
 	access: Access,
 	caller: Identity,
-	namespace: string,
+	namespace: NamespacePath,
 	registry: RoleRegistry,
 ): boolean => {
 	if (caller._tag === "server") {

@@ -633,7 +633,7 @@ describe("defineNamespace", () => {
 			expect(
 				show[manifestRolesKey].roles.get(RoleName.make("operator"))
 					?.linkedRoles,
-			).toStrictEqual([{ namespace: "show-assets", name: "uploader" }]);
+			).toStrictEqual([{ children: ["assets"], name: "uploader" }]);
 		});
 
 		test("links a role to a grandchild role", () => {
@@ -658,7 +658,7 @@ describe("defineNamespace", () => {
 			expect(
 				show[manifestRolesKey].roles.get(RoleName.make("operator"))
 					?.linkedRoles,
-			).toStrictEqual([{ namespace: "show-archive", name: "archiver" }]);
+			).toStrictEqual([{ children: ["media", "archive"], name: "archiver" }]);
 		});
 
 		test("refuses a role reference built by hand", () => {
@@ -667,7 +667,7 @@ describe("defineNamespace", () => {
 					operator: {
 						permission: [],
 						// @ts-expect-error a plain object lacks the brand
-						linkRoles: () => [{ namespace: "show-assets", name: "uploader" }],
+						linkRoles: () => [{ children: ["assets"], name: "uploader" }],
 					},
 				},
 				children: { assets },
@@ -681,14 +681,32 @@ describe("defineNamespace", () => {
 						operator: {
 							permission: [],
 							linkRoles: () => [
-								RoleReference.make({ namespace: "show-media", name: "player" }),
+								RoleReference.make({ children: ["media"], name: "player" }),
 							],
 						},
 					},
 					children: { assets },
 				}),
 			).toThrow(
-				'Role "operator" links to unknown role "player" of "show-media"',
+				'Role "operator" links to unknown role "player" of child "media"',
+			);
+			expect(() =>
+				defineNamespace("show", {
+					roles: {
+						operator: {
+							permission: [],
+							linkRoles: () => [
+								RoleReference.make({
+									children: ["assets", "archive"],
+									name: "archiver",
+								}),
+							],
+						},
+					},
+					children: { assets },
+				}),
+			).toThrow(
+				'Role "operator" links to unknown role "archiver" of child "assets/archive"',
 			);
 		});
 
@@ -699,17 +717,14 @@ describe("defineNamespace", () => {
 						operator: {
 							permission: [],
 							linkRoles: () => [
-								RoleReference.make({
-									namespace: "show-assets",
-									name: "server",
-								}),
+								RoleReference.make({ children: ["assets"], name: "server" }),
 							],
 						},
 					},
 					children: { assets },
 				}),
 			).toThrow(
-				'Role "operator" links to unknown role "server" of "show-assets"',
+				'Role "operator" links to unknown role "server" of child "assets"',
 			);
 		});
 	});

@@ -12,7 +12,7 @@ const userIdentity = User.make({
 	globalRoles: [],
 });
 
-const userPayload: MePayload = { identity: userIdentity, namespaces: {} };
+const userPayload: MePayload = { identity: userIdentity, namespaces: [] };
 
 const stubClient = () => {
 	const providers = vi.fn<AuthClient["providers"]>(async () => []);

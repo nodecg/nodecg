@@ -1,5 +1,5 @@
 import type { GlobalRoleName, Role, UserId } from "@nodecg/internal";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Array, Effect, type HashSet, Layer, Option } from "effect";
 
 import {
@@ -88,28 +88,16 @@ export const DrizzleSqliteUserRepository = Layer.effect(
 				yield* db.transaction(() =>
 					Effect.gen(function* () {
 						const accountId = yield* requireAccountId(id);
-						const rolesByNamespace = Map.groupBy(
-							roles,
-							({ namespace }) => namespace,
-						);
-						for (const [namespace, namespaceRoles] of rolesByNamespace) {
-							const rows = namespaceRoles.map(({ name }) => ({
-								accountId,
-								namespace,
-								roleName: name,
-							}));
-							yield* queryInChunks(rows, (chunk) =>
-								db.delete(roleGrants).where(
+						for (const { namespace, name } of roles) {
+							yield* db
+								.delete(roleGrants)
+								.where(
 									and(
 										eq(roleGrants.accountId, accountId),
 										eq(roleGrants.namespace, namespace),
-										inArray(
-											roleGrants.roleName,
-											chunk.map(({ roleName }) => roleName),
-										),
+										eq(roleGrants.roleName, name),
 									),
-								),
-							);
+								);
 						}
 					}),
 				);

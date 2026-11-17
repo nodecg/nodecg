@@ -50,7 +50,6 @@ describe("callEncoded", () => {
 				"echo",
 				manifest.rpc.echo,
 				manifest[manifestRolesKey],
-				"ns",
 				handler,
 				context,
 			);
@@ -72,7 +71,6 @@ describe("callEncoded", () => {
 				"echo",
 				manifest.rpc.echo,
 				manifest[manifestRolesKey],
-				"ns",
 				async (request: number) => {
 					await Promise.resolve();
 					return request + 1;
@@ -97,7 +95,6 @@ describe("callEncoded", () => {
 				"echo",
 				manifest.rpc.echo,
 				manifest[manifestRolesKey],
-				"ns",
 				handler,
 				context,
 			);
@@ -119,7 +116,6 @@ describe("callEncoded", () => {
 				"echo",
 				manifest.rpc.echo,
 				manifest[manifestRolesKey],
-				"ns",
 				() => {
 					throw new Error("boom");
 				},
@@ -143,7 +139,6 @@ describe("callEncoded", () => {
 				"echo",
 				manifest.rpc.echo,
 				manifest[manifestRolesKey],
-				"ns",
 				() => "nope" as unknown as number,
 				context,
 			);
@@ -169,7 +164,6 @@ describe("call", () => {
 				"echo",
 				manifest.rpc.echo,
 				manifest[manifestRolesKey],
-				"ns",
 				handler,
 				context,
 			);
@@ -189,7 +183,6 @@ describe("call", () => {
 				"echo",
 				manifest.rpc.echo,
 				manifest[manifestRolesKey],
-				"ns",
 				() => {
 					throw new Error("boom");
 				},
@@ -212,7 +205,6 @@ test(
 			"locked",
 			manifest.rpc.locked,
 			manifest[manifestRolesKey],
-			"ns",
 			handler,
 			context,
 		);

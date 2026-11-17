@@ -39,6 +39,7 @@ const namespaces = Layer.effect(
 		return yield* NamespaceRegistryService.make([
 			{
 				namespace: "show",
+				path: ["show"],
 				declaredRoles: new Set(show.manifest[manifestRolesKey].roles.keys()),
 				fields,
 			},

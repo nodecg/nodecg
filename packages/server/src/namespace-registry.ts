@@ -1,5 +1,5 @@
-import type { RoleName } from "@nodecg/internal";
-import { Context, Effect, HashSet, Layer } from "effect";
+import type { NamespacePath, RoleName } from "@nodecg/internal";
+import { Context, Effect, HashMap, HashSet, Layer } from "effect";
 
 import type { CustomRoute } from "./build-custom-routes.ts";
 import { type BuiltNamespace } from "./build-fields.ts";
@@ -33,12 +33,13 @@ export interface NamespaceRegistry {
 	readonly topic: ReadonlyMap<string, ReadonlyMap<string, TopicFieldInternal>>;
 	readonly rpc: ReadonlyMap<string, ReadonlyMap<string, RpcFieldInternal>>;
 	readonly customRoute: ReadonlyMap<string, HashSet.HashSet<CustomRoute>>;
-	readonly declaredRoles: ReadonlyMap<string, ReadonlySet<RoleName>>;
+	readonly declaredRoles: HashMap.HashMap<NamespacePath, ReadonlySet<RoleName>>;
 	readonly frontend: ReadonlyMap<string, FrontendConfig>;
 }
 
 export interface RegisteredNamespace {
 	readonly namespace: string;
+	readonly path: NamespacePath;
 	readonly declaredRoles: ReadonlySet<RoleName>;
 	readonly frontend?: FrontendConfig;
 	readonly customRoute?: HashSet.HashSet<CustomRoute>;
@@ -75,11 +76,12 @@ export class NamespaceRegistryService extends Context.Service<NamespaceRegistryS
 				const topic = new Map<string, Map<string, TopicFieldInternal>>();
 				const rpc = new Map<string, Map<string, RpcFieldInternal>>();
 				const customRoute = new Map<string, HashSet.HashSet<CustomRoute>>();
-				const declaredRoles = new Map<string, ReadonlySet<RoleName>>();
+				const declaredRoles = HashMap.fromIterable(
+					namespaces.map(({ path, declaredRoles }) => [path, declaredRoles]),
+				);
 				const frontend = new Map<string, FrontendConfig>();
 				for (const registered of namespaces) {
 					const { namespace, fields } = registered;
-					declaredRoles.set(namespace, registered.declaredRoles);
 					if (typeof registered.frontend !== "undefined") {
 						frontend.set(namespace, registered.frontend);
 					}

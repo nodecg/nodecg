@@ -14,6 +14,7 @@ import {
 } from "../auth.ts";
 import { Authentication } from "../models/authentication.ts";
 import { Identity } from "../models/identity.ts";
+import { NamespacePath } from "../models/namespace-path.ts";
 import {
 	AdminRoleName,
 	GlobalRoleName,
@@ -41,11 +42,12 @@ export class SuperadminRevokeRefused extends Schema.TaggedError<SuperadminRevoke
 ) {}
 
 const NamespacePermissionsSchema = Schema.Struct({
+	namespace: NamespacePath,
 	roles: Schema.Array(RoleName),
 });
 export const MePayload = Schema.Struct({
 	identity: Identity,
-	namespaces: Schema.Record(Schema.String, NamespacePermissionsSchema),
+	namespaces: Schema.Array(NamespacePermissionsSchema),
 });
 export type MePayload = typeof MePayload.Type;
 
@@ -123,7 +125,7 @@ const DeclarableRoleName = RoleName.check(
 );
 
 const DeclarableRole = Schema.Struct({
-	namespace: Schema.String,
+	namespace: NamespacePath,
 	name: DeclarableRoleName,
 });
 

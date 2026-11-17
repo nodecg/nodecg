@@ -10,7 +10,7 @@ import { UserRepositoryService } from "../src/services/repository/user/user-repo
 import { buildClient, findUser, login, loginAdmin, services } from "./setup.ts";
 
 const producer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("producer"),
 });
 
@@ -20,6 +20,7 @@ const test = testLayer(
 		NamespaceRegistryService.layer([
 			{
 				namespace: "show",
+				path: ["show"],
 				declaredRoles: new Set([producer.name]),
 				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
 			},
@@ -154,13 +155,13 @@ describe("validation", () => {
 			for (const name of ["superadmin", "admin", "server"]) {
 				const grantRes = yield* asAdmin.post(
 					`${usersUrl}/${operatorId}/roles/grant`,
-					{ body: yield* HttpBody.json({ namespace: "show", name }) },
+					{ body: yield* HttpBody.json({ namespace: ["show"], name }) },
 				);
 				expect(grantRes.status).toBe(400);
 
 				const revokeRes = yield* asAdmin.post(
 					`${usersUrl}/${operatorId}/roles/revoke`,
-					{ body: yield* HttpBody.json({ namespace: "show", name }) },
+					{ body: yield* HttpBody.json({ namespace: ["show"], name }) },
 				);
 				expect(revokeRes.status).toBe(400);
 			}
@@ -179,17 +180,40 @@ describe("validation", () => {
 
 			const undeclaredRoleRes = yield* asAdmin.post(
 				`${usersUrl}/${operatorId}/roles/grant`,
-				{ body: yield* HttpBody.json({ namespace: "show", name: "ghost" }) },
+				{ body: yield* HttpBody.json({ namespace: ["show"], name: "ghost" }) },
 			);
 			expect(undeclaredRoleRes.status).toBe(422);
 
 			const unknownNamespaceRes = yield* asAdmin.post(
 				`${usersUrl}/${operatorId}/roles/grant`,
 				{
-					body: yield* HttpBody.json({ namespace: "stage", name: "producer" }),
+					body: yield* HttpBody.json({
+						namespace: ["stage"],
+						name: "producer",
+					}),
 				},
 			);
 			expect(unknownNamespaceRes.status).toBe(422);
+		}),
+	);
+
+	test(
+		"400 for a namespace path that is not file-safe",
+		Effect.gen(function* () {
+			const client = yield* buildClient;
+
+			yield* login(client, operator);
+			const { id: operatorId } = yield* findUser(operator);
+
+			const asAdmin = yield* loginAdmin(client, admin);
+
+			for (const namespace of [["a.b"], ["show", "con"]]) {
+				const grantRes = yield* asAdmin.post(
+					`${usersUrl}/${operatorId}/roles/grant`,
+					{ body: yield* HttpBody.json({ namespace, name: "operator" }) },
+				);
+				expect(grantRes.status).toBe(400);
+			}
 		}),
 	);
 });

@@ -49,15 +49,15 @@ const test = testLayer(
 );
 
 const viewer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("viewer"),
 });
 const judge = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("judge"),
 });
 const producer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("producer"),
 });
 const ghost = ServiceAccountId.make("00000000-0000-4000-8000-0000000000ff");
@@ -479,7 +479,7 @@ describe("grantRoles", () => {
 			const roles = HashSet.fromIterable(
 				Array.makeBy(10_923, (index) =>
 					Role.make({
-						namespace: "show",
+						namespace: ["show"],
 						name: RoleName.make(`role-${index}`),
 					}),
 				),

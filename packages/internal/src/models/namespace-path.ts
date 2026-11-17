@@ -1,6 +1,8 @@
 import { Schema } from "effect";
 
-export const NamespacePath = Schema.NonEmptyArray(Schema.String);
+import { FileSafeName } from "./file-safe-name.ts";
+
+export const NamespacePath = Schema.NonEmptyArray(FileSafeName);
 export type NamespacePath = typeof NamespacePath.Type;
 
 export const formatNamespacePath = (namespace: NamespacePath) =>

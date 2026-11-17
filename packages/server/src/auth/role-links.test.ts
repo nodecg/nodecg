@@ -1,56 +1,88 @@
 import { defineNamespace } from "@nodecg/core";
-import { Role, RoleName } from "@nodecg/internal";
+import { manifestRolesKey, Role, RoleName } from "@nodecg/internal";
 import { Equal, HashMap, HashSet, Option } from "effect";
 import { assert, describe, test } from "vitest";
 
-import { expandRoleLinks, normalizeRoleLinks } from "./role-links.ts";
+import {
+	expandRoleLinks,
+	normalizeRoleLinks,
+	resolveRoleLinks,
+} from "./role-links.ts";
 
 const operator = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("operator"),
 });
 const uploader = Role.make({
-	namespace: "show-assets",
+	namespace: ["show", "assets"],
 	name: RoleName.make("uploader"),
 });
 const archiver = Role.make({
-	namespace: "show-archive",
+	namespace: ["show", "assets", "archive"],
 	name: RoleName.make("archiver"),
 });
 const player = Role.make({
-	namespace: "show-media",
+	namespace: ["show", "media"],
 	name: RoleName.make("player"),
 });
 const viewer = Role.make({
-	namespace: "show",
+	namespace: ["show"],
 	name: RoleName.make("viewer"),
 });
 
-describe("normalizeRoleLinks", () => {
-	test("follows a chain to every role it reaches", () => {
+describe("resolveRoleLinks", () => {
+	test("places each linked role under the declaring path and the child keys", () => {
 		const archive = defineNamespace("show-archive", {
 			roles: { archiver: { permission: [] } },
 		});
-		const assets = defineNamespace("show-assets", {
-			roles: {
-				uploader: {
-					permission: [],
-					linkRoles: (children) => [children.archive.roles.archiver],
-				},
-			},
+		const media = defineNamespace("show-media", {
+			roles: { player: { permission: [] } },
 			children: { archive },
 		});
 		const show = defineNamespace("show", {
 			roles: {
 				operator: {
 					permission: [],
-					linkRoles: (children) => [children.assets.roles.uploader],
+					linkRoles: (children) => [
+						children.media.children.archive.roles.archiver,
+						children.media.roles.player,
+					],
 				},
 			},
-			children: { assets },
+			children: { media },
 		});
 
-		const links = normalizeRoleLinks([show, assets, archive]);
+		assert(
+			Equal.equals(
+				resolveRoleLinks(["root", "show"], show[manifestRolesKey].roles),
+				HashMap.make([
+					Role.make({
+						namespace: ["root", "show"],
+						name: RoleName.make("operator"),
+					}),
+					HashSet.make(
+						Role.make({
+							namespace: ["root", "show", "media", "archive"],
+							name: RoleName.make("archiver"),
+						}),
+						Role.make({
+							namespace: ["root", "show", "media"],
+							name: RoleName.make("player"),
+						}),
+					),
+				]),
+			),
+		);
+	});
+});
+
+describe("normalizeRoleLinks", () => {
+	test("follows a chain to every role it reaches", () => {
+		const links = normalizeRoleLinks([
+			HashMap.make([operator, HashSet.make(uploader)]),
+			HashMap.make([uploader, HashSet.make(archiver)]),
+			HashMap.make([archiver, HashSet.empty<Role>()]),
+		]);
 
 		assert(
 			Equal.equals(
@@ -62,36 +94,6 @@ describe("normalizeRoleLinks", () => {
 			Equal.equals(
 				HashMap.get(links, uploader),
 				Option.some(HashSet.make(archiver)),
-			),
-		);
-	});
-
-	test("follows every link of a role", () => {
-		const assets = defineNamespace("show-assets", {
-			roles: { uploader: { permission: [] } },
-		});
-		const media = defineNamespace("show-media", {
-			roles: { player: { permission: [] } },
-		});
-		const show = defineNamespace("show", {
-			roles: {
-				operator: {
-					permission: [],
-					linkRoles: (children) => [
-						children.assets.roles.uploader,
-						children.media.roles.player,
-					],
-				},
-			},
-			children: { assets, media },
-		});
-
-		const links = normalizeRoleLinks([show, assets, media]);
-
-		assert(
-			Equal.equals(
-				HashMap.get(links, operator),
-				Option.some(HashSet.make(uploader, player)),
 			),
 		);
 	});

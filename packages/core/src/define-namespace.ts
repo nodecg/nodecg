@@ -1,26 +1,27 @@
 import {
+	type CaseClashingKeys,
 	DeclarablePrincipalNameSchema,
+	type FileSafeName,
+	findCaseClash,
+	formatNamespacePath,
+	isFileSafeName,
 	isUndeclarableRole,
 	manifestRolesKey,
 	PRINCIPAL,
-	Role,
 	RoleName,
 	UndeniablePrincipalNameSchema,
 	type Principal,
 	type UndeclarableRoleName,
+	type UnsafeNameKeys,
+	type ValidateFileSafeName,
 } from "@nodecg/internal";
 import {
-	type CaseClashingKeys,
-	type FileSafeName,
-	findCaseClash,
-	isFileSafeName,
 	mapNestedValues,
 	mapValues,
 	type NestedValues,
-	type UnsafeNameKeys,
 } from "@nodecg/internal/utils";
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { type HKT, Option, Record, Schema, String } from "effect";
+import { Array, type HKT, Option, pipe, Record, Schema, String } from "effect";
 import { HttpMethod } from "effect/http";
 
 import { makeCodec, type FieldCodec } from "./field-codec.ts";
@@ -395,9 +396,11 @@ const findInvalidName = (
 const isCustomRouteMethod = Schema.is(
 	Schema.Literals([
 		"*",
-		...Array.from(HttpMethod.all)
-			.filter((method) => method !== "TRACE")
-			.map((method) => String.toLowerCase(method)),
+		...pipe(
+			Array.fromIterable(HttpMethod.all),
+			Array.filter((method) => method !== "TRACE"),
+			Array.map((method) => String.toLowerCase(method)),
+		),
 	]),
 );
 
@@ -427,24 +430,34 @@ const isUndeniablePrincipalName = Schema.is(UndeniablePrincipalNameSchema);
 
 const buildRoleTree = (
 	children: WidestNamespaceManifests,
+	path: FileSafeName[],
 ): ChildRoleTree<WidestNamespaceManifests> =>
-	Record.map(children, (child) => ({
-		roles: Record.fromIterableWith(child.roles, (name) => [
-			name,
-			RoleReference.make({ namespace: child.namespace, name }),
-		]),
-		children: buildRoleTree(child.children),
-	}));
+	Record.map(children, (child, key) => {
+		const childPath = Array.append(path, key);
+		return {
+			roles: Record.fromIterableWith(child.roles, (name) => [
+				name,
+				RoleReference.make({ children: childPath, name }),
+			]),
+			children: buildRoleTree(child.children, childPath),
+		};
+	});
 
-const declaresRole = (
+const findDescendant = (
 	children: WidestNamespaceManifests,
-	role: RoleReference,
-): boolean =>
-	Object.values(children).some(
-		(child) =>
-			(child.namespace === role.namespace && child.roles.has(role.name)) ||
-			declaresRole(child.children, role),
-	);
+	path: Array.NonEmptyReadonlyArray<FileSafeName>,
+) => {
+	const [head, ...rest] = path;
+	let target = Record.get(children, head);
+	for (const key of rest) {
+		if (Option.isNone(target)) {
+			return target;
+		}
+		const nextLevel: WidestNamespaceManifests = target.value.children;
+		target = Record.get(nextLevel, key);
+	}
+	return target;
+};
 
 const declareRoles = (
 	named:
@@ -474,7 +487,7 @@ const declareRoles = (
 	}
 
 	// Resolve roles
-	const roleTree = buildRoleTree(children);
+	const roleTree = buildRoleTree(children, []);
 	for (const [key, arg] of Object.entries(named ?? {})) {
 		if (typeof arg === "undefined") {
 			continue;
@@ -491,15 +504,16 @@ const declareRoles = (
 		}
 		const roleName = RoleName.make(key);
 		const linkedRoles = arg.linkRoles?.(roleTree).map((role) => {
-			if (!declaresRole(children, role)) {
+			if (
+				!Option.exists(findDescendant(children, role.children), (child) =>
+					child.roles.has(role.name),
+				)
+			) {
 				throw new Error(
-					`Role "${key}" links to unknown role "${role.name}" of "${role.namespace}"`,
+					`Role "${key}" links to unknown role "${role.name}" of child "${formatNamespacePath(role.children)}"`,
 				);
 			}
-			return Role.make({
-				namespace: role.namespace,
-				name: RoleName.make(role.name),
-			});
+			return role;
 		});
 		roles.set(roleName, {
 			name: roleName,
@@ -528,7 +542,7 @@ export function defineNamespace<
 	const DeclaredRoleName extends string = never,
 	Children extends WidestNamespaceManifests = {},
 >(
-	namespace: FileSafeName<Namespace>,
+	namespace: ValidateFileSafeName<Namespace>,
 	defineOption: {
 		roles?: Record<DeclaredRoleName, RoleArg<NoInfer<Children>>> & {
 			[K in UndeclarableRoleName]?: never;
@@ -549,7 +563,7 @@ export function defineNamespace<
 		children?: Children & UnsafeNameKeys<Children> & CaseClashingKeys<Children>;
 	},
 ): NamespaceManifest<
-	FileSafeName<Namespace>,
+	ValidateFileSafeName<Namespace>,
 	{
 		replicant: { [K in keyof Replicant]: FieldDecoded<Replicant[K]> };
 		computed: { [K in keyof Computed]: FieldDecoded<Computed[K]> };

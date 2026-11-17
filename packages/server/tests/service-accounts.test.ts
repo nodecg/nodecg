@@ -16,6 +16,7 @@ import {
 const namespaces = NamespaceRegistryService.layer([
 	{
 		namespace: "show",
+		path: ["show"],
 		declaredRoles: new Set([RoleName.make("viewer"), RoleName.make("judge")]),
 		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
 	},
@@ -169,7 +170,7 @@ describe("grant role", () => {
 
 			const grantRes = yield* asAdmin.post(
 				`${serviceAccountsUrl}/${serviceAccountId}/roles/grant`,
-				{ body: yield* HttpBody.json({ namespace: "show", name: "viewer" }) },
+				{ body: yield* HttpBody.json({ namespace: ["show"], name: "viewer" }) },
 			);
 			expect(grantRes.status).toBe(204);
 
@@ -178,7 +179,7 @@ describe("grant role", () => {
 				serviceAccounts: expect.arrayContaining([
 					expect.objectContaining({
 						id: serviceAccountId,
-						roles: [{ namespace: "show", name: "viewer" }],
+						roles: [{ namespace: ["show"], name: "viewer" }],
 					}),
 				]),
 			});
@@ -196,8 +197,8 @@ describe("grant role", () => {
 			);
 
 			for (const role of [
-				{ namespace: "show", name: "admin" },
-				{ namespace: "show", name: "server" },
+				{ namespace: ["show"], name: "admin" },
+				{ namespace: ["show"], name: "server" },
 			]) {
 				const res = yield* asAdmin.post(
 					`${serviceAccountsUrl}/${serviceAccountId}/roles/grant`,
@@ -221,8 +222,8 @@ describe("grant role", () => {
 			);
 
 			for (const role of [
-				{ namespace: "show", name: "ghost" },
-				{ namespace: "stage", name: "viewer" },
+				{ namespace: ["show"], name: "ghost" },
+				{ namespace: ["stage"], name: "viewer" },
 			]) {
 				const res = yield* asAdmin.post(
 					`${serviceAccountsUrl}/${serviceAccountId}/roles/grant`,
@@ -245,7 +246,7 @@ describe("grant role", () => {
 
 			const res = yield* asAdmin.post(
 				`${serviceAccountsUrl}/${unknownId}/roles/grant`,
-				{ body: yield* HttpBody.json({ namespace: "show", name: "viewer" }) },
+				{ body: yield* HttpBody.json({ namespace: ["show"], name: "viewer" }) },
 			);
 			expect(res.status).toBe(404);
 		}),
@@ -265,19 +266,19 @@ describe("revoke role", () => {
 			yield* asAdmin.post(
 				`${serviceAccountsUrl}/${serviceAccountId}/roles/grant`,
 				{
-					body: yield* HttpBody.json({ namespace: "show", name: "viewer" }),
+					body: yield* HttpBody.json({ namespace: ["show"], name: "viewer" }),
 				},
 			);
 			yield* asAdmin.post(
 				`${serviceAccountsUrl}/${serviceAccountId}/roles/grant`,
 				{
-					body: yield* HttpBody.json({ namespace: "show", name: "judge" }),
+					body: yield* HttpBody.json({ namespace: ["show"], name: "judge" }),
 				},
 			);
 
 			const revokeRes = yield* asAdmin.post(
 				`${serviceAccountsUrl}/${serviceAccountId}/roles/revoke`,
-				{ body: yield* HttpBody.json({ namespace: "show", name: "viewer" }) },
+				{ body: yield* HttpBody.json({ namespace: ["show"], name: "viewer" }) },
 			);
 			expect(revokeRes.status).toBe(204);
 
@@ -286,7 +287,7 @@ describe("revoke role", () => {
 				serviceAccounts: expect.arrayContaining([
 					expect.objectContaining({
 						id: serviceAccountId,
-						roles: [{ namespace: "show", name: "judge" }],
+						roles: [{ namespace: ["show"], name: "judge" }],
 					}),
 				]),
 			});
@@ -303,7 +304,7 @@ describe("revoke role", () => {
 
 			const res = yield* asAdmin.post(
 				`${serviceAccountsUrl}/${unknownId}/roles/revoke`,
-				{ body: yield* HttpBody.json({ namespace: "show", name: "viewer" }) },
+				{ body: yield* HttpBody.json({ namespace: ["show"], name: "viewer" }) },
 			);
 			expect(res.status).toBe(404);
 		}),
@@ -322,7 +323,7 @@ describe("revoke role", () => {
 			for (const name of ["admin", "server"]) {
 				const res = yield* asAdmin.post(
 					`${serviceAccountsUrl}/${serviceAccountId}/roles/revoke`,
-					{ body: yield* HttpBody.json({ namespace: "show", name }) },
+					{ body: yield* HttpBody.json({ namespace: ["show"], name }) },
 				);
 				expect(res.status).toBe(400);
 			}

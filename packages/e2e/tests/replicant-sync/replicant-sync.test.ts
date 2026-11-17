@@ -8,17 +8,22 @@ import { replicantSyncManifest } from "./manifest.ts";
 const base = suiteBase("replicant-sync");
 const { createUser, grantAsAdmin, login, logout, revokeAsAdmin } =
 	makeAuthHelpers(base);
+const fixturePath = ["e2e-replicant-sync", "fixture"] as const;
+const libraryPath = ["e2e-replicant-sync", "library"] as const;
 
 // Assign the roles the field-access tests rely on once, so those tests just log
 // in as the subject. Grant/revoke behavior itself is covered in auth.test.ts.
 beforeAll(async () => {
 	const prodUserId = await createUser("prod");
 	const viewUserId = await createUser("view");
-	await grantAsAdmin(prodUserId, { namespace: "e2e", name: "producer" });
-	await grantAsAdmin(viewUserId, { namespace: "e2e", name: "viewer" });
+	await grantAsAdmin(prodUserId, { namespace: fixturePath, name: "producer" });
+	await grantAsAdmin(viewUserId, { namespace: fixturePath, name: "viewer" });
 	return async () => {
-		await revokeAsAdmin(prodUserId, { namespace: "e2e", name: "producer" });
-		await revokeAsAdmin(viewUserId, { namespace: "e2e", name: "viewer" });
+		await revokeAsAdmin(prodUserId, {
+			namespace: fixturePath,
+			name: "producer",
+		});
+		await revokeAsAdmin(viewUserId, { namespace: fixturePath, name: "viewer" });
 		await logout();
 	};
 });
@@ -446,12 +451,12 @@ describe("role-gated field access (HTTP)", () => {
 	test("a producer of the library writes its score", async () => {
 		const libraryUserId = await createUser("library");
 		await grantAsAdmin(libraryUserId, {
-			namespace: "e2e-library",
+			namespace: libraryPath,
 			name: "producer",
 		});
 		onTestFinished(async () => {
 			await revokeAsAdmin(libraryUserId, {
-				namespace: "e2e-library",
+				namespace: libraryPath,
 				name: "producer",
 			});
 		});
@@ -464,10 +469,13 @@ describe("role-gated field access (HTTP)", () => {
 
 	test("a role granted in one namespace does not reach another declaring the same role", async () => {
 		const singleUserId = await createUser("single");
-		await grantAsAdmin(singleUserId, { namespace: "e2e", name: "producer" });
+		await grantAsAdmin(singleUserId, {
+			namespace: fixturePath,
+			name: "producer",
+		});
 		onTestFinished(async () => {
 			await revokeAsAdmin(singleUserId, {
-				namespace: "e2e",
+				namespace: fixturePath,
 				name: "producer",
 			});
 		});

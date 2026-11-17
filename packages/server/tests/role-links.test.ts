@@ -9,7 +9,11 @@ import {
 import { Effect, HashSet, Layer } from "effect";
 import { describe, expect } from "vitest";
 
-import { normalizeRoleLinks, RoleLinks } from "../src/auth/role-links.ts";
+import {
+	normalizeRoleLinks,
+	resolveRoleLinks,
+	RoleLinks,
+} from "../src/auth/role-links.ts";
 import { NamespaceRegistryService } from "../src/namespace-registry.ts";
 import { UserRepositoryService } from "../src/services/repository/user/user-repository.ts";
 import { buildClient, findUser, login, services } from "./setup.ts";
@@ -28,19 +32,32 @@ const show = defineNamespace("show", {
 });
 
 const operator = Role.make({
-	namespace: show.namespace,
+	namespace: ["show"],
 	name: RoleName.make("operator"),
 });
 
+const tree = [
+	{ manifest: show, path: ["show"] },
+	{ manifest: assets, path: ["show", "assets"] },
+] as const;
+
 const namespaces = NamespaceRegistryService.layer(
-	[show, assets].map((manifest) => ({
+	tree.map(({ manifest, path }) => ({
 		namespace: manifest.namespace,
+		path,
 		declaredRoles: new Set(manifest[manifestRolesKey].roles.keys()),
 		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
 	})),
 );
 
-const links = Layer.succeed(RoleLinks, normalizeRoleLinks([show, assets]));
+const links = Layer.succeed(
+	RoleLinks,
+	normalizeRoleLinks(
+		tree.map(({ manifest, path }) =>
+			resolveRoleLinks(path, manifest[manifestRolesKey].roles),
+		),
+	),
+);
 
 const test = testLayer(Layer.mergeAll(services, namespaces, links));
 
@@ -61,10 +78,10 @@ describe("role links", () => {
 			const res = yield* asAlice.get(meUrl);
 			expect(res.status).toBe(200);
 			expect(yield* res.json).toMatchObject({
-				namespaces: {
-					show: { roles: ["operator"] },
-					"show-assets": { roles: ["uploader"] },
-				},
+				namespaces: [
+					{ namespace: ["show"], roles: ["operator"] },
+					{ namespace: ["show", "assets"], roles: ["uploader"] },
+				],
 			});
 		}),
 	);
@@ -83,7 +100,10 @@ describe("role links", () => {
 			const res = yield* asAlice.get(meUrl);
 			expect(res.status).toBe(200);
 			expect(yield* res.json).toMatchObject({
-				namespaces: { show: { roles: [] }, "show-assets": { roles: [] } },
+				namespaces: [
+					{ namespace: ["show"], roles: [] },
+					{ namespace: ["show", "assets"], roles: [] },
+				],
 			});
 		}),
 	);

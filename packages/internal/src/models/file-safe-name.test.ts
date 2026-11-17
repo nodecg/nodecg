@@ -3,10 +3,10 @@ import { describe, expect, expectTypeOf, test } from "vitest";
 
 import {
 	type CaseClashingKeys,
-	type FileSafeName,
 	findCaseClash,
 	isFileSafeName,
 	type UnsafeNameKeys,
+	type ValidateFileSafeName,
 } from "./file-safe-name.ts";
 
 type Rule =
@@ -45,20 +45,24 @@ describe("findCaseClash", () => {
 	});
 });
 
-describe("FileSafeName", () => {
+describe("ValidateFileSafeName", () => {
 	test("keeps a safe literal", () => {
-		expectTypeOf<FileSafeName<"Show-2_a">>().toEqualTypeOf<"Show-2_a">();
+		expectTypeOf<
+			ValidateFileSafeName<"Show-2_a">
+		>().toEqualTypeOf<"Show-2_a">();
 	});
 
 	test("turns an unsafe literal into the rule", () => {
-		expectTypeOf<FileSafeName<"a.b">>().toEqualTypeOf<Rule>();
-		expectTypeOf<FileSafeName<"Com1">>().toEqualTypeOf<Rule>();
-		expectTypeOf<FileSafeName<"">>().toEqualTypeOf<Rule>();
+		expectTypeOf<ValidateFileSafeName<"a.b">>().toEqualTypeOf<Rule>();
+		expectTypeOf<ValidateFileSafeName<"Com1">>().toEqualTypeOf<Rule>();
+		expectTypeOf<ValidateFileSafeName<"">>().toEqualTypeOf<Rule>();
 	});
 
 	test("turns a name that is not fully literal into the rule", () => {
-		expectTypeOf<FileSafeName<string>>().toEqualTypeOf<Rule>();
-		expectTypeOf<FileSafeName<`bundle-${string}`>>().toEqualTypeOf<Rule>();
+		expectTypeOf<ValidateFileSafeName<string>>().toEqualTypeOf<Rule>();
+		expectTypeOf<
+			ValidateFileSafeName<`bundle-${string}`>
+		>().toEqualTypeOf<Rule>();
 	});
 });
 
