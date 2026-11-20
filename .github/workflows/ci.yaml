@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   type-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v6
       - run: corepack enable pnpm
@@ -30,7 +30,7 @@ jobs:
       - run: pnpm install
       - run: pnpm type-check
   effect-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v6
       - run: corepack enable pnpm
@@ -41,7 +41,7 @@ jobs:
       - run: pnpm install
       - run: pnpm effect-check
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v6
       - run: corepack enable pnpm
@@ -52,7 +52,7 @@ jobs:
       - run: pnpm install
       - run: pnpm run build
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v6
       - run: corepack enable pnpm
@@ -63,7 +63,7 @@ jobs:
       - run: pnpm install
       - run: pnpm oxlint
   format-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v6
       - run: corepack enable pnpm
@@ -79,13 +79,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-26.04
             node: "22.19"
-          - os: ubuntu-latest
+          - os: ubuntu-26.04
             node: "24.11"
-          - os: ubuntu-latest
+          - os: ubuntu-26.04
             node: "26.13"
-          - os: windows-latest
+          - os: windows-2025
             node: "22.19"
     runs-on: ${{ matrix.os }}
     steps:
@@ -97,12 +97,14 @@ jobs:
           cache: pnpm
       - run: pnpm install
       - id: playwright
-        run: echo "version=$(pnpm exec playwright --version)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "version=$(pnpm exec playwright --version)" >> "$GITHUB_OUTPUT"
+          echo "image=$ImageOS" >> "$GITHUB_OUTPUT"
         shell: bash
       - uses: actions/cache@v5
         with:
           path: ${{ runner.os == 'Windows' && '~\AppData\Local\ms-playwright' || '~/.cache/ms-playwright' }}
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          key: playwright-${{ steps.playwright.outputs.image }}-${{ steps.playwright.outputs.version }}
       - run: pnpm exec playwright install
       - run: pnpm exec playwright install-deps
         if: runner.os == 'Linux'
@@ -111,7 +113,7 @@ jobs:
   test:
     needs: test-matrix
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - run: exit 1
         if: needs.test-matrix.result != 'success'
