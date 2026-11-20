@@ -13,14 +13,14 @@ export const counterManifest = defineNamespace("counter", {
 		operator: { permission: ["replicant-write"] },
 	},
 	replicant: {
-		count: { schema: Schema.Number, permission: everyoneRead },
+		count: { schema: Schema.Finite, permission: everyoneRead },
 	},
 	topic: {
 		cheer: { schema: Schema.String, permission: everyoneReadWrite },
 	},
 	rpc: {
 		roll: {
-			schema: { request: Schema.Number, response: Schema.Number },
+			schema: { request: Schema.Finite, response: Schema.Finite },
 			permission: everyoneWrite,
 		},
 	},

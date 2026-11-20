@@ -1,5 +1,3 @@
-import { timingSafeEqual } from "node:crypto";
-
 import { getRoles } from "@nodecg/core";
 import {
 	CurrentIdentity,
@@ -33,7 +31,7 @@ import {
 	Semaphore,
 	String,
 } from "effect";
-import { Digest } from "effect/crypto";
+import { Digest, Mac } from "effect/crypto";
 import { HttpServerRequest, HttpServerResponse, Url } from "effect/http";
 import { HttpApiBuilder, HttpApiError } from "effect/http-api";
 
@@ -136,7 +134,7 @@ const tokenEquals = Effect.fnUntraced(function* (
 		Digest.sha256,
 		encoder.encode(Redacted.value(provided)),
 	);
-	return timingSafeEqual(expectedDigest, providedDigest);
+	return Mac.timingSafeEqual(expectedDigest, providedDigest);
 });
 
 const CLAIM_ATTEMPT_LIMIT = 5;
