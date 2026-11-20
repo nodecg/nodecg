@@ -453,13 +453,6 @@ interface RpcFieldPromiseLambda extends HKT.TypeLambda {
 	>;
 }
 
-export class DuplicateNamespace extends Schema.TaggedError<DuplicateNamespace>()(
-	"DuplicateNamespace",
-	{ namespace: Schema.String },
-) {
-	override readonly message = `Namespace "${this.namespace}" was loaded twice`;
-}
-
 class ReportedError extends Schema.TaggedError<ReportedError>()(
 	"ReportedError",
 	{ cause: Schema.Defect() },
@@ -540,11 +533,6 @@ interface TreeManifestLambda extends HKT.TypeLambda {
 	>;
 }
 
-interface WidenedManifest {
-	readonly namespace: string;
-	readonly children: Readonly<Record<string, WidenedManifest>>;
-}
-
 type BuiltFields<
 	S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes,
@@ -593,26 +581,6 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 	S extends WidestNamespaceFields,
 	CustomRoutes extends WidestCustomRoutes,
 >(manifest: TreeManifest<S, CustomRoutes>, baseUrl: string | undefined) {
-	const manifests = new Set<WidenedManifest>();
-	const walk = (node: WidenedManifest) => {
-		if (manifests.has(node)) {
-			return;
-		}
-		manifests.add(node);
-		for (const child of Object.values(node.children)) {
-			walk(child);
-		}
-	};
-	walk(manifest);
-
-	const names = new Set<string>();
-	for (const { namespace } of manifests) {
-		if (names.has(namespace)) {
-			return yield* DuplicateNamespace.make({ namespace });
-		}
-		names.add(namespace);
-	}
-
 	const services = yield* Effect.context<never>().pipe(
 		Effect.map(Context.omit(Tracer.ParentSpan)),
 	);
@@ -621,7 +589,6 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 			Context.omit(Tracer.ParentSpan),
 		),
 	);
-	const builtHandles = new WeakMap<WidenedManifest, unknown>();
 	const build = <
 		TreeS extends WidestNamespaceFields,
 		TreeCustomRoutes extends WidestCustomRoutes,
@@ -634,11 +601,6 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 		Effect.Services<ReturnType<typeof buildFields>>
 	> =>
 		Effect.gen(function* () {
-			// Reuse when namespace is referenced by multiple parents
-			const existing = builtHandles.get(node);
-			if (typeof existing !== "undefined") {
-				return existing as NamespaceHandles<TreeS, TreeCustomRoutes>;
-			}
 			const children = yield* mapEffectValues<
 				TreeManifestLambda,
 				NamespaceHandlesLambda
@@ -646,7 +608,7 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 				TreeS["children"]
 			>(node.children);
 			const fields = yield* buildFields(node, namespace, baseUrl);
-			const handles: NamespaceHandles<TreeS, TreeCustomRoutes> = {
+			return {
 				built: {
 					...fields,
 					children: mapValues<NamespaceHandlesLambda, BuiltNamespaceLambda>(
@@ -663,8 +625,6 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 					)(children),
 				),
 			};
-			builtHandles.set(node, handles);
-			return handles;
 		});
 
 	const root = yield* build(manifest, [manifest.namespace]);

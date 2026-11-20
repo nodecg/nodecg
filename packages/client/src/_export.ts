@@ -12,7 +12,6 @@ export {
 	type Get,
 } from "./derive.ts";
 export {
-	DuplicateNamespace,
 	loadNamespace,
 	loadNamespaceEffect,
 	type LoadedNamespace,

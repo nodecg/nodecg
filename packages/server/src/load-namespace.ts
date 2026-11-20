@@ -9,7 +9,6 @@ import type {
 	WidestNamespaceFields,
 } from "@nodecg/core";
 import {
-	findCaseClash,
 	formatNamespacePath,
 	manifestRolesKey,
 	NamespacePath,
@@ -30,7 +29,6 @@ import {
 	Layer,
 	Logger,
 	ManagedRuntime,
-	Option,
 	References,
 	Schema,
 	Scope,
@@ -116,16 +114,6 @@ export class UnimplementedChild extends Schema.TaggedError<UnimplementedChild>()
 	{ namespace: Schema.String, child: Schema.String },
 ) {
 	override readonly message = `Child "${this.child}" of namespace "${this.namespace}" is not implemented with its declared manifest`;
-}
-
-export class DuplicateNamespace extends Schema.TaggedError<DuplicateNamespace>()(
-	"DuplicateNamespace",
-	{ namespace: Schema.String, clash: Schema.String },
-) {
-	override readonly message =
-		this.namespace === this.clash
-			? `Namespace "${this.namespace}" was loaded twice`
-			: `Namespace "${this.namespace}" differs from "${this.clash}" only in case`;
 }
 
 // Catch a child implemented for another manifest of the same shape
@@ -265,30 +253,11 @@ export const loadNamespaceEffect = Effect.fn(
 
 		yield* Effect.forEach(namespaces, checkChildren, { discard: true });
 
-		const names = new Set<string>();
-		for (const { manifest } of namespaces) {
-			if (names.has(manifest.namespace)) {
-				return yield* DuplicateNamespace.make({
-					namespace: manifest.namespace,
-					clash: manifest.namespace,
-				});
-			}
-			names.add(manifest.namespace);
-		}
-		const clash = findCaseClash(names);
-		if (Option.isSome(clash)) {
-			return yield* DuplicateNamespace.make({
-				namespace: clash.value.name,
-				clash: clash.value.clash,
-			});
-		}
-
 		const internalServices = yield* Layer.build(ReplicantStoreService.layer);
 		const dataDir = yield* resolveDataDir();
 
 		return yield* Effect.gen(function* () {
 			const store = yield* ReplicantStoreService;
-			const builtHandles = new WeakMap<WidenedImplementedNamespace, unknown>();
 
 			const loadTree = <
 				TreeS extends WidestNamespaceFields,
@@ -302,14 +271,6 @@ export const loadNamespaceEffect = Effect.fn(
 				Effect.Services<ReturnType<typeof prepareNamespace>>
 			> =>
 				Effect.gen(function* () {
-					// Reuse when namespace is referenced by multiple parents
-					const existing = builtHandles.get(implemented);
-					if (typeof existing !== "undefined") {
-						return {
-							handles: existing as NamespaceHandles<TreeS>,
-							prepared: [],
-						};
-					}
 					const children = yield* mapEffectValues<
 						ImplementedNamespaceLambda,
 						PreparedTreeLambda
@@ -324,7 +285,6 @@ export const loadNamespaceEffect = Effect.fn(
 						)(children),
 						dataDir,
 					);
-					builtHandles.set(implemented, handles);
 					return {
 						handles,
 						prepared: [

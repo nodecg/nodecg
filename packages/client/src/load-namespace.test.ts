@@ -35,11 +35,7 @@ import {
 
 import { derive, fieldSource } from "./derive.ts";
 import type { FieldFailure } from "./field-cells.ts";
-import {
-	DuplicateNamespace,
-	loadNamespace,
-	loadNamespaceEffect,
-} from "./load-namespace.ts";
+import { loadNamespace, loadNamespaceEffect } from "./load-namespace.ts";
 import { Cold, Pending } from "./loadable.ts";
 import { createTransportStub } from "./services/field-transport/field-transport.stub.ts";
 import {
@@ -1220,32 +1216,43 @@ describe("children", () => {
 	);
 
 	test(
-		"builds a child reached from two parents once",
+		"loads one manifest under two keys as two namespaces",
 		Effect.gen(function* () {
-			const middle = defineNamespace("middle", { children: { first } });
-			const root = defineNamespace("root", { children: { middle, first } });
+			transport.getReplicant.mockImplementation((namespace) =>
+				Effect.succeed(Equal.equals(namespace, ["root", "home"]) ? "4" : "9"),
+			);
+			const root = defineNamespace("root", {
+				children: { home: first, away: first },
+			});
 
 			const loaded = yield* loadNamespaceEffect(root);
 
-			expect(loaded.children.middle.children.first).toBe(loaded.children.first);
+			const homeCount = yield* loaded.children.home.replicant.count.get();
+			const awayCount = yield* loaded.children.away.replicant.count.get();
+			expect(homeCount).toBe(4);
+			expect(awayCount).toBe(9);
 		}),
 	);
 
 	test(
-		"fails when two children name the same namespace",
+		"loads two manifests sharing a name under their own keys",
 		Effect.gen(function* () {
-			const lookalike = defineNamespace("first", {});
+			transport.getReplicant.mockImplementation((namespace) =>
+				Effect.succeed(Equal.equals(namespace, ["root", "first"]) ? "4" : "9"),
+			);
+			const lookalike = defineNamespace("first", {
+				replicant: { count: { schema: Schema.FiniteFromString } },
+			});
 			const root = defineNamespace("root", {
 				children: { first, again: lookalike },
 			});
 
-			const error = yield* loadNamespaceEffect(root).pipe(Effect.flip);
+			const loaded = yield* loadNamespaceEffect(root);
 
-			expect(error).toStrictEqual(
-				DuplicateNamespace.make({ namespace: "first" }),
-			);
-			expect(error.message).toBe('Namespace "first" was loaded twice');
-			expect(channel.receive).not.toHaveBeenCalled();
+			const firstCount = yield* loaded.children.first.replicant.count.get();
+			const againCount = yield* loaded.children.again.replicant.count.get();
+			expect(firstCount).toBe(4);
+			expect(againCount).toBe(9);
 		}),
 	);
 });
@@ -1271,22 +1278,6 @@ describe("loadNamespace (Promise wrapper)", () => {
 			["root", "stage"],
 			"count",
 		);
-	});
-
-	it("gives a child reached from two parents one handle", async () => {
-		const { stub: transportStub } = createTransportStub();
-		const { stub: channelStub } = createMessageChannelStub();
-		const child = defineNamespace("child", {});
-		const middle = defineNamespace("middle", { children: { child } });
-		const root = defineNamespace("root", { children: { middle, child } });
-
-		const loaded = await loadNamespace(root, {
-			fieldTransport: () => transportStub,
-			messageChannel: () => channelStub,
-		});
-		onTestFinished(() => loaded.dispose());
-
-		expect(loaded.children.middle.children.child).toBe(loaded.children.child);
 	});
 
 	it("forwards to the injected transport", async () => {

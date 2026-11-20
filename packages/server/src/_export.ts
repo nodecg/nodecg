@@ -1,5 +1,4 @@
 export {
-	DuplicateNamespace,
 	loadNamespaceEffect,
 	loadNamespace,
 	OnLoadError,

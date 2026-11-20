@@ -18,7 +18,6 @@ import {
 
 import { implementNamespace } from "./implement-namespace.ts";
 import {
-	DuplicateNamespace,
 	loadNamespace,
 	loadNamespaceEffect,
 	UnimplementedChild,
@@ -428,7 +427,7 @@ describe("children", () => {
 	);
 
 	testInMemory(
-		"loads a child reached from two parents once",
+		"loads a child reached from two parents at each path",
 		Effect.gen(function* () {
 			const onLoad = vi.fn();
 			const assets = implementNamespace(assetsManifest, {
@@ -455,71 +454,36 @@ describe("children", () => {
 				handle.children.stage.children.assets.replicant.files.set(9),
 			);
 
-			expect(onLoad).toHaveBeenCalledTimes(1);
+			expect(onLoad).toHaveBeenCalledTimes(2);
 			expect(handle.children.show.children.assets.replicant.files.get()).toBe(
-				9,
+				4,
 			);
 		}),
 	);
 
 	testInMemory(
-		"fails when two child objects share a name",
+		"loads one manifest under two keys as two namespaces",
 		Effect.gen(function* () {
-			const show = implementNamespace(
-				defineNamespace("show", { children: { assets: assetsManifest } }),
+			const venue = implementNamespace(
+				defineNamespace("venue", {
+					children: { home: assetsManifest, away: assetsManifest },
+				}),
 				{
 					children: {
-						assets: implementNamespace(assetsManifest, {
-							seedReplicant: { files: () => 0 },
+						home: implementNamespace(assetsManifest, {
+							seedReplicant: { files: () => 1 },
+						}),
+						away: implementNamespace(assetsManifest, {
+							seedReplicant: { files: () => 2 },
 						}),
 					},
 				},
 			);
-			const stage = implementNamespace(
-				defineNamespace("stage", { children: { assets: assetsManifest } }),
-				{
-					children: {
-						assets: implementNamespace(assetsManifest, {
-							seedReplicant: { files: () => 0 },
-						}),
-					},
-				},
-			);
-			const venue = implementNamespace(
-				defineNamespace("venue", {
-					children: { show: show.manifest, stage: stage.manifest },
-				}),
-				{ children: { show, stage } },
-			);
 
-			const error = yield* loadNamespaceEffect(venue).pipe(Effect.flip);
+			const handle = yield* loadNamespaceEffect(venue);
 
-			expect(error).toStrictEqual(
-				DuplicateNamespace.make({ namespace: "assets", clash: "assets" }),
-			);
-			expect(error.message).toBe('Namespace "assets" was loaded twice');
-		}),
-	);
-
-	testInMemory(
-		"fails when two namespace names differ only in case",
-		Effect.gen(function* () {
-			const upper = implementNamespace(defineNamespace("Counter", {}), {});
-			const venue = implementNamespace(
-				defineNamespace("venue", {
-					children: { first: counter.manifest, second: upper.manifest },
-				}),
-				{ children: { first: counter, second: upper } },
-			);
-
-			const error = yield* loadNamespaceEffect(venue).pipe(Effect.flip);
-
-			expect(error).toStrictEqual(
-				DuplicateNamespace.make({ namespace: "Counter", clash: "counter" }),
-			);
-			expect(error.message).toBe(
-				'Namespace "Counter" differs from "counter" only in case',
-			);
+			expect(handle.children.home.replicant.files.get()).toBe(1);
+			expect(handle.children.away.replicant.files.get()).toBe(2);
 		}),
 	);
 
@@ -614,17 +578,19 @@ describe("loadNamespace", () => {
 			vi.unstubAllGlobals();
 		});
 		vi.stubEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://collector:4318");
-		const first = implementNamespace(defineNamespace("twin", {}), {});
-		const second = implementNamespace(defineNamespace("twin", {}), {});
 		const venue = implementNamespace(
 			defineNamespace("venue", {
-				children: { first: first.manifest, second: second.manifest },
+				children: { assets: defineNamespace("assets", {}) },
 			}),
-			{ children: { first, second } },
+			{
+				children: {
+					assets: implementNamespace(defineNamespace("assets", {}), {}),
+				},
+			},
 		);
 
 		await expect(loadNamespace(venue)).rejects.toThrow(
-			'Namespace "twin" was loaded twice',
+			'Child "assets" of namespace "venue" is not implemented with its declared manifest',
 		);
 
 		const traces = fetch.mock.calls.find(
@@ -633,7 +599,9 @@ describe("loadNamespace", () => {
 		assert(typeof traces !== "undefined");
 		const [, init] = traces;
 		assert(init?.body instanceof Uint8Array);
-		expect(Buffer.from(init.body).includes("was loaded twice")).toBe(true);
+		expect(
+			Buffer.from(init.body).includes("is not implemented with its declared"),
+		).toBe(true);
 	});
 
 	test("persists a write made after loading returns", async () => {
