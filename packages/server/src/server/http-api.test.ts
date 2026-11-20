@@ -3,7 +3,7 @@ import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
 import { it } from "@effect/vitest";
 import { FieldDecodeError } from "@nodecg/core";
-import { type NamespacePath, RoleName } from "@nodecg/internal";
+import type { NamespacePath } from "@nodecg/internal";
 import { ConfigProvider, Effect, HashMap, Layer, Stream } from "effect";
 import {
 	FetchHttpClient,
@@ -86,12 +86,8 @@ function registeredNamespace(
 	computed: BuiltNamespace["computed"] = {},
 	topic: BuiltNamespace["topic"] = {},
 	rpc: BuiltNamespace["rpc"] = {},
-	declaredRoles: ReadonlySet<RoleName> = new Set(),
 ): readonly [NamespacePath, RegisteredNamespace] {
-	return [
-		[namespace],
-		{ declaredRoles, fields: { replicant, computed, topic, rpc } },
-	];
+	return [[namespace], { fields: { replicant, computed, topic, rpc } }];
 }
 
 const webHandler = Effect.fn(function* (

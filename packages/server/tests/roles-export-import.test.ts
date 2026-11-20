@@ -13,7 +13,7 @@ import { SecureRandom } from "effect/crypto";
 import { HttpBody } from "effect/http";
 import { describe, expect } from "vitest";
 
-import { NamespaceRegistryService } from "../src/namespace-registry.ts";
+import { RoleLinks } from "../src/auth/role-links.ts";
 import { UserRepositoryService } from "../src/services/repository/user/user-repository.ts";
 import {
 	buildClient,
@@ -41,15 +41,11 @@ const test = testLayer(
 	Layer.merge(
 		services,
 		Layer.succeed(
-			NamespaceRegistryService,
+			RoleLinks,
 			HashMap.fromIterable([
-				[
-					["show"],
-					{
-						declaredRoles: new Set([producer.name, viewer.name, judge.name]),
-						fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-					},
-				],
+				[producer, HashSet.empty()],
+				[viewer, HashSet.empty()],
+				[judge, HashSet.empty()],
 			]),
 		),
 	),

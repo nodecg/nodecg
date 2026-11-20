@@ -32,9 +32,7 @@ const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
 		const { fields } = yield* buildNamespace(["show"], namespace, {});
-		return HashMap.fromIterable([
-			[["show"], { declaredRoles: new Set(), fields }],
-		]);
+		return HashMap.fromIterable([[["show"], { fields }]]);
 	}),
 ).pipe(Layer.provide(services));
 

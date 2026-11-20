@@ -50,7 +50,6 @@ const serve = Effect.fn(function* (frontend: FrontendConfig) {
 					[
 						["ns"],
 						{
-							declaredRoles: new Set(),
 							frontend,
 							fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
 						},

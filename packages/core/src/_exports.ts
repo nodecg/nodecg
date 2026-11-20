@@ -24,6 +24,7 @@ export {
 export { jsonSchema, type JsonSchemaCodec } from "./json-schema.ts";
 export {
 	canAccess,
+	getRoles,
 	getRolesForNamespace,
 	isAdminTier,
 	isSuperadmin,

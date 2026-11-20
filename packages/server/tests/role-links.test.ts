@@ -44,12 +44,9 @@ const tree = [
 const namespaces = Layer.succeed(
 	NamespaceRegistryService,
 	HashMap.fromIterable(
-		tree.map(({ manifest, path }) => [
+		tree.map(({ path }) => [
 			path,
-			{
-				declaredRoles: new Set(manifest[manifestRolesKey].roles.keys()),
-				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-			},
+			{ fields: { replicant: {}, computed: {}, topic: {}, rpc: {} } },
 		]),
 	),
 );

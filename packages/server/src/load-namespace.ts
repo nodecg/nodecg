@@ -199,7 +199,6 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 				);
 	const { roles } = implemented.manifest[manifestRolesKey];
 	const registered: RegisteredNamespace = {
-		declaredRoles: new Set(roles.keys()),
 		frontend: implemented.impl?.frontend,
 		customRoute: yield* buildCustomRoutes(implemented, ctx),
 		fields,

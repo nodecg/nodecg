@@ -1,11 +1,11 @@
 import { testLayer } from "@nodecg-private/test-utils";
-import { Authentication, RoleName } from "@nodecg/internal";
-import { Effect, HashMap, Layer } from "effect";
+import { Authentication, Role, RoleName } from "@nodecg/internal";
+import { Effect, HashMap, HashSet, Layer } from "effect";
 import { SecureRandom } from "effect/crypto";
 import { HttpBody } from "effect/http";
 import { describe, expect } from "vitest";
 
-import { NamespaceRegistryService } from "../src/namespace-registry.ts";
+import { RoleLinks } from "../src/auth/role-links.ts";
 import {
 	buildClient,
 	createServiceAccount,
@@ -13,23 +13,21 @@ import {
 	services,
 } from "./setup.ts";
 
-const namespaces = Layer.succeed(
-	NamespaceRegistryService,
+const roleLinks = Layer.succeed(
+	RoleLinks,
 	HashMap.fromIterable([
 		[
-			["show"],
-			{
-				declaredRoles: new Set([
-					RoleName.make("viewer"),
-					RoleName.make("judge"),
-				]),
-				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-			},
+			Role.make({ namespace: ["show"], name: RoleName.make("viewer") }),
+			HashSet.empty(),
+		],
+		[
+			Role.make({ namespace: ["show"], name: RoleName.make("judge") }),
+			HashSet.empty(),
 		],
 	]),
 );
 
-const test = testLayer(Layer.merge(services, namespaces));
+const test = testLayer(Layer.merge(services, roleLinks));
 
 const serviceAccountsUrl = "http://x/api/internal/service-accounts";
 

@@ -7,6 +7,7 @@ import {
 	type NamespacePath,
 	PRINCIPAL,
 	type Principal,
+	type Role,
 	RoleName,
 } from "@nodecg/internal";
 import { Equal, Match, Schema } from "effect";
@@ -81,21 +82,21 @@ export type Access = PrincipalGrants & {
 	readonly rolesDenied: ReadonlySet<RoleName>;
 };
 
-export const getRolesForNamespace = (
-	caller: Identity,
-	namespace: NamespacePath,
-): ReadonlyArray<RoleName> =>
+export const getRoles = (caller: Identity): ReadonlyArray<Role> =>
 	Match.value(caller).pipe(
-		Match.withReturnType<ReadonlyArray<RoleName>>(),
-		Match.tag("user", "serviceAccount", (holder) =>
-			holder.roles
-				.filter((role) => Equal.equals(role.namespace, namespace))
-				.map((role) => role.name),
-		),
+		Match.tag("user", "serviceAccount", (holder) => holder.roles),
 		Match.tag("anonymous", () => []),
 		Match.tag("server", () => []),
 		Match.exhaustive,
 	);
+
+export const getRolesForNamespace = (
+	caller: Identity,
+	namespace: NamespacePath,
+): ReadonlyArray<RoleName> =>
+	getRoles(caller)
+		.filter((role) => Equal.equals(role.namespace, namespace))
+		.map((role) => role.name);
 
 export const isAdminTier = (caller: Identity): boolean =>
 	Match.value(caller).pipe(

@@ -1,6 +1,5 @@
 import { testLayer } from "@nodecg-private/test-utils";
 import { defineNamespace } from "@nodecg/core";
-import { manifestRolesKey } from "@nodecg/internal";
 import { Effect, HashMap, Schema } from "effect";
 import { HttpBody } from "effect/http";
 import { describe, expect, vi } from "vitest";
@@ -41,9 +40,6 @@ const loadShow = Effect.gen(function* () {
 				[
 					["show"],
 					{
-						declaredRoles: new Set(
-							show.manifest[manifestRolesKey].roles.keys(),
-						),
 						fields,
 					},
 				],

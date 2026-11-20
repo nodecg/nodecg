@@ -7,6 +7,7 @@ import {
 	type Identity,
 	manifestRolesKey,
 	type NamespacePath,
+	type Role,
 	RoleName,
 	ServerIdentity,
 	ServiceAccountId,
@@ -18,6 +19,7 @@ import { describe, expect, test } from "vitest";
 import { defineNamespace } from "./define-namespace.ts";
 import {
 	canAccess,
+	getRoles,
 	getRolesForNamespace,
 	isAdminTier,
 	type PermissionArg,
@@ -739,6 +741,41 @@ describe("isAdminTier", () => {
 		expect(isAdminTier(user(RoleName.make("judge")))).toBe(false);
 		expect(isAdminTier(anonymous)).toBe(false);
 		expect(isAdminTier(server)).toBe(false);
+	});
+});
+
+describe("getRoles", () => {
+	test("returns every role a user and a service account hold", () => {
+		const roles: ReadonlyArray<Role> = [
+			{ namespace: path, name: RoleName.make("judge") },
+			{ namespace: ["root", "other"], name: RoleName.make("viewer") },
+		];
+		expect(
+			getRoles(
+				User.make({
+					id: UserId.make("1"),
+					authentication,
+					displayName: "user",
+					roles,
+					globalRoles: [],
+				}),
+			),
+		).toEqual(roles);
+		expect(
+			getRoles(
+				ServiceAccount.make({
+					id: ServiceAccountId.make("00000000-0000-4000-8000-000000000001"),
+					displayName: "Bot",
+					roles,
+					globalRoles: [],
+				}),
+			),
+		).toEqual(roles);
+	});
+
+	test("is empty for anonymous and server", () => {
+		expect(getRoles(anonymous)).toEqual([]);
+		expect(getRoles(server)).toEqual([]);
 	});
 });
 

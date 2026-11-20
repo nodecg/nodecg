@@ -74,6 +74,25 @@ describe("resolveRoleLinks", () => {
 			),
 		);
 	});
+
+	test("keeps a role with no links", () => {
+		const show = defineNamespace("show", {
+			roles: { viewer: { permission: [] } },
+		});
+
+		assert(
+			Equal.equals(
+				resolveRoleLinks(["root", "show"], show[manifestRolesKey].roles),
+				HashMap.make([
+					Role.make({
+						namespace: ["root", "show"],
+						name: RoleName.make("viewer"),
+					}),
+					HashSet.empty(),
+				]),
+			),
+		);
+	});
 });
 
 describe("normalizeRoleLinks", () => {

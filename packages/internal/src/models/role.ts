@@ -3,7 +3,7 @@ import { Schema } from "effect";
 import { NamespacePath } from "./namespace-path.ts";
 import { PrincipalNameSchema } from "./principal.ts";
 
-export const RoleName = Schema.String.pipe(Schema.brand("Role"));
+export const RoleName = Schema.String.pipe(Schema.brand("RoleName"));
 export type RoleName = typeof RoleName.Type;
 
 export const Role = Schema.Struct({

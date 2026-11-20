@@ -91,9 +91,7 @@ const namespaces = Layer.effect(
 			dataDir: "data",
 			namespacePath: ["show"],
 		});
-		return HashMap.fromIterable([
-			[["show"], { declaredRoles: new Set(), customRoute, fields }],
-		]);
+		return HashMap.fromIterable([[["show"], { customRoute, fields }]]);
 	}),
 ).pipe(Layer.provide(services));
 

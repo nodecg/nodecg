@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 
-import { getRolesForNamespace } from "@nodecg/core";
+import { getRoles } from "@nodecg/core";
 import {
 	CurrentIdentity,
 	CurrentSessionUser,
@@ -20,6 +20,7 @@ import {
 	type Config,
 	type Duration,
 	Effect,
+	Equal,
 	HashMap,
 	HashSet,
 	Layer,
@@ -42,6 +43,7 @@ import {
 	consumeLoginAttempt,
 	createLoginAttempt,
 } from "../../auth/login-attempt.ts";
+import { RoleLinks } from "../../auth/role-links.ts";
 import { superadminExists } from "../../auth/roles.ts";
 import {
 	createServiceAccount,
@@ -194,14 +196,17 @@ const AuthenticationGroupLive = HttpApiBuilder.group(
 					Effect.gen(function* () {
 						const identity = yield* CurrentIdentity;
 						const namespaceRegistry = yield* NamespaceRegistryService;
+						const links = yield* RoleLinks;
+						const roles = getRoles(identity).filter((role) =>
+							HashMap.has(links, role),
+						);
 						const namespaces: MePayload["namespaces"] = namespaceRegistry.pipe(
 							Array.fromIterable,
-							Array.map(([path, { declaredRoles }]) => ({
+							Array.map(([path]) => ({
 								namespace: path,
-								roles: Array.intersection(
-									getRolesForNamespace(identity, path),
-									declaredRoles,
-								),
+								roles: roles
+									.filter((role) => Equal.equals(role.namespace, path))
+									.map((role) => role.name),
 							})),
 							Array.sortWith(
 								({ namespace }) => namespace,
@@ -431,13 +436,8 @@ const UsersGroupLive = HttpApiBuilder.group(RootApi, "Users", (handlers) =>
 		)
 		.handle("grantRole", ({ params: { id }, payload: role }) =>
 			Effect.gen(function* () {
-				const registry = yield* NamespaceRegistryService;
-				if (
-					!registry.pipe(
-						HashMap.get(role.namespace),
-						Option.exists(({ declaredRoles }) => declaredRoles.has(role.name)),
-					)
-				) {
+				const links = yield* RoleLinks;
+				if (!HashMap.has(links, role)) {
 					return yield* HttpApiError.UnprocessableEntity.make();
 				}
 				const users = yield* UserRepositoryService;
@@ -525,15 +525,8 @@ const ServiceAccountsGroupLive = HttpApiBuilder.group(
 			)
 			.handle("grantRole", ({ params: { id }, payload: role }) =>
 				Effect.gen(function* () {
-					const registry = yield* NamespaceRegistryService;
-					if (
-						!registry.pipe(
-							HashMap.get(role.namespace),
-							Option.exists(({ declaredRoles }) =>
-								declaredRoles.has(role.name),
-							),
-						)
-					) {
+					const links = yield* RoleLinks;
+					if (!HashMap.has(links, role)) {
 						return yield* HttpApiError.UnprocessableEntity.make();
 					}
 					const serviceAccounts = yield* ServiceAccountRepositoryService;

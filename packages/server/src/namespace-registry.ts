@@ -1,4 +1,4 @@
-import type { NamespacePath, RoleName } from "@nodecg/internal";
+import type { NamespacePath } from "@nodecg/internal";
 import { Context, type HashMap, type HashSet } from "effect";
 
 import type { CustomRoute } from "./build-custom-routes.ts";
@@ -30,7 +30,6 @@ type Fields<
 > = Readonly<Record<string, { readonly [fieldInternal]: F }>>;
 
 export interface RegisteredNamespace {
-	readonly declaredRoles: ReadonlySet<RoleName>;
 	readonly frontend?: FrontendConfig;
 	readonly customRoute?: HashSet.HashSet<CustomRoute>;
 	readonly fields: {

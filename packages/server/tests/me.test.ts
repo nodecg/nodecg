@@ -3,6 +3,7 @@ import { Authentication, Role, RoleName } from "@nodecg/internal";
 import { Effect, HashMap, HashSet, Layer } from "effect";
 import { describe, expect } from "vitest";
 
+import { RoleLinks } from "../src/auth/role-links.ts";
 import { NamespaceRegistryService } from "../src/namespace-registry.ts";
 import { UserRepositoryService } from "../src/services/repository/user/user-repository.ts";
 import { buildClient, findUser, login, loginAdmin, services } from "./setup.ts";
@@ -15,24 +16,30 @@ const producer = Role.make({
 const namespaces = Layer.succeed(
 	NamespaceRegistryService,
 	HashMap.fromIterable([
-		[
-			["show"],
-			{
-				declaredRoles: new Set([producer.name, RoleName.make("viewer")]),
-				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-			},
-		],
+		[["show"], { fields: { replicant: {}, computed: {}, topic: {}, rpc: {} } }],
 		[
 			["other"],
-			{
-				declaredRoles: new Set([producer.name]),
-				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-			},
+			{ fields: { replicant: {}, computed: {}, topic: {}, rpc: {} } },
 		],
 	]),
 );
 
-const test = testLayer(Layer.merge(services, namespaces));
+const roleLinks = Layer.succeed(
+	RoleLinks,
+	HashMap.fromIterable([
+		[producer, HashSet.empty()],
+		[
+			Role.make({ namespace: ["show"], name: RoleName.make("viewer") }),
+			HashSet.empty(),
+		],
+		[
+			Role.make({ namespace: ["other"], name: RoleName.make("producer") }),
+			HashSet.empty(),
+		],
+	]),
+);
+
+const test = testLayer(Layer.mergeAll(services, namespaces, roleLinks));
 
 const meUrl = "http://x/api/internal/me";
 
