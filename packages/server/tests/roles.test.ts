@@ -1,6 +1,6 @@
 import { testLayer } from "@nodecg-private/test-utils";
 import { Authentication, Role, RoleName, UserId } from "@nodecg/internal";
-import { Effect, HashSet, Layer } from "effect";
+import { Effect, HashMap, HashSet, Layer } from "effect";
 import { SecureRandom } from "effect/crypto";
 import { HttpBody } from "effect/http";
 import { describe, expect } from "vitest";
@@ -17,14 +17,18 @@ const producer = Role.make({
 const test = testLayer(
 	Layer.merge(
 		services,
-		NamespaceRegistryService.layer([
-			{
-				namespace: "show",
-				path: ["show"],
-				declaredRoles: new Set([producer.name]),
-				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-			},
-		]),
+		Layer.succeed(
+			NamespaceRegistryService,
+			HashMap.fromIterable([
+				[
+					["show"],
+					{
+						declaredRoles: new Set([producer.name]),
+						fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
+					},
+				],
+			]),
+		),
 	),
 );
 

@@ -6,13 +6,14 @@ import {
 	HttpApiSchema,
 } from "effect/http-api";
 
+import { NamespacePathFromString } from "../models/namespace-path.ts";
 import { Patch, PatchNotApplicable, RevisionConflict } from "../occ/schema.ts";
 
 const replicantGet = HttpApiEndpoint.get(
 	"replicantGet",
 	"/namespaces/:namespace/replicant/:fieldName",
 	{
-		params: { namespace: Schema.String, fieldName: Schema.String },
+		params: { namespace: NamespacePathFromString, fieldName: Schema.String },
 		success: Schema.Json,
 		error: [
 			HttpApiError.NotFound,
@@ -26,7 +27,7 @@ const replicantUpdate = HttpApiEndpoint.put(
 	"replicantUpdate",
 	"/namespaces/:namespace/replicant/:fieldName",
 	{
-		params: { namespace: Schema.String, fieldName: Schema.String },
+		params: { namespace: NamespacePathFromString, fieldName: Schema.String },
 		payload: Patch,
 		error: [
 			HttpApiError.NotFound,
@@ -43,7 +44,7 @@ const computedGet = HttpApiEndpoint.get(
 	"computedGet",
 	"/namespaces/:namespace/computed/:fieldName",
 	{
-		params: { namespace: Schema.String, fieldName: Schema.String },
+		params: { namespace: NamespacePathFromString, fieldName: Schema.String },
 		success: Schema.Json,
 		error: [
 			HttpApiError.NotFound,
@@ -57,7 +58,7 @@ const topicPublish = HttpApiEndpoint.post(
 	"topicPublish",
 	"/namespaces/:namespace/topic/:fieldName",
 	{
-		params: { namespace: Schema.String, fieldName: Schema.String },
+		params: { namespace: NamespacePathFromString, fieldName: Schema.String },
 		payload: Schema.Json,
 		error: [
 			HttpApiError.NotFound,
@@ -76,7 +77,7 @@ const rpcCall = HttpApiEndpoint.post(
 	"rpcCall",
 	"/namespaces/:namespace/rpc/:fieldName",
 	{
-		params: { namespace: Schema.String, fieldName: Schema.String },
+		params: { namespace: NamespacePathFromString, fieldName: Schema.String },
 		payload: Schema.Json,
 		success: Schema.Json,
 		error: [

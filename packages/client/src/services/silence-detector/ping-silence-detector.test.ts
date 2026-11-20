@@ -77,7 +77,11 @@ describe("pingSilenceDetector", () => {
 					Effect.andThen(
 						silenceDetector.onMessage(
 							ReplicantSnapshotMessage.make({
-								field: { type: "replicant", namespace: "root", name: "count" },
+								field: {
+									type: "replicant",
+									namespace: ["root"],
+									name: "count",
+								},
 								value: 42,
 								revision: 3,
 							}),

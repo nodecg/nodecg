@@ -63,7 +63,7 @@ export const services = Layer.mergeAll(
 		),
 	),
 	HttpPlatform.layer.pipe(Layer.provideMerge(Etag.layerWeak)),
-	NamespaceRegistryService.layer([]),
+	Layer.succeed(NamespaceRegistryService, HashMap.empty()),
 	Layer.succeed(AuthProviderRegistry, HashMap.empty<string, AuthProvider>()),
 	Layer.succeed(RoleLinks, HashMap.empty()),
 	FetchHttpClient.layer,

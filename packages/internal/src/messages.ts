@@ -1,22 +1,23 @@
 import { Schema } from "effect";
 
+import { NamespacePath } from "./models/namespace-path.ts";
 import { ChangeOp } from "./occ/schema.ts";
 
 const ReplicantFieldIdentifier = Schema.Struct({
 	type: Schema.Literal("replicant"),
-	namespace: Schema.String,
+	namespace: NamespacePath,
 	name: Schema.String,
 });
 export type ReplicantFieldIdentifier = typeof ReplicantFieldIdentifier.Type;
 const ComputedFieldIdentifier = Schema.Struct({
 	type: Schema.Literal("computed"),
-	namespace: Schema.String,
+	namespace: NamespacePath,
 	name: Schema.String,
 });
 export type ComputedFieldIdentifier = typeof ComputedFieldIdentifier.Type;
 const TopicFieldIdentifier = Schema.Struct({
 	type: Schema.Literal("topic"),
-	namespace: Schema.String,
+	namespace: NamespacePath,
 	name: Schema.String,
 });
 export type TopicFieldIdentifier = typeof TopicFieldIdentifier.Type;

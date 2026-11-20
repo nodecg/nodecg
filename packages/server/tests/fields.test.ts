@@ -2,7 +2,7 @@ import { testLayer } from "@nodecg-private/test-utils";
 import { defineNamespace } from "@nodecg/core";
 import { Authentication } from "@nodecg/internal";
 import { computeTestHash } from "@nodecg/internal/occ";
-import { Effect, Layer, Schema } from "effect";
+import { Effect, HashMap, Layer, Schema } from "effect";
 import { HttpBody } from "effect/http";
 import { describe, expect } from "vitest";
 
@@ -52,29 +52,22 @@ const namespace = implementNamespace(manifest, {
 const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
-		const { fields } = yield* buildNamespace(
-			[manifest.namespace],
-			namespace,
-			{},
-		);
-		return yield* NamespaceRegistryService.make([
-			{
-				namespace: fields.namespace,
-				path: [fields.namespace],
-				declaredRoles: new Set(),
-				fields,
-			},
+		const { fields } = yield* buildNamespace(["root", "stage"], namespace, {});
+		return HashMap.fromIterable([
+			[["root", "stage"], { declaredRoles: new Set(), fields }],
 		]);
 	}),
 ).pipe(Layer.provide(services));
 
 const test = testLayer(Layer.merge(services, namespaces));
 
-const countUrl = "http://x/api/internal/namespaces/show/replicant/count";
-const tagsUrl = "http://x/api/internal/namespaces/show/replicant/tags";
-const lockedUrl = "http://x/api/internal/namespaces/show/replicant/locked";
-const doubledUrl = "http://x/api/internal/namespaces/show/computed/doubled";
-const explodeUrl = "http://x/api/internal/namespaces/show/rpc/explode";
+const countUrl = "http://x/api/internal/namespaces/root.stage/replicant/count";
+const tagsUrl = "http://x/api/internal/namespaces/root.stage/replicant/tags";
+const lockedUrl =
+	"http://x/api/internal/namespaces/root.stage/replicant/locked";
+const doubledUrl =
+	"http://x/api/internal/namespaces/root.stage/computed/doubled";
+const explodeUrl = "http://x/api/internal/namespaces/root.stage/rpc/explode";
 
 const admin = Authentication.make({ issuer: "dev", subject: "admin" });
 
@@ -96,9 +89,41 @@ describe("get", () => {
 			const client = yield* buildClient;
 
 			const res = yield* client.get(
-				"http://x/api/internal/namespaces/show/replicant/missing",
+				"http://x/api/internal/namespaces/root.stage/replicant/missing",
 			);
 			expect(res.status).toBe(404);
+		}),
+	);
+
+	test(
+		"404 when the namespace is not addressed by its full path",
+		Effect.gen(function* () {
+			const client = yield* buildClient;
+
+			const nameRes = yield* client.get(
+				"http://x/api/internal/namespaces/show/replicant/count",
+			);
+			expect(nameRes.status).toBe(404);
+			const partialRes = yield* client.get(
+				"http://x/api/internal/namespaces/stage/replicant/count",
+			);
+			expect(partialRes.status).toBe(404);
+		}),
+	);
+
+	test(
+		"400 when a path segment does not decode",
+		Effect.gen(function* () {
+			const client = yield* buildClient;
+
+			const emptyRes = yield* client.get(
+				"http://x/api/internal/namespaces/root..stage/replicant/count",
+			);
+			expect(emptyRes.status).toBe(400);
+			const deviceRes = yield* client.get(
+				"http://x/api/internal/namespaces/root.con/replicant/count",
+			);
+			expect(deviceRes.status).toBe(400);
 		}),
 	);
 
@@ -267,7 +292,7 @@ describe("rpc", () => {
 			});
 			expect(yield* res.json).toEqual({
 				_tag: "RpcCallError",
-				message: 'RPC handler for "explode" in "show" failed',
+				message: 'RPC handler for "explode" in "root/stage" failed',
 			});
 		}),
 	);

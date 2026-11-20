@@ -1,7 +1,7 @@
 import { testLayer } from "@nodecg-private/test-utils";
 import { defineNamespace } from "@nodecg/core";
 import { manifestRolesKey } from "@nodecg/internal";
-import { Effect, Layer, Schema } from "effect";
+import { Effect, HashMap, Layer, Schema } from "effect";
 import { HttpBody } from "effect/http";
 import { describe, expect, vi } from "vitest";
 
@@ -36,13 +36,14 @@ const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
 		const { fields } = yield* buildNamespace(["show"], show, {});
-		return yield* NamespaceRegistryService.make([
-			{
-				namespace: "show",
-				path: ["show"],
-				declaredRoles: new Set(show.manifest[manifestRolesKey].roles.keys()),
-				fields,
-			},
+		return HashMap.fromIterable([
+			[
+				["show"],
+				{
+					declaredRoles: new Set(show.manifest[manifestRolesKey].roles.keys()),
+					fields,
+				},
+			],
 		]);
 	}),
 ).pipe(Layer.provide(services));

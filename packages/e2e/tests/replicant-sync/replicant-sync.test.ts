@@ -51,7 +51,10 @@ describe("anonymous access", () => {
 
 		await vi.waitFor(() =>
 			expect(onError).toHaveBeenCalledWith(
-				new FieldPermissionDenied({ namespace: "e2e", name: "secret" }),
+				new FieldPermissionDenied({
+					namespace: ["e2e-replicant-sync", "fixture"],
+					name: "secret",
+				}),
 			),
 		);
 	});
@@ -366,13 +369,17 @@ describe("client ⇄ server replicant sync (as producer)", () => {
 
 describe("namespace frontend serving", () => {
 	test("serves the namespace's index", async () => {
-		const response = await fetch(`${base}/frontend/namespaces/e2e/`);
+		const response = await fetch(
+			`${base}/frontend/namespaces/e2e-replicant-sync.fixture/`,
+		);
 		expect(response.ok).toBe(true);
 		expect(await response.text()).toContain("hello from the frontend");
 	});
 
 	test("serves a file under the namespace", async () => {
-		const response = await fetch(`${base}/frontend/namespaces/e2e/app.js`);
+		const response = await fetch(
+			`${base}/frontend/namespaces/e2e-replicant-sync.fixture/app.js`,
+		);
 		expect(response.ok).toBe(true);
 		expect(await response.text()).toContain("frontend module loaded");
 	});
@@ -385,21 +392,25 @@ describe("namespace frontend serving", () => {
 	});
 
 	test("404s for a missing file in a known namespace", async () => {
-		const response = await fetch(`${base}/frontend/namespaces/e2e/missing.js`);
+		const response = await fetch(
+			`${base}/frontend/namespaces/e2e-replicant-sync.fixture/missing.js`,
+		);
 		expect(response.status).toBe(404);
 	});
 });
 
 describe("spa frontend serving", () => {
 	test("serves the index", async () => {
-		const response = await fetch(`${base}/frontend/namespaces/e2e-library/`);
+		const response = await fetch(
+			`${base}/frontend/namespaces/e2e-replicant-sync.library/`,
+		);
 		expect(response.ok).toBe(true);
 		expect(await response.text()).toContain("spa shell");
 	});
 
 	test("falls back to the index for a client-side route", async () => {
 		const response = await fetch(
-			`${base}/frontend/namespaces/e2e-library/some/route`,
+			`${base}/frontend/namespaces/e2e-replicant-sync.library/some/route`,
 			{ headers: { accept: "text/html" } },
 		);
 		expect(response.ok).toBe(true);
@@ -408,7 +419,7 @@ describe("spa frontend serving", () => {
 
 	test("404s for a missing file despite the fallback", async () => {
 		const response = await fetch(
-			`${base}/frontend/namespaces/e2e-library/missing.js`,
+			`${base}/frontend/namespaces/e2e-replicant-sync.library/missing.js`,
 		);
 		expect(response.status).toBe(404);
 	});

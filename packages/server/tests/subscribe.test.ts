@@ -1,7 +1,7 @@
 import { testLayer } from "@nodecg-private/test-utils";
 import { defineNamespace } from "@nodecg/core";
 import { manifestRolesKey } from "@nodecg/internal";
-import { Effect, Schema } from "effect";
+import { Effect, HashMap, Schema } from "effect";
 import { HttpBody } from "effect/http";
 import { describe, expect, vi } from "vitest";
 
@@ -34,16 +34,21 @@ const loadShow = Effect.gen(function* () {
 		show,
 		{},
 	);
-	const registry = yield* NamespaceRegistryService.make([
-		{
-			namespace: "show",
-			path: ["show"],
-			declaredRoles: new Set(show.manifest[manifestRolesKey].roles.keys()),
-			fields,
-		},
-	]);
 	const client = yield* buildClient.pipe(
-		Effect.provideService(NamespaceRegistryService, registry),
+		Effect.provideService(
+			NamespaceRegistryService,
+			HashMap.fromIterable([
+				[
+					["show"],
+					{
+						declaredRoles: new Set(
+							show.manifest[manifestRolesKey].roles.keys(),
+						),
+						fields,
+					},
+				],
+			]),
+		),
 	);
 	return { client, handle: handles.loaded };
 });

@@ -21,6 +21,7 @@ import {
 	HashMap,
 	Match,
 	Option,
+	Record,
 	Schema,
 	Stream,
 	SynchronizedRef,
@@ -35,6 +36,7 @@ import {
 	resolveServiceAccountCaller,
 	resolveSessionCaller,
 } from "../auth/identity.ts";
+import { fieldInternal } from "../field-builders/field-internal-key.ts";
 import type { FieldPermissionDenied } from "../field-builders/permission.ts";
 import {
 	type ComputedFieldInternal,
@@ -95,33 +97,44 @@ export const websocketRoute = HttpRouter.use((router) =>
 		const resolveField = (field: FieldIdentifier) =>
 			Match.value(field).pipe(
 				Match.when({ type: "replicant" }, (replicantField) =>
-					Option.fromNullishOr(
-						registry.replicant
-							.get(replicantField.namespace)
-							?.get(replicantField.name),
-					).pipe(
-						Option.map((internal) =>
-							ResolvedField.Replicant({ field: replicantField, internal }),
+					registry.pipe(
+						HashMap.get(replicantField.namespace),
+						Option.flatMap(({ fields }) =>
+							Record.get(fields.replicant, replicantField.name),
+						),
+						Option.map((handle) =>
+							ResolvedField.Replicant({
+								field: replicantField,
+								internal: handle[fieldInternal],
+							}),
 						),
 					),
 				),
 				Match.when({ type: "computed" }, (computedField) =>
-					Option.fromNullishOr(
-						registry.computed
-							.get(computedField.namespace)
-							?.get(computedField.name),
-					).pipe(
-						Option.map((internal) =>
-							ResolvedField.Computed({ field: computedField, internal }),
+					registry.pipe(
+						HashMap.get(computedField.namespace),
+						Option.flatMap(({ fields }) =>
+							Record.get(fields.computed, computedField.name),
+						),
+						Option.map((handle) =>
+							ResolvedField.Computed({
+								field: computedField,
+								internal: handle[fieldInternal],
+							}),
 						),
 					),
 				),
 				Match.when({ type: "topic" }, (topicField) =>
-					Option.fromNullishOr(
-						registry.topic.get(topicField.namespace)?.get(topicField.name),
-					).pipe(
-						Option.map((internal) =>
-							ResolvedField.Topic({ field: topicField, internal }),
+					registry.pipe(
+						HashMap.get(topicField.namespace),
+						Option.flatMap(({ fields }) =>
+							Record.get(fields.topic, topicField.name),
+						),
+						Option.map((handle) =>
+							ResolvedField.Topic({
+								field: topicField,
+								internal: handle[fieldInternal],
+							}),
 						),
 					),
 				),

@@ -4,6 +4,8 @@ import {
 	type ComputedFieldIdentifier,
 	type FieldIdentifier,
 	type FieldValueMessage,
+	formatField,
+	type NamespacePath,
 	type PublishMessage,
 	type ReplicantDeltaMessage,
 	type ReplicantFieldIdentifier,
@@ -111,7 +113,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 			>();
 
 			const makeRejectionError = (
-				namespace: string,
+				namespace: NamespacePath,
 				name: string,
 				reason: "forbidden" | "not-found" | "unavailable",
 				message: string | undefined,
@@ -180,7 +182,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 
 			const makeReplicantCell = Effect.fn("makeReplicantCell")(function* <
 				Decoded,
-			>(namespace: string, name: string, manifest: FieldCodec<Decoded>) {
+			>(namespace: NamespacePath, name: string, manifest: FieldCodec<Decoded>) {
 				const field: ReplicantFieldIdentifier = {
 					type: "replicant",
 					namespace,
@@ -230,14 +232,14 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 								const applied = applyPatch(current.encoded, delta.ops);
 								if (Result.isFailure(applied)) {
 									yield* Effect.logWarning(
-										`Delta for "${namespace}/${name}" did not apply, resyncing:`,
+										`Delta for ${formatField(namespace, name)} did not apply, resyncing:`,
 										applied.failure,
 									);
 									return yield* requestResync;
 								}
 								if (computeFingerprint(applied.success) !== delta.hash) {
 									yield* Effect.logWarning(
-										`Delta for "${namespace}/${name}" diverged from the server fingerprint, resyncing`,
+										`Delta for ${formatField(namespace, name)} diverged from the server fingerprint, resyncing`,
 									);
 									return yield* requestResync;
 								}
@@ -273,7 +275,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 			});
 
 			const makeComputedCell = <Decoded>(
-				namespace: string,
+				namespace: NamespacePath,
 				name: string,
 				manifest: FieldCodec<Decoded>,
 			): ComputedCell<Decoded> => {
@@ -308,7 +310,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 			};
 
 			const makeTopicCell = <Decoded>(
-				namespace: string,
+				namespace: NamespacePath,
 				name: string,
 				manifest: FieldCodec<Decoded>,
 			): TopicCell<Decoded> => {
@@ -419,7 +421,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 							.pipe(
 								Effect.catchTag("SetSignalError", (error) =>
 									Effect.logError(
-										`A watcher of "${frame.field.namespace}/${frame.field.name}" threw:`,
+										`A watcher of ${formatField(frame.field.namespace, frame.field.name)} threw:`,
 										error,
 									),
 								),
@@ -466,7 +468,7 @@ export class FieldCellsService extends Context.Service<FieldCellsService>()(
 									);
 									if (Result.isFailure(rejection)) {
 										yield* Effect.logError(
-											`A watcher of "${rejected.field.namespace}/${rejected.field.name}" threw:`,
+											`A watcher of ${formatField(rejected.field.namespace, rejected.field.name)} threw:`,
 											rejection.failure,
 										);
 									}

@@ -65,6 +65,7 @@ export {
 	formatField,
 	formatNamespacePath,
 	NamespacePath,
+	NamespacePathFromString,
 } from "./models/namespace-path.ts";
 export {
 	DeclarablePrincipalNameSchema,

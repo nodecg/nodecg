@@ -8,7 +8,7 @@ import {
 	ServiceAccountId,
 	UserDocumentEntry,
 } from "@nodecg/internal";
-import { Effect, HashSet, Layer } from "effect";
+import { Effect, HashMap, HashSet, Layer } from "effect";
 import { SecureRandom } from "effect/crypto";
 import { HttpBody } from "effect/http";
 import { describe, expect } from "vitest";
@@ -40,14 +40,18 @@ const judge = Role.make({
 const test = testLayer(
 	Layer.merge(
 		services,
-		NamespaceRegistryService.layer([
-			{
-				namespace: "show",
-				path: ["show"],
-				declaredRoles: new Set([producer.name, viewer.name, judge.name]),
-				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-			},
-		]),
+		Layer.succeed(
+			NamespaceRegistryService,
+			HashMap.fromIterable([
+				[
+					["show"],
+					{
+						declaredRoles: new Set([producer.name, viewer.name, judge.name]),
+						fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
+					},
+				],
+			]),
+		),
 	),
 );
 

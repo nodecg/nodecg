@@ -1,4 +1,4 @@
-import { InternalApi } from "@nodecg/internal";
+import { InternalApi, type NamespacePath } from "@nodecg/internal";
 import type { Patch } from "@nodecg/internal/occ";
 import { toError } from "@nodecg/internal/utils";
 import { Effect, Layer, Match, type Schema } from "effect";
@@ -22,7 +22,7 @@ export const httpFieldTransport = (baseUrl?: string) =>
 			const client = yield* HttpApiClient.make(InternalApi, { baseUrl });
 
 			const getReplicant = Effect.fn("FieldTransport.getReplicant")(function* (
-				namespace: string,
+				namespace: NamespacePath,
 				name: string,
 			) {
 				return yield* client.Field.replicantGet({
@@ -48,7 +48,7 @@ export const httpFieldTransport = (baseUrl?: string) =>
 			});
 
 			const getComputed = Effect.fn("FieldTransport.getComputed")(function* (
-				namespace: string,
+				namespace: NamespacePath,
 				name: string,
 			) {
 				return yield* client.Field.computedGet({
@@ -74,7 +74,7 @@ export const httpFieldTransport = (baseUrl?: string) =>
 			});
 
 			const updateReplicant = Effect.fn("FieldTransport.updateReplicant")(
-				function* (namespace: string, name: string, patch: Patch) {
+				function* (namespace: NamespacePath, name: string, patch: Patch) {
 					yield* client.Field.replicantUpdate({
 						params: { namespace, fieldName: name },
 						payload: patch,
@@ -101,7 +101,7 @@ export const httpFieldTransport = (baseUrl?: string) =>
 			);
 
 			const publishTopic = Effect.fn("FieldTransport.publishTopic")(function* (
-				namespace: string,
+				namespace: NamespacePath,
 				name: string,
 				value: Schema.Json,
 			) {
@@ -133,7 +133,7 @@ export const httpFieldTransport = (baseUrl?: string) =>
 			});
 
 			const callRpc = Effect.fn("FieldTransport.callRpc")(function* (
-				namespace: string,
+				namespace: NamespacePath,
 				name: string,
 				request: Schema.Json,
 			) {

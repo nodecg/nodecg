@@ -1,5 +1,5 @@
 import { customRoutePath } from "@nodecg/internal";
-import { Effect, Match } from "effect";
+import { Array, Effect, Match } from "effect";
 import { HttpRouter, HttpServerResponse } from "effect/http";
 
 import { resolveRequestIdentity } from "../auth/identity.ts";
@@ -26,15 +26,25 @@ const handleRequest = Effect.fn(function* (route: CustomRoute) {
 export const customRoutes = HttpRouter.use((router) =>
 	Effect.gen(function* () {
 		const registry = yield* NamespaceRegistryService;
-		yield* router.addAll(
-			Array.from(registry.customRoute).flatMap(([namespace, routes]) =>
-				Array.from(routes, (route) =>
-					HttpRouter.prefixRoute(
-						HttpRouter.route(route.method, "/*", handleRequest(route)),
-						customRoutePath(namespace, route.name),
-					),
-				),
+		const namespaceRoutes = registry.pipe(
+			Array.fromIterable,
+			Array.flatMap(
+				([path, { customRoute }]) =>
+					customRoute?.pipe(
+						Array.fromIterable,
+						Array.map((route) => ({ path, route })),
+					) ?? [],
 			),
 		);
+		const routes = yield* Effect.forEach(namespaceRoutes, ({ path, route }) =>
+			Effect.gen(function* () {
+				const prefix = yield* customRoutePath(path, route.name);
+				return HttpRouter.prefixRoute(
+					HttpRouter.route(route.method, "/*", handleRequest(route)),
+					prefix,
+				);
+			}),
+		);
+		yield* router.addAll(routes);
 	}),
 );

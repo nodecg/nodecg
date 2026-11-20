@@ -1,18 +1,22 @@
-import { RpcCallError } from "@nodecg/internal";
+import { type NamespacePath, RpcCallError } from "@nodecg/internal";
 import type { Patch } from "@nodecg/internal/occ";
-import { Effect, Match, type Schema } from "effect";
+import { Effect, HashMap, Match, Option, Record, type Schema } from "effect";
 import { HttpApiError } from "effect/http-api";
 
+import { fieldInternal } from "../../field-builders/field-internal-key.ts";
 import { NamespaceRegistryService } from "../../namespace-registry.ts";
 
-export const getReplicant = (namespace: string, name: string) =>
+export const getReplicant = (namespace: NamespacePath, name: string) =>
 	Effect.gen(function* () {
 		const registry = yield* NamespaceRegistryService;
-		const field = registry.replicant.get(namespace)?.get(name);
-		if (typeof field === "undefined") {
+		const field = registry.pipe(
+			HashMap.get(namespace),
+			Option.flatMap(({ fields }) => Record.get(fields.replicant, name)),
+		);
+		if (Option.isNone(field)) {
 			return yield* new HttpApiError.NotFound();
 		}
-		return yield* field.getRevisioned().pipe(
+		return yield* field.value[fieldInternal].getRevisioned().pipe(
 			Effect.map((revisioned) => revisioned.value),
 			Effect.catchTags({
 				FieldPermissionDenied: () => new HttpApiError.Forbidden(),
@@ -21,17 +25,20 @@ export const getReplicant = (namespace: string, name: string) =>
 	});
 
 export const updateReplicant = (
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	payload: Patch,
 ) =>
 	Effect.gen(function* () {
 		const registry = yield* NamespaceRegistryService;
-		const field = registry.replicant.get(namespace)?.get(name);
-		if (typeof field === "undefined") {
+		const field = registry.pipe(
+			HashMap.get(namespace),
+			Option.flatMap(({ fields }) => Record.get(fields.replicant, name)),
+		);
+		if (Option.isNone(field)) {
 			return yield* new HttpApiError.NotFound();
 		}
-		yield* field.commitPatch(payload).pipe(
+		yield* field.value[fieldInternal].commitPatch(payload).pipe(
 			Effect.mapError((error) =>
 				Match.value(error).pipe(
 					Match.tag("PatchNotApplicable", (invalid) => invalid),
@@ -48,14 +55,17 @@ export const updateReplicant = (
 		);
 	});
 
-export const getComputed = (namespace: string, name: string) =>
+export const getComputed = (namespace: NamespacePath, name: string) =>
 	Effect.gen(function* () {
 		const registry = yield* NamespaceRegistryService;
-		const field = registry.computed.get(namespace)?.get(name);
-		if (typeof field === "undefined") {
+		const field = registry.pipe(
+			HashMap.get(namespace),
+			Option.flatMap(({ fields }) => Record.get(fields.computed, name)),
+		);
+		if (Option.isNone(field)) {
 			return yield* new HttpApiError.NotFound();
 		}
-		return yield* field.getEncoded().pipe(
+		return yield* field.value[fieldInternal].getEncoded().pipe(
 			Effect.catchTags({
 				FieldPermissionDenied: () => HttpApiError.Forbidden.make(),
 				ComputedComputeError: () => HttpApiError.InternalServerError.make(),
@@ -67,17 +77,20 @@ export const getComputed = (namespace: string, name: string) =>
 	});
 
 export const publishTopic = (
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	payload: Schema.Json,
 ) =>
 	Effect.gen(function* () {
 		const registry = yield* NamespaceRegistryService;
-		const field = registry.topic.get(namespace)?.get(name);
-		if (typeof field === "undefined") {
+		const field = registry.pipe(
+			HashMap.get(namespace),
+			Option.flatMap(({ fields }) => Record.get(fields.topic, name)),
+		);
+		if (Option.isNone(field)) {
 			return yield* new HttpApiError.NotFound();
 		}
-		yield* field.publishEncoded(payload).pipe(
+		yield* field.value[fieldInternal].publishEncoded(payload).pipe(
 			Effect.catchTags({
 				FieldPermissionDenied: () => new HttpApiError.Forbidden(),
 				FieldDecodeError: () => new HttpApiError.BadRequest(),
@@ -86,17 +99,20 @@ export const publishTopic = (
 	});
 
 export const callRpc = (
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	payload: Schema.Json,
 ) =>
 	Effect.gen(function* () {
 		const registry = yield* NamespaceRegistryService;
-		const field = registry.rpc.get(namespace)?.get(name);
-		if (typeof field === "undefined") {
+		const field = registry.pipe(
+			HashMap.get(namespace),
+			Option.flatMap(({ fields }) => Record.get(fields.rpc, name)),
+		);
+		if (Option.isNone(field)) {
 			return yield* new HttpApiError.NotFound();
 		}
-		return yield* field.callEncoded(payload).pipe(
+		return yield* field.value[fieldInternal].callEncoded(payload).pipe(
 			Effect.catchTags({
 				FieldPermissionDenied: () => new HttpApiError.Forbidden(),
 				FieldDecodeError: () => new HttpApiError.BadRequest(),

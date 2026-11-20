@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
 
-import { Effect } from "effect";
+import { formatNamespacePath, NamespacePathFromString } from "@nodecg/internal";
+import { Effect, Schema } from "effect";
 import { HttpRouter, HttpStaticServer } from "effect/http";
 
 import { NamespaceRegistryService } from "../namespace-registry.ts";
@@ -11,8 +12,7 @@ import {
 } from "./node-connect-middleware.ts";
 import { buildViteServer } from "./vite-dev-server.ts";
 
-const frontendPrefix = (namespace: string) =>
-	`/frontend/namespaces/${namespace}` as const;
+const encodeNamespacePath = Schema.encodeEffect(NamespacePathFromString);
 
 const coerceToPath = (url: string | URL) => {
 	if (url instanceof URL) {
@@ -28,18 +28,25 @@ export const frontendRoutes = HttpRouter.use((router) =>
 	Effect.gen(function* () {
 		const registry = yield* NamespaceRegistryService;
 		const dev = yield* config.dev;
-		for (const [name, frontend] of registry.frontend) {
+		for (const [path, { frontend }] of registry) {
+			if (typeof frontend === "undefined") {
+				continue;
+			}
+			const segment = yield* encodeNamespacePath(path).pipe(
+				Effect.catchTag("SchemaError", Effect.die),
+			);
+			const prefix = `/frontend/namespaces/${segment}`;
 			const spa = frontend.spa ?? false;
 			if (dev && typeof frontend.vite !== "undefined") {
 				const devServer = yield* buildViteServer({
 					root: coerceToPath(frontend.vite.root),
-					prefix: frontendPrefix(name),
+					prefix,
 					spa,
 				});
 				// Vite runs these middlewares under HTTP/2 too, but types them for node:http only.
 				const middlewares = devServer.middlewares as NodeMiddleware;
 				yield* router
-					.prefixed(frontendPrefix(name))
+					.prefixed(prefix)
 					.add("*", "/*", nodeMiddlewareToHttpApp(middlewares));
 			} else {
 				const roots = frontend.dir.map(coerceToPath);
@@ -53,7 +60,7 @@ export const frontendRoutes = HttpRouter.use((router) =>
 						)),
 					);
 				}
-				yield* router.prefixed(frontendPrefix(name)).add(
+				yield* router.prefixed(prefix).add(
 					"GET",
 					"/*",
 					apps.reduce((acc, next) =>
@@ -67,7 +74,7 @@ export const frontendRoutes = HttpRouter.use((router) =>
 				);
 			}
 			yield* Effect.logInfo(
-				`Serving frontend for "${name}" at ${frontendPrefix(name)}/`,
+				`Serving frontend for "${formatNamespacePath(path)}" at ${prefix}/`,
 			);
 		}
 	}),

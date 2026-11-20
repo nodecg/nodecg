@@ -75,7 +75,7 @@ const waitFor = (assertion: () => void) =>
 
 const countField: FieldIdentifier = {
 	type: "replicant",
-	namespace: "root",
+	namespace: ["root"],
 	name: "count",
 };
 
@@ -106,7 +106,7 @@ describe("send", () => {
 			expect(written).toEqual([
 				{
 					_tag: "subscribe",
-					field: { type: "replicant", namespace: "root", name: "count" },
+					field: { type: "replicant", namespace: ["root"], name: "count" },
 				},
 			]);
 		}),
@@ -130,7 +130,7 @@ describe("send", () => {
 				yield* channel.send(SubscribeMessage.make({ field: countField }));
 				yield* channel.send(
 					SubscribeMessage.make({
-						field: { type: "replicant", namespace: "root", name: "total" },
+						field: { type: "replicant", namespace: ["root"], name: "total" },
 					}),
 				);
 			}).pipe(Effect.provide(makeChannelLayer(socket)));
@@ -141,11 +141,11 @@ describe("send", () => {
 			expect(written).toEqual([
 				{
 					_tag: "subscribe",
-					field: { type: "replicant", namespace: "root", name: "count" },
+					field: { type: "replicant", namespace: ["root"], name: "count" },
 				},
 				{
 					_tag: "subscribe",
-					field: { type: "replicant", namespace: "root", name: "total" },
+					field: { type: "replicant", namespace: ["root"], name: "total" },
 				},
 			]);
 		}),
@@ -205,7 +205,7 @@ describe("receive", () => {
 					assert(Option.isSome(first));
 					expect(first.value).toEqual({
 						_tag: "snapshot",
-						field: { type: "replicant", namespace: "root", name: "count" },
+						field: { type: "replicant", namespace: ["root"], name: "count" },
 						value: 42,
 						revision: 3,
 					});
@@ -281,7 +281,7 @@ describe("receive", () => {
 					assert(Option.isSome(first));
 					expect(first.value).toEqual({
 						_tag: "snapshot",
-						field: { type: "replicant", namespace: "root", name: "count" },
+						field: { type: "replicant", namespace: ["root"], name: "count" },
 						value: 42,
 						revision: 3,
 					});
@@ -307,7 +307,7 @@ describe("reconnect", () => {
 				assert(Option.isSome(head));
 				expect(head.value).toEqual({
 					_tag: "snapshot",
-					field: { type: "replicant", namespace: "root", name: "count" },
+					field: { type: "replicant", namespace: ["root"], name: "count" },
 					value: 42,
 					revision: 3,
 				});
@@ -348,7 +348,11 @@ describe("reconnect", () => {
 						[
 							{
 								_tag: "snapshot",
-								field: { type: "replicant", namespace: "root", name: "count" },
+								field: {
+									type: "replicant",
+									namespace: ["root"],
+									name: "count",
+								},
 								value: 42,
 								revision: 3,
 							},

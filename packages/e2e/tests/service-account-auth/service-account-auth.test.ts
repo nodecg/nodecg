@@ -152,7 +152,7 @@ describe("duplicate subscribe over the raw wire", () => {
 		};
 		const subscribeFrame: ClientMessage = {
 			_tag: "subscribe",
-			field: { type: "replicant", namespace: "e2e", name: "tallies" },
+			field: { type: "replicant", namespace: ["e2e"], name: "tallies" },
 		};
 		socket.send(JSON.stringify(subscribeFrame));
 		await vi.waitFor(() => expect(frames).toHaveLength(1));

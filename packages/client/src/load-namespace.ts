@@ -8,7 +8,12 @@ import type {
 	WidestNamespaceFields,
 	WidestRpcField,
 } from "@nodecg/core";
-import { customRoutePath, type Updater } from "@nodecg/internal";
+import {
+	customRoutePath,
+	formatField,
+	type NamespacePath,
+	type Updater,
+} from "@nodecg/internal";
 import { diffSignedPatch } from "@nodecg/internal/occ";
 import {
 	type ApplyLambdaToObjectValues,
@@ -101,7 +106,7 @@ const subscribeCell = Effect.fn(function* <Decoded>(
 });
 
 const implementReplicant = Effect.fn("implementReplicant")(function* <Decoded>(
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	manifest: FieldCodec<Decoded>,
 ) {
@@ -166,7 +171,7 @@ const implementReplicant = Effect.fn("implementReplicant")(function* <Decoded>(
 			Effect.mapError(
 				(failure) =>
 					new Error(
-						`Diffing "${namespace}/${name}" produced an unusable patch: ${failure._tag}`,
+						`Diffing ${formatField(namespace, name)} produced an unusable patch: ${failure._tag}`,
 					),
 			),
 			Effect.orDie,
@@ -271,7 +276,7 @@ export type ReplicantField<Decoded> = ApplyLambdaToObject<
 	FieldSource<Decoded>;
 
 const implementComputed = Effect.fn("implementComputed")(function* <Decoded>(
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	manifest: FieldCodec<Decoded>,
 ) {
@@ -311,7 +316,7 @@ export type ComputedField<Decoded> = ApplyLambdaToObject<
 	FieldSource<Decoded>;
 
 const implementTopic = Effect.fn("implementTopic")(function* <Decoded>(
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	manifest: FieldCodec<Decoded>,
 ) {
@@ -341,7 +346,7 @@ export type TopicField<Decoded> = ApplyLambdaToObject<
 >;
 
 const implementRpc = Effect.fn("implementRpc")(function* <Request, Response>(
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 	manifest: RpcFieldManifest<Request, Response>,
 ) {
@@ -368,11 +373,11 @@ export type RpcField<Request, Response> = ApplyLambdaToObject<
 
 const implementCustomRoute = Effect.fn("implementCustomRoute")(function* (
 	base: Option.Option<URL>,
-	namespace: string,
+	namespace: NamespacePath,
 	name: string,
 ) {
 	const urlPath = yield* Path.Path;
-	const routePath = customRoutePath(namespace, name);
+	const routePath = yield* customRoutePath(namespace, name);
 	const routeUrl = Option.match(base, {
 		onNone: () => routePath,
 		onSome: (url) =>
@@ -467,6 +472,7 @@ const buildFields = <
 	CustomRoutes extends WidestCustomRoutes,
 >(
 	manifest: NamespaceManifest<string, S, string, CustomRoutes>,
+	namespace: NamespacePath,
 	baseUrl: string | undefined,
 ) =>
 	Layer.build(Layer.merge(FieldCellsService.layer, Path.layer)).pipe(
@@ -478,31 +484,31 @@ const buildFields = <
 				const replicant = yield* mapEffectValues<
 					FieldCodecLambda,
 					ReplicantFieldEffectLambda
-				>()((codec, name) =>
-					implementReplicant(manifest.namespace, name, codec),
-				)(manifest.replicant);
+				>()((codec, name) => implementReplicant(namespace, name, codec))(
+					manifest.replicant,
+				);
 				const computed = yield* mapEffectValues<
 					FieldCodecLambda,
 					ComputedFieldEffectLambda
-				>()((codec, name) =>
-					implementComputed(manifest.namespace, name, codec),
-				)(manifest.computed);
+				>()((codec, name) => implementComputed(namespace, name, codec))(
+					manifest.computed,
+				);
 				const topic = yield* mapEffectValues<
 					FieldCodecLambda,
 					TopicFieldEffectLambda
-				>()((codec, name) => implementTopic(manifest.namespace, name, codec))(
+				>()((codec, name) => implementTopic(namespace, name, codec))(
 					manifest.topic,
 				);
 				const rpc = yield* mapEffectValues<
 					RpcFieldManifestLambda,
 					RpcFieldEffectLambda
-				>()((codec, name) => implementRpc(manifest.namespace, name, codec))(
+				>()((codec, name) => implementRpc(namespace, name, codec))(
 					manifest.rpc,
 				);
 				const customRoute = yield* mapEffectValues<
 					CustomRouteManifestLambda,
 					CustomRouteLambda
-				>()((_, name) => implementCustomRoute(base, manifest.namespace, name))(
+				>()((_, name) => implementCustomRoute(base, namespace, name))(
 					manifest.customRoute,
 				);
 				return {
@@ -621,6 +627,7 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 		TreeCustomRoutes extends WidestCustomRoutes,
 	>(
 		node: TreeManifest<TreeS, TreeCustomRoutes>,
+		namespace: NamespacePath,
 	): Effect.Effect<
 		NamespaceHandles<TreeS, TreeCustomRoutes>,
 		Effect.Error<ReturnType<typeof buildFields>>,
@@ -635,8 +642,10 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 			const children = yield* mapEffectValues<
 				TreeManifestLambda,
 				NamespaceHandlesLambda
-			>()((child) => build(child))<TreeS["children"]>(node.children);
-			const fields = yield* buildFields(node, baseUrl);
+			>()((child, key) => build(child, Array.append(namespace, key)))<
+				TreeS["children"]
+			>(node.children);
+			const fields = yield* buildFields(node, namespace, baseUrl);
 			const handles: NamespaceHandles<TreeS, TreeCustomRoutes> = {
 				built: {
 					...fields,
@@ -647,6 +656,7 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 				loaded: adaptNamespace(
 					services,
 					runSubscription,
+					namespace,
 					fields,
 					mapValues<NamespaceHandlesLambda, LoadedNamespaceLambda>(
 						(child) => child.loaded,
@@ -657,7 +667,7 @@ const loadTree = Effect.fn("loadNamespace")(function* <
 			return handles;
 		});
 
-	const root = yield* build(manifest);
+	const root = yield* build(manifest, [manifest.namespace]);
 	const auth = yield* makeAuthClient(baseUrl);
 	return { root, auth };
 });
@@ -694,6 +704,7 @@ const adaptNamespace = <
 >(
 	services: Context.Context<never>,
 	runSubscription: (subscription: Effect.Effect<void>) => Fiber.Fiber<void>,
+	namespace: NamespacePath,
 	fields: BuiltFields<S, CustomRoutes>,
 	children: LoadedNamespace<S, CustomRoutes>["children"],
 ) => {
@@ -723,13 +734,13 @@ const adaptNamespace = <
 										Effect.tryPromise(async () => callback(value)),
 									onFailure: (error) =>
 										Effect.logError(
-											`Subscription to "${name}" in "${fields.namespace}" failed`,
+											`Subscription to ${formatField(namespace, name)} failed`,
 											error,
 										).pipe(Effect.andThen(Effect.try(() => onError?.(error)))),
 								}),
 								Effect.catchTag("UnknownError", (error) =>
 									Effect.logError(
-										`Subscription handler for "${name}" in "${fields.namespace}" threw`,
+										`Subscription handler for ${formatField(namespace, name)} threw`,
 										error,
 									),
 								),

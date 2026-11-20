@@ -1,7 +1,15 @@
 import { testLayer } from "@nodecg-private/test-utils";
 import { defineNamespace } from "@nodecg/core";
 import { Authentication, Role, RoleName } from "@nodecg/internal";
-import { Effect, HashSet, Layer, Logger, Redacted, Schema } from "effect";
+import {
+	Effect,
+	HashMap,
+	HashSet,
+	Layer,
+	Logger,
+	Redacted,
+	Schema,
+} from "effect";
 import { HttpBody } from "effect/http";
 import { describe, expect } from "vitest";
 
@@ -78,18 +86,13 @@ const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
 		const { fields, handles } = yield* buildNamespace(["show"], namespace, {});
-		return yield* NamespaceRegistryService.make([
-			{
-				namespace: fields.namespace,
-				path: [fields.namespace],
-				declaredRoles: new Set(),
-				customRoute: yield* buildCustomRoutes(namespace, {
-					...handles.loaded,
-					dataDir: "data",
-					namespacePath: ["show"],
-				}),
-				fields,
-			},
+		const customRoute = yield* buildCustomRoutes(namespace, {
+			...handles.loaded,
+			dataDir: "data",
+			namespacePath: ["show"],
+		});
+		return HashMap.fromIterable([
+			[["show"], { declaredRoles: new Set(), customRoute, fields }],
 		]);
 	}),
 ).pipe(Layer.provide(services));

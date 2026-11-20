@@ -211,15 +211,16 @@ const prepareNamespace = Effect.fn("prepareNamespace")(function* <
 				);
 	const { roles } = implemented.manifest[manifestRolesKey];
 	const registered: RegisteredNamespace = {
-		namespace: fields.namespace,
-		path: namespace,
 		declaredRoles: new Set(roles.keys()),
 		frontend: implemented.impl?.frontend,
 		customRoute: yield* buildCustomRoutes(implemented, ctx),
 		fields,
 	};
 	const roleLinks = resolveRoleLinks(namespace, roles);
-	return { handles, prepared: { registered, runOnLoad, roleLinks } };
+	return {
+		handles,
+		prepared: { namespace, registered, runOnLoad, roleLinks },
+	};
 });
 
 type PreparedNamespace = Effect.Success<
@@ -337,14 +338,16 @@ export const loadNamespaceEffect = Effect.fn(
 				handles: { loaded },
 				prepared,
 			} = yield* loadTree(root, [root.manifest.namespace]);
-			const registered = prepared.map(({ registered }) => registered);
+			const registry = HashMap.fromIterable(
+				prepared.map(({ namespace, registered }) => [namespace, registered]),
+			);
 			const roleLinks = normalizeRoleLinks(
 				prepared.map(({ roleLinks }) => roleLinks),
 			);
 
 			yield* Effect.forEach(
-				registered,
-				({ fields }) => validateComputedFields(fields),
+				prepared,
+				({ registered: { fields } }) => validateComputedFields(fields),
 				{ concurrency: "unbounded", discard: true },
 			);
 
@@ -359,7 +362,7 @@ export const loadNamespaceEffect = Effect.fn(
 					? serve
 					: reportReady(serve, options.onReady)
 			).pipe(
-				Layer.provide(NamespaceRegistryService.layer(registered)),
+				Layer.provide(Layer.succeed(NamespaceRegistryService, registry)),
 				Layer.provide(Layer.succeed(RoleLinks, roleLinks)),
 				Layer.provide(Layer.succeed(ReplicantStoreService, store)),
 				Layer.provide(

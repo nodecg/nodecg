@@ -193,14 +193,14 @@ const AuthenticationGroupLive = HttpApiBuilder.group(
 				.handle("me", () =>
 					Effect.gen(function* () {
 						const identity = yield* CurrentIdentity;
-						const { declaredRoles } = yield* NamespaceRegistryService;
-						const namespaces: MePayload["namespaces"] = declaredRoles.pipe(
+						const namespaceRegistry = yield* NamespaceRegistryService;
+						const namespaces: MePayload["namespaces"] = namespaceRegistry.pipe(
 							Array.fromIterable,
-							Array.map(([namespace, declared]) => ({
-								namespace,
+							Array.map(([path, { declaredRoles }]) => ({
+								namespace: path,
 								roles: Array.intersection(
-									getRolesForNamespace(identity, namespace),
-									declared,
+									getRolesForNamespace(identity, path),
+									declaredRoles,
 								),
 							})),
 							Array.sortWith(
@@ -431,11 +431,11 @@ const UsersGroupLive = HttpApiBuilder.group(RootApi, "Users", (handlers) =>
 		)
 		.handle("grantRole", ({ params: { id }, payload: role }) =>
 			Effect.gen(function* () {
-				const { declaredRoles } = yield* NamespaceRegistryService;
+				const registry = yield* NamespaceRegistryService;
 				if (
-					!declaredRoles.pipe(
+					!registry.pipe(
 						HashMap.get(role.namespace),
-						Option.exists((declared) => declared.has(role.name)),
+						Option.exists(({ declaredRoles }) => declaredRoles.has(role.name)),
 					)
 				) {
 					return yield* HttpApiError.UnprocessableEntity.make();
@@ -525,11 +525,13 @@ const ServiceAccountsGroupLive = HttpApiBuilder.group(
 			)
 			.handle("grantRole", ({ params: { id }, payload: role }) =>
 				Effect.gen(function* () {
-					const { declaredRoles } = yield* NamespaceRegistryService;
+					const registry = yield* NamespaceRegistryService;
 					if (
-						!declaredRoles.pipe(
+						!registry.pipe(
 							HashMap.get(role.namespace),
-							Option.exists((declared) => declared.has(role.name)),
+							Option.exists(({ declaredRoles }) =>
+								declaredRoles.has(role.name),
+							),
 						)
 					) {
 						return yield* HttpApiError.UnprocessableEntity.make();

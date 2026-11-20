@@ -58,7 +58,7 @@ describe("chained computed over the wire", () => {
 			expect(onError).toHaveBeenCalledWith(
 				expect.objectContaining({
 					message:
-						'Field "reciprocal" in "e2e-chain" is currently unavailable: Computing computed field "reciprocal" in "e2e-computed-chain/chain" failed',
+						'Field "reciprocal" in "e2e-computed-chain/chain" is currently unavailable: Computing computed field "reciprocal" in "e2e-computed-chain/chain" failed',
 				}),
 			),
 		);
@@ -76,7 +76,7 @@ describe("chained computed over the wire", () => {
 			expect(onError).toHaveBeenCalledWith(
 				expect.objectContaining({
 					_tag: "FieldUnavailable",
-					namespace: "e2e-chain",
+					namespace: ["e2e-computed-chain", "chain"],
 					name: "reciprocal",
 				}),
 			),

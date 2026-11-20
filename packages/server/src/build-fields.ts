@@ -240,7 +240,7 @@ export const buildFields = Effect.fn("buildFields")(function* <
 	);
 
 	return {
-		fields: { namespace: manifest.namespace, replicant, computed, topic, rpc },
+		fields: { replicant, computed, topic, rpc },
 		computeContext,
 		fieldServices,
 	};

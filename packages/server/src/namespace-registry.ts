@@ -1,9 +1,9 @@
 import type { NamespacePath, RoleName } from "@nodecg/internal";
-import { Context, Effect, HashMap, HashSet, Layer } from "effect";
+import { Context, type HashMap, type HashSet } from "effect";
 
 import type { CustomRoute } from "./build-custom-routes.ts";
 import { type BuiltNamespace } from "./build-fields.ts";
-import { fieldInternal } from "./field-builders/field-internal-key.ts";
+import type { fieldInternal } from "./field-builders/field-internal-key.ts";
 import type { FrontendConfig } from "./implement-namespace.ts";
 
 // Exclude Decoded types
@@ -21,104 +21,27 @@ export type TopicFieldInternal = Pick<
 >;
 type RpcFieldInternal = BuiltNamespace["rpc"][string][typeof fieldInternal];
 
-export interface NamespaceRegistry {
-	readonly replicant: ReadonlyMap<
-		string,
-		ReadonlyMap<string, ReplicantFieldInternal>
-	>;
-	readonly computed: ReadonlyMap<
-		string,
-		ReadonlyMap<string, ComputedFieldInternal>
-	>;
-	readonly topic: ReadonlyMap<string, ReadonlyMap<string, TopicFieldInternal>>;
-	readonly rpc: ReadonlyMap<string, ReadonlyMap<string, RpcFieldInternal>>;
-	readonly customRoute: ReadonlyMap<string, HashSet.HashSet<CustomRoute>>;
-	readonly declaredRoles: HashMap.HashMap<NamespacePath, ReadonlySet<RoleName>>;
-	readonly frontend: ReadonlyMap<string, FrontendConfig>;
-}
+type Fields<
+	F extends
+		| ReplicantFieldInternal
+		| ComputedFieldInternal
+		| TopicFieldInternal
+		| RpcFieldInternal,
+> = Readonly<Record<string, { readonly [fieldInternal]: F }>>;
 
 export interface RegisteredNamespace {
-	readonly namespace: string;
-	readonly path: NamespacePath;
 	readonly declaredRoles: ReadonlySet<RoleName>;
 	readonly frontend?: FrontendConfig;
 	readonly customRoute?: HashSet.HashSet<CustomRoute>;
 	readonly fields: {
-		readonly replicant: Record<
-			string,
-			{ readonly [fieldInternal]: ReplicantFieldInternal }
-		>;
-		readonly computed: Record<
-			string,
-			{ readonly [fieldInternal]: ComputedFieldInternal }
-		>;
-		readonly topic: Record<
-			string,
-			{ readonly [fieldInternal]: TopicFieldInternal }
-		>;
-		readonly rpc: Record<
-			string,
-			{ readonly [fieldInternal]: RpcFieldInternal }
-		>;
+		readonly replicant: Fields<ReplicantFieldInternal>;
+		readonly computed: Fields<ComputedFieldInternal>;
+		readonly topic: Fields<TopicFieldInternal>;
+		readonly rpc: Fields<RpcFieldInternal>;
 	};
 }
 
-export class NamespaceRegistryService extends Context.Service<NamespaceRegistryService>()(
-	"NamespaceRegistry",
-	{
-		make: (namespaces: ReadonlyArray<RegisteredNamespace>) =>
-			Effect.sync((): NamespaceRegistry => {
-				const replicant = new Map<
-					string,
-					Map<string, ReplicantFieldInternal>
-				>();
-				const computed = new Map<string, Map<string, ComputedFieldInternal>>();
-				const topic = new Map<string, Map<string, TopicFieldInternal>>();
-				const rpc = new Map<string, Map<string, RpcFieldInternal>>();
-				const customRoute = new Map<string, HashSet.HashSet<CustomRoute>>();
-				const declaredRoles = HashMap.fromIterable(
-					namespaces.map(({ path, declaredRoles }) => [path, declaredRoles]),
-				);
-				const frontend = new Map<string, FrontendConfig>();
-				for (const registered of namespaces) {
-					const { namespace, fields } = registered;
-					if (typeof registered.frontend !== "undefined") {
-						frontend.set(namespace, registered.frontend);
-					}
-					const replicantFields = new Map<string, ReplicantFieldInternal>();
-					for (const [name, field] of Object.entries(fields.replicant)) {
-						replicantFields.set(name, field[fieldInternal]);
-					}
-					replicant.set(namespace, replicantFields);
-					const computedFields = new Map<string, ComputedFieldInternal>();
-					for (const [name, field] of Object.entries(fields.computed)) {
-						computedFields.set(name, field[fieldInternal]);
-					}
-					computed.set(namespace, computedFields);
-					const topicFields = new Map<string, TopicFieldInternal>();
-					for (const [name, field] of Object.entries(fields.topic)) {
-						topicFields.set(name, field[fieldInternal]);
-					}
-					topic.set(namespace, topicFields);
-					const rpcFields = new Map<string, RpcFieldInternal>();
-					for (const [name, field] of Object.entries(fields.rpc)) {
-						rpcFields.set(name, field[fieldInternal]);
-					}
-					rpc.set(namespace, rpcFields);
-					customRoute.set(namespace, registered.customRoute ?? HashSet.empty());
-				}
-				return {
-					replicant,
-					computed,
-					topic,
-					rpc,
-					customRoute,
-					declaredRoles,
-					frontend,
-				};
-			}),
-	},
-) {
-	static readonly layer = (namespaces: ReadonlyArray<RegisteredNamespace>) =>
-		Layer.effect(this, this.make(namespaces));
-}
+export class NamespaceRegistryService extends Context.Service<
+	NamespaceRegistryService,
+	HashMap.HashMap<NamespacePath, RegisteredNamespace>
+>()("NamespaceRegistry") {}

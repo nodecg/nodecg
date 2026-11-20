@@ -1,7 +1,7 @@
 import { testLayer } from "@nodecg-private/test-utils";
 import { defineNamespace } from "@nodecg/core";
 import { Authentication, CreateApiKeyResultSchema } from "@nodecg/internal";
-import { Effect, Layer, Redacted, Schema } from "effect";
+import { Effect, HashMap, Layer, Redacted, Schema } from "effect";
 import { HttpClientResponse } from "effect/http";
 import { describe, expect } from "vitest";
 
@@ -31,18 +31,9 @@ const namespace = implementNamespace(manifest, {
 const namespaces = Layer.effect(
 	NamespaceRegistryService,
 	Effect.gen(function* () {
-		const { fields } = yield* buildNamespace(
-			[namespace.manifest.namespace],
-			namespace,
-			{},
-		);
-		return yield* NamespaceRegistryService.make([
-			{
-				namespace: fields.namespace,
-				path: [fields.namespace],
-				declaredRoles: new Set(),
-				fields,
-			},
+		const { fields } = yield* buildNamespace(["show"], namespace, {});
+		return HashMap.fromIterable([
+			[["show"], { declaredRoles: new Set(), fields }],
 		]);
 	}),
 ).pipe(Layer.provide(services));

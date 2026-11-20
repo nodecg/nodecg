@@ -10,6 +10,7 @@ import {
 import { computeTestHash, RevisionConflict } from "@nodecg/internal/occ";
 import {
 	Effect,
+	Equal,
 	Exit,
 	Fiber,
 	Layer,
@@ -103,7 +104,7 @@ describe("get", () => {
 		"propagates FieldNotFound from the transport",
 		Effect.gen(function* () {
 			transport.getReplicant.mockReturnValue(
-				Effect.fail(new FieldNotFound({ namespace: "root", name: "count" })),
+				Effect.fail(new FieldNotFound({ namespace: ["root"], name: "count" })),
 			);
 			const manifest = defineNamespace("root", {
 				replicant: { count: { schema: Schema.Finite } },
@@ -144,7 +145,7 @@ describe("set", () => {
 
 			yield* namespace.replicant.count.set(7);
 			expect(transport.updateReplicant).toHaveBeenCalledExactlyOnceWith(
-				"root",
+				["root"],
 				"count",
 				[{ op: "replace", path: "", value: "7" }],
 			);
@@ -183,7 +184,7 @@ describe("set", () => {
 				yield* Schema.decodeEffect(Schema.DateFromString)(encodedDate),
 			);
 			expect(transport.updateReplicant).toHaveBeenLastCalledWith(
-				"root",
+				["root"],
 				"when",
 				[{ op: "replace", path: "", value: encodedDate }],
 			);
@@ -204,7 +205,7 @@ describe("update", () => {
 
 			yield* loaded.replicant.count.update((v) => v + 5);
 			expect(transport.updateReplicant).toHaveBeenLastCalledWith(
-				"root",
+				["root"],
 				"count",
 				[
 					{ op: "test-hash", path: "", hash: computeTestHash(10) },
@@ -237,7 +238,7 @@ describe("update", () => {
 				draft.n = 5;
 			});
 			expect(transport.updateReplicant).toHaveBeenLastCalledWith(
-				"root",
+				["root"],
 				"box",
 				[
 					{ op: "test-hash", path: "/n", hash: computeTestHash("1") },
@@ -351,15 +352,15 @@ describe("update", () => {
 describe("subscribe", () => {
 	const subscribeFrame = {
 		_tag: "subscribe",
-		field: { type: "replicant", namespace: "root", name: "count" },
+		field: { type: "replicant", namespace: ["root"], name: "count" },
 	};
 	const unsubscribeFrame = {
 		_tag: "unsubscribe",
-		field: { type: "replicant", namespace: "root", name: "count" },
+		field: { type: "replicant", namespace: ["root"], name: "count" },
 	};
 	const publishFrame = (value: number, revision = 1): ServerMessage =>
 		ReplicantSnapshotMessage.make({
-			field: { type: "replicant", namespace: "root", name: "count" },
+			field: { type: "replicant", namespace: ["root"], name: "count" },
 			value,
 			revision,
 		});
@@ -417,7 +418,7 @@ describe("subscribe", () => {
 			yield* Queue.offer(
 				queue,
 				ReplicantSnapshotMessage.make({
-					field: { type: "replicant", namespace: "root", name: "other" },
+					field: { type: "replicant", namespace: ["root"], name: "other" },
 					value: 99,
 					revision: 1,
 				}),
@@ -576,7 +577,7 @@ describe("subscribe", () => {
 
 	const rejectedFrame = (reason: "forbidden" | "not-found"): ServerMessage =>
 		SubscribeRejectedMessage.make({
-			field: { type: "replicant", namespace: "root", name: "count" },
+			field: { type: "replicant", namespace: ["root"], name: "count" },
 			reason,
 		});
 
@@ -605,7 +606,7 @@ describe("subscribe", () => {
 			expect(first).toEqual(
 				Option.some(
 					Result.fail(
-						new FieldPermissionDenied({ namespace: "root", name: "count" }),
+						new FieldPermissionDenied({ namespace: ["root"], name: "count" }),
 					),
 				),
 			);
@@ -636,7 +637,9 @@ describe("subscribe", () => {
 			const first = yield* Fiber.join(head);
 			expect(first).toEqual(
 				Option.some(
-					Result.fail(new FieldNotFound({ namespace: "root", name: "count" })),
+					Result.fail(
+						new FieldNotFound({ namespace: ["root"], name: "count" }),
+					),
 				),
 			);
 		}),
@@ -678,7 +681,7 @@ describe("subscribe", () => {
 					expect(received).toEqual([
 						Result.succeed(1),
 						Result.fail(
-							new FieldPermissionDenied({ namespace: "root", name: "count" }),
+							new FieldPermissionDenied({ namespace: ["root"], name: "count" }),
 						),
 						Result.succeed(7),
 					]),
@@ -718,7 +721,7 @@ describe("subscribe", () => {
 			yield* Queue.offer(
 				queue,
 				ReplicantSnapshotMessage.make({
-					field: { type: "replicant", namespace: "root", name: "count" },
+					field: { type: "replicant", namespace: ["root"], name: "count" },
 					value: "not a number",
 					revision: 2,
 				}),
@@ -732,7 +735,7 @@ describe("subscribe", () => {
 						Result.fail(
 							expect.objectContaining({
 								_tag: "FieldUnavailable",
-								namespace: "root",
+								namespace: ["root"],
 								name: "count",
 								detail: expect.stringContaining(
 									"published value did not decode",
@@ -845,7 +848,7 @@ describe("computed", () => {
 						_tag: "subscribe",
 						field: {
 							type: "computed",
-							namespace: "root",
+							namespace: ["root"],
 							name: "firstGameId",
 						},
 					});
@@ -855,7 +858,7 @@ describe("computed", () => {
 			yield* PubSub.publish(
 				pubsub,
 				FieldValueMessage.make({
-					field: { type: "computed", namespace: "root", name: "firstGameId" },
+					field: { type: "computed", namespace: ["root"], name: "firstGameId" },
 					value: "z",
 				}),
 			);
@@ -872,15 +875,15 @@ describe("topic", () => {
 	});
 	const subscribeFrame = {
 		_tag: "subscribe",
-		field: { type: "topic", namespace: "root", name: "chat" },
+		field: { type: "topic", namespace: ["root"], name: "chat" },
 	};
 	const unsubscribeFrame = {
 		_tag: "unsubscribe",
-		field: { type: "topic", namespace: "root", name: "chat" },
+		field: { type: "topic", namespace: ["root"], name: "chat" },
 	};
 	const publishFrame = (value: number): ServerMessage =>
 		FieldValueMessage.make({
-			field: { type: "topic", namespace: "root", name: "chat" },
+			field: { type: "topic", namespace: ["root"], name: "chat" },
 			value,
 		});
 
@@ -890,7 +893,7 @@ describe("topic", () => {
 			const loaded = yield* loadNamespaceEffect(topicManifest);
 
 			yield* loaded.topic.chat.publish(7);
-			expect(transport.publishTopic).toHaveBeenCalledWith("root", "chat", 7);
+			expect(transport.publishTopic).toHaveBeenCalledWith(["root"], "chat", 7);
 		}),
 	);
 
@@ -927,7 +930,7 @@ describe("topic", () => {
 			yield* PubSub.publish(
 				pubsub,
 				FieldValueMessage.make({
-					field: { type: "topic", namespace: "root", name: "other" },
+					field: { type: "topic", namespace: ["root"], name: "other" },
 					value: 99,
 				}),
 			);
@@ -1052,7 +1055,7 @@ describe("topic", () => {
 			yield* Queue.offer(
 				queue,
 				SubscribeRejectedMessage.make({
-					field: { type: "topic", namespace: "root", name: "chat" },
+					field: { type: "topic", namespace: ["root"], name: "chat" },
 					reason: "forbidden",
 				}),
 			);
@@ -1063,7 +1066,7 @@ describe("topic", () => {
 					expect(seen).toEqual([
 						Result.succeed(1),
 						Result.fail(
-							new FieldPermissionDenied({ namespace: "root", name: "chat" }),
+							new FieldPermissionDenied({ namespace: ["root"], name: "chat" }),
 						),
 						Result.succeed(2),
 					]),
@@ -1094,7 +1097,7 @@ describe("rpc", () => {
 
 			const result = yield* loaded.rpc.echo.call(42);
 			expect(result).toBe(84);
-			expect(transport.callRpc).toHaveBeenCalledWith("root", "echo", 42);
+			expect(transport.callRpc).toHaveBeenCalledWith(["root"], "echo", 42);
 		}),
 	);
 
@@ -1114,7 +1117,7 @@ describe("rpc", () => {
 		Effect.gen(function* () {
 			transport.callRpc.mockReturnValue(
 				Effect.fail(
-					new FieldPermissionDenied({ namespace: "root", name: "echo" }),
+					new FieldPermissionDenied({ namespace: ["root"], name: "echo" }),
 				),
 			);
 			const loaded = yield* loadNamespaceEffect(rpcManifest);
@@ -1199,7 +1202,7 @@ describe("children", () => {
 		"loads each namespace of the tree under its key",
 		Effect.gen(function* () {
 			transport.getReplicant.mockImplementation((namespace) =>
-				Effect.succeed(namespace === "first" ? "4" : "9"),
+				Effect.succeed(Equal.equals(namespace, ["root", "first"]) ? "4" : "9"),
 			);
 			const middle = defineNamespace("middle", { children: { second } });
 			const root = defineNamespace("root", { children: { first, middle } });
@@ -1255,7 +1258,7 @@ describe("loadNamespace (Promise wrapper)", () => {
 		const child = defineNamespace("child", {
 			replicant: { count: { schema: Schema.Finite } },
 		});
-		const root = defineNamespace("root", { children: { child } });
+		const root = defineNamespace("root", { children: { stage: child } });
 
 		const loaded = await loadNamespace(root, {
 			fieldTransport: () => transportStub,
@@ -1263,8 +1266,11 @@ describe("loadNamespace (Promise wrapper)", () => {
 		});
 		onTestFinished(() => loaded.dispose());
 
-		expect(await loaded.children.child.replicant.count.get()).toBe(42);
-		expect(transportStub.getReplicant).toHaveBeenCalledWith("child", "count");
+		expect(await loaded.children.stage.replicant.count.get()).toBe(42);
+		expect(transportStub.getReplicant).toHaveBeenCalledWith(
+			["root", "stage"],
+			"count",
+		);
 	});
 
 	it("gives a child reached from two parents one handle", async () => {
@@ -1299,7 +1305,7 @@ describe("loadNamespace (Promise wrapper)", () => {
 		expect(await loaded.replicant.count.get()).toBe(42);
 		await loaded.replicant.count.set(9);
 		expect(transportStub.updateReplicant).toHaveBeenCalledWith(
-			"root",
+			["root"],
 			"count",
 			[{ op: "replace", path: "", value: 9 }],
 		);
@@ -1322,9 +1328,13 @@ describe("loadNamespace (Promise wrapper)", () => {
 		});
 
 		await loaded.topic.chat.publish(3);
-		expect(transportStub.publishTopic).toHaveBeenCalledWith("root", "chat", 3);
+		expect(transportStub.publishTopic).toHaveBeenCalledWith(
+			["root"],
+			"chat",
+			3,
+		);
 		expect(await loaded.rpc.echo.call(42)).toBe(84);
-		expect(transportStub.callRpc).toHaveBeenCalledWith("root", "echo", 42);
+		expect(transportStub.callRpc).toHaveBeenCalledWith(["root"], "echo", 42);
 	});
 
 	it("calls onError when the subscribe is rejected after the first value", async () => {
@@ -1339,7 +1349,7 @@ describe("loadNamespace (Promise wrapper)", () => {
 		});
 		const field = {
 			type: "replicant",
-			namespace: "root",
+			namespace: ["root"],
 			name: "count",
 		} as const;
 
@@ -1366,7 +1376,7 @@ describe("loadNamespace (Promise wrapper)", () => {
 		);
 		await vi.waitFor(() =>
 			expect(onError).toHaveBeenCalledWith(
-				new FieldPermissionDenied({ namespace: "root", name: "count" }),
+				new FieldPermissionDenied({ namespace: ["root"], name: "count" }),
 			),
 		);
 		expect(received).toEqual([1]);
@@ -1383,7 +1393,7 @@ describe("loadNamespace (Promise wrapper)", () => {
 		});
 		const field = {
 			type: "replicant",
-			namespace: "root",
+			namespace: ["root"],
 			name: "count",
 		} as const;
 		const loaded = await loadNamespace(manifest, {
@@ -1413,7 +1423,7 @@ describe("loadNamespace (Promise wrapper)", () => {
 		await vi.waitFor(() => expect(received).toEqual([1]));
 		expect(onError).toHaveBeenCalledWith(
 			new FieldUnavailable({
-				namespace: "root",
+				namespace: ["root"],
 				name: "count",
 				detail: "compute failed",
 			}),
@@ -1449,7 +1459,7 @@ describe("loadNamespace (Promise wrapper)", () => {
 		});
 		const field = {
 			type: "replicant",
-			namespace: "root",
+			namespace: ["root"],
 			name: "count",
 		} as const;
 		const loaded = await loadNamespace(manifest, {
@@ -1495,7 +1505,7 @@ describe("loadNamespace (Promise wrapper)", () => {
 		});
 		const field = {
 			type: "computed",
-			namespace: "root",
+			namespace: ["root"],
 			name: "doubled",
 		} as const;
 		const loaded = await loadNamespace(manifest, {
@@ -1532,7 +1542,7 @@ describe("derivation over loaded fields", () => {
 
 	const publish = (name: string, value: number, revision = 1): ServerMessage =>
 		ReplicantSnapshotMessage.make({
-			field: { type: "replicant", namespace: "match", name },
+			field: { type: "replicant", namespace: ["match"], name },
 			value: String(value),
 			revision,
 		});
@@ -1683,7 +1693,7 @@ describe("derivation over loaded fields", () => {
 			yield* loaded.replicant.scoreLeft.update((v) => v + 1);
 
 			expect(transport.updateReplicant).toHaveBeenLastCalledWith(
-				"match",
+				["match"],
 				"scoreLeft",
 				[
 					{ op: "test-hash", path: "", hash: computeTestHash("10") },

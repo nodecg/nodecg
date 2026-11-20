@@ -3,7 +3,7 @@ import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem";
 import * as NodePath from "@effect/platform-node/NodePath";
 import { it } from "@effect/vitest";
 import { FieldDecodeError } from "@nodecg/core";
-import { RoleName } from "@nodecg/internal";
+import { type NamespacePath, RoleName } from "@nodecg/internal";
 import { ConfigProvider, Effect, HashMap, Layer, Stream } from "effect";
 import {
 	FetchHttpClient,
@@ -87,17 +87,15 @@ function registeredNamespace(
 	topic: BuiltNamespace["topic"] = {},
 	rpc: BuiltNamespace["rpc"] = {},
 	declaredRoles: ReadonlySet<RoleName> = new Set(),
-): RegisteredNamespace {
-	return {
-		namespace,
-		path: [namespace],
-		declaredRoles,
-		fields: { replicant, computed, topic, rpc },
-	};
+): readonly [NamespacePath, RegisteredNamespace] {
+	return [
+		[namespace],
+		{ declaredRoles, fields: { replicant, computed, topic, rpc } },
+	];
 }
 
 const webHandler = Effect.fn(function* (
-	namespaces: ReadonlyArray<RegisteredNamespace>,
+	namespaces: ReadonlyArray<readonly [NamespacePath, RegisteredNamespace]>,
 	middleware: typeof UserAuthenticationMiddlewareLive = UserAuthenticationMiddlewareLive,
 	environment: Layer.Layer<never> = ConfigProvider.layer(
 		ConfigProvider.fromEnvRecord({}),
@@ -132,7 +130,10 @@ const webHandler = Effect.fn(function* (
 		RootApiLive.pipe(
 			HttpRouter.provideRequest(
 				Layer.mergeAll(
-					NamespaceRegistryService.layer(namespaces),
+					Layer.succeed(
+						NamespaceRegistryService,
+						HashMap.fromIterable(namespaces),
+					),
 					InMemoryTopicBroker,
 					UrlPath.layer,
 					FetchHttpClient.layer,

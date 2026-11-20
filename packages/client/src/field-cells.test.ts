@@ -56,7 +56,7 @@ const snapshot = (
 	revision = 1,
 ): ServerMessage =>
 	ReplicantSnapshotMessage.make({
-		field: { type: "replicant", namespace: "match", name },
+		field: { type: "replicant", namespace: ["match"], name },
 		value: String(value),
 		revision,
 	});
@@ -69,7 +69,7 @@ const delta = (
 	hash: number,
 ): ServerMessage =>
 	ReplicantDeltaMessage.make({
-		field: { type: "replicant", namespace: "match", name },
+		field: { type: "replicant", namespace: ["match"], name },
 		ops: [{ op: "replace", path: "", value }],
 		baseRevision,
 		revision,
@@ -78,7 +78,7 @@ const delta = (
 
 const resync = {
 	_tag: "resync",
-	field: { type: "replicant", namespace: "match", name: "scoreLeft" },
+	field: { type: "replicant", namespace: ["match"], name: "scoreLeft" },
 };
 
 const waitFor = (assertion: () => void) =>
@@ -116,7 +116,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells.pipe(Effect.withSpan("load"));
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -137,7 +137,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -163,7 +163,7 @@ describe("FieldCellsService", () => {
 		Effect.gen(function* () {
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -203,7 +203,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -218,7 +218,7 @@ describe("FieldCellsService", () => {
 			yield* PubSub.publish(
 				pubsub,
 				SubscribeRejectedMessage.make({
-					field: { type: "replicant", namespace: "match", name: "scoreLeft" },
+					field: { type: "replicant", namespace: ["match"], name: "scoreLeft" },
 					reason: "forbidden",
 				}),
 			);
@@ -228,7 +228,7 @@ describe("FieldCellsService", () => {
 					Pending,
 					Loadable.Failure({
 						error: new FieldPermissionDenied({
-							namespace: "match",
+							namespace: ["match"],
 							name: "scoreLeft",
 						}),
 					}),
@@ -246,7 +246,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -261,7 +261,7 @@ describe("FieldCellsService", () => {
 			yield* PubSub.publish(
 				pubsub,
 				SubscribeRejectedMessage.make({
-					field: { type: "replicant", namespace: "match", name: "scoreLeft" },
+					field: { type: "replicant", namespace: ["match"], name: "scoreLeft" },
 					reason: "not-found",
 				}),
 			);
@@ -271,7 +271,7 @@ describe("FieldCellsService", () => {
 					Pending,
 					Loadable.Failure({
 						error: new FieldNotFound({
-							namespace: "match",
+							namespace: ["match"],
 							name: "scoreLeft",
 						}),
 					}),
@@ -288,7 +288,7 @@ describe("FieldCellsService", () => {
 				PubSub.subscribe(pubsub).pipe(Effect.map(Stream.fromSubscription)),
 			);
 			const cells = yield* makeCells;
-			const cell = cells.computed("match", "total", namespace.computed.total);
+			const cell = cells.computed(["match"], "total", namespace.computed.total);
 
 			const { seen } = observe(cell.signal);
 
@@ -301,7 +301,7 @@ describe("FieldCellsService", () => {
 			yield* PubSub.publish(
 				pubsub,
 				SubscribeRejectedMessage.make({
-					field: { type: "computed", namespace: "match", name: "total" },
+					field: { type: "computed", namespace: ["match"], name: "total" },
 					reason: "unavailable",
 					message: "compute boom",
 				}),
@@ -312,7 +312,7 @@ describe("FieldCellsService", () => {
 					Pending,
 					Loadable.Failure({
 						error: new FieldUnavailable({
-							namespace: "match",
+							namespace: ["match"],
 							name: "total",
 							detail: "compute boom",
 						}),
@@ -331,7 +331,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -345,7 +345,7 @@ describe("FieldCellsService", () => {
 			yield* PubSub.publish(
 				pubsub,
 				SubscribeRejectedMessage.make({
-					field: { type: "replicant", namespace: "match", name: "scoreLeft" },
+					field: { type: "replicant", namespace: ["match"], name: "scoreLeft" },
 					reason: "forbidden",
 				}),
 			);
@@ -354,7 +354,7 @@ describe("FieldCellsService", () => {
 					Pending,
 					Loadable.Failure({
 						error: new FieldPermissionDenied({
-							namespace: "match",
+							namespace: ["match"],
 							name: "scoreLeft",
 						}),
 					}),
@@ -380,7 +380,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -402,7 +402,7 @@ describe("FieldCellsService", () => {
 					Loadable.Failure({
 						error: expect.objectContaining({
 							_tag: "FieldUnavailable",
-							namespace: "match",
+							namespace: ["match"],
 							name: "scoreLeft",
 							detail:
 								"published value did not decode: Expected a finite number",
@@ -423,12 +423,12 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const left = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
 			const right = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreRight",
 				namespace.replicant.scoreRight,
 			);
@@ -461,7 +461,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -502,7 +502,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -535,7 +535,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -582,7 +582,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -621,7 +621,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -658,7 +658,7 @@ describe("FieldCellsService", () => {
 					Loadable.Failure({
 						error: expect.objectContaining({
 							_tag: "FieldUnavailable",
-							namespace: "match",
+							namespace: ["match"],
 							name: "scoreLeft",
 							detail: expect.stringContaining("published value did not decode"),
 						}),
@@ -678,7 +678,7 @@ describe("FieldCellsService", () => {
 			);
 			const cells = yield* makeCells;
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -720,10 +720,10 @@ describe("FieldCellsService", () => {
 
 describe("connection status", () => {
 	const subscribeLeft = SubscribeMessage.make({
-		field: { type: "replicant", namespace: "match", name: "scoreLeft" },
+		field: { type: "replicant", namespace: ["match"], name: "scoreLeft" },
 	});
 	const subscribeRight = SubscribeMessage.make({
-		field: { type: "replicant", namespace: "match", name: "scoreRight" },
+		field: { type: "replicant", namespace: ["match"], name: "scoreRight" },
 	});
 
 	test(
@@ -738,7 +738,7 @@ describe("connection status", () => {
 				}),
 			);
 			const left = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -749,7 +749,7 @@ describe("connection status", () => {
 				expect(channel.send.mock.calls).toEqual([[subscribeLeft]]);
 			});
 			const right = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreRight",
 				namespace.replicant.scoreRight,
 			);
@@ -774,7 +774,7 @@ describe("connection status", () => {
 				}),
 			);
 			const cell = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
@@ -806,12 +806,12 @@ describe("connection status", () => {
 				}),
 			);
 			const left = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreLeft",
 				namespace.replicant.scoreLeft,
 			);
 			const right = yield* cells.replicant(
-				"match",
+				["match"],
 				"scoreRight",
 				namespace.replicant.scoreRight,
 			);

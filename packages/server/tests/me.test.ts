@@ -1,6 +1,6 @@
 import { testLayer } from "@nodecg-private/test-utils";
 import { Authentication, Role, RoleName } from "@nodecg/internal";
-import { Effect, HashSet, Layer } from "effect";
+import { Effect, HashMap, HashSet, Layer } from "effect";
 import { describe, expect } from "vitest";
 
 import { NamespaceRegistryService } from "../src/namespace-registry.ts";
@@ -12,20 +12,25 @@ const producer = Role.make({
 	name: RoleName.make("producer"),
 });
 
-const namespaces = NamespaceRegistryService.layer([
-	{
-		namespace: "show",
-		path: ["show"],
-		declaredRoles: new Set([producer.name, RoleName.make("viewer")]),
-		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-	},
-	{
-		namespace: "other",
-		path: ["other"],
-		declaredRoles: new Set([producer.name]),
-		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-	},
-]);
+const namespaces = Layer.succeed(
+	NamespaceRegistryService,
+	HashMap.fromIterable([
+		[
+			["show"],
+			{
+				declaredRoles: new Set([producer.name, RoleName.make("viewer")]),
+				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
+			},
+		],
+		[
+			["other"],
+			{
+				declaredRoles: new Set([producer.name]),
+				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
+			},
+		],
+	]),
+);
 
 const test = testLayer(Layer.merge(services, namespaces));
 

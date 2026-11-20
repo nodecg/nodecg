@@ -49,7 +49,7 @@ const handler = () => {
 		Layer.mergeAll(RootApiLive, websocketRoute).pipe(
 			HttpRouter.provideRequest(
 				Layer.mergeAll(
-					NamespaceRegistryService.layer([]),
+					Layer.succeed(NamespaceRegistryService, HashMap.empty()),
 					InMemoryTopicBroker,
 					UrlPath.layer,
 					FetchHttpClient.layer,
@@ -63,7 +63,7 @@ const handler = () => {
 			Layer.provide(AdminTierMiddlewareLive),
 			Layer.provide(SuperadminMiddlewareLive),
 			Layer.provide(repositories),
-			Layer.provide(NamespaceRegistryService.layer([])),
+			Layer.provide(Layer.succeed(NamespaceRegistryService, HashMap.empty())),
 			Layer.provide(InMemoryReplicantRepository),
 			Layer.provide(InMemoryTopicBroker),
 			Layer.provide(

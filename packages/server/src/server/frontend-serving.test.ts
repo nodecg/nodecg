@@ -1,6 +1,6 @@
 import * as NodeHttpServer from "@effect/platform-node/NodeHttpServer";
 import { testLayer } from "@nodecg-private/test-utils";
-import { Effect, FileSystem, Layer, Path } from "effect";
+import { Effect, FileSystem, HashMap, Layer, Path } from "effect";
 import {
 	FetchHttpClient,
 	HttpClient,
@@ -44,15 +44,19 @@ const fixtures = Effect.gen(function* () {
 const serve = Effect.fn(function* (frontend: FrontendConfig) {
 	const handler = yield* HttpRouter.toHttpEffect(frontendRoutes).pipe(
 		Effect.provide(
-			NamespaceRegistryService.layer([
-				{
-					namespace: "ns",
-					path: ["ns"],
-					declaredRoles: new Set(),
-					frontend,
-					fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-				},
-			]),
+			Layer.succeed(
+				NamespaceRegistryService,
+				HashMap.fromIterable([
+					[
+						["ns"],
+						{
+							declaredRoles: new Set(),
+							frontend,
+							fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
+						},
+					],
+				]),
+			),
 		),
 	);
 	const web = HttpEffect.toWebHandler(handler);

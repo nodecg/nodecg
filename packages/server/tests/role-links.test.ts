@@ -6,7 +6,7 @@ import {
 	Role,
 	RoleName,
 } from "@nodecg/internal";
-import { Effect, HashSet, Layer } from "effect";
+import { Effect, HashMap, HashSet, Layer } from "effect";
 import { describe, expect } from "vitest";
 
 import {
@@ -41,13 +41,17 @@ const tree = [
 	{ manifest: assets, path: ["show", "assets"] },
 ] as const;
 
-const namespaces = NamespaceRegistryService.layer(
-	tree.map(({ manifest, path }) => ({
-		namespace: manifest.namespace,
-		path,
-		declaredRoles: new Set(manifest[manifestRolesKey].roles.keys()),
-		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-	})),
+const namespaces = Layer.succeed(
+	NamespaceRegistryService,
+	HashMap.fromIterable(
+		tree.map(({ manifest, path }) => [
+			path,
+			{
+				declaredRoles: new Set(manifest[manifestRolesKey].roles.keys()),
+				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
+			},
+		]),
+	),
 );
 
 const links = Layer.succeed(

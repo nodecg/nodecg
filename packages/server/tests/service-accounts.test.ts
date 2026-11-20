@@ -1,6 +1,6 @@
 import { testLayer } from "@nodecg-private/test-utils";
 import { Authentication, RoleName } from "@nodecg/internal";
-import { Effect, Layer } from "effect";
+import { Effect, HashMap, Layer } from "effect";
 import { SecureRandom } from "effect/crypto";
 import { HttpBody } from "effect/http";
 import { describe, expect } from "vitest";
@@ -13,14 +13,21 @@ import {
 	services,
 } from "./setup.ts";
 
-const namespaces = NamespaceRegistryService.layer([
-	{
-		namespace: "show",
-		path: ["show"],
-		declaredRoles: new Set([RoleName.make("viewer"), RoleName.make("judge")]),
-		fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
-	},
-]);
+const namespaces = Layer.succeed(
+	NamespaceRegistryService,
+	HashMap.fromIterable([
+		[
+			["show"],
+			{
+				declaredRoles: new Set([
+					RoleName.make("viewer"),
+					RoleName.make("judge"),
+				]),
+				fields: { replicant: {}, computed: {}, topic: {}, rpc: {} },
+			},
+		],
+	]),
+);
 
 const test = testLayer(Layer.merge(services, namespaces));
 
