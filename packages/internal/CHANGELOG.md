@@ -1,5 +1,11 @@
 # @nodecg/internal
 
+## 0.0.7-alpha.2
+
+### Patch Changes
+
+- Internal updates
+
 ## 0.0.7-alpha.1
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @nodecg/server
 
+## 3.0.0-alpha.2
+
+### Patch Changes
+
+- resolve namespaces by child keys at load ([b468a80](https://github.com/nodecg/nodecg/commit/b468a8099690c8b2e72a39001385383fbdadc970))
+- Group roles by namespace path ([446fdd8](https://github.com/nodecg/nodecg/commit/446fdd8787eb401110fa4cd3b1669d226fcf9d20))
+- serve endpoints by namespace path ([270b7cd](https://github.com/nodecg/nodecg/commit/270b7cd3c791222920712cf90930b4320a53eb85))
+
 ## 3.0.0-alpha.1
 
 ### Patch Changes

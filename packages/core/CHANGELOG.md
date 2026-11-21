@@ -1,5 +1,11 @@
 # @nodecg/core
 
+## 3.0.0-alpha.2
+
+### Patch Changes
+
+- Group roles by namespace path ([446fdd8](https://github.com/nodecg/nodecg/commit/446fdd8787eb401110fa4cd3b1669d226fcf9d20))
+
 ## 3.0.0-alpha.1
 
 ### Patch Changes
