@@ -2,6 +2,7 @@ import { it } from "@effect/vitest";
 import { testLayer } from "@nodecg-private/test-utils";
 import { defineNamespace } from "@nodecg/core";
 import {
+	fieldSignalKey,
 	FieldValueMessage,
 	ReplicantSnapshotMessage,
 	type ServerMessage,
@@ -33,7 +34,7 @@ import {
 	vi,
 } from "vitest";
 
-import { derive, fieldSource } from "./derive.ts";
+import { derive } from "./derive.ts";
 import type { FieldFailure } from "./field-cells.ts";
 import { loadNamespace, loadNamespaceEffect } from "./load-namespace.ts";
 import { Cold, Pending } from "./loadable.ts";
@@ -1431,11 +1432,11 @@ describe("loadNamespace (Promise wrapper)", () => {
 		});
 
 		loaded.replicant.count.subscribe(() => {});
-		expect(loaded.replicant.count[fieldSource].value).toEqual(Pending);
+		expect(loaded.replicant.count[fieldSignalKey].value).toEqual(Pending);
 		loaded.dispose();
 
 		await vi.waitFor(() =>
-			expect(loaded.replicant.count[fieldSource].value).toEqual(Cold),
+			expect(loaded.replicant.count[fieldSignalKey].value).toEqual(Cold),
 		);
 	});
 

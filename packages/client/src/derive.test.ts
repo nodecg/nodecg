@@ -1,7 +1,8 @@
+import { fieldSignalKey } from "@nodecg/internal";
 import { batch, signal } from "@preact/signals-core";
 import { describe, expect, it, onTestFinished, vi } from "vitest";
 
-import { derive, type FieldSource, fieldSource } from "./derive.ts";
+import { derive, type FieldSource } from "./derive.ts";
 import {
 	Cold,
 	Loadable,
@@ -15,7 +16,7 @@ const ready = <T>(decoded: T) =>
 
 const source = <T>(initial: Loadable<ReadyLoadableValueType<T>>) => {
 	const s = signal(initial);
-	const handle: FieldSource<T> = { [fieldSource]: s };
+	const handle: FieldSource<T> = { [fieldSignalKey]: s };
 	return { s, handle };
 };
 
