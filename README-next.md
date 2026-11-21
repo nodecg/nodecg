@@ -365,19 +365,20 @@ For datasets too large to keep in memory. Unlike Replicant, which is mirrored in
 
 ### Authorization
 
-- ✅ Per-field permission enforcement at every transport from the baked role/principal rules
-- ✅ Role reporting: `me()` returns the caller's held roles per namespace. Per-field access is evaluated client-side from the shared manifest's baked rules
+- ✅ Per-field permission enforcement at every transport from each field's declared role/principal rules
+- ✅ Role reporting: `me()` returns the caller's held roles per namespace path
+- 🚧 Per-field access evaluated client-side from the shared manifest
 - ✅ Role assignment: admins grant and revoke roles, and export or import every assignment as one document
 
 ### ✅ Frontend serving
 
-- Each namespace serves its own frontend files from the same origin under `/frontend/namespaces/{ns}/`
+- Each namespace serves its own frontend files from the same origin under `/frontend/namespaces/{path}/` with key path written with dots
   - built static directory in production
   - optionally Vite dev server (HMR) for development
 
 ### ✅ Custom routes
 
-- A namespace can declare custom HTTP routes, served under `/namespaces/{namespace}/custom/{name}/`
+- A namespace can declare custom HTTP routes, served under `/namespaces/{path}/custom/{name}/`
   ```ts
   const scoreboard = defineNamespace("scoreboard", {
     customRoute: {
