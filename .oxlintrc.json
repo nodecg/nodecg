@@ -1,6 +1,6 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
-	"plugins": ["typescript", "unicorn", "oxc"],
+	"plugins": ["typescript", "unicorn", "oxc", "react"],
 	"categories": {
 		"correctness": "error",
 		"nursery": "error"
@@ -33,6 +33,14 @@
 			}
 		]
 	},
+	"overrides": [
+		{
+			"files": ["packages/react/**"],
+			"rules": {
+				"react/rules-of-hooks": "error"
+			}
+		}
+	],
 	"env": {
 		"builtin": true
 	},

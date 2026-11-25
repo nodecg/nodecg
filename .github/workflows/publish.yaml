@@ -34,4 +34,4 @@ jobs:
           pnpm publish -r --tag "$tag" --provenance --report-summary --publish-branch "$GITHUB_REF_NAME"
       - env:
           GH_TOKEN: ${{ github.token }}
-        run: bash scripts/create-release.bash
+        run: node scripts/create-release.ts

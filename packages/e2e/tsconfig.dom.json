@@ -1,7 +1,8 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"lib": ["ESNext", "DOM"]
+		"lib": ["ESNext", "DOM"],
+		"jsx": "react-jsx"
 	},
-	"include": ["./src/client", "./tests/**/*.test.ts"]
+	"include": ["./src/client", "./tests/**/*.test.ts", "./tests/**/*.test.tsx"]
 }

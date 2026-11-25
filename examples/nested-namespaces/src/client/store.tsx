@@ -1,18 +1,5 @@
-import type { ComputedField, ReplicantField } from "@nodecg/client";
-import { type ReactNode, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import ReactDOM from "react-dom/client";
-
-export function useReplicant<T>(field: ReplicantField<T> | ComputedField<T>) {
-	const [value, setValue] = useState<T>();
-	useEffect(
-		() =>
-			field.subscribe((next) => {
-				setValue(() => next);
-			}),
-		[field],
-	);
-	return value;
-}
 
 export const render = (node: ReactNode) => {
 	const rootElement = document.getElementById("app");

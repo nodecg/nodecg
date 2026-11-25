@@ -134,7 +134,12 @@
 				},
 				"overrides": [
 					{
-						"include": ["**/*.test.ts", "**/packages/e2e/**/*.ts"],
+						"include": [
+							"**/*.test.ts",
+							"**/*.test.tsx",
+							"**/packages/e2e/**/*.ts",
+							"**/packages/e2e/**/*.tsx"
+						],
 						"options": {
 							"diagnosticSeverity": {
 								"globalFetch": "off",

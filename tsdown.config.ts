@@ -6,6 +6,7 @@ export default defineConfig({
 		"packages/core",
 		"packages/client",
 		"packages/browser",
+		"packages/react",
 		"packages/server",
 	],
 	platform: "neutral",

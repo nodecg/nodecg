@@ -9,6 +9,7 @@ const BROWSER_TESTS = [
 	"packages/core",
 	"packages/client",
 	"packages/browser",
+	"packages/react",
 ];
 
 export default defineConfig({
@@ -33,7 +34,7 @@ export default defineConfig({
 						groupOrder: 1,
 					},
 					include: BROWSER_TESTS.map(
-						(projectPath) => `${projectPath}/**/*.test.ts`,
+						(projectPath) => `${projectPath}/**/*.test.{ts,tsx}`,
 					),
 					browser: {
 						enabled: true,

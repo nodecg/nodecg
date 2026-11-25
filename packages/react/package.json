@@ -1,0 +1,39 @@
+{
+	"name": "@nodecg/react",
+	"version": "0.0.0",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nodecg/nodecg.git",
+		"directory": "packages/react"
+	},
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"exports": {
+		".": "./src/_export.ts"
+	},
+	"publishConfig": {
+		"exports": {
+			".": "./dist/_export.js"
+		}
+	},
+	"dependencies": {
+		"effect": "catalog:"
+	},
+	"devDependencies": {
+		"@nodecg/client": "workspace:*",
+		"@nodecg/internal": "workspace:*",
+		"@preact/signals-core": "catalog:",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"react": "catalog:",
+		"react-dom": "catalog:",
+		"vitest": "catalog:"
+	},
+	"peerDependencies": {
+		"@nodecg/client": "^3.0.0-alpha.0",
+		"react": "^19.0.0"
+	}
+}

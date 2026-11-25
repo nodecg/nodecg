@@ -1,8 +1,9 @@
 import { derive } from "@nodecg/client";
+import { useField } from "@nodecg/react";
 import { StrictMode, Suspense, useState } from "react";
 
 import { Login } from "./login.tsx";
-import { counter, mount, root, useField, useTopic } from "./store.tsx";
+import { counter, mount, root, useTopic } from "./store.tsx";
 
 const nextCount = derive(
 	(get) => get(counter.replicant.count) + get(root.replicant.step),

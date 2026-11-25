@@ -11,6 +11,7 @@
 		"@nodecg/browser": "workspace:*",
 		"@nodecg/client": "workspace:*",
 		"@nodecg/core": "workspace:*",
+		"@nodecg/react": "workspace:*",
 		"@nodecg/server": "workspace:*",
 		"effect": "catalog:",
 		"react": "catalog:",

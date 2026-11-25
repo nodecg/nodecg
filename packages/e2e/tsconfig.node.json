@@ -3,5 +3,11 @@
 	"compilerOptions": {
 		"types": ["node"]
 	},
-	"exclude": ["./node_modules", "./src/client", "./tests/**/*.test.ts"]
+	"include": [
+		"./vitest-projects.ts",
+		"./tests/*/config.ts",
+		"./tests/*/server.ts",
+		"./src/server",
+		"./src/shared"
+	]
 }

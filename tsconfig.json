@@ -6,6 +6,7 @@
 		{ "path": "./packages/core" },
 		{ "path": "./packages/e2e" },
 		{ "path": "./packages/internal" },
+		{ "path": "./packages/react" },
 		{ "path": "./packages/server" },
 		{ "path": "./packages/test-utils" },
 		{ "path": "./examples" }

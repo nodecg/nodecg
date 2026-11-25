@@ -1,6 +1,7 @@
+import { useField } from "@nodecg/react";
 import { StrictMode, Suspense } from "react";
 
-import { counter, mount, root, useField, useTopic } from "./store.tsx";
+import { counter, mount, root, useTopic } from "./store.tsx";
 
 function Graphics() {
 	const count = useField(counter.replicant.count);

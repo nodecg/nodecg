@@ -37,7 +37,7 @@ export const projects = await Promise.all(
 			test: {
 				name: `e2e-${browser}`,
 				sequence: { groupOrder: index + 2 }, // 0 and 1 are unit tests
-				include: ["tests/**/*.test.ts"],
+				include: ["tests/**/*.test.{ts,tsx}"],
 				env: { E2E_BACKENDS: JSON.stringify(backends) },
 				api: { port: vitePort, strictPort: true },
 				browser: {
