@@ -24,13 +24,12 @@
 	},
 	"devDependencies": {
 		"@nodecg/client": "workspace:*",
-		"@nodecg/internal": "workspace:*",
-		"@preact/signals-core": "catalog:",
 		"@types/react": "catalog:",
 		"@types/react-dom": "catalog:",
 		"react": "catalog:",
 		"react-dom": "catalog:",
-		"vitest": "catalog:"
+		"vitest": "catalog:",
+		"vitest-mock-extended": "^6.0.1"
 	},
 	"peerDependencies": {
 		"@nodecg/client": "^3.0.0-alpha.0",

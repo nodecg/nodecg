@@ -1,5 +1,4 @@
-import { fieldSignalKey } from "@nodecg/internal";
-import { computed, effect, type ReadonlySignal } from "@preact/signals-core";
+import { computed, effect } from "@preact/signals-core";
 import { Equal } from "effect";
 
 import {
@@ -16,8 +15,10 @@ const SUSPENDED: unique symbol = Symbol("client/suspended");
 
 const isSuspended = (e: unknown): e is typeof SUSPENDED => e === SUSPENDED;
 
+export const fieldSource: unique symbol = Symbol("client/field-source");
+
 export interface FieldSource<T> {
-	readonly [fieldSignalKey]: ReadonlySignal<Loadable<ReadyLoadableValue<T>>>;
+	readonly [fieldSource]: { readonly value: Loadable<ReadyLoadableValue<T>> };
 }
 
 export interface DerivedHandle<T> extends FieldSource<T> {
@@ -29,7 +30,7 @@ export interface DerivedHandle<T> extends FieldSource<T> {
 }
 
 const getAccessor = <T>(source: FieldSource<T>): T => {
-	const loadable = source[fieldSignalKey].value;
+	const loadable = source[fieldSource].value;
 	switch (loadable._tag) {
 		case "Ready":
 			return loadable.value.decoded;
@@ -121,5 +122,5 @@ export const derive = <T>(
 		});
 	};
 
-	return { get, subscribe, [fieldSignalKey]: derived };
+	return { get, subscribe, [fieldSource]: derived };
 };

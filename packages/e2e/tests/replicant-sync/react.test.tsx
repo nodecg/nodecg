@@ -1,4 +1,4 @@
-import { FieldPermissionDenied, loadNamespace } from "@nodecg/client";
+import { derive, FieldPermissionDenied, loadNamespace } from "@nodecg/client";
 import { useField } from "@nodecg/react";
 import { type ReactNode, Suspense } from "react";
 import { createRoot, type RootOptions } from "react-dom/client";
@@ -51,6 +51,34 @@ test("renders a computed", async () => {
 	await vi.waitFor(async () =>
 		expect(container.textContent).toBe(await summary.get()),
 	);
+});
+
+test("keeps the value while a derive starts reading a cold field", async () => {
+	const root = await loadNamespace(replicantSyncManifest, { baseUrl: base });
+	onTestFinished(root.dispose);
+	const { mirrorSource, mirror } = root.children.fixture.replicant;
+	await mirrorSource.set(0);
+	const status = derive((get) =>
+		get(mirrorSource) === 0 ? "off" : `mirror ${get(mirror)}`,
+	);
+	const onFallback = vi.fn();
+	const Fallback = () => {
+		onFallback();
+		return <p>loading</p>;
+	};
+	const Value = () => <p>{useField(status)}</p>;
+
+	const container = render(
+		<Suspense fallback={<Fallback />}>
+			<Value />
+		</Suspense>,
+	);
+	await vi.waitFor(() => expect(container.textContent).toBe("off"));
+
+	onFallback.mockClear();
+	await mirrorSource.set(1);
+	await vi.waitFor(() => expect(container.textContent).toBe("mirror 0"));
+	expect(onFallback).not.toHaveBeenCalled();
 });
 
 test("throws a denied read to the error boundary", async () => {

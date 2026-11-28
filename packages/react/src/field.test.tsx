@@ -1,54 +1,40 @@
-import {
-	derive,
-	type DerivedHandle,
-	FieldPermissionDenied,
-	type FieldSource,
-} from "@nodecg/client";
-import { fieldSignalKey } from "@nodecg/internal";
-import { signal } from "@preact/signals-core";
-import { Data } from "effect";
+import { FieldPermissionDenied, type ReplicantField } from "@nodecg/client";
 import { type ReactNode, startTransition, Suspense } from "react";
 import { createRoot, type RootOptions } from "react-dom/client";
 import { expect, onTestFinished, test, vi } from "vitest";
+import { mock } from "vitest-mock-extended";
 
 import { useField } from "./field.ts";
 
-type CellLoadable = ReturnType<
-	FieldSource<number>[typeof fieldSignalKey]["peek"]
->;
-type ReadyValue = Extract<CellLoadable, { _tag: "Ready" }>["value"];
-
-const Loadable = Data.taggedEnum<CellLoadable>();
-const ReadyValue = Data.taggedEnum<ReadyValue>();
+const error = FieldPermissionDenied.make({
+	namespace: ["root"],
+	name: "count",
+});
 
 const fieldStub = () => {
-	let watching = false;
-	let latest: CellLoadable = Loadable.Pending();
-	const cell = signal<CellLoadable>(Loadable.Cold(), {
-		watched: () => {
-			watching = true;
-			cell.value = latest;
-		},
-		unwatched: () => {
-			watching = false;
-			cell.value = Loadable.Cold();
-		},
+	const field = mock<ReplicantField<number>>();
+	const { promise, resolve } = Promise.withResolvers<number>();
+	field.get.mockReturnValue(promise);
+	const subscribers = new Set<(value: number) => void>();
+	field.subscribe.mockImplementation((onValue, onError) => {
+		const deliver = (value: number) => void onValue(value, undefined);
+		subscribers.add(deliver);
+		void field.get().then(deliver, onError);
+		return () => {
+			subscribers.delete(deliver);
+		};
 	});
-	const push = (loadable: CellLoadable) => {
-		latest = loadable;
-		if (watching) {
-			cell.value = loadable;
+	const push = (value: number) => {
+		resolve(value);
+		field.get.mockResolvedValue(value);
+		for (const deliver of subscribers) {
+			deliver(value);
 		}
 	};
-	const isWatched = () => watching;
-	const field = derive((get) => get({ [fieldSignalKey]: cell }));
-	return { push, isWatched, field };
+	return { field, push };
 };
 
-const ready = (decoded: number) =>
-	Loadable.Ready({ value: ReadyValue.Derived({ decoded }) });
-
-const Count = ({ field }: { field: DerivedHandle<number> }) => (
+const Count = ({ field }: { field: ReplicantField<number> }) => (
 	<p>{useField(field)}</p>
 );
 
@@ -73,31 +59,28 @@ test("suspends until the first value", async () => {
 
 	const { container } = render(<Count field={field} />);
 	await vi.waitFor(() => expect(container.textContent).toBe("loading"));
+	expect(field.subscribe).not.toHaveBeenCalled();
 
-	push(ready(1));
+	push(1);
 	await vi.waitFor(() => expect(container.textContent).toBe("1"));
 });
 
 test("renders a new value", async () => {
 	const { push, field } = fieldStub();
 	const { container } = render(<Count field={field} />);
-	push(ready(1));
+	push(1);
 	await vi.waitFor(() => expect(container.textContent).toBe("1"));
 
-	push(ready(2));
+	push(2);
 	await vi.waitFor(() => expect(container.textContent).toBe("2"));
 });
 
 test("throws a failure to the error boundary", async () => {
-	const { push, field } = fieldStub();
+	const { field } = fieldStub();
+	field.get.mockRejectedValue(error);
 	const onUncaughtError = vi.fn();
-	render(<Count field={field} />, { onUncaughtError });
-	const error = FieldPermissionDenied.make({
-		namespace: ["root"],
-		name: "count",
-	});
 
-	push(Loadable.Failure({ error }));
+	render(<Count field={field} />, { onUncaughtError });
 	await vi.waitFor(() =>
 		expect(onUncaughtError).toHaveBeenCalledWith(error, expect.anything()),
 	);
@@ -105,20 +88,16 @@ test("throws a failure to the error boundary", async () => {
 
 test("loads again after a failed first load", async () => {
 	const { push, field } = fieldStub();
+	field.get.mockRejectedValue(error);
 	const onUncaughtError = vi.fn();
 	const { container, root } = render(<Count field={field} />, {
 		onUncaughtError,
 	});
-	const error = FieldPermissionDenied.make({
-		namespace: ["root"],
-		name: "count",
-	});
-	push(Loadable.Failure({ error }));
 	await vi.waitFor(() =>
 		expect(onUncaughtError).toHaveBeenCalledWith(error, expect.anything()),
 	);
 
-	push(ready(1));
+	push(1);
 	root.render(
 		<LoadingBoundary>
 			<Count field={field} />
@@ -131,13 +110,12 @@ test("switches to another field", async () => {
 	const first = fieldStub();
 	const second = fieldStub();
 	const onRender = vi.fn<(value: number) => void>();
-	const Value = ({ field }: { field: DerivedHandle<number> }) => {
+	const Value = ({ field }: { field: ReplicantField<number> }) => {
 		const value = useField(field);
 		onRender(value);
 		return <p>{value}</p>;
 	};
-	onTestFinished(first.field[fieldSignalKey].subscribe(() => {}));
-	first.push(ready(1));
+	first.push(1);
 	const { container, root } = render(<Value field={first.field} />);
 	await vi.waitFor(() => expect(container.textContent).toBe("1"));
 
@@ -148,10 +126,10 @@ test("switches to another field", async () => {
 		</LoadingBoundary>,
 	);
 	await vi.waitFor(() => expect(container.textContent).toContain("loading"));
-	second.push(ready(2));
+	second.push(2);
 	await vi.waitFor(() => expect(container.textContent).toBe("2"));
 
-	second.push(ready(3));
+	second.push(3);
 	await vi.waitFor(() => expect(container.textContent).toBe("3"));
 	expect(onRender).not.toHaveBeenCalledWith(1);
 });
@@ -159,8 +137,7 @@ test("switches to another field", async () => {
 test("keeps the old value while switching in a transition", async () => {
 	const first = fieldStub();
 	const second = fieldStub();
-	onTestFinished(first.field[fieldSignalKey].subscribe(() => {}));
-	first.push(ready(1));
+	first.push(1);
 	const { container, root } = render(<Count field={first.field} />);
 	await vi.waitFor(() => expect(container.textContent).toBe("1"));
 
@@ -171,27 +148,10 @@ test("keeps the old value while switching in a transition", async () => {
 			</LoadingBoundary>,
 		);
 	});
-	await vi.waitFor(() => expect(second.isWatched()).toBe(true));
+	await vi.waitFor(() => expect(second.field.get).toHaveBeenCalled());
 	expect(container.textContent).toBe("1");
-	second.push(ready(2));
+	second.push(2);
 	await vi.waitFor(() => expect(container.textContent).toBe("2"));
-});
-
-test("keeps the value while a derive starts reading a cold field", async () => {
-	const choice = fieldStub();
-	const other = fieldStub();
-	const picked = derive((get) =>
-		get(choice.field) === 0 ? 0 : get(other.field),
-	);
-	choice.push(ready(0));
-	const { container } = render(<Count field={picked} />);
-	await vi.waitFor(() => expect(container.textContent).toBe("0"));
-
-	choice.push(ready(1));
-	await vi.waitFor(() => expect(other.isWatched()).toBe(true));
-	expect(container.textContent).toBe("0");
-	other.push(ready(5));
-	await vi.waitFor(() => expect(container.textContent).toBe("5"));
 });
 
 test("loads again after a remount", async () => {
@@ -203,10 +163,11 @@ test("loads again after a remount", async () => {
 		return <p>{value}</p>;
 	};
 	const first = render(<Value />);
-	push(ready(1));
+	push(1);
 	await vi.waitFor(() => expect(first.container.textContent).toBe("1"));
+	await vi.waitFor(() => expect(field.subscribe).toHaveBeenCalled());
 	first.root.unmount();
-	push(ready(2));
+	push(2);
 
 	onRender.mockClear();
 	const second = render(<Value />);

@@ -10,7 +10,6 @@ import type {
 } from "@nodecg/core";
 import {
 	customRoutePath,
-	fieldSignalKey,
 	formatField,
 	type NamespacePath,
 	type Updater,
@@ -48,7 +47,7 @@ import { FetchHttpClient, Url } from "effect/http";
 import type { Promisable } from "type-fest";
 
 import { adaptAuthClient, makeAuthClient } from "./auth-client.ts";
-import { type FieldSource } from "./derive.ts";
+import { type FieldSource, fieldSource } from "./derive.ts";
 import {
 	type ComputedCell,
 	FieldCellsService,
@@ -215,7 +214,7 @@ const implementReplicant = Effect.fn("implementReplicant")(function* <Decoded>(
 
 	const subscribe = () => subscribeCell(cell, { skipInitial: false });
 
-	return { get, set, update, subscribe, [fieldSignalKey]: cell.signal };
+	return { get, set, update, subscribe, [fieldSource]: cell.signal };
 });
 
 interface EffectToPromiseLambda extends HKT.TypeLambda {
@@ -266,7 +265,7 @@ type ReplicantFieldEffect<Decoded> = Effect.Success<
 	ReturnType<typeof implementReplicant<Decoded>>
 >;
 export type ReplicantField<Decoded> = ApplyLambdaToObject<
-	Omit<ReplicantFieldEffect<Decoded>, typeof fieldSignalKey>,
+	Omit<ReplicantFieldEffect<Decoded>, typeof fieldSource>,
 	{
 		get: EffectToPromiseLambda;
 		set: EffectToPromiseLambda;
@@ -301,14 +300,14 @@ const implementComputed = Effect.fn("implementComputed")(function* <Decoded>(
 
 	const subscribe = () => subscribeCell(cell, { skipInitial: false });
 
-	return { get, subscribe, [fieldSignalKey]: cell.signal };
+	return { get, subscribe, [fieldSource]: cell.signal };
 });
 
 type ComputedFieldEffect<Decoded> = Effect.Success<
 	ReturnType<typeof implementComputed<Decoded>>
 >;
 export type ComputedField<Decoded> = ApplyLambdaToObject<
-	Omit<ComputedFieldEffect<Decoded>, typeof fieldSignalKey>,
+	Omit<ComputedFieldEffect<Decoded>, typeof fieldSource>,
 	{
 		get: EffectToPromiseLambda;
 		subscribe: StreamToSubscribeLambda;
@@ -731,7 +730,7 @@ const adaptNamespace = <
 				([oldValue, value]) => callback(value, Option.getOrUndefined(oldValue)),
 				onError,
 			),
-		[fieldSignalKey]: field[fieldSignalKey],
+		[fieldSource]: field[fieldSource],
 	}))(fields.replicant);
 
 	const computed = mapValues<
@@ -747,7 +746,7 @@ const adaptNamespace = <
 				([oldValue, value]) => callback(value, Option.getOrUndefined(oldValue)),
 				onError,
 			),
-		[fieldSignalKey]: field[fieldSignalKey],
+		[fieldSource]: field[fieldSource],
 	}))(fields.computed);
 
 	const topic = mapValues<TopicFieldEffectLambda, TopicFieldPromiseLambda>(

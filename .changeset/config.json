@@ -4,5 +4,6 @@
 	"linked": [
 		["@nodecg/core", "@nodecg/server", "@nodecg/client", "@nodecg/browser"]
 	],
-	"baseBranch": "next"
+	"baseBranch": "next",
+	"bumpVersionsWithWorkspaceProtocolOnly": true
 }

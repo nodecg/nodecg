@@ -26,7 +26,6 @@ export {
 	sessionCookieSecurity,
 } from "./auth.ts";
 export { baseUrlCookieName } from "./base-url.ts";
-export { fieldSignalKey } from "./field-signal-key.ts";
 export {
 	ClientMessage,
 	FieldValueMessage,

@@ -489,12 +489,6 @@ importers:
       '@nodecg/client':
         specifier: workspace:*
         version: link:../client
-      '@nodecg/internal':
-        specifier: workspace:*
-        version: link:../internal
-      '@preact/signals-core':
-        specifier: 'catalog:'
-        version: 1.14.4
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.17
@@ -510,6 +504,9 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.3)(@vitest/browser-playwright@5.0.0)(@vitest/ui@5.0.0)(vite@8.2.2(@types/node@24.13.3)(jiti@2.7.0)(yaml@2.9.0))
+      vitest-mock-extended:
+        specifier: ^6.0.1
+        version: 6.0.1(typescript@7.0.2)(vitest@5.0.0)
 
   packages/server:
     dependencies:
@@ -2315,6 +2312,14 @@ packages:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
     hasBin: true
 
+  ts-essentials@10.2.1:
+    resolution: {integrity: sha512-+Id1fRkuir+CsgK2x04/icS2b4V1hQmq7ObzIrDjhN0ozfRYivnP7aaKMVJfLApQm0trjR39A6NIMVchiB9Erw==}
+    peerDependencies:
+      typescript: '>=4.5.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   tsdown@0.23.1:
     resolution: {integrity: sha512-MSC2WSOts3in95J334/VIS7KPfor3eCSvndJ6KdoVj9Aak9Kh1aNfz9ws5owhdukuTNSXRdfkPEzA/ihpDD6SA==}
     engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
@@ -2429,6 +2434,12 @@ packages:
         optional: true
       yaml:
         optional: true
+
+  vitest-mock-extended@6.0.1:
+    resolution: {integrity: sha512-tsyqBqOascdCkcWTA7YvDKRmk4KPhvpY0FyfbO+bCSPrbRwfsHbw7O4VcpL9kODlrW2o4qahNNjEchoW4FrwRw==}
+    peerDependencies:
+      typescript: 3.x || 4.x || 5.x || 6.x || 7.x
+      vitest: '>=4.0.0'
 
   vitest@5.0.0:
     resolution: {integrity: sha512-gpsMNoRhMjMktVxPtstOH4/PJuPyovVaMDr4oDilXaGH1EcqM2OE96SoHT2VIQ6fTGtTjqmHDrEu2X9RQiXf8Q==}
@@ -3834,6 +3845,10 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
+  ts-essentials@10.2.1(typescript@7.0.2):
+    optionalDependencies:
+      typescript: 7.0.2
+
   tsdown@0.23.1(typescript@7.0.2):
     dependencies:
       cac: 7.1.0
@@ -3921,6 +3936,12 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.7.0
       yaml: 2.9.0
+
+  vitest-mock-extended@6.0.1(typescript@7.0.2)(vitest@5.0.0):
+    dependencies:
+      ts-essentials: 10.2.1(typescript@7.0.2)
+      typescript: 7.0.2
+      vitest: 5.0.0(@types/node@24.13.3)(@vitest/browser-playwright@5.0.0)(@vitest/ui@5.0.0)(vite@8.2.2(@types/node@24.13.3)(jiti@2.7.0)(yaml@2.9.0))
 
   vitest@5.0.0(@types/node@24.13.3)(@vitest/browser-playwright@5.0.0)(@vitest/ui@5.0.0)(vite@8.2.2(@types/node@24.13.3)(jiti@2.7.0)(yaml@2.9.0)):
     dependencies:
